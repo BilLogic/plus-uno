@@ -1,0 +1,57 @@
+/**
+ * PLUS Design System Main Stylesheet
+ * 
+ * This is the main entry point for PLUS design system styles.
+ * Import all design tokens and component styles here.
+ */
+
+// Design Tokens
+@use "tokens/colors" as *;
+@use "tokens/primitives" as *;
+@use "tokens/spacing_semantics" as *;
+@use "tokens/layout" as *;
+@use "tokens/fonts" as *;
+@use "tokens/plus_spacing" as *;
+@use "tokens/mixins" as *;
+
+// Components
+@use "components/plus_buttons" as *;
+@use "components/inputs" as *;
+@use "components/alerts" as *;
+@use "components/breadcrumb" as *;
+@use "components/badges" as *;
+@use "components/dividers" as *;
+@use "components/button-groups" as *;
+
+// Base Styles
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-150);
+    color: var(--color-on-surface);
+    background-color: var(--color-surface);
+}
+
+// Utility Classes
+.shadow-light-2 {
+    box-shadow: var(--elevation-light-2);
+}
+
+.border-none {
+    border: none !important;
+}
+
+.border-outline {
+    border: 1px solid var(--color-outline);
+}
+
+.border-outline-variant {
+    border: 1px solid var(--color-outline-variant);
+}
+
+.border-radius-sm {
+    border-radius: 2px;
+}
+

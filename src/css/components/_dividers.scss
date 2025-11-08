@@ -1,0 +1,48 @@
+/**
+ * Divider Component Styles
+ * Matches Figma design system specifications
+ */
+
+.plus-divider {
+    display: block;
+    width: 100%;
+    position: relative;
+}
+
+.plus-divider-line {
+    position: absolute;
+    inset: 0;
+    border-radius: 1px;
+}
+
+/* Divider Sizes */
+.plus-divider.size-1px {
+    height: 1px;
+}
+
+.plus-divider.size-2px {
+    height: 2px;
+}
+
+.plus-divider.size-3px {
+    height: 3px;
+}
+
+.plus-divider.size-4px {
+    height: 4px;
+}
+
+/* Divider Styles */
+.plus-divider.light .plus-divider-line {
+    background-color: var(--color-neutral-outline-variant);
+}
+
+.plus-divider.dark .plus-divider-line {
+    background-color: var(--color-neutral-outline);
+}
+
+/* Divider with opacity (for use in collapse/accordion) */
+.plus-divider.opacity-10 {
+    opacity: 0.1;
+}
+
