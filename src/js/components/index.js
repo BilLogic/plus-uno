@@ -30,6 +30,7 @@ export class PlusInterface {
     static createBadge = UniversalComponents.createBadge;
     static createChip = UniversalComponents.createChip;
     static createDivider = UniversalComponents.createDivider;
+    static createDropdown = UniversalComponents.createDropdown;
     
     // Legacy constants
     static BUTTON_FILL = UniversalComponents.BUTTON_CONSTANTS.FILL;
