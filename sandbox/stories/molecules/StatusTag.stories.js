@@ -73,7 +73,7 @@ export const AllStatuses = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-section-gap-md)';
     container.style.alignItems = 'center';
     
     const statuses = ['assigned', 'started', 'not started', 'complete'];

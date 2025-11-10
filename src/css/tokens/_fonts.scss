@@ -48,33 +48,35 @@
 
     /*Headline*/
         /*Shared*/
+        /* Note: Figma uses SF Pro Display for h1/h2, but codebase uses Lato for consistency */
         --font-family-headline: var(--font-family-header);
+        /* Note: Figma specifies Semibold (600) for h1/h2, but codebase uses Bold (700) for headlines */
         --font-weight-headline: var(--font-weight-bold);
 
-        /*h1*/
-        --font-size-h1: 2.5rem;
-        --font-line-height-h1: var(--font-line-height-160);
+        /*h1 - Figma: Heading/h1 - 32px, SF Pro Display, Semibold (600), lineHeight 48*/
+        --font-size-h1: 2rem; /* 32px */
+        --font-line-height-h1: 1.5; /* 48px / 32px = 1.5 */
 
-        /*h2*/
-        --font-size-h2: 2rem;
-        --font-line-height-h2: var(--font-line-height-150);
+        /*h2 - Figma: Heading/h2 - 24px, SF Pro Display, Semibold (600), lineHeight 36*/
+        --font-size-h2: 1.5rem; /* 24px */
+        --font-line-height-h2: 1.5; /* 36px / 24px = 1.5 */
 
-        /*h3*/
-        --font-size-h3: 1.75rem;
-        --font-line-height-h3: 142.9%;
+        /*h3 - Figma: Headline/H3 - Lato Bold (700), 28px, lineHeight 1.429*/
+        --font-size-h3: 1.75rem; /* 28px - matches Figma */
+        --font-line-height-h3: 142.9%; /* 1.429 - matches Figma */
 
     /*Title*/
         /*Shared*/
         --font-family-title: var(--font-family-header);
         --font-weight-title: var(--font-weight-semibold-2);
 
-        /*h4*/
-        --font-size-h4: 1.5rem;
-        --font-line-height-h4: 133.3%;
+        /*h4 - Figma: Heading/h4 - 16px, SF Pro Text, Semibold (600), lineHeight 24*/
+        --font-size-h4: 1rem; /* 16px */
+        --font-line-height-h4: 1.5; /* 24px / 16px = 1.5 */
 
-        /*h5*/
-        --font-size-h5: var(--font-size-125);
-        --font-line-height-h5: var(--font-line-height-140);
+        /*h5 - Figma: Title/H5 - Lato SemiBold (600), 20px, lineHeight 1.4*/
+        --font-size-h5: var(--font-size-125); /* 1.25rem = 20px - matches Figma */
+        --font-line-height-h5: var(--font-line-height-140); /* 140% = 1.4 - matches Figma */
 
         /*h6*/
         --font-size-h6: 1rem;
@@ -85,13 +87,13 @@
         --font-size-body1: 1rem;
         --font-line-height-body1: var(--font-line-height-150);
 
-        /*b1*/
-        --font-size-body2: 0.875rem;
-        --font-line-height-body2: 157.1%;
+        /*b2 - Figma: Body/B2/Regular - Merriweather Sans Light (300), 14px, lineHeight 1.571*/
+        --font-size-body2: 0.875rem; /* 14px - matches Figma */
+        --font-line-height-body2: 157.1%; /* 1.571 - matches Figma */
 
-        /*b3*/
-        --font-size-body3: 0.75rem;
-        --font-line-height-body3: 166.7%;
+        /*b3 - Figma: Body/B3/Semibold - Merriweather Sans Regular (400), 12px, lineHeight 1.667*/
+        --font-size-body3: 0.75rem; /* 12px - matches Figma */
+        --font-line-height-body3: 166.7%; /* 1.667 - matches Figma */
 
         /*lead*/
         --font-size-lead: var(--font-size-125);
@@ -104,6 +106,21 @@
         --font-weight-blockquote: var(--font-weight-semibold-1);
 
     /*Fontawesome (icons)*/
+        /* Figma: Fontawesome/Solid/B1 - 14px, lineHeight 1.714 */
+        /*body 1*/
+        --font-size-fa-body1: var(--font-size-body2); /* 14px - matches Figma */
+        --font-line-height-fa-body1: 171.4%; /* 1.714 - matches Figma */
+
+        /* Figma: Fontawesome/Solid/B2 - 12px, lineHeight 1.833 */
+        /*body 2*/
+        --font-size-fa-body2: var(--font-size-body3); /* 12px - matches Figma */
+        --font-line-height-fa-body2: 183.3%; /* 1.833 - matches Figma */
+
+        /* Figma: Fontawesome/Solid/B3 - 10px, lineHeight 2.0 */
+        /*body 3*/
+        --font-size-fa-body3: 0.625rem; /* 10px - matches Figma */
+        --font-line-height-fa-body3: 200%; /* 2.0 - matches Figma */
+
         /*h1*/
         --font-size-fa-h1: 2.25rem;
         --font-line-height-fa-h1: 177.8%;
@@ -127,18 +144,6 @@
         /*h6*/
         --font-size-fa-h6: var(--font-size-body2);
         --font-line-height-fa-h6: 171.4%;
-
-        /*body 1*/
-        --font-size-fa-body1: var(--font-size-body2);
-        --font-line-height-fa-body1: 171.4%;
-
-        /*body 2*/
-        --font-size-fa-body2: var(--font-size-body3);
-        --font-line-height-fa-body2: 183.3%;
-
-        /*body 3*/
-        --font-size-fa-body3: 0.625rem;
-        --font-line-height-fa-body3: 200%;
 }
 
 %default-font-color {

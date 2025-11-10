@@ -16,17 +16,17 @@ export default {
     btnStyle: {
       control: 'select',
       options: ['primary', 'secondary', 'tertiary', 'success', 'info', 'warning', 'error', 'default'],
-      description: 'Button style',
+      description: 'Button style (uses color tokens: --color-primary, --color-secondary, etc.)',
     },
     btnFill: {
       control: 'select',
       options: ['filled', 'outline', 'tonal', 'text'],
-      description: 'Button fill',
+      description: 'Button fill variant (uses color and state layer tokens)',
     },
     btnSize: {
       control: 'select',
       options: ['small', 'default', 'large'],
-      description: 'Button size',
+      description: 'Button size (uses element padding tokens: --size-element-pad-x-sm/md/lg, --size-element-pad-y-sm/md/lg)',
     },
     icon: {
       control: 'text',

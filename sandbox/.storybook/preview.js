@@ -1,6 +1,9 @@
 /**
  * Storybook preview configuration for PLUS Design System
  * Dependencies (Bootstrap, jQuery, Font Awesome, PLUS CSS) are loaded via preview-head.html
+ * 
+ * Note: CSS is loaded via preview-head.html to avoid Vite module resolution issues
+ * The CSS file at /dist/css/main.css contains all color tokens and component styles
  */
 
 /** @type { import('@storybook/html').Preview } */

@@ -24,7 +24,7 @@ export default {
         'body2-txt',
         'body3-txt',
       ],
-      description: 'Text size class',
+      description: 'Text size class (uses typography tokens: --font-size-display1/2/3/4, --font-size-h1-h6, --font-size-body1/2/3)',
     },
     textColor: {
       control: 'select',
@@ -38,7 +38,7 @@ export default {
         'color-warning',
         'color-error',
       ],
-      description: 'Text color class',
+      description: 'Text color class (uses color tokens: --color-primary, --color-secondary, etc.)',
     },
     text: {
       control: 'text',
@@ -245,11 +245,16 @@ export const Body3 = {
  * Color Variations
  */
 export const ColorVariations = {
-  render: () => {
+  args: {
+    textColor: "color-warning",
+    textSize: "display4-txt",
+    text: "asdfadssd\n\n"
+  },
+  render:() => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const colors = [
       { class: '', label: 'Default' },
@@ -270,6 +275,6 @@ export const ColorVariations = {
     });
     
     return container;
-  },
+  }
 };
 

@@ -16,12 +16,12 @@ export default {
     size: {
       control: 'select',
       options: ['small', 'default', 'large'],
-      description: 'Dropdown size',
+      description: 'Dropdown size (uses element padding tokens: --size-element-pad-x-sm/md/lg, --size-element-pad-y-sm/md/lg)',
     },
     style: {
       control: 'select',
       options: ['default', 'primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-      description: 'Dropdown style (color)',
+      description: 'Dropdown style (uses color tokens: --color-primary, --color-secondary, etc.)',
     },
     split: {
       control: 'boolean',
@@ -69,7 +69,7 @@ export const Styles = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     container.style.alignItems = 'flex-start';
     
     const styles = ['default', 'primary', 'secondary', 'success', 'danger', 'warning', 'info'];
@@ -104,7 +104,7 @@ export const Sizes = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     container.style.alignItems = 'flex-start';
     
     const sizes = ['small', 'default', 'large'];
@@ -267,7 +267,7 @@ export const States = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     container.style.alignItems = 'flex-start';
     
     const states = [
@@ -280,7 +280,7 @@ export const States = {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const label = document.createElement('p');
       label.textContent = state.label;

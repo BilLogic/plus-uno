@@ -23,6 +23,7 @@ const config = {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '../..');
     const srcPath = path.resolve(rootDir, 'src');
+    const distPath = path.resolve(rootDir, 'dist');
     
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
@@ -40,6 +41,10 @@ const config = {
     
     // Configure Vite to resolve modules from project root
     config.resolve.preserveSymlinks = false;
+    
+    // Ensure CSS is processed and available
+    config.css = config.css || {};
+    config.css.postcss = config.css.postcss || {};
     
     return config;
   },

@@ -19,7 +19,7 @@ export default {
     iconSize: {
       control: 'select',
       options: ['body1-txt', 'body2-txt', 'body3-txt'],
-      description: 'Icon size class',
+      description: 'Icon size class (uses typography tokens: --font-size-body1/2/3)',
     },
     iconColor: {
       control: 'select',
@@ -32,7 +32,7 @@ export default {
         'color-warning',
         'color-error',
       ],
-      description: 'Icon color class',
+      description: 'Icon color class (uses color tokens: --color-primary, --color-secondary, etc.)',
     },
   },
 };
@@ -63,7 +63,7 @@ export const Sizes = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.alignItems = 'center';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-section-gap-md)';
     
     const sizes = [
       { class: 'body1-txt', label: 'Body 1' },
@@ -76,7 +76,7 @@ export const Sizes = {
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
       wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const icon = document.createElement('i');
       icon.className = `fas fa-star ${size.class}`;
@@ -102,7 +102,7 @@ export const Styles = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.alignItems = 'center';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-section-gap-md)';
     
     const styles = [
       { class: 'fas', label: 'Solid' },
@@ -114,7 +114,7 @@ export const Styles = {
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
       wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const icon = document.createElement('i');
       icon.className = `${style.class} fa-star body2-txt`;
@@ -140,7 +140,7 @@ export const Colors = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-section-gap-md)';
     
     const colors = [
       { class: '', label: 'Default' },
@@ -157,7 +157,7 @@ export const Colors = {
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
       wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const icon = document.createElement('i');
       icon.className = `fas fa-star body2-txt ${color.class}`;
@@ -183,7 +183,7 @@ export const CommonIcons = {
     const container = document.createElement('div');
     container.style.display = 'grid';
     container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(100px, 1fr))';
-    container.style.gap = '1.5rem';
+    container.style.gap = 'var(--size-section-gap-md)';
     
     const icons = [
       'check', 'times', 'plus', 'minus', 'edit', 'trash', 'save', 'cancel',
@@ -197,7 +197,7 @@ export const CommonIcons = {
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
       wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const icon = document.createElement('i');
       icon.className = `fas fa-${iconName} body2-txt`;
@@ -207,7 +207,7 @@ export const CommonIcons = {
       label.className = 'body3-txt';
       label.textContent = iconName;
       label.style.textAlign = 'center';
-      label.style.fontSize = '0.75rem';
+      label.style.fontSize = 'var(--font-size-body3)';
       wrapper.appendChild(label);
       
       container.appendChild(wrapper);
@@ -225,7 +225,7 @@ export const StatusIndicators = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-section-gap-md)';
     
     const statuses = [
       { icon: 'fa-check-circle', color: 'color-success', label: 'Complete' },
@@ -239,7 +239,7 @@ export const StatusIndicators = {
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
       wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const icon = document.createElement('i');
       icon.className = `${status.icon} body2-txt ${status.color}`;

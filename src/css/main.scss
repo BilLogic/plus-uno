@@ -36,6 +36,74 @@ body {
 }
 
 // Utility Classes
+
+// Color Utility Classes
+.color-primary {
+    color: var(--color-primary) !important;
+}
+
+.color-secondary {
+    color: var(--color-secondary) !important;
+}
+
+.color-tertiary {
+    color: var(--color-tertiary) !important;
+}
+
+.color-success {
+    color: var(--color-success) !important;
+}
+
+.color-danger {
+    color: var(--color-danger) !important;
+}
+
+.color-warning {
+    color: var(--color-warning) !important;
+}
+
+.color-info {
+    color: var(--color-info) !important;
+}
+
+.color-neutral {
+    color: var(--color-on-surface) !important;
+}
+
+.color-error {
+    color: var(--color-danger) !important;
+}
+
+// Background Color Utility Classes
+.bg-color-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-color-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-color-tertiary {
+    background-color: var(--color-tertiary) !important;
+}
+
+.bg-color-success {
+    background-color: var(--color-success) !important;
+}
+
+.bg-color-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.bg-color-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-color-info {
+    background-color: var(--color-info) !important;
+}
+
+// Other Utility Classes
 .shadow-light-2 {
     box-shadow: var(--elevation-light-2);
 }

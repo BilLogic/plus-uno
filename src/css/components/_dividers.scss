@@ -34,11 +34,11 @@
 
 /* Divider Styles */
 .plus-divider.light .plus-divider-line {
-    background-color: var(--color-neutral-outline-variant);
+    background-color: var(--color-outline-variant);
 }
 
 .plus-divider.dark .plus-divider-line {
-    background-color: var(--color-neutral-outline);
+    background-color: var(--color-outline);
 }
 
 /* Divider with opacity (for use in collapse/accordion) */
