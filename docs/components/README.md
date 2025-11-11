@@ -14,8 +14,8 @@ Complete component library documentation including:
 ## Component Code Location
 
 Component implementation code is located in:
-- **JavaScript Components**: `src/js/components/`
-- **CSS Components**: `src/css/components/`
+- **JavaScript Components**: `design-system/components/local/`
+- **CSS Components**: `design-system/styles/`
 
 ## Using Components
 

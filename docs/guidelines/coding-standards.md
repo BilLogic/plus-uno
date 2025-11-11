@@ -55,11 +55,11 @@ When designing a specific type of UI, reference the appropriate guideline:
 ## File Structure
 
 ### Organization
-- Components: `src/js/components/`
+- Components: `design-system/components/local/`
 - Utilities: `src/js/utils/`
 - Styles: `src/css/`
-- Tokens: `src/css/tokens/`
-- Component styles: `src/css/components/`
+- Tokens: `design-system/tokens/`
+- Component styles: `design-system/styles/`
 - Examples: `examples/`
 
 ### Naming Conventions

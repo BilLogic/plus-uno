@@ -554,20 +554,20 @@ function generateLayoutSCSS() {
 console.log('Generating token SCSS files...');
 
 const colorsSCSS = generateColorsSCSS();
-fs.writeFileSync('src/css/tokens/_colors.scss', colorsSCSS);
-console.log('✅ Generated src/css/tokens/_colors.scss');
+fs.writeFileSync('design-system/tokens/_colors.scss', colorsSCSS);
+console.log('✅ Generated design-system/tokens/_colors.scss');
 
 const primitivesSCSS = generatePrimitivesSCSS();
-fs.writeFileSync('src/css/tokens/_primitives.scss', primitivesSCSS);
-console.log('✅ Generated src/css/tokens/_primitives.scss');
+fs.writeFileSync('design-system/tokens/_primitives.scss', primitivesSCSS);
+console.log('✅ Generated design-system/tokens/_primitives.scss');
 
 const semanticsSCSS = generateSemanticsSCSS();
-fs.writeFileSync('src/css/tokens/_spacing_semantics.scss', semanticsSCSS);
-console.log('✅ Generated src/css/tokens/_spacing_semantics.scss');
+fs.writeFileSync('design-system/tokens/_spacing_semantics.scss', semanticsSCSS);
+console.log('✅ Generated design-system/tokens/_spacing_semantics.scss');
 
 const layoutSCSS = generateLayoutSCSS();
-fs.writeFileSync('src/css/tokens/_layout.scss', layoutSCSS);
-console.log('✅ Generated src/css/tokens/_layout.scss');
+fs.writeFileSync('design-system/tokens/_layout.scss', layoutSCSS);
+console.log('✅ Generated design-system/tokens/_layout.scss');
 
 console.log('\n✅ All token files generated successfully!');
 

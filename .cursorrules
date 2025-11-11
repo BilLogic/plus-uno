@@ -219,21 +219,42 @@ const button = PlusInterface.createButton({
 ## Output Guidelines
 
 ### Code Generation
-- Generate clean, readable code
+- **BEFORE generating code, study existing patterns:**
+  - Review similar components in `design-system/components/local/universal/elements/`
+  - Review similar styles in `design-system/styles/`
+  - Reference production repository for design component patterns: `https://github.com/CMU-PLUS/web-app`
+    - Styles: `java/sass/*` (e.g., `java/sass/_colors.scss`)
+    - Components: `java/docroot/javascript/pl2/plus_components/*`
+  - Match the exact structure, naming, and patterns used in existing code
+- Generate clean, readable code that matches existing patterns
 - Include all necessary imports
 - Use proper error handling
-- Follow the patterns in existing code
-- Include JSDoc comments
+- Include JSDoc comments (match format: `@fileoverview`, `@param {Object} options`, `@returns {HTMLElement}`)
 - Use design tokens consistently
 - Ensure code is production-ready
 - **Always reference guideline files** when in doubt
 
 ### Code Organization
+- **Match existing code structure patterns:**
+  - **JavaScript components**: Study `design-system/components/local/universal/elements/*.js` for patterns
+    - Use named exports: `export function createComponentName()`
+    - Use options object pattern: `{param1, param2, param3 = defaultValue}`
+    - Import constants from `constants.js` when available
+    - Use `document.createElement()` for DOM elements
+    - Return HTMLElement (not HTML string)
+  - **CSS/SCSS styles**: Study `design-system/styles/*.scss` for patterns
+    - Use class prefixes matching existing: `.plus-*` for components, `.pbtn-*` for buttons
+    - Use `color-mix(in srgb, ...)` for state layers (hover, active, focus)
+    - Use `calc()` when adjusting for borders: `calc(var(--size-*) - 1px)`
+    - Include comments explaining Figma references: `/* Figma: ... */`
+    - Use `:not(:disabled):not(.disabled)` pattern for interactive states
+  - **Production repository patterns**: Reference `https://github.com/CMU-PLUS/web-app` for design component implementations
 - Group related code together
-- Use meaningful variable names
+- Use meaningful variable names matching existing patterns
 - Keep functions focused and small
 - Use comments to explain complex logic
 - Follow the established file structure
+- **When in doubt, find the most similar existing file and match its structure**
 
 ## Testing Considerations
 

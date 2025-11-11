@@ -400,5 +400,5 @@ Use for: table cells and spacing
 
 - **Terminology Guide**: `guidelines/terminology.md` - Component type definitions
 - **Coding Standards**: `guidelines/coding-standards.md` - Project rules and standards
-- **Design Tokens Source**: `src/css/tokens/` - SCSS token files
+- **Design Tokens Source**: `design-system/tokens/` - SCSS token files
 
