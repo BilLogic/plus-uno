@@ -44,8 +44,8 @@ This repository contains:
 
 ### Core Guidelines (Always Reference)
 ```
-guidelines/                    # Core guidelines and reference documents
-├── coding-standards.md       # Project rules and coding standards
+docs/guidelines/              # Core guidelines and reference documents
+├── coding-standards.md      # Project rules and coding standards
 ├── token-reference.md        # Complete token reference
 ├── terminology.md            # UI component types and terminology
 └── README.md                 # Guidelines overview
@@ -53,36 +53,40 @@ guidelines/                    # Core guidelines and reference documents
 
 ### Documentation
 ```
-components/                    # Component documentation
-├── docs/
-│   └── COMPONENTS.md         # Component library documentation
-└── README.md
-
-tokens/                        # Token system documentation
-└── docs/
-    └── README.md
-
-docs/                          # Additional documentation
+docs/                          # All documentation consolidated
+├── guidelines/               # Core guidelines
+├── components/               # Component documentation
+│   └── COMPONENTS.md        # Component library documentation
+├── tokens/                   # Token system documentation
+│   └── README.md
 ├── DESIGN_PATTERNS.md
 ├── DEV_STANDARDS.md
 └── FIGMA_DESIGN_SYSTEM.md
 ```
 
-### Source Code
+### Design System Source
 ```
-src/                           # Source files
+design-system/                # Design system source files
+├── tokens/                   # Token SCSS files
+│   ├── _colors.scss         # Material Design 3 colors
+│   ├── _primitives.scss     # Primitive tokens
+│   ├── _spacing_semantics.scss # Semantic spacing
+│   └── ...
+├── components/
+│   ├── local/               # Component implementations
+│   └── atoms-molecules/     # Storybook stories
+└── styles/                  # Component styles
+```
+
+### Application Source
+```
+src/                          # Application source files
 ├── css/
-│   ├── tokens/               # Token SCSS files
-│   │   ├── _colors.scss      # Material Design 3 colors
-│   │   ├── _primitives.scss  # Primitive tokens
-│   │   ├── _spacing_semantics.scss # Semantic spacing
-│   │   └── ...
-│   ├── components/           # Component styles
-│   └── main.scss             # Main stylesheet
+│   └── main.scss           # Main stylesheet (references design-system)
 └── js/
-    ├── components/           # Component implementations
-    ├── utils/                # Utility functions
-    └── main.js               # Main JavaScript
+    ├── components/          # (references design-system)
+    ├── utils/               # Utility functions
+    └── main.js             # Main JavaScript (references design-system)
 ```
 
 ### Configuration
@@ -115,7 +119,7 @@ See `PROJECT_STRUCTURE.md` for complete structure documentation.
 
 ### Design Tokens
 
-Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `guidelines/token-reference.md` for all available tokens.
+Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `docs/guidelines/token-reference.md` for all available tokens.
 
 ```css
 /* ✅ Good - Using semantic tokens */
