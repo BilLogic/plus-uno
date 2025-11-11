@@ -8,13 +8,6 @@ import { PlusSmartComponents } from '@/js/components/index.js';
 export default {
   title: 'Atoms/StatusIndicator',
   tags: ['autodocs'],
-  argTypes: {
-    status: {
-      control: 'select',
-      options: ['assigned', 'started', 'not started', 'complete'],
-      description: 'Status type',
-    },
-  },
 };
 
 /**
@@ -61,7 +54,7 @@ export const AllStatuses = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-card-gap-lg)';
     container.style.alignItems = 'center';
     
     const statuses = ['assigned', 'started', 'not started', 'complete'];
@@ -71,7 +64,7 @@ export const AllStatuses = {
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
       wrapper.style.alignItems = 'center';
-      wrapper.style.gap = '0.5rem';
+      wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const indicator = PlusSmartComponents.createStatusIcon(status);
       wrapper.appendChild(indicator);
@@ -96,7 +89,7 @@ export const Interactive = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     container.style.alignItems = 'center';
     
     const indicator = PlusSmartComponents.createStatusIcon(args.status);
@@ -108,6 +101,13 @@ export const Interactive = {
     container.appendChild(label);
     
     return container;
+  },
+  argTypes: {
+    status: {
+      control: 'select',
+      options: ['assigned', 'started', 'not started', 'complete'],
+      description: 'Status type',
+    },
   },
   args: {
     status: 'complete',

@@ -8,6 +8,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    /* Figma: --element/radius-sm (4px) → Border/Radius/radius-100 */
     border-radius: var(--size-element-radius-sm);
     white-space: nowrap;
 }

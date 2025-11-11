@@ -159,21 +159,24 @@
     }
     
     /* Default toggle */
+    /* Figma: Border/Stroke/stroke-150 (1.5px) → --size-element-stroke-md */
+    /* Figma: Body/B2/Semibold (Merriweather Sans Regular, 14px, weight 400) */
     .pdropdown-default-toggle {
         border-radius: var(--size-element-radius-sm);
         width: 100%;
         justify-content: space-between;
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-sm);
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-    color: var(--color-on-surface);
-    background-color: var(--color-surface);
-    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
-    font-weight: var(--font-weight-normal);
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm);
+        /* Figma shows: left padding 8px (pad-x-sm), right padding appears larger due to gap + icon */
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-sm) var(--size-element-pad-y-md) var(--size-element-pad-x-sm);
+        color: var(--color-on-surface);
+        background-color: var(--color-surface);
+        border: var(--size-element-stroke-md) solid var(--color-outline-variant); /* Figma: Border/Stroke/stroke-150 (1.5px) */
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2); /* 14px */
+        line-height: var(--font-line-height-body2); /* 1.571 */
+        font-weight: var(--font-weight-semibold-1); /* 400 - Figma: Body/B2/Semibold */
     }
     
     .pdropdown-default-toggle:focus {
@@ -187,13 +190,15 @@
     }
     
     .pdropdown-default-toggle i {
-        color: var(--color-on-surface-variant);
+        color: inherit; /* Icons inherit button text color to match style variants */
     }
     
     .pdropdown-default-toggle::after {
         content: "\f0d7";
-        font: var(--fa-font-solid);
-        color: var(--color-on-surface-variant);
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-style: normal;
+        color: inherit; /* Inherit button text color to match style variants */
         font-size: var(--font-size-fa-body2);
         line-height: var(--font-line-height-fa-body2);
         display: inline-block;
@@ -240,8 +245,12 @@
 
 /* Primary */
 .pdropdown.pdropdown-primary .pdropdown-default-toggle:not([disabled]) {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    border-color: var(--color-primary); /* Figma: _Primary/Primary for border */
+    color: var(--color-primary-text); /* Figma: _Primary/Primary (Text) for text */
+    
+    &::after {
+        color: var(--color-primary-text); /* Caret matches button text color */
+    }
 }
 
 .pdropdown.pdropdown-primary .pdropdown-default-toggle:not([disabled]):hover {
@@ -255,8 +264,12 @@
 
 /* Secondary */
 .pdropdown.pdropdown-secondary .pdropdown-default-toggle:not([disabled]) {
-    border-color: var(--color-secondary);
-    color: var(--color-secondary);
+    border-color: var(--color-secondary); /* Figma: _Secondary/Secondary for border */
+    color: var(--color-secondary-text); /* Figma: _Secondary/Secondary (Text) for text */
+    
+    &::after {
+        color: var(--color-secondary-text); /* Caret matches button text color */
+    }
 }
 
 .pdropdown.pdropdown-secondary .pdropdown-default-toggle:not([disabled]):hover {
@@ -270,8 +283,12 @@
 
 /* Success */
 .pdropdown.pdropdown-success .pdropdown-default-toggle:not([disabled]) {
-    border-color: var(--color-success);
-    color: var(--color-success);
+    border-color: var(--color-success); /* Figma: _Success/Success for border */
+    color: var(--color-success-text); /* Figma: _Success/Success (Text) for text */
+    
+    &::after {
+        color: var(--color-success-text); /* Caret matches button text color */
+    }
 }
 
 .pdropdown.pdropdown-success .pdropdown-default-toggle:not([disabled]):hover {
@@ -285,8 +302,12 @@
 
 /* Danger */
 .pdropdown.pdropdown-danger .pdropdown-default-toggle:not([disabled]) {
-    border-color: var(--color-danger);
-    color: var(--color-danger);
+    border-color: var(--color-danger); /* Figma: _Danger/Danger for border */
+    color: var(--color-danger-text); /* Figma: _Danger/Danger (Text) for text */
+    
+    &::after {
+        color: var(--color-danger-text); /* Caret matches button text color */
+    }
 }
 
 .pdropdown.pdropdown-danger .pdropdown-default-toggle:not([disabled]):hover {
@@ -300,8 +321,12 @@
 
 /* Warning */
 .pdropdown.pdropdown-warning .pdropdown-default-toggle:not([disabled]) {
-    border-color: var(--color-warning);
-    color: var(--color-warning);
+    border-color: var(--color-warning); /* Figma: _Warning/Warning for border */
+    color: var(--color-warning-text); /* Figma: _Warning/Warning (Text) for text */
+    
+    &::after {
+        color: var(--color-warning-text); /* Caret matches button text color */
+    }
 }
 
 .pdropdown.pdropdown-warning .pdropdown-default-toggle:not([disabled]):hover {
@@ -315,8 +340,12 @@
 
 /* Info */
 .pdropdown.pdropdown-info .pdropdown-default-toggle:not([disabled]) {
-    border-color: var(--color-info);
-    color: var(--color-info);
+    border-color: var(--color-info); /* Figma: _Info/Info for border */
+    color: var(--color-info-text); /* Figma: _Info/Info (Text) for text */
+    
+    &::after {
+        color: var(--color-info-text); /* Caret matches button text color */
+    }
 }
 
 .pdropdown.pdropdown-info .pdropdown-default-toggle:not([disabled]):hover {
@@ -332,6 +361,10 @@
 .pdropdown.pdropdown-default .pdropdown-default-toggle:not([disabled]) {
     border-color: var(--color-outline-variant);
     color: var(--color-on-surface);
+    
+    &::after {
+        color: var(--color-on-surface-variant); /* Default caret uses on-surface-variant token */
+    }
 }
 
 /** Multiselect Styles **/

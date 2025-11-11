@@ -8,7 +8,9 @@
     /* override CSS button defaults */
     border: 0;
     padding: 0;
-    border-radius: var(--size-border-radius-2);
+    /* Figma: Border/Radius/radius-100 (4px) → --size-element-radius-sm/md/lg based on size */
+    /* Default uses radius-sm, but all element radius tokens are 4px */
+    border-radius: var(--size-element-radius-sm);
     cursor: pointer;
     background-color: transparent;
     display: inline-block;
@@ -82,6 +84,11 @@ a.pbtn {text-decoration: none; }
     min-width: 28px;
 }
 
+.pbtn.small {
+    /* Figma: --element/radius-sm (4px) for small buttons */
+    border-radius: var(--size-element-radius-sm);
+}
+
 .pbtn.pbtn-outline.small .pbtn-content,
 .plus-datepicker.small input {
     /* subtract border width from padding to maintain consistent dimensions */
@@ -93,6 +100,11 @@ a.pbtn {text-decoration: none; }
     padding: var(--size-spacing-within-component-3) var(--size-spacing-within-component-4);
     gap: var(--size-spacing-within-component-4);
     min-width: 44px;
+}
+
+.pbtn.large {
+    /* Figma: --element/radius-lg (4px) for large buttons */
+    border-radius: var(--size-element-radius-lg);
 }
 .pbtn.pbtn-outline.large .pbtn-content,
 .plus-datepicker.large input {

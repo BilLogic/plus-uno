@@ -6,51 +6,18 @@
 export default {
   title: 'Atoms/Input',
   tags: ['autodocs'],
-  argTypes: {
-    type: {
-      control: 'select',
-      options: ['text', 'textarea'],
-      description: 'Input type',
-    },
-    placeholder: {
-      control: 'text',
-      description: 'Placeholder text',
-    },
-    value: {
-      control: 'text',
-      description: 'Input value',
-    },
-    disabled: {
-      control: 'boolean',
-      description: 'Disabled state',
-    },
-    size: {
-      control: 'select',
-      options: ['body1-txt', 'body2-txt', 'body3-txt'],
-      description: 'Input size class',
-    },
-  },
 };
 
 /**
  * Text Input
  */
 export const TextInput = {
-  render: (args) => {
+  render: () => {
     const input = document.createElement('input');
     input.type = 'text';
-    input.className = `plus-text-field ${args.size || 'body2-txt'}`;
-    input.placeholder = args.placeholder || 'Enter text...';
-    input.value = args.value || '';
-    input.disabled = args.disabled || false;
+    input.className = 'plus-text-field body2-txt';
+    input.placeholder = 'Enter text...';
     return input;
-  },
-  args: {
-    type: 'text',
-    placeholder: 'Enter text...',
-    value: '',
-    disabled: false,
-    size: 'body2-txt',
   },
 };
 
@@ -58,21 +25,12 @@ export const TextInput = {
  * Textarea
  */
 export const Textarea = {
-  render: (args) => {
+  render: () => {
     const textarea = document.createElement('textarea');
-    textarea.className = `plus-textarea ${args.size || 'body2-txt'}`;
-    textarea.placeholder = args.placeholder || 'Enter text...';
-    textarea.value = args.value || '';
-    textarea.disabled = args.disabled || false;
+    textarea.className = 'plus-textarea body2-txt';
+    textarea.placeholder = 'Enter text...';
     textarea.rows = 4;
     return textarea;
-  },
-  args: {
-    type: 'textarea',
-    placeholder: 'Enter text...',
-    value: '',
-    disabled: false,
-    size: 'body2-txt',
   },
 };
 
@@ -84,8 +42,8 @@ export const Sizes = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
-    container.style.width = '400px';
+    container.style.gap = 'var(--size-card-gap-md)';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     
     const sizes = [
       { class: 'body1-txt', label: 'Body 1' },
@@ -97,7 +55,7 @@ export const Sizes = {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
-      wrapper.style.gap = '0.25rem';
+      wrapper.style.gap = 'var(--size-element-gap-xs)';
       
       const label = document.createElement('label');
       label.className = 'body3-txt';
@@ -125,8 +83,8 @@ export const States = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
-    container.style.width = '400px';
+    container.style.gap = 'var(--size-card-gap-md)';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     
     const states = [
       { label: 'Default', disabled: false, value: '' },
@@ -139,7 +97,7 @@ export const States = {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
-      wrapper.style.gap = '0.25rem';
+      wrapper.style.gap = 'var(--size-element-gap-xs)';
       
       const label = document.createElement('label');
       label.className = 'body3-txt';
@@ -169,8 +127,8 @@ export const TextareaSizes = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
-    container.style.width = '400px';
+    container.style.gap = 'var(--size-card-gap-md)';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     
     const sizes = [
       { class: 'body1-txt', label: 'Body 1' },
@@ -182,7 +140,7 @@ export const TextareaSizes = {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
-      wrapper.style.gap = '0.25rem';
+      wrapper.style.gap = 'var(--size-element-gap-xs)';
       
       const label = document.createElement('label');
       label.className = 'body3-txt';
@@ -199,6 +157,62 @@ export const TextareaSizes = {
     });
     
     return container;
+  },
+};
+
+/**
+ * Interactive Input
+ */
+export const Interactive = {
+  render: (args) => {
+    if (args.type === 'textarea') {
+      const textarea = document.createElement('textarea');
+      textarea.className = `plus-textarea ${args.size || 'body2-txt'}`;
+      textarea.placeholder = args.placeholder || 'Enter text...';
+      textarea.value = args.value || '';
+      textarea.disabled = args.disabled || false;
+      textarea.rows = 4;
+      return textarea;
+    } else {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = `plus-text-field ${args.size || 'body2-txt'}`;
+      input.placeholder = args.placeholder || 'Enter text...';
+      input.value = args.value || '';
+      input.disabled = args.disabled || false;
+      return input;
+    }
+  },
+  argTypes: {
+    type: {
+      control: 'select',
+      options: ['text', 'textarea'],
+      description: 'Input type',
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Placeholder text',
+    },
+    value: {
+      control: 'text',
+      description: 'Input value',
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disabled state',
+    },
+    size: {
+      control: 'select',
+      options: ['body1-txt', 'body2-txt', 'body3-txt'],
+      description: 'Input size class',
+    },
+  },
+  args: {
+    type: 'text',
+    placeholder: 'Enter text...',
+    value: '',
+    disabled: false,
+    size: 'body2-txt',
   },
 };
 

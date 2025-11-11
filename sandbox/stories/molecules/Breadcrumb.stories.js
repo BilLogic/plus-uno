@@ -8,16 +8,6 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/Breadcrumb',
   tags: ['autodocs'],
-  argTypes: {
-    items: {
-      control: 'object',
-      description: 'Array of breadcrumb items',
-    },
-    separator: {
-      control: 'text',
-      description: 'Separator character',
-    },
-  },
 };
 
 /**
@@ -147,6 +137,16 @@ export const Interactive = {
     });
     container.appendChild(breadcrumb);
     return container;
+  },
+  argTypes: {
+    items: {
+      control: 'object',
+      description: 'Array of breadcrumb items',
+    },
+    separator: {
+      control: 'text',
+      description: 'Separator character',
+    },
   },
   args: {
     items: [

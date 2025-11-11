@@ -8,24 +8,6 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/Checkbox',
   tags: ['autodocs'],
-  argTypes: {
-    label: {
-      control: 'text',
-      description: 'Checkbox label',
-    },
-    name: {
-      control: 'text',
-      description: 'Input name attribute',
-    },
-    value: {
-      control: 'text',
-      description: 'Input value attribute',
-    },
-    checked: {
-      control: 'boolean',
-      description: 'Checked state',
-    },
-  },
 };
 
 /**
@@ -91,7 +73,7 @@ export const CheckboxGroup = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '0.5rem';
+    container.style.gap = 'var(--size-element-gap-sm)';
     
     const options = [
       { label: 'Option 1', value: 'option1', id: 'opt1', checked: false },
@@ -116,14 +98,14 @@ export const MultipleGroups = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-card-gap-lg)';
     
     // Group 1
     const group1Container = document.createElement('div');
     const group1Label = document.createElement('div');
     group1Label.className = 'h6';
     group1Label.textContent = 'Category 1';
-    group1Label.style.marginBottom = '0.5rem';
+    group1Label.style.marginBottom = 'var(--size-element-gap-sm)';
     group1Container.appendChild(group1Label);
     
     const group1Options = [
@@ -142,7 +124,7 @@ export const MultipleGroups = {
     const group2Label = document.createElement('div');
     group2Label.className = 'h6';
     group2Label.textContent = 'Category 2';
-    group2Label.style.marginBottom = '0.5rem';
+    group2Label.style.marginBottom = 'var(--size-element-gap-sm)';
     group2Container.appendChild(group2Label);
     
     const group2Options = [
@@ -168,6 +150,24 @@ export const Interactive = {
     const checkbox = PlusInterface.createCheckbox(args);
     container.appendChild(checkbox);
     return container;
+  },
+  argTypes: {
+    label: {
+      control: 'text',
+      description: 'Checkbox label',
+    },
+    name: {
+      control: 'text',
+      description: 'Input name attribute',
+    },
+    value: {
+      control: 'text',
+      description: 'Input value attribute',
+    },
+    checked: {
+      control: 'boolean',
+      description: 'Checked state',
+    },
   },
   args: {
     label: 'Interactive checkbox',

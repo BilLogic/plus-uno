@@ -8,13 +8,6 @@ import { PlusSmartComponents } from '@/js/components/index.js';
 export default {
   title: 'Molecules/StatusTag',
   tags: ['autodocs'],
-  argTypes: {
-    status: {
-      control: 'select',
-      options: ['assigned', 'started', 'not started', 'complete'],
-      description: 'Status type',
-    },
-  },
 };
 
 /**
@@ -96,6 +89,13 @@ export const Interactive = {
     const statusTag = PlusSmartComponents.createContentStatusTag(args.status);
     container.appendChild(statusTag);
     return container;
+  },
+  argTypes: {
+    status: {
+      control: 'select',
+      options: ['assigned', 'started', 'not started', 'complete'],
+      description: 'Status type',
+    },
   },
   args: {
     status: 'complete',

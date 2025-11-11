@@ -117,7 +117,7 @@ export function createDropdown({
             const counter = document.createElement("span");
             counter.style.cssText = `
                 background-color: color-mix(in srgb, var(--color-on-surface) 16%, transparent);
-                border-radius: 999px;
+                border-radius: var(--size-border-radius-radius-1000); /* Figma: Border/Radius/radius-1000 (999px) for pill shape */
                 padding: 0 var(--size-element-pad-x-sm);
                 font-size: var(--font-size-body3);
                 line-height: var(--font-line-height-body3);

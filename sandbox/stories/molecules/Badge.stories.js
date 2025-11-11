@@ -8,22 +8,6 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/Badge',
   tags: ['autodocs'],
-  argTypes: {
-    text: {
-      control: 'text',
-      description: 'Badge text',
-    },
-    style: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'],
-      description: 'Badge style',
-    },
-    size: {
-      control: 'select',
-      options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'],
-      description: 'Badge size',
-    },
-  },
 };
 
 /**
@@ -34,7 +18,7 @@ export const Styles = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const styles = ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'];
     
@@ -60,7 +44,7 @@ export const Sizes = {
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
     container.style.alignItems = 'center';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'];
     
@@ -85,7 +69,7 @@ export const AllStylesH4 = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const styles = ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'];
     
@@ -110,7 +94,7 @@ export const AllStylesB2 = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const styles = ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'];
     
@@ -137,6 +121,22 @@ export const Interactive = {
     container.appendChild(badge);
     return container;
   },
+  argTypes: {
+    text: {
+      control: 'text',
+      description: 'Badge text',
+    },
+    style: {
+      control: 'select',
+      options: ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'],
+      description: 'Badge style',
+    },
+    size: {
+      control: 'select',
+      options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'],
+      description: 'Badge size',
+    },
+  },
   args: {
     text: 'Badge',
     style: 'primary',
@@ -152,7 +152,7 @@ export const Chips = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const chips = [
       { text: 'Chip 1', style: 'primary', removable: true },

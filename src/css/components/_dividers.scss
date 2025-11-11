@@ -12,7 +12,8 @@
 .plus-divider-line {
     position: absolute;
     inset: 0;
-    border-radius: 1px;
+    /* Divider line uses minimal radius for rounded ends */
+    border-radius: var(--size-border-radius-radius-0); /* Figma: Border/Radius/radius-0 (1px) */
 }
 
 /* Divider Sizes */

@@ -8,22 +8,6 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/Divider',
   tags: ['autodocs'],
-  argTypes: {
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg', 'xl'],
-      description: 'Divider size (uses element stroke tokens: sm=1px, md=1.5px, lg=2px, xl=2.5px)',
-    },
-    style: {
-      control: 'select',
-      options: ['light', 'dark'],
-      description: 'Divider style',
-    },
-    opacity10: {
-      control: 'boolean',
-      description: 'Apply 10% opacity',
-    },
-  },
 };
 
 /**
@@ -35,7 +19,7 @@ export const Sizes = {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-md)';
-    container.style.width = '300px';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     
     const sizes = [
       { value: 'sm', label: 'Small (1px)', token: '--size-element-stroke-sm' },
@@ -73,7 +57,7 @@ export const Styles = {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-md)';
-    container.style.width = '300px';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     container.style.backgroundColor = 'var(--color-surface-container)';
     
@@ -117,7 +101,7 @@ export const WithOpacity = {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-md)';
-    container.style.width = '300px';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     container.style.backgroundColor = 'var(--color-surface-container)';
     
@@ -159,7 +143,7 @@ export const WithOpacity = {
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
-    container.style.width = '300px';
+    container.style.width = 'var(--size-card-pad-x-lg)'; /* Demo container width */
     container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     container.style.backgroundColor = 'var(--color-surface-container)';
     
@@ -167,6 +151,22 @@ export const Interactive = {
     container.appendChild(divider);
     
     return container;
+  },
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg', 'xl'],
+      description: 'Divider size (uses element stroke tokens: sm=1px, md=1.5px, lg=2px, xl=2.5px)',
+    },
+    style: {
+      control: 'select',
+      options: ['light', 'dark'],
+      description: 'Divider style',
+    },
+    opacity10: {
+      control: 'boolean',
+      description: 'Apply 10% opacity',
+    },
   },
   args: {
     size: '1px', // Maps to --size-element-stroke-sm (1px)

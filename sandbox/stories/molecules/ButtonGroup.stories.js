@@ -8,28 +8,6 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/ButtonGroup',
   tags: ['autodocs'],
-  argTypes: {
-    size: {
-      control: 'select',
-      options: ['small', 'default', 'large'],
-      description: 'Button size',
-    },
-    style: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'],
-      description: 'Button style',
-    },
-    fill: {
-      control: 'select',
-      options: ['filled', 'outline', 'tonal', 'text'],
-      description: 'Button fill',
-    },
-    alignment: {
-      control: 'select',
-      options: ['horizontal', 'vertical'],
-      description: 'Button alignment',
-    },
-  },
 };
 
 /**
@@ -195,7 +173,7 @@ export const DifferentStyles = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '2rem';
+    container.style.gap = 'var(--size-card-gap-lg)';
     
     const styles = ['primary', 'secondary', 'tertiary'];
     
@@ -236,6 +214,28 @@ export const Interactive = {
     });
     container.appendChild(group);
     return container;
+  },
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['small', 'default', 'large'],
+      description: 'Button size',
+    },
+    style: {
+      control: 'select',
+      options: ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'],
+      description: 'Button style',
+    },
+    fill: {
+      control: 'select',
+      options: ['filled', 'outline', 'tonal', 'text'],
+      description: 'Button fill',
+    },
+    alignment: {
+      control: 'select',
+      options: ['horizontal', 'vertical'],
+      description: 'Button alignment',
+    },
   },
   args: {
     size: 'default',

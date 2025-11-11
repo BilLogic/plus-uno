@@ -9,25 +9,6 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/Alert',
   tags: ['autodocs'],
-  argTypes: {
-    style: {
-      control: 'select',
-      options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-      description: 'Alert style',
-    },
-    title: {
-      control: 'text',
-      description: 'Alert title',
-    },
-    text: {
-      control: 'text',
-      description: 'Alert text',
-    },
-    dismissable: {
-      control: 'boolean',
-      description: 'Dismissable state',
-    },
-  },
 };
 
 /**
@@ -58,7 +39,7 @@ export const AllStyles = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const styles = ['primary', 'secondary', 'success', 'danger', 'warning'];
     
@@ -156,7 +137,7 @@ export const WithTitle = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const alert = PlusInterface.createAlert({
       style: 'info',
@@ -178,7 +159,7 @@ export const WithoutTitle = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const alert = PlusInterface.createAlert({
       style: 'info',
@@ -199,7 +180,7 @@ export const Dismissable = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const alert = PlusInterface.createAlert({
       style: 'warning',
@@ -221,7 +202,7 @@ export const NonDismissable = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '1rem';
+    container.style.gap = 'var(--size-card-gap-md)';
     
     const alert = PlusInterface.createAlert({
       style: 'danger',
@@ -249,6 +230,25 @@ export const Interactive = {
     });
     container.appendChild(alert);
     return container;
+  },
+  argTypes: {
+    style: {
+      control: 'select',
+      options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
+      description: 'Alert style',
+    },
+    title: {
+      control: 'text',
+      description: 'Alert title',
+    },
+    text: {
+      control: 'text',
+      description: 'Alert text',
+    },
+    dismissable: {
+      control: 'boolean',
+      description: 'Dismissable state',
+    },
   },
   args: {
     style: 'info',

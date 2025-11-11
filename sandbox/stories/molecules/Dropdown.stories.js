@@ -8,36 +8,18 @@ import { PlusInterface } from '@/js/components/index.js';
 export default {
   title: 'Molecules/Dropdown',
   tags: ['autodocs'],
-  argTypes: {
-    buttonText: {
-      control: 'text',
-      description: 'Dropdown button text',
-    },
-    size: {
-      control: 'select',
-      options: ['small', 'default', 'large'],
-      description: 'Dropdown size (uses element padding tokens: --size-element-pad-x-sm/md/lg, --size-element-pad-y-sm/md/lg)',
-    },
-    style: {
-      control: 'select',
-      options: ['default', 'primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-      description: 'Dropdown style (uses color tokens: --color-primary, --color-secondary, etc.)',
-    },
-    split: {
-      control: 'boolean',
-      description: 'Split button dropdown',
-    },
-  },
 };
 
 /**
  * Default Dropdown
  */
 export const Default = {
-  render: (args) => {
+  render: () => {
     const container = document.createElement('div');
     const dropdown = PlusInterface.createDropdown({
-      ...args,
+      buttonText: 'Dropdown',
+      size: 'default',
+      style: 'default',
       items: [
         { text: 'Option 1', onClick: () => console.log('Option 1 clicked') },
         { text: 'Option 2', onClick: () => console.log('Option 2 clicked') },
@@ -52,12 +34,6 @@ export const Default = {
     }
     
     return container;
-  },
-  args: {
-    buttonText: 'Dropdown',
-    size: 'default',
-    style: 'default',
-    split: false,
   },
 };
 
@@ -306,3 +282,53 @@ export const States = {
   },
 };
 
+/**
+ * Interactive Dropdown
+ */
+export const Interactive = {
+  render: (args) => {
+    const container = document.createElement('div');
+    const dropdown = PlusInterface.createDropdown({
+      ...args,
+      items: args.items || [
+        { text: 'Option 1', onClick: () => console.log('Option 1 clicked') },
+        { text: 'Option 2', onClick: () => console.log('Option 2 clicked') },
+        { text: 'Option 3', onClick: () => console.log('Option 3 clicked') },
+      ],
+    });
+    container.appendChild(dropdown);
+    
+    // Initialize Bootstrap dropdown
+    if (typeof $ !== 'undefined') {
+      $(dropdown).find('.dropdown-toggle').dropdown();
+    }
+    
+    return container;
+  },
+  argTypes: {
+    buttonText: {
+      control: 'text',
+      description: 'Dropdown button text',
+    },
+    size: {
+      control: 'select',
+      options: ['small', 'default', 'large'],
+      description: 'Dropdown size (uses element padding tokens: --size-element-pad-x-sm/md/lg, --size-element-pad-y-sm/md/lg)',
+    },
+    style: {
+      control: 'select',
+      options: ['default', 'primary', 'secondary', 'success', 'danger', 'warning', 'info'],
+      description: 'Dropdown style (uses color tokens: --color-primary, --color-secondary, etc.)',
+    },
+    split: {
+      control: 'boolean',
+      description: 'Split button dropdown',
+    },
+  },
+  args: {
+    buttonText: 'Dropdown',
+    size: 'default',
+    style: 'default',
+    split: false,
+  },
+};

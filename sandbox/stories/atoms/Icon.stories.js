@@ -6,52 +6,16 @@
 export default {
   title: 'Atoms/Icon',
   tags: ['autodocs'],
-  argTypes: {
-    iconName: {
-      control: 'text',
-      description: 'Font Awesome icon name (without fa- prefix)',
-    },
-    iconStyle: {
-      control: 'select',
-      options: ['solid', 'regular'],
-      description: 'Icon style',
-    },
-    iconSize: {
-      control: 'select',
-      options: ['body1-txt', 'body2-txt', 'body3-txt'],
-      description: 'Icon size class (uses typography tokens: --font-size-body1/2/3)',
-    },
-    iconColor: {
-      control: 'select',
-      options: [
-        'default',
-        'color-primary',
-        'color-secondary',
-        'color-success',
-        'color-info',
-        'color-warning',
-        'color-error',
-      ],
-      description: 'Icon color class (uses color tokens: --color-primary, --color-secondary, etc.)',
-    },
-  },
 };
 
 /**
  * Basic Icon
  */
 export const Default = {
-  render: (args) => {
+  render: () => {
     const icon = document.createElement('i');
-    const styleClass = args.iconStyle === 'regular' ? 'far' : 'fas';
-    icon.className = `${styleClass} fa-${args.iconName || 'star'} ${args.iconSize || 'body2-txt'} ${args.iconColor !== 'default' ? args.iconColor : ''}`;
+    icon.className = 'fas fa-star body2-txt';
     return icon;
-  },
-  args: {
-    iconName: 'star',
-    iconStyle: 'solid',
-    iconSize: 'body2-txt',
-    iconColor: 'default',
   },
 };
 
@@ -254,6 +218,55 @@ export const StatusIndicators = {
     });
     
     return container;
+  },
+};
+
+/**
+ * Interactive Icon
+ */
+export const Interactive = {
+  render: (args) => {
+    const icon = document.createElement('i');
+    const styleClass = args.iconStyle === 'regular' ? 'far' : 'fas';
+    const sizeClass = args.iconSize || 'body2-txt';
+    const colorClass = args.iconColor !== 'default' ? args.iconColor : '';
+    icon.className = `${styleClass} fa-${args.iconName || 'star'} ${sizeClass} ${colorClass}`.trim();
+    return icon;
+  },
+  argTypes: {
+    iconName: {
+      control: 'text',
+      description: 'Font Awesome icon name (without fa- prefix)',
+    },
+    iconStyle: {
+      control: 'select',
+      options: ['solid', 'regular'],
+      description: 'Icon style',
+    },
+    iconSize: {
+      control: 'select',
+      options: ['body1-txt', 'body2-txt', 'body3-txt'],
+      description: 'Icon size class (uses typography tokens: --font-size-body1/2/3)',
+    },
+    iconColor: {
+      control: 'select',
+      options: [
+        'default',
+        'color-primary',
+        'color-secondary',
+        'color-success',
+        'color-info',
+        'color-warning',
+        'color-error',
+      ],
+      description: 'Icon color class (uses color tokens: --color-primary, --color-secondary, etc.)',
+    },
+  },
+  args: {
+    iconName: 'star',
+    iconStyle: 'solid',
+    iconSize: 'body2-txt',
+    iconColor: 'default',
   },
 };
 
