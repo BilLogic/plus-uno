@@ -141,7 +141,7 @@ Use existing PLUS components when possible:
 
 ```javascript
 // New modular import (preferred)
-import { Universal } from "./src/js/components/index.js";
+import { Universal } from "./design-system/components/local/index.js";
 
 const button = Universal.createButton({
     btnText: "Click me",
@@ -151,7 +151,7 @@ const button = Universal.createButton({
 });
 
 // Legacy import (still works for backward compatibility)
-import { PlusInterface } from "./src/js/components/index.js";
+import { PlusInterface } from "./design-system/components/local/index.js";
 
 const button = PlusInterface.createButton({
     btnText: "Click me",
@@ -170,12 +170,12 @@ See `COMPONENT_ORGANIZATION.md` for details.
 ## Documentation
 
 ### Essential Guidelines (Always Reference)
-- **[Coding Standards](guidelines/coding-standards.md)** - Project rules and coding standards
-- **[Token Reference](guidelines/token-reference.md)** - Complete token reference (colors, spacing, typography, layout)
-- **[Terminology](guidelines/terminology.md)** - UI component types and terminology
+- **[Coding Standards](docs/guidelines/coding-standards.md)** - Project rules and coding standards
+- **[Token Reference](docs/guidelines/token-reference.md)** - Complete token reference (colors, spacing, typography, layout)
+- **[Terminology](docs/guidelines/terminology.md)** - UI component types and terminology
 
 ### Additional Documentation
-- **[Components](components/docs/COMPONENTS.md)** - Component library documentation
+- **[Components](docs/components/COMPONENTS.md)** - Component library documentation
 - **[Design Patterns](docs/DESIGN_PATTERNS.md)** - Design patterns and examples
 - **[Development Standards](docs/DEV_STANDARDS.md)** - Detailed development guidelines
 - **[Project Structure](PROJECT_STRUCTURE.md)** - Complete project structure guide
@@ -233,14 +233,14 @@ npm run watch:css
 
 ### Adding New Components
 
-1. Create component file in `src/js/components/`
-2. Add component styles in `src/css/components/`
+1. Create component file in `design-system/components/local/`
+2. Add component styles in `design-system/styles/`
 3. Import in `src/js/main.js`
-4. Document in `docs/COMPONENTS.md`
+4. Document in `docs/components/COMPONENTS.md`
 
 ### Updating Design Tokens
 
-1. Update token files in `src/css/tokens/`
+1. Update token files in `design-system/tokens/`
 2. Rebuild CSS: `npm run build:css`
 3. Update documentation in `docs/DESIGN_TOKENS.md`
 
