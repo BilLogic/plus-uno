@@ -105,10 +105,10 @@ See `PROJECT_STRUCTURE.md` for complete structure documentation.
 1. **Open this project in Cursor**
 2. **Start a new conversation** with Cursor AI
 3. **Ask for prototypes** using PLUS design system
-4. **Always reference guideline files** in `guidelines/` folder:
-   - `guidelines/coding-standards.md` - Project rules
-   - `guidelines/token-reference.md` - Token reference
-   - `guidelines/terminology.md` - Component types
+4. **Always reference guideline files** in `docs/guidelines/` folder:
+   - `docs/guidelines/coding-standards.md` - Project rules
+   - `docs/guidelines/token-reference.md` - Token reference
+   - `docs/guidelines/terminology.md` - Component types
 
 ### Example Prompts
 
