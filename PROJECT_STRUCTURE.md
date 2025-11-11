@@ -72,8 +72,6 @@ plus-vibe-coding-starting-kit/
 │   ├── regenerate-colors.js
 │   └── fix-colors.js
 │
-├── archive/                   # Archived old documentation
-│
 ├── dist/                      # Compiled output
 │   └── css/
 │       └── main.css

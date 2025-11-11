@@ -169,7 +169,7 @@ Components are organized by:
 - **Product Pillar**: universal, login, profile, home, training, toolkit, admin
 - **Component Type**: elements, cards, modals, sections, tables, pages
 
-See `COMPONENT_ORGANIZATION.md` for details.
+See `docs/components/COMPONENTS.md` for component details and `PROJECT_STRUCTURE.md` for complete project organization.
 
 ## Documentation
 
