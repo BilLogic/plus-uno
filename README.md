@@ -44,8 +44,8 @@ This repository contains:
 
 ### Core Guidelines (Always Reference)
 ```
-guidelines/                    # Core guidelines and reference documents
-├── coding-standards.md       # Project rules and coding standards
+docs/guidelines/              # Core guidelines and reference documents
+├── coding-standards.md      # Project rules and coding standards
 ├── token-reference.md        # Complete token reference
 ├── terminology.md            # UI component types and terminology
 └── README.md                 # Guidelines overview
@@ -53,36 +53,40 @@ guidelines/                    # Core guidelines and reference documents
 
 ### Documentation
 ```
-components/                    # Component documentation
-├── docs/
-│   └── COMPONENTS.md         # Component library documentation
-└── README.md
-
-tokens/                        # Token system documentation
-└── docs/
-    └── README.md
-
-docs/                          # Additional documentation
+docs/                          # All documentation consolidated
+├── guidelines/               # Core guidelines
+├── components/               # Component documentation
+│   └── COMPONENTS.md        # Component library documentation
+├── tokens/                   # Token system documentation
+│   └── README.md
 ├── DESIGN_PATTERNS.md
 ├── DEV_STANDARDS.md
 └── FIGMA_DESIGN_SYSTEM.md
 ```
 
-### Source Code
+### Design System Source
 ```
-src/                           # Source files
+design-system/                # Design system source files
+├── tokens/                   # Token SCSS files
+│   ├── _colors.scss         # Material Design 3 colors
+│   ├── _primitives.scss     # Primitive tokens
+│   ├── _spacing_semantics.scss # Semantic spacing
+│   └── ...
+├── components/
+│   ├── local/               # Component implementations
+│   └── atoms-molecules/     # Storybook stories
+└── styles/                  # Component styles
+```
+
+### Application Source
+```
+src/                          # Application source files
 ├── css/
-│   ├── tokens/               # Token SCSS files
-│   │   ├── _colors.scss      # Material Design 3 colors
-│   │   ├── _primitives.scss  # Primitive tokens
-│   │   ├── _spacing_semantics.scss # Semantic spacing
-│   │   └── ...
-│   ├── components/           # Component styles
-│   └── main.scss             # Main stylesheet
+│   └── main.scss           # Main stylesheet (references design-system)
 └── js/
-    ├── components/           # Component implementations
-    ├── utils/                # Utility functions
-    └── main.js               # Main JavaScript
+    ├── components/          # (references design-system)
+    ├── utils/               # Utility functions
+    └── main.js             # Main JavaScript (references design-system)
 ```
 
 ### Configuration
@@ -101,10 +105,10 @@ See `PROJECT_STRUCTURE.md` for complete structure documentation.
 1. **Open this project in Cursor**
 2. **Start a new conversation** with Cursor AI
 3. **Ask for prototypes** using PLUS design system
-4. **Always reference guideline files** in `guidelines/` folder:
-   - `guidelines/coding-standards.md` - Project rules
-   - `guidelines/token-reference.md` - Token reference
-   - `guidelines/terminology.md` - Component types
+4. **Always reference guideline files** in `docs/guidelines/` folder:
+   - `docs/guidelines/coding-standards.md` - Project rules
+   - `docs/guidelines/token-reference.md` - Token reference
+   - `docs/guidelines/terminology.md` - Component types
 
 ### Example Prompts
 
@@ -115,7 +119,7 @@ See `PROJECT_STRUCTURE.md` for complete structure documentation.
 
 ### Design Tokens
 
-Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `guidelines/token-reference.md` for all available tokens.
+Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `docs/guidelines/token-reference.md` for all available tokens.
 
 ```css
 /* ✅ Good - Using semantic tokens */
@@ -141,7 +145,7 @@ Use existing PLUS components when possible:
 
 ```javascript
 // New modular import (preferred)
-import { Universal } from "./src/js/components/index.js";
+import { Universal } from "./design-system/components/local/index.js";
 
 const button = Universal.createButton({
     btnText: "Click me",
@@ -151,7 +155,7 @@ const button = Universal.createButton({
 });
 
 // Legacy import (still works for backward compatibility)
-import { PlusInterface } from "./src/js/components/index.js";
+import { PlusInterface } from "./design-system/components/local/index.js";
 
 const button = PlusInterface.createButton({
     btnText: "Click me",
@@ -165,17 +169,17 @@ Components are organized by:
 - **Product Pillar**: universal, login, profile, home, training, toolkit, admin
 - **Component Type**: elements, cards, modals, sections, tables, pages
 
-See `COMPONENT_ORGANIZATION.md` for details.
+See `docs/components/COMPONENTS.md` for component details and `PROJECT_STRUCTURE.md` for complete project organization.
 
 ## Documentation
 
 ### Essential Guidelines (Always Reference)
-- **[Coding Standards](guidelines/coding-standards.md)** - Project rules and coding standards
-- **[Token Reference](guidelines/token-reference.md)** - Complete token reference (colors, spacing, typography, layout)
-- **[Terminology](guidelines/terminology.md)** - UI component types and terminology
+- **[Coding Standards](docs/guidelines/coding-standards.md)** - Project rules and coding standards
+- **[Token Reference](docs/guidelines/token-reference.md)** - Complete token reference (colors, spacing, typography, layout)
+- **[Terminology](docs/guidelines/terminology.md)** - UI component types and terminology
 
 ### Additional Documentation
-- **[Components](components/docs/COMPONENTS.md)** - Component library documentation
+- **[Components](docs/components/COMPONENTS.md)** - Component library documentation
 - **[Design Patterns](docs/DESIGN_PATTERNS.md)** - Design patterns and examples
 - **[Development Standards](docs/DEV_STANDARDS.md)** - Detailed development guidelines
 - **[Project Structure](PROJECT_STRUCTURE.md)** - Complete project structure guide
@@ -233,14 +237,14 @@ npm run watch:css
 
 ### Adding New Components
 
-1. Create component file in `src/js/components/`
-2. Add component styles in `src/css/components/`
+1. Create component file in `design-system/components/local/`
+2. Add component styles in `design-system/styles/`
 3. Import in `src/js/main.js`
-4. Document in `docs/COMPONENTS.md`
+4. Document in `docs/components/COMPONENTS.md`
 
 ### Updating Design Tokens
 
-1. Update token files in `src/css/tokens/`
+1. Update token files in `design-system/tokens/`
 2. Rebuild CSS: `npm run build:css`
 3. Update documentation in `docs/DESIGN_TOKENS.md`
 
