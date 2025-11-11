@@ -50,6 +50,67 @@ export class PlusUtil {
             console.error("Error writing to localStorage:", e);
         }
     }
+
+    /**
+     * Handles connection errors and displays user-friendly error message
+     * @param {string} [customMessage] - Custom error message (optional)
+     * @param {HTMLElement} [container] - Container element to display error in (optional, defaults to body)
+     */
+    static handleConnectionError(customMessage = null, container = null) {
+        const errorMessage = customMessage || "Connection failed. If the problem persists, please check your internet connection or VPN.";
+        
+        // Use provided container or default to body
+        const targetContainer = container || document.body;
+        
+        // Check if error alert already exists to avoid duplicates
+        const existingError = document.getElementById('plus-connection-error');
+        if (existingError) {
+            return;
+        }
+
+        // Import alert component dynamically
+        import('../components/universal/elements/alert.js').then(({ createAlert }) => {
+            const errorAlert = createAlert({
+                id: 'plus-connection-error',
+                style: 'danger',
+                title: 'Connection Error',
+                text: errorMessage,
+                dismissable: true,
+                onDismiss: () => {
+                    // Allow retry after dismissing
+                }
+            });
+            
+            // Insert at the top of the container
+            if (targetContainer.firstChild) {
+                targetContainer.insertBefore(errorAlert, targetContainer.firstChild);
+            } else {
+                targetContainer.appendChild(errorAlert);
+            }
+        }).catch(err => {
+            // Fallback if alert component fails to load
+            console.error("Failed to load alert component:", err);
+            const fallbackError = document.createElement('div');
+            fallbackError.id = 'plus-connection-error';
+            fallbackError.style.cssText = 'padding: 1rem; margin: 1rem; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;';
+            fallbackError.innerHTML = `<strong>Connection Error</strong><br>${errorMessage}`;
+            if (targetContainer.firstChild) {
+                targetContainer.insertBefore(fallbackError, targetContainer.firstChild);
+            } else {
+                targetContainer.appendChild(fallbackError);
+            }
+        });
+    }
+
+    /**
+     * Checks if a resource failed to load and handles the error
+     * @param {string} resourceUrl - URL of the resource that failed
+     * @param {string} resourceType - Type of resource (css, js, etc.)
+     */
+    static handleResourceLoadError(resourceUrl, resourceType = 'resource') {
+        console.error(`Failed to load ${resourceType}:`, resourceUrl);
+        this.handleConnectionError();
+    }
 }
 
 /**

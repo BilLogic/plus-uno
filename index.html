@@ -41,6 +41,119 @@
         </main>
     </div>
 
+    <!-- Connection Error Handler -->
+    <script type="module">
+        // Handle connection errors for CDN resources
+        import { PlusUtil } from './src/js/utils/plus_util.js';
+        
+        /**
+         * Checks if a resource loaded successfully
+         * @param {string} url - Resource URL to check
+         * @returns {Promise<boolean>} True if resource loaded, false otherwise
+         */
+        async function checkResourceLoaded(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        /**
+         * Verifies critical CDN resources loaded
+         */
+        async function verifyResources() {
+            const criticalResources = [
+                'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                'https://code.jquery.com/jquery-3.6.0.min.js'
+            ];
+            
+            // Check if jQuery loaded (most reliable check)
+            if (typeof window.jQuery === 'undefined') {
+                setTimeout(() => {
+                    if (typeof window.jQuery === 'undefined') {
+                        PlusUtil.handleConnectionError();
+                    }
+                }, 3000);
+            }
+            
+            // Check if Bootstrap loaded (check for Bootstrap classes)
+            setTimeout(() => {
+                const testEl = document.createElement('div');
+                testEl.className = 'container';
+                const styles = window.getComputedStyle(testEl);
+                // If Bootstrap didn't load, display will be inline instead of block
+                if (styles.display === 'inline') {
+                    PlusUtil.handleConnectionError();
+                }
+            }, 2000);
+        }
+        
+        // Check for connection errors after page loads
+        window.addEventListener('load', () => {
+            verifyResources();
+            
+            // Check for failed script loads
+            const scripts = document.querySelectorAll('script[src]');
+            scripts.forEach(script => {
+                script.addEventListener('error', () => {
+                    PlusUtil.handleResourceLoadError(script.src, 'script');
+                });
+            });
+        });
+        
+        // Handle unhandled promise rejections (often network errors)
+        window.addEventListener('unhandledrejection', (event) => {
+            const error = event.reason;
+            // Check if it's a network/connection error
+            if (error && (
+                error.message && (
+                    error.message.includes('Failed to fetch') ||
+                    error.message.includes('NetworkError') ||
+                    error.message.includes('Load failed') ||
+                    error.message.includes('connection')
+                ) ||
+                error.name === 'TypeError' ||
+                error.name === 'NetworkError'
+            )) {
+                event.preventDefault(); // Prevent default error logging
+                PlusUtil.handleConnectionError();
+            }
+        });
+        
+        // Handle fetch errors globally
+        const originalFetch = window.fetch;
+        window.fetch = async function(...args) {
+            try {
+                return await originalFetch.apply(this, args);
+            } catch (error) {
+                // Check if it's a network error
+                if (error.message && (
+                    error.message.includes('Failed to fetch') ||
+                    error.message.includes('NetworkError') ||
+                    error.message.includes('Load failed')
+                )) {
+                    PlusUtil.handleConnectionError();
+                }
+                throw error;
+            }
+        };
+        
+        // Handle online/offline events
+        window.addEventListener('online', () => {
+            const errorAlert = document.getElementById('plus-connection-error');
+            if (errorAlert) {
+                errorAlert.remove();
+            }
+        });
+        
+        window.addEventListener('offline', () => {
+            PlusUtil.handleConnectionError();
+        });
+    </script>
+    
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
