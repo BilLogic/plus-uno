@@ -1,0 +1,113 @@
+/**
+ * Alert Component Styles
+ * Matches Figma design system specifications
+ */
+
+.plus-alert {
+    display: flex;
+    align-items: center;
+    border-radius: var(--size-modal-radius-md);
+    width: 400px;
+    max-width: 100%;
+    border: 1px solid;
+    box-sizing: border-box;
+    gap: var(--size-modal-pad-x-sm);
+}
+
+.plus-alert-content {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 0;
+    min-width: 0;
+    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-md);
+    position: relative;
+}
+
+.plus-alert.primary .plus-alert-content {
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-alert.secondary .plus-alert-content {
+    gap: var(--size-modal-pad-x-sm);
+}
+
+.plus-alert.success .plus-alert-content {
+    gap: var(--size-element-gap-sm);
+}
+
+.plus-alert.danger .plus-alert-content {
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-alert.warning .plus-alert-content {
+    gap: var(--size-modal-gap-sm);
+}
+
+.plus-alert-title {
+    font-family: var(--font-family-heading, 'Lato');
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1.333;
+    white-space: pre-wrap;
+}
+
+.plus-alert-text {
+    font-family: var(--font-family-body, 'Merriweather Sans');
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.plus-alert-dismiss-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: var(--size-modal-pad-x-sm);
+    font-size: 20px;
+    line-height: 1.6;
+}
+
+/* Alert Style Variants */
+
+.plus-alert.primary {
+    background-color: var(--color-primary-state-08);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary-container);
+}
+
+.plus-alert.secondary {
+    background-color: var(--color-secondary-state-08);
+    border-color: var(--color-secondary);
+    color: var(--color-on-secondary-container);
+}
+
+.plus-alert.success {
+    background-color: var(--color-success-state-08);
+    border-color: var(--color-success);
+    color: var(--color-on-success-container);
+}
+
+.plus-alert.danger {
+    background-color: var(--color-danger-state-08);
+    border-color: var(--color-danger);
+    color: var(--color-on-danger-container);
+}
+
+.plus-alert.warning {
+    background-color: var(--color-warning-state-08);
+    border-color: var(--color-warning);
+    color: var(--color-on-warning-container);
+}
+
+.plus-alert.info {
+    background-color: var(--color-info-state-08);
+    border-color: var(--color-info);
+    color: var(--color-on-info-container);
+}
+

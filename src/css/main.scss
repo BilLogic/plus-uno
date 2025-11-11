@@ -6,22 +6,22 @@
  */
 
 // Design Tokens
-@use "tokens/colors" as *;
-@use "tokens/primitives" as *;
-@use "tokens/spacing_semantics" as *;
-@use "tokens/layout" as *;
-@use "tokens/fonts" as *;
-@use "tokens/plus_spacing" as *;
-@use "tokens/mixins" as *;
+@use "../design-system/tokens/colors" as *;
+@use "../design-system/tokens/primitives" as *;
+@use "../design-system/tokens/spacing_semantics" as *;
+@use "../design-system/tokens/layout" as *;
+@use "../design-system/tokens/fonts" as *;
+@use "../design-system/tokens/plus_spacing" as *;
+@use "../design-system/tokens/mixins" as *;
 
 // Components
-@use "components/plus_buttons" as *;
-@use "components/inputs" as *;
-@use "components/alerts" as *;
-@use "components/breadcrumb" as *;
-@use "components/badges" as *;
-@use "components/dividers" as *;
-@use "components/button-groups" as *;
+@use "../design-system/styles/plus_buttons" as *;
+@use "../design-system/styles/inputs" as *;
+@use "../design-system/styles/alerts" as *;
+@use "../design-system/styles/breadcrumb" as *;
+@use "../design-system/styles/badges" as *;
+@use "../design-system/styles/dividers" as *;
+@use "../design-system/styles/button-groups" as *;
 
 // Base Styles
 body {

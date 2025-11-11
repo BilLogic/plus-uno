@@ -7,164 +7,185 @@ This document describes the organized project structure optimized for both human
 
 ```
 plus-vibe-coding-starting-kit/
-├── guidelines/                    # Core guidelines and reference documents
-│   ├── README.md                 # Guidelines overview and usage
-│   ├── coding-standards.md       # Project rules and coding standards
-│   ├── token-reference.md        # Complete token reference (colors, spacing, etc.)
-│   └── terminology.md            # UI component types and terminology
+├── design-system/              # Design system source files
+│   ├── tokens/                # Design token SCSS files
+│   │   ├── _colors.scss       # Material Design 3 colors
+│   │   ├── _primitives.scss   # Primitive size tokens
+│   │   ├── _spacing_semantics.scss # Semantic spacing tokens
+│   │   ├── _layout.scss       # Layout and breakpoint tokens
+│   │   ├── _fonts.scss        # Typography tokens
+│   │   ├── _plus_spacing.scss # PLUS-specific spacing
+│   │   └── _mixins.scss       # SCSS mixins
+│   ├── components/
+│   │   ├── atoms-molecules/   # Storybook stories
+│   │   │   ├── atoms/         # Atom-level component stories
+│   │   │   └── molecules/     # Molecule-level component stories
+│   │   └── local/             # Component implementations
+│   │       ├── universal/     # Universal components
+│   │       ├── login/         # Login-specific components
+│   │       ├── profile/       # Profile-specific components
+│   │       ├── home/          # Home/dashboard components
+│   │       ├── training/      # Training components
+│   │       ├── toolkit/       # Toolkit components
+│   │       └── admin/          # Admin components
+│   └── styles/                # Component style SCSS files
+│       ├── _plus_buttons.scss
+│       ├── _inputs.scss
+│       ├── _alerts.scss
+│       ├── _breadcrumb.scss
+│       ├── _badges.scss
+│       ├── _dividers.scss
+│       └── _button-groups.scss
 │
-├── components/                    # Component documentation
-│   ├── README.md                 # Components overview
-│   └── docs/
-│       └── COMPONENTS.md         # Component library documentation
+├── docs/                      # All documentation (consolidated)
+│   ├── guidelines/            # Core guidelines and reference documents
+│   │   ├── README.md          # Guidelines overview
+│   │   ├── coding-standards.md # Project rules and coding standards
+│   │   ├── token-reference.md # Complete token reference
+│   │   └── terminology.md     # UI component types and terminology
+│   ├── components/           # Component documentation
+│   │   ├── README.md          # Components overview
+│   │   └── COMPONENTS.md      # Component library documentation
+│   ├── tokens/                # Token system documentation
+│   │   └── README.md          # Token system documentation
+│   ├── DESIGN_PATTERNS.md    # Design patterns and examples
+│   ├── DEV_STANDARDS.md       # Development standards
+│   ├── DESIGN_TOKENS.md      # Legacy design tokens doc
+│   └── FIGMA_DESIGN_SYSTEM.md # Figma integration
 │
-├── tokens/                        # Token system documentation
-│   └── docs/
-│       └── README.md             # Token system documentation
-│
-├── src/                          # Source code
+├── src/                       # Application source code
 │   ├── css/
-│   │   ├── main.scss            # Main stylesheet
-│   │   ├── tokens/              # Token SCSS files
-│   │   │   ├── _colors.scss     # Material Design 3 colors
-│   │   │   ├── _primitives.scss # Primitive size tokens
-│   │   │   ├── _spacing_semantics.scss # Semantic spacing tokens
-│   │   │   ├── _layout.scss     # Layout and breakpoint tokens
-│   │   │   ├── _fonts.scss      # Typography tokens
-│   │   │   └── ...
-│   │   └── components/          # Component styles
-│   │       ├── _plus_buttons.scss
-│   │       └── _inputs.scss
+│   │   └── main.scss          # Main stylesheet (references design-system)
 │   └── js/
-│       ├── main.js              # Main JavaScript entry point
-│       ├── components/          # Component implementations
-│       │   ├── general_interface.js
-│       │   └── plus_smart_components.js
-│       └── utils/               # Utility functions
+│       ├── main.js            # Main JavaScript entry point
+│       └── utils/              # Utility functions
 │           └── plus_util.js
 │
-├── docs/                         # Additional documentation
-│   ├── DESIGN_PATTERNS.md       # Design patterns and examples
-│   ├── DEV_STANDARDS.md         # Development standards
-│   ├── FIGMA_DESIGN_SYSTEM.md   # Figma integration
-│   └── DESIGN_TOKENS.md         # Legacy design tokens doc
+├── sandbox/                   # Storybook configuration
+│   └── .storybook/            # Storybook config files
 │
-├── examples/                     # Reference prototypes
+├── examples/                  # Reference prototypes
 │   └── README.md
 │
-├── scripts/                      # Token generation scripts
+├── scripts/                   # Token generation scripts
 │   ├── generate-all-tokens.js
 │   ├── regenerate-colors.js
 │   └── fix-colors.js
 │
-├── dist/                         # Compiled output
+├── archive/                   # Archived old documentation
+│
+├── dist/                      # Compiled output
 │   └── css/
 │       └── main.css
 │
-├── .cursorrules                  # Cursor AI agent configuration
-├── package.json                  # Project configuration
-└── index.html                    # Main HTML file
+├── .cursorrules               # Cursor AI agent configuration
+├── package.json               # Project configuration
+└── index.html                 # Main HTML file
 ```
 
-## Guidelines Folder
+## Design System Structure
 
-The `guidelines/` folder contains the core reference documents that should be consulted when generating code:
+The `design-system/` folder contains all design system source files:
 
-### `coding-standards.md`
-- Project rules and coding standards
-- Code style guidelines (JavaScript, CSS/SCSS, HTML)
-- Best practices and anti-patterns
-- File structure and naming conventions
-
-### `token-reference.md`
-- Complete token reference
-- All available color tokens (Material Design 3)
-- All spacing tokens (semantic system)
+### Tokens (`design-system/tokens/`)
+- All design token SCSS files
+- Material Design 3 color system
+- Semantic spacing tokens
 - Typography tokens
 - Layout tokens
-- Usage guidelines and examples
 
-### `terminology.md`
-- UI component type definitions
-- Elements, Cards, Sections, Modals, Surfaces, Surface Containers
-- Characteristics and examples
-- Token usage for each component type
-- Decision tree for determining component type
+### Components (`design-system/components/`)
+- **`local/`**: Component implementations organized by product area
+- **`atoms-molecules/`**: Storybook stories for design system components
 
-## Components Folder
+### Styles (`design-system/styles/`)
+- Component-specific SCSS files
+- Styles for buttons, inputs, alerts, badges, etc.
 
-The `components/` folder contains component documentation:
-- `docs/COMPONENTS.md` - Complete component library documentation
-- Component code is located in `src/js/components/` and `src/css/components/`
+## Documentation Structure
 
-## Tokens Folder
+All documentation is consolidated in `docs/`:
 
-The `tokens/` folder contains token system documentation:
-- `docs/README.md` - Token system architecture and documentation
-- Token SCSS files are located in `src/css/tokens/`
+### Guidelines (`docs/guidelines/`)
+- Core reference documents for code generation
+- Coding standards, token reference, terminology
+
+### Components (`docs/components/`)
+- Component API documentation
+- Usage examples and patterns
+
+### Tokens (`docs/tokens/`)
+- Token system architecture
+- Token usage guidelines
+
+## Application Source (`src/`)
+
+The `src/` folder contains application code that references the design system:
+
+- `src/css/main.scss` - Imports tokens and styles from `design-system/`
+- `src/js/main.js` - Imports components from `design-system/components/local/`
 
 ## Navigation Guide
 
 ### For Designers
-1. Start with `guidelines/README.md` for overview
-2. Reference `guidelines/terminology.md` to identify component type
-3. Reference `guidelines/token-reference.md` to select tokens
-4. Reference `guidelines/coding-standards.md` for code patterns
+1. Start with `docs/guidelines/README.md` for overview
+2. Reference `docs/guidelines/terminology.md` to identify component type
+3. Reference `docs/guidelines/token-reference.md` to select tokens
+4. Reference `docs/guidelines/coding-standards.md` for code patterns
 
 ### For Developers
-1. Review `guidelines/coding-standards.md` for project rules
-2. Reference `components/docs/COMPONENTS.md` for component APIs
-3. Check `tokens/docs/README.md` for token system details
+1. Review `docs/guidelines/coding-standards.md` for project rules
+2. Reference `docs/components/COMPONENTS.md` for component APIs
+3. Check `docs/tokens/README.md` for token system details
 4. Review `docs/DESIGN_PATTERNS.md` for design patterns
 
 ### For AI Agents (Cursor)
 1. Reference `.cursorrules` for core rules
-2. Always consult `guidelines/` files when generating code
-3. Use `guidelines/terminology.md` when designing specific UI types
-4. Use `guidelines/token-reference.md` when selecting tokens
-5. Follow `guidelines/coding-standards.md` for code style
+2. Always consult `docs/guidelines/` files when generating code
+3. Use `docs/guidelines/terminology.md` when designing specific UI types
+4. Use `docs/guidelines/token-reference.md` when selecting tokens
+5. Follow `docs/guidelines/coding-standards.md` for code style
 
 ## File Organization Principles
 
-1. **Guidelines**: Core reference documents in `guidelines/`
-2. **Components**: Component documentation in `components/docs/`
-3. **Tokens**: Token documentation in `tokens/docs/`
-4. **Source Code**: Implementation code in `src/`
-5. **Additional Docs**: Extended documentation in `docs/`
+1. **Design System**: All design system source in `design-system/`
+2. **Documentation**: All documentation consolidated in `docs/`
+3. **Application**: Application code in `src/` (references design-system)
+4. **Stories**: Storybook stories in `design-system/components/atoms-molecules/`
 
 ## Key Files
 
 ### Essential for Code Generation
 - `.cursorrules` - Cursor AI agent configuration
-- `guidelines/coding-standards.md` - Project rules
-- `guidelines/token-reference.md` - Token reference
-- `guidelines/terminology.md` - Component types
+- `docs/guidelines/coding-standards.md` - Project rules
+- `docs/guidelines/token-reference.md` - Token reference
+- `docs/guidelines/terminology.md` - Component types
 
 ### Reference Documentation
-- `components/docs/COMPONENTS.md` - Component library
-- `tokens/docs/README.md` - Token system
+- `docs/components/COMPONENTS.md` - Component library
+- `docs/tokens/README.md` - Token system
 - `docs/DESIGN_PATTERNS.md` - Design patterns
 
 ### Source Files
-- `src/css/main.scss` - Main stylesheet
-- `src/css/tokens/*.scss` - Token files
-- `src/js/components/*.js` - Component implementations
+- `src/css/main.scss` - Main stylesheet (imports from design-system)
+- `design-system/tokens/*.scss` - Token files
+- `design-system/components/local/*.js` - Component implementations
 
 ## Workflow
 
 ### Designing a UI Component
 
 1. **Identify Component Type**
-   - Open `guidelines/terminology.md`
+   - Open `docs/guidelines/terminology.md`
    - Determine if it's an Element, Card, Section, Modal, Surface, or Surface Container
 
 2. **Select Tokens**
-   - Open `guidelines/token-reference.md`
+   - Open `docs/guidelines/token-reference.md`
    - Find tokens that match the component type
    - Select appropriate sizes (sm/md/lg)
 
 3. **Follow Coding Standards**
-   - Open `guidelines/coding-standards.md`
+   - Open `docs/guidelines/coding-standards.md`
    - Follow code style guidelines
    - Use existing components when possible
 
@@ -180,18 +201,19 @@ The `tokens/` folder contains token system documentation:
 1. Update Figma design system
 2. Export JSON files
 3. Run `scripts/generate-all-tokens.js`
-4. Verify SCSS compilation
-5. Update `guidelines/token-reference.md` if needed
+4. Update files in `design-system/tokens/`
+5. Verify SCSS compilation
+6. Update `docs/guidelines/token-reference.md` if needed
 
 ### Adding Components
-1. Create component in `src/js/components/`
-2. Create styles in `src/css/components/`
-3. Update `components/docs/COMPONENTS.md`
-4. Add examples to `examples/`
+1. Create component in `design-system/components/local/`
+2. Create styles in `design-system/styles/`
+3. Add Storybook story in `design-system/components/atoms-molecules/`
+4. Update `docs/components/COMPONENTS.md`
+5. Add examples to `examples/`
 
 ### Updating Guidelines
-1. Update appropriate guideline file
+1. Update appropriate file in `docs/guidelines/`
 2. Ensure examples are current
 3. Verify references are correct
 4. Update `.cursorrules` if needed
-

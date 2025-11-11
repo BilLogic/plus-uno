@@ -7,16 +7,16 @@ You are helping designers prototype interactive high-fidelity work using the PLU
 
 **When generating code, ALWAYS reference these guideline files:**
 
-1. **`guidelines/coding-standards.md`** - Project rules, coding standards, best practices, and anti-patterns
-2. **`guidelines/token-reference.md`** - Complete token reference (colors, spacing, typography, layout)
-3. **`guidelines/terminology.md`** - UI component types (Elements, Cards, Sections, Modals, Surfaces, Surface Containers)
+1. **`docs/guidelines/coding-standards.md`** - Project rules, coding standards, best practices, and anti-patterns
+2. **`docs/guidelines/token-reference.md`** - Complete token reference (colors, spacing, typography, layout)
+3. **`docs/guidelines/terminology.md`** - UI component types (Elements, Cards, Sections, Modals, Surfaces, Surface Containers)
 
 ## Key Principles
 
 ### Design Tokens
 - **ALWAYS** use CSS variables for design tokens (colors, spacing, typography)
 - **NEVER** hardcode values - always use semantic tokens
-- **Reference**: `guidelines/token-reference.md` for all available tokens
+- **Reference**: `docs/guidelines/token-reference.md` for all available tokens
 - Follow Material Design 3 (M3) naming conventions and color roles
 
 ### Component Design Workflow
@@ -24,15 +24,15 @@ You are helping designers prototype interactive high-fidelity work using the PLU
 When designing a specific type of UI component:
 
 1. **Identify Component Type**
-   - Reference `guidelines/terminology.md` to determine if it's an Element, Card, Section, Modal, Surface, or Surface Container
+   - Reference `docs/guidelines/terminology.md` to determine if it's an Element, Card, Section, Modal, Surface, or Surface Container
 
 2. **Select Appropriate Tokens**
-   - Reference `guidelines/token-reference.md` for available tokens
+   - Reference `docs/guidelines/token-reference.md` for available tokens
    - Use tokens that match the component type from `terminology.md`
    - Match token prefix to component type: `element-*`, `card-*`, `section-*`, `modal-*`, `surface-*`, `surface-container-*`
 
 3. **Follow Coding Standards**
-   - Reference `guidelines/coding-standards.md` for code style and patterns
+   - Reference `docs/guidelines/coding-standards.md` for code style and patterns
    - Use existing components when possible
    - Follow naming conventions
 
@@ -90,15 +90,21 @@ When designing a specific type of UI component:
 ## File Structure
 
 ### Organization
-- Components: `src/js/components/`
-- Utilities: `src/js/utils/`
-- Styles: `src/css/`
-- Tokens: `src/css/tokens/`
-- Component styles: `src/css/components/`
+- Design System Source:
+  - Components: `design-system/components/local/`
+  - Tokens: `design-system/tokens/`
+  - Component Styles: `design-system/styles/`
+  - Storybook Stories: `design-system/components/atoms-molecules/`
+- Application Source:
+  - Components: `src/js/components/` (references design-system)
+  - Utilities: `src/js/utils/`
+  - Styles: `src/css/` (references design-system)
+- Documentation:
+  - Guidelines: `docs/guidelines/`
+  - Component docs: `docs/components/`
+  - Token docs: `docs/tokens/`
+  - Patterns: `docs/` (DESIGN_PATTERNS.md, etc.)
 - Examples: `examples/`
-- Guidelines: `guidelines/`
-- Component docs: `components/docs/`
-- Token docs: `tokens/docs/`
 
 ### Naming Conventions
 - Files: kebab-case (e.g., `general_interface.js`)
@@ -111,9 +117,9 @@ When designing a specific type of UI component:
 
 ### Using Components
 - Always use existing PLUS components when possible
-- Import components: `import { PlusInterface } from "./components/general_interface.js"`
-- Use component creation methods: `PlusInterface.createButton()`, `PlusSmartComponents.createStatusIcon()`, etc.
-- Follow component API patterns from `components/docs/COMPONENTS.md`
+- Import components: `import { Universal } from "../design-system/components/local/index.js"`
+- Use component creation methods: `Universal.createButton()`, `Universal.createStatusIcon()`, etc.
+- Follow component API patterns from `docs/components/COMPONENTS.md`
 
 ### Button Components
 - Use `PlusInterface.createButton()` for all buttons
@@ -150,15 +156,15 @@ When designing a specific type of UI component:
 ## Documentation References
 
 ### Primary Guidelines (Always Reference)
-- **Coding Standards**: `guidelines/coding-standards.md` - Project rules and coding standards
-- **Token Reference**: `guidelines/token-reference.md` - Complete token reference
-- **Terminology**: `guidelines/terminology.md` - UI component types and terminology
+- **Coding Standards**: `docs/guidelines/coding-standards.md` - Project rules and coding standards
+- **Token Reference**: `docs/guidelines/token-reference.md` - Complete token reference
+- **Terminology**: `docs/guidelines/terminology.md` - UI component types and terminology
 
 ### Additional Documentation
-- **Components**: `components/docs/COMPONENTS.md` - Component library documentation
+- **Components**: `docs/components/COMPONENTS.md` - Component library documentation
 - **Design Patterns**: `docs/DESIGN_PATTERNS.md` - Design patterns and examples
 - **Development Standards**: `docs/DEV_STANDARDS.md` - Detailed development guidelines
-- **Token Documentation**: `tokens/docs/README.md` - Token system documentation
+- **Token Documentation**: `docs/tokens/README.md` - Token system documentation
 
 ## Common Patterns
 
@@ -249,6 +255,6 @@ When generating code, consider:
 - Always consider accessibility and responsiveness
 - Always follow PLUS design system patterns
 - Always generate production-ready code
-- **When designing a specific UI type, reference `guidelines/terminology.md` first**
-- **When selecting tokens, reference `guidelines/token-reference.md`**
-- **When following code standards, reference `guidelines/coding-standards.md`**
+- **When designing a specific UI type, reference `docs/guidelines/terminology.md` first**
+- **When selecting tokens, reference `docs/guidelines/token-reference.md`**
+- **When following code standards, reference `docs/guidelines/coding-standards.md`**

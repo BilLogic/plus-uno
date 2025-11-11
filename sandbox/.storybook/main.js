@@ -2,7 +2,7 @@ const path = require('path');
 
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 const config = {
-  stories: ['../stories/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../../design-system/components/atoms-molecules/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
@@ -23,6 +23,7 @@ const config = {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '../..');
     const srcPath = path.resolve(rootDir, 'src');
+    const designSystemPath = path.resolve(rootDir, 'design-system');
     
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
@@ -30,8 +31,11 @@ const config = {
     config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};
     
-    // Add alias for src directory - use absolute path
+    // Add alias for src directory - use absolute path (for backward compatibility)
     config.resolve.alias['@'] = srcPath;
+    // Add alias for design-system components - map @/js/components to design-system/components/local
+    config.resolve.alias['@/js/components'] = path.resolve(designSystemPath, 'components/local');
+    config.resolve.alias['@design-system'] = designSystemPath;
     
     // Ensure proper resolution of .js files
     if (!config.resolve.extensions) {

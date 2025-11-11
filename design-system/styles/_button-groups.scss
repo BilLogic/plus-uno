@@ -1,0 +1,59 @@
+/**
+ * Button Group Component Styles
+ * Matches Figma design system specifications
+ */
+
+.plus-button-group {
+    display: inline-flex;
+    gap: 0;
+}
+
+.plus-button-group.vertical {
+    flex-direction: column;
+}
+
+.plus-button-group > .pbtn {
+    border-radius: 0;
+}
+
+.plus-button-group > .pbtn:first-child {
+    border-top-left-radius: var(--size-element-radius-md);
+    border-bottom-left-radius: var(--size-element-radius-md);
+}
+
+.plus-button-group.vertical > .pbtn:first-child {
+    border-top-left-radius: var(--size-element-radius-md);
+    border-top-right-radius: var(--size-element-radius-md);
+    border-bottom-left-radius: 0;
+}
+
+.plus-button-group > .pbtn:last-child {
+    border-top-right-radius: var(--size-element-radius-md);
+    border-bottom-right-radius: var(--size-element-radius-md);
+}
+
+.plus-button-group.vertical > .pbtn:last-child {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: var(--size-element-radius-md);
+    border-bottom-right-radius: var(--size-element-radius-md);
+}
+
+.plus-button-group > .pbtn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+/* Remove borders between buttons */
+.plus-button-group > .pbtn:not(:first-child) {
+    margin-left: -1px;
+}
+
+.plus-button-group.vertical > .pbtn:not(:first-child) {
+    margin-left: 0;
+    margin-top: -1px;
+}
+
+.plus-button-group > .pbtn:hover,
+.plus-button-group > .pbtn:focus {
+    z-index: 1;
+}
+

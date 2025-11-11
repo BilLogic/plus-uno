@@ -3,10 +3,10 @@
  */
 
 // New modular import (preferred)
-import { Universal } from "./components/index.js";
+import { Universal } from "../design-system/components/local/index.js";
 
 // Legacy import (backward compatibility)
-import { PlusInterface, PlusSmartComponents } from "./components/index.js";
+import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
 
 // Network utilities
 import { PlusNetworkUtil } from "./utils/plus_util.js";
