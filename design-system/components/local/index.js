@@ -31,6 +31,7 @@ export class PlusInterface {
     static createChip = UniversalComponents.createChip;
     static createDivider = UniversalComponents.createDivider;
     static createDropdown = UniversalComponents.createDropdown;
+    static createCard = UniversalComponents.createCard;
     
     // Legacy constants
     static BUTTON_FILL = UniversalComponents.BUTTON_CONSTANTS.FILL;

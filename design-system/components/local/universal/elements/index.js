@@ -15,4 +15,5 @@ export { createContentStatusTag } from './content-status-tag.js';
 export { createSuperCompPillDiv } from './super-comp-pill.js';
 export { createStatusIndicator } from './status-indicator.js';
 export { createDropdown } from './dropdown.js';
+export { createCard } from './card.js';
 

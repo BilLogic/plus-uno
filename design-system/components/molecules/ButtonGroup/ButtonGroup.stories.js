@@ -15,11 +15,14 @@
  * 
  * ### Implementation Context
  * - **Component Type**: Element (uses `element-` tokens)
- * - **Token Usage**: 
- *   - Padding: `--size-element-pad-x-sm/md/lg`, `--size-element-pad-y-sm/md/lg` (for individual buttons)
+ * - **Component Dependencies**:
+ *   - Uses the **Button component** (`createButton` from `button.js`) for each button in the group
+ *   - Each button uses `element-` tokens for its own styling (padding, gap, radius, border)
+ *   - Each button uses Material Design 3 color tokens (`--color-primary`, `--color-on-primary`, etc.)
+ *   - See `Molecules/Button` documentation for complete Button token usage
+ * - **ButtonGroup Container Token Usage**: 
  *   - Gap: `--size-element-gap-sm/md/lg` (between buttons in group)
- *   - Radius: `--size-element-radius-sm/md/lg` (for button corners)
- *   - Colors: `--color-primary`, `--color-secondary`, etc. (for button styles)
+ *   - Layout: Flexbox for horizontal/vertical arrangement
  * 
  * ### Layout Variants
  * - **Horizontal**: Buttons arranged side-by-side (default for most use cases)
@@ -43,6 +46,7 @@
  * 
  * See docs/guidelines/terminology.md for Element Component Guidelines
  * See docs/guidelines/token-reference.md for Token Reference
+ * See Molecules/Button for Button component documentation (used for individual buttons in group)
  */
 
 import { PlusInterface } from '@/js/components/index.js';
