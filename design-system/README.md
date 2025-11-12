@@ -15,27 +15,29 @@ design-system/
 │   ├── _plus_spacing.scss    # PLUS-specific spacing
 │   └── _mixins.scss          # SCSS mixins
 │
-├── components/
-│   ├── atoms-molecules/      # Storybook stories for design system components
-│   │   ├── atoms/           # Atom-level component stories
-│   │   └── molecules/       # Molecule-level component stories
-│   └── local/               # Local component implementations
-│       ├── universal/       # Universal components (used across all products)
-│       ├── login/           # Login-specific components
-│       ├── profile/         # Profile-specific components
-│       ├── home/            # Home/dashboard components
-│       ├── training/        # Training components
-│       ├── toolkit/         # Toolkit components
-│       └── admin/           # Admin components
-│
-└── styles/                  # Component style SCSS files
-    ├── _plus_buttons.scss
-    ├── _inputs.scss
-    ├── _alerts.scss
-    ├── _breadcrumb.scss
-    ├── _badges.scss
-    ├── _dividers.scss
-    └── _button-groups.scss
+└── components/
+    ├── atoms/               # Atom-level components
+    │   └── Input/          # Each component has its own folder
+    │       ├── Input.stories.js
+    │       └── Input.scss
+    ├── molecules/           # Molecule-level components
+    │   ├── Button/         # Each component has its own folder
+    │   │   ├── Button.stories.js
+    │   │   └── Button.scss
+    │   ├── Alert/
+    │   ├── Badge/
+    │   ├── Breadcrumb/
+    │   ├── ButtonGroup/
+    │   ├── Divider/
+    │   └── Dropdown/
+    └── local/               # Local component implementations
+        ├── universal/       # Universal components (used across all products)
+        ├── login/           # Login-specific components
+        ├── profile/         # Profile-specific components
+        ├── home/            # Home/dashboard components
+        ├── training/        # Training components
+        ├── toolkit/         # Toolkit components
+        └── admin/           # Admin components
 ```
 
 ## Usage
@@ -52,12 +54,12 @@ Import styles in SCSS:
 
 ```scss
 @use "../design-system/tokens/colors" as *;
-@use "../design-system/styles/plus_buttons" as *;
+@use "../design-system/components/molecules/Button/Button" as *;
 ```
 
 ### Storybook
 
-Storybook stories are located in `components/atoms-molecules/` and can be viewed by running:
+Storybook stories are located in `components/molecules/` and `components/atoms/` and can be viewed by running:
 
 ```bash
 npm run storybook

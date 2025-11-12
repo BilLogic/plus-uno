@@ -4,8 +4,8 @@
   "description": "Starter kit for PLUS design prototyping with Cursor agent",
   "main": "index.js",
   "scripts": {
-    "build:css": "sass src/css/main.scss dist/css/main.css",
-    "watch:css": "sass --watch src/css/main.scss:dist/css/main.css",
+    "build:css": "sass --load-path=design-system/tokens --load-path=design-system/components src/css/main.scss dist/css/main.css",
+    "watch:css": "sass --load-path=design-system/tokens --load-path=design-system/components --watch src/css/main.scss:dist/css/main.css",
     "serve": "python3 -m http.server 8000",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006 --config-dir sandbox/.storybook",

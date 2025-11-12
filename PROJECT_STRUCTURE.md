@@ -17,9 +17,8 @@ plus-vibe-coding-starting-kit/
 │   │   ├── _plus_spacing.scss # PLUS-specific spacing
 │   │   └── _mixins.scss       # SCSS mixins
 │   ├── components/
-│   │   ├── atoms-molecules/   # Storybook stories
-│   │   │   ├── atoms/         # Atom-level component stories
-│   │   │   └── molecules/     # Molecule-level component stories
+│   │   ├── molecules/         # Molecule components
+│   │   ├── atoms/            # Atom components
 │   │   └── local/             # Component implementations
 │   │       ├── universal/     # Universal components
 │   │       ├── login/         # Login-specific components
@@ -94,11 +93,10 @@ The `design-system/` folder contains all design system source files:
 
 ### Components (`design-system/components/`)
 - **`local/`**: Component implementations organized by product area
-- **`atoms-molecules/`**: Storybook stories for design system components
-
-### Styles (`design-system/styles/`)
-- Component-specific SCSS files
-- Styles for buttons, inputs, alerts, badges, etc.
+- **`molecules/`**: Molecule-level components with Storybook stories and styles
+- **`atoms/`**: Atom-level components with Storybook stories and styles
+- Component-based structure: each component has its own folder with both `.stories.js` and `.scss` files
+- Styles for buttons, inputs, alerts, badges, etc. are co-located with their Storybook stories
 
 ## Documentation Structure
 
@@ -149,7 +147,7 @@ The `src/` folder contains application code that references the design system:
 1. **Design System**: All design system source in `design-system/`
 2. **Documentation**: All documentation consolidated in `docs/`
 3. **Application**: Application code in `src/` (references design-system)
-4. **Stories**: Storybook stories in `design-system/components/atoms-molecules/`
+4. **Stories**: Storybook stories in `design-system/components/molecules/` and `design-system/components/atoms/`
 
 ## Key Files
 
@@ -205,10 +203,11 @@ The `src/` folder contains application code that references the design system:
 
 ### Adding Components
 1. Create component in `design-system/components/local/`
-2. Create styles in `design-system/styles/`
-3. Add Storybook story in `design-system/components/atoms-molecules/`
-4. Update `docs/components/COMPONENTS.md`
-5. Add examples to `examples/`
+2. Create component folder in `design-system/components/` (in `molecules/` or `atoms/` subfolder)
+3. Add component styles (`.scss`) and Storybook story (`.stories.js`) in the component folder
+4. Import styles in `src/css/main.scss`
+5. Update `docs/components/COMPONENTS.md`
+6. Add examples to `examples/`
 
 ### Updating Guidelines
 1. Update appropriate file in `docs/guidelines/`

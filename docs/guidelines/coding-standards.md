@@ -59,7 +59,7 @@ When designing a specific type of UI, reference the appropriate guideline:
 - Utilities: `src/js/utils/`
 - Styles: `src/css/`
 - Tokens: `design-system/tokens/`
-- Component styles: `design-system/styles/`
+- Component styles: `design-system/components/` (organized by component in `molecules/` and `atoms/` folders)
 - Examples: `examples/`
 
 ### Naming Conventions

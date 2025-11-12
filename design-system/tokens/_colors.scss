@@ -20,9 +20,10 @@
     --color-inverse-primary: #84cfff;
 
     /* Primary State Layers */
-    --color-primary-state-08: rgba(0, 101, 142, 0.080);
-    --color-primary-state-12: rgba(0, 101, 142, 0.120);
-    --color-primary-state-16: rgba(0, 101, 142, 0.160);
+    /* Using actual primary color #0472a8 = rgb(4, 114, 168) */
+    --color-primary-state-08: rgba(4, 114, 168, 0.080);
+    --color-primary-state-12: rgba(4, 114, 168, 0.120);
+    --color-primary-state-16: rgba(4, 114, 168, 0.160);
     --color-primary-container-state-08: rgba(199, 231, 255, 0.080);
     --color-primary-container-state-12: rgba(199, 231, 255, 0.120);
     --color-primary-container-state-16: rgba(199, 231, 255, 0.160);
@@ -64,9 +65,10 @@
     --color-on-danger-container: #410002;
 
     /* Danger State Layers */
-    --color-danger-state-08: rgba(190, 12, 22, 0.080);
-    --color-danger-state-12: rgba(190, 12, 22, 0.120);
-    --color-danger-state-16: rgba(190, 12, 22, 0.160);
+    /* Using actual danger color #ba1a1a = rgb(186, 26, 26) */
+    --color-danger-state-08: rgba(186, 26, 26, 0.080);
+    --color-danger-state-12: rgba(186, 26, 26, 0.120);
+    --color-danger-state-16: rgba(186, 26, 26, 0.160);
     --color-danger-container-state-08: rgba(255, 218, 214, 0.080);
     --color-danger-container-state-12: rgba(255, 218, 214, 0.120);
     --color-danger-container-state-16: rgba(255, 218, 214, 0.160);
@@ -94,9 +96,10 @@
     --color-on-warning-container: #231b00;
 
     /* Warning State Layers */
-    --color-warning-state-08: rgba(113, 92, 0, 0.080);
-    --color-warning-state-12: rgba(113, 92, 0, 0.120);
-    --color-warning-state-16: rgba(113, 92, 0, 0.160);
+    /* Using actual warning color #9f8205 = rgb(159, 130, 5) */
+    --color-warning-state-08: rgba(159, 130, 5, 0.080);
+    --color-warning-state-12: rgba(159, 130, 5, 0.120);
+    --color-warning-state-16: rgba(159, 130, 5, 0.160);
     --color-warning-container-state-08: rgba(255, 225, 122, 0.080);
     --color-warning-container-state-12: rgba(255, 225, 122, 0.120);
     --color-warning-container-state-16: rgba(255, 225, 122, 0.160);

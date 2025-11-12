@@ -1,0 +1,452 @@
+@use "../../../tokens/fonts";
+@use "../../atoms/Input/Input";
+
+/** dropdowns **/
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+  text-decoration: none;
+}
+
+.dropdown-item.disabled,
+.dropdown-item:disabled {
+  pointer-events: none;
+}
+
+.pdropdown .dropdown-menu,
+.multiselect-container.dropdown-menu {
+    box-sizing: border-box;
+    border: none;
+    /* Figma: Dropdown menu - radius-md (4px) */
+    border-radius: var(--size-element-radius-md);
+    padding: 0px;
+    width: 100%;
+    min-width: fit-content;
+    background-color: var(--color-surface-container-high);
+}
+
+/* need to distinguish scrollable dropdowns bc scrolling overflow breaks nested dropdowns */
+.pdropdown.can-scroll .dropdown-menu {
+    overflow-y: auto;
+}
+
+.pdropdown .dropdown-menu .dropdown-item,
+.multiselect-container.dropdown-menu .multiselect-option.dropdown-item,
+.multiselect-container.dropdown-menu .multiselect-all.dropdown-item {
+    width: 100%;
+    /* Figma: Dropdown item default - pad-y-sm (4px), pad-x-sm (8px) */
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    box-sizing: border-box;
+    border-radius: 0px;
+}
+
+.pdropdown[data-allow-multiple="true"][data-use-checkboxes="true"] .dropdown-menu .dropdown-item:not(.dropdown-section-header) {
+    padding: 0px;
+}
+
+.pdropdown.large .dropdown-menu .dropdown-item {
+    /* Figma: Large dropdown item - pad-y-md (6px), pad-x-md (10px) */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+}
+
+.pdropdown[data-allow-multiple="true"][data-use-checkboxes="true"] .dropdown-menu .dropdown-item label {
+    padding: 4px 12px;
+    margin: 0px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: -1px !important; /*compensate for border*/
+    left: calc(100% + 1px) !important;
+    margin-top: 0px;
+}
+
+.pdropdown .dropdown-menu .dropdown-item.dropdown-section-header:not(:first-child) {
+    border-top: 1px solid var(--color-outline);
+}
+
+.pdropdown .dropdown-menu .dropdown-item.dropdown-section-header,
+.pdropdown .dropdown-menu .dropdown-item.disabled,
+.pdropdown .dropdown-menu .dropdown-item[disabled="true"] {
+    cursor: default;
+    pointer-events: none;
+    
+    .pdropdown-item-text {
+        opacity: 0.38;
+    }
+}
+
+.pdropdown .dropdown-menu .dropdown-item {
+
+    display: flex;
+    align-items: center;
+
+    .pdropdown-item-text {
+        color: var(--color-on-surface);
+    }
+
+    .selected-icon {
+        color: var(--color-on-surface-variant);
+    }
+}
+
+/* hide checkmarks in non-multisection menus */
+.pdropdown:not(.multi-section) {
+    i.selected-icon {
+        display: none;
+    }
+}
+
+.pdropdown .dropdown-menu .dropdown-item .selected-icon {
+    color: transparent;
+}
+
+.pdropdown .dropdown-menu .dropdown-item.selected .selected-icon {
+    color: var(--color-on-surface-variant);
+}
+
+.pdropdown .dropdown-menu .dropdown-item:not(.dropdown-section-header):hover,
+.multiselect-container.dropdown-menu .multiselect-option.dropdown-item:hover,
+.multiselect-container.dropdown-menu .multiselect-all.dropdown-item:hover {
+    /* Figma: Hover state - 12% opacity state layer */
+    background-color: color-mix(in srgb, var(--color-on-surface) 12%, var(--color-surface-container-lowest)) !important
+}
+
+.pdropdown .dropdown-menu .dropdown-item.selected {
+    background-color: var(--color-surface-container-highest);
+}
+
+/*toggles*/
+.pdropdown {
+    
+    &.pdropdown-split-dropdown {
+        .pdropdown-split-text-btn {
+            border-right: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            pointer-events: none;
+        }
+        .pdropdown-split-toggle-btn {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            /* Figma: Split dropdown separator - use border color from style */
+            border-left: var(--size-element-stroke-md) solid currentColor;
+        }
+    }
+
+    /* all toggles */
+    .pdropdown-toggle {
+        /* Figma: Dropdown toggle - radius-sm (4px) */
+        border-radius: var(--size-element-radius-sm); 
+    }
+    
+    /* default toggle */
+    .pdropdown-default-toggle {        
+        /* Figma: Dropdown toggle - radius-sm (4px) */
+        border-radius: var(--size-element-radius-sm);
+        width: 100%;
+        justify-content: space-between;
+    }
+
+
+    .pdropdown-default-toggle:focus {
+        outline: none;
+    }
+
+    .pdropdown-default-toggle[disabled] {
+        color: var(--color-on-surface-variant);
+        border-color: var(--color-outline-variant);
+        background-color: var(--color-surface-variant);
+    }
+
+    .pdropdown-default-toggle i {
+        color: var(--color-on-surface-variant);
+    }
+    
+    /* Color style variants for dropdown toggles */
+    &.pdropdown-primary {
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            /* Figma: Primary style - border and text use primary color */
+            border-color: var(--color-primary);
+            color: var(--color-primary-text);
+            
+            &::after {
+                color: var(--color-primary-text);
+            }
+        }
+    }
+    
+    &.pdropdown-secondary {
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            border-color: var(--color-secondary);
+            color: var(--color-secondary-text);
+            
+            &::after {
+                color: var(--color-secondary-text);
+            }
+        }
+    }
+    
+    &.pdropdown-success {
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            border-color: var(--color-success);
+            color: var(--color-success-text);
+            
+            &::after {
+                color: var(--color-success-text);
+            }
+        }
+    }
+    
+    &.pdropdown-danger {
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            border-color: var(--color-danger);
+            color: var(--color-danger-text);
+            
+            &::after {
+                color: var(--color-danger-text);
+            }
+        }
+    }
+    
+    &.pdropdown-warning {
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            border-color: var(--color-warning);
+            color: var(--color-warning-text);
+            
+            &::after {
+                color: var(--color-warning-text);
+            }
+        }
+    }
+    
+    &.pdropdown-info {
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            border-color: var(--color-info);
+            color: var(--color-info-text);
+            
+            &::after {
+                color: var(--color-info-text);
+            }
+        }
+    }
+
+}
+
+.pdropdown.small .pdropdown-default-toggle {
+    /* Figma: Small dropdown - pad-y-sm (4px), pad-x-sm (8px) */
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+}
+
+.pdropdown.large .pdropdown-default-toggle {
+    /* Figma: Large dropdown - pad-y-lg (8px), pad-x-lg (16px) */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+}
+
+/** multiselects **/
+
+
+.multiselect {
+    @extend .body2-txt;
+}
+
+.pdropdown-default-toggle,
+.multiselect.dropdown-toggle {
+    /* Figma: Default toggle border radius - radius-sm (4px) */
+    border-radius: var(--size-element-radius-sm);
+    color: var(--color-on-surface-variant);
+    background: var(--color-surface);
+    /* Figma: Border - stroke-md (1.5px) */
+    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
+    display: flex;
+    /* Figma: Gap between text and caret - gap-sm (8px) */
+    gap: var(--size-element-gap-sm);
+    /* Figma: Dropdown toggle default - pad-y-md (6px), pad-x-md (10px) */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+
+    &:has(.multiselect-label-tag) .multiselect-selected-text {
+        display: none;
+    }
+
+    &::after {
+        content: "\f0d7";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: var(--color-on-surface-variant);
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
+        display: inline-block;
+        border: none;
+        margin-left: auto;
+    }
+
+    &[aria-expanded="true"]:has(+ [x-placement="bottom-start"]) {
+        border-bottom-width: 0px;
+    }
+
+    &[aria-expanded="true"]:has(+ [x-placement="top-start"]) {
+        border-top-width: 0px;
+    }
+
+    &[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    &.disabled,
+    &[disabled] {
+        .multiselect-label-tag {
+            pointer-events: none;
+        }
+    }
+}
+
+.multiselect-container.dropdown-menu,
+.pdropdown-menu.dropdown-menu {
+    margin-top: 0;
+    background-color: var(--color-surface);
+    /* Figma: Dropdown menu border - stroke-md (1.5px) */
+    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
+    border-radius: 0 0 var(--size-element-radius-sm) var(--size-element-radius-sm);
+
+    //all menu items
+    .multiselect-filter,
+    .multiselect-option.dropdown-item,
+    .multiselect-all.dropdown-item {
+
+        /* body2-txt */
+        @extend .body2-txt;
+        
+        min-width: 218.67px; /* Based on Figma col-4 specification - matches production var(--size-columns-min-4) */
+
+        /* Figma: Dropdown toggle default - pad-y-md (6px), pad-x-md (10px) */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        color: var(--color-on-surface);
+        background-color: inherit;
+    
+        &.active {
+            background-color: var(--color-surface-container-highest) !important;
+        }
+
+        &:not(:hover):not(.active):focus {
+            background-color: inherit !important;
+        }
+    }
+    
+    //search bar and add option btn don't scroll with rest of menu
+    .multiselect-filter,
+    .multiselect-option.add-option-btn {
+        border-bottom: 1px solid var(--color-outline-variant);
+        position: sticky;
+        z-index: 1;
+    }
+
+    //search bar
+    .multiselect-filter {
+        
+        top: 0px;
+
+        i,
+        ::-webkit-search-cancel-button {
+            color: var(--color-outline) !important;
+            padding: 0;
+            font-size: var(--font-size-fa-body2);
+            line-height: var(--font-line-height-fa-body2);
+            margin-left: 0;
+        }
+        i.multiselect-clear-filter {
+            //nudge to align with caret icon in toggle
+            margin-right: -1px;
+        }
+
+        ::-webkit-search-cancel-button {
+            margin-right: -12px;
+
+            /** the following needed for clear btn to appear on iOS **/
+            /* Remove default */
+            -webkit-appearance: none;
+
+            /* custom styles */
+            height: var(--font-size-fa-body2);
+            width: var(--font-size-fa-body2);
+            display: block;
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAn0lEQVR42u3UMQrDMBBEUZ9WfQqDmm22EaTyjRMHAlM5K+Y7lb0wnUZPIKHlnutOa+25Z4D++MRBX98MD1V/trSppLKHqj9TTBWKcoUqffb0cbBBEhTjBOV4ja4l4OIAZThEOV6jHO8ARXD+gPPvKMABinGOrnu6gTNUawrcQKNCAQ7QeTxORzle3+sDfjJpPCqhJh7GixZq4rHcc9l5A9qZ+WeBhgEuAAAAAElFTkSuQmCC);
+            background-repeat: no-repeat;
+            background-size: var(--font-size-fa-body2);
+        }
+        
+        input.multiselect-search.form-control {
+            @extend .body2-txt;
+            
+            color: var(--color-on-surface);
+            padding: 0 var(--size-element-pad-x-md);
+            margin: 0;
+            height: unset;
+            background-color: inherit;
+            border: none;
+
+            &::placeholder {
+                color: var(--color-on-surface-variant);
+            }
+
+            &:focus {
+                box-shadow: none;
+            }
+        }
+    }
+
+    //add option btn
+    .multiselect-option.add-option-btn {
+        //font size * line-height + total vertical padding + border width
+        top: calc(var(--font-size-body2) * 1.57 + var(--size-element-pad-y-md) * 2 + 1px);
+    }
+
+    //regular option btns
+    .multiselect-option.dropdown-item {
+        .form-check {
+            // width of checkbox + gap b/w checkbox and label
+            padding-left: calc(var(--font-size-body3) + var(--size-element-pad-x-md));
+            display: flex;
+            align-items: center;
+            
+            input[type="checkbox"] {
+                @extend .plus-checkbox;
+                padding: 0;
+                margin-top: 0;
+                
+                // negative margin equal to width of checkbox + gap b/w checkbox and label 
+                margin-left: calc(0px - var(--font-size-body3) - var(--size-element-pad-x-md));
+            }
+        }
+
+        &:has(input[value="__plus-ms-fake-option__"]) {
+            display: none !important;
+        }
+    }
+}
+
+.multiselect-native-select:has(select:not([multiple])) .dropdown-item {
+    .form-check-input {
+        display: none;
+    }
+    .form-check-label {
+        margin-left: -1.5em;
+    }
+}

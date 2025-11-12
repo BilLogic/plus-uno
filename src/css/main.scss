@@ -6,23 +6,24 @@
  */
 
 // Design Tokens
-@use "../design-system/tokens/colors" as *;
-@use "../design-system/tokens/primitives" as *;
-@use "../design-system/tokens/spacing_semantics" as *;
-@use "../design-system/tokens/layout" as *;
-@use "../design-system/tokens/fonts" as *;
-@use "../design-system/tokens/plus_spacing" as *;
-@use "../design-system/tokens/mixins" as *;
+// Use @import to include :root blocks (Ruby Sass outputs :root blocks with @import)
+// Import token files directly to ensure :root blocks are included
+@import "_colors";
+@import "_primitives";
+@import "_spacing_semantics";
+@import "_layout";
+@import "_fonts";
+@import "_plus_spacing";
 
-// Components
-@use "../design-system/styles/plus_buttons" as *;
-@use "../design-system/styles/inputs" as *;
-@use "../design-system/styles/alerts" as *;
-@use "../design-system/styles/breadcrumb" as *;
-@use "../design-system/styles/badges" as *;
-@use "../design-system/styles/dividers" as *;
-@use "../design-system/styles/button-groups" as *;
-@use "../design-system/styles/dropdowns" as *;
+// Components (using load path)
+@import "molecules/Button/Button";
+@import "atoms/Input/Input";
+@import "molecules/Alert/Alert";
+@import "molecules/Breadcrumb/Breadcrumb";
+@import "molecules/Badge/Badge";
+@import "molecules/Divider/Divider";
+@import "molecules/ButtonGroup/ButtonGroup";
+@import "molecules/Dropdown/Dropdown";
 
 // Base Styles
 body {
