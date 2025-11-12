@@ -222,9 +222,12 @@ const button = PlusInterface.createButton({
 - **BEFORE generating code, study existing patterns:**
   - Review similar components in `design-system/components/local/universal/elements/`
   - Review similar styles in `design-system/styles/`
-  - Reference production repository for design component patterns: `https://github.com/CMU-PLUS/web-app`
-    - Styles: `java/sass/*` (e.g., `java/sass/_colors.scss`)
-    - Components: `java/docroot/javascript/pl2/plus_components/*`
+  - **Reference production repository**: Check the cloned repository at `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` for existing component implementations
+    - Study production code patterns for functionality, event handling, and DOM structure
+    - Match production implementation patterns exactly (naming, structure, behavior)
+  - **Reference production SCSS**: Check `{cloned-repo-path}/java/sass/` for existing styling patterns
+    - Study production SCSS patterns for class naming, structure, and token usage
+    - Match production styling patterns exactly (class prefixes, organization, patterns)
   - Match the exact structure, naming, and patterns used in existing code
 - Generate clean, readable code that matches existing patterns
 - Include all necessary imports
@@ -248,7 +251,7 @@ const button = PlusInterface.createButton({
     - Use `calc()` when adjusting for borders: `calc(var(--size-*) - 1px)`
     - Include comments explaining Figma references: `/* Figma: ... */`
     - Use `:not(:disabled):not(.disabled)` pattern for interactive states
-  - **Production repository patterns**: Reference `https://github.com/CMU-PLUS/web-app` for design component implementations
+  - **Production repository patterns**: Reference the cloned repository at `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` for JavaScript component implementations and `{cloned-repo-path}/java/sass/` for SCSS styling patterns
 - Group related code together
 - Use meaningful variable names matching existing patterns
 - Keep functions focused and small

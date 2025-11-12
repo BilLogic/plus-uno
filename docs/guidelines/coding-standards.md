@@ -14,6 +14,8 @@ This document outlines the coding standards, project rules, and best practices f
 - Follow PascalCase for classes
 - Use const/let, never var
 - Use static methods for component creation functions
+- **Reference production repository**: When creating new components, check the cloned production repository at `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` for existing functionality/styling patterns
+- Match production code patterns for component structure, functionality, and behavior
 
 ### CSS/SCSS
 - Always use CSS custom properties (variables) for design tokens
@@ -21,6 +23,9 @@ This document outlines the coding standards, project rules, and best practices f
 - Use utility classes for common patterns
 - Follow kebab-case for class names
 - Use SCSS partials for modularity
+- **Reference production repository**: When creating new component styles, check the cloned production repository at `{cloned-repo-path}/java/sass/` for existing styling patterns
+- Study production SCSS patterns for class naming, structure, and token usage
+- Match production styling patterns exactly (class prefixes, organization, patterns)
 
 ### HTML
 - Use semantic HTML elements
@@ -81,12 +86,14 @@ When designing a specific type of UI, reference the appropriate guideline:
 7. Use functional code patterns
 
 ### Component Creation
-1. Use static methods for component creation
-2. Return DOM elements (not HTML strings where possible)
-3. Accept configuration objects as parameters
-4. Provide sensible defaults
-5. Document all parameters with JSDoc
-6. Handle edge cases
+1. **Reference production repository first**: Check `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` and `{cloned-repo-path}/java/sass/` for existing implementations
+2. Use static methods for component creation
+3. Return DOM elements (not HTML strings where possible)
+4. Accept configuration objects as parameters
+5. Provide sensible defaults
+6. Document all parameters with JSDoc
+7. Handle edge cases
+8. Match production implementation patterns exactly
 
 ### Accessibility
 - Include proper ARIA attributes

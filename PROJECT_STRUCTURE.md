@@ -202,11 +202,41 @@ The `src/` folder contains application code that references the design system:
 6. Update `docs/guidelines/token-reference.md` if needed
 
 ### Adding Components
-1. Create component in `design-system/components/local/`
-2. Create component folder in `design-system/components/` (in `molecules/` or `atoms/` subfolder)
-3. Add component styles (`.scss`) and Storybook story (`.stories.js`) in the component folder
+
+**Before starting:**
+- **Reference production repository**: Check the cloned repository at `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` for existing component implementations
+- Study production code patterns for functionality, event handling, and DOM structure
+- Match production implementation patterns exactly (naming, structure, behavior)
+- Reference production SCSS in `{cloned-repo-path}/java/sass/` for styling patterns
+
+**Steps:**
+1. **Create JavaScript component file** in `design-system/components/local/universal/elements/{component-name}.js`
+   - Reference production repository for existing functionality/styling
+   - Match production code patterns for component structure and functionality
+   - Use existing components as reference (e.g., `button.js`, `alert.js`, `dropdown.js`)
+   - Export named function: `export function create{ComponentName}({options})`
+   - Use JSDoc with `@fileoverview` and `@param` documentation
+   - Return `HTMLElement` (use `document.createElement()`, not HTML strings)
+   - Add to `design-system/components/local/index.js` exports
+
+2. **Create SCSS component file** in `design-system/components/{molecules|atoms}/{ComponentName}/{ComponentName}.scss`
+   - Reference production repository for existing styling patterns
+   - Study production SCSS patterns for class naming, structure, and token usage
+   - Match production styling patterns exactly (class prefixes, organization, patterns)
+   - Reference production component JavaScript for class names and structure
+   - **NEVER hardcode values** - always use semantic tokens
+   - Match component type to token prefix (element-*, card-*, section-*, etc.)
+   - Use `color-mix(in srgb, ...)` for state layers
+   - Use `:not(:disabled):not(.disabled)` pattern for interactive states
+
+3. **Create component folder** in `design-system/components/` (in `molecules/` or `atoms/` subfolder)
+   - Add Storybook story (`.stories.js`) in the component folder
+   - Follow Storybook organization guidelines from `docs/guidelines/storybook-organization.md`
+
 4. Import styles in `src/css/main.scss`
+
 5. Update `docs/components/COMPONENTS.md`
+
 6. Add examples to `examples/`
 
 ### Updating Guidelines
