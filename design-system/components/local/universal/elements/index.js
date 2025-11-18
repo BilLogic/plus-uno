@@ -16,4 +16,7 @@ export { createSuperCompPillDiv } from './super-comp-pill.js';
 export { createStatusIndicator } from './status-indicator.js';
 export { createDropdown } from './dropdown.js';
 export { createCard } from './card.js';
+export { createModal } from './modal.js';
+export { createNavigation } from './navigation.js';
+export { createTextarea, createSelect, createRangeInput, createSelectMultiple } from './form.js';
 

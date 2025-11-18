@@ -1,0 +1,370 @@
+/**
+ * Modal Component Styles
+ * Matches Figma design system specifications
+ * Modals are dialog windows that overlay the main content
+ * 
+ * Figma Specs:
+ * - Background: surface-container-high
+ * - Border radius: 6px (radius-150)
+ * - Padding: varies by size (sm: 8px/10px, md: 12px/16px)
+ * - Gap: varies by size (sm: 8px, md: 12px)
+ * - Width: 340px (default)
+ */
+
+.plus-modal {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: var(--color-surface-container-high); /* Figma: bg-[var(--neutral-colors/surface-container/surface-container-high,#e7e8eb)] */
+    color: var(--color-on-surface);
+    overflow: hidden;
+    
+    /* Default width from Figma: 340px */
+    /* Figma: w-[340px] */
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    
+    /* Default padding from Figma specs: sm (10px/8px) */
+    /* Figma: px-[var(--modal/pad-x-sm,10px)] py-[var(--modal/pad-y-sm,8px)] */
+    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); /* 8px top/bottom, 10px left/right */
+    
+    /* Default gap - spacing between major sections: sm (8px) */
+    /* Figma: gap-[var(--modal/gap-sm,8px)] */
+    gap: var(--size-modal-gap-sm); /* 8px */
+    
+    /* Default radius from Figma specs: 6px (radius-150) */
+    /* Figma: rounded-bl-[6px] rounded-br-[6px] rounded-tl-[6px] rounded-tr-[var(--border/radius/radius-150,6px)] */
+    border-radius: var(--size-modal-radius-md); /* 6px (radius-150) */
+    
+    /* No border in Figma design */
+    border: none;
+    
+    /* Ensure modal is visible as a box */
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Padding Size Variants */
+.plus-modal-pad-sm {
+    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); /* 8px top/bottom, 10px left/right */
+}
+
+.plus-modal-pad-md {
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md); /* 12px top/bottom, 16px left/right */
+}
+
+.plus-modal-pad-lg {
+    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg); /* 24px top/bottom, 40px left/right */
+}
+
+/* Gap Size Variants */
+.plus-modal-gap-sm {
+    gap: var(--size-modal-gap-sm); /* 8px */
+}
+
+.plus-modal-gap-md {
+    gap: var(--size-modal-gap-md); /* 12px */
+}
+
+.plus-modal-gap-lg {
+    gap: var(--size-modal-gap-lg); /* 32px */
+}
+
+/* Radius Size Variants */
+.plus-modal-radius-sm {
+    border-radius: var(--size-modal-radius-sm); /* 4px */
+}
+
+.plus-modal-radius-md {
+    border-radius: var(--size-modal-radius-md); /* 6px */
+}
+
+.plus-modal-radius-lg {
+    border-radius: var(--size-modal-radius-lg); /* 12px */
+}
+
+/* Modal Header */
+/* Figma: content-stretch flex gap-[var(--modal/gap-md,12px)] items-center relative shrink-0 w-full */
+.plus-modal-header {
+    display: flex;
+    flex-direction: row; /* Ensure horizontal layout */
+    gap: var(--size-modal-gap-md); /* 12px gap between title and close button */
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0; /* Don't shrink */
+}
+
+/* Modal Title */
+/* Figma: basis-0 flex flex-col ... grow justify-center ... shrink-0 text-[20px] */
+/* Typography handled by .h5 class - only override color */
+.plus-modal-title {
+    flex: 1 1 auto;
+    min-width: 0; /* Allow text to shrink */
+    min-height: 0;
+    color: var(--color-on-surface);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Modal Close Button */
+/* Figma: Icon component with iconName="xmark", style="solid", size="h3" (24px) */
+/* Figma: text-[24px] leading-[1.667] - Fontawesome/Solid/H3 */
+/* Figma: content-stretch flex items-center justify-center relative shrink-0 */
+.plus-modal-close-btn {
+    position: relative;
+    background: transparent !important; /* Override any inherited background */
+    border: none !important; /* Override any inherited border */
+    cursor: pointer;
+    padding: 0 !important; /* Override any inherited padding */
+    margin: 0;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-on-surface-variant); /* Figma: text-[color:var(--neutral-colors/on-surface-variant,#3f484a)] */
+    flex-shrink: 0;
+    outline: none !important; /* Remove default button outline */
+    box-shadow: none !important; /* Remove any box shadow */
+    -webkit-appearance: none; /* Remove iOS button styling */
+    -moz-appearance: none; /* Remove Firefox button styling */
+    appearance: none; /* Remove default button styling */
+    
+    /* Ensure no border or background is applied */
+    &::before,
+    &::after {
+        display: none;
+    }
+    
+    &:hover:not(:disabled):not(.disabled) {
+        color: color-mix(in srgb, var(--color-on-surface-variant) 85%, black);
+        background: transparent !important;
+        border: none !important;
+    }
+    
+    &:active:not(:disabled):not(.disabled) {
+        color: color-mix(in srgb, var(--color-on-surface-variant) 75%, black);
+        background: transparent !important;
+        border: none !important;
+    }
+    
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+    
+    i {
+        font-size: 24px; /* H3 icon size - Figma: text-[24px] */
+        line-height: 1.667; /* Figma: leading-[1.667] */
+        display: inline-block;
+        width: auto;
+        height: auto;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+/* Modal Divider */
+/* Figma: h-px bg-[var(--neutral-colors/outline,#6f797a)] opacity-10 */
+.plus-modal-divider {
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-outline); /* Figma: bg-[var(--neutral-colors/outline,#6f797a)] */
+    opacity: 0.1; /* Figma: opacity-10 */
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+/* Modal Body */
+.plus-modal-body {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Modal Body - Default type */
+/* Figma: content-stretch flex h-[64px] items-start */
+.plus-modal-default .plus-modal-body {
+    /* Default type: fixed height body */
+    height: 64px; /* Figma: h-[64px] */
+    flex: 0 0 auto; /* Don't grow or shrink */
+    gap: 0; /* No gap between content and scrollbar (no scrollbar for default) */
+}
+
+/* Modal Body - Scrollable type */
+/* Figma: basis-0 content-stretch flex gap-[var(--spacing/small/space-000,0px)] grow items-start */
+.plus-modal-scrollable .plus-modal-body {
+    /* Scrollable type: flexible height */
+    flex: 1 1 auto; /* Grow to fill available space */
+    min-height: 0; /* Allow flex shrinking */
+    gap: var(--size-spacing-small-space-000); /* 0px gap between content and scrollbar - Figma: gap-[var(--spacing/small/space-000,0px)] */
+}
+
+/* Modal Content */
+/* Figma: basis-0 box-border content-stretch flex grow h-full items-start min-h-px min-w-px px-0 py-[var(--spacing/small/space-000,0px)] */
+.plus-modal-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 100%;
+    
+    /* Typography handled by content classes - only override color */
+    color: var(--color-on-surface);
+}
+
+/* Default type content - no gap */
+/* Figma: basis-0 box-border content-stretch flex grow h-full items-start min-h-px min-w-px px-0 py-[var(--spacing/small/space-000,0px)] */
+.plus-modal-default .plus-modal-content {
+    /* No gap for default type - single content element */
+    gap: 0;
+}
+
+/* Scrollable type content - has gap for multiple content elements */
+/* Figma: basis-0 content-stretch flex gap-[var(--modal/gap-md,12px)] grow h-full items-start min-h-px min-w-px */
+.plus-modal-scrollable .plus-modal-content {
+    /* Gap is for spacing between multiple content elements */
+    gap: var(--size-modal-gap-md); /* 12px gap - Figma: gap-[var(--modal/gap-md,12px)] */
+}
+
+/* Modal Scrollbar (for scrollable type) */
+/* Figma: bg-[var(--neutral-colors/surface-container/surface-container,#edeef0)] content-stretch flex flex-col h-full items-center relative shrink-0 */
+.plus-modal-scrollbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--color-surface-container); /* Figma: surface-container background */
+    flex-shrink: 0;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    height: 100%; /* Match body height - Figma: h-full */
+}
+
+.plus-modal-scrollbar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-outline);
+    font-size: 10px; /* b3 icon size */
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+    
+    i {
+        font-size: 10px; /* b3 icon size */
+    }
+}
+
+.plus-modal-scrollbar-track {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 1px;
+    margin: 0;
+    min-height: 0;
+    width: 100%;
+}
+
+.plus-modal-scrollbar-bar {
+    flex: 1 1 auto;
+    background-color: var(--color-outline-variant);
+    border-radius: var(--size-border-radius-radius-0); /* 1px */
+    min-height: 30px;
+    width: 100%;
+}
+
+/* Modal Footer */
+/* Figma: flex gap-[var(--modal/gap-md,12px)] items-center justify-end */
+.plus-modal-footer {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.plus-modal-button-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Button gap varies by modal type */
+.plus-modal-default .plus-modal-button-row {
+    gap: var(--size-modal-gap-sm); /* 8px gap - Figma: gap-[var(--modal/gap-sm,8px)] */
+}
+
+.plus-modal-scrollable .plus-modal-button-row {
+    gap: var(--size-modal-gap-md); /* 12px gap - Figma: gap-[var(--modal/gap-md,12px)] */
+}
+
+.plus-modal-button {
+    flex-shrink: 0;
+}
+
+/* Type-specific styles */
+/* Default type with buttons - different padding */
+.plus-modal-default.plus-modal-with-buttons {
+    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); /* 8px top/bottom, 10px left/right */
+    gap: var(--size-modal-gap-sm); /* 8px */
+}
+
+/* Scrollable type with buttons - different padding */
+.plus-modal-scrollable.plus-modal-with-buttons {
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md); /* 12px top/bottom, 16px left/right */
+    gap: var(--size-modal-gap-md); /* 12px */
+}
+
+/* Default type without buttons - different padding */
+.plus-modal-default.plus-modal-no-buttons {
+    padding: 0; /* No container padding - header and body handle their own */
+}
+
+.plus-modal-default.plus-modal-no-buttons .plus-modal-header {
+    padding: var(--size-element-pad-y-lg) var(--size-spacing-medium-space-300); /* 8px top/bottom, 16px left/right */
+    gap: var(--size-element-gap-lg); /* 12px gap between title and close button */
+}
+
+.plus-modal-default.plus-modal-no-buttons .plus-modal-body {
+    padding: var(--size-element-pad-x-lg) var(--size-element-pad-y-lg); /* 16px left/right, 8px top/bottom */
+    gap: var(--size-spacing-small-space-150); /* 10px gap between content and scrollbar (if scrollable) */
+}
+
+/* Scrollable type without buttons - different padding */
+.plus-modal-scrollable.plus-modal-no-buttons {
+    padding: 0; /* No container padding - header and body handle their own */
+}
+
+.plus-modal-scrollable.plus-modal-no-buttons .plus-modal-header {
+    padding: var(--size-element-pad-y-lg) var(--size-spacing-medium-space-300); /* 8px top/bottom, 16px left/right */
+    gap: var(--size-element-gap-lg); /* 12px gap between title and close button */
+}
+
+.plus-modal-scrollable.plus-modal-no-buttons .plus-modal-body {
+    padding: var(--size-element-pad-x-lg) var(--size-element-pad-y-lg); /* 16px left/right, 8px top/bottom */
+    gap: var(--size-spacing-small-space-150); /* 10px gap between content and scrollbar */
+}
+

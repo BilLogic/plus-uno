@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisor Sessions - PLUS Design System</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&family=Merriweather+Sans:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 4 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PLUS Design System CSS -->
+    <link rel="stylesheet" href="dist/css/main.css">
+    
+    <style>
+        /* Custom styles for session management page */
+        .session-page {
+            background-color: var(--color-surface-container);
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .top-bar {
+            background-color: var(--color-surface-container);
+            padding: var(--size-surface-container-pad-y-sm) var(--size-surface-container-pad-x-md);
+            display: flex;
+            align-items: center;
+            gap: var(--size-surface-container-gap-sm);
+            border-bottom: var(--size-surface-container-border) solid var(--color-outline-variant);
+        }
+        
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-md);
+        }
+        
+        .top-bar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-md);
+        }
+        
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-sm);
+            padding: var(--size-element-pad-x-md) var(--size-element-pad-y-md);
+            background-color: var(--color-surface-container-lowest);
+            border-radius: var(--size-element-radius-sm);
+        }
+        
+        .avatar-initial {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--color-primary-state-08);
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .notification-badge {
+            background-color: var(--color-danger-state-08);
+            color: var(--color-danger);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .main-container {
+            padding: var(--size-section-pad-x-md) var(--size-section-pad-y-md);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .content-container {
+            background-color: var(--color-surface);
+            border-radius: var(--size-surface-radius);
+            padding: var(--size-section-pad-x-lg) var(--size-section-pad-y-lg);
+            gap: var(--size-section-gap-lg);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .alert-box {
+            background-color: var(--color-primary-state-08);
+            border: 1px solid var(--color-primary);
+            border-radius: var(--size-modal-radius-md);
+            padding: var(--size-modal-pad-x-md) var(--size-modal-pad-y-lg);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--size-modal-gap-md);
+            margin-bottom: var(--size-section-gap-md);
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-family: var(--font-family-header);
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.5;
+            color: var(--color-on-surface);
+            margin-bottom: var(--size-element-gap-xs);
+        }
+        
+        .alert-text {
+            font-family: var(--font-family-body);
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.571;
+            color: var(--color-on-surface);
+        }
+        
+        .alert-close {
+            background: none;
+            border: none;
+            color: var(--color-on-surface-variant);
+            cursor: pointer;
+            padding: 4px;
+            cursor: pointer;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--size-section-gap-md);
+        }
+        
+        .page-title {
+            font-family: var(--font-family-header);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.429;
+            color: var(--color-on-surface);
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--size-card-gap-md);
+            margin-bottom: var(--size-section-gap-lg);
+        }
+        
+        .summary-card {
+            background-color: var(--color-surface-container-lowest);
+            border-radius: var(--size-card-radius-sm);
+            padding: var(--size-card-pad-x-lg) var(--size-card-pad-y-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--size-element-gap-xs);
+        }
+        
+        .summary-card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-sm);
+            justify-content: space-between;
+        }
+        
+        .summary-card-title {
+            font-family: var(--font-family-header);
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.5;
+            color: var(--color-on-surface);
+        }
+        
+        .summary-card-icon {
+            background-color: var(--color-primary-state-08);
+            padding: 4px 8px;
+            border-radius: 50px;
+            color: var(--color-primary);
+            font-size: 14px;
+        }
+        
+        .summary-card-value {
+            font-family: var(--font-family-header);
+            font-size: 40px;
+            font-weight: 700;
+            line-height: 1.6;
+            color: var(--color-on-surface);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-outline-variant);
+            margin-bottom: var(--size-section-gap-md);
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: var(--size-element-pad-x-lg) var(--size-element-pad-y-lg);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-lg);
+            font-family: var(--font-family-body);
+            font-size: 16px;
+            color: var(--color-on-surface);
+            position: relative;
+        }
+        
+        .nav-tab.active {
+            border-bottom-color: var(--color-secondary);
+            color: var(--color-secondary);
+            font-weight: 400;
+        }
+        
+        .nav-tab:not(.active) {
+            font-weight: 300;
+        }
+        
+        .tab-counter {
+            background-color: var(--color-primary-state-08);
+            color: var(--color-primary);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .tab-counter:not(.active) {
+            background-color: var(--color-on-surface-state-08);
+            color: var(--color-on-surface);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--size-section-gap-sm);
+        }
+        
+        .section-title {
+            font-family: var(--font-family-header);
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.333;
+            color: var(--color-on-surface);
+        }
+        
+        .filters {
+            display: flex;
+            gap: var(--size-element-gap-md);
+        }
+        
+        .session-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .session-table-header {
+            background-color: transparent;
+        }
+        
+        .session-table-header th {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            text-align: left;
+            font-family: var(--font-family-body);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-on-surface);
+            border-bottom: 1px solid var(--color-outline-variant);
+        }
+        
+        .session-table-row {
+            border-bottom: 1px solid var(--color-outline-variant);
+        }
+        
+        .session-table-row:hover {
+            background-color: var(--color-surface-variant);
+        }
+        
+        .session-table-row td {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            font-family: var(--font-family-body);
+            font-size: 14px;
+            color: var(--color-on-surface);
+        }
+        
+        .session-date-time {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .session-date {
+            font-weight: 400;
+        }
+        
+        .session-time {
+            font-weight: 300;
+        }
+        
+        .session-school {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .session-school-name {
+            font-weight: 400;
+        }
+        
+        .session-teacher {
+            font-weight: 300;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--size-element-gap-sm);
+            padding: 0 var(--size-element-pad-x-sm);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .status-badge.live {
+            background-color: var(--color-info-state-08);
+            color: var(--color-info);
+        }
+        
+        .status-badge.starting-soon {
+            background-color: var(--color-warning-state-08);
+            color: var(--color-warning);
+        }
+        
+        .status-badge.scheduled {
+            background-color: var(--color-primary-state-08);
+            color: var(--color-primary);
+        }
+        
+        .status-badge.cancelled {
+            background-color: var(--color-danger-state-08);
+            color: var(--color-danger);
+        }
+        
+        /* Modal Backdrop */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--color-scrim);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .modal-backdrop.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Multi-step Modal Styles */
+        .modal-step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--size-element-gap-sm);
+            margin-bottom: var(--size-modal-gap-md);
+            padding-bottom: var(--size-modal-gap-md);
+            border-bottom: 1px solid var(--color-outline-variant);
+        }
+        
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-outline-variant);
+        }
+        
+        .step-dot.active {
+            background-color: var(--color-primary);
+        }
+        
+        .step-dot.completed {
+            background-color: var(--color-primary);
+        }
+        
+        .step-line {
+            width: 40px;
+            height: 2px;
+            background-color: var(--color-outline-variant);
+        }
+        
+        .step-line.completed {
+            background-color: var(--color-primary);
+        }
+        
+        .modal-step {
+            display: none;
+        }
+        
+        .modal-step.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: var(--size-section-gap-sm);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--size-element-gap-xs);
+            font-family: var(--font-family-body);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-on-surface);
+        }
+        
+        .form-label.required::after {
+            content: " *";
+            color: var(--color-danger);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--size-element-gap-md);
+        }
+        
+        .review-section {
+            margin-bottom: var(--size-section-gap-md);
+        }
+        
+        .review-label {
+            font-family: var(--font-family-body);
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--color-on-surface-variant);
+            margin-bottom: var(--size-element-gap-xs);
+        }
+        
+        .review-value {
+            font-family: var(--font-family-body);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-on-surface);
+        }
+    </style>
+</head>
+<body>
+    <div class="session-page">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="pbtn pbtn-tonal pbtn-secondary" style="border: none; background: var(--color-primary-state-08);">
+                    <div class="pbtn-content body2-txt">
+                        <span><i class="fas fa-square-plus"></i></span>
+                    </div>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb" style="background: none; padding: 0; margin: 0;">
+                        <li class="breadcrumb-item"><a href="#" style="color: var(--color-on-surface-variant);">Strategies</a></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="top-bar-right">
+                <div class="user-avatar">
+                    <div class="avatar-initial">J</div>
+                    <span class="body2-txt" style="color: var(--color-on-surface);">John Doe</span>
+                    <div class="notification-badge">2</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Container -->
+        <div class="main-container">
+            <div class="content-container">
+                <!-- Alert -->
+                <div class="alert-box" id="alert-box">
+                    <div class="alert-content">
+                        <div class="alert-title">Update on your call-off request</div>
+                        <div class="alert-text">There's an update to your recent call-off request. Please visit the Call-offs tab to review the latest status and details.</div>
+                    </div>
+                    <button class="alert-close" onclick="document.getElementById('alert-box').style.display='none'">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1 class="page-title">Your Sessions</h1>
+                    <div>
+                        <button id="create-session-btn" class="pbtn pbtn-filled pbtn-primary">
+                            <div class="pbtn-content body2-txt">
+                                <span><i class="fas fa-calendar-plus"></i></span>
+                                <span>Fill in</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <div class="summary-card-title">Today's sessions</div>
+                            <div class="summary-card-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+                        <div class="summary-card-value">1</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <div class="summary-card-title">Pending call-offs</div>
+                            <div class="summary-card-icon">
+                                <i class="fas fa-hourglass"></i>
+                            </div>
+                        </div>
+                        <div class="summary-card-value">2</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <div class="summary-card-title">Open for fill-ins</div>
+                            <div class="summary-card-icon">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="summary-card-value">23</div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Tabs -->
+                <div class="nav-tabs">
+                    <button class="nav-tab active">
+                        <span>My sessions</span>
+                        <span class="tab-counter active">3</span>
+                    </button>
+                    <button class="nav-tab">
+                        <span>Sign-ups</span>
+                        <span class="tab-counter">3</span>
+                    </button>
+                    <button class="nav-tab">
+                        <span>Call-offs</span>
+                        <span class="tab-counter">3</span>
+                    </button>
+                    <button class="nav-tab">
+                        <span>Reflections</span>
+                        <span class="tab-counter">20</span>
+                    </button>
+                </div>
+                
+                <!-- Sessions Section -->
+                <div>
+                    <div class="section-header">
+                        <h2 class="section-title">My Sessions</h2>
+                        <div class="filters">
+                            <select class="plus-form-select plus-form-select-medium body2-txt" style="min-width: 150px;">
+                                <option>All schools</option>
+                                <option>Hogwarts</option>
+                                <option>Beauxbatons</option>
+                            </select>
+                            <select class="plus-form-select plus-form-select-medium body2-txt" style="min-width: 150px;">
+                                <option>This week</option>
+                                <option>This month</option>
+                                <option>All time</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <table class="session-table">
+                        <thead class="session-table-header">
+                            <tr>
+                                <th>Date & time <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--color-secondary);"></i></th>
+                                <th>School & teacher <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--color-outline-variant);"></i></th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="session-table-row">
+                                <td>
+                                    <div class="session-date-time">
+                                        <div class="session-date">Tue, Sep 9</div>
+                                        <div class="session-time">12:30 PM - 1:30 PM</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="session-school">
+                                        <div class="session-school-name">Hogwarts</div>
+                                        <div class="session-teacher">Mr. Snape</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge live">
+                                        <i class="fas fa-circle-play"></i>
+                                        Live
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="pbtn pbtn-outline pbtn-primary">
+                                        <div class="pbtn-content body2-txt">
+                                            <span>Details</span>
+                                        </div>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="session-table-row">
+                                <td>
+                                    <div class="session-date-time">
+                                        <div class="session-date">Tue, Sep 9</div>
+                                        <div class="session-time">12:30 PM - 1:30 PM</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="session-school">
+                                        <div class="session-school-name">Hogwarts</div>
+                                        <div class="session-teacher">Mr. Snape</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge starting-soon">
+                                        <i class="fas fa-clock"></i>
+                                        Starting soon
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="pbtn pbtn-outline pbtn-primary">
+                                        <div class="pbtn-content body2-txt">
+                                            <span>Details</span>
+                                        </div>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="session-table-row">
+                                <td>
+                                    <div class="session-date-time">
+                                        <div class="session-date">Tue, Sep 9</div>
+                                        <div class="session-time">12:30 PM - 1:30 PM</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="session-school">
+                                        <div class="session-school-name">Hogwarts</div>
+                                        <div class="session-teacher">Mr. Snape</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge scheduled">
+                                        <i class="fas fa-check"></i>
+                                        Scheduled
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="pbtn pbtn-outline pbtn-primary">
+                                        <div class="pbtn-content body2-txt">
+                                            <span>Details</span>
+                                        </div>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="session-table-row">
+                                <td>
+                                    <div class="session-date-time">
+                                        <div class="session-date">Tue, Sep 9</div>
+                                        <div class="session-time">12:30 PM - 1:30 PM</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="session-school">
+                                        <div class="session-school-name">Hogwarts</div>
+                                        <div class="session-teacher">Mr. Snape</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge cancelled">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Cancelled
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="pbtn pbtn-outline pbtn-primary">
+                                        <div class="pbtn-content body2-txt">
+                                            <span>Details</span>
+                                        </div>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop" id="modal-backdrop">
+        <div id="create-session-modal"></div>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap 4 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- PLUS Components -->
+    <script type="module">
+        import { createModal, createButton, createSelect, createTextarea } from './design-system/components/local/universal/index.js';
+        
+        let currentStep = 1;
+        const totalSteps = 3;
+        const sessionData = {
+            date: '',
+            startTime: '',
+            endTime: '',
+            school: '',
+            teacher: '',
+            description: '',
+            notes: ''
+        };
+        
+        /**
+         * Creates the step indicator
+         */
+        function createStepIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'modal-step-indicator';
+            
+            for (let i = 1; i <= totalSteps; i++) {
+                const dot = document.createElement('div');
+                dot.className = `step-dot ${i === currentStep ? 'active' : i < currentStep ? 'completed' : ''}`;
+                indicator.appendChild(dot);
+                
+                if (i < totalSteps) {
+                    const line = document.createElement('div');
+                    line.className = `step-line ${i < currentStep ? 'completed' : ''}`;
+                    indicator.appendChild(line);
+                }
+            }
+            
+            return indicator;
+        }
+        
+        /**
+         * Creates step 1: Basic Information
+         */
+        function createStep1() {
+            const step = document.createElement('div');
+            step.className = `modal-step ${currentStep === 1 ? 'active' : ''}`;
+            step.id = 'step-1';
+            
+            const form = document.createElement('div');
+            
+            // Date field
+            const dateGroup = document.createElement('div');
+            dateGroup.className = 'form-group';
+            const dateLabel = document.createElement('label');
+            dateLabel.className = 'form-label required';
+            dateLabel.textContent = 'Session Date';
+            dateLabel.setAttribute('for', 'session-date');
+            const dateInput = document.createElement('input');
+            dateInput.type = 'date';
+            dateInput.id = 'session-date';
+            dateInput.name = 'session-date';
+            dateInput.className = 'plus-text-field body2-txt';
+            dateInput.style.width = '100%';
+            dateInput.addEventListener('change', (e) => {
+                sessionData.date = e.target.value;
+            });
+            dateGroup.appendChild(dateLabel);
+            dateGroup.appendChild(dateInput);
+            form.appendChild(dateGroup);
+            
+            // Time fields row
+            const timeRow = document.createElement('div');
+            timeRow.className = 'form-row';
+            
+            const startTimeGroup = document.createElement('div');
+            startTimeGroup.className = 'form-group';
+            const startTimeLabel = document.createElement('label');
+            startTimeLabel.className = 'form-label required';
+            startTimeLabel.textContent = 'Start Time';
+            startTimeLabel.setAttribute('for', 'start-time');
+            const startTimeInput = document.createElement('input');
+            startTimeInput.type = 'time';
+            startTimeInput.id = 'start-time';
+            startTimeInput.name = 'start-time';
+            startTimeInput.className = 'plus-text-field body2-txt';
+            startTimeInput.style.width = '100%';
+            startTimeInput.addEventListener('change', (e) => {
+                sessionData.startTime = e.target.value;
+            });
+            startTimeGroup.appendChild(startTimeLabel);
+            startTimeGroup.appendChild(startTimeInput);
+            timeRow.appendChild(startTimeGroup);
+            
+            const endTimeGroup = document.createElement('div');
+            endTimeGroup.className = 'form-group';
+            const endTimeLabel = document.createElement('label');
+            endTimeLabel.className = 'form-label required';
+            endTimeLabel.textContent = 'End Time';
+            endTimeLabel.setAttribute('for', 'end-time');
+            const endTimeInput = document.createElement('input');
+            endTimeInput.type = 'time';
+            endTimeInput.id = 'end-time';
+            endTimeInput.name = 'end-time';
+            endTimeInput.className = 'plus-text-field body2-txt';
+            endTimeInput.style.width = '100%';
+            endTimeInput.addEventListener('change', (e) => {
+                sessionData.endTime = e.target.value;
+            });
+            endTimeGroup.appendChild(endTimeLabel);
+            endTimeGroup.appendChild(endTimeInput);
+            timeRow.appendChild(endTimeGroup);
+            
+            form.appendChild(timeRow);
+            
+            // School select
+            const schoolSelectWrapper = createSelect({
+                id: 'session-school',
+                name: 'session-school',
+                size: 'medium',
+                placeholder: 'Select a school',
+                options: [
+                    { value: 'hogwarts', text: 'Hogwarts', selected: false },
+                    { value: 'beauxbatons', text: 'Beauxbatons', selected: false },
+                    { value: 'durmstrang', text: 'Durmstrang', selected: false }
+                ],
+                onChange: (e) => {
+                    sessionData.school = e.target.value;
+                }
+            });
+            const schoolLabel = document.createElement('label');
+            schoolLabel.className = 'form-label required';
+            schoolLabel.textContent = 'School';
+            schoolLabel.setAttribute('for', 'session-school');
+            const schoolGroup = document.createElement('div');
+            schoolGroup.className = 'form-group';
+            schoolGroup.appendChild(schoolLabel);
+            schoolGroup.appendChild(schoolSelectWrapper);
+            form.appendChild(schoolGroup);
+            
+            // Teacher select
+            const teacherSelectWrapper = createSelect({
+                id: 'session-teacher',
+                name: 'session-teacher',
+                size: 'medium',
+                placeholder: 'Select a teacher',
+                options: [
+                    { value: 'snape', text: 'Mr. Snape', selected: false },
+                    { value: 'mcgonagall', text: 'Prof. McGonagall', selected: false },
+                    { value: 'dumbledore', text: 'Prof. Dumbledore', selected: false }
+                ],
+                onChange: (e) => {
+                    sessionData.teacher = e.target.value;
+                }
+            });
+            const teacherLabel = document.createElement('label');
+            teacherLabel.className = 'form-label required';
+            teacherLabel.textContent = 'Teacher';
+            teacherLabel.setAttribute('for', 'session-teacher');
+            const teacherGroup = document.createElement('div');
+            teacherGroup.className = 'form-group';
+            teacherGroup.appendChild(teacherLabel);
+            teacherGroup.appendChild(teacherSelectWrapper);
+            form.appendChild(teacherGroup);
+            
+            step.appendChild(form);
+            return step;
+        }
+        
+        /**
+         * Creates step 2: Additional Details
+         */
+        function createStep2() {
+            const step = document.createElement('div');
+            step.className = `modal-step ${currentStep === 2 ? 'active' : ''}`;
+            step.id = 'step-2';
+            
+            const form = document.createElement('div');
+            
+            // Description textarea
+            const descriptionTextarea = createTextarea({
+                id: 'session-description',
+                name: 'session-description',
+                placeholder: 'Enter session description...',
+                size: 'medium',
+                rows: 4,
+                onChange: (e) => {
+                    sessionData.description = e.target.value;
+                }
+            });
+            const descriptionLabel = document.createElement('label');
+            descriptionLabel.className = 'form-label';
+            descriptionLabel.textContent = 'Description';
+            descriptionLabel.setAttribute('for', 'session-description');
+            const descriptionGroup = document.createElement('div');
+            descriptionGroup.className = 'form-group';
+            descriptionGroup.appendChild(descriptionLabel);
+            descriptionGroup.appendChild(descriptionTextarea);
+            form.appendChild(descriptionGroup);
+            
+            // Notes textarea
+            const notesTextarea = createTextarea({
+                id: 'session-notes',
+                name: 'session-notes',
+                placeholder: 'Enter any additional notes...',
+                size: 'medium',
+                rows: 4,
+                onChange: (e) => {
+                    sessionData.notes = e.target.value;
+                }
+            });
+            const notesLabel = document.createElement('label');
+            notesLabel.className = 'form-label';
+            notesLabel.textContent = 'Notes (Optional)';
+            notesLabel.setAttribute('for', 'session-notes');
+            const notesGroup = document.createElement('div');
+            notesGroup.className = 'form-group';
+            notesGroup.appendChild(notesLabel);
+            notesGroup.appendChild(notesTextarea);
+            form.appendChild(notesGroup);
+            
+            step.appendChild(form);
+            return step;
+        }
+        
+        /**
+         * Creates step 3: Review
+         */
+        function createStep3() {
+            const step = document.createElement('div');
+            step.className = `modal-step ${currentStep === 3 ? 'active' : ''}`;
+            step.id = 'step-3';
+            
+            const review = document.createElement('div');
+            
+            function createReviewItem(label, value) {
+                const section = document.createElement('div');
+                section.className = 'review-section';
+                const labelEl = document.createElement('div');
+                labelEl.className = 'review-label';
+                labelEl.textContent = label;
+                const valueEl = document.createElement('div');
+                valueEl.className = 'review-value';
+                valueEl.textContent = value || 'Not provided';
+                section.appendChild(labelEl);
+                section.appendChild(valueEl);
+                return section;
+            }
+            
+            // Format date
+            const dateStr = sessionData.date ? new Date(sessionData.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '';
+            const timeStr = sessionData.startTime && sessionData.endTime ? 
+                `${formatTime(sessionData.startTime)} - ${formatTime(sessionData.endTime)}` : '';
+            
+            review.appendChild(createReviewItem('Date', dateStr));
+            review.appendChild(createReviewItem('Time', timeStr));
+            review.appendChild(createReviewItem('School', getSelectText('session-school')));
+            review.appendChild(createReviewItem('Teacher', getSelectText('session-teacher')));
+            review.appendChild(createReviewItem('Description', sessionData.description));
+            review.appendChild(createReviewItem('Notes', sessionData.notes));
+            
+            step.appendChild(review);
+            return step;
+        }
+        
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
+        
+        function getSelectText(id) {
+            const wrapper = document.getElementById(id + '-wrapper') || document.getElementById(id);
+            if (!wrapper) return '';
+            const select = wrapper.querySelector('select') || wrapper;
+            if (!select || !select.value) return '';
+            const option = select.querySelector(`option[value="${select.value}"]`);
+            return option ? option.textContent : '';
+        }
+        
+        /**
+         * Updates the modal content based on current step
+         */
+        function updateModal() {
+            const modalContainer = document.getElementById('create-session-modal');
+            modalContainer.innerHTML = '';
+            
+            const step1 = createStep1();
+            const step2 = createStep2();
+            const step3 = createStep3();
+            
+            const stepsContainer = document.createElement('div');
+            stepsContainer.appendChild(createStepIndicator());
+            stepsContainer.appendChild(step1);
+            stepsContainer.appendChild(step2);
+            stepsContainer.appendChild(step3);
+            
+            const modal = createModal({
+                id: 'create-session-modal-content',
+                title: 'Create New Session',
+                body: stepsContainer,
+                type: 'scrollable',
+                showBottomButtons: true,
+                primaryButton: {
+                    text: currentStep === totalSteps ? 'Create Session' : 'Next',
+                    style: 'primary',
+                    fill: 'filled',
+                    size: 'default',
+                    onClick: handleNext
+                },
+                secondaryButton: currentStep === 1 ? null : {
+                    text: 'Back',
+                    style: 'secondary',
+                    fill: 'tonal',
+                    size: 'default',
+                    onClick: handleBack
+                },
+                onClose: closeModal,
+                width: 600
+            });
+            
+            modalContainer.appendChild(modal);
+        }
+        
+        /**
+         * Handles next button click
+         */
+        function handleNext() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateModal();
+            } else {
+                // Create session
+                console.log('Creating session:', sessionData);
+                alert('Session created successfully!');
+                closeModal();
+            }
+        }
+        
+        /**
+         * Handles back button click
+         */
+        function handleBack() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateModal();
+            }
+        }
+        
+        /**
+         * Opens the modal
+         */
+        function openModal() {
+            currentStep = 1;
+            sessionData.date = '';
+            sessionData.startTime = '';
+            sessionData.endTime = '';
+            sessionData.school = '';
+            sessionData.teacher = '';
+            sessionData.description = '';
+            sessionData.notes = '';
+            updateModal();
+            document.getElementById('modal-backdrop').classList.add('show');
+        }
+        
+        /**
+         * Closes the modal
+         */
+        function closeModal() {
+            document.getElementById('modal-backdrop').classList.remove('show');
+        }
+        
+        // Event listeners
+        document.getElementById('create-session-btn').addEventListener('click', openModal);
+        
+        // Close modal when clicking backdrop
+        document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-backdrop') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
