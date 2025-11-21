@@ -7,11 +7,18 @@
  * They allow users to make multiple selections and are commonly used in forms and filters.
  * 
  * ### When to Use
- * - **Multiple selections**: When users can select multiple options
+ * - **Multiple selections**: When users can select multiple options from a set
  * - **Form inputs**: For form fields requiring yes/no or multiple choice answers
- * - **Filters**: For filtering content by multiple criteria
- * - **Settings**: For enabling/disabling multiple features or options
- * - **Agreements**: For terms of service, privacy policy acceptance
+ * - **Filters**: For filtering content by multiple criteria (e.g., filter by multiple categories)
+ * - **Settings**: For enabling/disabling multiple features or options simultaneously
+ * - **Agreements**: For terms of service, privacy policy acceptance, or consent checkboxes
+ * - **Lists with multiple items**: When users need to select several items from a list
+ * - **Bulk actions**: For selecting multiple items to perform actions on
+ * 
+ * ### When NOT to Use
+ * - **Single selection**: Use radio buttons when only one option can be selected
+ * - **Binary toggle**: Use switches for simple on/off states that take effect immediately
+ * - **Many options**: Consider using a multi-select dropdown when there are many options (>10)
  * 
  * ### Implementation Context
  * - **Component Type**: Element (uses `element-` tokens)
@@ -22,8 +29,9 @@
  *   - Typography: Uses body typography scales for labels
  * 
  * ### State Variants
- * - **Checked**: Selected state (checkbox is marked)
+ * - **Checked**: Selected state (checkbox is marked with checkmark)
  * - **Unchecked**: Unselected state (default)
+ * - **Indeterminate**: Partially selected state (shows dash/minus, used when some items in a group are selected)
  * - **Disabled**: Non-interactive state (read-only or unavailable)
  * 
  * ### Content Variants
@@ -98,6 +106,17 @@ export const AllVariants = {
       checked: false,
     });
     statesSection.appendChild(unchecked);
+    
+    const indeterminate = PlusInterface.createCheckbox({
+      label: 'Indeterminate checkbox (dash/minus)',
+      name: 'checkbox',
+      value: 'value',
+      id: 'checkbox-indeterminate',
+      checked: false,
+      indeterminate: true,
+    });
+    statesSection.appendChild(indeterminate);
+    
     container.appendChild(statesSection);
     
     return container;
@@ -131,6 +150,10 @@ export const Interactive = {
     checked: {
       control: 'boolean',
       description: 'Checked state',
+    },
+    indeterminate: {
+      control: 'boolean',
+      description: 'Indeterminate state (shows dash/minus instead of checkmark)',
     },
   },
   args: {

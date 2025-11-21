@@ -19,37 +19,54 @@ export const WithOpacity = {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-md)';
-    container.style.width = 'var(--size-card-pad-x-lg)';
+    container.style.width = '100%';
+    container.style.maxWidth = '600px';
     container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     container.style.backgroundColor = 'var(--color-surface-container)';
+    container.style.borderRadius = 'var(--size-card-radius-sm)';
     
-    const normalDivider = PlusInterface.createDivider({
-      size: '1px',
-      style: 'dark',
-      width: '100%'
-    });
-    container.appendChild(normalDivider);
+    // Normal opacity example
+    const normalWrapper = document.createElement('div');
+    normalWrapper.style.display = 'flex';
+    normalWrapper.style.flexDirection = 'column';
+    normalWrapper.style.gap = 'var(--size-element-gap-sm)';
+    normalWrapper.style.padding = 'var(--size-section-pad-y-sm) 0';
     
     const normalLabel = document.createElement('div');
     normalLabel.className = 'body2-txt';
     normalLabel.textContent = 'Normal opacity';
-    normalLabel.style.marginTop = 'var(--size-element-gap-sm)';
-    normalLabel.style.marginBottom = 'var(--size-element-gap-md)';
-    container.appendChild(normalLabel);
+    normalLabel.style.color = 'var(--color-on-surface)';
+    normalWrapper.appendChild(normalLabel);
     
-    const opacityDivider = PlusInterface.createDivider({
-      size: '1px',
+    const normalDivider = PlusInterface.createDivider({
+      size: 'sm', // Uses semantic token (maps to 1px via --size-element-stroke-sm)
       style: 'dark',
-      opacity10: true,
       width: '100%'
     });
-    container.appendChild(opacityDivider);
+    normalWrapper.appendChild(normalDivider);
+    container.appendChild(normalWrapper);
+    
+    // 10% opacity example
+    const opacityWrapper = document.createElement('div');
+    opacityWrapper.style.display = 'flex';
+    opacityWrapper.style.flexDirection = 'column';
+    opacityWrapper.style.gap = 'var(--size-element-gap-sm)';
+    opacityWrapper.style.padding = 'var(--size-section-pad-y-sm) 0';
     
     const opacityLabel = document.createElement('div');
     opacityLabel.className = 'body2-txt';
     opacityLabel.textContent = '10% opacity (for accordion/collapse)';
-    opacityLabel.style.marginTop = 'var(--size-element-gap-sm)';
-    container.appendChild(opacityLabel);
+    opacityLabel.style.color = 'var(--color-on-surface)';
+    opacityWrapper.appendChild(opacityLabel);
+    
+    const opacityDivider = PlusInterface.createDivider({
+      size: 'sm', // Uses semantic token (maps to 1px via --size-element-stroke-sm)
+      style: 'dark',
+      opacity10: true,
+      width: '100%'
+    });
+    opacityWrapper.appendChild(opacityDivider);
+    container.appendChild(opacityWrapper);
     
     return container;
   },

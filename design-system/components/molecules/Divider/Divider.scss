@@ -1,40 +1,87 @@
 /**
  * Divider Component Styles
  * Matches Figma design system specifications
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage: --size-element-stroke-sm/md/lg/xl for stroke width
  */
 
 .plus-divider {
     display: block;
     width: 100%;
     position: relative;
+    /* Prevent text selection */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .plus-divider-line {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    /* Ensure it's a visual element, not text */
+    display: block;
     /* Divider line uses minimal radius for rounded ends */
     /* Figma: Border/Radius/radius-0 (1px) - using primitive token */
     border-radius: var(--size-border-radius-radius-0);
+    /* Prevent text selection and interaction */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+    /* Ensure no text content can be added */
+    font-size: 0;
+    line-height: 0;
+    overflow: hidden;
 }
 
-/* Divider Sizes */
+/* Divider Sizes - Using semantic element stroke tokens */
+/* Figma: Small (1px), Medium (1.5px), Large (2px), Extra Large (2.5px) */
+.plus-divider-sm {
+    height: var(--size-element-stroke-sm); /* 1px */
+}
+
+.plus-divider-md {
+    height: var(--size-element-stroke-md); /* 1.5px */
+}
+
+.plus-divider-lg {
+    height: var(--size-element-stroke-lg); /* 2px */
+}
+
+.plus-divider-xl {
+    height: var(--size-element-stroke-xl); /* 2.5px */
+}
+
+/* Legacy support for pixel-based size classes (backward compatibility) */
+/* Note: Classes with dots (like .size-1.5px) are invalid CSS, so we only support integer pixel values */
 .plus-divider.size-1px {
-    height: 1px;
+    height: var(--size-element-stroke-sm);
 }
 
 .plus-divider.size-2px {
-    height: 2px;
-}
-
-.plus-divider.size-3px {
-    height: 3px;
-}
-
-.plus-divider.size-4px {
-    height: 4px;
+    height: var(--size-element-stroke-lg);
 }
 
 /* Divider Styles */
+/* Light: Uses outline-variant for subtle separation on light backgrounds */
+.plus-divider-light .plus-divider-line {
+    background-color: var(--color-outline-variant);
+}
+
+/* Dark: Uses outline for more prominent separation or dark backgrounds */
+.plus-divider-dark .plus-divider-line {
+    background-color: var(--color-outline);
+}
+
+/* Legacy style classes (backward compatibility) */
 .plus-divider.light .plus-divider-line {
     background-color: var(--color-outline-variant);
 }
@@ -44,6 +91,11 @@
 }
 
 /* Divider with opacity (for use in collapse/accordion) */
+.plus-divider-opacity-10 {
+    opacity: 0.1;
+}
+
+/* Legacy opacity class (backward compatibility) */
 .plus-divider.opacity-10 {
     opacity: 0.1;
 }

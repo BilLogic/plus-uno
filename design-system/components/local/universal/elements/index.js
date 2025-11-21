@@ -6,6 +6,8 @@
 export { createButton } from './button.js';
 export { createButtonGroup } from './button-group.js';
 export { createCheckbox, createCheckboxGroup } from './checkbox.js';
+export { createRadio, createRadioGroup } from './radio.js';
+export { createSwitch } from './switch.js';
 export { createAlert } from './alert.js';
 export { createBreadcrumb } from './breadcrumb.js';
 export { createBadge, createChip } from './badge.js';
@@ -19,4 +21,5 @@ export { createCard } from './card.js';
 export { createModal } from './modal.js';
 export { createNavigation } from './navigation.js';
 export { createTextarea, createSelect, createRangeInput, createSelectMultiple } from './form.js';
+export { createDatePicker } from './date-picker.js';
 

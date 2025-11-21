@@ -46,3 +46,23 @@ export const Unchecked = {
   },
 };
 
+/**
+ * Indeterminate Checkbox
+ * Shows a dash/minus instead of a checkmark, used when some items in a group are selected
+ */
+export const Indeterminate = {
+  render: () => {
+    const container = document.createElement('div');
+    const checkbox = PlusInterface.createCheckbox({
+      label: 'Indeterminate checkbox (dash/minus)',
+      name: 'checkbox',
+      value: 'value',
+      id: 'checkbox-indeterminate',
+      checked: false,
+      indeterminate: true,
+    });
+    container.appendChild(checkbox);
+    return container;
+  },
+};
+

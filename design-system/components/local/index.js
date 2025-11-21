@@ -25,6 +25,9 @@ export class PlusInterface {
     static createButtonGroup = UniversalComponents.createButtonGroup;
     static createCheckbox = UniversalComponents.createCheckbox;
     static createCheckboxGroup = UniversalComponents.createCheckboxGroup;
+    static createRadio = UniversalComponents.createRadio;
+    static createRadioGroup = UniversalComponents.createRadioGroup;
+    static createSwitch = UniversalComponents.createSwitch;
     static createAlert = UniversalComponents.createAlert;
     static createBreadcrumb = UniversalComponents.createBreadcrumb;
     static createBadge = UniversalComponents.createBadge;
@@ -38,6 +41,7 @@ export class PlusInterface {
     static createSelect = UniversalComponents.createSelect;
     static createRangeInput = UniversalComponents.createRangeInput;
     static createSelectMultiple = UniversalComponents.createSelectMultiple;
+    static createDatePicker = UniversalComponents.createDatePicker;
     
     // Legacy constants
     static BUTTON_FILL = UniversalComponents.BUTTON_CONSTANTS.FILL;

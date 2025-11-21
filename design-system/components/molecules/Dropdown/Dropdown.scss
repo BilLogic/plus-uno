@@ -181,6 +181,13 @@
             &::after {
                 color: var(--color-primary-text);
             }
+            
+            /* Open state - when dropdown is open, use primary state layer */
+            &[aria-expanded="true"] {
+                background-color: var(--color-primary-state-08);
+                border-color: var(--color-primary);
+                color: var(--color-primary-text);
+            }
         }
     }
     

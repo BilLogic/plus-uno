@@ -67,85 +67,11 @@ input[type="text"][readonly]:not(.hasDatepicker),
     }
 }
 
-/** checkboxes **/
-.plus-checkbox {
-    appearance: none;
-    -webkit-appearance: none;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    padding: 0.1rem;
-    border: 1px solid var(--color-primary);
-    border-radius: var(--size-border-radius-radius-50); /* Using primitive token for 2px radius */
-    margin-top: 0.25rem;
-
-    &::before {
-        content: "";
-        //compensate for border
-        width: calc(var(--font-size-body3) - 2px);
-        height: calc(var(--font-size-body3) - 2px);
-        clip-path: polygon(26% 43%, 14% 57%, 49% 85%, 90% 26%, 75% 16%, 46% 59%);
-        transform: scale(0);
-        background-color: var(--color-on-primary);
-    }
-
-    &:not(:checked) {
-        background-color: var(--color-surface-container-lowest);
-    }
-
-    &:checked {
-        background-color: var(--color-primary);
-    }
-
-    &:checked::before {
-        transform: scale(1);
-        background-color: var(--color-on-primary);
-    }
-}
-
-/** custom control (toggle switch - overrides rules in sb-admin-2.min.css) **/
-
-.custom-control-label {
-    display: flex;
-    align-items: center;
-}
-
-.custom-control-label::before {
-    height: 0.75rem;
-    box-sizing: border-box;
-    margin-left: -2.25rem;
-    margin-right: var(--size-spacing-between-components-2);
-    position: static;
-}
-
-.custom-switch .custom-control-label::after {
-    top: calc(50% - 0.25rem);
-    left: calc(-2rem - 2px);
-    width: calc(0.75rem - 4px);
-    height: calc(0.75rem - 4px);
-}
-
-.custom-control-input:checked ~ .custom-control-label::before {
-  color: var(--color-on-primary);
-  border-color: var(--color-primary);
-  background-color: var(--color-primary);
-}
-
-.custom-control-input:not(:disabled) ~ .custom-control-label::before {
-    border-color: var(--color-primary);
-}
-
-.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
-    transform: translate(1rem);
-}
-
-.custom-switch .custom-control-input:not(:disabled):not(:checked) ~ .custom-control-label::after {
-    background-color: var(--color-primary);
-}
-
-.custom-switch .custom-control-input:not(:disabled):not(:checked) ~ .custom-control-label {
-    color: color-mix(in srgb, var(--color-on-surface) 38%, transparent);
-}
+/* Checkbox, Radio, and Switch styles moved to molecule components:
+   - design-system/components/molecules/Checkbox/Checkbox.scss
+   - design-system/components/molecules/Radio/Radio.scss
+   - design-system/components/molecules/Switch/Switch.scss
+*/
 
 /*************/
 

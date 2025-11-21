@@ -66,6 +66,7 @@ export const AllVariants = {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     
     const styles = [
       { value: 'light', label: 'Light' },
@@ -73,10 +74,10 @@ export const AllVariants = {
     ];
     
     const sizes = [
-      { value: 'sm', label: 'Small (1px)', token: '--size-element-stroke-sm', px: '1px' },
-      { value: 'md', label: 'Medium (1.5px)', token: '--size-element-stroke-md', px: '1.5px' },
-      { value: 'lg', label: 'Large (2px)', token: '--size-element-stroke-lg', px: '2px' },
-      { value: 'xl', label: 'Extra Large (2.5px)', token: '--size-element-stroke-xl', px: '2.5px' },
+      { value: 'sm', label: 'Small', token: '--size-element-stroke-sm', px: '1px' },
+      { value: 'md', label: 'Medium', token: '--size-element-stroke-md', px: '1.5px' },
+      { value: 'lg', label: 'Large', token: '--size-element-stroke-lg', px: '2px' },
+      { value: 'xl', label: 'Extra Large', token: '--size-element-stroke-xl', px: '2.5px' },
     ];
     
     // Organize by visual style - each style shows all sizes
@@ -85,34 +86,54 @@ export const AllVariants = {
       styleSection.style.display = 'flex';
       styleSection.style.flexDirection = 'column';
       styleSection.style.gap = 'var(--size-section-gap-md)';
-      styleSection.style.width = 'var(--size-card-pad-x-lg)';
+      styleSection.style.width = '100%';
+      styleSection.style.maxWidth = '600px';
       
       // Add background for dark style to show contrast
       if (style.value === 'dark') {
         styleSection.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
         styleSection.style.backgroundColor = 'var(--color-surface-container)';
+        styleSection.style.borderRadius = 'var(--size-card-radius-sm)';
       }
       
       const styleLabel = document.createElement('div');
       styleLabel.className = 'h6';
       styleLabel.textContent = `${style.label} Style - All Sizes`;
-      styleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+      styleLabel.style.marginBottom = 'var(--size-element-gap-md)';
       styleSection.appendChild(styleLabel);
       
       sizes.forEach((size) => {
+        // Create a wrapper for each divider example
+        const exampleWrapper = document.createElement('div');
+        exampleWrapper.style.display = 'flex';
+        exampleWrapper.style.flexDirection = 'column';
+        exampleWrapper.style.gap = 'var(--size-element-gap-sm)';
+        exampleWrapper.style.padding = 'var(--size-section-pad-y-sm) 0';
+        
+        // Add label above divider
+        const sizeLabel = document.createElement('div');
+        sizeLabel.className = 'body2-txt';
+        sizeLabel.style.color = 'var(--color-on-surface-variant)';
+        sizeLabel.textContent = `${size.label} (${size.value})`;
+        exampleWrapper.appendChild(sizeLabel);
+        
+        // Add token info
+        const tokenInfo = document.createElement('div');
+        tokenInfo.className = 'body3-txt';
+        tokenInfo.style.color = 'var(--color-on-surface-variant)';
+        tokenInfo.style.fontFamily = 'monospace';
+        tokenInfo.textContent = `${size.token} = ${size.px}`;
+        exampleWrapper.appendChild(tokenInfo);
+        
+        // Add the divider
         const divider = PlusInterface.createDivider({
-          size: size.px,
+          size: size.value, // Use semantic token (sm, md, lg, xl)
           style: style.value,
           width: '100%'
         });
-        styleSection.appendChild(divider);
+        exampleWrapper.appendChild(divider);
         
-        const label = document.createElement('div');
-        label.className = 'body2-txt';
-        label.textContent = `${size.label} - ${size.token}`;
-        label.style.marginTop = 'var(--size-element-gap-sm)';
-        label.style.marginBottom = 'var(--size-element-gap-md)';
-        styleSection.appendChild(label);
+        styleSection.appendChild(exampleWrapper);
       });
       
       container.appendChild(styleSection);
@@ -143,20 +164,20 @@ export const Interactive = {
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg', 'xl'],
-      description: 'Divider size (uses element stroke tokens: sm=1px, md=1.5px, lg=2px, xl=2.5px)',
+      description: 'Divider size using semantic tokens (sm=1px, md=1.5px, lg=2px, xl=2.5px). Uses --size-element-stroke-* tokens.',
     },
     style: {
       control: 'select',
       options: ['light', 'dark'],
-      description: 'Divider style',
+      description: 'Divider style (light uses outline-variant, dark uses outline)',
     },
     opacity10: {
       control: 'boolean',
-      description: 'Apply 10% opacity',
+      description: 'Apply 10% opacity (for accordion/collapse use cases)',
     },
   },
   args: {
-    size: '1px',
+    size: 'md',
     style: 'light',
     opacity10: false,
     width: '100%',

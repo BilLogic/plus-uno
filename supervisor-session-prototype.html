@@ -721,7 +721,7 @@
     
     <!-- PLUS Components -->
     <script type="module">
-        import { createModal, createButton, createSelect, createTextarea } from './design-system/components/local/universal/index.js';
+        import { createModal, createButton, createSelect, createTextarea, createDivider, createDatePicker } from './design-system/components/local/universal/index.js';
         
         let currentStep = 1;
         const totalSteps = 3;
@@ -774,17 +774,19 @@
             dateLabel.className = 'form-label required';
             dateLabel.textContent = 'Session Date';
             dateLabel.setAttribute('for', 'session-date');
-            const dateInput = document.createElement('input');
-            dateInput.type = 'date';
-            dateInput.id = 'session-date';
-            dateInput.name = 'session-date';
-            dateInput.className = 'plus-text-field body2-txt';
-            dateInput.style.width = '100%';
-            dateInput.addEventListener('change', (e) => {
-                sessionData.date = e.target.value;
+            const datePicker = createDatePicker({
+                id: 'session-date',
+                name: 'session-date',
+                placeholder: 'Select session date',
+                size: 'medium',
+                value: sessionData.date || '',
+                minDate: new Date(), // Only allow future dates
+                onChange: (dateString) => {
+                    sessionData.date = dateString;
+                }
             });
             dateGroup.appendChild(dateLabel);
-            dateGroup.appendChild(dateInput);
+            dateGroup.appendChild(datePicker);
             form.appendChild(dateGroup);
             
             // Time fields row
@@ -1012,6 +1014,15 @@
             
             const stepsContainer = document.createElement('div');
             stepsContainer.appendChild(createStepIndicator());
+            
+            // Add divider after step indicator
+            const indicatorDivider = createDivider({
+                size: 'sm',
+                style: 'light',
+                width: '100%'
+            });
+            stepsContainer.appendChild(indicatorDivider);
+            
             stepsContainer.appendChild(step1);
             stepsContainer.appendChild(step2);
             stepsContainer.appendChild(step3);
