@@ -1,0 +1,178 @@
+/**
+ * Collapse Component Styles
+ * Bootstrap 4.6.2 collapse with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/collapse/
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Padding: --size-element-pad-x-md, --size-element-pad-y-md
+ *   - Gap: --size-element-gap-sm (between trigger and content)
+ *   - Typography: Uses body2-txt class
+ *   - Colors: --color-on-surface for text, --color-primary for focus/hover
+ */
+
+/* ============================================
+   COLLAPSE WRAPPER
+   ============================================ */
+
+.plus-collapse-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+}
+
+/* ============================================
+   COLLAPSE TRIGGER
+   ============================================ */
+
+.plus-collapse-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    background-color: transparent;
+    border: none;
+    color: var(--color-on-surface);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    font-weight: var(--font-weight-normal);
+    
+    /* Override Bootstrap button defaults */
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--color-primary-state-16);
+    }
+    
+    &:hover:not(:disabled):not(.disabled) {
+        color: var(--color-primary);
+        background-color: var(--color-primary-state-08);
+    }
+    
+    &:active:not(:disabled):not(.disabled) {
+        background-color: var(--color-primary-state-12);
+    }
+    
+    /* Anchor tag styling */
+    &[href] {
+        text-decoration: none;
+        color: var(--color-on-surface);
+        
+        &:hover {
+            text-decoration: none;
+            color: var(--color-primary);
+        }
+    }
+    
+    /* Disabled state */
+    &:disabled,
+    &.disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+}
+
+.plus-collapse-trigger-content {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+}
+
+/* ============================================
+   COLLAPSE ICON
+   ============================================ */
+
+.plus-collapse-icon {
+    transition: transform 0.3s ease;
+    color: var(--color-on-surface-variant);
+    flex-shrink: 0;
+}
+
+/* Icon rotation when expanded */
+.plus-collapse-trigger:not(.collapsed) .plus-collapse-icon {
+    transform: rotate(180deg);
+}
+
+/* Icon rotation for chevron-down/up */
+.plus-collapse-trigger.collapsed .plus-collapse-icon.fa-chevron-down,
+.plus-collapse-trigger:not(.collapsed) .plus-collapse-icon.fa-chevron-up {
+    transform: rotate(0deg);
+}
+
+.plus-collapse-trigger:not(.collapsed) .plus-collapse-icon.fa-chevron-down,
+.plus-collapse-trigger.collapsed .plus-collapse-icon.fa-chevron-up {
+    transform: rotate(180deg);
+}
+
+/* ============================================
+   COLLAPSE CONTENT
+   ============================================ */
+
+.plus-collapse-content {
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    color: var(--color-on-surface);
+    background-color: var(--color-surface-container);
+    border-radius: var(--size-element-radius-sm);
+    
+    /* Override Bootstrap collapse defaults */
+    transition: height 0.35s ease;
+    
+    /* Typography */
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    font-weight: var(--font-weight-normal);
+}
+
+/* Bootstrap collapse show state */
+.plus-collapse-content.show {
+    display: block;
+}
+
+/* ============================================
+   BOOTSTRAP COLLAPSE OVERRIDES
+   ============================================ */
+
+/* Ensure Bootstrap collapse uses our styling */
+.collapse {
+    &:not(.show) {
+        display: none;
+    }
+}
+
+/* Bootstrap collapse transition */
+.collapsing {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.plus-collapse-trigger[aria-expanded="true"] {
+    /* Expanded state styling if needed */
+}
+
+.plus-collapse-trigger[aria-expanded="false"] {
+    /* Collapsed state styling if needed */
+}
+
+/* Focus visible for keyboard navigation */
+.plus-collapse-trigger:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--size-element-radius-sm);
+}
+
+
+

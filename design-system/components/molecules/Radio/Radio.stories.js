@@ -22,13 +22,10 @@
  * - **Optional single choice**: Consider using a dropdown if the selection is optional and space is limited
  * 
  * ### Implementation Context
- * - **Component Type**: Element (uses `element-*` tokens)
- * - **Token Usage**: 
- *   - Gap: `--size-element-gap-sm` (between radio and label)
- *   - Border: `--size-element-stroke-md`
- *   - Radius: `--size-border-radius-radius-1000` (circular)
- *   - Colors: `--color-primary` for selected, `--color-outline-variant` for unselected
- *   - Typography: Uses body typography scales for labels
+ * - **Component Type**: Element
+ * - **Bootstrap Framework**: Uses Bootstrap 4.6.2's `form-check` pattern
+ * - **Styling**: Currently uses Bootstrap's default styling (no custom overrides)
+ * - **Reference**: https://getbootstrap.com/docs/4.6/components/forms/#radios
  * 
  * ### State Variants
  * - **Checked**: Selected state (radio is selected)
@@ -63,7 +60,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'Radio button component for selecting a single option from a set. Includes input and label combination with checked/unchecked states. Uses element-level tokens for spacing.',
+        component: 'Radio button component for selecting a single option from a set. Built on Bootstrap 4.6.2 form-check pattern. Currently uses Bootstrap default styling.',
       },
     },
   },

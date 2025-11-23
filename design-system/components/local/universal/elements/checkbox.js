@@ -67,20 +67,50 @@ export function createCheckbox({
     
     // Track if checkbox is currently indeterminate
     let isIndeterminate = indeterminate;
+    // Track if checkbox was initially set to indeterminate (to enable 3-state cycle)
+    let wasInitiallyIndeterminate = indeterminate;
+    // Track previous state for indeterminate checkboxes only
+    let previousState = indeterminate ? 'indeterminate' : null;
     
-    // Handle change event - when indeterminate checkbox is clicked, make it unchecked (not checked)
+    // Handle change event
     input.addEventListener("change", (e) => {
-        // If it was indeterminate before the click, the browser toggles it to checked
-        // But we want it to become unchecked instead
-        if (isIndeterminate) {
-            // User clicked indeterminate checkbox - make it unchecked (not checked)
-            isIndeterminate = false;
-            input.indeterminate = false;
-            input.checked = false;
-            container.classList.remove("plus-checkbox-indeterminate");
+        // Only apply 2-state cycle logic if checkbox was initially indeterminate
+        if (wasInitiallyIndeterminate) {
+            // 2-state cycle: unchecked <-> indeterminate (skip checked state)
+            if (previousState === 'indeterminate') {
+                // If it was indeterminate, browser toggles to checked
+                // We want it to go to unchecked instead (cycle: indeterminate -> unchecked)
+                input.indeterminate = false;
+                input.checked = false;
+                isIndeterminate = false;
+                previousState = 'unchecked';
+                container.classList.remove("plus-checkbox-indeterminate");
+            } else if (previousState === 'unchecked') {
+                // unchecked -> indeterminate (skip checked state)
+                input.indeterminate = true;
+                input.checked = false;
+                isIndeterminate = true;
+                previousState = 'indeterminate';
+                container.classList.add("plus-checkbox-indeterminate");
+            } else {
+                // Fallback: update tracking
+                isIndeterminate = input.indeterminate;
+                if (isIndeterminate) {
+                    previousState = 'indeterminate';
+                    container.classList.add("plus-checkbox-indeterminate");
+                } else {
+                    previousState = 'unchecked';
+                    container.classList.remove("plus-checkbox-indeterminate");
+                }
+            }
         } else {
-            // Update our tracking
+            // Regular checkbox behavior - Bootstrap default (unchecked <-> checked)
             isIndeterminate = input.indeterminate;
+            if (isIndeterminate) {
+                container.classList.add("plus-checkbox-indeterminate");
+            } else {
+                container.classList.remove("plus-checkbox-indeterminate");
+            }
         }
         
         if (onChange) {
@@ -94,8 +124,12 @@ export function createCheckbox({
         input.indeterminate = value;
         if (value) {
             input.checked = false;
+            wasInitiallyIndeterminate = true; // Enable 3-state cycle
+            previousState = 'indeterminate';
             container.classList.add("plus-checkbox-indeterminate");
         } else {
+            wasInitiallyIndeterminate = false; // Disable 3-state cycle
+            previousState = input.checked ? 'checked' : 'unchecked';
             container.classList.remove("plus-checkbox-indeterminate");
         }
     };

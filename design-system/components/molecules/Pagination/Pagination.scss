@@ -1,0 +1,298 @@
+/**
+ * Pagination Component Styles
+ * Bootstrap 4.6.2 pagination with PLUS design token customizations
+ * Connected pagination design matching Figma specifications
+ * All items connected in one container with rounded corners on ends
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/pagination/
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Padding: --size-element-pad-x-md, --size-element-pad-y-md
+ *   - Border: --size-element-border (1px) for container and dividers
+ *   - Radius: --size-element-radius-sm (4px) for end items
+ *   - Colors: --color-outline-variant for borders, --color-primary for active
+ *   - Typography: body2-txt class (14px, 157.1% line-height)
+ * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=53-19821
+ */
+
+/* ============================================
+   PAGINATION CONTAINER (Bootstrap 4.6.2 pagination)
+   Connected container with no gaps between items
+   ============================================ */
+
+.plus-pagination {
+    /* Override Bootstrap default margin */
+    margin-bottom: 0;
+    margin-top: 0;
+    
+    /* Use flexbox for layout - no gap, items are connected */
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0; /* No gap - items are connected */
+    
+    /* Remove Bootstrap default padding-left */
+    padding-left: 0;
+    list-style: none;
+    
+    /* Container border and styling - single border around entire group */
+    /* Use --size-element-border (1px) like ListGroup, not stroke-md */
+    border: var(--size-element-border) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--color-surface);
+    overflow: hidden; /* Ensure rounded corners work properly and items don't overflow */
+}
+
+/* ============================================
+   PAGE ITEM (Bootstrap 4.6.2 page-item)
+   ============================================ */
+
+.plus-pagination .page-item {
+    /* Remove Bootstrap default margin */
+    margin-right: 0;
+    margin-left: 0;
+    
+    /* Remove Bootstrap default list-style */
+    list-style: none;
+    
+    /* Flex to fill container */
+    flex: 0 0 auto;
+    
+    /* Ensure items stretch to container height */
+    display: flex;
+}
+
+/* ============================================
+   PAGE LINK (Bootstrap 4.6.2 page-link)
+   Connected items with vertical dividers
+   ============================================ */
+
+.plus-pagination .page-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Use PLUS design tokens for padding */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    
+    /* No border on individual items - container has the border */
+    border: none;
+    border-radius: 0; /* No radius on individual items initially */
+    
+    /* Use PLUS typography - match button pattern */
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-semibold-1);
+    font-size: var(--font-size-body2); /* 14px */
+    line-height: var(--font-line-height-body2); /* 157.1% */
+    
+    /* Default text color */
+    color: var(--color-on-surface);
+    
+    /* Remove Bootstrap default text decoration */
+    text-decoration: none;
+    
+    /* Background color */
+    background-color: var(--color-surface);
+    
+    /* Transition for hover/active states */
+    transition: background-color 0.2s, color 0.2s;
+    
+    /* Remove Bootstrap default margin */
+    margin-left: 0;
+    margin-right: 0;
+    
+    /* Min width for consistent sizing */
+    min-width: 36px;
+    min-height: 36px;
+    text-align: center;
+    
+    /* Cursor pointer */
+    cursor: pointer;
+    
+    /* Box sizing */
+    box-sizing: border-box;
+    
+    /* Make link fill the item */
+    width: 100%;
+    height: 100%;
+    
+    /* Vertical divider between items - use 1px border like ListGroup */
+    border-right: var(--size-element-border) solid var(--color-outline-variant);
+}
+
+/* Remove border from last item */
+.plus-pagination .page-item:last-child .page-link {
+    border-right: none;
+}
+
+/* First item - rounded corners on left only */
+.plus-pagination .page-item:first-child .page-link {
+    border-top-left-radius: var(--size-element-radius-sm);
+    border-bottom-left-radius: var(--size-element-radius-sm);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Last item - rounded corners on right only */
+.plus-pagination .page-item:last-child .page-link {
+    border-top-right-radius: var(--size-element-radius-sm);
+    border-bottom-right-radius: var(--size-element-radius-sm);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-right: none;
+}
+
+/* Middle items - no rounded corners */
+.plus-pagination .page-item:not(:first-child):not(:last-child) .page-link {
+    border-radius: 0;
+}
+
+/* Hover state - use secondary state layer 08 token */
+.plus-pagination .page-item:not(.disabled):not(.active) .page-link:hover {
+    background-color: var(--color-secondary-state-08);
+    color: var(--color-on-surface);
+    z-index: 2;
+}
+
+/* Focus state - use secondary state layer 12 token */
+.plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus {
+    outline: none;
+    background-color: var(--color-secondary-state-12);
+    color: var(--color-on-surface);
+    z-index: 2;
+    /* Add focus ring */
+    box-shadow: inset 0 0 0 2px var(--color-outline);
+}
+
+/* Active state - use secondary state layer 08 token */
+.plus-pagination .page-item.active .page-link {
+    background-color: var(--color-secondary-state-08);
+    color: var(--color-on-surface);
+    cursor: default;
+    font-weight: var(--font-weight-semibold-2);
+    z-index: 3;
+}
+
+/* Disabled state */
+.plus-pagination .page-item.disabled .page-link {
+    color: color-mix(in srgb, var(--color-on-surface) 38%, transparent);
+    background-color: var(--color-surface-variant);
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Ellipsis styling - keep border divider, minimal text */
+.plus-pagination .page-item.disabled .page-link:not([href]) {
+    color: var(--color-on-surface-variant);
+    background-color: transparent;
+    cursor: default;
+    opacity: 1;
+    pointer-events: none;
+    min-width: auto;
+    min-height: auto;
+    padding: var(--size-element-pad-y-md) var(--size-element-gap-sm);
+    /* Keep the border-right for ellipsis - use 1px */
+    border-right: var(--size-element-border) solid var(--color-outline-variant);
+}
+
+/* Ellipsis as last item - remove border */
+.plus-pagination .page-item.disabled:last-child .page-link:not([href]) {
+    border-right: none;
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+/* Small size */
+.plus-pagination.plus-pagination-small {
+    border-width: var(--size-element-border);
+    border-radius: var(--size-element-radius-sm);
+}
+
+.plus-pagination.plus-pagination-small .page-link {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    font-size: var(--font-size-body3); /* 12px */
+    line-height: var(--font-line-height-body3); /* 166.7% */
+    min-width: 28px;
+    min-height: 28px;
+    border-right-width: var(--size-element-border);
+}
+
+.plus-pagination.plus-pagination-small .page-item:first-child .page-link {
+    border-top-left-radius: var(--size-element-radius-sm);
+    border-bottom-left-radius: var(--size-element-radius-sm);
+}
+
+.plus-pagination.plus-pagination-small .page-item:last-child .page-link {
+    border-top-right-radius: var(--size-element-radius-sm);
+    border-bottom-right-radius: var(--size-element-radius-sm);
+}
+
+.plus-pagination.plus-pagination-small .page-item.disabled .page-link:not([href]) {
+    padding: var(--size-element-pad-y-sm) var(--size-element-gap-xs);
+    min-width: auto;
+    min-height: auto;
+    border-right-width: var(--size-element-border);
+}
+
+/* Large size */
+.plus-pagination.plus-pagination-large {
+    border-width: var(--size-element-border);
+    border-radius: var(--size-element-radius-lg);
+}
+
+.plus-pagination.plus-pagination-large .page-link {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    font-size: var(--font-size-body1); /* 16px */
+    line-height: var(--font-line-height-body1); /* 150% */
+    min-width: 44px;
+    min-height: 44px;
+    border-right-width: var(--size-element-border);
+}
+
+.plus-pagination.plus-pagination-large .page-item:first-child .page-link {
+    border-top-left-radius: var(--size-element-radius-lg);
+    border-bottom-left-radius: var(--size-element-radius-lg);
+}
+
+.plus-pagination.plus-pagination-large .page-item:last-child .page-link {
+    border-top-right-radius: var(--size-element-radius-lg);
+    border-bottom-right-radius: var(--size-element-radius-lg);
+}
+
+.plus-pagination.plus-pagination-large .page-item.disabled .page-link:not([href]) {
+    padding: var(--size-element-pad-y-lg) var(--size-element-gap-md);
+    min-width: auto;
+    min-height: auto;
+    border-right-width: var(--size-element-border);
+}
+
+/* ============================================
+   RESPONSIVE BEHAVIOR
+   ============================================ */
+
+/* On smaller screens, allow wrapping and reduce sizing */
+@media (max-width: 575.98px) {
+    .plus-pagination {
+        flex-wrap: wrap;
+    }
+    
+    .plus-pagination .page-link {
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+        min-width: 32px;
+        min-height: 32px;
+        font-size: var(--font-size-body3);
+        line-height: var(--font-line-height-body3);
+    }
+    
+    .plus-pagination .page-item.disabled .page-link:not([href]) {
+        padding: var(--size-element-pad-y-sm) var(--size-element-gap-xs);
+        min-width: auto;
+        min-height: auto;
+    }
+}

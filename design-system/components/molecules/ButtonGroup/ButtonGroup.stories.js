@@ -65,68 +65,72 @@ export default {
 
 /**
  * All Variants
- * Shows all button group combinations organized by style: each style shows all layouts × all sizes
+ * Shows all button group combinations exactly as shown in Figma
+ * Layout matches Figma: 3 styles (primary, secondary, tertiary) × 3 sizes (small, medium, large) × 2 alignments (horizontal, vertical) × 4 button counts (2, 3, 4, 5)
+ * Text: "Left", "Middle", "Right" (with "Middle" repeated for groups with 4-5 buttons)
  */
 export const AllVariants = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.gap = 'var(--size-section-gap-xl)';
     
-    const styles = ['primary', 'secondary', 'tertiary', 'success', 'info', 'warning', 'error'];
+    const styles = ['primary', 'secondary', 'tertiary'];
     const sizes = ['small', 'default', 'large'];
-    const alignments = ['horizontal', 'vertical'];
+    const buttonCounts = [2, 3, 4, 5];
     
-    // Organize by style - each style shows all layouts × all sizes
+    // Organize by style (primary, secondary, tertiary) - each style gets its own section
     styles.forEach((style) => {
       const styleSection = document.createElement('div');
       styleSection.style.display = 'flex';
       styleSection.style.flexDirection = 'column';
-      styleSection.style.gap = 'var(--size-card-gap-md)';
+      styleSection.style.gap = 'var(--size-section-gap-lg)';
       
-      const styleLabel = document.createElement('div');
-      styleLabel.className = 'h6';
-      styleLabel.textContent = `${style.charAt(0).toUpperCase() + style.slice(1)} Style - All Layouts × All Sizes`;
-      styleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-      styleSection.appendChild(styleLabel);
-      
-      // For each alignment, show all sizes
-      alignments.forEach((alignment) => {
-        const alignmentGroup = document.createElement('div');
-        alignmentGroup.style.display = 'flex';
-        alignmentGroup.style.flexDirection = 'column';
-        alignmentGroup.style.gap = 'var(--size-element-gap-sm)';
+      // For each style, show horizontal alignment first, then vertical
+      ['horizontal', 'vertical'].forEach((alignment) => {
+        const alignmentSection = document.createElement('div');
+        alignmentSection.style.display = 'flex';
+        alignmentSection.style.flexDirection = alignment === 'horizontal' ? 'row' : 'column';
+        alignmentSection.style.flexWrap = 'wrap';
+        alignmentSection.style.gap = 'var(--size-card-gap-lg)';
+        alignmentSection.style.alignItems = 'flex-start';
         
-        const alignmentLabel = document.createElement('div');
-        alignmentLabel.className = 'body2-txt';
-        alignmentLabel.textContent = `${alignment.charAt(0).toUpperCase() + alignment.slice(1)} Layout:`;
-        alignmentLabel.style.marginBottom = 'var(--size-element-gap-xs)';
-        alignmentGroup.appendChild(alignmentLabel);
-        
-        const sizesRow = document.createElement('div');
-        sizesRow.style.display = 'flex';
-        sizesRow.style.flexDirection = alignment === 'horizontal' ? 'row' : 'column';
-        sizesRow.style.flexWrap = 'wrap';
-        sizesRow.style.gap = 'var(--size-card-gap-md)';
-        
+        // Show all sizes (small, default, large) for this alignment
         sizes.forEach((size) => {
-          const group = PlusInterface.createButtonGroup({
-            buttons: [
-              { btnText: `${size} 1` },
-              { btnText: `${size} 2` },
-              { btnText: `${size} 3` }
-            ],
-            size: size,
-            style: style,
-            fill: 'filled',
-            alignment: alignment
+          const sizeColumn = document.createElement('div');
+          sizeColumn.style.display = 'flex';
+          sizeColumn.style.flexDirection = alignment === 'horizontal' ? 'column' : 'row';
+          sizeColumn.style.gap = 'var(--size-element-gap-md)';
+          sizeColumn.style.alignItems = 'flex-start';
+          
+          // Show all button counts (2, 3, 4, 5) for this size
+          buttonCounts.forEach((count) => {
+            const buttonTexts = [];
+            if (count === 2) {
+              buttonTexts.push('Left', 'Right');
+            } else if (count === 3) {
+              buttonTexts.push('Left', 'Middle', 'Right');
+            } else if (count === 4) {
+              buttonTexts.push('Left', 'Middle', 'Middle', 'Right');
+            } else if (count === 5) {
+              buttonTexts.push('Left', 'Middle', 'Middle', 'Middle', 'Right');
+            }
+            
+            const group = PlusInterface.createButtonGroup({
+              buttons: buttonTexts.map(text => ({ btnText: text })),
+              size: size,
+              style: style,
+              alignment: alignment
+            });
+            
+            sizeColumn.appendChild(group);
           });
-          sizesRow.appendChild(group);
+          
+          alignmentSection.appendChild(sizeColumn);
         });
         
-        alignmentGroup.appendChild(sizesRow);
-        styleSection.appendChild(alignmentGroup);
+        styleSection.appendChild(alignmentSection);
       });
       
       container.appendChild(styleSection);

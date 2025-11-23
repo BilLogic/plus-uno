@@ -1,0 +1,222 @@
+/**
+ * List Group Component Styles
+ * Matches Figma design system specifications
+ * Built on Bootstrap 4.6.2 list-group with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/list-group/
+ * 
+ * Component Type: Element (list items use `element-*` tokens)
+ * Token Usage:
+ *   - Padding: --size-element-pad-x-md, --size-element-pad-y-md (for items)
+ *   - Border: --size-element-border (1px)
+ *   - Radius: --size-element-radius-sm (for container)
+ *   - Colors: --color-surface-container, --color-on-surface, --color-primary (active)
+ *   - Gap: --size-element-gap-sm (between content and badge)
+ */
+
+/* ============================================
+   LIST GROUP CONTAINER (Bootstrap 4.6.2 list-group)
+   ============================================ */
+
+.plus-list-group {
+    /* Override Bootstrap's default border-radius with design tokens */
+    border-radius: var(--size-element-radius-sm);
+    /* Use design token for border */
+    border: var(--size-element-border) solid var(--color-outline-variant);
+    /* Background color from design tokens */
+    background-color: var(--color-surface-container);
+    /* Remove Bootstrap's default margin-bottom */
+    margin-bottom: 0;
+}
+
+/* Flush variant - no borders or rounded corners */
+.plus-list-group.list-group-flush {
+    border: none;
+    border-radius: 0;
+}
+
+/* ============================================
+   LIST GROUP ITEM (Bootstrap 4.6.2 list-group-item)
+   ============================================ */
+
+.plus-list-group-item {
+    /* Override Bootstrap's default padding with design tokens */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    /* Use design token for border color */
+    border-color: var(--color-outline-variant);
+    /* Background color from design tokens */
+    background-color: var(--color-surface-container);
+    /* Text color from design tokens */
+    color: var(--color-on-surface);
+    /* Typography - use body2-txt class for consistent typography */
+    /* Remove Bootstrap's default border-width override */
+    border-width: var(--size-element-border);
+    
+    /* Flex layout for content and badge */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-sm);
+}
+
+/* First item - remove top border radius override */
+.plus-list-group-item:first-child {
+    border-top-left-radius: var(--size-element-radius-sm);
+    border-top-right-radius: var(--size-element-radius-sm);
+}
+
+/* Last item - remove bottom border radius override */
+.plus-list-group-item:last-child {
+    border-bottom-left-radius: var(--size-element-radius-sm);
+    border-bottom-right-radius: var(--size-element-radius-sm);
+    border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+}
+
+/* Flush variant - no borders between items */
+.plus-list-group.list-group-flush .plus-list-group-item {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+}
+
+.plus-list-group.list-group-flush .plus-list-group-item:first-child {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.plus-list-group.list-group-flush .plus-list-group-item:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ============================================
+   LIST GROUP ITEM CONTENT
+   ============================================ */
+
+.plus-list-group-item-content {
+    flex: 1;
+    /* Typography handled by body2-txt class */
+    color: var(--color-on-surface);
+}
+
+/* ============================================
+   LIST GROUP ITEM BADGE
+   ============================================ */
+
+.plus-list-group-item-badge {
+    flex-shrink: 0;
+    /* Badge styling handled by Badge component */
+}
+
+/* ============================================
+   ACTIVE STATE (Bootstrap 4.6.2 .active)
+   ============================================ */
+
+.plus-list-group-item.active {
+    /* Override Bootstrap's default active colors with design tokens */
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    border-color: var(--color-primary);
+    /* Use design token for border */
+    border-width: var(--size-element-border);
+    z-index: 2; /* Ensure active item appears above others */
+}
+
+.plus-list-group-item.active .plus-list-group-item-content {
+    color: var(--color-on-primary-container);
+}
+
+/* ============================================
+   DISABLED STATE (Bootstrap 4.6.2 .disabled)
+   ============================================ */
+
+.plus-list-group-item.disabled {
+    /* Override Bootstrap's default disabled colors with design tokens */
+    background-color: var(--color-surface-container);
+    color: var(--color-on-surface);
+    opacity: 0.38; /* Material Design disabled opacity */
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.plus-list-group-item.disabled .plus-list-group-item-content {
+    color: var(--color-on-surface);
+    opacity: 0.38;
+}
+
+/* ============================================
+   ACTION ITEMS (Bootstrap 4.6.2 .list-group-item-action)
+   ============================================ */
+
+.plus-list-group-item.list-group-item-action {
+    cursor: pointer;
+    /* Remove Bootstrap's default hover background */
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* Hover state for action items */
+.plus-list-group-item.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-primary-state-08);
+    color: var(--color-on-surface);
+    border-color: var(--color-primary);
+}
+
+.plus-list-group-item.list-group-item-action:hover:not(.active):not(.disabled) .plus-list-group-item-content {
+    color: var(--color-on-surface);
+}
+
+/* Focus state for action items */
+.plus-list-group-item.list-group-item-action:focus {
+    outline: none;
+    /* Use design token for focus ring */
+    box-shadow: 0 0 0 2px var(--color-primary-state-16);
+    border-color: var(--color-primary);
+}
+
+.plus-list-group-item.list-group-item-action:focus:not(.active) {
+    background-color: var(--color-primary-state-08);
+    color: var(--color-on-surface);
+}
+
+.plus-list-group-item.list-group-item-action:focus:not(.active) .plus-list-group-item-content {
+    color: var(--color-on-surface);
+}
+
+/* Active + Action state */
+.plus-list-group-item.list-group-item-action.active {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    border-color: var(--color-primary);
+}
+
+.plus-list-group-item.list-group-item-action.active:hover {
+    background-color: var(--color-primary-container-state-12);
+    color: var(--color-on-primary-container);
+}
+
+.plus-list-group-item.list-group-item-action.active:focus {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    box-shadow: 0 0 0 2px var(--color-primary-state-16);
+}
+
+/* ============================================
+   LIST GROUP LIST ITEM (when using <ul> with <li>)
+   ============================================ */
+
+.plus-list-group-list-item {
+    /* Remove default list styling */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* When list item contains an action item, merge styles */
+.plus-list-group-list-item > .plus-list-group-item {
+    /* Styles already applied to .plus-list-group-item */
+}
+
+
+

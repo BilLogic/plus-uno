@@ -1,0 +1,146 @@
+/**
+ * Loading GIF Component Styles
+ * CSS-animated loading indicator (no actual GIF file required)
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Size: Custom sizes using element tokens
+ *   - Colors: Uses Material Design 3 color tokens
+ *   - Display: Flexbox for dot alignment
+ */
+
+/* ============================================
+   BASE LOADING GIF CONTAINER
+   ============================================ */
+
+.plus-loading-gif {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-xs);
+    vertical-align: middle;
+}
+
+/* ============================================
+   ANIMATED DOTS
+   ============================================ */
+
+.plus-loading-gif-dot {
+    display: inline-block;
+    border-radius: 50%;
+    background-color: currentColor;
+    animation: loading-gif-pulse 1.4s ease-in-out infinite;
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+/* Small loading GIF */
+.plus-loading-gif.plus-loading-gif-small {
+    gap: calc(var(--size-element-gap-xs) * 0.5);
+    
+    .plus-loading-gif-dot {
+        width: 0.25rem;
+        height: 0.25rem;
+    }
+}
+
+/* Default loading GIF */
+.plus-loading-gif.plus-loading-gif-default {
+    gap: var(--size-element-gap-xs);
+    
+    .plus-loading-gif-dot {
+        width: 0.375rem;
+        height: 0.375rem;
+    }
+}
+
+/* Large loading GIF */
+.plus-loading-gif.plus-loading-gif-large {
+    gap: calc(var(--size-element-gap-xs) * 1.5);
+    
+    .plus-loading-gif-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+}
+
+/* ============================================
+   STYLE VARIANTS (Color)
+   ============================================ */
+
+/* Primary style - uses primary color token */
+.plus-loading-gif.plus-loading-gif-primary {
+    color: var(--color-primary);
+}
+
+/* Secondary style - uses secondary color token */
+.plus-loading-gif.plus-loading-gif-secondary {
+    color: var(--color-secondary);
+}
+
+/* Tertiary style - uses tertiary color token */
+.plus-loading-gif.plus-loading-gif-tertiary {
+    color: var(--color-tertiary);
+}
+
+/* Success style - uses success color token */
+.plus-loading-gif.plus-loading-gif-success {
+    color: var(--color-success);
+}
+
+/* Danger style - uses danger color token */
+.plus-loading-gif.plus-loading-gif-danger {
+    color: var(--color-danger);
+}
+
+/* Warning style - uses warning color token */
+.plus-loading-gif.plus-loading-gif-warning {
+    color: var(--color-warning);
+}
+
+/* Info style - uses info color token */
+.plus-loading-gif.plus-loading-gif-info {
+    color: var(--color-info);
+}
+
+/* ============================================
+   ANIMATION
+   ============================================ */
+
+@keyframes loading-gif-pulse {
+    0%, 80%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Screen reader only text (Bootstrap's sr-only class) */
+.plus-loading-gif .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus state for keyboard navigation (if loading indicator is focusable) */
+.plus-loading-gif:focus {
+    outline: 2px solid var(--color-inverse-primary);
+    outline-offset: 2px;
+    border-radius: var(--size-element-radius-sm);
+}
+

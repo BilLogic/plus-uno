@@ -1,0 +1,173 @@
+/**
+ * Tooltip Component Styles
+ * Matches Figma design system specifications
+ * Tooltips are Element components that display brief information on hover/focus
+ * 
+ * Figma Specs:
+ * - Background: surface-container-high (for tooltip content)
+ * - Border radius: 4px (element-radius-sm)
+ * - Padding: varies by size (sm: 4px/8px, md: 6px/10px, lg: 8px/16px)
+ * - Typography: body2-txt for content
+ * - Uses element-level tokens since tooltips are Element components
+ */
+
+/* Bootstrap Tooltip Overrides */
+.tooltip {
+    /* Figma: Tooltip container - uses element tokens since tooltips are Element components */
+    /* But tooltip content overlays like modals, so we use surface-container-high for background */
+    opacity: 1; /* Bootstrap sets opacity to 0 by default, we override to 1 */
+    z-index: 1070; /* Bootstrap default z-index for tooltips */
+}
+
+.tooltip-inner {
+    /* Figma: Tooltip content background - surface-container-high */
+    background-color: var(--color-surface-container-high);
+    color: var(--color-on-surface);
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    
+    /* Figma: Tooltip border radius - radius-sm (4px) */
+    border-radius: var(--size-element-radius-sm);
+    
+    /* Default padding - medium size */
+    /* Figma: Tooltip default - pad-y-md (6px), pad-x-md (10px) */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    
+    /* Max width to prevent overly wide tooltips */
+    max-width: 200px;
+    
+    /* Typography */
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    color: var(--color-on-surface);
+    
+    /* Text alignment */
+    text-align: left;
+}
+
+/* Tooltip Arrow (Bootstrap 4 uses .arrow class with ::before and ::after) */
+.tooltip .arrow {
+    /* ::before creates the border/shadow, ::after creates the actual arrow */
+    &::before {
+        /* Border/shadow color - transparent to match our borderless design */
+        border-color: transparent;
+    }
+    
+    &::after {
+        /* Arrow fill color matches tooltip background */
+        border-color: transparent;
+    }
+}
+
+/* Tooltip Arrow positioning - Bootstrap 4 uses bs-tooltip-* classes */
+/* Top placement */
+.tooltip.bs-tooltip-top .arrow::before,
+.tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before {
+    border-top-color: transparent;
+}
+
+.tooltip.bs-tooltip-top .arrow::after,
+.tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::after {
+    border-top-color: var(--color-surface-container-high);
+    bottom: calc((0.5rem + 1px) * -1);
+}
+
+/* Bottom placement */
+.tooltip.bs-tooltip-bottom .arrow::before,
+.tooltip.bs-tooltip-auto[x-placement^="bottom"] .arrow::before {
+    border-bottom-color: transparent;
+}
+
+.tooltip.bs-tooltip-bottom .arrow::after,
+.tooltip.bs-tooltip-auto[x-placement^="bottom"] .arrow::after {
+    border-bottom-color: var(--color-surface-container-high);
+    top: calc((0.5rem + 1px) * -1);
+}
+
+/* Left placement */
+.tooltip.bs-tooltip-left .arrow::before,
+.tooltip.bs-tooltip-auto[x-placement^="left"] .arrow::before {
+    border-left-color: transparent;
+}
+
+.tooltip.bs-tooltip-left .arrow::after,
+.tooltip.bs-tooltip-auto[x-placement^="left"] .arrow::after {
+    border-left-color: var(--color-surface-container-high);
+    right: calc((0.5rem + 1px) * -1);
+}
+
+/* Right placement */
+.tooltip.bs-tooltip-right .arrow::before,
+.tooltip.bs-tooltip-auto[x-placement^="right"] .arrow::before {
+    border-right-color: transparent;
+}
+
+.tooltip.bs-tooltip-right .arrow::after,
+.tooltip.bs-tooltip-auto[x-placement^="right"] .arrow::after {
+    border-right-color: var(--color-surface-container-high);
+    left: calc((0.5rem + 1px) * -1);
+}
+
+/* Size Variants */
+
+/* Small Tooltip */
+.plus-tooltip-small + .tooltip .tooltip-inner,
+.tooltip.plus-tooltip-small .tooltip-inner {
+    /* Figma: Small tooltip - pad-y-sm (4px), pad-x-sm (8px) */
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    
+    /* Figma: Small tooltip content - body3-txt typography */
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    
+    max-width: 150px;
+}
+
+/* Default Tooltip (already set above, but explicit for clarity) */
+.plus-tooltip-default + .tooltip .tooltip-inner,
+.tooltip.plus-tooltip-default .tooltip-inner {
+    /* Figma: Default tooltip - pad-y-md (6px), pad-x-md (10px) */
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+}
+
+/* Large Tooltip */
+.plus-tooltip-large + .tooltip .tooltip-inner,
+.tooltip.plus-tooltip-large .tooltip-inner {
+    /* Figma: Large tooltip - pad-y-lg (8px), pad-x-lg (16px) */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    
+    /* Figma: Large tooltip content - body1-txt typography */
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+    
+    max-width: 300px;
+}
+
+/* Tooltip Trigger Element */
+.plus-tooltip-trigger {
+    /* Trigger elements can be styled as needed */
+    cursor: help; /* Default cursor for tooltip triggers */
+}
+
+/* Override Bootstrap's default tooltip styles */
+.tooltip {
+    /* Remove Bootstrap's default border */
+    border: none;
+    
+    /* Ensure proper z-index */
+    z-index: 1070;
+}
+
+/* Tooltip fade animation (Bootstrap default) */
+.tooltip.fade {
+    opacity: 0;
+    transition: opacity 0.15s linear;
+}
+
+.tooltip.fade.show {
+    opacity: 1;
+}
+

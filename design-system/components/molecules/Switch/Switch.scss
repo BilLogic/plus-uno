@@ -25,6 +25,30 @@
    SWITCH WRAPPER (Bootstrap 4.6.2 custom-control custom-switch)
    ============================================ */
 
+/* Override Bootstrap's default custom-control-input colors completely */
+/* Bootstrap uses #007bff (blue) by default - we override with primary token */
+.custom-control-input,
+.custom-switch .custom-control-input,
+.custom-control.custom-switch .custom-control-input {
+    /* Remove any Bootstrap default colors */
+    color: var(--color-primary) !important;
+}
+
+.custom-control-input:checked,
+.custom-switch .custom-control-input:checked,
+.custom-control.custom-switch .custom-control-input:checked {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before,
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+}
+
 .plus-switch-wrapper {
     /* Override Bootstrap's default custom-control padding */
     padding-left: 0;
@@ -56,6 +80,9 @@
     padding: 0;
     flex-shrink: 0;
     
+    /* Override browser's default accent-color with primary color token */
+    accent-color: var(--color-primary) !important;
+    
     /* Hide the actual checkbox input visually but keep it for accessibility */
     opacity: 0;
     cursor: pointer;
@@ -69,9 +96,9 @@
         /* Figma: Track width 25px, height 12px */
         width: 25px;
         height: 12px;
-        border: var(--size-element-stroke-md) solid var(--color-primary);
+        border: var(--size-element-stroke-md) solid var(--color-primary) !important;
         border-radius: 999px; /* Figma: radius-1000 (pill shape) */
-        background-color: var(--color-surface); /* Figma: neutral-colors/surface */
+        background-color: var(--color-surface) !important; /* Figma: neutral-colors/surface */
         cursor: pointer;
         transition: all 0.2s;
         box-sizing: border-box;
@@ -88,7 +115,7 @@
         width: 8px;
         height: 8px;
         border-radius: 999px; /* Pill shape */
-        background-color: var(--color-primary); /* Figma: primary color for unchecked thumb */
+        background-color: var(--color-primary) !important; /* Figma: primary color for unchecked thumb */
         transition: transform 0.2s, background-color 0.2s;
         box-sizing: border-box;
         pointer-events: none;
@@ -97,12 +124,12 @@
     /* Unchecked state - thumb on left, primary colored */
     &:not(:checked) {
         &::before {
-            border-color: var(--color-primary);
-            background-color: var(--color-surface);
+            border-color: var(--color-primary) !important;
+            background-color: var(--color-surface) !important;
         }
         
         &::after {
-            background-color: var(--color-primary);
+            background-color: var(--color-primary) !important;
             transform: translateX(0);
         }
     }
@@ -110,24 +137,41 @@
     /* Checked state - thumb on right, white colored */
     &:checked {
         &::before {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary);
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
         }
         
         &::after {
-            background-color: var(--color-on-primary); /* Figma: white thumb when checked */
+            background-color: var(--color-on-primary) !important; /* Figma: white thumb when checked */
             /* Move right: track width (25px) - thumb width (8px) - left padding (2px) - right padding (2px) = 13px */
             transform: translateX(13px);
         }
     }
     
-    /* Hover state */
+    /* Hover state - use primary color tokens */
+    &:hover:not(:disabled) {
+        &::before {
+            border-color: var(--color-primary) !important;
+        }
+        
+        &:not(:checked)::before {
+            background-color: var(--color-primary-state-08) !important;
+        }
+        
+        &:checked::before {
+            background-color: var(--color-primary-state-12) !important;
+        }
+    }
+    
+    /* Wrapper hover state - ensures hover works when hovering over wrapper */
     .plus-switch-wrapper:not(.plus-switch-disabled):hover &:not(:checked)::before {
-        background-color: var(--color-primary-state-08);
+        border-color: var(--color-primary) !important;
+        background-color: var(--color-primary-state-08) !important;
     }
     
     .plus-switch-wrapper:not(.plus-switch-disabled):hover &:checked::before {
-        background-color: var(--color-primary-state-12);
+        border-color: var(--color-primary) !important;
+        background-color: var(--color-primary-state-12) !important;
     }
     
     /* Focus state - Figma: 2px border using inverse-primary color */
@@ -211,4 +255,46 @@
 .plus-switch-disabled .plus-switch-label {
     opacity: 0.38; /* Figma: 38% opacity for disabled */
     cursor: not-allowed;
+}
+
+/* ============================================
+   BOOTSTRAP OVERRIDES - Force primary color token
+   ============================================ */
+/* These overrides must be at the end to ensure they override Bootstrap's defaults */
+
+/* Override Bootstrap's default blue (#007bff) with primary color token */
+.custom-control.custom-switch .custom-control-input:checked ~ .custom-control-label::before,
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before,
+.custom-control-input.custom-switch-input:checked ~ .custom-control-label::before {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+}
+
+/* Override Bootstrap's default colors on the input pseudo-elements */
+.custom-control.custom-switch .plus-switch-input:checked::before,
+.custom-switch .plus-switch-input:checked::before,
+.plus-switch-wrapper .plus-switch-input:checked::before {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.custom-control.custom-switch .plus-switch-input:checked::after,
+.custom-switch .plus-switch-input:checked::after,
+.plus-switch-wrapper .plus-switch-input:checked::after {
+    background-color: var(--color-on-primary) !important;
+}
+
+/* Override unchecked state to use primary color for thumb */
+.custom-control.custom-switch .plus-switch-input:not(:checked)::before,
+.custom-switch .plus-switch-input:not(:checked)::before,
+.plus-switch-wrapper .plus-switch-input:not(:checked)::before {
+    border-color: var(--color-primary) !important;
+    background-color: var(--color-surface) !important;
+}
+
+.custom-control.custom-switch .plus-switch-input:not(:checked)::after,
+.custom-switch .plus-switch-input:not(:checked)::after,
+.plus-switch-wrapper .plus-switch-input:not(:checked)::after {
+    background-color: var(--color-primary) !important;
 }

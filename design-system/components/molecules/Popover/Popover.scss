@@ -1,0 +1,184 @@
+/**
+ * Popover Component Styles
+ * Matches Figma design system specifications
+ * Popovers are Element components that display additional information on hover/click
+ * 
+ * Figma Specs:
+ * - Background: surface-container-high (for popover content)
+ * - Border radius: 4px (element-radius-sm)
+ * - Padding: varies by size (sm: 8px/10px, md: 12px/16px, lg: 16px/20px)
+ * - Typography: body1-txt for content, h5 for title
+ * - Uses modal-level tokens for container (overlays content like modals)
+ */
+
+/* Bootstrap Popover Overrides */
+.popover {
+    /* Figma: Popover container - uses modal tokens since it overlays content */
+    background-color: var(--color-surface-container-high);
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    
+    /* Figma: Popover border radius - radius-sm (4px) */
+    border-radius: var(--size-element-radius-sm);
+    
+    /* Default padding - medium size */
+    /* Figma: Popover default - pad-y-md (12px), pad-x-md (16px) */
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
+    
+    /* Max width to prevent overly wide popovers */
+    max-width: 276px;
+    min-width: 200px;
+    
+    /* Typography */
+    font-family: var(--font-family-body);
+    color: var(--color-on-surface);
+}
+
+/* Popover Arrow (Bootstrap 4 uses .arrow class with ::before and ::after) */
+.popover .arrow {
+    /* ::before creates the border/shadow, ::after creates the actual arrow */
+    &::before {
+        /* Border/shadow color - transparent to match our borderless design */
+        border-color: transparent;
+    }
+    
+    &::after {
+        /* Arrow fill color matches popover background */
+        border-color: transparent;
+    }
+}
+
+/* Popover Arrow positioning - Bootstrap 4 uses bs-popover-* classes */
+/* Top placement */
+.popover.bs-popover-top .arrow::after,
+.popover.bs-popover-auto[x-placement^="top"] .arrow::after {
+    border-top-color: var(--color-surface-container-high);
+    bottom: calc((0.5rem + 1px) * -1);
+}
+
+/* Bottom placement */
+.popover.bs-popover-bottom .arrow::after,
+.popover.bs-popover-auto[x-placement^="bottom"] .arrow::after {
+    border-bottom-color: var(--color-surface-container-high);
+    top: calc((0.5rem + 1px) * -1);
+}
+
+/* Left placement */
+.popover.bs-popover-left .arrow::after,
+.popover.bs-popover-auto[x-placement^="left"] .arrow::after {
+    border-left-color: var(--color-surface-container-high);
+    right: calc((0.5rem + 1px) * -1);
+}
+
+/* Right placement */
+.popover.bs-popover-right .arrow::after,
+.popover.bs-popover-auto[x-placement^="right"] .arrow::after {
+    border-right-color: var(--color-surface-container-high);
+    left: calc((0.5rem + 1px) * -1);
+}
+
+/* Popover Header */
+.popover-header {
+    /* Figma: Popover title - h5 typography */
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-semibold-2);
+    font-size: var(--font-size-h5);
+    line-height: var(--font-line-height-h5);
+    color: var(--color-on-surface);
+    
+    /* Figma: Popover header padding - bottom uses gap-sm (8px) */
+    padding: 0 0 var(--size-modal-gap-sm) 0;
+    margin: 0 0 var(--size-modal-gap-sm) 0;
+    border-bottom: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+    background-color: transparent;
+    border-radius: 0;
+}
+
+/* Popover Body */
+.popover-body {
+    /* Figma: Popover content - body1-txt typography */
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+    color: var(--color-on-surface);
+    
+    padding: 0;
+    margin: 0;
+}
+
+/* Size Variants */
+
+/* Small Popover */
+.plus-popover-small + .popover,
+.popover.plus-popover-small {
+    /* Figma: Small popover - pad-y-sm (8px), pad-x-sm (10px) */
+    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm);
+    
+    .popover-body {
+        /* Figma: Small popover content - body2-txt typography */
+        font-size: var(--font-size-body2);
+        line-height: var(--font-line-height-body2);
+    }
+    
+    .popover-header {
+        /* Figma: Small popover title - h6 typography */
+        font-size: var(--font-size-h6);
+        line-height: var(--font-line-height-h6);
+    }
+}
+
+/* Default Popover (already set above, but explicit for clarity) */
+.plus-popover-default + .popover,
+.popover.plus-popover-default {
+    /* Figma: Default popover - pad-y-md (12px), pad-x-md (16px) */
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
+}
+
+/* Large Popover */
+.plus-popover-large + .popover,
+.popover.plus-popover-large {
+    /* Figma: Large popover - pad-y-lg (24px), pad-x-lg (40px) */
+    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg);
+    
+    max-width: 400px;
+    
+    .popover-body {
+        /* Figma: Large popover content - body1-txt typography (same as default) */
+        font-size: var(--font-size-body1);
+        line-height: var(--font-line-height-body1);
+    }
+    
+    .popover-header {
+        /* Figma: Large popover title - h5 typography (same as default) */
+        font-size: var(--font-size-h5);
+        line-height: var(--font-line-height-h5);
+    }
+}
+
+/* Popover Trigger Element */
+.plus-popover-trigger {
+    /* Trigger elements can be styled as needed */
+    cursor: pointer;
+}
+
+/* Override Bootstrap's default popover styles */
+.popover {
+    /* Remove Bootstrap's default border */
+    border: none;
+    
+    /* Ensure proper z-index */
+    z-index: 1060;
+}
+
+/* Popover without header - adjust body padding */
+.popover:not(:has(.popover-header)) .popover-body {
+    /* If no header, body already has padding from container */
+}
+
+/* Popover with header - body doesn't need top padding */
+.popover:has(.popover-header) .popover-body {
+    /* Body padding handled by container, header has bottom margin */
+}
+

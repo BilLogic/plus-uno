@@ -3,6 +3,23 @@
 
 /** dropdowns **/
 
+/* Ensure Bootstrap direction classes work correctly for static display in Storybook */
+/* Note: Bootstrap's Popper.js will handle dynamic positioning on click */
+.pdropdown.dropup .dropdown-menu {
+    /* Bootstrap 4 dropup - menu opens upward */
+    /* Popper.js will position this, but we set defaults for static display */
+}
+
+.pdropdown.dropleft .dropdown-menu {
+    /* Bootstrap 4 dropleft - menu opens to the left */
+    /* Popper.js will position this, but we set defaults for static display */
+}
+
+.pdropdown.dropright .dropdown-menu {
+    /* Bootstrap 4 dropright - menu opens to the right */
+    /* Popper.js will position this, but we set defaults for static display */
+}
+
 .dropdown-item:focus,
 .dropdown-item:hover {
   text-decoration: none;
@@ -23,6 +40,17 @@
     width: 100%;
     min-width: fit-content;
     background-color: var(--color-surface-container-high);
+    
+    /* Ensure Bootstrap can hide the menu - display: none should work */
+    /* Bootstrap uses display: none to hide, so we need to allow that */
+    &.show {
+        display: block !important;
+    }
+    
+    /* When not shown, Bootstrap sets display: none - ensure that works */
+    &:not(.show) {
+        display: none !important;
+    }
 }
 
 /* need to distinguish scrollable dropdowns bc scrolling overflow breaks nested dropdowns */
@@ -88,25 +116,21 @@
 
     .pdropdown-item-text {
         color: var(--color-on-surface);
+        flex-grow: 1;
+        min-width: 0;
     }
 
     .selected-icon {
         color: var(--color-on-surface-variant);
+        /* Always present but opacity-0 when not selected (matching Figma) */
+        opacity: 0;
+        flex-shrink: 0;
     }
 }
 
-/* hide checkmarks in non-multisection menus */
-.pdropdown:not(.multi-section) {
-    i.selected-icon {
-        display: none;
-    }
-}
-
-.pdropdown .dropdown-menu .dropdown-item .selected-icon {
-    color: transparent;
-}
-
+/* Show checkmark when selected */
 .pdropdown .dropdown-menu .dropdown-item.selected .selected-icon {
+    opacity: 1;
     color: var(--color-on-surface-variant);
 }
 
@@ -123,20 +147,104 @@
 
 /*toggles*/
 .pdropdown {
+    /* Bootstrap 4 requires position: relative for dropdown positioning */
+    position: relative;
     
     &.pdropdown-split-dropdown {
+        /* Container should use flex to align buttons */
+        display: flex;
+        align-items: stretch;
+        /* Ensure buttons have proper spacing - no gap needed as border separator provides visual separation */
+        gap: 0;
+        
+        .pdropdown-split-text-btn {
+            /* Text button should not have caret icon */
+            &::after {
+                display: none;
+            }
+            /* Text button is clickable for its own action, not for dropdown toggle */
+            pointer-events: auto;
+            /* Ensure same height as toggle button */
+            display: flex;
+            align-items: center;
+            /* Text button should be the larger part */
+            flex: 1;
+            /* Prevent collapsing - ensure minimum width for text content */
+            min-width: fit-content;
+            /* Ensure text doesn't get cut off */
+            white-space: nowrap;
+        }
+        
+        /* Default order: text on left, toggle on right (for dropdown, dropup, dropright) */
         .pdropdown-split-text-btn {
             border-right: none;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
-            pointer-events: none;
         }
         .pdropdown-split-toggle-btn {
             border-left: none;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            /* Figma: Split dropdown separator - use border color from style */
-            border-left: var(--size-element-stroke-md) solid currentColor;
+            /* No separator border - buttons are connected as one unit */
+            /* Ensure toggle button has enough space for the caret icon */
+            min-width: fit-content;
+            white-space: nowrap;
+        }
+        
+        /* Reversed order for dropleft: toggle on left, text on right */
+        &.dropleft {
+            .pdropdown-split-toggle-btn {
+                border-left: none;
+                border-right: none;
+                border-top-left-radius: var(--size-element-radius-sm);
+                border-bottom-left-radius: var(--size-element-radius-sm);
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            .pdropdown-split-text-btn {
+                border-right: none;
+                border-left: none;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                border-top-right-radius: var(--size-element-radius-sm);
+                border-bottom-right-radius: var(--size-element-radius-sm);
+            }
+        }
+        
+        .pdropdown-split-toggle-btn {
+            /* Toggle button should only show caret icon (no text) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Toggle button should be compact/square-like - minimal padding, just enough for caret */
+            /* Use smaller horizontal padding to make it narrower */
+            padding: var(--size-element-pad-y-md) var(--size-element-pad-x-sm);
+            /* Ensure toggle button doesn't grow - it should be compact */
+            flex-shrink: 0;
+            /* Set a fixed narrow width - just enough for the caret icon */
+            width: auto;
+            min-width: auto;
+            max-width: fit-content;
+            /* Ensure no background artifacts */
+            background: var(--color-surface);
+            /* Ensure caret icon is visible and centered - content will be set by direction classes */
+            &::after {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 0;
+                margin-right: 0;
+                /* Ensure caret is vertically aligned */
+                vertical-align: middle;
+                /* Content will be set by direction-specific classes (pdropdown-caret-*) */
+                /* Ensure no background or border artifacts */
+                background: none !important;
+                box-shadow: none !important;
+                border: none !important;
+                /* Ensure no width/height constraints that could cause trapezoid shape */
+                width: auto !important;
+                height: auto !important;
+            }
         }
     }
 
@@ -261,11 +369,23 @@
 .pdropdown.small .pdropdown-default-toggle {
     /* Figma: Small dropdown - pad-y-sm (4px), pad-x-sm (8px) */
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    
+    /* Small size icon - 10px (fa-body3) */
+    &::after {
+        font-size: var(--font-size-fa-body3);
+        line-height: var(--font-line-height-fa-body3);
+    }
 }
 
 .pdropdown.large .pdropdown-default-toggle {
     /* Figma: Large dropdown - pad-y-lg (8px), pad-x-lg (16px) */
     padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    
+    /* Large size icon - 14px (fa-body1) */
+    &::after {
+        font-size: var(--font-size-fa-body1);
+        line-height: var(--font-line-height-fa-body1);
+    }
 }
 
 /** multiselects **/
@@ -273,6 +393,18 @@
 
 .multiselect {
     @extend .body2-txt;
+}
+
+/* Override Bootstrap's default dropdown-toggle caret - completely remove it */
+.pdropdown .dropdown-toggle::after,
+.pdropdown-default-toggle.dropdown-toggle::after,
+.pdropdown-split-toggle-btn.dropdown-toggle::after {
+    /* Remove Bootstrap's default caret completely - we use our own via pdropdown-default-toggle */
+    /* This prevents duplicate icons from Bootstrap */
+    border: none !important;
+    margin: 0 !important;
+    vertical-align: 0 !important;
+    /* Content will be set by our own rules below */
 }
 
 .pdropdown-default-toggle,
@@ -284,25 +416,143 @@
     /* Figma: Border - stroke-md (1.5px) */
     border: var(--size-element-stroke-md) solid var(--color-outline-variant);
     display: flex;
+    align-items: center;
     /* Figma: Gap between text and caret - gap-sm (8px) */
     gap: var(--size-element-gap-sm);
     /* Figma: Dropdown toggle default - pad-y-md (6px), pad-x-md (10px) */
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
 
+    /* Ensure text content is properly aligned */
+    > span {
+        display: inline;
+        /* Ensure text doesn't constrain icon */
+        flex-shrink: 1;
+    }
+
     &:has(.multiselect-label-tag) .multiselect-selected-text {
         display: none;
     }
 
+    /* Override Bootstrap's dropdown-toggle ::after - but don't force content here */
+    /* Content will be set by direction-specific classes below */
+    &.dropdown-toggle::after {
+        /* Reset Bootstrap's default, but let direction classes set the content */
+        display: inline-block !important;
+        font-family: "Font Awesome 6 Free" !important;
+        font-weight: 900 !important;
+        /* Don't set content here - let direction classes handle it */
+    }
+
     &::after {
-        content: "\f0d7";
+        content: "\f0d8" !important; /* caret-up - Font Awesome icon (default direction when closed) */
         font-family: "Font Awesome 6 Free";
         font-weight: 900;
-        color: var(--color-on-surface-variant);
+        /* Icon color should match button text color */
+        color: inherit;
+        /* Default size (medium) - 12px */
         font-size: var(--font-size-fa-body2);
+        /* Use Font Awesome line-height for proper icon rendering */
         line-height: var(--font-line-height-fa-body2);
+        /* Use inline-block to align naturally with text */
         display: inline-block;
         border: none;
         margin-left: auto;
+        /* Ensure caret is vertically aligned with text */
+        flex-shrink: 0;
+        /* Align with text middle - works better for Font Awesome icons */
+        vertical-align: middle;
+        /* Ensure icon maintains its natural width/height - don't constrain */
+        width: auto;
+        height: auto;
+        min-width: auto;
+        min-height: auto;
+        /* Prevent any text transformation or scaling */
+        text-transform: none;
+        transform: none;
+        /* Ensure no background or border artifacts */
+        background: none;
+        box-shadow: none;
+    }
+    
+    /* When dropdown is open (default direction), caret should point down */
+    &[aria-expanded="true"]:not(.pdropdown-caret-up):not(.pdropdown-caret-left):not(.pdropdown-caret-right)::after {
+        content: "\f0d7" !important; /* caret-down - when open */
+    }
+
+    /* Direction-specific caret icons - using different Font Awesome icons (not rotated) */
+    &.pdropdown-caret-up::after {
+        content: "\f0d8" !important; /* caret-up - different icon, not rotated */
+        /* Use same size, line-height and alignment as default */
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
+        display: inline-block;
+        vertical-align: middle;
+        /* Ensure icon maintains its natural width/height */
+        width: auto;
+        height: auto;
+        min-width: auto;
+        min-height: auto;
+        text-transform: none;
+        transform: none;
+        /* Ensure no background or border artifacts */
+        background: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Ensure no ::before pseudo-element creates duplicate icons */
+    &::before {
+        display: none !important;
+        content: none !important;
+    }
+    
+    /* Hide any actual icon elements that might be added (should only use ::after) */
+    > i.fa-caret-down,
+    > i.fa-caret-up,
+    > i.fa-caret-left,
+    > i.fa-caret-right,
+    i.fas.fa-caret-down,
+    i.fas.fa-caret-up,
+    i.fas.fa-caret-left,
+    i.fas.fa-caret-right {
+        display: none !important;
+    }
+
+    &.pdropdown-caret-left::after {
+        content: "\f0d9" !important; /* caret-left - different icon, not rotated */
+        /* Use same size, line-height and alignment as default */
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
+        display: inline-block;
+        vertical-align: middle;
+        /* Ensure icon maintains its natural width/height */
+        width: auto;
+        height: auto;
+        min-width: auto;
+        min-height: auto;
+        text-transform: none;
+        transform: none;
+        /* Ensure no background or border artifacts */
+        background: none !important;
+        box-shadow: none !important;
+    }
+
+    &.pdropdown-caret-right::after {
+        content: "\f0da" !important; /* caret-right - different icon, not rotated */
+        /* Use same size, line-height and alignment as default */
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
+        display: inline-block;
+        vertical-align: middle;
+        /* Ensure icon maintains its natural width/height */
+        width: auto;
+        height: auto;
+        min-width: auto;
+        min-height: auto;
+        text-transform: none;
+        transform: none;
+        /* Ensure no background or border artifacts */
+        background: none !important;
+        box-shadow: none !important;
     }
 
     &[aria-expanded="true"]:has(+ [x-placement="bottom-start"]) {
@@ -313,8 +563,9 @@
         border-top-width: 0px;
     }
 
+    /* Don't rotate caret when expanded - icons should match direction exactly */
     &[aria-expanded="true"]::after {
-        transform: rotate(180deg);
+        transform: none;
     }
 
     &.disabled,

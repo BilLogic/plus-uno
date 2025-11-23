@@ -13,6 +13,11 @@
  * - **Categorization**: Tag content with categories or classifications
  * - **SMART competency areas**: Use extended colors for SMART competency area badges
  * 
+ * ### When NOT to Use
+ * - **Removable tags**: Use chips for tags that can be removed by the user
+ * - **User selections**: Use chips for selected items that can be deselected
+ * - **Input values**: Use chips for entered values that can be removed
+ * 
  * ### Implementation Context
  * - **Component Type**: Element (uses `element-` tokens)
  * - **Token Usage**: 
@@ -40,7 +45,7 @@
  * - Keep badge text concise (1-3 words typically)
  * - Use pill shape (border-radius-1000) for rounded appearance
  * - Ensure sufficient contrast for accessibility
- * - Consider using chips for removable tags/filters
+ * - Use badges for static labels, chips for removable content
  * 
  * See docs/guidelines/terminology.md for Element Component Guidelines
  * See docs/guidelines/token-reference.md for Token Reference
@@ -54,7 +59,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'Badge component for labels, tags, and status indicators. Supports multiple styles and typography-based sizes. Uses element-level tokens and pill-shaped border radius.',
+        component: 'Badge component for labels, tags, and status indicators. Supports multiple styles and typography-based sizes. Uses element-level tokens and pill-shaped border radius. For removable tags and selections, use the Chip component instead.',
       },
     },
   },

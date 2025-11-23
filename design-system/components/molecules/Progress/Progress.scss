@@ -1,0 +1,188 @@
+/**
+ * Progress Component Styles
+ * Bootstrap 4.6.2 progress with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/progress/
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Height: Based on size variant (small: 4px, medium: 6px, large: 8px)
+ *   - Border Radius: --size-element-radius-sm (4px)
+ *   - Colors: --color-primary, --color-secondary, etc. for different styles
+ *   - Background: --color-surface-container-highest for track
+ */
+
+/* ============================================
+   PROGRESS CONTAINER (Bootstrap 4.6.2 .progress)
+   ============================================ */
+
+.plus-progress {
+    /* Override Bootstrap's default height with design tokens */
+    /* Bootstrap default: height: 1rem (16px) */
+    /* Use element tokens for sizing */
+    background-color: var(--color-surface-container-highest);
+    border-radius: var(--size-element-radius-sm);
+    overflow: hidden;
+    /* Remove Bootstrap's default box-shadow */
+    box-shadow: none;
+}
+
+/* ============================================
+   PROGRESS BAR (Bootstrap 4.6.2 .progress-bar)
+   ============================================ */
+
+.plus-progress-bar {
+    /* Override Bootstrap's default colors with design tokens */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--size-element-radius-sm);
+    transition: width 0.6s ease;
+    /* Remove Bootstrap's default box-shadow */
+    box-shadow: none;
+    /* Typography for label text */
+    font-family: var(--font-family-body);
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold-2);
+    line-height: 1.5;
+    color: var(--color-on-primary);
+    white-space: nowrap;
+    padding: 0 var(--size-element-pad-x-sm);
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+/* Small Size */
+.plus-progress-small {
+    height: 4px; /* Figma: h-[4px] */
+}
+
+.plus-progress-small .plus-progress-bar {
+    min-height: 4px;
+    font-size: 10px;
+    padding: 0 var(--size-element-pad-x-sm);
+}
+
+/* Medium Size (default) */
+.plus-progress-medium {
+    height: 6px; /* Figma: h-[6px] */
+}
+
+.plus-progress-medium .plus-progress-bar {
+    min-height: 6px;
+    font-size: 12px;
+    padding: 0 var(--size-element-pad-x-sm);
+}
+
+/* Large Size */
+.plus-progress-large {
+    height: 8px; /* Figma: h-[8px] */
+}
+
+.plus-progress-large .plus-progress-bar {
+    min-height: 8px;
+    font-size: 14px;
+    padding: 0 var(--size-element-pad-x-md);
+}
+
+/* ============================================
+   STYLE VARIANTS (Color)
+   ============================================ */
+
+/* Primary */
+.plus-progress-bar-primary {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+/* Secondary */
+.plus-progress-bar-secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-on-secondary);
+}
+
+/* Tertiary */
+.plus-progress-bar-tertiary {
+    background-color: var(--color-tertiary);
+    color: var(--color-on-tertiary);
+}
+
+/* Success */
+.plus-progress-bar-success {
+    background-color: var(--color-success);
+    color: var(--color-on-success);
+}
+
+/* Danger */
+.plus-progress-bar-danger {
+    background-color: var(--color-danger);
+    color: var(--color-on-danger);
+}
+
+/* Warning */
+.plus-progress-bar-warning {
+    background-color: var(--color-warning);
+    color: var(--color-on-warning);
+}
+
+/* Info */
+.plus-progress-bar-info {
+    background-color: var(--color-info);
+    color: var(--color-on-info);
+}
+
+/* ============================================
+   STRIPED VARIANT
+   ============================================ */
+
+/* Bootstrap's striped pattern - override colors to use design tokens */
+.plus-progress-bar.progress-bar-striped {
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 1rem 1rem;
+}
+
+/* ============================================
+   ANIMATED VARIANT (requires striped)
+   ============================================ */
+
+.plus-progress-bar.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    from {
+        background-position: 1rem 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Ensure proper contrast for labels */
+.plus-progress-bar[aria-valuenow] {
+    /* ARIA attributes are set via JavaScript */
+}
+
+/* Focus state for keyboard navigation */
+.plus-progress:focus-within {
+    outline: 2px solid var(--color-inverse-primary);
+    outline-offset: 2px;
+}
+
+
+

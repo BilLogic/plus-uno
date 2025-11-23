@@ -1,183 +1,106 @@
 /**
  * Radio Component Styles
- * Matches Figma design system specifications
- * Built on Bootstrap 4.6.2 custom-control custom-radio with PLUS design token customizations
- * 
- * Component Type: Element (uses `element-*` tokens)
- * Token Usage: 
- *   - Gap: --size-element-gap-sm (between radio and label)
- *   - Border: --size-element-stroke-md
- *   - Radius: --size-border-radius-radius-1000 (circular)
- *   - Colors: --color-primary for selected, --color-outline-variant for unselected
+ * Bootstrap 4.6.2 form-check with PLUS design token customizations
  * 
  * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/forms/#radios
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Border: --color-outline-variant (unchecked), --color-primary (checked)
+ *   - Background: --color-primary (checked state)
+ *   - Focus: --color-inverse-primary (light blue focus ring, matches Switch pattern)
+ * 
+ * Bootstrap's default focus uses box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
+ * We override this to use PLUS design tokens with proper circular shape.
  */
 
 /* ============================================
-   RADIO WRAPPER (Bootstrap 4.6.2 custom-control custom-radio)
+   RADIO INPUT (Bootstrap 4.6.2 form-check-input)
    ============================================ */
-
-.plus-radio-wrapper {
-    /* Override Bootstrap's default custom-control padding */
-    padding-left: 0;
-    /* Use PLUS design token for gap between radio and label */
-    gap: var(--size-element-gap-sm);
-    display: flex;
-    align-items: flex-start;
-    position: relative;
-}
-
-/* ============================================
-   RADIO INPUT (Bootstrap 4.6.2 custom-control-input)
-   ============================================
-   Bootstrap 4.6.2 custom-radio uses ::before for the indicator dot.
-   We override these to match Figma design specifications.
- */
 
 .plus-radio {
-    /* Bootstrap 4 custom-control-input positioning - keep relative for pseudo-elements */
-    position: relative;
-    /* Override Bootstrap's default width/height */
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    min-height: 18px;
-    margin: 0;
-    margin-top: var(--size-element-gap-xs); /* Align with label text baseline - 4px */
-    padding: 0;
-    flex-shrink: 0;
+    /* Make radio button circular - required for circular focus ring */
+    border-radius: 50% !important;
+    position: relative; /* Required for pseudo-element positioning */
     
-    /* Hide the actual radio input visually but keep it for accessibility */
-    opacity: 0;
-    cursor: pointer;
+    /* Override browser's default accent-color (purple/blue) with primary color token */
+    accent-color: var(--color-primary) !important;
     
-    /* Bootstrap 4 custom-radio uses ::before for the outer circle and indicator */
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 18px;
-        height: 18px;
-        border: var(--size-element-stroke-md) solid var(--color-outline-variant);
-        border-radius: var(--size-border-radius-radius-1000); /* Circular */
-        background-color: var(--color-surface-container-lowest);
-        cursor: pointer;
-        transition: all 0.2s;
-        box-sizing: border-box;
-        pointer-events: none;
-    }
+    /* Override Bootstrap's default blue/purple colors with primary color token */
+    /* Unchecked state - use outline-variant for border */
+    border-color: var(--color-outline-variant) !important;
+    background-color: transparent !important;
     
-    /* Inner dot indicator - Bootstrap 4 uses ::after for the inner dot */
-    &::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        /* Inner dot size calculated using element padding tokens */
-        /* Radio is 18px, border is 1.5px (--size-element-stroke-md), so inner space is 15px */
-        /* Spacing from border uses --size-element-pad-y-sm (4px) on each side */
-        /* Inner dot = 15px - (4px * 2) = 7px */
-        width: calc(18px - var(--size-element-stroke-md) * 2 - var(--size-element-pad-y-sm) * 2);
-        height: calc(18px - var(--size-element-stroke-md) * 2 - var(--size-element-pad-y-sm) * 2);
-        margin-top: calc((18px - var(--size-element-stroke-md) * 2 - var(--size-element-pad-y-sm) * 2) / -2);
-        margin-left: calc((18px - var(--size-element-stroke-md) * 2 - var(--size-element-pad-y-sm) * 2) / -2);
-        border-radius: var(--size-border-radius-radius-1000);
-        background-color: var(--color-primary); /* Inner dot is primary color (blue) */
-        transform: scale(0);
-        transition: transform 0.2s;
-        pointer-events: none;
-    }
-
-    /* Unselected state */
-    &:not(:checked) {
-        &::before {
-            background-color: var(--color-surface-container-lowest);
-            border-color: var(--color-outline-variant);
-        }
-    }
-
-    /* Selected state */
+    /* Checked state - use primary color everywhere */
     &:checked {
-        &::before {
-            border-color: var(--color-primary);
-            background-color: transparent; /* Radio background stays transparent, only border changes */
-        }
+        background-color: var(--color-primary) !important;
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+    }
+    
+    /* Create circular focus ring using pseudo-element */
+    /* This ensures the focus ring is truly circular, not square */
+    /* Position it to hug the radio button border with no gap */
+    &::after {
+        content: '';
+        position: absolute;
+        top: -2px; /* Position directly on the border edge (no gap) */
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 50%; /* Make it circular */
+        border: 2px solid var(--color-inverse-primary);
+        opacity: 0; /* Hidden by default */
+        pointer-events: none; /* Don't interfere with clicks */
+        transition: opacity 0.2s;
+    }
+    
+    /* Focus state - show circular ring only for keyboard navigation */
+    /* Use :focus-visible to only show focus ring when navigating with keyboard */
+    /* This prevents the focus ring from showing on mouse clicks */
+    &:focus-visible {
+        outline: none !important; /* Remove default outline */
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+        box-shadow: none !important; /* Remove any box-shadow */
         
+        /* Show the circular focus ring */
         &::after {
-            transform: scale(1);
-            background-color: var(--color-primary); /* Inner dot is primary color (blue) */
+            opacity: 1;
         }
     }
-
+    
+    /* Regular :focus state - update colors but don't show focus ring */
+    &:focus:not(:focus-visible) {
+        outline: none !important;
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+        box-shadow: none !important;
+        
+        /* Hide the focus ring on mouse clicks */
+        &::after {
+            opacity: 0;
+        }
+    }
+    
     /* Hover state */
-    .plus-radio-wrapper:not(.plus-radio-disabled):hover &:not(:checked)::before {
-        border-color: var(--color-primary);
-        background-color: var(--color-primary-state-08);
+    &:hover:not(:disabled) {
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
     }
-
-    .plus-radio-wrapper:not(.plus-radio-disabled):hover &:checked::before {
-        border-color: var(--color-primary);
-        background-color: transparent; /* Keep background transparent when checked */
-    }
-
-    /* Focus state */
-    .plus-radio-wrapper:focus-within &::before {
-        outline: none;
-        box-shadow: 0 0 0 2px var(--color-primary-state-16);
-    }
-
+    
     /* Disabled state */
     &:disabled {
-        &::before {
-            opacity: 0.38;
-            cursor: not-allowed;
-            border-color: var(--color-outline-variant);
-            background-color: var(--color-surface-variant);
-        }
-        
-        &::after {
-            opacity: 0.38;
-        }
+        opacity: 0.38;
+        cursor: not-allowed;
+        border-color: var(--color-outline-variant) !important;
+        background-color: var(--color-surface-variant) !important;
+        accent-color: var(--color-outline-variant) !important;
     }
     
-    .plus-radio-disabled & {
-        &::before {
-            opacity: 0.38;
-            cursor: not-allowed;
-        }
-        
-        &::after {
-            opacity: 0.38;
-        }
+    &:disabled:checked {
+        background-color: var(--color-outline-variant) !important;
+        border-color: var(--color-outline-variant) !important;
+        accent-color: var(--color-outline-variant) !important;
     }
-
-    .plus-radio-disabled &:checked {
-        &::before {
-            background-color: var(--color-outline-variant);
-            border-color: var(--color-outline-variant);
-        }
-    }
-}
-
-/* ============================================
-   RADIO LABEL (Bootstrap 4.6.2 custom-control-label)
-   ============================================ */
-
-.plus-radio-label {
-    color: var(--color-on-surface);
-    cursor: pointer;
-    user-select: none;
-    flex: 1;
-    margin-left: 0; /* Override Bootstrap default margin */
-    padding-left: 0; /* Override Bootstrap default padding */
-    /* Add spacing after the radio button */
-    margin-left: var(--size-element-gap-sm);
-    position: relative; /* Override Bootstrap's absolute positioning */
-    top: 0; /* Reset Bootstrap's top positioning */
-}
-
-.plus-radio-wrapper.plus-radio-disabled .plus-radio-label {
-    opacity: 0.38;
-    cursor: not-allowed;
 }

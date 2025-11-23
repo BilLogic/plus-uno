@@ -1,13 +1,15 @@
 /**
  * @fileoverview Radio component for PLUS design system.
  * Universal element component for creating radio buttons with labels.
- * Built on Bootstrap 4.6.2's custom-control custom-radio pattern with PLUS design token customizations.
+ * Uses Bootstrap 4.6.2's default form-check pattern.
  * 
  * Reference: https://getbootstrap.com/docs/4.6/components/forms/#radios
  */
 
 /**
- * Creates a radio button with label using Bootstrap 4.6.2 custom-radio pattern
+ * Creates a radio button with label using Bootstrap 4.6.2 default form-check pattern
+ * The radio will use Bootstrap's native styling - no custom overrides.
+ * 
  * @param {Object} options - Radio configuration
  * @param {string} options.label - Label text
  * @param {string} options.name - Input name attribute (required for radio groups)
@@ -29,18 +31,18 @@ export function createRadio({
     disabled = false,
     onChange = null
 } = {}) {
-    // Bootstrap 4.6.2 custom-control custom-radio container
+    // Bootstrap 4.6.2 form-check container
     const container = document.createElement("div");
-    container.classList.add("custom-control", "custom-radio", "plus-radio-wrapper", "body2-txt");
+    container.classList.add("form-check", "plus-radio-wrapper", "body2-txt");
     
     if (classes && classes.length > 0) {
         container.classList.add(...classes);
     }
 
-    // Bootstrap 4.6.2 custom-control-input (radio input)
+    // Bootstrap 4.6.2 form-check-input (radio input)
     const input = document.createElement("input");
     input.type = "radio";
-    input.classList.add("custom-control-input", "plus-radio");
+    input.classList.add("form-check-input", "plus-radio");
     input.name = name;
     input.id = id;
     input.value = value;
@@ -54,13 +56,13 @@ export function createRadio({
         container.classList.add("plus-radio-disabled");
     }
 
-    // Bootstrap 4.6.2 custom-control-label
+    // Bootstrap 4.6.2 form-check-label
     const labelEl = document.createElement("label");
-    labelEl.classList.add("custom-control-label", "plus-radio-label");
+    labelEl.classList.add("form-check-label", "plus-radio-label");
     labelEl.htmlFor = id;
     labelEl.textContent = label;
 
-    // Assemble: input, label (Bootstrap 4.6.2 custom-radio structure)
+    // Assemble: input, label (Bootstrap 4.6.2 form-check structure)
     container.appendChild(input);
     container.appendChild(labelEl);
     

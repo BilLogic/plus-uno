@@ -1,0 +1,323 @@
+/**
+ * Toast Component Styles
+ * Bootstrap 4.6.2 toast with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/toasts/
+ * 
+ * Component Type: Modal (uses `modal-*` tokens)
+ * Token Usage:
+ *   - Padding: --size-modal-pad-x-md, --size-modal-pad-y-md
+ *   - Gap: --size-modal-gap-sm
+ *   - Radius: --size-modal-radius-md
+ *   - Colors: Style-specific color tokens (primary, success, danger, etc.)
+ * 
+ * Toasts are positioned fixed and overlay the UI, making them Modal-type components.
+ */
+
+/* ============================================
+   TOAST CONTAINER
+   ============================================ */
+
+.plus-toast-container {
+    position: fixed;
+    z-index: 1050; /* Above modals (1040) but below tooltips/popovers */
+    padding: var(--size-modal-pad-x-md);
+    pointer-events: none; /* Allow clicks to pass through container */
+    
+    /* Default: top-right */
+    &.plus-toast-top-right {
+        top: 0;
+        right: 0;
+    }
+    
+    &.plus-toast-top-left {
+        top: 0;
+        left: 0;
+    }
+    
+    &.plus-toast-bottom-right {
+        bottom: 0;
+        right: 0;
+    }
+    
+    &.plus-toast-bottom-left {
+        bottom: 0;
+        left: 0;
+    }
+}
+
+/* ============================================
+   TOAST ELEMENT
+   ============================================ */
+
+.plus-toast {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    max-width: 400px;
+    background-color: var(--color-surface-container-highest);
+    border: var(--size-modal-border-sm) solid var(--color-outline-variant);
+    border-radius: var(--size-modal-radius-md);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    pointer-events: auto; /* Enable clicks on toast */
+    margin-bottom: var(--size-modal-gap-sm);
+    
+    /* Default: slide in from right (top-right) */
+    transform: translateX(100%);
+    
+    /* Show state - slide in from edge */
+    &.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Position-specific animations */
+.plus-toast-top-right .plus-toast {
+    transform: translateX(100%);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+.plus-toast-top-left .plus-toast {
+    transform: translateX(-100%);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+.plus-toast-bottom-right .plus-toast {
+    transform: translateX(100%);
+    margin-bottom: 0;
+    margin-top: var(--size-modal-gap-sm);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+.plus-toast-bottom-left .plus-toast {
+    transform: translateX(-100%);
+    margin-bottom: 0;
+    margin-top: var(--size-modal-gap-sm);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+/* ============================================
+   STATIC TOAST (for Storybook/documentation)
+   ============================================ */
+
+.plus-toast-static {
+    position: relative !important; /* Override fixed positioning */
+    opacity: 1 !important; /* Always visible */
+    transform: none !important; /* No slide animation */
+    margin-bottom: var(--size-modal-gap-sm);
+    margin-right: 0;
+    margin-left: 0;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* ============================================
+   TOAST HEADER
+   ============================================ */
+
+.plus-toast-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
+    border-bottom: var(--size-modal-border-sm) solid var(--color-outline-variant);
+    border-radius: var(--size-modal-radius-md) var(--size-modal-radius-md) 0 0;
+    gap: var(--size-modal-gap-sm);
+}
+
+.plus-toast-title {
+    font-family: var(--font-family-heading, 'Lato');
+    font-weight: var(--font-weight-semibold-2, 600);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-on-surface);
+    flex: 1;
+    margin: 0;
+}
+
+/* ============================================
+   TOAST BODY
+   ============================================ */
+
+.plus-toast-body {
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
+    font-family: var(--font-family-body, 'Merriweather Sans');
+    font-weight: var(--font-weight-normal, 300);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-on-surface);
+    position: relative;
+}
+
+/* ============================================
+   TOAST CLOSE BUTTON
+   ============================================ */
+
+.plus-toast-close {
+    background: none;
+    border: none;
+    padding: var(--size-element-pad-x-sm);
+    cursor: pointer;
+    color: var(--color-on-surface);
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    margin-left: var(--size-element-gap-sm);
+    
+    &:hover:not(:disabled) {
+        opacity: 1;
+    }
+    
+    &:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+    
+    i {
+        font-size: 14px;
+    }
+}
+
+.plus-toast-close-body {
+    position: absolute;
+    top: var(--size-modal-pad-y-md);
+    right: var(--size-modal-pad-x-md);
+    margin-left: 0;
+}
+
+/* ============================================
+   TOAST STYLE VARIANTS
+   ============================================ */
+
+.plus-toast.primary {
+    border-left: 4px solid var(--color-primary);
+    
+    .plus-toast-header {
+        background-color: var(--color-primary-state-08);
+        border-bottom-color: var(--color-primary-state-12);
+    }
+    
+    .plus-toast-title {
+        color: var(--color-on-primary-container);
+    }
+    
+    .plus-toast-body {
+        color: var(--color-on-surface);
+    }
+}
+
+.plus-toast.secondary {
+    border-left: 4px solid var(--color-secondary);
+    
+    .plus-toast-header {
+        background-color: var(--color-secondary-state-08);
+        border-bottom-color: var(--color-secondary-state-12);
+    }
+    
+    .plus-toast-title {
+        color: var(--color-on-secondary-container);
+    }
+    
+    .plus-toast-body {
+        color: var(--color-on-surface);
+    }
+}
+
+.plus-toast.success {
+    border-left: 4px solid var(--color-success);
+    
+    .plus-toast-header {
+        background-color: var(--color-success-state-08);
+        border-bottom-color: var(--color-success-state-12);
+    }
+    
+    .plus-toast-title {
+        color: var(--color-on-success-container);
+    }
+    
+    .plus-toast-body {
+        color: var(--color-on-surface);
+    }
+}
+
+.plus-toast.danger {
+    border-left: 4px solid var(--color-danger);
+    
+    .plus-toast-header {
+        background-color: var(--color-danger-state-08);
+        border-bottom-color: var(--color-danger-state-12);
+    }
+    
+    .plus-toast-title {
+        color: var(--color-on-danger-container);
+    }
+    
+    .plus-toast-body {
+        color: var(--color-on-surface);
+    }
+}
+
+.plus-toast.warning {
+    border-left: 4px solid var(--color-warning);
+    
+    .plus-toast-header {
+        background-color: var(--color-warning-state-08);
+        border-bottom-color: var(--color-warning-state-12);
+    }
+    
+    .plus-toast-title {
+        color: var(--color-on-warning-container);
+    }
+    
+    .plus-toast-body {
+        color: var(--color-on-surface);
+    }
+}
+
+.plus-toast.info {
+    border-left: 4px solid var(--color-info);
+    
+    .plus-toast-header {
+        background-color: var(--color-info-state-08);
+        border-bottom-color: var(--color-info-state-12);
+    }
+    
+    .plus-toast-title {
+        color: var(--color-on-info-container);
+    }
+    
+    .plus-toast-body {
+        color: var(--color-on-surface);
+    }
+}
+
+/* ============================================
+   RESPONSIVE BEHAVIOR
+   ============================================ */
+
+@media (max-width: 576px) {
+    .plus-toast {
+        min-width: calc(100vw - var(--size-modal-pad-x-md) * 2);
+        max-width: calc(100vw - var(--size-modal-pad-x-md) * 2);
+    }
+    
+    .plus-toast-container {
+        padding: var(--size-modal-pad-x-sm);
+    }
+}
+

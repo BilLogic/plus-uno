@@ -43,11 +43,12 @@ export function createButtonGroup({
     }
     
     buttons.forEach((buttonConfig, index) => {
-        // Merge default size, style, fill with button-specific config
+        // Button groups always use "tonal" fill style (state-layer backgrounds)
+        // This matches Figma design where button groups use state-layer-08 backgrounds
         const button = createButton({
             btnSize: buttonConfig.btnSize || size,
             btnStyle: buttonConfig.btnStyle || style,
-            btnFill: buttonConfig.btnFill || fill,
+            btnFill: 'tonal', // Button groups always use tonal style
             ...buttonConfig
         });
         

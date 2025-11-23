@@ -1,0 +1,230 @@
+/**
+ * Media Object Component Styles
+ * Bootstrap 4.6.2 media object with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/media-object/
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Colors: --color-on-surface, --color-on-surface-variant, --color-outline-variant
+ *   - Spacing: --size-element-gap-* for gaps between media and content
+ *   - Typography: Body typography scales (h6 for heading, body1 for content)
+ * 
+ * Bootstrap's default media object uses:
+ * - margin-right: 1rem (16px) for media element
+ * - margin-top: 0 for heading
+ * We override these with PLUS design tokens.
+ */
+
+/* ============================================
+   MEDIA OBJECT CONTAINER (Bootstrap 4.6.2 .media)
+   ============================================ */
+
+.plus-media {
+    display: flex;
+    align-items: flex-start; /* Default: align items to top */
+    color: var(--color-on-surface);
+    
+    /* Override Bootstrap's default margin-bottom */
+    margin-bottom: var(--size-element-gap-md); /* 10px default gap between media objects */
+    
+    /* Remove Bootstrap's default padding if any */
+    padding: 0;
+}
+
+/* ============================================
+   MEDIA ELEMENT (Image, Icon, etc.)
+   ============================================ */
+
+.plus-media-object {
+    flex-shrink: 0; /* Prevent media from shrinking */
+    margin-right: var(--size-element-gap-md); /* 10px gap between media and content (default) */
+    
+    /* Remove any default margins/padding */
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding: 0;
+}
+
+/* Media image styling */
+.plus-media-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--size-element-radius-sm); /* 4px default radius */
+    
+    /* Ensure images don't overflow */
+    object-fit: cover;
+}
+
+/* Media icon styling */
+.plus-media-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   MEDIA BODY (Bootstrap 4.6.2 .media-body)
+   ============================================ */
+
+.plus-media-body {
+    flex: 1; /* Take remaining space */
+    color: var(--color-on-surface);
+    
+    /* Remove Bootstrap's default margin-top: 0 from h6 */
+    /* We'll handle spacing with our own gap system */
+}
+
+/* ============================================
+   MEDIA HEADING (h6)
+   ============================================ */
+
+.plus-media-heading {
+    margin-top: 0; /* Bootstrap default - keep it */
+    margin-bottom: var(--size-element-gap-xs); /* 4px gap between heading and body (title text spacing) */
+    color: var(--color-on-surface);
+    
+    /* Typography handled by .h6 class - only override color */
+    /* h6 uses: Lato SemiBold, appropriate size */
+}
+
+/* ============================================
+   MEDIA CONTENT (Body text)
+   ============================================ */
+
+.plus-media-content {
+    color: var(--color-on-surface-variant); /* Use variant color for body text */
+    margin: 0;
+    
+    /* Typography handled by .body1-txt class - only override color */
+    /* body1-txt uses: Merriweather Sans Light, 16px, line-height 1.5 */
+}
+
+/* ============================================
+   ALIGNMENT VARIANTS
+   ============================================ */
+
+/* Right alignment - media on right, content on left */
+.plus-media-right {
+    flex-direction: row-reverse;
+    
+    .plus-media-object {
+        margin-right: 0;
+        margin-left: var(--size-element-gap-md); /* Gap on left side when right-aligned */
+    }
+}
+
+/* Top alignment - media on top, content below */
+.plus-media-top {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .plus-media-object {
+        margin-right: 0;
+        margin-bottom: var(--size-element-gap-md); /* Gap below media when top-aligned */
+    }
+}
+
+/* Center alignment - vertically center media and content */
+.plus-media-center {
+    align-items: center;
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+/* Small size - compact spacing */
+.plus-media-small {
+    .plus-media-object {
+        margin-right: var(--size-element-gap-sm); /* 8px gap for small size */
+    }
+    
+    &.plus-media-right .plus-media-object {
+        margin-left: var(--size-element-gap-sm);
+        margin-right: 0;
+    }
+    
+    &.plus-media-top .plus-media-object {
+        margin-bottom: var(--size-element-gap-sm);
+        margin-right: 0;
+    }
+    
+    .plus-media-heading {
+        margin-bottom: var(--size-element-gap-xs); /* Keep 4px for heading-body gap */
+    }
+}
+
+/* Default size - standard spacing (already set above) */
+.plus-media-default {
+    /* Uses default spacing defined above */
+}
+
+/* Large size - spacious spacing */
+.plus-media-large {
+    .plus-media-object {
+        margin-right: var(--size-element-gap-lg); /* 12px gap for large size */
+    }
+    
+    &.plus-media-right .plus-media-object {
+        margin-left: var(--size-element-gap-lg);
+        margin-right: 0;
+    }
+    
+    &.plus-media-top .plus-media-object {
+        margin-bottom: var(--size-element-gap-lg);
+        margin-right: 0;
+    }
+    
+    .plus-media-heading {
+        margin-bottom: var(--size-element-gap-sm); /* 8px gap for large size heading-body spacing */
+    }
+}
+
+/* ============================================
+   NESTED MEDIA OBJECTS
+   ============================================ */
+
+.plus-media-nested {
+    margin-top: var(--size-element-gap-md); /* 10px gap above nested media object */
+    margin-left: var(--size-element-gap-lg); /* 12px left indent for nested objects */
+    padding-left: var(--size-element-gap-md); /* 10px additional padding for visual nesting */
+    border-left: var(--size-element-border) solid var(--color-outline-variant); /* Visual indicator for nesting */
+    
+    /* Reduce bottom margin for nested objects */
+    margin-bottom: var(--size-element-gap-sm); /* 8px gap between nested objects */
+}
+
+/* ============================================
+   INTERACTIVE STATES
+   ============================================ */
+
+.plus-media[style*="cursor: pointer"]:hover,
+.plus-media[style*="cursor:pointer"]:hover {
+    /* Optional: Could add subtle background color change for hover feedback */
+    transition: background-color 0.2s ease;
+}
+
+/* ============================================
+   RESPONSIVE BEHAVIOR
+   ============================================ */
+
+/* On smaller screens, consider stacking media objects vertically */
+@media (max-width: 575.98px) {
+    .plus-media {
+        /* Optional: Stack vertically on very small screens */
+        /* Uncomment if needed:
+        flex-direction: column;
+        
+        .plus-media-object {
+            margin-right: 0;
+            margin-bottom: var(--size-element-gap-md);
+        }
+        */
+    }
+}
+
+
+

@@ -1,59 +1,171 @@
 /**
  * Button Group Component Styles
- * Matches Figma design system specifications
+ * Based on Figma design system specifications
+ * Button groups use state-layer backgrounds (tonal style) with style-text colors
  */
 
 .plus-button-group {
     display: inline-flex;
     gap: 0;
+    /* Figma: Button groups have no gap between buttons */
 }
 
 .plus-button-group.vertical {
     flex-direction: column;
 }
 
+/* Button Group Button Styling - Override default button styles */
+/* Figma: Button groups use state-layer backgrounds (like primary-state-08) and style-text colors */
 .plus-button-group > .pbtn {
     border-radius: 0;
+    /* Remove default button background - will be set by style */
+    background-color: transparent;
+    border: none;
 }
 
+/* Horizontal: First button - rounded left corners */
 .plus-button-group > .pbtn:first-child {
-    border-top-left-radius: var(--size-element-radius-md);
-    border-bottom-left-radius: var(--size-element-radius-md);
+    border-top-left-radius: var(--size-element-radius-sm);
+    border-bottom-left-radius: var(--size-element-radius-sm);
 }
 
-.plus-button-group.vertical > .pbtn:first-child {
-    border-top-left-radius: var(--size-element-radius-md);
-    border-top-right-radius: var(--size-element-radius-md);
-    border-bottom-left-radius: 0;
-}
-
+/* Horizontal: Last button - rounded right corners */
 .plus-button-group > .pbtn:last-child {
-    border-top-right-radius: var(--size-element-radius-md);
-    border-bottom-right-radius: var(--size-element-radius-md);
+    border-top-right-radius: var(--size-element-radius-sm);
+    border-bottom-right-radius: var(--size-element-radius-sm);
 }
 
+/* Vertical: First button - rounded top corners */
+.plus-button-group.vertical > .pbtn:first-child {
+    border-top-left-radius: var(--size-element-radius-sm);
+    border-top-right-radius: var(--size-element-radius-sm);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Vertical: Last button - rounded bottom corners */
 .plus-button-group.vertical > .pbtn:last-child {
+    border-top-left-radius: 0;
     border-top-right-radius: 0;
-    border-bottom-left-radius: var(--size-element-radius-md);
-    border-bottom-right-radius: var(--size-element-radius-md);
+    border-bottom-left-radius: var(--size-element-radius-sm);
+    border-bottom-right-radius: var(--size-element-radius-sm);
 }
 
-.plus-button-group > .pbtn:not(:first-child):not(:last-child) {
-    border-radius: 0;
+/* Medium size: Use radius-md */
+.plus-button-group > .pbtn.default:first-child,
+.plus-button-group > .pbtn.default:last-child {
+    border-radius: var(--size-element-radius-md);
 }
 
-/* Remove borders between buttons */
+.plus-button-group.vertical > .pbtn.default:first-child,
+.plus-button-group.vertical > .pbtn.default:last-child {
+    border-radius: var(--size-element-radius-md);
+}
+
+/* Large size: Use radius-lg for buttons, but container may use radius-150 (6px) */
+.plus-button-group > .pbtn.large:first-child,
+.plus-button-group > .pbtn.large:last-child {
+    border-radius: var(--size-element-radius-lg);
+}
+
+.plus-button-group.vertical > .pbtn.large:first-child,
+.plus-button-group.vertical > .pbtn.large:last-child {
+    border-radius: var(--size-element-radius-lg);
+}
+
+/* Remove borders between buttons - buttons are connected */
 .plus-button-group > .pbtn:not(:first-child) {
-    margin-left: -1px;
+    margin-left: 0;
 }
 
 .plus-button-group.vertical > .pbtn:not(:first-child) {
-    margin-left: 0;
-    margin-top: -1px;
+    margin-top: 0;
 }
 
+/* Button Group Style Variants - State-layer backgrounds */
+/* Figma: Button groups use state-layer-08 backgrounds with style-text colors */
+.plus-button-group > .pbtn.pbtn-primary:not(:disabled):not(.disabled) {
+    background-color: var(--color-primary-state-08);
+    color: var(--color-primary-text);
+}
+
+.plus-button-group > .pbtn.pbtn-secondary:not(:disabled):not(.disabled) {
+    background-color: var(--color-secondary-state-08);
+    color: var(--color-secondary-text);
+}
+
+.plus-button-group > .pbtn.pbtn-tertiary:not(:disabled):not(.disabled) {
+    background-color: var(--color-tertiary-state-08);
+    /* Figma: Tertiary uses tertiary-(text) which is #005a50 = on-tertiary-container */
+    color: var(--color-on-tertiary-container);
+}
+
+.plus-button-group > .pbtn.pbtn-default:not(:disabled):not(.disabled) {
+    /* Figma: Default uses on-surface state layer */
+    background-color: rgba(25, 28, 30, 0.08);
+    color: var(--color-on-surface);
+}
+
+/* Button Group Hover States */
+.plus-button-group > .pbtn.pbtn-primary:not(:disabled):not(.disabled):hover .pbtn-state-screen {
+    background-color: var(--color-primary-state-12);
+}
+
+.plus-button-group > .pbtn.pbtn-secondary:not(:disabled):not(.disabled):hover .pbtn-state-screen {
+    background-color: var(--color-secondary-state-12);
+}
+
+.plus-button-group > .pbtn.pbtn-tertiary:not(:disabled):not(.disabled):hover .pbtn-state-screen {
+    background-color: var(--color-tertiary-state-12);
+}
+
+.plus-button-group > .pbtn.pbtn-default:not(:disabled):not(.disabled):hover .pbtn-state-screen {
+    background-color: rgba(25, 28, 30, 0.12);
+}
+
+/* Button Group Focus/Active States */
+.plus-button-group > .pbtn.pbtn-primary:not(:disabled):not(.disabled):focus .pbtn-state-screen,
+.plus-button-group > .pbtn.pbtn-primary:not(:disabled):not(.disabled):active .pbtn-state-screen {
+    background-color: var(--color-primary-state-16);
+}
+
+.plus-button-group > .pbtn.pbtn-secondary:not(:disabled):not(.disabled):focus .pbtn-state-screen,
+.plus-button-group > .pbtn.pbtn-secondary:not(:disabled):not(.disabled):active .pbtn-state-screen {
+    background-color: var(--color-secondary-state-16);
+}
+
+.plus-button-group > .pbtn.pbtn-tertiary:not(:disabled):not(.disabled):focus .pbtn-state-screen,
+.plus-button-group > .pbtn.pbtn-tertiary:not(:disabled):not(.disabled):active .pbtn-state-screen {
+    background-color: var(--color-tertiary-state-16);
+}
+
+.plus-button-group > .pbtn.pbtn-default:not(:disabled):not(.disabled):focus .pbtn-state-screen,
+.plus-button-group > .pbtn.pbtn-default:not(:disabled):not(.disabled):active .pbtn-state-screen {
+    background-color: rgba(25, 28, 30, 0.16);
+}
+
+/* Ensure buttons appear above each other on hover/focus */
 .plus-button-group > .pbtn:hover,
 .plus-button-group > .pbtn:focus {
     z-index: 1;
+    position: relative;
+}
+
+/* Button Group Typography - Override to match Figma exactly */
+/* Figma: Small uses body3-txt (12px, Merriweather Sans Regular) - already correct */
+/* Figma: Medium uses h6 (16px, Lato SemiBold) */
+.plus-button-group > .pbtn.default .pbtn-content {
+    font-size: 16px;
+    font-family: var(--font-family-heading, 'Lato');
+    font-weight: 600; /* SemiBold */
+    line-height: 1.5;
+}
+
+/* Figma: Large uses h3 (28px, Lato Bold) */
+.plus-button-group > .pbtn.large .pbtn-content {
+    font-size: 28px;
+    font-family: var(--font-family-heading, 'Lato');
+    font-weight: 700; /* Bold */
+    line-height: 1.429;
 }
 
