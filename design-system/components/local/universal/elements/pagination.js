@@ -2,7 +2,7 @@
  * @fileoverview Pagination component for PLUS design system.
  * Universal element component for pagination navigation.
  * Built on Bootstrap 4.6.2 pagination with PLUS design token customizations.
- * Matches Figma design system specifications.
+ * Matches Figma design system specifications exactly.
  */
 
 /**
@@ -13,14 +13,11 @@
  * @param {Function} [options.onPageChange] - Callback function when page changes (receives page number)
  * @param {string} [options.id] - Pagination ID
  * @param {string} [options.ariaLabel='Page navigation'] - ARIA label for accessibility
- * @param {boolean} [options.showFirstLast=true] - Show first/last page buttons
- * @param {boolean} [options.showPrevNext=true] - Show previous/next buttons
+ * @param {string} [options.type='icon'] - Type variant ('icon' or 'text')
+ * @param {string} [options.size='default'] - Size variant ('small', 'default', 'large')
  * @param {number} [options.maxVisible=5] - Maximum number of visible page numbers
- * @param {string} [options.prevText='Previous'] - Previous button text
- * @param {string} [options.nextText='Next'] - Next button text
- * @param {string} [options.firstText='First'] - First button text
- * @param {string} [options.lastText='Last'] - Last button text
- * @param {string} [options.size] - Size variant ('small', 'default', 'large')
+ * @param {string} [options.prevText='Previous'] - Previous button text (for text type)
+ * @param {string} [options.nextText='Next'] - Next button text (for text type)
  * @returns {HTMLElement} Pagination element
  */
 export function createPagination({
@@ -29,14 +26,11 @@ export function createPagination({
     onPageChange = null,
     id = null,
     ariaLabel = 'Page navigation',
-    showFirstLast = false,
-    showPrevNext = true,
+    type = 'icon',
+    size = 'default',
     maxVisible = 5,
     prevText = 'Previous',
-    nextText = 'Next',
-    firstText = 'First',
-    lastText = 'Last',
-    size = 'default'
+    nextText = 'Next'
 }) {
     // Validate inputs
     if (!currentPage || !totalPages) {
@@ -65,9 +59,13 @@ export function createPagination({
     if (size && size !== 'default') {
         pagination.classList.add(`plus-pagination-${size}`);
     }
+    
+    if (type && type !== 'icon') {
+        pagination.classList.add(`plus-pagination-${type}`);
+    }
 
     // Helper function to create page item
-    const createPageItem = (pageNumber, text, isActive = false, isDisabled = false) => {
+    const createPageItem = (pageNumber, content, isActive = false, isDisabled = false, isIcon = false) => {
         const li = document.createElement('li');
         li.classList.add('page-item');
         
@@ -78,10 +76,22 @@ export function createPagination({
         if (isDisabled) {
             li.classList.add('disabled');
         }
+        
+        if (isIcon) {
+            li.classList.add('page-item-icon');
+        }
 
         const link = document.createElement('a');
         link.classList.add('page-link');
-        link.textContent = text;
+        
+        if (isIcon) {
+            // Create icon element
+            const icon = document.createElement('i');
+            icon.classList.add('fas', `fa-${content}`); // content is 'caret-left' or 'caret-right'
+            link.appendChild(icon);
+        } else {
+            link.textContent = content;
+        }
         
         if (isActive) {
             link.setAttribute('aria-current', 'page');
@@ -124,17 +134,15 @@ export function createPagination({
         return Array.from({ length: end - start + 1 }, (_, i) => start + i);
     };
 
-    // First button
-    if (showFirstLast && totalPages > 1) {
-        const firstItem = createPageItem(1, firstText, false, currentPage === 1);
-        pagination.appendChild(firstItem);
-    }
-
     // Previous button
-    if (showPrevNext) {
-        const prevItem = createPageItem(currentPage - 1, prevText, false, currentPage === 1);
-        pagination.appendChild(prevItem);
-    }
+    const prevItem = createPageItem(
+        currentPage - 1, 
+        type === 'icon' ? 'caret-left' : prevText, 
+        false, 
+        currentPage === 1,
+        type === 'icon'
+    );
+    pagination.appendChild(prevItem);
 
     // Page numbers
     const visiblePages = getVisiblePages();
@@ -142,7 +150,7 @@ export function createPagination({
     // Show ellipsis before if needed
     if (visiblePages[0] > 1) {
         const ellipsisLi = document.createElement('li');
-        ellipsisLi.classList.add('page-item', 'disabled');
+        ellipsisLi.classList.add('page-item', 'disabled', 'page-item-ellipsis');
         const ellipsisLink = document.createElement('span');
         ellipsisLink.classList.add('page-link');
         ellipsisLink.textContent = '...';
@@ -154,14 +162,14 @@ export function createPagination({
     // Visible page numbers
     visiblePages.forEach(pageNum => {
         const isActive = pageNum === currentPage;
-        const pageItem = createPageItem(pageNum, pageNum.toString(), isActive, false);
+        const pageItem = createPageItem(pageNum, pageNum.toString(), isActive, false, false);
         pagination.appendChild(pageItem);
     });
 
     // Show ellipsis after if needed
     if (visiblePages[visiblePages.length - 1] < totalPages) {
         const ellipsisLi = document.createElement('li');
-        ellipsisLi.classList.add('page-item', 'disabled');
+        ellipsisLi.classList.add('page-item', 'disabled', 'page-item-ellipsis');
         const ellipsisLink = document.createElement('span');
         ellipsisLink.classList.add('page-link');
         ellipsisLink.textContent = '...';
@@ -171,18 +179,15 @@ export function createPagination({
     }
 
     // Next button
-    if (showPrevNext) {
-        const nextItem = createPageItem(currentPage + 1, nextText, false, currentPage === totalPages);
-        pagination.appendChild(nextItem);
-    }
-
-    // Last button
-    if (showFirstLast && totalPages > 1) {
-        const lastItem = createPageItem(totalPages, lastText, false, currentPage === totalPages);
-        pagination.appendChild(lastItem);
-    }
+    const nextItem = createPageItem(
+        currentPage + 1, 
+        type === 'icon' ? 'caret-right' : nextText, 
+        false, 
+        currentPage === totalPages,
+        type === 'icon'
+    );
+    pagination.appendChild(nextItem);
 
     nav.appendChild(pagination);
     return nav;
 }
-

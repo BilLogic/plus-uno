@@ -1,56 +1,25 @@
 /**
  * List Group Molecule Stories
  * 
+ * Matches Figma design system specifications exactly
+ * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=69-16193&t=XxnevshHwphhdAOI-4
+ * 
  * ## Usage and Implementation
  * 
  * List groups are **Element** components used for displaying a series of content items in a structured list format.
- * They provide a clean, organized way to present related information and can be interactive or static.
  * 
  * ### When to Use
- * - **Content lists**: When displaying a series of related items (e.g., notifications, messages, tasks)
- * - **Navigation menus**: For vertical navigation menus with multiple options
- * - **Selection lists**: When users need to select items from a list (with active states)
- * - **Information display**: For displaying structured information in a list format
+ * - **Content lists**: When displaying a series of related items
+ * - **Navigation menus**: For vertical navigation menus
+ * - **Selection lists**: When users need to select items from a list
  * - **Action lists**: When items have associated actions (links or buttons)
- * - **Grouped content**: When organizing related content items together
  * - **Status lists**: For displaying items with status indicators or badges
- * 
- * ### When NOT to Use
- * - **Simple navigation**: Use Navigation component for primary navigation menus
- * - **Dropdown menus**: Use Dropdown component for compact selection menus
- * - **Form inputs**: Use radio buttons or checkboxes for form selections
- * - **Tables**: Use Table component for tabular data with multiple columns
- * - **Cards**: Use Card component for self-contained content blocks with images/actions
  * 
  * ### Implementation Context
  * - **Component Type**: Element (list items use `element-*` tokens)
  * - **Bootstrap Framework**: Uses Bootstrap 4.6.2's `list-group` pattern
- * - **Styling**: Customized with PLUS design tokens (colors, spacing, typography)
- * - **Reference**: https://getbootstrap.com/docs/4.6/components/list-group/
- * 
- * ### State Variants
- * - **Default**: Normal list item state
- * - **Active**: Selected/highlighted state (uses primary container color)
- * - **Disabled**: Non-interactive state (reduced opacity)
- * - **Hover**: Interactive hover state (for action items)
- * - **Focus**: Keyboard focus state (for action items)
- * 
- * ### Content Variants
- * - **Basic list**: Simple text items
- * - **Action list**: Items with links or buttons (interactive)
- * - **Badge list**: Items with badges or status indicators
- * - **Flush list**: No borders or rounded corners (for full-width layouts)
- * - **Mixed content**: Items with various content types
- * 
- * ### Best Practices
- * - Use clear, descriptive content for each item
- * - Provide visual feedback for interactive items (hover, focus states)
- * - Use active state to indicate selected items
- * - Use badges sparingly and only when they add value
- * - Ensure sufficient spacing between items
- * - Use flush variant when list spans full width of container
- * - Maintain consistent item structure within a list
- * - Use semantic HTML (<ul> for lists, <div> for non-semantic containers)
+ * - **Styling**: Customized with PLUS design tokens
  * 
  * See docs/guidelines/terminology.md for Element Component Guidelines
  * See docs/guidelines/token-reference.md for Token Reference
@@ -64,7 +33,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'List group component for displaying a series of content items. Built on Bootstrap 4.6.2 list-group pattern with PLUS design token customizations.',
+        component: 'List group component for displaying a series of content items. Built on Bootstrap 4.6.2 list-group pattern with PLUS design token customizations. Matches Figma design system specifications exactly.',
       },
     },
   },
@@ -84,6 +53,7 @@ export const Basic = {
         { content: 'List item 4' },
       ],
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
@@ -96,32 +66,12 @@ export const Action = {
   render: () => {
     const listGroup = PlusInterface.createListGroup({
       items: [
-        { 
-          content: 'Action item 1',
-          href: '#',
-          onClick: (e) => {
-            e.preventDefault();
-            console.log('Clicked item 1');
-          }
-        },
-        { 
-          content: 'Action item 2',
-          href: '#',
-          onClick: (e) => {
-            e.preventDefault();
-            console.log('Clicked item 2');
-          }
-        },
-        { 
-          content: 'Action item 3',
-          href: '#',
-          onClick: (e) => {
-            e.preventDefault();
-            console.log('Clicked item 3');
-          }
-        },
+        { content: 'Action item 1', href: '#' },
+        { content: 'Action item 2', href: '#' },
+        { content: 'Action item 3', href: '#' },
       ],
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
@@ -140,13 +90,14 @@ export const Active = {
         { content: 'List item 4' },
       ],
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
 
 /**
  * Disabled State
- * List with disabled items
+ * List with disabled items (38% opacity)
  */
 export const Disabled = {
   render: () => {
@@ -158,6 +109,7 @@ export const Disabled = {
         { content: 'List item 4', disabled: true },
       ],
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
@@ -180,6 +132,7 @@ export const WithBadges = {
         { content: 'List item 4' },
       ],
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
@@ -199,6 +152,7 @@ export const Flush = {
       ],
       flush: true,
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
@@ -211,25 +165,13 @@ export const ActionWithActive = {
   render: () => {
     const listGroup = PlusInterface.createListGroup({
       items: [
-        { 
-          content: 'Action item 1',
-          href: '#',
-        },
-        { 
-          content: 'Action item 2',
-          href: '#',
-          active: true,
-        },
-        { 
-          content: 'Action item 3',
-          href: '#',
-        },
-        { 
-          content: 'Action item 4',
-          href: '#',
-        },
+        { content: 'Action item 1', href: '#' },
+        { content: 'Action item 2', href: '#', active: true },
+        { content: 'Action item 3', href: '#' },
+        { content: 'Action item 4', href: '#' },
       ],
     });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
@@ -242,31 +184,38 @@ export const ButtonActions = {
   render: () => {
     const listGroup = PlusInterface.createListGroup({
       items: [
-        { 
-          content: 'Button item 1',
-          action: 'button',
-          onClick: () => console.log('Button 1 clicked'),
-        },
-        { 
-          content: 'Button item 2',
-          action: 'button',
-          active: true,
-          onClick: () => console.log('Button 2 clicked'),
-        },
-        { 
-          content: 'Button item 3',
-          action: 'button',
-          onClick: () => console.log('Button 3 clicked'),
-        },
+        { content: 'Button item 1', action: 'button', onClick: () => console.log('Button 1') },
+        { content: 'Button item 2', action: 'button', active: true, onClick: () => console.log('Button 2') },
+        { content: 'Button item 3', action: 'button', onClick: () => console.log('Button 3') },
       ],
     });
+    listGroup.classList.add('body2-txt');
+    return listGroup;
+  },
+};
+
+/**
+ * Mixed States
+ * List with various states combined
+ */
+export const MixedStates = {
+  render: () => {
+    const listGroup = PlusInterface.createListGroup({
+      items: [
+        { content: 'Normal item' },
+        { content: 'Active item', active: true },
+        { content: 'Disabled item', disabled: true },
+        { content: 'Action item', href: '#' },
+      ],
+    });
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
 };
 
 /**
  * All Variants
- * Shows all list group combinations: states, badges, actions
+ * Shows all list group combinations matching Figma design system
  */
 export const AllVariants = {
   render: () => {
@@ -294,6 +243,7 @@ export const AllVariants = {
         { content: 'List item 3' },
       ],
     });
+    basicList.classList.add('body2-txt');
     basicSection.appendChild(basicList);
     container.appendChild(basicSection);
     
@@ -316,6 +266,7 @@ export const AllVariants = {
         { content: 'Action item 3', href: '#' },
       ],
     });
+    actionList.classList.add('body2-txt');
     actionSection.appendChild(actionList);
     container.appendChild(actionSection);
     
@@ -342,6 +293,7 @@ export const AllVariants = {
         { content: 'List item 3', badge: badge3 },
       ],
     });
+    badgeList.classList.add('body2-txt');
     badgeSection.appendChild(badgeList);
     container.appendChild(badgeSection);
     
@@ -365,6 +317,7 @@ export const AllVariants = {
         { content: 'List item 4', disabled: true },
       ],
     });
+    disabledList.classList.add('body2-txt');
     disabledSection.appendChild(disabledList);
     container.appendChild(disabledSection);
     
@@ -388,6 +341,7 @@ export const AllVariants = {
       ],
       flush: true,
     });
+    flushList.classList.add('body2-txt');
     flushSection.appendChild(flushList);
     container.appendChild(flushSection);
     
@@ -402,6 +356,7 @@ export const AllVariants = {
 export const Interactive = {
   render: (args) => {
     const listGroup = PlusInterface.createListGroup(args);
+    listGroup.classList.add('body2-txt');
     return listGroup;
   },
   argTypes: {
@@ -429,5 +384,180 @@ export const Interactive = {
   },
 };
 
-
-
+/**
+ * Color Style Variants
+ * List groups with different color token variants matching Figma design system
+ * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=5173-6149&t=XxnevshHwphhdAOI-4
+ */
+export const ColorStyleVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    
+    // Primary Style (default)
+    const primarySection = document.createElement('div');
+    primarySection.style.display = 'flex';
+    primarySection.style.flexDirection = 'column';
+    primarySection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const primaryLabel = document.createElement('div');
+    primaryLabel.className = 'h6';
+    primaryLabel.textContent = 'Primary Style';
+    primaryLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    primarySection.appendChild(primaryLabel);
+    
+    const primaryList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Primary item 1', href: '#', style: 'primary' },
+        { content: 'Primary item 2', href: '#', style: 'primary', active: true },
+        { content: 'Primary item 3', href: '#', style: 'primary' },
+      ],
+    });
+    primaryList.classList.add('body2-txt');
+    primarySection.appendChild(primaryList);
+    container.appendChild(primarySection);
+    
+    // Secondary Style
+    const secondarySection = document.createElement('div');
+    secondarySection.style.display = 'flex';
+    secondarySection.style.flexDirection = 'column';
+    secondarySection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const secondaryLabel = document.createElement('div');
+    secondaryLabel.className = 'h6';
+    secondaryLabel.textContent = 'Secondary Style';
+    secondaryLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    secondarySection.appendChild(secondaryLabel);
+    
+    const secondaryList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Secondary item 1', href: '#', style: 'secondary' },
+        { content: 'Secondary item 2', href: '#', style: 'secondary', active: true },
+        { content: 'Secondary item 3', href: '#', style: 'secondary' },
+      ],
+    });
+    secondaryList.classList.add('body2-txt');
+    secondarySection.appendChild(secondaryList);
+    container.appendChild(secondarySection);
+    
+    // Tertiary Style
+    const tertiarySection = document.createElement('div');
+    tertiarySection.style.display = 'flex';
+    tertiarySection.style.flexDirection = 'column';
+    tertiarySection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const tertiaryLabel = document.createElement('div');
+    tertiaryLabel.className = 'h6';
+    tertiaryLabel.textContent = 'Tertiary Style';
+    tertiaryLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    tertiarySection.appendChild(tertiaryLabel);
+    
+    const tertiaryList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Tertiary item 1', href: '#', style: 'tertiary' },
+        { content: 'Tertiary item 2', href: '#', style: 'tertiary', active: true },
+        { content: 'Tertiary item 3', href: '#', style: 'tertiary' },
+      ],
+    });
+    tertiaryList.classList.add('body2-txt');
+    tertiarySection.appendChild(tertiaryList);
+    container.appendChild(tertiarySection);
+    
+    // Success Style
+    const successSection = document.createElement('div');
+    successSection.style.display = 'flex';
+    successSection.style.flexDirection = 'column';
+    successSection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const successLabel = document.createElement('div');
+    successLabel.className = 'h6';
+    successLabel.textContent = 'Success Style';
+    successLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    successSection.appendChild(successLabel);
+    
+    const successList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Success item 1', href: '#', style: 'success' },
+        { content: 'Success item 2', href: '#', style: 'success', active: true },
+        { content: 'Success item 3', href: '#', style: 'success' },
+      ],
+    });
+    successList.classList.add('body2-txt');
+    successSection.appendChild(successList);
+    container.appendChild(successSection);
+    
+    // Danger Style
+    const dangerSection = document.createElement('div');
+    dangerSection.style.display = 'flex';
+    dangerSection.style.flexDirection = 'column';
+    dangerSection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const dangerLabel = document.createElement('div');
+    dangerLabel.className = 'h6';
+    dangerLabel.textContent = 'Danger Style';
+    dangerLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    dangerSection.appendChild(dangerLabel);
+    
+    const dangerList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Danger item 1', href: '#', style: 'danger' },
+        { content: 'Danger item 2', href: '#', style: 'danger', active: true },
+        { content: 'Danger item 3', href: '#', style: 'danger' },
+      ],
+    });
+    dangerList.classList.add('body2-txt');
+    dangerSection.appendChild(dangerList);
+    container.appendChild(dangerSection);
+    
+    // Warning Style
+    const warningSection = document.createElement('div');
+    warningSection.style.display = 'flex';
+    warningSection.style.flexDirection = 'column';
+    warningSection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const warningLabel = document.createElement('div');
+    warningLabel.className = 'h6';
+    warningLabel.textContent = 'Warning Style';
+    warningLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    warningSection.appendChild(warningLabel);
+    
+    const warningList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Warning item 1', href: '#', style: 'warning' },
+        { content: 'Warning item 2', href: '#', style: 'warning', active: true },
+        { content: 'Warning item 3', href: '#', style: 'warning' },
+      ],
+    });
+    warningList.classList.add('body2-txt');
+    warningSection.appendChild(warningList);
+    container.appendChild(warningSection);
+    
+    // Info Style
+    const infoSection = document.createElement('div');
+    infoSection.style.display = 'flex';
+    infoSection.style.flexDirection = 'column';
+    infoSection.style.gap = 'var(--size-element-gap-sm)';
+    
+    const infoLabel = document.createElement('div');
+    infoLabel.className = 'h6';
+    infoLabel.textContent = 'Info Style';
+    infoLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    infoSection.appendChild(infoLabel);
+    
+    const infoList = PlusInterface.createListGroup({
+      items: [
+        { content: 'Info item 1', href: '#', style: 'info' },
+        { content: 'Info item 2', href: '#', style: 'info', active: true },
+        { content: 'Info item 3', href: '#', style: 'info' },
+      ],
+    });
+    infoList.classList.add('body2-txt');
+    infoSection.appendChild(infoList);
+    container.appendChild(infoSection);
+    
+    return container;
+  },
+};

@@ -154,8 +154,10 @@
         /* Container should use flex to align buttons */
         display: flex;
         align-items: stretch;
-        /* Ensure buttons have proper spacing - no gap needed as border separator provides visual separation */
+        /* Ensure buttons are connected with no gap or spacing */
         gap: 0;
+        /* Remove any default margins that might create separation */
+        margin: 0;
         
         .pdropdown-split-text-btn {
             /* Text button should not have caret icon */
@@ -173,41 +175,63 @@
             min-width: fit-content;
             /* Ensure text doesn't get cut off */
             white-space: nowrap;
+            /* Remove any margins that could create separation */
+            margin: 0;
+            margin-right: 0;
+            margin-left: 0;
         }
         
         /* Default order: text on left, toggle on right (for dropdown, dropup, dropright) */
         .pdropdown-split-text-btn {
-            border-right: none;
+            border-right: none !important;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
+            /* Ensure buttons are connected - no margin between them */
+            margin-right: 0;
+            position: relative;
         }
         .pdropdown-split-toggle-btn {
-            border-left: none;
+            border-left: none !important;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             /* No separator border - buttons are connected as one unit */
+            /* Overlap by border width + small amount to ensure seamless connection */
+            margin-left: calc(-1 * var(--size-element-stroke-md) - 0.5px);
+            position: relative;
+            z-index: 1;
             /* Ensure toggle button has enough space for the caret icon */
             min-width: fit-content;
             white-space: nowrap;
+            /* Remove other margins that could create separation */
+            margin-right: 0;
+            margin-top: 0;
+            margin-bottom: 0;
         }
         
         /* Reversed order for dropleft: toggle on left, text on right */
         &.dropleft {
             .pdropdown-split-toggle-btn {
-                border-left: none;
-                border-right: none;
+                border-left: none !important;
+                border-right: none !important;
                 border-top-left-radius: var(--size-element-radius-sm);
                 border-bottom-left-radius: var(--size-element-radius-sm);
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
+                /* Overlap by border width + small amount to ensure seamless connection */
+                margin-right: calc(-1 * var(--size-element-stroke-md) - 0.5px);
+                margin-left: 0;
+                position: relative;
+                z-index: 1;
             }
             .pdropdown-split-text-btn {
-                border-right: none;
-                border-left: none;
+                border-right: none !important;
+                border-left: none !important;
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
                 border-top-right-radius: var(--size-element-radius-sm);
                 border-bottom-right-radius: var(--size-element-radius-sm);
+                margin-left: 0;
+                position: relative;
             }
         }
         

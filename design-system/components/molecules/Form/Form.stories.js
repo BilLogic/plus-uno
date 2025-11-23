@@ -48,10 +48,11 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all form component types, sizes, and states
+ * Overview
+ * Overview of all form components
+ * See Size Variants, States, and Content Variants for detailed examples
  */
-export const AllVariants = () => {
+export const Overview = () => {
   const container = document.createElement('div');
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
@@ -59,228 +60,31 @@ export const AllVariants = () => {
   container.style.padding = '24px';
   container.style.backgroundColor = 'var(--color-surface)';
   
-  // Textarea Section
-  const textareaSection = document.createElement('div');
-  const textareaLabel = document.createElement('h3');
-  textareaLabel.textContent = 'Textarea';
-  textareaLabel.style.marginBottom = '24px';
-  textareaSection.appendChild(textareaLabel);
+  const info = document.createElement('div');
+  info.className = 'body2-txt';
+  info.textContent = 'Form components include textarea, select, range input, and select multiple. See the subcategories for detailed variants:';
+  info.style.marginBottom = '24px';
+  container.appendChild(info);
   
-  const textareaContainer = document.createElement('div');
-  textareaContainer.style.display = 'flex';
-  textareaContainer.style.flexDirection = 'column';
-  textareaContainer.style.gap = '24px';
-  textareaContainer.style.maxWidth = '400px';
+  const list = document.createElement('ul');
+  list.style.paddingLeft = '24px';
+  list.style.marginBottom = '24px';
   
-  // Textarea - Small
-  const textareaSmall = PlusInterface.createTextarea({
-    placeholder: 'Placeholder',
-    size: 'small'
+  const items = [
+    'Size Variants - All sizes (small, medium, large)',
+    'States - Default, with value, read-only, disabled',
+    'Content Variants - Options, multiple rows, custom ranges',
+    'Textarea Variants - All textarea-specific variations'
+  ];
+  
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'body2-txt';
+    li.textContent = item;
+    list.appendChild(li);
   });
-  const textareaSmallLabel = document.createElement('div');
-  textareaSmallLabel.className = 'body2-txt';
-  textareaSmallLabel.textContent = 'Small - Placeholder';
-  textareaSmallLabel.style.marginBottom = '8px';
-  textareaContainer.appendChild(textareaSmallLabel);
-  textareaContainer.appendChild(textareaSmall);
   
-  // Textarea - Medium
-  const textareaMedium = PlusInterface.createTextarea({
-    placeholder: 'Placeholder',
-    size: 'medium'
-  });
-  const textareaMediumLabel = document.createElement('div');
-  textareaMediumLabel.className = 'body2-txt';
-  textareaMediumLabel.textContent = 'Medium - Placeholder';
-  textareaMediumLabel.style.marginBottom = '8px';
-  textareaContainer.appendChild(textareaMediumLabel);
-  textareaContainer.appendChild(textareaMedium);
-  
-  // Textarea - Large
-  const textareaLarge = PlusInterface.createTextarea({
-    placeholder: 'Placeholder',
-    size: 'large'
-  });
-  const textareaLargeLabel = document.createElement('div');
-  textareaLargeLabel.className = 'body2-txt';
-  textareaLargeLabel.textContent = 'Large - Placeholder';
-  textareaLargeLabel.style.marginBottom = '8px';
-  textareaContainer.appendChild(textareaLargeLabel);
-  textareaContainer.appendChild(textareaLarge);
-  
-  textareaSection.appendChild(textareaContainer);
-  container.appendChild(textareaSection);
-  
-  // Select Section
-  const selectSection = document.createElement('div');
-  const selectLabel = document.createElement('h3');
-  selectLabel.textContent = 'Select';
-  selectLabel.style.marginBottom = '24px';
-  selectSection.appendChild(selectLabel);
-  
-  const selectContainer = document.createElement('div');
-  selectContainer.style.display = 'flex';
-  selectContainer.style.flexDirection = 'column';
-  selectContainer.style.gap = '24px';
-  selectContainer.style.maxWidth = '400px';
-  
-  // Select - Small
-  const selectSmall = PlusInterface.createSelect({
-    placeholder: 'Select Form',
-    size: 'small',
-    options: []
-  });
-  const selectSmallLabel = document.createElement('div');
-  selectSmallLabel.className = 'body2-txt';
-  selectSmallLabel.textContent = 'Small - Placeholder';
-  selectSmallLabel.style.marginBottom = '8px';
-  selectContainer.appendChild(selectSmallLabel);
-  selectContainer.appendChild(selectSmall);
-  
-  // Select - Medium
-  const selectMedium = PlusInterface.createSelect({
-    placeholder: 'Select Form',
-    size: 'medium',
-    options: []
-  });
-  const selectMediumLabel = document.createElement('div');
-  selectMediumLabel.className = 'body2-txt';
-  selectMediumLabel.textContent = 'Medium - Placeholder';
-  selectMediumLabel.style.marginBottom = '8px';
-  selectContainer.appendChild(selectMediumLabel);
-  selectContainer.appendChild(selectMedium);
-  
-  // Select - Large
-  const selectLarge = PlusInterface.createSelect({
-    placeholder: 'Select Form',
-    size: 'large',
-    options: []
-  });
-  const selectLargeLabel = document.createElement('div');
-  selectLargeLabel.className = 'body2-txt';
-  selectLargeLabel.textContent = 'Large - Placeholder';
-  selectLargeLabel.style.marginBottom = '8px';
-  selectContainer.appendChild(selectLargeLabel);
-  selectContainer.appendChild(selectLarge);
-  
-  selectSection.appendChild(selectContainer);
-  container.appendChild(selectSection);
-  
-  // Range Input Section
-  const rangeSection = document.createElement('div');
-  const rangeLabel = document.createElement('h3');
-  rangeLabel.textContent = 'Range Input';
-  rangeLabel.style.marginBottom = '24px';
-  rangeSection.appendChild(rangeLabel);
-  
-  const rangeContainer = document.createElement('div');
-  rangeContainer.style.display = 'flex';
-  rangeContainer.style.flexDirection = 'column';
-  rangeContainer.style.gap = '24px';
-  rangeContainer.style.maxWidth = '400px';
-  
-  // Range - Small
-  const rangeSmall = PlusInterface.createRangeInput({
-    size: 'small',
-    value: 50
-  });
-  const rangeSmallLabel = document.createElement('div');
-  rangeSmallLabel.className = 'body2-txt';
-  rangeSmallLabel.textContent = 'Small';
-  rangeSmallLabel.style.marginBottom = '8px';
-  rangeContainer.appendChild(rangeSmallLabel);
-  rangeContainer.appendChild(rangeSmall);
-  
-  // Range - Medium
-  const rangeMedium = PlusInterface.createRangeInput({
-    size: 'medium',
-    value: 50
-  });
-  const rangeMediumLabel = document.createElement('div');
-  rangeMediumLabel.className = 'body2-txt';
-  rangeMediumLabel.textContent = 'Medium';
-  rangeMediumLabel.style.marginBottom = '8px';
-  rangeContainer.appendChild(rangeMediumLabel);
-  rangeContainer.appendChild(rangeMedium);
-  
-  // Range - Large
-  const rangeLarge = PlusInterface.createRangeInput({
-    size: 'large',
-    value: 50
-  });
-  const rangeLargeLabel = document.createElement('div');
-  rangeLargeLabel.className = 'body2-txt';
-  rangeLargeLabel.textContent = 'Large';
-  rangeLargeLabel.style.marginBottom = '8px';
-  rangeContainer.appendChild(rangeLargeLabel);
-  rangeContainer.appendChild(rangeLarge);
-  
-  rangeSection.appendChild(rangeContainer);
-  container.appendChild(rangeSection);
-  
-  // Select Multiple Section
-  const selectMultipleSection = document.createElement('div');
-  const selectMultipleLabel = document.createElement('h3');
-  selectMultipleLabel.textContent = 'Select Multiple';
-  selectMultipleLabel.style.marginBottom = '24px';
-  selectMultipleSection.appendChild(selectMultipleLabel);
-  
-  const selectMultipleContainer = document.createElement('div');
-  selectMultipleContainer.style.display = 'flex';
-  selectMultipleContainer.style.flexDirection = 'column';
-  selectMultipleContainer.style.gap = '24px';
-  selectMultipleContainer.style.maxWidth = '400px';
-  
-  // Select Multiple - Small
-  const selectMultipleSmall = PlusInterface.createSelectMultiple({
-    size: 'small',
-    options: [
-      { value: 'form1', text: 'Form', selected: true },
-      { value: 'form2', text: 'Form', selected: false },
-      { value: 'form3', text: 'Form', selected: false }
-    ]
-  });
-  const selectMultipleSmallLabel = document.createElement('div');
-  selectMultipleSmallLabel.className = 'body2-txt';
-  selectMultipleSmallLabel.textContent = 'Small';
-  selectMultipleSmallLabel.style.marginBottom = '8px';
-  selectMultipleContainer.appendChild(selectMultipleSmallLabel);
-  selectMultipleContainer.appendChild(selectMultipleSmall);
-  
-  // Select Multiple - Medium
-  const selectMultipleMedium = PlusInterface.createSelectMultiple({
-    size: 'medium',
-    options: [
-      { value: 'form1', text: 'Form', selected: true },
-      { value: 'form2', text: 'Form', selected: false },
-      { value: 'form3', text: 'Form', selected: false }
-    ]
-  });
-  const selectMultipleMediumLabel = document.createElement('div');
-  selectMultipleMediumLabel.className = 'body2-txt';
-  selectMultipleMediumLabel.textContent = 'Medium';
-  selectMultipleMediumLabel.style.marginBottom = '8px';
-  selectMultipleContainer.appendChild(selectMultipleMediumLabel);
-  selectMultipleContainer.appendChild(selectMultipleMedium);
-  
-  // Select Multiple - Large
-  const selectMultipleLarge = PlusInterface.createSelectMultiple({
-    size: 'large',
-    options: [
-      { value: 'form1', text: 'Form', selected: true },
-      { value: 'form2', text: 'Form', selected: false },
-      { value: 'form3', text: 'Form', selected: false }
-    ]
-  });
-  const selectMultipleLargeLabel = document.createElement('div');
-  selectMultipleLargeLabel.className = 'body2-txt';
-  selectMultipleLargeLabel.textContent = 'Large';
-  selectMultipleLargeLabel.style.marginBottom = '8px';
-  selectMultipleContainer.appendChild(selectMultipleLargeLabel);
-  selectMultipleContainer.appendChild(selectMultipleLarge);
-  
-  selectMultipleSection.appendChild(selectMultipleContainer);
-  container.appendChild(selectMultipleSection);
+  container.appendChild(list);
   
   return container;
 };

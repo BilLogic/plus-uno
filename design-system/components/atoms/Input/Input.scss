@@ -54,7 +54,8 @@
 .plus-text-field::placeholder,
 .plus-textarea::placeholder {
     color: var(--color-on-surface-variant);
-    opacity: 1; 
+    opacity: 1;
+    font-weight: var(--font-weight-normal); /* Light (300) - matches Figma Body/B2/Regular */
 }
 
 input[type="text"][readonly]:not(.hasDatepicker),

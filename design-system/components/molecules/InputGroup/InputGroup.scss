@@ -95,6 +95,20 @@
         margin: 0; /* Remove default margin */
         margin-top: 0; /* Override default margin-top */
     }
+    
+    /* Disabled checkbox - change container background */
+    .plus-checkbox:disabled {
+        ~ * {
+            /* This won't work, need different approach */
+        }
+    }
+}
+
+/* Disabled checkbox/radio container styling */
+.plus-input-group-checkbox:has(.plus-checkbox:disabled),
+.plus-input-group-radio:has(.plus-radio:disabled) {
+    background-color: var(--color-surface-variant);
+    border-color: var(--color-outline-variant);
 }
 
 /* Radio addons */

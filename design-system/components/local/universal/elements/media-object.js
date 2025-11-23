@@ -46,12 +46,15 @@ export function createMediaObject({
     }
     
     // Add alignment class
-    if (alignment === "right") {
+    // Support: "left", "left-center", "right", "right-center", "left-bottom", "right-bottom"
+    if (alignment === "right" || alignment === "right-center" || alignment === "right-bottom") {
         mediaObject.classList.add("plus-media-right");
-    } else if (alignment === "top") {
-        mediaObject.classList.add("plus-media-top");
-    } else if (alignment === "center") {
+    }
+    if (alignment === "left-center" || alignment === "right-center") {
         mediaObject.classList.add("plus-media-center");
+    }
+    if (alignment === "left-bottom" || alignment === "right-bottom") {
+        mediaObject.classList.add("plus-media-bottom");
     }
     // Default is "left" - no additional class needed
     
@@ -125,8 +128,8 @@ export function createMediaObject({
     }
     
     // Assemble: media element, then body (Bootstrap 4.6.2 structure)
-    // For right alignment, reverse the order
-    if (alignment === "right") {
+    // For right alignment variants, reverse the order
+    if (alignment === "right" || alignment === "right-center" || alignment === "right-bottom") {
         mediaObject.appendChild(mediaBody);
         mediaObject.appendChild(mediaEl);
     } else {

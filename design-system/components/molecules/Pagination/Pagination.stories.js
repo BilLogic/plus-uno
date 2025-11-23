@@ -18,13 +18,16 @@
  * - **Component Dependencies**:
  *   - Built on Bootstrap 4.6.2 pagination structure
  *   - Uses `element-*` tokens for styling (padding, gap, radius, border)
- *   - Uses Material Design 3 color tokens (`--color-primary`, `--color-on-primary`, etc.)
+ *   - Uses Material Design 3 color tokens
  * - **Token Usage**: 
  *   - Padding: `--size-element-pad-x-md`, `--size-element-pad-y-md`
- *   - Gap: `--size-element-gap-sm` (between page items)
- *   - Border: `--size-element-stroke-md` (1.5px)
- *   - Radius: `--size-element-radius-sm` (4px)
- *   - Colors: `--color-primary` for active, `--color-outline-variant` for borders
+ *   - Border: `--size-element-border` (1px)
+ *   - Radius: Varies by size (4px/6px/8px for container, 100px/999px for ends)
+ *   - Colors: `--color-secondary-text`, `--color-secondary`, `--color-outline-variant`, `--color-secondary-state-08`
+ * 
+ * ### Type Variants
+ * - **Icon**: Uses Font Awesome caret-left/caret-right icons
+ * - **Text**: Uses "Previous"/"Next" text labels
  * 
  * ### Size Variants
  * - **Small**: Compact size for dense interfaces
@@ -32,8 +35,7 @@
  * - **Large**: Prominent size for important navigation
  * 
  * ### Features
- * - Previous/Next navigation buttons
- * - First/Last page buttons (optional)
+ * - Previous/Next navigation buttons (icon or text)
  * - Ellipsis for large page ranges
  * - Active page highlighting
  * - Disabled state for boundary pages
@@ -46,14 +48,12 @@
  * - Use ellipsis for large page ranges
  * - Always show current page clearly
  * - Provide Previous/Next buttons for easy navigation
- * - Consider showing First/Last for very large datasets
  * - Ensure sufficient spacing between page items
  * - Test with various page counts (1, 5, 10, 50+ pages)
  * 
  * See docs/guidelines/terminology.md for Element Component Guidelines
  * See docs/guidelines/token-reference.md for Token Reference
  * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=53-19822
- * Documentation: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=3548-38197
  */
 
 import { PlusInterface } from '@/js/components/index.js';
@@ -64,15 +64,15 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'Pagination component for navigating through paginated content. Built on Bootstrap 4.6.2 with PLUS design token customizations. Supports multiple sizes and configurations.',
+        component: 'Pagination component for navigating through paginated content. Built on Bootstrap 4.6.2 with PLUS design token customizations. Supports icon and text types, multiple sizes, and various configurations.',
       },
     },
   },
 };
 
 /**
- * Default Pagination
- * Standard pagination with Previous/Next buttons and page numbers
+ * Default Pagination (Icon Type, Medium Size)
+ * Standard pagination with icon Previous/Next buttons
  */
 export const Default = {
   render: () => {
@@ -80,11 +80,35 @@ export const Default = {
     container.style.padding = 'var(--size-section-pad-y-md)';
     
     const pagination = PlusInterface.createPagination({
-      currentPage: 3,
+      currentPage: 5,
       totalPages: 10,
+      type: 'icon',
+      size: 'default',
       onPageChange: (page) => {
         console.log('Page changed to:', page);
       }
+    });
+    
+    container.appendChild(pagination);
+    return container;
+  },
+};
+
+/**
+ * Text Type Pagination
+ * Pagination with text Previous/Next buttons
+ */
+export const TextType = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.padding = 'var(--size-section-pad-y-md)';
+    
+    const pagination = PlusInterface.createPagination({
+      currentPage: 5,
+      totalPages: 10,
+      type: 'text',
+      size: 'default',
+      onPageChange: (page) => console.log('Page:', page)
     });
     
     container.appendChild(pagination);
@@ -104,6 +128,7 @@ export const FirstPage = {
     const pagination = PlusInterface.createPagination({
       currentPage: 1,
       totalPages: 10,
+      type: 'icon',
       onPageChange: (page) => console.log('Page:', page)
     });
     
@@ -124,6 +149,7 @@ export const LastPage = {
     const pagination = PlusInterface.createPagination({
       currentPage: 10,
       totalPages: 10,
+      type: 'icon',
       onPageChange: (page) => console.log('Page:', page)
     });
     
@@ -144,48 +170,8 @@ export const ManyPages = {
     const pagination = PlusInterface.createPagination({
       currentPage: 25,
       totalPages: 50,
+      type: 'icon',
       maxVisible: 5,
-      onPageChange: (page) => console.log('Page:', page)
-    });
-    
-    container.appendChild(pagination);
-    return container;
-  },
-};
-
-/**
- * With First/Last Buttons
- * Pagination including First and Last page buttons
- */
-export const WithFirstLast = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const pagination = PlusInterface.createPagination({
-      currentPage: 5,
-      totalPages: 20,
-      showFirstLast: true,
-      onPageChange: (page) => console.log('Page:', page)
-    });
-    
-    container.appendChild(pagination);
-    return container;
-  },
-};
-
-/**
- * Single Page
- * Pagination with only one page (edge case)
- */
-export const SinglePage = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const pagination = PlusInterface.createPagination({
-      currentPage: 1,
-      totalPages: 1,
       onPageChange: (page) => console.log('Page:', page)
     });
     
@@ -216,13 +202,14 @@ export const SizeVariants = {
       
       const label = document.createElement('div');
       label.className = 'body2-txt';
-      label.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} Size:`;
+      label.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} Size (Icon Type):`;
       label.style.marginBottom = 'var(--size-element-gap-xs)';
       sizeContainer.appendChild(label);
       
       const pagination = PlusInterface.createPagination({
-        currentPage: 3,
+        currentPage: 5,
         totalPages: 10,
+        type: 'icon',
         size: size,
         onPageChange: (page) => console.log(`${size} pagination - Page:`, page)
       });
@@ -236,74 +223,47 @@ export const SizeVariants = {
 };
 
 /**
- * Interactive Pagination
- * Interactive playground for testing pagination variations
+ * Type Variants
+ * Icon and text type variants
  */
-export const Interactive = {
-  render: (args) => {
+export const TypeVariants = {
+  render: () => {
     const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-md)';
     container.style.padding = 'var(--size-section-pad-y-md)';
     
-    let currentPage = args.currentPage || 1;
+    const types = [
+      { type: 'icon', label: 'Icon Type' },
+      { type: 'text', label: 'Text Type' }
+    ];
     
-    const updatePagination = () => {
-      // Clear container
-      container.innerHTML = '';
+    types.forEach(({ type, label }) => {
+      const typeContainer = document.createElement('div');
+      typeContainer.style.display = 'flex';
+      typeContainer.style.flexDirection = 'column';
+      typeContainer.style.gap = 'var(--size-element-gap-sm)';
+      
+      const typeLabel = document.createElement('div');
+      typeLabel.className = 'body2-txt';
+      typeLabel.textContent = `${label}:`;
+      typeLabel.style.marginBottom = 'var(--size-element-gap-xs)';
+      typeContainer.appendChild(typeLabel);
       
       const pagination = PlusInterface.createPagination({
-        currentPage: currentPage,
-        totalPages: args.totalPages || 10,
-        showFirstLast: args.showFirstLast !== false,
-        showPrevNext: args.showPrevNext !== false,
-        maxVisible: args.maxVisible || 5,
-        size: args.size || 'default',
-        onPageChange: (page) => {
-          currentPage = page;
-          console.log('Page changed to:', page);
-          updatePagination();
-        }
+        currentPage: 5,
+        totalPages: 10,
+        type: type,
+        size: 'default',
+        onPageChange: (page) => console.log(`${type} pagination - Page:`, page)
       });
       
-      container.appendChild(pagination);
-    };
+      typeContainer.appendChild(pagination);
+      container.appendChild(typeContainer);
+    });
     
-    updatePagination();
     return container;
-  },
-  argTypes: {
-    currentPage: {
-      control: { type: 'number', min: 1, max: 50 },
-      description: 'Current active page',
-    },
-    totalPages: {
-      control: { type: 'number', min: 1, max: 100 },
-      description: 'Total number of pages',
-    },
-    showFirstLast: {
-      control: 'boolean',
-      description: 'Show First/Last buttons',
-    },
-    showPrevNext: {
-      control: 'boolean',
-      description: 'Show Previous/Next buttons',
-    },
-    maxVisible: {
-      control: { type: 'number', min: 3, max: 10 },
-      description: 'Maximum visible page numbers',
-    },
-    size: {
-      control: 'select',
-      options: ['small', 'default', 'large'],
-      description: 'Pagination size',
-    },
-  },
-  args: {
-    currentPage: 3,
-    totalPages: 10,
-    showFirstLast: true,
-    showPrevNext: true,
-    maxVisible: 5,
-    size: 'default',
   },
 };
 
@@ -319,104 +279,38 @@ export const AllVariants = {
     container.style.gap = 'var(--size-section-gap-lg)';
     container.style.padding = 'var(--size-section-pad-y-md)';
     
-    // First page
-    const firstSection = document.createElement('div');
-    firstSection.style.display = 'flex';
-    firstSection.style.flexDirection = 'column';
-    firstSection.style.gap = 'var(--size-element-gap-sm)';
+    const variants = [
+      { type: 'icon', size: 'small', label: 'Small Icon Type' },
+      { type: 'icon', size: 'default', label: 'Default Icon Type' },
+      { type: 'icon', size: 'large', label: 'Large Icon Type' },
+      { type: 'text', size: 'small', label: 'Small Text Type' },
+      { type: 'text', size: 'default', label: 'Default Text Type' },
+      { type: 'text', size: 'large', label: 'Large Text Type' }
+    ];
     
-    const firstLabel = document.createElement('div');
-    firstLabel.className = 'h6';
-    firstLabel.textContent = 'First Page:';
-    firstSection.appendChild(firstLabel);
-    
-    const firstPagination = Universal.createPagination({
-      currentPage: 1,
-      totalPages: 10,
-      onPageChange: () => {}
+    variants.forEach(({ type, size, label }) => {
+      const variantContainer = document.createElement('div');
+      variantContainer.style.display = 'flex';
+      variantContainer.style.flexDirection = 'column';
+      variantContainer.style.gap = 'var(--size-element-gap-sm)';
+      
+      const variantLabel = document.createElement('div');
+      variantLabel.className = 'h6';
+      variantLabel.textContent = `${label}:`;
+      variantContainer.appendChild(variantLabel);
+      
+      const pagination = PlusInterface.createPagination({
+        currentPage: 5,
+        totalPages: 10,
+        type: type,
+        size: size,
+        onPageChange: () => {}
+      });
+      
+      variantContainer.appendChild(pagination);
+      container.appendChild(variantContainer);
     });
-    firstSection.appendChild(firstPagination);
-    container.appendChild(firstSection);
-    
-    // Middle page
-    const middleSection = document.createElement('div');
-    middleSection.style.display = 'flex';
-    middleSection.style.flexDirection = 'column';
-    middleSection.style.gap = 'var(--size-element-gap-sm)';
-    
-    const middleLabel = document.createElement('div');
-    middleLabel.className = 'h6';
-    middleLabel.textContent = 'Middle Page:';
-    middleSection.appendChild(middleLabel);
-    
-    const middlePagination = Universal.createPagination({
-      currentPage: 5,
-      totalPages: 10,
-      onPageChange: () => {}
-    });
-    middleSection.appendChild(middlePagination);
-    container.appendChild(middleSection);
-    
-    // Last page
-    const lastSection = document.createElement('div');
-    lastSection.style.display = 'flex';
-    lastSection.style.flexDirection = 'column';
-    lastSection.style.gap = 'var(--size-element-gap-sm)';
-    
-    const lastLabel = document.createElement('div');
-    lastLabel.className = 'h6';
-    lastLabel.textContent = 'Last Page:';
-    lastSection.appendChild(lastLabel);
-    
-    const lastPagination = Universal.createPagination({
-      currentPage: 10,
-      totalPages: 10,
-      onPageChange: () => {}
-    });
-    lastSection.appendChild(lastPagination);
-    container.appendChild(lastSection);
-    
-    // Many pages with ellipsis
-    const manySection = document.createElement('div');
-    manySection.style.display = 'flex';
-    manySection.style.flexDirection = 'column';
-    manySection.style.gap = 'var(--size-element-gap-sm)';
-    
-    const manyLabel = document.createElement('div');
-    manyLabel.className = 'h6';
-    manyLabel.textContent = 'Many Pages (with Ellipsis):';
-    manySection.appendChild(manyLabel);
-    
-    const manyPagination = Universal.createPagination({
-      currentPage: 25,
-      totalPages: 50,
-      maxVisible: 5,
-      onPageChange: () => {}
-    });
-    manySection.appendChild(manyPagination);
-    container.appendChild(manySection);
-    
-    // With first/last
-    const firstLastSection = document.createElement('div');
-    firstLastSection.style.display = 'flex';
-    firstLastSection.style.flexDirection = 'column';
-    firstLastSection.style.gap = 'var(--size-element-gap-sm)';
-    
-    const firstLastLabel = document.createElement('div');
-    firstLastLabel.className = 'h6';
-    firstLastLabel.textContent = 'With First/Last Buttons:';
-    firstLastSection.appendChild(firstLastLabel);
-    
-    const firstLastPagination = Universal.createPagination({
-      currentPage: 5,
-      totalPages: 20,
-      showFirstLast: true,
-      onPageChange: () => {}
-    });
-    firstLastSection.appendChild(firstLastPagination);
-    container.appendChild(firstLastSection);
     
     return container;
   },
 };
-

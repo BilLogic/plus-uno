@@ -168,6 +168,7 @@ export const AllVariants = {
 /**
  * Input Group Text
  * Text addons (prefixes and suffixes) for input fields
+ * Based on Figma Design System specifications - exact layout match
  */
 export const InputGroupText = {
   render: () => {
@@ -178,96 +179,55 @@ export const InputGroupText = {
     container.style.padding = '24px';
     container.style.backgroundColor = 'var(--color-surface)';
     
-    // Row 1
-    const row1 = document.createElement('div');
-    row1.style.display = 'flex';
-    row1.style.flexWrap = 'wrap';
-    row1.style.gap = 'var(--size-element-gap-md)';
-    row1.style.alignItems = 'center';
-    
-    // Text prepend
-    const textPrepend1 = PlusInterface.createInputGroup({
+    // Row 1: Single text prepend + input
+    const row1 = PlusInterface.createInputGroup({
       prepend: 'Text',
       input: { type: 'text', placeholder: 'Placeholder', id: 'text-prepend-1' },
       size: 'default'
     });
-    row1.appendChild(textPrepend1);
+    container.appendChild(row1);
     
-    // Two text prepends
-    const textPrepend2 = PlusInterface.createInputGroup({
+    // Row 2: Two text prepends + input
+    const row2 = PlusInterface.createInputGroup({
       prepend: ['Text', 'Text'],
       input: { type: 'text', placeholder: 'Placeholder', id: 'text-prepend-2' },
       size: 'default'
     });
-    row1.appendChild(textPrepend2);
+    container.appendChild(row2);
     
-    // Text append
-    const textAppend1 = PlusInterface.createInputGroup({
+    // Row 3: Input + single text append
+    const row3 = PlusInterface.createInputGroup({
       append: 'Text',
       input: { type: 'text', placeholder: 'Placeholder', id: 'text-append-1' },
       size: 'default'
     });
-    row1.appendChild(textAppend1);
-    
-    container.appendChild(row1);
-    
-    // Row 2
-    const row2 = document.createElement('div');
-    row2.style.display = 'flex';
-    row2.style.flexWrap = 'wrap';
-    row2.style.gap = 'var(--size-element-gap-md)';
-    row2.style.alignItems = 'center';
-    
-    // Standalone input
-    const standaloneInput = document.createElement('input');
-    standaloneInput.type = 'text';
-    standaloneInput.className = 'form-control plus-text-field body2-txt';
-    standaloneInput.placeholder = 'Placeholder';
-    standaloneInput.id = 'standalone-input';
-    row2.appendChild(standaloneInput);
-    
-    // Three text prepends
-    const textPrepend3 = PlusInterface.createInputGroup({
-      prepend: ['Text', 'Text', 'Text'],
-      input: { type: 'text', placeholder: 'Placeholder', id: 'text-prepend-3' },
-      size: 'default'
-    });
-    row2.appendChild(textPrepend3);
-    
-    // Standalone text
-    const standaloneText = document.createElement('span');
-    standaloneText.className = 'input-group-text plus-input-group-text body2-txt';
-    standaloneText.textContent = 'Text';
-    row2.appendChild(standaloneText);
-    
-    container.appendChild(row2);
-    
-    // Row 3
-    const row3 = document.createElement('div');
-    row3.style.display = 'flex';
-    row3.style.flexWrap = 'wrap';
-    row3.style.gap = 'var(--size-element-gap-md)';
-    row3.style.alignItems = 'center';
-    
-    // Two text prepends
-    const textPrepend4 = PlusInterface.createInputGroup({
-      prepend: ['Text', 'Text'],
-      input: { type: 'text', placeholder: 'Placeholder', id: 'text-prepend-4' },
-      size: 'default'
-    });
-    row3.appendChild(textPrepend4);
-    
-    // Two standalone texts
-    const standaloneText1 = document.createElement('span');
-    standaloneText1.className = 'input-group-text plus-input-group-text body2-txt';
-    standaloneText1.textContent = 'Text';
-    const standaloneText2 = document.createElement('span');
-    standaloneText2.className = 'input-group-text plus-input-group-text body2-txt';
-    standaloneText2.textContent = 'Text';
-    row3.appendChild(standaloneText1);
-    row3.appendChild(standaloneText2);
-    
     container.appendChild(row3);
+    
+    // Row 4: Input + two text appends (two text to the right)
+    const row4 = PlusInterface.createInputGroup({
+      append: ['Text', 'Text'],
+      input: { type: 'text', placeholder: 'Placeholder', id: 'text-append-2' },
+      size: 'default'
+    });
+    container.appendChild(row4);
+    
+    // Row 5: One text prepend + input + one text append (one on each side)
+    const row5 = PlusInterface.createInputGroup({
+      prepend: 'Text',
+      append: 'Text',
+      input: { type: 'text', placeholder: 'Placeholder', id: 'text-both-1' },
+      size: 'default'
+    });
+    container.appendChild(row5);
+    
+    // Row 6: Two text prepends + input + two text appends (two on each side)
+    const row6 = PlusInterface.createInputGroup({
+      prepend: ['Text', 'Text'],
+      append: ['Text', 'Text'],
+      input: { type: 'text', placeholder: 'Placeholder', id: 'text-both-2' },
+      size: 'default'
+    });
+    container.appendChild(row6);
     
     return container;
   },
@@ -276,6 +236,7 @@ export const InputGroupText = {
 /**
  * Input Group Checkbox
  * Checkbox addons for input fields
+ * Based on Figma Design System specifications - exact layout match
  */
 export const InputGroupCheckbox = {
   render: () => {
@@ -286,14 +247,7 @@ export const InputGroupCheckbox = {
     container.style.padding = '24px';
     container.style.backgroundColor = 'var(--color-surface)';
     
-    // Row 1
-    const row1 = document.createElement('div');
-    row1.style.display = 'flex';
-    row1.style.flexWrap = 'wrap';
-    row1.style.gap = 'var(--size-element-gap-md)';
-    row1.style.alignItems = 'center';
-    
-    // Checked checkbox prepend
+    // Row 1: Checked checkbox + input
     const checkedCheckbox = PlusInterface.createCheckbox({
       label: '',
       name: 'checkbox-1',
@@ -306,9 +260,9 @@ export const InputGroupCheckbox = {
       input: { type: 'text', placeholder: 'Placeholder', id: 'input-checked' },
       size: 'default'
     });
-    row1.appendChild(checkedGroup);
+    container.appendChild(checkedGroup);
     
-    // Indeterminate checkbox prepend
+    // Row 2: Indeterminate checkbox + input
     const indeterminateCheckbox = PlusInterface.createCheckbox({
       label: '',
       name: 'checkbox-2',
@@ -321,9 +275,9 @@ export const InputGroupCheckbox = {
       input: { type: 'text', placeholder: 'Placeholder', id: 'input-indeterminate' },
       size: 'default'
     });
-    row1.appendChild(indeterminateGroup);
+    container.appendChild(indeterminateGroup);
     
-    // Unchecked checkbox prepend
+    // Row 3: Unchecked checkbox + input
     const uncheckedCheckbox = PlusInterface.createCheckbox({
       label: '',
       name: 'checkbox-3',
@@ -336,33 +290,23 @@ export const InputGroupCheckbox = {
       input: { type: 'text', placeholder: 'Placeholder', id: 'input-unchecked' },
       size: 'default'
     });
-    row1.appendChild(uncheckedGroup);
+    container.appendChild(uncheckedGroup);
     
-    container.appendChild(row1);
-    
-    // Row 2
-    const row2 = document.createElement('div');
-    row2.style.display = 'flex';
-    row2.style.flexWrap = 'wrap';
-    row2.style.gap = 'var(--size-element-gap-md)';
-    row2.style.alignItems = 'center';
-    
-    // Another unchecked checkbox prepend
-    const uncheckedCheckbox2 = PlusInterface.createCheckbox({
+    // Row 4: Disabled checkbox (checkbox disabled, input enabled)
+    const disabledCheckbox = PlusInterface.createCheckbox({
       label: '',
       name: 'checkbox-4',
       value: '4',
-      id: 'checkbox-unchecked-2',
-      checked: false
+      id: 'checkbox-disabled-1',
+      checked: false,
+      disabled: true
     });
-    const uncheckedGroup2 = PlusInterface.createInputGroup({
-      prepend: { type: 'checkbox', checkbox: uncheckedCheckbox2 },
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-unchecked-2' },
+    const disabledGroup = PlusInterface.createInputGroup({
+      prepend: { type: 'checkbox', checkbox: disabledCheckbox },
+      input: { type: 'text', placeholder: 'Placeholder', id: 'input-enabled' },
       size: 'default'
     });
-    row2.appendChild(uncheckedGroup2);
-    
-    container.appendChild(row2);
+    container.appendChild(disabledGroup);
     
     return container;
   },
@@ -371,6 +315,7 @@ export const InputGroupCheckbox = {
 /**
  * Input Group Radio
  * Radio button addons for input fields
+ * Based on Figma Design System specifications - exact layout match
  */
 export const InputGroupRadio = {
   render: () => {
@@ -381,14 +326,7 @@ export const InputGroupRadio = {
     container.style.padding = '24px';
     container.style.backgroundColor = 'var(--color-surface)';
     
-    // Row 1
-    const row1 = document.createElement('div');
-    row1.style.display = 'flex';
-    row1.style.flexWrap = 'wrap';
-    row1.style.gap = 'var(--size-element-gap-md)';
-    row1.style.alignItems = 'center';
-    
-    // Selected radio prepend
+    // Row 1: Selected radio + input
     const selectedRadio = PlusInterface.createRadio({
       label: '',
       name: 'radio-group-1',
@@ -401,9 +339,9 @@ export const InputGroupRadio = {
       input: { type: 'text', placeholder: 'Placeholder', id: 'input-selected' },
       size: 'default'
     });
-    row1.appendChild(selectedGroup);
+    container.appendChild(selectedGroup);
     
-    // Unselected radio prepend
+    // Row 2: Unselected radio + input
     const unselectedRadio1 = PlusInterface.createRadio({
       label: '',
       name: 'radio-group-1',
@@ -416,24 +354,23 @@ export const InputGroupRadio = {
       input: { type: 'text', placeholder: 'Placeholder', id: 'input-unselected-1' },
       size: 'default'
     });
-    row1.appendChild(unselectedGroup1);
+    container.appendChild(unselectedGroup1);
     
-    // Another unselected radio prepend
-    const unselectedRadio2 = PlusInterface.createRadio({
+    // Row 3: Disabled radio (radio disabled, input enabled)
+    const disabledRadio = PlusInterface.createRadio({
       label: '',
-      name: 'radio-group-1',
-      value: '3',
-      id: 'radio-unselected-2',
-      checked: false
+      name: 'radio-group-2',
+      value: '1',
+      id: 'radio-disabled-1',
+      checked: false,
+      disabled: true
     });
-    const unselectedGroup2 = PlusInterface.createInputGroup({
-      prepend: { type: 'radio', radio: unselectedRadio2 },
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-unselected-2' },
+    const disabledRadioGroup = PlusInterface.createInputGroup({
+      prepend: { type: 'radio', radio: disabledRadio },
+      input: { type: 'text', placeholder: 'Placeholder', id: 'input-enabled-radio' },
       size: 'default'
     });
-    row1.appendChild(unselectedGroup2);
-    
-    container.appendChild(row1);
+    container.appendChild(disabledRadioGroup);
     
     return container;
   },
@@ -442,6 +379,8 @@ export const InputGroupRadio = {
 /**
  * Input Group Button
  * Button addons for input fields
+ * Based on Figma Design System specifications - exact layout match
+ * Uses outline buttons (text and border use primary color, no background fill)
  */
 export const InputGroupButton = {
   render: () => {
@@ -452,166 +391,139 @@ export const InputGroupButton = {
     container.style.padding = '24px';
     container.style.backgroundColor = 'var(--color-surface)';
     
-    // Row 1
-    const row1 = document.createElement('div');
-    row1.style.display = 'flex';
-    row1.style.flexWrap = 'wrap';
-    row1.style.gap = 'var(--size-element-gap-md)';
-    row1.style.alignItems = 'center';
-    
-    // Button prepend
+    // Row 1: Single button prepend + input
     const button1 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    const buttonPrepend1 = PlusInterface.createInputGroup({
+    const row1 = PlusInterface.createInputGroup({
       prepend: { type: 'button', button: button1 },
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-button-prepend-1' },
+      input: { type: 'text', placeholder: 'Placeholder', id: 'button-prepend-1' },
       size: 'default'
     });
-    row1.appendChild(buttonPrepend1);
+    container.appendChild(row1);
     
-    // Button append
+    // Row 2: Two button prepends + input
     const button2 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    const buttonAppend1 = PlusInterface.createInputGroup({
-      append: { type: 'button', button: button2 },
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-button-append-1' },
-      size: 'default'
-    });
-    row1.appendChild(buttonAppend1);
-    
-    // Button prepend and append
     const button3 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
+    const row2 = PlusInterface.createInputGroup({
+      prepend: [
+        { type: 'button', button: button2 },
+        { type: 'button', button: button3 }
+      ],
+      input: { type: 'text', placeholder: 'Placeholder', id: 'button-prepend-2' },
+      size: 'default'
+    });
+    container.appendChild(row2);
+    
+    // Row 3: Input + single button append
     const button4 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    const buttonBoth = PlusInterface.createInputGroup({
-      prepend: { type: 'button', button: button3 },
+    const row3 = PlusInterface.createInputGroup({
       append: { type: 'button', button: button4 },
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-button-both-1' },
+      input: { type: 'text', placeholder: 'Placeholder', id: 'button-append-1' },
       size: 'default'
     });
-    row1.appendChild(buttonBoth);
+    container.appendChild(row3);
     
-    container.appendChild(row1);
-    
-    // Row 2
-    const row2 = document.createElement('div');
-    row2.style.display = 'flex';
-    row2.style.flexWrap = 'wrap';
-    row2.style.gap = 'var(--size-element-gap-md)';
-    row2.style.alignItems = 'center';
-    
-    // Two buttons prepend
+    // Row 4: Input + two button appends (two buttons to the right)
     const button5 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
     const button6 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    const twoButtonsPrepend = PlusInterface.createInputGroup({
-      prepend: [
+    const row4 = PlusInterface.createInputGroup({
+      append: [
         { type: 'button', button: button5 },
         { type: 'button', button: button6 }
       ],
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-two-buttons-prepend' },
+      input: { type: 'text', placeholder: 'Placeholder', id: 'button-append-2' },
       size: 'default'
     });
-    row2.appendChild(twoButtonsPrepend);
+    container.appendChild(row4);
     
-    // Two buttons append
+    // Row 5: One button prepend + input + one button append (one on each side)
     const button7 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
     const button8 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    const twoButtonsAppend = PlusInterface.createInputGroup({
-      append: [
-        { type: 'button', button: button7 },
-        { type: 'button', button: button8 }
-      ],
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-two-buttons-append' },
+    const row5 = PlusInterface.createInputGroup({
+      prepend: { type: 'button', button: button7 },
+      append: { type: 'button', button: button8 },
+      input: { type: 'text', placeholder: 'Placeholder', id: 'button-both-1' },
       size: 'default'
     });
-    row2.appendChild(twoButtonsAppend);
+    container.appendChild(row5);
     
-    container.appendChild(row2);
-    
-    // Row 3
-    const row3 = document.createElement('div');
-    row3.style.display = 'flex';
-    row3.style.flexWrap = 'wrap';
-    row3.style.gap = 'var(--size-element-gap-md)';
-    row3.style.alignItems = 'center';
-    
-    // Two buttons prepend (again)
+    // Row 6: Two button prepends + input + two button appends (two on each side)
     const button9 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
     const button10 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    const twoButtonsPrepend2 = PlusInterface.createInputGroup({
-      prepend: [
-        { type: 'button', button: button9 },
-        { type: 'button', button: button10 }
-      ],
-      input: { type: 'text', placeholder: 'Placeholder', id: 'input-two-buttons-prepend-2' },
-      size: 'default'
-    });
-    row3.appendChild(twoButtonsPrepend2);
-    
-    // Two standalone buttons
     const button11 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
     const button12 = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default'
     });
-    row3.appendChild(button11);
-    row3.appendChild(button12);
-    
-    container.appendChild(row3);
+    const row6 = PlusInterface.createInputGroup({
+      prepend: [
+        { type: 'button', button: button9 },
+        { type: 'button', button: button10 }
+      ],
+      append: [
+        { type: 'button', button: button11 },
+        { type: 'button', button: button12 }
+      ],
+      input: { type: 'text', placeholder: 'Placeholder', id: 'button-both-2' },
+      size: 'default'
+    });
+    container.appendChild(row6);
     
     return container;
   },

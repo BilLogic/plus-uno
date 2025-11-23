@@ -18,6 +18,7 @@
  * @param {HTMLElement|string} [options.badge=null] - Badge element or text to display
  * @param {Function} [options.onClick=null] - Click event handler
  * @param {string} [options.action=null] - Action type: "button" or "link" (default: "link" if href provided, otherwise "div")
+ * @param {string} [options.style=null] - Color style variant: "primary", "secondary", "tertiary", "success", "danger", "warning", "info", "default"
  * @returns {HTMLElement} List item element
  */
 export function createListGroupItem({
@@ -29,7 +30,8 @@ export function createListGroupItem({
     classes = [],
     badge = null,
     onClick = null,
-    action = null
+    action = null,
+    style = null
 } = {}) {
     // Determine the element type based on action and href
     let item;
@@ -69,9 +71,16 @@ export function createListGroupItem({
         item.classList.add(...classes);
     }
     
+    // Add style variant class if provided
+    if (style && style !== 'default') {
+        item.classList.add(`plus-list-group-item-${style}`);
+    }
+    
     // Add content
     const contentWrapper = document.createElement("div");
     contentWrapper.classList.add("plus-list-group-item-content");
+    // Add body2-txt class for typography (matches Figma design)
+    contentWrapper.classList.add("body2-txt");
     
     if (typeof content === "string") {
         contentWrapper.textContent = content;
