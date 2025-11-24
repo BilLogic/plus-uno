@@ -1,121 +1,269 @@
 /**
  * Tooltip Component Styles
- * Matches Figma design system specifications
- * Tooltips are Element components that display brief information on hover/focus
+ * Matches Figma design system specifications EXACTLY
  * 
- * Figma Specs:
- * - Background: surface-container-high (for tooltip content)
- * - Border radius: 4px (element-radius-sm)
- * - Padding: varies by size (sm: 4px/8px, md: 6px/10px, lg: 8px/16px)
- * - Typography: body2-txt for content
- * - Uses element-level tokens since tooltips are Element components
+ * CRITICAL: We completely override ALL Bootstrap defaults to match Figma pixel-perfect
+ * Bootstrap is ONLY used for functional foundation (JavaScript behavior)
+ * ALL visual styling is custom to match Figma design exactly
+ * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=42-6020&m=dev
+ * 
+ * Figma Specs (from design context - EXACT values):
+ * - Background: var(--color-inverse-surface) = #2e3133
+ * - Text color: var(--color-inverse-on-surface) = #f0f1f3
+ * - Border radius: var(--size-element-radius-md) = 4px
+ * - Padding: px-[var(--element/pad-x-sm,8px)] py-[var(--element/pad-y-lg,8px)] = 8px horizontal, 8px vertical
+ * - Typography: font-['Merriweather_Sans:Light',sans-serif] font-light text-[14px] leading-[1.571]
+ *   = Merriweather Sans Light, weight 300, 14px, line-height 1.571
+ * - Text alignment: text-center (centered)
+ * - Arrow: h-[5px] w-[10px] = 5px tall, 10px wide
+ * - Arrow color: rgba(46, 49, 51, 1) = #2e3133 = inverse-surface
+ * - No shadow: box-shadow: none
+ * - Max width: max-w-[293.33px] = 293.33px
  */
 
-/* Bootstrap Tooltip Overrides */
+/* ============================================
+   COMPLETE BOOTSTRAP OVERRIDE - Figma Design Takes Precedence
+   ============================================ */
+
+/* Bootstrap Tooltip Container - Complete Override */
+/* We override EVERY Bootstrap default property to match Figma exactly */
 .tooltip {
-    /* Figma: Tooltip container - uses element tokens since tooltips are Element components */
-    /* But tooltip content overlays like modals, so we use surface-container-high for background */
-    opacity: 1; /* Bootstrap sets opacity to 0 by default, we override to 1 */
-    z-index: 1070; /* Bootstrap default z-index for tooltips */
+    /* Figma: Container structure - flex layout matching Figma */
+    /* Bootstrap default: position, display, etc. - ALL overridden */
+    position: absolute !important;
+    display: flex !important;
+    opacity: 1 !important; /* Bootstrap default: 0 - OVERRIDDEN */
+    z-index: 1070 !important;
+    
+    /* Figma: Remove ALL Bootstrap defaults */
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    
+    /* Figma: Typography defaults - Body/B2/Regular */
+    font-family: var(--font-family-body) !important; /* Merriweather Sans */
+    font-style: normal !important;
+    font-weight: 300 !important; /* Light - Figma: font-light */
+    font-size: 14px !important; /* Figma: text-[14px] */
+    line-height: 1.571 !important; /* Figma: leading-[1.571] */
+    text-align: center !important; /* Figma: text-center */
+    text-decoration: none !important;
+    text-shadow: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    word-break: normal !important;
+    word-spacing: normal !important;
+    white-space: normal !important;
+    line-break: auto !important;
+    word-wrap: break-word !important;
+    color: var(--color-inverse-on-surface) !important; /* Figma: text color */
 }
 
+/* Tooltip Inner - Complete Bootstrap Override */
+/* Figma: bg-[var(--neutral-colors/alternative/inverse-surface,#2e3133)] */
 .tooltip-inner {
-    /* Figma: Tooltip content background - surface-container-high */
-    background-color: var(--color-surface-container-high);
-    color: var(--color-on-surface);
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    box-sizing: border-box;
+    /* Figma: Background - inverse-surface */
+    background-color: var(--color-inverse-surface) !important; /* #2e3133 */
+    color: var(--color-inverse-on-surface) !important; /* #f0f1f3 */
+    border: none !important;
     
-    /* Figma: Tooltip border radius - radius-sm (4px) */
-    border-radius: var(--size-element-radius-sm);
+    /* Figma: No shadow - box-shadow: none */
+    box-shadow: none !important;
+    box-sizing: border-box !important;
     
-    /* Default padding - medium size */
-    /* Figma: Tooltip default - pad-y-md (6px), pad-x-md (10px) */
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    /* Figma: Border radius - rounded-[var(--element/radius-md,4px)] */
+    border-radius: var(--size-element-radius-md) !important; /* 4px */
     
-    /* Max width to prevent overly wide tooltips */
-    max-width: 200px;
+    /* Figma: Padding - px-[var(--element/pad-x-sm,8px)] py-[var(--element/pad-y-lg,8px)] */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-sm) !important; /* 8px vertical, 8px horizontal */
     
-    /* Typography */
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
-    color: var(--color-on-surface);
+    /* Figma: Max width - max-w-[293.33px] */
+    max-width: 293.33px !important; /* Figma: Columns/Max/col-4 */
+    min-width: auto !important;
+    width: auto !important;
     
-    /* Text alignment */
-    text-align: left;
+    /* Figma: Typography - Body/B2/Regular */
+    font-family: var(--font-family-body) !important; /* Merriweather Sans */
+    font-weight: 300 !important; /* Light - Figma: font-light */
+    font-size: 14px !important; /* Figma: text-[14px] */
+    line-height: 1.571 !important; /* Figma: leading-[1.571] */
+    color: var(--color-inverse-on-surface) !important; /* #f0f1f3 */
+    
+    /* Figma: Text alignment - text-center */
+    text-align: center !important;
+    
+    /* Figma: Flex properties from design */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-grow: 1 !important;
+    flex-shrink: 0 !important;
+    flex-basis: 0 !important;
+    
+    /* Override ALL Bootstrap defaults */
+    padding-top: var(--size-element-pad-y-lg) !important;
+    padding-right: var(--size-element-pad-x-sm) !important;
+    padding-bottom: var(--size-element-pad-y-lg) !important;
+    padding-left: var(--size-element-pad-x-sm) !important;
 }
 
-/* Tooltip Arrow (Bootstrap 4 uses .arrow class with ::before and ::after) */
+/* Tooltip Arrow - Complete Bootstrap Override */
+/* Figma: h-[5px] w-[10px] = 5px tall, 10px wide */
+/* Figma: Arrow color rgba(46, 49, 51, 1) = #2e3133 = inverse-surface */
+/* Arrow is positioned absolutely and CENTERED on the tooltip edge */
 .tooltip .arrow {
-    /* ::before creates the border/shadow, ::after creates the actual arrow */
+    /* Figma: Arrow dimensions */
+    width: 10px !important; /* Figma: w-[10px] */
+    height: 5px !important; /* Figma: h-[5px] */
+    
+    /* Position absolutely to center on tooltip edge */
+    position: absolute !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    
+    /* Remove Bootstrap's default arrow styling */
     &::before {
-        /* Border/shadow color - transparent to match our borderless design */
-        border-color: transparent;
+        display: none !important; /* Remove Bootstrap's border arrow */
     }
     
+    /* Create arrow using ::after to match Figma */
     &::after {
-        /* Arrow fill color matches tooltip background */
-        border-color: transparent;
+        content: "" !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        border-style: solid !important;
+        border-color: transparent !important;
     }
 }
 
-/* Tooltip Arrow positioning - Bootstrap 4 uses bs-tooltip-* classes */
-/* Top placement */
-.tooltip.bs-tooltip-top .arrow::before,
-.tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before {
-    border-top-color: transparent;
+/* ============================================
+   Tooltip Arrow Positioning - Match Figma Exactly
+   Figma: Arrow rotates based on direction (0deg, 90deg, 180deg, 270deg)
+   ============================================ */
+
+/* Top placement - tooltip appears ABOVE trigger, arrow on BOTTOM CENTERED pointing DOWN */
+.tooltip.bs-tooltip-top,
+.tooltip.bs-tooltip-auto[x-placement^="top"] {
+    padding: 0 !important;
+    margin: 0 !important;
+    
+    .arrow {
+        /* Position arrow at bottom center of tooltip */
+        bottom: -5px !important; /* Arrow height (5px) - extends below tooltip */
+        left: 50% !important; /* Center horizontally */
+        transform: translateX(-50%) !important; /* Center the arrow itself */
+        width: 10px !important; /* Figma: w-[10px] */
+        height: 5px !important; /* Figma: h-[5px] */
+        
+        /* Arrow pointing DOWN towards trigger (triangle pointing down) */
+        &::after {
+            border-width: 5px 5px 0 5px !important; /* Creates downward triangle */
+            border-top-color: var(--color-inverse-surface) !important; /* #2e3133 */
+            border-bottom-color: transparent !important;
+            border-left-color: transparent !important;
+            border-right-color: transparent !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+    }
 }
 
-.tooltip.bs-tooltip-top .arrow::after,
-.tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::after {
-    border-top-color: var(--color-surface-container-high);
-    bottom: calc((0.5rem + 1px) * -1);
+/* Bottom placement - tooltip appears BELOW trigger, arrow on TOP CENTERED pointing UP */
+.tooltip.bs-tooltip-bottom,
+.tooltip.bs-tooltip-auto[x-placement^="bottom"] {
+    padding: 0 !important;
+    margin: 0 !important;
+    
+    .arrow {
+        /* Position arrow at top center of tooltip */
+        top: -5px !important; /* Arrow height (5px) - extends above tooltip */
+        left: 50% !important; /* Center horizontally */
+        transform: translateX(-50%) !important; /* Center the arrow itself */
+        width: 10px !important; /* Figma: w-[10px] */
+        height: 5px !important; /* Figma: h-[5px] */
+        
+        /* Arrow pointing UP towards trigger (triangle pointing up) */
+        &::after {
+            border-width: 0 5px 5px 5px !important; /* Creates upward triangle */
+            border-bottom-color: var(--color-inverse-surface) !important; /* #2e3133 */
+            border-top-color: transparent !important;
+            border-left-color: transparent !important;
+            border-right-color: transparent !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+    }
 }
 
-/* Bottom placement */
-.tooltip.bs-tooltip-bottom .arrow::before,
-.tooltip.bs-tooltip-auto[x-placement^="bottom"] .arrow::before {
-    border-bottom-color: transparent;
+/* Left placement - tooltip appears to LEFT of trigger, arrow on RIGHT CENTERED pointing RIGHT */
+.tooltip.bs-tooltip-left,
+.tooltip.bs-tooltip-auto[x-placement^="left"] {
+    padding: 0 !important;
+    margin: 0 !important;
+    
+    .arrow {
+        /* Position arrow at right center of tooltip */
+        right: -5px !important; /* Arrow width when rotated (5px) - extends right of tooltip */
+        top: 50% !important; /* Center vertically */
+        transform: translateY(-50%) !important; /* Center the arrow itself */
+        width: 5px !important; /* Rotated: h-[5px] becomes width */
+        height: 10px !important; /* Rotated: w-[10px] becomes height */
+        
+        /* Arrow pointing RIGHT towards trigger (triangle pointing right) */
+        &::after {
+            border-width: 5px 0 5px 5px !important; /* Creates rightward triangle */
+            border-left-color: var(--color-inverse-surface) !important; /* #2e3133 */
+            border-right-color: transparent !important;
+            border-top-color: transparent !important;
+            border-bottom-color: transparent !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+    }
 }
 
-.tooltip.bs-tooltip-bottom .arrow::after,
-.tooltip.bs-tooltip-auto[x-placement^="bottom"] .arrow::after {
-    border-bottom-color: var(--color-surface-container-high);
-    top: calc((0.5rem + 1px) * -1);
-}
-
-/* Left placement */
-.tooltip.bs-tooltip-left .arrow::before,
-.tooltip.bs-tooltip-auto[x-placement^="left"] .arrow::before {
-    border-left-color: transparent;
-}
-
-.tooltip.bs-tooltip-left .arrow::after,
-.tooltip.bs-tooltip-auto[x-placement^="left"] .arrow::after {
-    border-left-color: var(--color-surface-container-high);
-    right: calc((0.5rem + 1px) * -1);
-}
-
-/* Right placement */
-.tooltip.bs-tooltip-right .arrow::before,
-.tooltip.bs-tooltip-auto[x-placement^="right"] .arrow::before {
-    border-right-color: transparent;
-}
-
-.tooltip.bs-tooltip-right .arrow::after,
-.tooltip.bs-tooltip-auto[x-placement^="right"] .arrow::after {
-    border-right-color: var(--color-surface-container-high);
-    left: calc((0.5rem + 1px) * -1);
+/* Right placement - tooltip appears to RIGHT of trigger, arrow on LEFT CENTERED pointing LEFT */
+.tooltip.bs-tooltip-right,
+.tooltip.bs-tooltip-auto[x-placement^="right"] {
+    padding: 0 !important;
+    margin: 0 !important;
+    
+    .arrow {
+        /* Position arrow at left center of tooltip */
+        left: -5px !important; /* Arrow width when rotated (5px) - extends left of tooltip */
+        top: 50% !important; /* Center vertically */
+        transform: translateY(-50%) !important; /* Center the arrow itself */
+        width: 5px !important; /* Rotated: h-[5px] becomes width */
+        height: 10px !important; /* Rotated: w-[10px] becomes height */
+        
+        /* Arrow pointing LEFT towards trigger (triangle pointing left) */
+        &::after {
+            border-width: 5px 5px 5px 0 !important; /* Creates leftward triangle */
+            border-right-color: var(--color-inverse-surface) !important; /* #2e3133 */
+            border-left-color: transparent !important;
+            border-top-color: transparent !important;
+            border-bottom-color: transparent !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+    }
 }
 
 /* Size Variants */
 
 /* Small Tooltip */
 .plus-tooltip-small + .tooltip .tooltip-inner,
-.tooltip.plus-tooltip-small .tooltip-inner {
+.tooltip.plus-tooltip-small .tooltip-inner,
+[data-tooltip-size="small"] + .tooltip .tooltip-inner,
+.tooltip[data-tooltip-size="small"] .tooltip-inner {
     /* Figma: Small tooltip - pad-y-sm (4px), pad-x-sm (8px) */
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
     
@@ -123,25 +271,42 @@
     font-size: var(--font-size-body3);
     line-height: var(--font-line-height-body3);
     
+    /* Use inverse colors */
+    background-color: var(--color-inverse-surface) !important;
+    color: var(--color-inverse-on-surface) !important;
+    
     max-width: 150px;
 }
 
 /* Default Tooltip (already set above, but explicit for clarity) */
 .plus-tooltip-default + .tooltip .tooltip-inner,
-.tooltip.plus-tooltip-default .tooltip-inner {
-    /* Figma: Default tooltip - pad-y-md (6px), pad-x-md (10px) */
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+.tooltip.plus-tooltip-default .tooltip-inner,
+[data-tooltip-size="default"] + .tooltip .tooltip-inner,
+.tooltip[data-tooltip-size="default"] .tooltip-inner {
+    /* Figma: Default tooltip - pad-y-lg (8px), pad-x-sm (8px) */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-sm);
+    
+    /* Figma: Default tooltip content - Body/B2/Regular typography */
+    font-size: 14px;
+    line-height: 1.571;
+    font-weight: 300;
 }
 
 /* Large Tooltip */
 .plus-tooltip-large + .tooltip .tooltip-inner,
-.tooltip.plus-tooltip-large .tooltip-inner {
+.tooltip.plus-tooltip-large .tooltip-inner,
+[data-tooltip-size="large"] + .tooltip .tooltip-inner,
+.tooltip[data-tooltip-size="large"] .tooltip-inner {
     /* Figma: Large tooltip - pad-y-lg (8px), pad-x-lg (16px) */
     padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
     
     /* Figma: Large tooltip content - body1-txt typography */
     font-size: var(--font-size-body1);
     line-height: var(--font-line-height-body1);
+    
+    /* Use inverse colors */
+    background-color: var(--color-inverse-surface) !important;
+    color: var(--color-inverse-on-surface) !important;
     
     max-width: 300px;
 }
@@ -152,22 +317,52 @@
     cursor: help; /* Default cursor for tooltip triggers */
 }
 
-/* Override Bootstrap's default tooltip styles */
+/* ============================================
+   Final Bootstrap Overrides - Ensure Figma Design Always Wins
+   ============================================ */
+
+/* Override Bootstrap's default tooltip styles - Figma design takes absolute precedence */
 .tooltip {
-    /* Remove Bootstrap's default border */
-    border: none;
-    
-    /* Ensure proper z-index */
-    z-index: 1070;
+    /* Remove ALL Bootstrap defaults */
+    border: none !important;
+    z-index: 1070 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
-/* Tooltip fade animation (Bootstrap default) */
+/* Tooltip fade animation - Keep Bootstrap's fade but ensure visibility */
 .tooltip.fade {
-    opacity: 0;
-    transition: opacity 0.15s linear;
+    opacity: 0 !important;
+    transition: opacity 0.15s linear !important;
 }
 
 .tooltip.fade.show {
-    opacity: 1;
+    opacity: 1 !important;
+}
+
+/* Final override - Ensure tooltip inner ALWAYS matches Figma exactly */
+/* This overrides ANY Bootstrap inline styles or JavaScript-applied styles */
+.tooltip .tooltip-inner {
+    /* Figma: Background and text colors */
+    background-color: var(--color-inverse-surface) !important; /* #2e3133 */
+    color: var(--color-inverse-on-surface) !important; /* #f0f1f3 */
+    border: none !important;
+    border-radius: var(--size-element-radius-md) !important; /* 4px */
+    box-shadow: none !important; /* Figma: No shadow */
+    
+    /* Figma: Padding - EXACT values */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-sm) !important; /* 8px vertical, 8px horizontal */
+    
+    /* Figma: Typography - EXACT values */
+    font-family: var(--font-family-body) !important; /* Merriweather Sans */
+    font-weight: 300 !important; /* Light */
+    font-size: 14px !important;
+    line-height: 1.571 !important;
+    text-align: center !important;
+    
+    /* Figma: Max width */
+    max-width: 293.33px !important;
 }
 

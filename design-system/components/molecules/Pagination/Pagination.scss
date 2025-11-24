@@ -33,8 +33,12 @@
     background-color: var(--color-surface);
     overflow: hidden;
     
-    /* Default size (medium) - radius 6px */
-    border-radius: 6px; /* Figma: radius-150 = 6px */
+    /* Container border-radius matches first/last items for seamless appearance */
+    /* First item left radius, last item right radius */
+    border-top-left-radius: var(--size-element-radius-pill);
+    border-bottom-left-radius: var(--size-element-radius-pill);
+    border-top-right-radius: var(--size-element-radius-pill);
+    border-bottom-right-radius: var(--size-element-radius-pill);
 }
 
 /* ============================================
@@ -136,12 +140,6 @@
     border-bottom-right-radius: 0;
 }
 
-/* Text type: fully rounded (100px) - Figma specific value */
-.plus-pagination.plus-pagination-text .page-item:first-child .page-link {
-    border-top-left-radius: 100px; /* Figma: rounded-bl-[100px] rounded-tl-[100px] */
-    border-bottom-left-radius: 100px;
-}
-
 /* Last item - rounded corners on right only */
 /* Icon type: fully rounded (pill shape) */
 .plus-pagination .page-item:last-child .page-link {
@@ -152,10 +150,20 @@
     border-right: none;
 }
 
-/* Text type: fully rounded (100px) - Figma specific value */
+/* Text type: fully rounded (pill shape) - same as icon type */
+/* These rules come after the general rules to ensure proper override */
+.plus-pagination.plus-pagination-text .page-item:first-child .page-link {
+    border-top-left-radius: var(--size-element-radius-pill) !important; /* Fully rounded (pill shape) */
+    border-bottom-left-radius: var(--size-element-radius-pill) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
 .plus-pagination.plus-pagination-text .page-item:last-child .page-link {
-    border-top-right-radius: 100px; /* Figma: rounded-br-[100px] rounded-tr-[100px] */
-    border-bottom-right-radius: 100px;
+    border-top-right-radius: var(--size-element-radius-pill) !important; /* Fully rounded (pill shape) */
+    border-bottom-right-radius: var(--size-element-radius-pill) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }
 
 /* Middle items - no rounded corners */
@@ -190,6 +198,27 @@
     border-right: none;
 }
 
+/* Preserve border radius for first/last items in all states */
+.plus-pagination .page-item:first-child .page-link:hover,
+.plus-pagination .page-item:first-child .page-link:focus,
+.plus-pagination .page-item:first-child .page-link:active,
+.plus-pagination .page-item:first-child.active .page-link {
+    border-top-left-radius: var(--size-element-radius-pill) !important;
+    border-bottom-left-radius: var(--size-element-radius-pill) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.plus-pagination .page-item:last-child .page-link:hover,
+.plus-pagination .page-item:last-child .page-link:focus,
+.plus-pagination .page-item:last-child .page-link:active,
+.plus-pagination .page-item:last-child.active .page-link {
+    border-top-right-radius: var(--size-element-radius-pill) !important;
+    border-bottom-right-radius: var(--size-element-radius-pill) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
 /* Disabled state */
 .plus-pagination .page-item.disabled .page-link {
     color: color-mix(in srgb, var(--color-secondary-text) 38%, transparent);
@@ -214,7 +243,11 @@
 
 /* Small size */
 .plus-pagination.plus-pagination-small {
-    border-radius: 4px; /* Figma: radius-100 = 4px */
+    /* Container border-radius matches first/last items */
+    border-top-left-radius: var(--size-element-radius-pill);
+    border-bottom-left-radius: var(--size-element-radius-pill);
+    border-top-right-radius: var(--size-element-radius-pill);
+    border-bottom-right-radius: var(--size-element-radius-pill);
 }
 
 .plus-pagination.plus-pagination-small .page-link {
@@ -234,8 +267,10 @@
 }
 
 .plus-pagination.plus-pagination-small.plus-pagination-text .page-item:first-child .page-link {
-    border-top-left-radius: 100px; /* Figma: rounded-bl-[100px] rounded-tl-[100px] */
-    border-bottom-left-radius: 100px;
+    border-top-left-radius: var(--size-element-radius-pill) !important; /* Fully rounded (pill shape) */
+    border-bottom-left-radius: var(--size-element-radius-pill) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 .plus-pagination.plus-pagination-small .page-item:last-child .page-link {
@@ -244,13 +279,19 @@
 }
 
 .plus-pagination.plus-pagination-small.plus-pagination-text .page-item:last-child .page-link {
-    border-top-right-radius: 100px; /* Figma: rounded-br-[100px] rounded-tr-[100px] */
-    border-bottom-right-radius: 100px;
+    border-top-right-radius: var(--size-element-radius-pill) !important; /* Fully rounded (pill shape) */
+    border-bottom-right-radius: var(--size-element-radius-pill) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }
 
 /* Large size */
 .plus-pagination.plus-pagination-large {
-    border-radius: 8px; /* Figma: radius-200 = 8px */
+    /* Container border-radius matches first/last items */
+    border-top-left-radius: var(--size-element-radius-pill);
+    border-bottom-left-radius: var(--size-element-radius-pill);
+    border-top-right-radius: var(--size-element-radius-pill);
+    border-bottom-right-radius: var(--size-element-radius-pill);
 }
 
 .plus-pagination.plus-pagination-large .page-link {
@@ -270,8 +311,10 @@
 }
 
 .plus-pagination.plus-pagination-large.plus-pagination-text .page-item:first-child .page-link {
-    border-top-left-radius: 100px; /* Figma: rounded-bl-[100px] rounded-tl-[100px] */
-    border-bottom-left-radius: 100px;
+    border-top-left-radius: var(--size-element-radius-pill) !important; /* Fully rounded (pill shape) */
+    border-bottom-left-radius: var(--size-element-radius-pill) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 .plus-pagination.plus-pagination-large .page-item:last-child .page-link {
@@ -280,6 +323,8 @@
 }
 
 .plus-pagination.plus-pagination-large.plus-pagination-text .page-item:last-child .page-link {
-    border-top-right-radius: 100px; /* Figma: rounded-br-[100px] rounded-tr-[100px] */
-    border-bottom-right-radius: 100px;
+    border-top-right-radius: var(--size-element-radius-pill) !important; /* Fully rounded (pill shape) */
+    border-bottom-right-radius: var(--size-element-radius-pill) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }

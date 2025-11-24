@@ -76,6 +76,8 @@ export const AllVariants = {
         menu.style.transform = 'none';
         menu.style.opacity = '1';
         menu.style.marginTop = '0';
+        // Add show class for Bootstrap compatibility
+        menu.classList.add('show');
       }
       
       // Hide the button, only show the menu

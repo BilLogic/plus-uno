@@ -61,8 +61,8 @@
 
 .list-group-item.plus-list-group-item {
     /* Override Bootstrap's default padding: 0.75rem 1.25rem (12px 20px) */
-    /* Figma: py-[var(--element/pad-y-md,6px)] px-[var(--element/pad-x-md,10px)] = 6px vertical, 10px horizontal */
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md) !important;
+    /* Figma: py-[var(--element/pad-y-lg,8px)] px-[var(--element/pad-x-lg,16px)] = 8px vertical, 16px horizontal */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg) !important;
     
     /* No borders on items - only divider lines between items */
     border: none !important;
@@ -79,11 +79,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Figma: gap-[var(--element/gap-sm,8px)] = 8px between content and badge */
-    gap: var(--size-element-gap-sm);
+    /* Figma: gap-[var(--element/gap-lg,12px)] = 12px between content and badge */
+    gap: var(--size-element-gap-lg);
     
-    /* Typography handled by .body2-txt class */
-    /* Figma: Body/B2/Regular - Merriweather Sans Light, 14px, weight 300, line-height 157.1% */
+    /* Typography handled by .body1-txt class */
+    /* Figma: Body/B1/Regular - Merriweather Sans Light, 16px, weight 300, line-height 1.5 */
     
     /* Override Bootstrap defaults */
     margin-bottom: 0; /* Bootstrap default: -1px */
@@ -161,13 +161,13 @@
    ACTIVE STATE (Bootstrap 4.6.2 .active)
    ============================================ */
 /* Bootstrap 4.6.2: .active uses primary color (#007bff) and white text */
-/* We override to match Figma: primary-container background, on-primary-container text */
+/* We override to match Figma: primary-state-08 background, on-primary-container text */
 
 .list-group-item.plus-list-group-item.active {
     /* Override Bootstrap's default: background-color: #007bff, color: #fff */
-    /* Figma: bg-[var(--_primary/primary-container,#d0e8f4)] = #61b5cf (token value) */
-    background-color: var(--color-primary-container) !important; /* #61b5cf */
-    /* Figma: text-[color:var(--_primary/on-primary-container,#001d2e)] = #001e2e (token value) */
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important; /* rgba(0, 101, 142, 0.08) */
+    /* Figma: text-[color:var(--_primary/on-primary-container,#001e2e)] = #001e2e (token value) */
     color: var(--color-on-primary-container) !important; /* #001e2e */
     /* Active items use primary color for divider (if not last item) */
     z-index: 2;
@@ -180,6 +180,13 @@
 
 .list-group-item.plus-list-group-item.active .plus-list-group-item-content {
     color: var(--color-on-primary-container) !important;
+}
+
+/* Active item badges use solid primary color background (not state layer) */
+.list-group-item.plus-list-group-item.active .plus-list-group-item-badge .plus-badge.primary {
+    /* Figma: bg-[var(--_primary/primary,#0472a8)] = solid primary color for active item badge */
+    background-color: var(--color-primary) !important; /* #0472a8 */
+    color: var(--color-on-primary) !important; /* #ffffff */
 }
 
 /* ============================================
@@ -263,7 +270,8 @@
 
 /* Active + Action state */
 .list-group-item.plus-list-group-item.list-group-item-action.active {
-    background-color: var(--color-primary-container) !important;
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important;
     color: var(--color-on-primary-container) !important;
 }
 
@@ -273,13 +281,14 @@
 }
 
 .list-group-item.plus-list-group-item.list-group-item-action.active:hover {
-    /* Figma: bg-[var(--state-layers/primary-container/opacity-0_12)] = primary-container state 12% */
-    background-color: var(--color-primary-container-state-12) !important;
+    /* Figma: bg-[var(--_primary/state-layers/primary-12)] = primary state 12% */
+    background-color: var(--color-primary-state-12) !important;
     color: var(--color-on-primary-container) !important;
 }
 
 .list-group-item.plus-list-group-item.list-group-item-action.active:focus {
-    background-color: var(--color-primary-container) !important;
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important;
     color: var(--color-on-primary-container) !important;
     box-shadow: 0 0 0 2px var(--color-primary-state-16) !important;
 }
@@ -543,7 +552,8 @@
 
 /* Override Bootstrap's default active state globally */
 .list-group-item.active {
-    background-color: var(--color-primary-container) !important;
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important;
     color: var(--color-on-primary-container) !important;
 }
 

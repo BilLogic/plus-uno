@@ -105,14 +105,20 @@ export const AllStyles = {
     stylesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
     stylesSection.appendChild(stylesLabel);
     
-    // Show all style variants directly
-    const styles = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+    // Show all style variants directly (matching Figma order)
+    const styles = [
+      { value: 'default', label: 'Default' },
+      { value: 'danger', label: 'Danger' },
+      { value: 'success', label: 'Success' },
+      { value: 'info', label: 'Info' },
+      { value: 'warning', label: 'Warning' }
+    ];
     
     styles.forEach((style) => {
       const toast = createStaticToast({
-        style: style,
-        title: 'Toast Title',
-        text: `This is a ${style} toast notification.`,
+        style: style.value,
+        title: 'Title',
+        text: 'Hello, world! This is a toast message.',
         dismissable: true,
       });
       stylesSection.appendChild(toast);
@@ -147,28 +153,20 @@ export const ContentVariants = {
     contentLabel.style.marginBottom = 'var(--size-element-gap-sm)';
     contentSection.appendChild(contentLabel);
     
-    // With title
+    // With title and dismissible
     const withTitle = createStaticToast({
       style: 'success',
-      title: 'Success',
-      text: 'Your changes have been saved successfully.',
+      title: 'Title',
+      text: 'Hello, world! This is a toast message.',
       dismissable: true,
     });
     contentSection.appendChild(withTitle);
     
-    // Without title
-    const withoutTitle = createStaticToast({
-      style: 'info',
-      text: 'This is a simple toast without a title.',
-      dismissable: true,
-    });
-    contentSection.appendChild(withoutTitle);
-    
-    // Non-dismissible
+    // Non-dismissible (no close button)
     const nonDismissible = createStaticToast({
-      style: 'warning',
-      title: 'Warning',
-      text: 'This toast cannot be manually closed (no close button).',
+      style: 'info',
+      title: 'Title',
+      text: 'Hello, world! This is a toast message.',
       dismissable: false,
     });
     contentSection.appendChild(nonDismissible);
@@ -218,9 +216,9 @@ export const PositionVariants = {
       positionSection.appendChild(label);
       
       const toast = createStaticToast({
-        style: 'primary',
-        title: 'Position Example',
-        text: `This toast would appear in the ${pos.label.toLowerCase()}.`,
+        style: 'default',
+        title: 'Title',
+        text: 'Hello, world! This is a toast message.',
         dismissable: true,
       });
       positionSection.appendChild(toast);
@@ -272,7 +270,7 @@ export const AutoDismissDelay = {
       
       const toast = createStaticToast({
         style: 'info',
-        title: 'Auto-dismiss',
+        title: 'Title',
         text: `This toast would ${delay.value === 0 ? 'not auto-dismiss' : `auto-dismiss in ${delay.label}`}.`,
         dismissable: true,
       });
@@ -311,24 +309,24 @@ export const StackedToasts = {
     // Show multiple toasts stacked
     const firstToast = createStaticToast({
       style: 'success',
-      title: 'First Toast',
-      text: 'This is the first toast in the stack.',
+      title: 'Title',
+      text: 'Hello, world! This is a toast message.',
       dismissable: true,
     });
     stackSection.appendChild(firstToast);
     
     const secondToast = createStaticToast({
       style: 'info',
-      title: 'Second Toast',
-      text: 'This is the second toast in the stack.',
+      title: 'Title',
+      text: 'Hello, world! This is a toast message.',
       dismissable: true,
     });
     stackSection.appendChild(secondToast);
     
     const thirdToast = createStaticToast({
       style: 'warning',
-      title: 'Third Toast',
-      text: 'This is the third toast in the stack.',
+      title: 'Title',
+      text: 'Hello, world! This is a toast message.',
       dismissable: true,
     });
     stackSection.appendChild(thirdToast);

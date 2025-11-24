@@ -33,19 +33,9 @@
  * - **Default**: Standard size spinner (default)
  * - **Large**: Prominent spinner for full-page loading
  * 
- * ### Style Variants
- * - **Primary**: Default blue spinner (most common)
- * - **Secondary**: Secondary color spinner
- * - **Tertiary**: Tertiary color spinner
- * - **Success**: Green spinner for successful operations
- * - **Danger**: Red spinner for errors or critical operations
- * - **Warning**: Yellow/orange spinner for warnings
- * - **Info**: Info color spinner
- * 
  * ### Best Practices
  * - Always include ARIA attributes for accessibility (automatically set)
  * - Provide meaningful screen reader labels
- * - Use appropriate colors for context (primary for general loading, success for positive operations)
  * - Match spinner size to the context (small for buttons, default for inline, large for full-page)
  * - Don't show spinner for operations under 200ms to avoid flickering
  * - Consider using skeleton loaders for content placeholders
@@ -63,7 +53,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'Spinner component for indicating loading states. Built on Bootstrap 4.6.2 spinner-border pattern. Customized with PLUS design tokens for colors and sizing.',
+        component: 'Spinner component for indicating loading states. Built on Bootstrap 4.6.2 spinner-border pattern. Uses fixed black color (--color-on-surface-variant) and supports multiple sizes.',
       },
     },
   },
@@ -71,7 +61,7 @@ export default {
 
 /**
  * All Variants
- * Shows all spinner combinations: sizes and styles
+ * Shows all spinner size variants
  */
 export const AllVariants = {
   render: () => {
@@ -108,7 +98,6 @@ export const AllVariants = {
       wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const spinner = PlusInterface.createSpinner({
-        style: 'primary',
         size: size,
         label: `Loading (${size})...`
       });
@@ -124,51 +113,6 @@ export const AllVariants = {
     
     sizesSection.appendChild(sizesContainer);
     container.appendChild(sizesSection);
-    
-    // Styles section
-    const stylesSection = document.createElement('div');
-    stylesSection.style.display = 'flex';
-    stylesSection.style.flexDirection = 'column';
-    stylesSection.style.gap = 'var(--size-element-gap-sm)';
-    
-    const stylesLabel = document.createElement('div');
-    stylesLabel.className = 'h6';
-    stylesLabel.textContent = 'Styles';
-    stylesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    stylesSection.appendChild(stylesLabel);
-    
-    const stylesContainer = document.createElement('div');
-    stylesContainer.style.display = 'flex';
-    stylesContainer.style.flexDirection = 'row';
-    stylesContainer.style.alignItems = 'center';
-    stylesContainer.style.gap = 'var(--size-card-gap-md)';
-    stylesContainer.style.flexWrap = 'wrap';
-    
-    const styles = ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning', 'info'];
-    styles.forEach((style) => {
-      const wrapper = document.createElement('div');
-      wrapper.style.display = 'flex';
-      wrapper.style.flexDirection = 'column';
-      wrapper.style.alignItems = 'center';
-      wrapper.style.gap = 'var(--size-element-gap-sm)';
-      
-      const spinner = PlusInterface.createSpinner({
-        style: style,
-        size: 'default',
-        label: `Loading (${style})...`
-      });
-      wrapper.appendChild(spinner);
-      
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.textContent = style.charAt(0).toUpperCase() + style.slice(1);
-      wrapper.appendChild(label);
-      
-      stylesContainer.appendChild(wrapper);
-    });
-    
-    stylesSection.appendChild(stylesContainer);
-    container.appendChild(stylesSection);
     
     return container;
   },
@@ -196,11 +140,6 @@ export const Interactive = {
     return container;
   },
   argTypes: {
-    style: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning', 'info'],
-      description: 'Spinner style/color',
-    },
     size: {
       control: 'select',
       options: ['small', 'default', 'large'],
@@ -212,7 +151,6 @@ export const Interactive = {
     },
   },
   args: {
-    style: 'primary',
     size: 'default',
     label: 'Loading...',
   },
@@ -235,7 +173,7 @@ export const InlineUsage = {
     inline1.style.display = 'flex';
     inline1.style.alignItems = 'center';
     inline1.style.gap = 'var(--size-element-gap-sm)';
-    inline1.appendChild(PlusInterface.createSpinner({ style: 'primary', size: 'small', label: 'Loading...' }));
+    inline1.appendChild(PlusInterface.createSpinner({ size: 'small', label: 'Loading...' }));
     inline1.appendChild(document.createTextNode('Loading data...'));
     container.appendChild(inline1);
     
@@ -246,7 +184,7 @@ export const InlineUsage = {
     button.style.display = 'flex';
     button.style.alignItems = 'center';
     button.style.gap = 'var(--size-element-gap-sm)';
-    button.appendChild(PlusInterface.createSpinner({ style: 'primary', size: 'small', label: 'Submitting...' }));
+    button.appendChild(PlusInterface.createSpinner({ size: 'small', label: 'Submitting...' }));
     button.appendChild(document.createTextNode('Submit'));
     buttonWrapper.appendChild(button);
     container.appendChild(buttonWrapper);
@@ -257,13 +195,15 @@ export const InlineUsage = {
     centerWrapper.style.flexDirection = 'column';
     centerWrapper.style.alignItems = 'center';
     centerWrapper.style.gap = 'var(--size-element-gap-sm)';
-    centerWrapper.appendChild(PlusInterface.createSpinner({ style: 'primary', size: 'large', label: 'Loading page...' }));
+    centerWrapper.appendChild(PlusInterface.createSpinner({ size: 'large', label: 'Loading page...' }));
     centerWrapper.appendChild(document.createTextNode('Loading page content...'));
     container.appendChild(centerWrapper);
     
     return container;
   },
 };
+
+
 
 
 

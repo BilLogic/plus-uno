@@ -65,8 +65,8 @@ export class PlusInterface {
     static createPagination = UniversalComponents.createPagination;
     static createTooltip = UniversalComponents.createTooltip;
     static createTooltipButton = UniversalComponents.createTooltipButton;
-    static initScrollspy = UniversalComponents.initScrollspy;
     static createScrollspy = UniversalComponents.createScrollspy;
+    static createScrollspyContent = UniversalComponents.createScrollspyContent;
     static createProgress = UniversalComponents.createProgress;
     static updateProgress = UniversalComponents.updateProgress;
     static createSpinner = UniversalComponents.createSpinner;

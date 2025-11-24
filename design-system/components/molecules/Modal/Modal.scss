@@ -86,15 +86,26 @@
 
 /* Modal Header */
 /* Figma: content-stretch flex gap-[var(--modal/gap-md,12px)] items-center relative shrink-0 w-full */
+/* For modals with buttons: gap-[var(--modal/gap-md,12px)] */
+/* For modals without buttons: gap-[var(--element/gap-lg,12px)] */
 .plus-modal-header {
     display: flex;
     flex-direction: row; /* Ensure horizontal layout */
-    gap: var(--size-modal-gap-md); /* 12px gap between title and close button */
     align-items: center;
     width: 100%;
     margin: 0;
     padding: 0;
     flex-shrink: 0; /* Don't shrink */
+}
+
+/* Header gap for modals with buttons */
+.plus-modal-with-buttons .plus-modal-header {
+    gap: var(--size-modal-gap-md); /* 12px gap between title and close button - Figma: gap-[var(--modal/gap-md,12px)] */
+}
+
+/* Header gap for modals without buttons */
+.plus-modal-no-buttons .plus-modal-header {
+    gap: var(--size-element-gap-lg); /* 12px gap between title and close button - Figma: gap-[var(--element/gap-lg,12px)] */
 }
 
 /* Modal Title */
@@ -113,8 +124,7 @@
 }
 
 /* Modal Close Button */
-/* Figma: Icon component with iconName="xmark", style="solid", size="h3" (24px) */
-/* Figma: text-[24px] leading-[1.667] - Fontawesome/Solid/H3 */
+/* Figma: Icon component with iconName="xmark", style="solid" */
 /* Figma: content-stretch flex items-center justify-center relative shrink-0 */
 .plus-modal-close-btn {
     position: relative;
@@ -163,14 +173,27 @@
     }
     
     i {
-        font-size: 24px; /* H3 icon size - Figma: text-[24px] */
-        line-height: 1.667; /* Figma: leading-[1.667] */
         display: inline-block;
         width: auto;
         height: auto;
         margin: 0;
         padding: 0;
     }
+}
+
+/* Close button with h5 size (16px) - for modals with buttons */
+/* Figma: Icon size="h5" (16px) - Fontawesome/Solid/H5 */
+.plus-modal-close-btn-h5 i {
+    font-size: 16px; /* H5 icon size - Figma: size="h5" */
+    line-height: 1.75; /* Figma: leading-[1.75] */
+}
+
+/* Close button with h3 size (24px) - for modals without buttons */
+/* Figma: Icon size="h3" (24px) - Fontawesome/Solid/H3 */
+/* Figma: text-[24px] leading-[1.667] */
+.plus-modal-close-btn-h3 i {
+    font-size: 24px; /* H3 icon size - Figma: text-[24px] */
+    line-height: 1.667; /* Figma: leading-[1.667] */
 }
 
 /* Modal Divider */
@@ -239,10 +262,16 @@
 }
 
 /* Scrollable type content - has gap for multiple content elements */
-/* Figma: basis-0 content-stretch flex gap-[var(--modal/gap-md,12px)] grow h-full items-start min-h-px min-w-px */
-.plus-modal-scrollable .plus-modal-content {
+/* For modals with buttons: gap-[var(--modal/gap-md,12px)] */
+/* For modals without buttons: gap-[var(--element/gap-lg,12px)] */
+.plus-modal-scrollable.plus-modal-with-buttons .plus-modal-content {
     /* Gap is for spacing between multiple content elements */
     gap: var(--size-modal-gap-md); /* 12px gap - Figma: gap-[var(--modal/gap-md,12px)] */
+}
+
+.plus-modal-scrollable.plus-modal-no-buttons .plus-modal-content {
+    /* Gap is for spacing between multiple content elements */
+    gap: var(--size-element-gap-lg); /* 12px gap - Figma: gap-[var(--element/gap-lg,12px)] */
 }
 
 /* Modal Scrollbar (for scrollable type) */
@@ -339,32 +368,40 @@
 }
 
 /* Default type without buttons - different padding */
+/* Figma: No container padding - header and body handle their own */
 .plus-modal-default.plus-modal-no-buttons {
     padding: 0; /* No container padding - header and body handle their own */
 }
 
+/* Figma: px-[var(--spacing/medium/space-300,16px)] py-[var(--element/pad-y-lg,8px)] */
 .plus-modal-default.plus-modal-no-buttons .plus-modal-header {
     padding: var(--size-element-pad-y-lg) var(--size-spacing-medium-space-300); /* 8px top/bottom, 16px left/right */
-    gap: var(--size-element-gap-lg); /* 12px gap between title and close button */
+    gap: var(--size-element-gap-lg); /* 12px gap between title and close button - Figma: gap-[var(--element/gap-lg,12px)] */
 }
 
+/* Figma: px-[var(--element/pad-x-lg,16px)] py-[var(--element/pad-y-lg,8px)] */
+/* Figma: gap-[var(--spacing/small/space-150,10px)] */
 .plus-modal-default.plus-modal-no-buttons .plus-modal-body {
-    padding: var(--size-element-pad-x-lg) var(--size-element-pad-y-lg); /* 16px left/right, 8px top/bottom */
-    gap: var(--size-spacing-small-space-150); /* 10px gap between content and scrollbar (if scrollable) */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg); /* 8px top/bottom, 16px left/right - Figma: py-[var(--element/pad-y-lg,8px)] px-[var(--element/pad-x-lg,16px)] */
+    gap: var(--size-spacing-small-space-150); /* 10px gap between content and scrollbar (if scrollable) - Figma: gap-[var(--spacing/small/space-150,10px)] */
 }
 
 /* Scrollable type without buttons - different padding */
+/* Figma: No container padding - header and body handle their own */
 .plus-modal-scrollable.plus-modal-no-buttons {
     padding: 0; /* No container padding - header and body handle their own */
 }
 
+/* Figma: px-[var(--spacing/medium/space-300,16px)] py-[var(--element/pad-y-lg,8px)] */
 .plus-modal-scrollable.plus-modal-no-buttons .plus-modal-header {
     padding: var(--size-element-pad-y-lg) var(--size-spacing-medium-space-300); /* 8px top/bottom, 16px left/right */
-    gap: var(--size-element-gap-lg); /* 12px gap between title and close button */
+    gap: var(--size-element-gap-lg); /* 12px gap between title and close button - Figma: gap-[var(--element/gap-lg,12px)] */
 }
 
+/* Figma: px-[var(--element/pad-x-lg,16px)] py-[var(--element/pad-y-lg,8px)] */
+/* Figma: gap-[var(--spacing/small/space-150,10px)] */
 .plus-modal-scrollable.plus-modal-no-buttons .plus-modal-body {
-    padding: var(--size-element-pad-x-lg) var(--size-element-pad-y-lg); /* 16px left/right, 8px top/bottom */
-    gap: var(--size-spacing-small-space-150); /* 10px gap between content and scrollbar */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg); /* 8px top/bottom, 16px left/right - Figma: py-[var(--element/pad-y-lg,8px)] px-[var(--element/pad-x-lg,16px)] */
+    gap: var(--size-spacing-small-space-150); /* 10px gap between content and scrollbar - Figma: gap-[var(--spacing/small/space-150,10px)] */
 }
 

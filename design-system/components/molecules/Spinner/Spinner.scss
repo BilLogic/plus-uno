@@ -21,14 +21,10 @@
     width: 2rem;
     height: 2rem;
     vertical-align: text-bottom;
-    border: 0.25em solid currentColor;
+    border: 0.25em solid var(--color-on-surface-variant);
     border-right-color: transparent;
     border-radius: 50%;
     animation: spinner-border 0.75s linear infinite;
-    
-    /* Override Bootstrap's default color with transparent for base */
-    /* Individual style variants will set the color */
-    color: transparent;
 }
 
 /* ============================================
@@ -54,59 +50,6 @@
     width: 3rem;
     height: 3rem;
     border-width: 0.375em;
-}
-
-/* ============================================
-   STYLE VARIANTS (Color)
-   ============================================ */
-
-/* Primary style - uses primary color token */
-.plus-spinner.plus-spinner-primary {
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-    border-right-color: transparent;
-}
-
-/* Secondary style - uses secondary color token */
-.plus-spinner.plus-spinner-secondary {
-    color: var(--color-secondary);
-    border-color: var(--color-secondary);
-    border-right-color: transparent;
-}
-
-/* Tertiary style - uses tertiary color token */
-.plus-spinner.plus-spinner-tertiary {
-    color: var(--color-tertiary);
-    border-color: var(--color-tertiary);
-    border-right-color: transparent;
-}
-
-/* Success style - uses success color token */
-.plus-spinner.plus-spinner-success {
-    color: var(--color-success);
-    border-color: var(--color-success);
-    border-right-color: transparent;
-}
-
-/* Danger style - uses danger color token */
-.plus-spinner.plus-spinner-danger {
-    color: var(--color-danger);
-    border-color: var(--color-danger);
-    border-right-color: transparent;
-}
-
-/* Warning style - uses warning color token */
-.plus-spinner.plus-spinner-warning {
-    color: var(--color-warning);
-    border-color: var(--color-warning);
-    border-right-color: transparent;
-}
-
-/* Info style - uses info color token */
-.plus-spinner.plus-spinner-info {
-    color: var(--color-info);
-    border-color: var(--color-info);
-    border-right-color: transparent;
 }
 
 /* ============================================
@@ -141,6 +84,8 @@
     outline: 2px solid var(--color-inverse-primary);
     outline-offset: 2px;
 }
+
+
 
 
 

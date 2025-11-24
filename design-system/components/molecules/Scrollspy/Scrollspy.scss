@@ -1,11 +1,49 @@
 /**
  * Scrollspy Component Styles
- * Matches Figma design system specifications
- * Scrollspy automatically updates navigation based on scroll position
+ * Matches Figma design system specifications exactly
+ * Scrollspy navbar with pills navigation that updates based on scroll position
  * 
  * Component Type: Section (uses `section-*` tokens for content, `element-*` tokens for navigation)
  * States: default, active (when section is in view)
  */
+
+/* Scrollspy Navbar */
+/* Figma: bg-[var(--neutral-colors/surface-container/surface-container-low,#f3f3f6)] */
+.plus-scrollspy-navbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: var(--color-surface-container-low);
+    /* Figma: px-[var(--spacing/medium/space-300,16px)] py-[var(--spacing/small/space-100,8px)] */
+    padding: var(--size-spacing-small-space-100) var(--size-spacing-medium-space-300); /* 8px top/bottom, 16px left/right */
+    /* Figma: gap-[var(--spacing/small/space-100,8px)] */
+    gap: var(--size-spacing-small-space-100); /* 8px gap between items */
+    box-sizing: border-box;
+}
+
+/* Scrollspy Brand */
+/* Figma: px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-md,6px)] */
+.plus-scrollspy-brand {
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md); /* 6px top/bottom, 10px left/right */
+    flex-shrink: 0;
+}
+
+.plus-scrollspy-brand p {
+    margin: 0;
+    /* Typography handled by .body-lead-txt class */
+    /* Figma: Merriweather Sans Light 20px, line-height 1.6 */
+}
+
+/* Scrollspy Spacer */
+/* Figma: basis-0 flex flex-row grow items-center self-stretch shrink-0 */
+.plus-scrollspy-spacer {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Scrollspy uses pills navigation - styles inherited from Navigation.scss */
+/* Active pill styling is handled by .plus-nav-pills .plus-nav-item-selected */
 
 /* Scrollspy Content Container */
 .plus-scrollspy-content {
@@ -18,56 +56,88 @@
 /* Scrollspy Section */
 .plus-scrollspy-section {
     position: relative;
-    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
-    margin-bottom: var(--size-section-gap-md);
-    min-height: 400px; /* Ensure sections are tall enough for scrollspy to work */
+    /* Different sections have different padding patterns per Figma */
+    /* Some use p-[16px], some use p-[var(--spacing/medium/space-300,16px)] */
+    /* Some use gap-[4px], some use gap-[var(--spacing/small/space-050,4px)] */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
-.plus-scrollspy-section-title {
-    margin-bottom: var(--size-section-gap-sm);
-    color: var(--color-on-surface);
+/* Section with gap-[var(--spacing/small/space-050,4px)] and p-[var(--spacing/medium/space-300,16px)] */
+.plus-scrollspy-section:first-child {
+    /* Figma: gap-[var(--spacing/small/space-050,4px)] p-[var(--spacing/medium/space-300,16px)] */
+    gap: var(--size-spacing-small-space-050); /* 4px gap */
+    padding: var(--size-spacing-medium-space-300); /* 16px all sides */
+}
+
+/* Section with gap-[4px] and p-[16px] */
+.plus-scrollspy-section:not(:first-child) {
+    /* Figma: gap-[4px] p-[16px] */
+    gap: 4px;
+    padding: 16px;
+}
+
+/* Section Title/Heading */
+/* Figma: Lato SemiBold 24px, line-height 1.333 */
+.plus-scrollspy-section h4 {
+    margin: 0;
+    /* Typography handled by .h4 class */
+    /* Figma: Lato SemiBold 24px */
+}
+
+/* Section Content */
+.plus-scrollspy-section .body1-txt {
+    margin: 0;
+    /* Typography handled by .body1-txt class */
+    /* Figma: Merriweather Sans Light 16px, line-height 1.5 */
 }
 
 /* Active Navigation Item Styling */
 /* Bootstrap's scrollspy adds .active class to nav links when their target section is in view */
-/* We override Bootstrap's default active styles with PLUS design tokens */
 /* JavaScript syncs .active on link to .plus-nav-item-selected on parent item */
 
-/* Ensure active nav items use PLUS design system colors */
-.plus-nav .plus-nav-link.active .plus-nav-text {
-    font-weight: var(--font-weight-normal); /* Regular (400) for active */
-}
-
-/* Horizontal/Tabs Navigation - Active State */
-.plus-nav-horizontal .plus-nav-link.active .plus-nav-text,
-.plus-nav-tabs .plus-nav-link.active .plus-nav-text {
-    color: var(--color-secondary-text); /* Secondary text color for active */
-}
-
-/* When link is active, parent item should have selected styling */
-.plus-nav-horizontal .plus-nav-item-selected,
-.plus-nav-tabs .plus-nav-item-selected {
-    border-bottom: 2px solid var(--color-secondary); /* 2px border, secondary color */
-}
-
-/* Vertical Navigation - Active State */
-.plus-nav-vertical .plus-nav-link.active .plus-nav-text {
-    color: var(--color-primary-text); /* Primary text color for active */
-}
-
-.plus-nav-vertical .plus-nav-item-selected {
-    border: 1px solid var(--color-primary); /* Primary border for active */
+/* Regular pills use primary color when active */
+.plus-scrollspy-navbar .plus-nav-item-selected:not(.plus-nav-item-dropdown) {
+    /* Figma: border border-[var(--_primary/primary,#0472a8)] */
+    border: 1px solid var(--color-primary);
     border-radius: var(--size-element-radius-md);
 }
 
-/* Pills Navigation - Active State */
-.plus-nav-pills .plus-nav-link.active .plus-nav-text {
-    color: var(--color-primary-text); /* Primary text color for active */
+.plus-scrollspy-navbar .plus-nav-item-selected:not(.plus-nav-item-dropdown) .plus-nav-text {
+    /* Figma: text-[color:var(--_primary/primary-(text),#00547e)] */
+    color: var(--color-primary-text);
+    font-weight: var(--font-weight-normal); /* Regular (400) */
 }
 
-.plus-nav-pills .plus-nav-item-selected {
-    border: 1px solid var(--color-primary); /* Primary border for active */
+/* Dropdown pill uses tertiary color when active */
+.plus-scrollspy-navbar .plus-nav-item-dropdown.plus-nav-item-selected {
+    /* Figma: border border-[var(--_tertiary/tertiary,#0e8175)] */
+    border: 1px solid var(--color-tertiary);
     border-radius: var(--size-element-radius-md);
+}
+
+.plus-scrollspy-navbar .plus-nav-item-dropdown.plus-nav-item-selected .plus-nav-text {
+    /* Figma: text-[color:var(--_tertiary/tertiary-(text),#005a50)] */
+    color: var(--color-tertiary-text);
+    font-weight: var(--font-weight-normal); /* Regular (400) */
+}
+
+.plus-scrollspy-navbar .plus-nav-item-dropdown.plus-nav-item-selected .plus-nav-dropdown-icon {
+    /* Figma: text-[color:var(--_tertiary/tertiary,#0e8175)] */
+    color: var(--color-tertiary);
+}
+
+/* Inactive pills */
+.plus-scrollspy-navbar .plus-nav-item:not(.plus-nav-item-selected) .plus-nav-text {
+    /* Figma: text-[color:var(--neutral-colors/on-surface,#191c1e)] */
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-light); /* Light (300) */
+}
+
+.plus-scrollspy-navbar .plus-nav-item:not(.plus-nav-item-selected) .plus-nav-dropdown-icon {
+    /* Figma: text-[color:var(--neutral-colors/on-surface-variant,#3f484a)] */
+    color: var(--color-on-surface-variant);
 }
 
 /* Smooth scrolling behavior */
@@ -76,25 +146,8 @@ html {
 }
 
 /* Focus styles for keyboard navigation */
-.plus-nav-link:focus-visible {
+.plus-scrollspy-navbar .plus-nav-link:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
     border-radius: 2px;
 }
-
-/* Scrollspy with fixed navigation */
-.plus-scrollspy-fixed-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    background-color: var(--color-surface-container-high);
-    box-shadow: var(--elevation-light-2);
-}
-
-/* Adjust content padding when using fixed navigation */
-.plus-scrollspy-content.with-fixed-nav {
-    padding-top: 80px; /* Adjust based on nav height */
-}
-

@@ -62,6 +62,11 @@ export function createTooltip({
     triggerElement.setAttribute("data-placement", placement);
     triggerElement.setAttribute("data-trigger", triggerType);
     
+    // Add data attribute for size (for CSS targeting)
+    if (size) {
+        triggerElement.setAttribute("data-tooltip-size", size);
+    }
+    
     // Use title attribute for tooltip text (Bootstrap 4.6.2 standard)
     if (html) {
         triggerElement.setAttribute("data-html", "true");
@@ -74,7 +79,18 @@ export function createTooltip({
     if (typeof $ !== "undefined") {
         $(triggerElement).tooltip({
             html: html,
-            container: "body"
+            container: "body",
+            // Ensure tooltip gets proper classes when shown
+            template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+        });
+        
+        // After tooltip is shown, apply size class to tooltip element
+        $(triggerElement).on('shown.bs.tooltip', function() {
+            const tooltipElement = document.querySelector('.tooltip.show');
+            if (tooltipElement && size && size !== "default") {
+                tooltipElement.classList.add(`plus-tooltip-${size}`);
+                tooltipElement.setAttribute("data-tooltip-size", size);
+            }
         });
     } else {
         console.warn("Tooltip: jQuery is required for Bootstrap tooltip functionality");

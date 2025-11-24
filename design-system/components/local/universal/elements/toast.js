@@ -87,12 +87,35 @@ export function createToast({
         const header = document.createElement('div');
         header.className = 'plus-toast-header';
         
+        // Icon
+        const icon = document.createElement('div');
+        icon.className = 'plus-toast-icon';
+        const iconMap = {
+            'danger': 'fa-triangle-exclamation',
+            'success': 'fa-circle-check',
+            'info': 'fa-circle-info',
+            'warning': 'fa-circle-exclamation',
+            'primary': 'fa-circle',
+            'secondary': 'fa-circle',
+            'default': 'fa-circle'
+        };
+        const iconClass = iconMap[style] || 'fa-circle';
+        icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        header.appendChild(icon);
+        
+        // Title
         const titleEl = document.createElement('strong');
         titleEl.className = 'plus-toast-title';
         titleEl.textContent = title;
         header.appendChild(titleEl);
+        
+        // Timestamp
+        const timestamp = document.createElement('div');
+        timestamp.className = 'plus-toast-timestamp';
+        timestamp.textContent = '11 mins ago';
+        header.appendChild(timestamp);
 
-        // Add dismiss button in header if dismissable
+        // Dismiss button
         if (dismissable) {
             const dismissBtn = document.createElement('button');
             dismissBtn.type = 'button';
@@ -106,6 +129,11 @@ export function createToast({
         }
         
         toast.appendChild(header);
+        
+        // Divider
+        const divider = document.createElement('div');
+        divider.className = 'plus-toast-divider';
+        toast.appendChild(divider);
     }
 
     // Create toast body
@@ -113,19 +141,6 @@ export function createToast({
     body.className = 'plus-toast-body';
     body.textContent = text;
     toast.appendChild(body);
-
-    // If no title, add dismiss button to body
-    if (!title && dismissable) {
-        const dismissBtn = document.createElement('button');
-        dismissBtn.type = 'button';
-        dismissBtn.className = 'plus-toast-close plus-toast-close-body';
-        dismissBtn.setAttribute('aria-label', 'Close');
-        dismissBtn.innerHTML = '<i class="fas fa-xmark"></i>';
-        dismissBtn.addEventListener('click', () => {
-            hideToast(toast, onDismiss);
-        });
-        body.appendChild(dismissBtn);
-    }
 
     // Get toast container and append toast
     const container = getToastContainer(position);
@@ -244,12 +259,35 @@ export function createStaticToast({
         const header = document.createElement('div');
         header.className = 'plus-toast-header';
         
+        // Icon
+        const icon = document.createElement('div');
+        icon.className = 'plus-toast-icon';
+        const iconMap = {
+            'danger': 'fa-triangle-exclamation',
+            'success': 'fa-circle-check',
+            'info': 'fa-circle-info',
+            'warning': 'fa-circle-exclamation',
+            'primary': 'fa-circle',
+            'secondary': 'fa-circle',
+            'default': 'fa-circle'
+        };
+        const iconClass = iconMap[style] || 'fa-circle';
+        icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        header.appendChild(icon);
+        
+        // Title
         const titleEl = document.createElement('strong');
         titleEl.className = 'plus-toast-title';
         titleEl.textContent = title;
         header.appendChild(titleEl);
+        
+        // Timestamp
+        const timestamp = document.createElement('div');
+        timestamp.className = 'plus-toast-timestamp';
+        timestamp.textContent = '11 mins ago';
+        header.appendChild(timestamp);
 
-        // Add dismiss button in header if dismissable
+        // Dismiss button
         if (dismissable) {
             const dismissBtn = document.createElement('button');
             dismissBtn.type = 'button';
@@ -261,6 +299,11 @@ export function createStaticToast({
         }
         
         toast.appendChild(header);
+        
+        // Divider
+        const divider = document.createElement('div');
+        divider.className = 'plus-toast-divider';
+        toast.appendChild(divider);
     }
 
     // Create toast body
@@ -268,17 +311,6 @@ export function createStaticToast({
     body.className = 'plus-toast-body';
     body.textContent = text;
     toast.appendChild(body);
-
-    // If no title, add dismiss button to body
-    if (!title && dismissable) {
-        const dismissBtn = document.createElement('button');
-        dismissBtn.type = 'button';
-        dismissBtn.className = 'plus-toast-close plus-toast-close-body';
-        dismissBtn.setAttribute('aria-label', 'Close');
-        dismissBtn.innerHTML = '<i class="fas fa-xmark"></i>';
-        // Don't add click handler for static display
-        body.appendChild(dismissBtn);
-    }
 
     return toast;
 }

@@ -1,12 +1,17 @@
 /**
  * Loading GIF Component Styles
- * CSS-animated loading indicator (no actual GIF file required)
+ * CSS-animated loading indicators matching Figma design system
  * 
  * Component Type: Element (uses `element-*` tokens)
  * Token Usage:
+ *   - Colors: Uses `--color-on-surface-variant` (matches Figma #3f484a)
  *   - Size: Custom sizes using element tokens
- *   - Colors: Uses Material Design 3 color tokens
- *   - Display: Flexbox for dot alignment
+ *   - Border radius: 1px (matches Figma)
+ * 
+ * Figma Reference:
+ * - Growing Grid: 3x3 grid that expands from center
+ * - Rotating Grid: 2x2 grid (L-shape) that rotates
+ * - Stacking Grid: 4 squares that stack and rotate
  */
 
 /* ============================================
@@ -14,22 +19,483 @@
    ============================================ */
 
 .plus-loading-gif {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--size-element-gap-xs);
+    display: inline-block;
+    position: relative;
     vertical-align: middle;
 }
 
 /* ============================================
-   ANIMATED DOTS
+   GRID CONTAINER
    ============================================ */
 
-.plus-loading-gif-dot {
-    display: inline-block;
-    border-radius: 50%;
-    background-color: currentColor;
-    animation: loading-gif-pulse 1.4s ease-in-out infinite;
+.plus-loading-gif-grid {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================
+   SQUARE BASE STYLES
+   ============================================ */
+
+.plus-loading-gif-square {
+    position: absolute;
+    background-color: var(--color-on-surface-variant);
+    border-radius: 1px; /* Figma: rounded-[1px] */
+}
+
+/* ============================================
+   GROWING GRID (3x3 grid that expands from center)
+   ============================================ */
+
+.plus-loading-gif-growing {
+    /* Default size: 93.4px (matches Figma) */
+    width: 93.4px;
+    height: 93.4px;
+    
+    .plus-loading-gif-grid {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .plus-loading-gif-square {
+        /* Start from center (31% inset) and grow outward */
+        inset: 31% 30.46% 30.46% 31%;
+        animation: loading-gif-growing 1.5s ease-in-out infinite;
+    }
+    
+    /* Stagger animation for each square */
+    .plus-loading-gif-square-1 { animation-delay: 0s; }
+    .plus-loading-gif-square-2 { animation-delay: 0.05s; }
+    .plus-loading-gif-square-3 { animation-delay: 0.1s; }
+    .plus-loading-gif-square-4 { animation-delay: 0.15s; }
+    .plus-loading-gif-square-5 { animation-delay: 0.2s; }
+    .plus-loading-gif-square-6 { animation-delay: 0.25s; }
+    .plus-loading-gif-square-7 { animation-delay: 0.3s; }
+    .plus-loading-gif-square-8 { animation-delay: 0.35s; }
+    .plus-loading-gif-square-9 { animation-delay: 0.4s; }
+}
+
+@keyframes loading-gif-growing {
+    0% {
+        inset: 31% 30.46% 30.46% 31%;
+    }
+    50% {
+        inset: 19.22% 18.58% 18.68% 19.33%;
+    }
+    100% {
+        inset: 31% 30.46% 30.46% 31%;
+    }
+}
+
+/* ============================================
+   ROTATING GRID (2x2 grid - L-shape that rotates)
+   ============================================ */
+
+.plus-loading-gif-rotating {
+    /* Default size: 52px (matches Figma) */
+    width: 52px;
+    height: 52px;
+    
+    .plus-loading-gif-grid {
+        width: 100%;
+        height: 100%;
+        animation: loading-gif-rotating 1.2s linear infinite;
+    }
+    
+    /* Three squares forming L-shape */
+    .plus-loading-gif-square-1 {
+        /* Top-left square */
+        bottom: 53.85%;
+        left: 0;
+        right: 53.85%;
+        top: 0;
+    }
+    
+    .plus-loading-gif-square-2 {
+        /* Bottom-left square */
+        bottom: 0;
+        left: 0;
+        right: 53.85%;
+        top: 53.85%;
+    }
+    
+    .plus-loading-gif-square-3 {
+        /* Bottom-right square */
+        bottom: 0;
+        left: 53.85%;
+        right: 0;
+        top: 53.85%;
+    }
+}
+
+@keyframes loading-gif-rotating {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================
+   STACKING GRID (4 squares that stack and rotate)
+   ============================================ */
+
+.plus-loading-gif-stacking {
+    /* Default size: 123.549px (matches Figma) */
+    width: 123.549px;
+    height: 123.549px;
+    
+    .plus-loading-gif-grid {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    
+    /* Base square size: 24px (matches Figma) */
+    .plus-loading-gif-square {
+        width: 24px;
+        height: 24px;
+    }
+    
+    /* Initial positions (step 1 from Figma) */
+    .plus-loading-gif-square-1 {
+        left: 22.35px;
+        top: 68.86px;
+        animation: loading-gif-stacking-1 2s ease-in-out infinite;
+    }
+    
+    .plus-loading-gif-square-2 {
+        left: 22.35px;
+        top: 40.86px;
+        animation: loading-gif-stacking-2 2s ease-in-out infinite;
+    }
+    
+    .plus-loading-gif-square-3 {
+        left: 49.77px;
+        top: 68.86px;
+        animation: loading-gif-stacking-3 2s ease-in-out infinite;
+    }
+    
+    .plus-loading-gif-square-4 {
+        left: 77.2px;
+        top: 68.86px;
+        animation: loading-gif-stacking-4 2s ease-in-out infinite;
+    }
+}
+
+/* Stacking animation - squares move and rotate through sequence */
+@keyframes loading-gif-stacking-1 {
+    0%, 100% {
+        left: 22.35px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    6.67% {
+        left: 22.35px;
+        top: 60.86px;
+        transform: rotate(0deg);
+    }
+    13.33% {
+        left: 22.35px;
+        top: 44.86px;
+        transform: rotate(0deg);
+    }
+    20% {
+        left: 22.35px;
+        top: 29.86px;
+        transform: rotate(45deg);
+    }
+    26.67% {
+        left: 22.35px;
+        top: 44.86px;
+        transform: rotate(90deg);
+    }
+    33.33% {
+        left: 22.35px;
+        top: 60.86px;
+        transform: rotate(90deg);
+    }
+    40% {
+        left: 22.35px;
+        top: 44.86px;
+        transform: rotate(90deg);
+    }
+    46.67% {
+        left: 22.35px;
+        top: 29.86px;
+        transform: rotate(135deg);
+    }
+    53.33% {
+        left: 22.35px;
+        top: 44.86px;
+        transform: rotate(180deg);
+    }
+    60% {
+        left: 22.35px;
+        top: 60.86px;
+        transform: rotate(180deg);
+    }
+    66.67% {
+        left: 22.35px;
+        top: 44.86px;
+        transform: rotate(180deg);
+    }
+    73.33% {
+        left: 11.38px;
+        top: 30.86px;
+        transform: rotate(225deg);
+    }
+    80% {
+        left: 8.63px;
+        top: 44.86px;
+        transform: rotate(270deg);
+    }
+    86.67% {
+        left: 8.63px;
+        top: 40.86px;
+        transform: rotate(270deg);
+    }
+    93.33% {
+        left: 22.35px;
+        top: 40.86px;
+        transform: rotate(90deg);
+    }
+}
+
+@keyframes loading-gif-stacking-2 {
+    0%, 100% {
+        left: 22.35px;
+        top: 40.86px;
+        transform: rotate(0deg);
+    }
+    6.67% {
+        left: 22.35px;
+        top: 60.86px;
+        transform: rotate(0deg);
+    }
+    13.33% {
+        left: 22.35px;
+        top: 44.86px;
+        transform: rotate(0deg);
+    }
+    20% {
+        left: 32.63px;
+        top: 29.86px;
+        transform: rotate(45deg);
+    }
+    26.67% {
+        left: 49.77px;
+        top: 44.86px;
+        transform: rotate(90deg);
+    }
+    33.33% {
+        left: 49.77px;
+        top: 60.86px;
+        transform: rotate(90deg);
+    }
+    40% {
+        left: 49.77px;
+        top: 44.86px;
+        transform: rotate(90deg);
+    }
+    46.67% {
+        left: 60.06px;
+        top: 29.86px;
+        transform: rotate(135deg);
+    }
+    53.33% {
+        left: 77.2px;
+        top: 44.86px;
+        transform: rotate(180deg);
+    }
+    60% {
+        left: 77.2px;
+        top: 60.86px;
+        transform: rotate(180deg);
+    }
+    66.67% {
+        left: 77.2px;
+        top: 44.86px;
+        transform: rotate(180deg);
+    }
+    73.33% {
+        left: 78.23px;
+        top: 30.86px;
+        transform: rotate(225deg);
+    }
+    80% {
+        left: 90.92px;
+        top: 44.86px;
+        transform: rotate(270deg);
+    }
+    86.67% {
+        left: 90.92px;
+        top: 68.86px;
+        transform: rotate(270deg);
+    }
+    93.33% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(270deg);
+    }
+}
+
+@keyframes loading-gif-stacking-3 {
+    0%, 100% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    6.67% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    13.33% {
+        left: 49.77px;
+        top: 68.71px;
+        transform: rotate(0deg);
+    }
+    20% {
+        left: 49.77px;
+        top: 68.71px;
+        transform: rotate(0deg);
+    }
+    26.67% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    33.33% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    40% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    46.67% {
+        left: 49.77px;
+        top: 68.71px;
+        transform: rotate(0deg);
+    }
+    53.33% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    60% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    66.67% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    73.33% {
+        left: 38.8px;
+        top: 69.14px;
+        transform: rotate(0deg);
+    }
+    80% {
+        left: 36.06px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    86.67% {
+        left: 36.06px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    93.33% {
+        left: 49.77px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes loading-gif-stacking-4 {
+    0%, 100% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    6.67% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    13.33% {
+        left: 77.2px;
+        top: 68.71px;
+        transform: rotate(0deg);
+    }
+    20% {
+        left: 77.2px;
+        top: 68.71px;
+        transform: rotate(0deg);
+    }
+    26.67% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    33.33% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    40% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    46.67% {
+        left: 77.2px;
+        top: 68.71px;
+        transform: rotate(0deg);
+    }
+    53.33% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    60% {
+        left: 77.2px;
+        top: 84.86px;
+        transform: rotate(0deg);
+    }
+    66.67% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    73.33% {
+        left: 66.23px;
+        top: 69.14px;
+        transform: rotate(0deg);
+    }
+    80% {
+        left: 63.49px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    86.67% {
+        left: 63.49px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
+    93.33% {
+        left: 77.2px;
+        top: 68.86px;
+        transform: rotate(0deg);
+    }
 }
 
 /* ============================================
@@ -37,86 +503,53 @@
    ============================================ */
 
 /* Small loading GIF */
-.plus-loading-gif.plus-loading-gif-small {
-    gap: calc(var(--size-element-gap-xs) * 0.5);
+.plus-loading-gif-small {
+    &.plus-loading-gif-growing {
+        width: 46.7px;
+        height: 46.7px;
+    }
     
-    .plus-loading-gif-dot {
-        width: 0.25rem;
-        height: 0.25rem;
+    &.plus-loading-gif-rotating {
+        width: 26px;
+        height: 26px;
+    }
+    
+    &.plus-loading-gif-stacking {
+        width: 61.77px;
+        height: 61.77px;
+        
+        .plus-loading-gif-square {
+            width: 12px;
+            height: 12px;
+        }
     }
 }
 
 /* Default loading GIF */
-.plus-loading-gif.plus-loading-gif-default {
-    gap: var(--size-element-gap-xs);
-    
-    .plus-loading-gif-dot {
-        width: 0.375rem;
-        height: 0.375rem;
-    }
+.plus-loading-gif-default {
+    /* Sizes are set in type-specific classes above */
 }
 
 /* Large loading GIF */
-.plus-loading-gif.plus-loading-gif-large {
-    gap: calc(var(--size-element-gap-xs) * 1.5);
+.plus-loading-gif-large {
+    &.plus-loading-gif-growing {
+        width: 140.1px;
+        height: 140.1px;
+    }
     
-    .plus-loading-gif-dot {
-        width: 0.5rem;
-        height: 0.5rem;
+    &.plus-loading-gif-rotating {
+        width: 78px;
+        height: 78px;
     }
-}
-
-/* ============================================
-   STYLE VARIANTS (Color)
-   ============================================ */
-
-/* Primary style - uses primary color token */
-.plus-loading-gif.plus-loading-gif-primary {
-    color: var(--color-primary);
-}
-
-/* Secondary style - uses secondary color token */
-.plus-loading-gif.plus-loading-gif-secondary {
-    color: var(--color-secondary);
-}
-
-/* Tertiary style - uses tertiary color token */
-.plus-loading-gif.plus-loading-gif-tertiary {
-    color: var(--color-tertiary);
-}
-
-/* Success style - uses success color token */
-.plus-loading-gif.plus-loading-gif-success {
-    color: var(--color-success);
-}
-
-/* Danger style - uses danger color token */
-.plus-loading-gif.plus-loading-gif-danger {
-    color: var(--color-danger);
-}
-
-/* Warning style - uses warning color token */
-.plus-loading-gif.plus-loading-gif-warning {
-    color: var(--color-warning);
-}
-
-/* Info style - uses info color token */
-.plus-loading-gif.plus-loading-gif-info {
-    color: var(--color-info);
-}
-
-/* ============================================
-   ANIMATION
-   ============================================ */
-
-@keyframes loading-gif-pulse {
-    0%, 80%, 100% {
-        opacity: 0.3;
-        transform: scale(0.8);
-    }
-    40% {
-        opacity: 1;
-        transform: scale(1);
+    
+    &.plus-loading-gif-stacking {
+        width: 185.32px;
+        height: 185.32px;
+        
+        .plus-loading-gif-square {
+            width: 36px;
+            height: 36px;
+        }
     }
 }
 
@@ -143,4 +576,3 @@
     outline-offset: 2px;
     border-radius: var(--size-element-radius-sm);
 }
-

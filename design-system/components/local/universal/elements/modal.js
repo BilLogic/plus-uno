@@ -116,12 +116,19 @@ export function createModal({
     }
     
     // Close button
-    // Figma: Icon component with iconName="xmark", style="solid", size="h3" (24px)
+    // Figma: Icon size varies by variant
+    // - With buttons: size="h5" (16px) - Figma: Icon iconName="xmark" size="h5" style="solid"
+    // - Without buttons: size="h3" (24px) - Figma: Icon iconName="xmark" size="h3"
     const closeBtn = document.createElement("button");
     closeBtn.classList.add("plus-modal-close-btn");
+    if (showBottomButtons) {
+        closeBtn.classList.add("plus-modal-close-btn-h5"); // h5 size (16px) for modals with buttons
+    } else {
+        closeBtn.classList.add("plus-modal-close-btn-h3"); // h3 size (24px) for modals without buttons
+    }
     closeBtn.setAttribute("type", "button");
     closeBtn.setAttribute("aria-label", "Close modal");
-    // Use "xmark" icon (not "times") with h3 size (24px) - Figma: Icon iconName="xmark" style="solid" size="h3"
+    // Use "xmark" icon (not "times") - Figma: Icon iconName="xmark" style="solid"
     closeBtn.innerHTML = '<i class="fas fa-xmark"></i>';
     if (onClose) {
         closeBtn.addEventListener("click", onClose);

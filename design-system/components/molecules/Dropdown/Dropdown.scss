@@ -33,23 +33,26 @@
 .pdropdown .dropdown-menu,
 .multiselect-container.dropdown-menu {
     box-sizing: border-box;
-    border: none;
-    /* Figma: Dropdown menu - radius-md (4px) */
-    border-radius: var(--size-element-radius-md);
+    /* Figma: Dropdown List - background surface-container-high, border stroke-md, radius-sm (4px) */
+    background-color: var(--color-surface-container-high);
+    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm);
+    /* Figma: Dropdown List - shadow: 0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15) */
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
     padding: 0px;
     width: 100%;
     min-width: fit-content;
-    background-color: var(--color-surface-container-high);
     
-    /* Ensure Bootstrap can hide the menu - display: none should work */
-    /* Bootstrap uses display: none to hide, so we need to allow that */
-    &.show {
-        display: block !important;
+    /* Bootstrap uses display: none to hide, and display: block to show */
+    /* Allow Bootstrap to control visibility, but don't force hide if inline styles are set */
+    /* Inline styles from Storybook should take precedence for static display */
+    &:not(.show) {
+        /* Only hide if there's no inline display style (allows Storybook static display) */
+        display: none;
     }
     
-    /* When not shown, Bootstrap sets display: none - ensure that works */
-    &:not(.show) {
-        display: none !important;
+    &.show {
+        display: block !important;
     }
 }
 
@@ -124,6 +127,25 @@
         color: var(--color-on-surface-variant);
         /* Always present but opacity-0 when not selected (matching Figma) */
         opacity: 0;
+        flex-shrink: 0;
+        /* Figma: Checkmark icon - Font Awesome B2 (12px) */
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
+    }
+    
+    /* Figma: Leading icon - Font Awesome B2 (12px), color on-surface-variant */
+    i.fas:not(.selected-icon):not(.fa-caret-right) {
+        color: var(--color-on-surface-variant);
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
+        flex-shrink: 0;
+    }
+    
+    /* Figma: Dropright arrow - Font Awesome B2 (12px), color on-surface-variant */
+    i.fa-caret-right {
+        color: var(--color-on-surface-variant);
+        font-size: var(--font-size-fa-body2);
+        line-height: var(--font-line-height-fa-body2);
         flex-shrink: 0;
     }
 }

@@ -1,6 +1,9 @@
 /**
  * Tooltip Molecule Stories
  * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=42-6020&m=dev
+ * Matches Figma design system specifications exactly
+ * 
  * ## Usage and Implementation
  * 
  * Tooltips are **Element** components that display brief information when triggered.
@@ -22,12 +25,14 @@
  * 
  * ### Implementation Context
  * - **Component Type**: Element (uses `element-` tokens)
- * - **Token Usage**:
+ * - **Token Usage** (from Figma design):
  *   - Tooltip Container: Uses `element-` tokens (tooltips are Element components)
- *   - Padding: `--size-element-pad-x-sm/md/lg`, `--size-element-pad-y-sm/md/lg`
- *   - Radius: `--size-element-radius-sm` (4px)
- *   - Colors: `--color-surface-container-high` for background, `--color-on-surface` for text
- *   - Typography: `--font-size-body2` for default, `--font-size-body3` for small, `--font-size-body1` for large
+ *   - Padding: `--size-element-pad-x-sm` (8px) horizontal, `--size-element-pad-y-lg` (8px) vertical
+ *   - Radius: `--size-element-radius-md` (4px)
+ *   - Colors: `--color-inverse-surface` (#2e3133) for background, `--color-inverse-on-surface` (#f0f1f3) for text
+ *   - Typography: Body/B2/Regular - Merriweather Sans Light, 14px, weight 300, line-height 1.571
+ *   - Arrow: 10px wide, 5px tall
+ *   - Shadow: None (no box-shadow in Figma design)
  * - **Bootstrap Integration**: Uses Bootstrap 4.6.2 tooltip component (requires Popper.js)
  * 
  * ### Placement Options

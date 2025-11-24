@@ -464,6 +464,41 @@ function generateSemanticsSCSS() {
         }
     });
     
+    // Add missing semantic tokens (additive only - never modify existing)
+    // Check if element-radius-pill exists, if not add it
+    const elementLayer = layers['element'] || [];
+    const hasRadiusPill = elementLayer.some(item => 
+        item.name.includes('element-radius-pill') || 
+        item.name.includes('radius-pill') ||
+        item.name === 'element-radius-pill'
+    );
+    
+    if (!hasRadiusPill) {
+        // Get primitive value for radius-1000 (999px)
+        let radiusPillValue = 999; // Default fallback
+        try {
+            const primitives = JSON.parse(fs.readFileSync('new tokens/size _ primitive.json', 'utf8'));
+            const primitiveMode = Object.keys(primitives.modes)[0];
+            const radius1000 = primitives.variables.find(v => {
+                const name = v.name.toLowerCase();
+                return name.includes('radius-1000') || name.includes('radius/radius-1000');
+            });
+            if (radius1000) {
+                const val = radius1000.valuesByMode[primitiveMode];
+                const resolved = radius1000.resolvedValuesByMode[primitiveMode];
+                radiusPillValue = resolved?.resolvedValue ?? val ?? 999;
+            }
+        } catch (e) {
+            console.warn('Warning: Could not read primitives file, using default 999px for radius-pill');
+        }
+        
+        // Add to element layer array so it gets processed naturally
+        layers['element'].push({ 
+            name: 'element-radius-pill', 
+            value: radiusPillValue 
+        });
+    }
+    
     // Output by layer
     const layerOrder = ['element', 'card', 'section', 'modal', 'surface', 'surface-container', 'table'];
     const layerLabels = {
@@ -491,7 +526,11 @@ function generateSemanticsSCSS() {
             
             sorted.forEach(item => {
                 const varName = item.name;
-                scss += `    --size-${varName}: ${item.value}px;\n`;
+                // Add comment for radius-pill token
+                const comment = varName === 'element-radius-pill' 
+                    ? ' /* Fully rounded (pill shape) - maps to --size-border-radius-radius-1000 */'
+                    : '';
+                scss += `    --size-${varName}: ${item.value}px;${comment}\n`;
             });
         }
     });
@@ -550,6 +589,30 @@ function generateLayoutSCSS() {
     return scss;
 }
 
+/**
+ * Validate generated SCSS files to ensure no primitive tokens are used
+ */
+function validateSemanticTokens(scssContent, filename) {
+    // List of primitive token patterns that should NOT appear in semantic files
+    const primitivePatterns = [
+        /--size-spacing-/,
+        /--size-border-radius-radius-/,
+        /--size-border-stroke-stroke-/,
+    ];
+    
+    const errors = [];
+    primitivePatterns.forEach(pattern => {
+        const matches = scssContent.match(new RegExp(pattern, 'g'));
+        if (matches) {
+            matches.forEach(match => {
+                errors.push(`Primitive token found in ${filename}: ${match}`);
+            });
+        }
+    });
+    
+    return errors;
+}
+
 // Generate all files
 console.log('Generating token SCSS files...');
 
@@ -565,9 +628,19 @@ const semanticsSCSS = generateSemanticsSCSS();
 fs.writeFileSync('design-system/tokens/_spacing_semantics.scss', semanticsSCSS);
 console.log('✅ Generated design-system/tokens/_spacing_semantics.scss');
 
+// Validate semantic tokens
+const validationErrors = validateSemanticTokens(semanticsSCSS, '_spacing_semantics.scss');
+if (validationErrors.length > 0) {
+    console.error('\n❌ Validation errors:');
+    validationErrors.forEach(error => console.error(`  - ${error}`));
+    console.error('\nError: Primitive tokens should not be used in semantic token files!');
+    process.exit(1);
+}
+
 const layoutSCSS = generateLayoutSCSS();
 fs.writeFileSync('design-system/tokens/_layout.scss', layoutSCSS);
 console.log('✅ Generated design-system/tokens/_layout.scss');
 
 console.log('\n✅ All token files generated successfully!');
+console.log('✅ Validation passed: No primitive tokens found in semantic files');
 

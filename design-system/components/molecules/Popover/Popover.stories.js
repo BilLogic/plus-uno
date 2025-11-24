@@ -13,46 +13,28 @@
  * - **Interactive Hints**: Show tips or guidance for complex interactions
  * - **Data Details**: Display additional data or metadata on hover/click
  * 
- * ### When NOT to Use
- * - **Simple Tooltips**: Use tooltips for brief, single-line text
- * - **Critical Information**: Use alerts or modals for important information that must be seen
- * - **Complex Forms**: Use modals for multi-step forms or complex interactions
- * - **Navigation**: Use dropdowns or menus for navigation options
- * 
  * ### Implementation Context
  * - **Component Type**: Element (uses `element-` tokens for trigger, `modal-` tokens for popover container)
  * - **Token Usage**: 
- *   - Popover Container: Uses `modal-` tokens (overlays content like modals)
- *     - Padding: `--size-modal-pad-x-sm/md/lg`, `--size-modal-pad-y-sm/md/lg`
- *     - Gap: `--size-modal-gap-sm/md/lg` (for spacing between header and body)
- *     - Radius: `--size-element-radius-sm` (4px)
- *   - Colors: `--color-surface-container-high` for background, `--color-on-surface` for text
- *   - Typography: `--font-size-h5` for title, `--font-size-body1` for content
+ *   - Title: `--size-element-pad-x-lg` (16px), `--size-element-gap-sm` (8px)
+ *   - Body: `--size-modal-pad-x-md` (16px) or `--size-modal-pad-x-sm` (10px for top), `--size-modal-pad-y-sm` (8px)
+ *   - Colors: `--color-inverse-surface` for title, `--color-surface-container` for body
+ *   - Typography: 14px, line-height 1.571 (Merriweather Sans Regular for title, Light for body)
  * - **Bootstrap Integration**: Uses Bootstrap 4.6.2 popover component (requires Popper.js)
  * 
- * ### Placement Options
- * - **top**: Popover appears above the trigger
- * - **bottom**: Popover appears below the trigger (default)
- * - **left**: Popover appears to the left of the trigger
- * - **right**: Popover appears to the right of the trigger
+ * ### Type Variants
+ * - **title + content**: Includes a dark header section with title and light body section with content
+ * - **content**: Only the light body section with content (no title)
  * 
- * ### Trigger Types
- * - **click**: Popover appears on click (default)
- * - **hover**: Popover appears on hover
- * - **focus**: Popover appears on focus (useful for form fields)
- * - **manual**: Popover is controlled programmatically
+ * ### Direction Variants
+ * - **top**: Popover appears above the trigger, arrow points down
+ * - **bottom**: Popover appears below the trigger, arrow points up
+ * - **left**: Popover appears to the left of the trigger, arrow points right
+ * - **right**: Popover appears to the right of the trigger, arrow points left
  * 
- * ### Size Variants
- * - **Small**: Compact size for brief information
- *   - Padding: 8px top/bottom, 10px left/right
- *   - Typography: body2-txt for content, h6 for title
- * - **Default**: Standard size for most use cases
- *   - Padding: 12px top/bottom, 16px left/right
- *   - Typography: body1-txt for content, h5 for title
- * - **Large**: Spacious size for detailed information
- *   - Padding: 24px top/bottom, 40px left/right
- *   - Typography: body1-txt for content, h5 for title
- *   - Max width: 400px
+ * ### Properties (from Figma documentation)
+ * - **Type**: You can select the popover to only show content, or both title and content
+ * - **Direction**: There are 4 directions for a popover: bottom, left, right, top
  * 
  * ### Best Practices
  * - Keep popover content concise and scannable
@@ -61,7 +43,6 @@
  * - Position popovers to avoid covering important content
  * - Test popover positioning on different screen sizes
  * - Ensure popover content is accessible (keyboard navigation, screen readers)
- * - Use hover for quick reference, click for more persistent information
  * 
  * See docs/guidelines/terminology.md for Element Component Guidelines
  * See docs/guidelines/token-reference.md for Token Reference
@@ -75,7 +56,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'Popover component for displaying additional information. Supports multiple placements, trigger types, and sizes. Uses element-level tokens for trigger and modal-level tokens for popover container.',
+        component: 'Popover component for displaying additional information. Matches Figma design system specifications exactly. Supports two types (title + content, content only) and four directions (top, bottom, left, right).',
       },
     },
   },
@@ -83,7 +64,7 @@ export default {
 
 /**
  * All Variants
- * Shows all popover combinations: placements, sizes, and with/without titles
+ * Shows all popover combinations from Figma: types and directions
  */
 export const AllVariants = {
   render: () => {
@@ -93,184 +74,258 @@ export const AllVariants = {
     container.style.gap = 'var(--size-section-gap-lg)';
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     
-    // Placements section
-    const placementsSection = document.createElement('div');
-    placementsSection.style.display = 'flex';
-    placementsSection.style.flexDirection = 'column';
-    placementsSection.style.gap = 'var(--size-card-gap-md)';
+    // Type Variants Section
+    const typeSection = document.createElement('div');
+    typeSection.style.display = 'flex';
+    typeSection.style.flexDirection = 'column';
+    typeSection.style.gap = 'var(--size-card-gap-md)';
     
-    const placementsLabel = document.createElement('div');
-    placementsLabel.className = 'h4';
-    placementsLabel.textContent = 'Placements';
-    placementsLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    placementsSection.appendChild(placementsLabel);
+    const typeLabel = document.createElement('div');
+    typeLabel.className = 'h4';
+    typeLabel.textContent = 'Type Variants';
+    typeLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    typeSection.appendChild(typeLabel);
     
-    const placementsContainer = document.createElement('div');
-    placementsContainer.style.display = 'flex';
-    placementsContainer.style.flexWrap = 'wrap';
-    placementsContainer.style.gap = 'var(--size-card-gap-md)';
-    placementsContainer.style.alignItems = 'center';
+    const typeContainer = document.createElement('div');
+    typeContainer.style.display = 'flex';
+    typeContainer.style.flexWrap = 'wrap';
+    typeContainer.style.gap = 'var(--size-card-gap-lg)';
+    typeContainer.style.alignItems = 'center';
     
-    const placements = ['top', 'bottom', 'left', 'right'];
-    placements.forEach((placement) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-primary';
-      button.textContent = `Popover ${placement.charAt(0).toUpperCase() + placement.slice(1)}`;
-      
-      createPopover({
-        trigger: button,
-        content: `This is a popover positioned ${placement} of the trigger element.`,
-        title: `Popover ${placement.charAt(0).toUpperCase() + placement.slice(1)}`,
-        placement: placement,
-        triggerType: 'click',
-        size: 'default'
-      });
-      
-      placementsContainer.appendChild(button);
-    });
-    
-    placementsSection.appendChild(placementsContainer);
-    container.appendChild(placementsSection);
-    
-    // Sizes section
-    const sizesSection = document.createElement('div');
-    sizesSection.style.display = 'flex';
-    sizesSection.style.flexDirection = 'column';
-    sizesSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const sizesLabel = document.createElement('div');
-    sizesLabel.className = 'h4';
-    sizesLabel.textContent = 'Sizes';
-    sizesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    sizesSection.appendChild(sizesLabel);
-    
-    const sizesContainer = document.createElement('div');
-    sizesContainer.style.display = 'flex';
-    sizesContainer.style.flexWrap = 'wrap';
-    sizesContainer.style.gap = 'var(--size-card-gap-md)';
-    sizesContainer.style.alignItems = 'center';
-    
-    const sizes = ['small', 'default', 'large'];
-    sizes.forEach((size) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-primary';
-      button.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} Popover`;
-      
-      createPopover({
-        trigger: button,
-        content: `This is a ${size} popover with different padding and typography.`,
-        title: `${size.charAt(0).toUpperCase() + size.slice(1)} Size`,
-        placement: 'top',
-        triggerType: 'click',
-        size: size
-      });
-      
-      sizesContainer.appendChild(button);
-    });
-    
-    sizesSection.appendChild(sizesContainer);
-    container.appendChild(sizesSection);
-    
-    // Trigger types section
-    const triggersSection = document.createElement('div');
-    triggersSection.style.display = 'flex';
-    triggersSection.style.flexDirection = 'column';
-    triggersSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const triggersLabel = document.createElement('div');
-    triggersLabel.className = 'h4';
-    triggersLabel.textContent = 'Trigger Types';
-    triggersLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    triggersSection.appendChild(triggersLabel);
-    
-    const triggersContainer = document.createElement('div');
-    triggersContainer.style.display = 'flex';
-    triggersContainer.style.flexWrap = 'wrap';
-    triggersContainer.style.gap = 'var(--size-card-gap-md)';
-    triggersContainer.style.alignItems = 'center';
-    
-    const triggerTypes = [
-      { type: 'click', label: 'Click Trigger' },
-      { type: 'hover', label: 'Hover Trigger' },
-      { type: 'focus', label: 'Focus Trigger' }
-    ];
-    
-    triggerTypes.forEach(({ type, label }) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-primary';
-      button.textContent = label;
-      
-      createPopover({
-        trigger: button,
-        content: `This popover is triggered by ${type}.`,
-        title: `${type.charAt(0).toUpperCase() + type.slice(1)} Trigger`,
-        placement: 'top',
-        triggerType: type,
-        size: 'default'
-      });
-      
-      triggersContainer.appendChild(button);
-    });
-    
-    triggersSection.appendChild(triggersContainer);
-    container.appendChild(triggersSection);
-    
-    // With/Without Title section
-    const titleSection = document.createElement('div');
-    titleSection.style.display = 'flex';
-    titleSection.style.flexDirection = 'column';
-    titleSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const titleLabel = document.createElement('div');
-    titleLabel.className = 'h4';
-    titleLabel.textContent = 'With/Without Title';
-    titleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    titleSection.appendChild(titleLabel);
-    
-    const titleContainer = document.createElement('div');
-    titleContainer.style.display = 'flex';
-    titleContainer.style.flexWrap = 'wrap';
-    titleContainer.style.gap = 'var(--size-card-gap-md)';
-    titleContainer.style.alignItems = 'center';
-    
-    // With title
+    // Title + Content
     const buttonWithTitle = document.createElement('button');
     buttonWithTitle.type = 'button';
     buttonWithTitle.className = 'btn btn-primary';
-    buttonWithTitle.textContent = 'Popover with Title';
+    buttonWithTitle.textContent = 'Title + Content';
     
     createPopover({
       trigger: buttonWithTitle,
-      content: 'This popover includes a title header for better context.',
-      title: 'Popover Title',
+      content: "And here's some amazing content. It's very engaging. Right?",
+      title: 'Popover title',
       placement: 'top',
-      triggerType: 'click',
-      size: 'default'
+      triggerType: 'click'
     });
     
-    titleContainer.appendChild(buttonWithTitle);
+    typeContainer.appendChild(buttonWithTitle);
     
-    // Without title
-    const buttonWithoutTitle = document.createElement('button');
-    buttonWithoutTitle.type = 'button';
-    buttonWithoutTitle.className = 'btn btn-primary';
-    buttonWithoutTitle.textContent = 'Popover without Title';
+    // Content Only
+    const buttonContentOnly = document.createElement('button');
+    buttonContentOnly.type = 'button';
+    buttonContentOnly.className = 'btn btn-primary';
+    buttonContentOnly.textContent = 'Content Only';
     
     createPopover({
-      trigger: buttonWithoutTitle,
-      content: 'This popover does not include a title header.',
+      trigger: buttonContentOnly,
+      content: "And here's some amazing content. It's very engaging. Right?",
       placement: 'top',
-      triggerType: 'click',
-      size: 'default'
+      triggerType: 'click'
     });
     
-    titleContainer.appendChild(buttonWithoutTitle);
+    typeContainer.appendChild(buttonContentOnly);
     
-    titleSection.appendChild(titleContainer);
-    container.appendChild(titleSection);
+    typeSection.appendChild(typeContainer);
+    container.appendChild(typeSection);
+    
+    // Direction Variants Section - Title + Content
+    const directionTitleSection = document.createElement('div');
+    directionTitleSection.style.display = 'flex';
+    directionTitleSection.style.flexDirection = 'column';
+    directionTitleSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const directionTitleLabel = document.createElement('div');
+    directionTitleLabel.className = 'h4';
+    directionTitleLabel.textContent = 'Direction Variants (Title + Content)';
+    directionTitleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    directionTitleSection.appendChild(directionTitleLabel);
+    
+    const directionTitleContainer = document.createElement('div');
+    directionTitleContainer.style.display = 'flex';
+    directionTitleContainer.style.flexWrap = 'wrap';
+    directionTitleContainer.style.gap = 'var(--size-card-gap-md)';
+    directionTitleContainer.style.alignItems = 'center';
+    
+    const directions = ['top', 'bottom', 'left', 'right'];
+    directions.forEach((direction) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn btn-primary';
+      button.textContent = `${direction.charAt(0).toUpperCase() + direction.slice(1)}`;
+      
+      createPopover({
+        trigger: button,
+        content: "And here's some amazing content. It's very engaging. Right?",
+        title: 'Popover title',
+        placement: direction,
+        triggerType: 'click'
+      });
+      
+      directionTitleContainer.appendChild(button);
+    });
+    
+    directionTitleSection.appendChild(directionTitleContainer);
+    container.appendChild(directionTitleSection);
+    
+    // Direction Variants Section - Content Only
+    const directionContentSection = document.createElement('div');
+    directionContentSection.style.display = 'flex';
+    directionContentSection.style.flexDirection = 'column';
+    directionContentSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const directionContentLabel = document.createElement('div');
+    directionContentLabel.className = 'h4';
+    directionContentLabel.textContent = 'Direction Variants (Content Only)';
+    directionContentLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    directionContentSection.appendChild(directionContentLabel);
+    
+    const directionContentContainer = document.createElement('div');
+    directionContentContainer.style.display = 'flex';
+    directionContentContainer.style.flexWrap = 'wrap';
+    directionContentContainer.style.gap = 'var(--size-card-gap-md)';
+    directionContentContainer.style.alignItems = 'center';
+    
+    directions.forEach((direction) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn btn-primary';
+      button.textContent = `${direction.charAt(0).toUpperCase() + direction.slice(1)}`;
+      
+      createPopover({
+        trigger: button,
+        content: "And here's some amazing content. It's very engaging. Right?",
+        placement: direction,
+        triggerType: 'click'
+      });
+      
+      directionContentContainer.appendChild(button);
+    });
+    
+    directionContentSection.appendChild(directionContentContainer);
+    container.appendChild(directionContentSection);
+    
+    return container;
+  },
+};
+
+/**
+ * Type Variants
+ * Shows the two type options: title + content vs content only
+ */
+export const TypeVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-card-gap-lg)';
+    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
+    container.style.alignItems = 'center';
+    
+    // Title + Content
+    const section1 = document.createElement('div');
+    section1.style.display = 'flex';
+    section1.style.flexDirection = 'column';
+    section1.style.gap = 'var(--size-element-gap-sm)';
+    section1.style.alignItems = 'center';
+    
+    const label1 = document.createElement('div');
+    label1.className = 'body2-txt';
+    label1.textContent = 'title + content';
+    section1.appendChild(label1);
+    
+    const button1 = document.createElement('button');
+    button1.type = 'button';
+    button1.className = 'btn btn-primary';
+    button1.textContent = 'Show Popover';
+    
+    createPopover({
+      trigger: button1,
+      content: "And here's some amazing content. It's very engaging. Right?",
+      title: 'Popover title',
+      placement: 'top',
+      triggerType: 'click'
+    });
+    
+    section1.appendChild(button1);
+    container.appendChild(section1);
+    
+    // Content Only
+    const section2 = document.createElement('div');
+    section2.style.display = 'flex';
+    section2.style.flexDirection = 'column';
+    section2.style.gap = 'var(--size-element-gap-sm)';
+    section2.style.alignItems = 'center';
+    
+    const label2 = document.createElement('div');
+    label2.className = 'body2-txt';
+    label2.textContent = 'content';
+    section2.appendChild(label2);
+    
+    const button2 = document.createElement('button');
+    button2.type = 'button';
+    button2.className = 'btn btn-primary';
+    button2.textContent = 'Show Popover';
+    
+    createPopover({
+      trigger: button2,
+      content: "And here's some amazing content. It's very engaging. Right?",
+      placement: 'top',
+      triggerType: 'click'
+    });
+    
+    section2.appendChild(button2);
+    container.appendChild(section2);
+    
+    return container;
+  },
+};
+
+/**
+ * Direction Variants
+ * Shows all four direction options
+ */
+export const DirectionVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-card-gap-md)';
+    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
+    container.style.alignItems = 'center';
+    
+    const directions = [
+      { name: 'bottom', label: 'bottom' },
+      { name: 'left', label: 'left' },
+      { name: 'right', label: 'right' },
+      { name: 'top', label: 'top' }
+    ];
+    
+    directions.forEach(({ name, label }) => {
+      const section = document.createElement('div');
+      section.style.display = 'flex';
+      section.style.flexDirection = 'column';
+      section.style.gap = 'var(--size-element-gap-sm)';
+      section.style.alignItems = 'center';
+      
+      const labelEl = document.createElement('div');
+      labelEl.className = 'body2-txt';
+      labelEl.textContent = label;
+      section.appendChild(labelEl);
+      
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn btn-primary';
+      button.textContent = 'Show Popover';
+      
+      createPopover({
+        trigger: button,
+        content: "And here's some amazing content. It's very engaging. Right?",
+        title: 'Popover title',
+        placement: name,
+        triggerType: 'click'
+      });
+      
+      section.appendChild(button);
+      container.appendChild(section);
+    });
     
     return container;
   },
@@ -287,6 +342,7 @@ export const Interactive = {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-card-gap-md)';
+    container.style.alignItems = 'center';
     
     const button = document.createElement('button');
     button.type = 'button';
@@ -295,11 +351,10 @@ export const Interactive = {
     
     createPopover({
       trigger: button,
-      content: args.content || 'This is an interactive popover. Adjust the controls to see different variations.',
+      content: args.content || "And here's some amazing content. It's very engaging. Right?",
       title: args.title,
       placement: args.placement || 'top',
-      triggerType: args.triggerType || 'click',
-      size: args.size || 'default'
+      triggerType: args.triggerType || 'click'
     });
     
     container.appendChild(button);
@@ -317,7 +372,7 @@ export const Interactive = {
     },
     title: {
       control: 'text',
-      description: 'Popover title (optional)',
+      description: 'Popover title (optional - if provided, creates "title + content" type)',
     },
     placement: {
       control: 'select',
@@ -329,178 +384,13 @@ export const Interactive = {
       options: ['click', 'hover', 'focus', 'manual'],
       description: 'Trigger type for showing popover',
     },
-    size: {
-      control: 'select',
-      options: ['small', 'default', 'large'],
-      description: 'Popover size (uses modal padding tokens: --size-modal-pad-x-sm/md/lg, --size-modal-pad-y-sm/md/lg)',
-    },
   },
   args: {
     buttonText: 'Popover Trigger',
-    content: 'This is an interactive popover. Adjust the controls to see different variations.',
-    title: 'Popover Title',
+    content: "And here's some amazing content. It's very engaging. Right?",
+    title: 'Popover title',
     placement: 'top',
     triggerType: 'click',
-    size: 'default',
   },
 };
-
-/**
- * Contextual Help Example
- * Shows popover used for form field help text
- */
-export const ContextualHelp = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    container.style.maxWidth = '500px';
-    
-    const form = document.createElement('form');
-    form.style.display = 'flex';
-    form.style.flexDirection = 'column';
-    form.style.gap = 'var(--size-card-gap-md)';
-    
-    // Form field with help popover
-    const fieldGroup = document.createElement('div');
-    fieldGroup.style.display = 'flex';
-    fieldGroup.style.flexDirection = 'column';
-    fieldGroup.style.gap = 'var(--size-element-gap-xs)';
-    
-    const labelContainer = document.createElement('div');
-    labelContainer.style.display = 'flex';
-    labelContainer.style.alignItems = 'center';
-    labelContainer.style.gap = 'var(--size-element-gap-sm)';
-    
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = 'Email Address';
-    labelContainer.appendChild(label);
-    
-    const helpIcon = document.createElement('i');
-    helpIcon.className = 'fas fa-question-circle';
-    helpIcon.style.cursor = 'pointer';
-    helpIcon.style.color = 'var(--color-primary)';
-    helpIcon.setAttribute('aria-label', 'Help');
-    
-    createPopover({
-      trigger: helpIcon,
-      content: 'Enter your email address. We will use this to send you important updates and notifications.',
-      title: 'Email Address Help',
-      placement: 'right',
-      triggerType: 'hover',
-      size: 'default'
-    });
-    
-    labelContainer.appendChild(helpIcon);
-    fieldGroup.appendChild(labelContainer);
-    
-    const input = document.createElement('input');
-    input.type = 'email';
-    input.className = 'form-control plus-text-field body2-txt';
-    input.placeholder = 'example@email.com';
-    fieldGroup.appendChild(input);
-    
-    form.appendChild(fieldGroup);
-    
-    // Another field with focus trigger
-    const fieldGroup2 = document.createElement('div');
-    fieldGroup2.style.display = 'flex';
-    fieldGroup2.style.flexDirection = 'column';
-    fieldGroup2.style.gap = 'var(--size-element-gap-xs)';
-    
-    const label2 = document.createElement('label');
-    label2.className = 'form-label';
-    label2.textContent = 'Password';
-    fieldGroup2.appendChild(label2);
-    
-    const input2 = document.createElement('input');
-    input2.type = 'password';
-    input2.className = 'form-control plus-text-field body2-txt';
-    input2.placeholder = 'Enter password';
-    
-    createPopover({
-      trigger: input2,
-      content: 'Password must be at least 8 characters long and include uppercase, lowercase, and numbers.',
-      title: 'Password Requirements',
-      placement: 'right',
-      triggerType: 'focus',
-      size: 'default'
-    });
-    
-    fieldGroup2.appendChild(input2);
-    form.appendChild(fieldGroup2);
-    
-    container.appendChild(form);
-    
-    return container;
-  },
-};
-
-/**
- * Data Details Example
- * Shows popover used to display additional data details
- */
-export const DataDetails = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-card-gap-md)';
-    
-    const card = document.createElement('div');
-    card.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
-    card.style.border = '1px solid var(--color-outline-variant)';
-    card.style.borderRadius = 'var(--size-card-radius-sm)';
-    card.style.backgroundColor = 'var(--color-surface-container)';
-    
-    const title = document.createElement('div');
-    title.className = 'h5';
-    title.textContent = 'User Statistics';
-    title.style.marginBottom = 'var(--size-card-gap-md)';
-    card.appendChild(title);
-    
-    const statRow = document.createElement('div');
-    statRow.style.display = 'flex';
-    statRow.style.justifyContent = 'space-between';
-    statRow.style.alignItems = 'center';
-    statRow.style.padding = 'var(--size-element-pad-y-md) 0';
-    
-    const statLabel = document.createElement('span');
-    statLabel.className = 'body1-txt';
-    statLabel.textContent = 'Total Users: ';
-    
-    const statValue = document.createElement('span');
-    statValue.className = 'body1-txt';
-    statValue.style.fontWeight = 'var(--font-weight-semibold-2)';
-    statValue.textContent = '1,234';
-    
-    const infoIcon = document.createElement('i');
-    infoIcon.className = 'fas fa-info-circle';
-    infoIcon.style.cursor = 'pointer';
-    infoIcon.style.color = 'var(--color-primary)';
-    infoIcon.style.marginLeft = 'var(--size-element-gap-sm)';
-    infoIcon.setAttribute('aria-label', 'More information');
-    
-    createPopover({
-      trigger: infoIcon,
-      content: 'Total number of registered users as of today. This includes active and inactive accounts.',
-      title: 'Total Users',
-      placement: 'right',
-      triggerType: 'hover',
-      size: 'default'
-    });
-    
-    statLabel.appendChild(statValue);
-    statRow.appendChild(statLabel);
-    statRow.appendChild(infoIcon);
-    card.appendChild(statRow);
-    
-    container.appendChild(card);
-    
-    return container;
-  },
-};
-
-
 

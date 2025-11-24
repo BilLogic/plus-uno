@@ -79,8 +79,8 @@ export function createListGroupItem({
     // Add content
     const contentWrapper = document.createElement("div");
     contentWrapper.classList.add("plus-list-group-item-content");
-    // Add body2-txt class for typography (matches Figma design)
-    contentWrapper.classList.add("body2-txt");
+    // Add body1-txt class for typography (matches Figma design: Body/B1/Regular - 16px)
+    contentWrapper.classList.add("body1-txt");
     
     if (typeof content === "string") {
         contentWrapper.textContent = content;

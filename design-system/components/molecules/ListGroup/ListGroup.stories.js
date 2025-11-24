@@ -41,19 +41,21 @@ export default {
 
 /**
  * Basic List Group
- * Simple list with text items
+ * Simple list with text items matching Figma design exactly
  */
 export const Basic = {
   render: () => {
+    const badge14 = PlusInterface.createBadge({ text: '14', style: 'primary' });
     const listGroup = PlusInterface.createListGroup({
       items: [
-        { content: 'List item 1' },
-        { content: 'List item 2' },
-        { content: 'List item 3' },
-        { content: 'List item 4' },
+        { content: 'An item' },
+        { content: 'A second item', badge: badge14 },
+        { content: 'A third item', badge: badge14 },
+        { content: 'A fourth item', badge: badge14 },
+        { content: 'And a fifth one', badge: badge14 },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -71,45 +73,51 @@ export const Action = {
         { content: 'Action item 3', href: '#' },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
 
 /**
  * Active State
- * List with active/selected item
+ * List with active/selected item matching Figma design exactly
  */
 export const Active = {
   render: () => {
+    const badge14 = PlusInterface.createBadge({ text: '14', style: 'primary' });
+    const activeBadge = PlusInterface.createBadge({ text: '14', style: 'primary' });
     const listGroup = PlusInterface.createListGroup({
       items: [
-        { content: 'List item 1' },
-        { content: 'List item 2', active: true },
-        { content: 'List item 3' },
-        { content: 'List item 4' },
+        { content: 'An active item', active: true, badge: activeBadge },
+        { content: 'A second item', badge: badge14 },
+        { content: 'A third item', badge: badge14 },
+        { content: 'A fourth item', badge: badge14 },
+        { content: 'And a fifth one', badge: badge14 },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
 
 /**
  * Disabled State
- * List with disabled items (38% opacity)
+ * List with disabled items (38% opacity) matching Figma design exactly
  */
 export const Disabled = {
   render: () => {
+    const badge14 = PlusInterface.createBadge({ text: '14', style: 'primary' });
+    const disabledBadge = PlusInterface.createBadge({ text: '14', style: 'secondary' });
     const listGroup = PlusInterface.createListGroup({
       items: [
-        { content: 'List item 1' },
-        { content: 'List item 2', disabled: true },
-        { content: 'List item 3' },
-        { content: 'List item 4', disabled: true },
+        { content: 'A disabled item', disabled: true, badge: disabledBadge },
+        { content: 'A second item', badge: badge14 },
+        { content: 'A third item', badge: badge14 },
+        { content: 'A fourth item', badge: badge14 },
+        { content: 'And a fifth one', badge: badge14 },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -132,7 +140,7 @@ export const WithBadges = {
         { content: 'List item 4' },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -152,7 +160,7 @@ export const Flush = {
       ],
       flush: true,
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -171,7 +179,7 @@ export const ActionWithActive = {
         { content: 'Action item 4', href: '#' },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -189,7 +197,7 @@ export const ButtonActions = {
         { content: 'Button item 3', action: 'button', onClick: () => console.log('Button 3') },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -208,7 +216,7 @@ export const MixedStates = {
         { content: 'Action item', href: '#' },
       ],
     });
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
 };
@@ -356,7 +364,7 @@ export const AllVariants = {
 export const Interactive = {
   render: (args) => {
     const listGroup = PlusInterface.createListGroup(args);
-    listGroup.classList.add('body2-txt');
+    listGroup.classList.add('body1-txt');
     return listGroup;
   },
   argTypes: {

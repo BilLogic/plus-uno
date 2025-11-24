@@ -9,7 +9,6 @@
 /**
  * Creates a spinner component
  * @param {Object} options - Spinner configuration
- * @param {string} [options.style='primary'] - Spinner style (primary, secondary, tertiary, success, danger, warning, info)
  * @param {string} [options.size='default'] - Spinner size (small, default, large)
  * @param {string} [options.label='Loading...'] - Screen reader label text
  * @param {string} [options.id] - Spinner container ID
@@ -17,7 +16,6 @@
  * @returns {HTMLElement} Spinner element
  */
 export function createSpinner({
-    style = 'primary',
     size = 'default',
     label = 'Loading...',
     id = null,
@@ -25,7 +23,7 @@ export function createSpinner({
 } = {}) {
     // Bootstrap 4.6.2 spinner-border container
     const spinner = document.createElement("div");
-    spinner.classList.add("spinner-border", "plus-spinner", `plus-spinner-${style}`, `plus-spinner-${size}`);
+    spinner.classList.add("spinner-border", "plus-spinner", `plus-spinner-${size}`);
     
     // Set ARIA attributes for accessibility
     spinner.setAttribute("role", "status");
@@ -47,6 +45,8 @@ export function createSpinner({
     
     return spinner;
 }
+
+
 
 
 

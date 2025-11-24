@@ -128,7 +128,7 @@ export const AllVariants = {
           stateLabel.style.opacity = '0.7';
           stateWrapper.appendChild(stateLabel);
           
-          const dropdown = PlusInterface.createDropdown({
+        const dropdown = PlusInterface.createDropdown({
             buttonText: split ? 'Split Dropdown' : 'Dropdown',
             size: 'default',
             style: 'primary',
@@ -148,6 +148,8 @@ export const AllVariants = {
               menu.style.position = 'static'; // Static positioning for Storybook display
               menu.style.transform = 'none';
               menu.style.margin = '0';
+              // Add show class for Bootstrap compatibility
+              menu.classList.add('show');
               
               // For split dropdowns, buttons are direct children. For standard, toggle is direct child.
               // Find the first button element to insert menu before/after
@@ -208,12 +210,21 @@ export const AllVariants = {
                 if ($toggle.length && !$toggle.data('bs.dropdown')) {
                   $toggle.dropdown();
                   
+                  // When Bootstrap shows the menu, add the show class
+                  $toggle.on('shown.bs.dropdown', function() {
+                    const menu = dropdown.querySelector('.dropdown-menu');
+                    if (menu) {
+                      menu.classList.add('show');
+                    }
+                  });
+                  
                   // When Bootstrap hides the menu, ensure it can override our inline styles
                   $toggle.on('hidden.bs.dropdown', function() {
                     const menu = dropdown.querySelector('.dropdown-menu');
                     if (menu) {
                       // Remove inline display style so Bootstrap can hide it
                       menu.style.display = '';
+                      menu.classList.remove('show');
                       // Also reset container flex styles if they were set
                       if (dropdown.getAttribute('data-storybook-open')) {
                         dropdown.style.display = '';
@@ -296,6 +307,17 @@ export const OpenProperty = {
       direction: 'dropdown',
       items: [],
     });
+    
+    // Initialize Bootstrap dropdown for closed state
+    setTimeout(() => {
+      if (typeof $ !== 'undefined' && $.fn.dropdown) {
+        const $toggle = $(closedDropdown).find('.dropdown-toggle');
+        if ($toggle.length && !$toggle.data('bs.dropdown')) {
+          $toggle.dropdown();
+        }
+      }
+    }, 0);
+    
     closedWrapper.appendChild(closedDropdown);
     container.appendChild(closedWrapper);
     
@@ -327,6 +349,7 @@ export const OpenProperty = {
       menu.style.transform = 'none';
       menu.style.opacity = '1';
       menu.style.marginTop = '0';
+      menu.classList.add('show');
     }
     const toggle = openDropdown.querySelector('.dropdown-toggle');
     if (toggle) {
@@ -409,6 +432,17 @@ export const SplitProperty = {
       direction: 'dropdown',
       items: [],
     });
+    
+    // Initialize Bootstrap dropdown for closed state
+    setTimeout(() => {
+      if (typeof $ !== 'undefined' && $.fn.dropdown) {
+        const $toggle = $(standardClosed).find('.dropdown-toggle');
+        if ($toggle.length && !$toggle.data('bs.dropdown')) {
+          $toggle.dropdown();
+        }
+      }
+    }, 0);
+    
     standardRow.appendChild(standardClosed);
     
     // Open standard (dropdown direction - opens downward)
@@ -428,6 +462,7 @@ export const SplitProperty = {
       menu1.style.opacity = '1';
       menu1.style.marginTop = 'var(--size-element-gap-sm)';
       menu1.style.marginBottom = '0';
+      menu1.classList.add('show');
     }
     const toggle1 = standardOpen.querySelector('.dropdown-toggle');
     if (toggle1) {
@@ -472,6 +507,17 @@ export const SplitProperty = {
       direction: 'dropdown',
       items: [],
     });
+    
+    // Initialize Bootstrap dropdown for closed state
+    setTimeout(() => {
+      if (typeof $ !== 'undefined' && $.fn.dropdown) {
+        const $toggle = $(splitClosed).find('.dropdown-toggle');
+        if ($toggle.length && !$toggle.data('bs.dropdown')) {
+          $toggle.dropdown();
+        }
+      }
+    }, 0);
+    
     splitRow.appendChild(splitClosed);
     
     // Open split (dropdown direction - opens downward)
@@ -491,6 +537,7 @@ export const SplitProperty = {
       menu2.style.opacity = '1';
       menu2.style.marginTop = 'var(--size-element-gap-sm)';
       menu2.style.marginBottom = '0';
+      menu2.classList.add('show');
     }
     const toggle2 = splitOpen.querySelector('.dropdown-toggle');
     if (toggle2) {
@@ -512,13 +559,36 @@ export const SplitProperty = {
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
+    
+    // Default items with all properties (matching Figma design)
+    const defaultItems = args.items || [
+      { 
+        text: 'Form', 
+        leadingIcon: 'th',
+        counter: 20,
+        dropright: true,
+        onClick: () => console.log('Form clicked')
+      },
+      { 
+        text: 'Form', 
+        leadingIcon: 'th',
+        counter: 20,
+        dropright: true,
+        onClick: () => console.log('Form clicked')
+      },
+      { 
+        text: 'Form', 
+        leadingIcon: 'th',
+        counter: 20,
+        dropright: true,
+        selected: true,
+        onClick: () => console.log('Form clicked (selected)')
+      }
+    ];
+    
     const dropdown = PlusInterface.createDropdown({
       ...args,
-      items: args.items || [
-        { text: 'Option 1', onClick: () => console.log('Option 1 clicked') },
-        { text: 'Option 2', onClick: () => console.log('Option 2 clicked') },
-        { text: 'Option 3', onClick: () => console.log('Option 3 clicked') },
-      ],
+      items: defaultItems,
     });
     container.appendChild(dropdown);
     
@@ -533,6 +603,14 @@ export const Interactive = {
         // No need to set offset or placement - Bootstrap handles this automatically
       });
       
+      // When Bootstrap shows the menu, add the show class
+      $toggle.on('shown.bs.dropdown', function() {
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if (menu) {
+          menu.classList.add('show');
+        }
+      });
+      
       // Ensure Bootstrap can hide the menu by removing inline styles when hidden
       $toggle.on('hidden.bs.dropdown', function() {
         const menu = dropdown.querySelector('.dropdown-menu');
@@ -543,6 +621,7 @@ export const Interactive = {
           menu.style.transform = '';
           menu.style.margin = '';
           menu.style.opacity = '';
+          menu.classList.remove('show');
         }
         // Also reset container flex styles if they were set
         if (dropdown.getAttribute('data-storybook-open')) {
@@ -580,6 +659,10 @@ export const Interactive = {
       options: ['dropdown', 'dropup', 'dropleft', 'dropright'],
       description: 'Dropdown direction',
     },
+    items: {
+      control: 'object',
+      description: 'Array of dropdown items. Each item can have: text, leadingIcon, counter, dropright, selected, disabled, onClick',
+    },
   },
   args: {
     buttonText: 'Dropdown',
@@ -587,5 +670,29 @@ export const Interactive = {
     style: 'primary',
     split: false,
     direction: 'dropdown',
+    items: [
+      { 
+        text: 'Form', 
+        leadingIcon: 'th',
+        counter: 20,
+        dropright: true,
+        onClick: () => console.log('Form clicked')
+      },
+      { 
+        text: 'Form', 
+        leadingIcon: 'th',
+        counter: 20,
+        dropright: true,
+        onClick: () => console.log('Form clicked')
+      },
+      { 
+        text: 'Form', 
+        leadingIcon: 'th',
+        counter: 20,
+        dropright: true,
+        selected: true,
+        onClick: () => console.log('Form clicked (selected)')
+      }
+    ],
   },
 };

@@ -107,13 +107,78 @@ Map Figma spacing values to CSS variables:
 - Figma: `Spacing/4` → CSS: `--size-spacing-within-component-2: 4px`
 - Figma: `Spacing/16` → CSS: `--size-spacing-between-components-3: 16px`
 
+## Automatic Token Syncing
+
+The design system now supports automatic syncing of tokens from Figma to the codebase using the Figma API and GitHub Actions.
+
+### Setup
+
+1. **Obtain Figma API Access Token**:
+   - Go to https://www.figma.com/developers/api#access-tokens
+   - Click "Get personal access token"
+   - Copy the generated token
+
+2. **Find Your Figma File Key**:
+   - Open your Figma design system file
+   - The file key is in the URL: `https://www.figma.com/file/FILE_KEY/...`
+   - Copy the `FILE_KEY` portion
+
+3. **Configure GitHub Secrets**:
+   - Go to your repository Settings → Secrets and variables → Actions
+   - Add the following secrets:
+     - `FIGMA_FILE_KEY`: Your Figma file key
+     - `FIGMA_ACCESS_TOKEN`: Your Figma API access token
+
+4. **Local Development Setup** (optional):
+   - Create a `.env` file in the project root (see `.env.example`)
+   - Add your `FIGMA_FILE_KEY` and `FIGMA_ACCESS_TOKEN`
+   - Run `npm run sync:tokens` to sync manually
+
+### How It Works
+
+1. **Automatic Daily Sync**: GitHub Actions runs daily at midnight UTC to sync tokens
+2. **Manual Sync**: You can trigger sync manually via GitHub Actions UI or locally with `npm run sync:tokens`
+3. **Token Generation**: After syncing, tokens are automatically generated into SCSS files
+4. **Auto-commit**: If tokens have changed, they are automatically committed to the repository
+
+### Manual Sync Process (Fallback)
+
+If automatic syncing is not available, you can manually sync tokens:
+
+1. **Export from Figma**:
+   - Export design tokens as JSON files from Figma
+   - Place them in the `new tokens/` directory with these exact names:
+     - `colors _ accent.json`
+     - `colors _ neutral.json`
+     - `size _ primitive.json`
+     - `size _ semantics.json`
+     - `size _ layout.json`
+
+2. **Generate SCSS Files**:
+   ```bash
+   npm run generate:tokens
+   ```
+
+### Token Preservation
+
+**Important**: The automatic sync process:
+- **Preserves all existing semantic tokens** - never modifies or redefines existing token mappings
+- **Only adds missing semantic tokens** - like `--size-element-radius-pill` for fully rounded corners
+- **Uses semantic tokens only** - generated SCSS files use semantic tokens, never primitive tokens directly
+- **Maintains existing structure** - all existing token generation logic remains unchanged
+
+### Scripts
+
+- `npm run sync:tokens` - Fetch tokens from Figma API and save to `new tokens/` directory
+- `npm run generate:tokens` - Generate SCSS files from tokens in `new tokens/` directory
+
 ## Next Steps
 
 1. **Identify Figma Files**: Get file keys for design system files
-2. **Extract Tokens**: Use Figma MCP or manual extraction
+2. **Extract Tokens**: Use automatic sync, Figma MCP, or manual extraction
 3. **Validate**: Compare Figma tokens with production code tokens
 4. **Document**: Create mapping documentation
-5. **Sync**: Set up process to keep Figma and code in sync
+5. **Sync**: Automatic daily sync via GitHub Actions (or manual sync as fallback)
 
 ## Notes
 
@@ -121,4 +186,5 @@ Map Figma spacing values to CSS variables:
 - Component specifications in Figma should match component implementations
 - Regular sync between Figma and code is important
 - Changes in Figma should be reflected in code and documentation
+- **Existing semantic tokens are preserved** - only missing tokens are added automatically
 

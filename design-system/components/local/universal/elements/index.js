@@ -35,6 +35,6 @@ export { createLoadingGif } from './loading-gif.js';
 export { createPopover, createPopoverButton } from './popover.js';
 export { createPagination } from './pagination.js';
 export { createTooltip, createTooltipButton, destroyAllTooltips } from './tooltip.js';
-export { initScrollspy, createScrollspy } from './scrollspy.js';
+export { createScrollspy, createScrollspyContent } from './scrollspy.js';
 export { createRichTextEditor } from './rich-text-editor.js';
 

@@ -176,6 +176,7 @@ Use for: buttons, forms, badges, items
 - `--size-element-radius-sm` - 4px
 - `--size-element-radius-md` - 4px
 - `--size-element-radius-lg` - 4px
+- `--size-element-radius-pill` - 999px (Fully rounded pill shape)
 
 #### Border/Stroke
 - `--size-element-stroke-sm` - 1px

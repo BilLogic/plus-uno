@@ -1,18 +1,19 @@
 /**
  * @fileoverview Popover component for PLUS design system.
  * Universal element component for creating popovers that display additional information.
+ * Matches Figma design system specifications exactly.
  * Uses Bootstrap 4.6.2 popover functionality with PLUS design system styling.
  */
 
 /**
  * Creates a popover element styled according to PLUS design system
+ * Matches Figma design system specifications exactly
  * @param {Object} options - Popover configuration options
  * @param {string|HTMLElement} options.trigger - Trigger element (button, link, etc.) or selector string
  * @param {string} options.content - Popover content text
- * @param {string} [options.title] - Popover title (optional)
+ * @param {string} [options.title] - Popover title (optional - creates "title + content" type)
  * @param {string} [options.placement="top"] - Popover placement ("top", "bottom", "left", "right")
  * @param {string} [options.triggerType="click"] - Trigger type ("click", "hover", "focus", "manual")
- * @param {string} [options.size="default"] - Popover size ("small", "default", "large")
  * @param {string} [options.id] - Popover ID
  * @param {Array} [options.classes=[]] - Additional CSS classes
  * @returns {HTMLElement} Popover trigger element with popover initialized
@@ -23,7 +24,6 @@ export function createPopover({
     title,
     placement = "top",
     triggerType = "click",
-    size = "default",
     id,
     classes = []
 } = {}) {
@@ -45,9 +45,15 @@ export function createPopover({
     // Add popover classes
     triggerElement.classList.add("plus-popover-trigger");
     
-    if (size && size !== "default") {
-        triggerElement.classList.add(`plus-popover-${size}`);
+    // Add type class based on whether title is provided
+    if (title) {
+        triggerElement.classList.add("plus-popover-title-content");
+    } else {
+        triggerElement.classList.add("plus-popover-content-only");
     }
+    
+    // Add placement class
+    triggerElement.classList.add(`plus-popover-${placement}`);
     
     if (classes && classes.length > 0) {
         triggerElement.classList.add(...classes);
@@ -57,21 +63,43 @@ export function createPopover({
         triggerElement.id = id;
     }
 
+    // Build popover content HTML based on type
+    let popoverContent = "";
+    if (title) {
+        // Title + Content type
+        popoverContent = `
+            <div class="plus-popover-title">${title}</div>
+            <div class="plus-popover-body">${content}</div>
+        `;
+    } else {
+        // Content only type
+        popoverContent = `<div class="plus-popover-body">${content}</div>`;
+    }
+    
     // Set Bootstrap popover data attributes
     triggerElement.setAttribute("data-toggle", "popover");
     triggerElement.setAttribute("data-placement", placement);
     triggerElement.setAttribute("data-trigger", triggerType);
-    triggerElement.setAttribute("data-content", content);
-    
-    if (title) {
-        triggerElement.setAttribute("data-title", title);
-    }
+    triggerElement.setAttribute("data-content", popoverContent);
+    triggerElement.setAttribute("data-html", "true");
 
     // Initialize Bootstrap popover when jQuery is available
     if (typeof $ !== "undefined") {
         $(triggerElement).popover({
             html: true,
             container: "body"
+        });
+        
+        // After popover is shown, add our custom class and restructure if needed
+        $(triggerElement).on('shown.bs.popover', function() {
+            const popover = $(this).data('bs.popover');
+            if (popover && popover.tip) {
+                const $tip = $(popover.tip);
+                $tip.addClass('plus-popover');
+                
+                // Remove Bootstrap's default header if it exists
+                $tip.find('.popover-header').remove();
+            }
         });
     } else {
         console.warn("Popover: jQuery is required for Bootstrap popover functionality");
@@ -88,10 +116,6 @@ export function createPopover({
  * @param {string} [options.title] - Popover title (optional)
  * @param {string} [options.placement="top"] - Popover placement ("top", "bottom", "left", "right")
  * @param {string} [options.triggerType="click"] - Trigger type ("click", "hover", "focus", "manual")
- * @param {string} [options.size="default"] - Popover size ("small", "default", "large")
- * @param {string} [options.buttonStyle="default"] - Button style ("primary", "secondary", "success", "danger", "warning", "info", "default")
- * @param {string} [options.buttonFill="filled"] - Button fill ("filled", "outline", "tonal", "text")
- * @param {string} [options.buttonSize="default"] - Button size ("small", "default", "large")
  * @param {string} [options.id] - Popover ID
  * @param {Array} [options.classes=[]] - Additional CSS classes
  * @returns {HTMLElement} Button element with popover initialized
@@ -102,19 +126,12 @@ export function createPopoverButton({
     title,
     placement = "top",
     triggerType = "click",
-    size = "default",
-    buttonStyle = "default",
-    buttonFill = "filled",
-    buttonSize = "default",
     id,
     classes = []
 } = {}) {
-    // Import PlusInterface dynamically to avoid circular dependencies
-    // In a real scenario, you might want to import this at the top
-    // For now, we'll create a simple button element
     const button = document.createElement("button");
     button.type = "button";
-    button.classList.add("btn");
+    button.className = "btn btn-primary";
     button.textContent = buttonText;
     
     // Use createPopover to add popover functionality
@@ -124,11 +141,8 @@ export function createPopoverButton({
         title,
         placement,
         triggerType,
-        size,
         id,
         classes
     });
 }
-
-
 
