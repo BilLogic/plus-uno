@@ -176,6 +176,7 @@ Use for: buttons, forms, badges, items
 - `--size-element-radius-sm` - 4px
 - `--size-element-radius-md` - 4px
 - `--size-element-radius-lg` - 4px
+- `--size-element-radius-pill` - 999px (Fully rounded pill shape)
 
 #### Border/Stroke
 - `--size-element-stroke-sm` - 1px
@@ -400,5 +401,5 @@ Use for: table cells and spacing
 
 - **Terminology Guide**: `guidelines/terminology.md` - Component type definitions
 - **Coding Standards**: `guidelines/coding-standards.md` - Project rules and standards
-- **Design Tokens Source**: `src/css/tokens/` - SCSS token files
+- **Design Tokens Source**: `design-system/tokens/` - SCSS token files
 

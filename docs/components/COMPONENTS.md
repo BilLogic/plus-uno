@@ -11,6 +11,14 @@ This document describes the PLUS component library and how to use components in 
 - Components use CSS classes for styling (utility classes + component-specific classes)
 - jQuery is used for DOM manipulation in production
 
+### Bootstrap Integration
+- **ALWAYS override Bootstrap default spacing/padding with design tokens**
+- When using Bootstrap classes (form-check, custom-control, dropdown, etc.), explicitly override their default spacing
+- Use PLUS design tokens from Figma instead of Bootstrap's default values
+- Example: `.form-check` has default `padding-left: 1.25rem` - override with `padding-left: 0` and use `gap: var(--size-element-gap-sm)` instead
+- Check Bootstrap's default styles and explicitly override them with PLUS tokens
+- Never rely on Bootstrap's default spacing - always use design tokens from Figma
+
 ### Import Pattern
 ```javascript
 import { PlusInterface } from "./components/general_interface.js";
@@ -59,7 +67,21 @@ const button = PlusInterface.createButton({
 ```
 
 #### createCheckbox(options)
-Creates a checkbox with label.
+Creates a checkbox with label. Use checkboxes when users can select multiple options from a set.
+
+**When to Use:**
+- Multiple selections from a set
+- Form fields requiring yes/no or multiple choice answers
+- Filters for multiple criteria
+- Settings with multiple features that can be enabled simultaneously
+- Agreements (terms of service, privacy policy)
+- Lists where users select several items
+- Bulk actions for selecting multiple items
+
+**When NOT to Use:**
+- Single selection (use radio buttons)
+- Binary toggle that takes effect immediately (use switches)
+- Many options (>10) - consider multi-select dropdown
 
 **Options:**
 - `label` (string): Label text
@@ -68,6 +90,9 @@ Creates a checkbox with label.
 - `id` (string): Input ID
 - `classes` (array, optional): Additional CSS classes
 - `checked` (boolean, optional): Whether checkbox is checked
+- `indeterminate` (boolean, optional): Whether checkbox is in indeterminate state (shows dash/minus instead of checkmark, used when some items in a group are selected)
+- `disabled` (boolean, optional): Whether checkbox is disabled
+- `onChange` (function, optional): Change event handler
 
 **Example:**
 ```javascript
@@ -77,6 +102,192 @@ const checkbox = PlusInterface.createCheckbox({
     value: "yes",
     id: "agree-checkbox",
     checked: false
+});
+```
+
+#### createRadio(options)
+Creates a radio button with label. Use radio buttons when users can select only one option from a set of mutually exclusive options.
+
+**When to Use:**
+- Single selection from mutually exclusive options
+- Form fields requiring single choice answers (e.g., "Select your preferred contact method")
+- Settings where only one option applies (e.g., "Choose notification frequency")
+- Small option sets (2-5 options) that should all be visible
+- Required choices where all options should be visible
+
+**When NOT to Use:**
+- Multiple selections (use checkboxes)
+- Binary toggle that takes effect immediately (use switches)
+- Many options (>5) or limited space (use dropdowns)
+- Optional single choice with limited space (consider dropdown)
+
+**Options:**
+- `label` (string): Label text
+- `name` (string): Input name attribute (required for radio groups)
+- `value` (string): Input value attribute
+- `id` (string): Input ID
+- `classes` (array, optional): Additional CSS classes
+- `checked` (boolean, optional): Whether radio is checked
+- `disabled` (boolean, optional): Whether radio is disabled
+- `onChange` (function, optional): Change event handler
+
+**Example:**
+```javascript
+const radio = PlusInterface.createRadio({
+    label: "Option 1",
+    name: "choice",
+    value: "option1",
+    id: "radio-option1",
+    checked: false
+});
+```
+
+#### createRadioGroup(options, groupName)
+Creates a group of related radio buttons.
+
+**Parameters:**
+- `options` (array): Array of radio option objects with `label`, `value`, `id`, `checked` (optional)
+- `groupName` (string): Common name attribute for all radios in the group
+
+**Example:**
+```javascript
+const radioGroup = PlusInterface.createRadioGroup([
+    { label: "Option 1", value: "opt1", id: "radio-opt1", checked: true },
+    { label: "Option 2", value: "opt2", id: "radio-opt2", checked: false },
+    { label: "Option 3", value: "opt3", id: "radio-opt3", checked: false }
+], "choice-group");
+```
+
+#### createSwitch(options)
+Creates a switch (toggle) component. Use switches for binary on/off states that take effect immediately.
+
+**When to Use:**
+- Binary states (on/off, enabled/disabled, yes/no)
+- Settings that take effect immediately (e.g., "Enable notifications", "Dark mode")
+- User preference toggles that apply instantly (e.g., "Auto-save", "Email notifications")
+- Settings panels with multiple toggles
+- Feature flags for enabling/disabling features
+
+**When NOT to Use:**
+- Multiple options (use radio buttons)
+- Multiple selections (use checkboxes)
+- Form submission required (use checkboxes or radio buttons)
+- Complex states (use dropdowns)
+- Single choice from many (use radio buttons or dropdowns)
+- Delayed actions requiring confirmation (consider checkboxes)
+
+**Options:**
+- `label` (string): Label text
+- `name` (string): Input name attribute
+- `id` (string): Input ID
+- `classes` (array, optional): Additional CSS classes
+- `checked` (boolean, optional): Whether switch is checked (on)
+- `disabled` (boolean, optional): Whether switch is disabled
+- `onChange` (function, optional): Change event handler
+
+**Example:**
+```javascript
+const switchEl = PlusInterface.createSwitch({
+    label: "Enable notifications",
+    name: "notifications",
+    id: "switch-notifications",
+    checked: true
+});
+```
+
+#### createDatePicker(options)
+Creates a date picker component with calendar popup. Use for selecting dates in forms.
+
+**When to Use:**
+- Selecting a single date
+- Date input in forms (birthday, appointment date, deadline)
+- Date range selection (with min/max constraints)
+- When calendar visualization is helpful
+
+**Options:**
+- `id` (string, optional): Input ID
+- `name` (string, optional): Input name attribute
+- `placeholder` (string, optional): Placeholder text
+- `value` (Date|string, optional): Initial date value
+- `minDate` (Date|string, optional): Minimum selectable date
+- `maxDate` (Date|string, optional): Maximum selectable date
+- `size` (string, optional): Size - "small", "medium", "large", default "medium"
+- `calendarAlign` (string, optional): Calendar alignment - "left", "center", "right", default "left"
+- `disabled` (boolean, optional): Whether date picker is disabled
+- `onChange` (function, optional): Change event handler
+
+**Example:**
+```javascript
+const datePicker = PlusInterface.createDatePicker({
+    id: "date-input",
+    name: "appointment-date",
+    placeholder: "Select a date",
+    minDate: new Date(), // Only allow future dates
+    calendarAlign: "center"
+});
+```
+
+#### createTextarea(options)
+Creates a textarea element for multi-line text input.
+
+**When to Use:**
+- Multi-line text input (comments, descriptions, notes)
+- Longer content that doesn't fit on a single line
+- Form fields requiring paragraph-length input
+
+**Options:**
+- `id` (string, optional): Textarea ID
+- `name` (string, optional): Textarea name attribute
+- `placeholder` (string, optional): Placeholder text
+- `value` (string, optional): Initial value
+- `size` (string, optional): Size - "small", "medium", "large", default "medium"
+- `readonly` (boolean, optional): Whether textarea is read-only
+- `disabled` (boolean, optional): Whether textarea is disabled
+- `rows` (number, optional): Number of rows
+- `cols` (number, optional): Number of columns
+- `onChange` (function, optional): Change event handler
+
+**Example:**
+```javascript
+const textarea = PlusInterface.createTextarea({
+    id: "comments",
+    name: "comments",
+    placeholder: "Enter your comments...",
+    size: "medium",
+    rows: 4
+});
+```
+
+#### createSelect(options)
+Creates a select dropdown element for single selection from a list.
+
+**When to Use:**
+- Single selection from a list of options
+- When space is limited
+- Many options (>5) that would clutter the interface as radio buttons
+- Optional selections where a dropdown is more appropriate
+
+**Options:**
+- `id` (string, optional): Select ID
+- `name` (string, optional): Select name attribute
+- `size` (string, optional): Size - "small", "medium", "large", default "medium"
+- `readonly` (boolean, optional): Whether select is read-only
+- `disabled` (boolean, optional): Whether select is disabled
+- `options` (array, optional): Array of option objects: `{value: string, text: string, selected: boolean}`
+- `placeholder` (string, optional): Placeholder option text
+- `onChange` (function, optional): Change event handler
+
+**Example:**
+```javascript
+const select = PlusInterface.createSelect({
+    id: "country",
+    name: "country",
+    placeholder: "Select a country",
+    options: [
+        { value: "us", text: "United States", selected: false },
+        { value: "ca", text: "Canada", selected: true },
+        { value: "uk", text: "United Kingdom", selected: false }
+    ]
 });
 ```
 

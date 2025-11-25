@@ -4,12 +4,16 @@
   "description": "Starter kit for PLUS design prototyping with Cursor agent",
   "main": "index.js",
   "scripts": {
-    "build:css": "sass src/css/main.scss dist/css/main.css",
-    "watch:css": "sass --watch src/css/main.scss:dist/css/main.css",
+    "build:css": "sass --load-path=design-system/tokens --load-path=design-system/components src/css/main.scss dist/css/main.css",
+    "watch:css": "sass --load-path=design-system/tokens --load-path=design-system/components --watch src/css/main.scss:dist/css/main.css",
+    "watch:css:auto": "node scripts/watch-css.js",
+    "dev": "npm run watch:css:auto & npm run serve",
     "serve": "python3 -m http.server 8000",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006 --config-dir sandbox/.storybook",
-    "build-storybook": "storybook build --config-dir sandbox/.storybook -o sandbox/storybook-static"
+    "build-storybook": "storybook build --config-dir sandbox/.storybook -o sandbox/storybook-static",
+    "sync:tokens": "node scripts/sync-figma-tokens.js",
+    "generate:tokens": "node scripts/generate-all-tokens.js"
   },
   "keywords": [
     "plus",
@@ -26,6 +30,7 @@
     "@storybook/blocks": "^8.6.14",
     "@storybook/html": "^8.6.14",
     "@storybook/html-vite": "^8.6.14",
+    "dotenv": "^16.4.5",
     "sass": "^1.77.8",
     "storybook": "^8.6.14",
     "vite": "^7.2.2"

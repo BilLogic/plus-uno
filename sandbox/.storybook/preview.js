@@ -1,7 +1,13 @@
 /**
  * Storybook preview configuration for PLUS Design System
  * Dependencies (Bootstrap, jQuery, Font Awesome, PLUS CSS) are loaded via preview-head.html
+ * 
+ * Note: CSS is loaded via preview-head.html to avoid Vite module resolution issues
+ * The CSS file at /dist/css/main.css contains all color tokens and component styles
  */
+
+import { clearAllToasts } from '../../design-system/components/local/universal/elements/toast.js';
+import { destroyAllTooltips } from '../../design-system/components/local/universal/elements/tooltip.js';
 
 /** @type { import('@storybook/html').Preview } */
 const preview = {
@@ -62,6 +68,22 @@ const preview = {
   },
   decorators: [
     (story) => {
+      // Clear all toasts before rendering a new story
+      // This prevents toasts from previous stories from persisting
+      try {
+        clearAllToasts();
+      } catch (e) {
+        // Silently fail if toast module isn't loaded yet
+      }
+      
+      // Destroy all tooltips before rendering a new story
+      // This prevents tooltips from previous stories from persisting
+      try {
+        destroyAllTooltips();
+      } catch (e) {
+        // Silently fail if tooltip module isn't loaded yet
+      }
+      
       // Create a container with proper structure
       const container = document.createElement('div');
       container.style.padding = '2rem';

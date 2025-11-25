@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // Fix state layer naming in colors file
-const colorsContent = fs.readFileSync('src/css/tokens/_colors.scss', 'utf8');
+const colorsContent = fs.readFileSync('design-system/tokens/_colors.scss', 'utf8');
 
 let fixed = colorsContent
     .replace(/--color-primary-state-layers-primary (\d+):/g, '--color-primary-state-$1:')
@@ -27,6 +27,6 @@ let fixed = colorsContent
     .replace(/--color-technology-tools-state-layers-technology-tools (\d+):/g, '--color-technology-tools-state-$1:')
     .replace(/--color-technology-tools-state-layers-technology-tools container (\d+):/g, '--color-technology-tools-container-state-$1:');
 
-fs.writeFileSync('src/css/tokens/_colors.scss', fixed);
+fs.writeFileSync('design-system/tokens/_colors.scss', fixed);
 console.log('✅ Fixed state layer naming in colors file');
 

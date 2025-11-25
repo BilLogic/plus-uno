@@ -1,0 +1,161 @@
+/**
+ * Jumbotron Component Styles
+ * Matches Figma design system specifications
+ * Jumbotrons are Section components used for marketing/landing pages to display prominent content
+ * 
+ * Based on Bootstrap 4.6.2 Jumbotron with PLUS design system tokens
+ * Figma Specs:
+ * - Uses section- tokens for spacing and layout
+ * - Background: surface or surface-container
+ * - Typography: h1 for title, h4 for subtitle, body1 for body
+ * - Responsive padding: larger on desktop, smaller on mobile
+ */
+
+.plus-jumbotron {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: var(--color-surface-container); /* Figma: surface-container background */
+    color: var(--color-on-surface);
+    
+    /* Default padding from Figma specs: responsive padding */
+    /* Mobile: section-pad-y-md (24px) section-pad-x-md (24px) */
+    /* Desktop: section-pad-y-lg (36px) section-pad-x-lg (36px) */
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md); /* 24px all sides on mobile */
+    
+    /* Default gap - spacing between title, subtitle, body, and buttons */
+    gap: 0;
+    
+    /* Default radius from Figma specs: 8px (section-radius-md) */
+    border-radius: var(--size-section-radius-md);
+    
+    /* Margin bottom for spacing from following content */
+    margin-bottom: var(--size-section-gap-md);
+    
+    /* Responsive padding - larger on desktop */
+    @media (min-width: 768px) {
+        padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg); /* 36px all sides on desktop */
+    }
+}
+
+/* Fluid variant - full width, no border-radius */
+.plus-jumbotron-fluid {
+    padding-right: 0;
+    padding-left: 0;
+    border-radius: 0;
+}
+
+/* Padding Size Variants */
+.plus-jumbotron-pad-sm {
+    padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm); /* 16px all sides */
+    
+    @media (min-width: 768px) {
+        padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md); /* 24px all sides on desktop */
+    }
+}
+
+.plus-jumbotron-pad-md {
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md); /* 24px all sides */
+    
+    @media (min-width: 768px) {
+        padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg); /* 36px all sides on desktop */
+    }
+}
+
+.plus-jumbotron-pad-lg {
+    padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg); /* 36px all sides */
+    
+    @media (min-width: 768px) {
+        padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg); /* 36px all sides on desktop */
+    }
+}
+
+/* Gap Size Variants */
+.plus-jumbotron-gap-sm {
+    gap: var(--size-section-gap-sm); /* 8px */
+}
+
+.plus-jumbotron-gap-md {
+    gap: var(--size-section-gap-md); /* 16px */
+}
+
+.plus-jumbotron-gap-lg {
+    gap: var(--size-section-gap-lg); /* 24px */
+}
+
+/* Radius Size Variants (only applies when not fluid) */
+.plus-jumbotron-radius-sm {
+    border-radius: var(--size-section-radius-sm); /* 8px */
+}
+
+.plus-jumbotron-radius-md {
+    border-radius: var(--size-section-radius-md); /* 8px */
+}
+
+.plus-jumbotron-radius-lg {
+    border-radius: var(--size-section-radius-lg); /* 16px */
+}
+
+/* Jumbotron Content Container */
+/* Figma: gap between title, subtitle, body, and buttons */
+.plus-jumbotron-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md); /* 16px default gap between elements */
+    flex: 1 1 auto;
+}
+
+/* Jumbotron Title */
+/* Figma: Title/H1 - Lato SemiBold, 32px, lineHeight 1.25 */
+/* Typography handled by .h1 class - only override color and margin */
+.plus-jumbotron-title {
+    color: var(--color-on-surface);
+    margin: 0;
+    margin-bottom: var(--size-section-gap-sm); /* 8px bottom margin */
+}
+
+/* Jumbotron Subtitle */
+/* Figma: Title/H4 - Lato SemiBold, 24px, lineHeight 1.333 */
+/* Typography handled by .h4 class - only override color and margin */
+.plus-jumbotron-subtitle {
+    color: var(--color-on-surface-variant);
+    margin: 0;
+    margin-bottom: var(--size-section-gap-sm); /* 8px bottom margin */
+}
+
+/* Jumbotron Body */
+/* Figma: Body/B1/Regular - Merriweather Sans Light, 16px, lineHeight 1.5 */
+/* Typography handled by .body1-txt class - only override color and margin */
+.plus-jumbotron-body {
+    color: var(--color-on-surface-variant); /* Figma: on-surface-variant, not on-surface */
+    margin: 0;
+    margin-bottom: var(--size-section-gap-sm); /* 8px bottom margin */
+}
+
+/* Jumbotron Actions Container */
+/* Figma: gap between buttons */
+.plus-jumbotron-actions {
+    display: flex;
+    flex-direction: row;
+    gap: var(--size-element-gap-md); /* 10px gap between buttons */
+    flex-wrap: wrap;
+    margin-top: var(--size-section-gap-sm); /* 8px top margin */
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .plus-jumbotron-actions {
+        flex-direction: column;
+        width: 100%;
+        
+        /* Make buttons full width on mobile */
+        > * {
+            width: 100%;
+        }
+    }
+}
+
+
+
+
+

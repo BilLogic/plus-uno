@@ -35,18 +35,18 @@ export function createBadge({text, style = 'primary', size = 'b2', id, classes =
 }
 
 /**
- * Creates a chip component (similar to badge but with different semantics)
+ * Creates a chip component (similar to badge but always removable)
+ * All chips are removable by default - this is what differentiates them from badges
  * @param {Object} options - Chip configuration
  * @param {string} options.text - Chip text
  * @param {string} [options.style='primary'] - Chip style
  * @param {string} [options.size='b2'] - Chip size
  * @param {string} [options.id] - Chip ID
- * @param {boolean} [options.removable=false] - Whether chip can be removed
  * @param {Function} [options.onRemove] - Function to call when chip is removed
  * @param {Array} [options.classes] - Additional CSS classes
  * @returns {HTMLElement} Chip element
  */
-export function createChip({text, style = 'primary', size = 'b2', id, removable = false, onRemove = null, classes = []}) {
+export function createChip({text, style = 'default', size = 'b1', id, onRemove = null, classes = []}) {
     const chip = document.createElement("span");
     chip.classList.add("plus-chip", style, size);
     
@@ -63,20 +63,21 @@ export function createChip({text, style = 'primary', size = 'b2', id, removable 
     textEl.textContent = text;
     chip.appendChild(textEl);
 
-    if (removable) {
-        const removeBtn = document.createElement("button");
-        removeBtn.type = "button";
-        removeBtn.classList.add("plus-chip-remove");
-        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        removeBtn.setAttribute("aria-label", "Remove");
-        removeBtn.addEventListener("click", () => {
-            chip.remove();
-            if (onRemove) {
-                onRemove();
-            }
-        });
-        chip.appendChild(removeBtn);
-    }
+    // All chips are removable by default - this is what differentiates them from badges
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.classList.add("plus-chip-remove");
+    // Use fa-xmark to match other components (alert, modal)
+    removeBtn.innerHTML = '<i class="fas fa-xmark"></i>';
+    removeBtn.setAttribute("aria-label", "Remove");
+    removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        chip.remove();
+        if (onRemove) {
+            onRemove();
+        }
+    });
+    chip.appendChild(removeBtn);
 
     return chip;
 }

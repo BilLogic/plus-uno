@@ -31,7 +31,7 @@ sandbox/
 
 ## Stories Location
 
-Stories are located in `design-system/components/atoms-molecules/`:
+Stories are located in `design-system/components/molecules/` and `design-system/components/atoms/`:
 - `atoms/` - Atom-level component stories (Icon, Input, StatusIndicator, Typography)
 - `molecules/` - Molecule-level component stories (Alert, Badge, Breadcrumb, Button, etc.)
 

@@ -6,22 +6,47 @@
  */
 
 // Design Tokens
-@use "../design-system/tokens/colors" as *;
-@use "../design-system/tokens/primitives" as *;
-@use "../design-system/tokens/spacing_semantics" as *;
-@use "../design-system/tokens/layout" as *;
-@use "../design-system/tokens/fonts" as *;
-@use "../design-system/tokens/plus_spacing" as *;
-@use "../design-system/tokens/mixins" as *;
+// Use @import to include :root blocks (Ruby Sass outputs :root blocks with @import)
+// Import token files directly to ensure :root blocks are included
+@import "_colors";
+@import "_primitives";
+@import "_spacing_semantics";
+@import "_layout";
+@import "_fonts";
+@import "_plus_spacing";
 
-// Components
-@use "../design-system/styles/plus_buttons" as *;
-@use "../design-system/styles/inputs" as *;
-@use "../design-system/styles/alerts" as *;
-@use "../design-system/styles/breadcrumb" as *;
-@use "../design-system/styles/badges" as *;
-@use "../design-system/styles/dividers" as *;
-@use "../design-system/styles/button-groups" as *;
+// Components (using load path)
+@import "molecules/Button/Button";
+@import "atoms/Input/Input";
+@import "molecules/Alert/Alert";
+@import "molecules/Breadcrumb/Breadcrumb";
+@import "molecules/Badge/Badge";
+@import "molecules/Divider/Divider";
+@import "molecules/ButtonGroup/ButtonGroup";
+@import "molecules/Dropdown/Dropdown";
+@import "molecules/Card/Card";
+@import "molecules/Modal/Modal";
+@import "molecules/Navigation/Navigation";
+@import "molecules/Form/Form";
+@import "molecules/DatePicker/DatePicker";
+@import "molecules/Checkbox/Checkbox";
+@import "molecules/Radio/Radio";
+@import "molecules/Switch/Switch";
+@import "molecules/InputGroup/InputGroup";
+@import "molecules/ListGroup/ListGroup";
+@import "molecules/Carousel/Carousel";
+@import "molecules/Collapse/Collapse";
+@import "molecules/Jumbotron/Jumbotron";
+@import "molecules/MediaObject/MediaObject";
+@import "molecules/Progress/Progress";
+@import "molecules/Spinner/Spinner";
+@import "molecules/LoadingGif/LoadingGif";
+@import "molecules/Popover/Popover";
+@import "molecules/Pagination/Pagination";
+@import "molecules/Tooltip/Tooltip";
+@import "molecules/Toast/Toast";
+@import "molecules/Scrollspy/Scrollspy";
+@import "molecules/RichTextEditor/RichTextEditor";
 
 // Base Styles
 body {
@@ -35,6 +60,74 @@ body {
 }
 
 // Utility Classes
+
+// Color Utility Classes
+.color-primary {
+    color: var(--color-primary) !important;
+}
+
+.color-secondary {
+    color: var(--color-secondary) !important;
+}
+
+.color-tertiary {
+    color: var(--color-tertiary) !important;
+}
+
+.color-success {
+    color: var(--color-success) !important;
+}
+
+.color-danger {
+    color: var(--color-danger) !important;
+}
+
+.color-warning {
+    color: var(--color-warning) !important;
+}
+
+.color-info {
+    color: var(--color-info) !important;
+}
+
+.color-neutral {
+    color: var(--color-on-surface) !important;
+}
+
+.color-error {
+    color: var(--color-danger) !important;
+}
+
+// Background Color Utility Classes
+.bg-color-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-color-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-color-tertiary {
+    background-color: var(--color-tertiary) !important;
+}
+
+.bg-color-success {
+    background-color: var(--color-success) !important;
+}
+
+.bg-color-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.bg-color-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-color-info {
+    background-color: var(--color-info) !important;
+}
+
+// Other Utility Classes
 .shadow-light-2 {
     box-shadow: var(--elevation-light-2);
 }

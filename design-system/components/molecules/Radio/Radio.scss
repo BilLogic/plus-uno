@@ -1,0 +1,106 @@
+/**
+ * Radio Component Styles
+ * Bootstrap 4.6.2 form-check with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/forms/#radios
+ * 
+ * Component Type: Element (uses `element-*` tokens)
+ * Token Usage:
+ *   - Border: --color-outline-variant (unchecked), --color-primary (checked)
+ *   - Background: --color-primary (checked state)
+ *   - Focus: --color-inverse-primary (light blue focus ring, matches Switch pattern)
+ * 
+ * Bootstrap's default focus uses box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
+ * We override this to use PLUS design tokens with proper circular shape.
+ */
+
+/* ============================================
+   RADIO INPUT (Bootstrap 4.6.2 form-check-input)
+   ============================================ */
+
+.plus-radio {
+    /* Make radio button circular - required for circular focus ring */
+    border-radius: 50% !important;
+    position: relative; /* Required for pseudo-element positioning */
+    
+    /* Override browser's default accent-color (purple/blue) with primary color token */
+    accent-color: var(--color-primary) !important;
+    
+    /* Override Bootstrap's default blue/purple colors with primary color token */
+    /* Unchecked state - use outline-variant for border */
+    border-color: var(--color-outline-variant) !important;
+    background-color: transparent !important;
+    
+    /* Checked state - use primary color everywhere */
+    &:checked {
+        background-color: var(--color-primary) !important;
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+    }
+    
+    /* Create circular focus ring using pseudo-element */
+    /* This ensures the focus ring is truly circular, not square */
+    /* Position it to hug the radio button border with no gap */
+    &::after {
+        content: '';
+        position: absolute;
+        top: -2px; /* Position directly on the border edge (no gap) */
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 50%; /* Make it circular */
+        border: 2px solid var(--color-inverse-primary);
+        opacity: 0; /* Hidden by default */
+        pointer-events: none; /* Don't interfere with clicks */
+        transition: opacity 0.2s;
+    }
+    
+    /* Focus state - show circular ring only for keyboard navigation */
+    /* Use :focus-visible to only show focus ring when navigating with keyboard */
+    /* This prevents the focus ring from showing on mouse clicks */
+    &:focus-visible {
+        outline: none !important; /* Remove default outline */
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+        box-shadow: none !important; /* Remove any box-shadow */
+        
+        /* Show the circular focus ring */
+        &::after {
+            opacity: 1;
+        }
+    }
+    
+    /* Regular :focus state - update colors but don't show focus ring */
+    &:focus:not(:focus-visible) {
+        outline: none !important;
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+        box-shadow: none !important;
+        
+        /* Hide the focus ring on mouse clicks */
+        &::after {
+            opacity: 0;
+        }
+    }
+    
+    /* Hover state */
+    &:hover:not(:disabled) {
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+    }
+    
+    /* Disabled state */
+    &:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+        border-color: var(--color-outline-variant) !important;
+        background-color: var(--color-surface-variant) !important;
+        accent-color: var(--color-outline-variant) !important;
+    }
+    
+    &:disabled:checked {
+        background-color: var(--color-outline-variant) !important;
+        border-color: var(--color-outline-variant) !important;
+        accent-color: var(--color-outline-variant) !important;
+    }
+}

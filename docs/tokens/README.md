@@ -5,7 +5,7 @@ This folder contains documentation about the PLUS design system token system. Fo
 
 ## Token Files Location
 
-All SCSS token files are located in: `src/css/tokens/`
+All SCSS token files are located in: `design-system/tokens/`
 
 ### Token Files
 - `_colors.scss` - Material Design 3 color tokens (152 tokens)
@@ -13,8 +13,7 @@ All SCSS token files are located in: `src/css/tokens/`
 - `_spacing_semantics.scss` - Semantic spacing tokens (79 tokens)
 - `_layout.scss` - Layout and breakpoint tokens (8 tokens)
 - `_fonts.scss` - Typography tokens
-- `_size.scss` - Legacy size tokens (being phased out)
-- `_plus_spacing.scss` - Legacy spacing utilities (being phased out)
+- `_plus_spacing.scss` - PLUS-specific spacing
 - `_mixins.scss` - SASS mixins
 
 ## Token System Architecture
@@ -23,12 +22,12 @@ All SCSS token files are located in: `src/css/tokens/`
 
 1. **Primitives** (Infrastructure)
    - Base values: `space-000` through `space-1000`, `radius-50` through `radius-1000`, `stroke-100` through `stroke-300`
-   - Location: `src/css/tokens/_primitives.scss`
+   - Location: `design-system/tokens/_primitives.scss`
    - **DO NOT USE DIRECTLY** - These are infrastructure tokens
 
 2. **Semantics** (Designer/Developer Usage)
    - Contextual tokens: `element-*`, `card-*`, `section-*`, `modal-*`, `surface-*`, `surface-container-*`
-   - Location: `src/css/tokens/_spacing_semantics.scss`
+   - Location: `design-system/tokens/_spacing_semantics.scss`
    - **USE THESE** - These are what you should use in code
 
 ## Color System

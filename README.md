@@ -74,7 +74,8 @@ design-system/                # Design system source files
 │   └── ...
 ├── components/
 │   ├── local/               # Component implementations
-│   └── atoms-molecules/     # Storybook stories
+│   ├── molecules/          # Molecule components
+│   ├── atoms/              # Atom components
 └── styles/                  # Component styles
 ```
 
@@ -238,9 +239,11 @@ npm run watch:css
 ### Adding New Components
 
 1. Create component file in `design-system/components/local/`
-2. Add component styles in `design-system/styles/`
-3. Import in `src/js/main.js`
-4. Document in `docs/components/COMPONENTS.md`
+2. Create component folder in `design-system/components/` (in `molecules/` or `atoms/` subfolder)
+3. Add component styles (`.scss`) and Storybook story (`.stories.js`) in the component folder
+4. Import styles in `src/css/main.scss`
+5. Import component in `src/js/main.js`
+6. Document in `docs/components/COMPONENTS.md`
 
 ### Updating Design Tokens
 

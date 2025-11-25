@@ -14,6 +14,8 @@ This document outlines the coding standards, project rules, and best practices f
 - Follow PascalCase for classes
 - Use const/let, never var
 - Use static methods for component creation functions
+- **Reference production repository**: When creating new components, check the cloned production repository at `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` for existing functionality/styling patterns
+- Match production code patterns for component structure, functionality, and behavior
 
 ### CSS/SCSS
 - Always use CSS custom properties (variables) for design tokens
@@ -21,6 +23,9 @@ This document outlines the coding standards, project rules, and best practices f
 - Use utility classes for common patterns
 - Follow kebab-case for class names
 - Use SCSS partials for modularity
+- **Reference production repository**: When creating new component styles, check the cloned production repository at `{cloned-repo-path}/java/sass/` for existing styling patterns
+- Study production SCSS patterns for class naming, structure, and token usage
+- Match production styling patterns exactly (class prefixes, organization, patterns)
 
 ### HTML
 - Use semantic HTML elements
@@ -28,6 +33,16 @@ This document outlines the coding standards, project rules, and best practices f
 - Use Bootstrap 4 classes for layout
 - Use PLUS utility classes for styling
 - Maintain consistent structure
+
+### Bootstrap Integration
+- **ALWAYS override Bootstrap default spacing/padding with design tokens**
+- Bootstrap components (form-check, custom-control, dropdown, etc.) have default spacing that must be overridden
+- When using Bootstrap classes, explicitly set spacing to use PLUS design tokens:
+  - Override `padding-left`, `padding-right`, `margin-left`, `margin-right` with design tokens
+  - Use `padding-left: 0` or `padding-left: var(--size-element-gap-sm)` instead of Bootstrap defaults
+  - Example: `.form-check` has default `padding-left: 1.25rem` - override with `padding-left: 0` and use `gap: var(--size-element-gap-sm)` instead
+- Check Bootstrap's default styles and explicitly override them with PLUS tokens
+- Never rely on Bootstrap's default spacing - always use design tokens from Figma
 
 ## Design System Usage
 
@@ -55,11 +70,11 @@ When designing a specific type of UI, reference the appropriate guideline:
 ## File Structure
 
 ### Organization
-- Components: `src/js/components/`
+- Components: `design-system/components/local/`
 - Utilities: `src/js/utils/`
 - Styles: `src/css/`
-- Tokens: `src/css/tokens/`
-- Component styles: `src/css/components/`
+- Tokens: `design-system/tokens/`
+- Component styles: `design-system/components/` (organized by component in `molecules/` and `atoms/` folders)
 - Examples: `examples/`
 
 ### Naming Conventions
@@ -81,12 +96,14 @@ When designing a specific type of UI, reference the appropriate guideline:
 7. Use functional code patterns
 
 ### Component Creation
-1. Use static methods for component creation
-2. Return DOM elements (not HTML strings where possible)
-3. Accept configuration objects as parameters
-4. Provide sensible defaults
-5. Document all parameters with JSDoc
-6. Handle edge cases
+1. **Reference production repository first**: Check `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` and `{cloned-repo-path}/java/sass/` for existing implementations
+2. Use static methods for component creation
+3. Return DOM elements (not HTML strings where possible)
+4. Accept configuration objects as parameters
+5. Provide sensible defaults
+6. Document all parameters with JSDoc
+7. Handle edge cases
+8. Match production implementation patterns exactly
 
 ### Accessibility
 - Include proper ARIA attributes
@@ -156,6 +173,8 @@ const button = PlusInterface.createButton({
 9. **Never create components from scratch**: Use existing PLUS components when possible
 10. **Never use inline styles for design tokens**: Use CSS variables and utility classes
 11. **Never mix semantic sizes for same token type**: Use consistent sizes
+12. **Never rely on Bootstrap default spacing**: ❌ Using Bootstrap's default `form-check` padding ✅ Override with `padding-left: 0` and use `gap: var(--size-element-gap-sm)`
+13. **Never assume Bootstrap spacing matches design tokens**: Always explicitly override Bootstrap defaults with PLUS design tokens from Figma
 
 ## Output Guidelines
 

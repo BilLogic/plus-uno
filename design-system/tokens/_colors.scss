@@ -12,22 +12,25 @@
     /* Primary Colors */
 
     /* Primary Colors */
-    --color-primary: #0472a8;
+    --color-primary: #0472a8; /* Figma: _Primary/Primary - for borders/backgrounds */
+    --color-primary-text: #00547e; /* Figma: _Primary/Primary (Text) - for text */
     --color-on-primary: #ffffff;
     --color-primary-container: #61b5cf;
     --color-on-primary-container: #001e2e;
     --color-inverse-primary: #84cfff;
 
     /* Primary State Layers */
-    --color-primary-state-08: rgba(0, 101, 142, 0.080);
-    --color-primary-state-12: rgba(0, 101, 142, 0.120);
-    --color-primary-state-16: rgba(0, 101, 142, 0.160);
+    /* Using actual primary color #0472a8 = rgb(4, 114, 168) */
+    --color-primary-state-08: rgba(4, 114, 168, 0.080);
+    --color-primary-state-12: rgba(4, 114, 168, 0.120);
+    --color-primary-state-16: rgba(4, 114, 168, 0.160);
     --color-primary-container-state-08: rgba(199, 231, 255, 0.080);
     --color-primary-container-state-12: rgba(199, 231, 255, 0.120);
     --color-primary-container-state-16: rgba(199, 231, 255, 0.160);
 
     /* Secondary Colors */
-    --color-secondary: #445c6a;
+    --color-secondary: #445c6a; /* Figma: _Secondary/Secondary - for borders/backgrounds */
+    --color-secondary-text: #3b525f; /* Figma: _Secondary/Secondary (Text) - for text */
     --color-on-secondary: #ffffff;
     --color-secondary-container: #5e849b;
     --color-on-secondary-container: #09171f;
@@ -55,21 +58,24 @@
     --color-tertiary-container-state-16: rgba(133, 236, 213, 0.160);
 
     /* Danger Colors */
-    --color-danger: #ba1a1a;
+    --color-danger: #ba1a1a; /* Figma: _Danger/Danger - for borders/backgrounds */
+    --color-danger-text: #9b0606; /* Figma: _Danger/Danger (Text) - for text */
     --color-on-danger: #ffffff;
     --color-danger-container: #ffdad6;
     --color-on-danger-container: #410002;
 
     /* Danger State Layers */
-    --color-danger-state-08: rgba(190, 12, 22, 0.080);
-    --color-danger-state-12: rgba(190, 12, 22, 0.120);
-    --color-danger-state-16: rgba(190, 12, 22, 0.160);
+    /* Using actual danger color #ba1a1a = rgb(186, 26, 26) */
+    --color-danger-state-08: rgba(186, 26, 26, 0.080);
+    --color-danger-state-12: rgba(186, 26, 26, 0.120);
+    --color-danger-state-16: rgba(186, 26, 26, 0.160);
     --color-danger-container-state-08: rgba(255, 218, 214, 0.080);
     --color-danger-container-state-12: rgba(255, 218, 214, 0.120);
     --color-danger-container-state-16: rgba(255, 218, 214, 0.160);
 
     /* Success Colors */
-    --color-success: #3e691a;
+    --color-success: #3e691a; /* Figma: _Success/Success - for borders/backgrounds */
+    --color-success-text: #2c5609; /* Figma: _Success/Success (Text) - for text */
     --color-on-success: #ffffff;
     --color-success-container: #a1eb83;
     --color-on-success-container: #0c2000;
@@ -83,21 +89,24 @@
     --color-success-container-state-16: rgba(189, 242, 146, 0.160);
 
     /* Warning Colors */
-    --color-warning: #9f8205;
+    --color-warning: #9f8205; /* Figma: _Warning/Warning - for borders/backgrounds */
+    --color-warning-text: #5b4a00; /* Figma: _Warning/Warning (Text) - for text */
     --color-on-warning: #ffffff;
     --color-warning-container: #ffe17a;
     --color-on-warning-container: #231b00;
 
     /* Warning State Layers */
-    --color-warning-state-08: rgba(113, 92, 0, 0.080);
-    --color-warning-state-12: rgba(113, 92, 0, 0.120);
-    --color-warning-state-16: rgba(113, 92, 0, 0.160);
+    /* Using actual warning color #9f8205 = rgb(159, 130, 5) */
+    --color-warning-state-08: rgba(159, 130, 5, 0.080);
+    --color-warning-state-12: rgba(159, 130, 5, 0.120);
+    --color-warning-state-16: rgba(159, 130, 5, 0.160);
     --color-warning-container-state-08: rgba(255, 225, 122, 0.080);
     --color-warning-container-state-12: rgba(255, 225, 122, 0.120);
     --color-warning-container-state-16: rgba(255, 225, 122, 0.160);
 
     /* Info Colors */
-    --color-info: #0e8175;
+    --color-info: #0e8175; /* Figma: _Info/Info - for borders/backgrounds */
+    --color-info-text: #005a50; /* Figma: _Info/Info (Text) - for text */
     --color-on-info: #ffffff;
     --color-info-container: #85ecd5;
     --color-on-info-container: #005a50;

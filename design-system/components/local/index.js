@@ -17,6 +17,12 @@ export * as Admin from './admin/index.js';
 // Legacy exports for backward compatibility
 import * as UniversalComponents from './universal/index.js';
 
+// Direct exports for convenience (used in Storybook stories)
+export { createTooltip, createTooltipButton, destroyAllTooltips } from './universal/index.js';
+export { createPopover, createPopoverButton } from './universal/index.js';
+export { createProgress, updateProgress } from './universal/index.js';
+export { clearAllToasts } from './universal/index.js';
+
 /**
  * Legacy PlusInterface class for backward compatibility
  */
@@ -25,11 +31,47 @@ export class PlusInterface {
     static createButtonGroup = UniversalComponents.createButtonGroup;
     static createCheckbox = UniversalComponents.createCheckbox;
     static createCheckboxGroup = UniversalComponents.createCheckboxGroup;
+    static createRadio = UniversalComponents.createRadio;
+    static createRadioGroup = UniversalComponents.createRadioGroup;
+    static createSwitch = UniversalComponents.createSwitch;
     static createAlert = UniversalComponents.createAlert;
+    static createToast = UniversalComponents.createToast;
+    static showToast = UniversalComponents.showToast;
+    static hideToastElement = UniversalComponents.hideToastElement;
     static createBreadcrumb = UniversalComponents.createBreadcrumb;
     static createBadge = UniversalComponents.createBadge;
     static createChip = UniversalComponents.createChip;
     static createDivider = UniversalComponents.createDivider;
+    static createDropdown = UniversalComponents.createDropdown;
+    static createCard = UniversalComponents.createCard;
+    static createModal = UniversalComponents.createModal;
+    static createNavigation = UniversalComponents.createNavigation;
+    static createTextarea = UniversalComponents.createTextarea;
+    static createSelect = UniversalComponents.createSelect;
+    static createRangeInput = UniversalComponents.createRangeInput;
+    static createSelectMultiple = UniversalComponents.createSelectMultiple;
+    static createDatePicker = UniversalComponents.createDatePicker;
+    static createInputGroup = UniversalComponents.createInputGroup;
+    static createCarousel = UniversalComponents.createCarousel;
+    static createCollapse = UniversalComponents.createCollapse;
+    static createCollapseTrigger = UniversalComponents.createCollapseTrigger;
+    static createListGroup = UniversalComponents.createListGroup;
+    static createListGroupItem = UniversalComponents.createListGroupItem;
+    static createJumbotron = UniversalComponents.createJumbotron;
+    static createMediaObject = UniversalComponents.createMediaObject;
+    static createNestedMediaObject = UniversalComponents.createNestedMediaObject;
+    static createPopover = UniversalComponents.createPopover;
+    static createPopoverButton = UniversalComponents.createPopoverButton;
+    static createPagination = UniversalComponents.createPagination;
+    static createTooltip = UniversalComponents.createTooltip;
+    static createTooltipButton = UniversalComponents.createTooltipButton;
+    static createScrollspy = UniversalComponents.createScrollspy;
+    static createScrollspyContent = UniversalComponents.createScrollspyContent;
+    static createProgress = UniversalComponents.createProgress;
+    static updateProgress = UniversalComponents.updateProgress;
+    static createSpinner = UniversalComponents.createSpinner;
+    static createLoadingGif = UniversalComponents.createLoadingGif;
+    static createRichTextEditor = UniversalComponents.createRichTextEditor;
     
     // Legacy constants
     static BUTTON_FILL = UniversalComponents.BUTTON_CONSTANTS.FILL;

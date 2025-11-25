@@ -90,6 +90,16 @@ function myFunction(param1, param2, callback) {
 - Use PLUS utility classes for styling
 - Maintain consistent structure
 
+#### Bootstrap Integration
+- **ALWAYS override Bootstrap default spacing/padding with design tokens**
+- Bootstrap components (form-check, custom-control, dropdown, etc.) have default spacing that must be overridden
+- When using Bootstrap classes, explicitly set spacing to use PLUS design tokens:
+  - Override `padding-left`, `padding-right`, `margin-left`, `margin-right` with design tokens
+  - Use `padding-left: 0` or `padding-left: var(--size-element-gap-sm)` instead of Bootstrap defaults
+  - Example: `.form-check` has default `padding-left: 1.25rem` - override with `padding-left: 0` and use `gap: var(--size-element-gap-sm)` instead
+- Check Bootstrap's default styles and explicitly override them with PLUS tokens
+- Never rely on Bootstrap's default spacing - always use design tokens from Figma
+
 #### Structure
 ```html
 <div class="container">
@@ -275,6 +285,8 @@ export class MyComponent {
 6. Inefficient code
 7. Missing responsive design
 8. Poor code organization
+9. Using Bootstrap default spacing instead of design tokens
+10. Not overriding Bootstrap component defaults with PLUS tokens
 
 ## Integration with Production Codebase
 
