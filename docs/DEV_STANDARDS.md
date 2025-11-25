@@ -139,11 +139,12 @@ project/
 │   ├── _spacing.scss
 │   └── main.scss
 ├── js/
-│   ├── components/
-│   │   ├── general_interface.js
-│   │   └── plus_smart_components.js
 │   └── utils/
 │       └── plus_util.js
+├── design-system/
+│   └── components/
+│       └── local/
+│           └── index.js
 ├── index.html
 └── package.json
 ```
@@ -297,8 +298,7 @@ export class MyComponent {
 
 ### Import Patterns
 ```javascript
-import { PlusInterface } from "./components/general_interface.js";
-import { PlusSmartComponents } from "./components/plus_smart_components.js";
+import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
 ```
 
 ### Style Integration

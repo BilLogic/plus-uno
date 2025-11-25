@@ -2,10 +2,7 @@
  * @fileoverview Main JavaScript file for PLUS design system starter template
  */
 
-// New modular import (preferred)
-import { Universal } from "../design-system/components/local/index.js";
-
-// Legacy import (backward compatibility)
+// Import PLUS design system components
 import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
 
 // Network utilities
@@ -23,7 +20,7 @@ function showConnectionError(message = null) {
     existingAlerts.forEach(alert => alert.remove());
     
     // Create error alert
-    const alert = Universal.createAlert({
+    const alert = PlusInterface.createAlert({
         id: 'connection-error-alert',
         style: 'danger',
         title: 'Connection Error',
@@ -59,7 +56,7 @@ function showConnectionRestored() {
     existingAlerts.forEach(alert => alert.remove());
     
     // Create success alert
-    const alert = Universal.createAlert({
+    const alert = PlusInterface.createAlert({
         id: 'connection-restored-alert',
         style: 'success',
         title: 'Connection Restored',
@@ -140,29 +137,28 @@ function init() {
     // Button examples
     const buttonContainer = document.getElementById("button-examples");
     if (buttonContainer) {
-        // Using new modular import
-        const filledBtn = Universal.createButton({
+        const filledBtn = PlusInterface.createButton({
             btnText: "Primary Button",
             btnStyle: "primary",
             btnFill: "filled",
             buttonOnClick: () => console.log("Primary button clicked")
         });
         
-        const outlineBtn = Universal.createButton({
+        const outlineBtn = PlusInterface.createButton({
             btnText: "Outline Button",
             btnStyle: "primary",
             btnFill: "outline",
             buttonOnClick: () => console.log("Outline button clicked")
         });
         
-        const tonalBtn = Universal.createButton({
+        const tonalBtn = PlusInterface.createButton({
             btnText: "Tonal Button",
             btnStyle: "primary",
             btnFill: "tonal",
             buttonOnClick: () => console.log("Tonal button clicked")
         });
         
-        const textBtn = Universal.createButton({
+        const textBtn = PlusInterface.createButton({
             btnText: "Text Button",
             btnStyle: "primary",
             btnFill: "text",
@@ -178,8 +174,7 @@ function init() {
     // Form examples
     const formContainer = document.getElementById("form-examples");
     if (formContainer) {
-        // Using new modular import
-        const checkbox1 = Universal.createCheckbox({
+        const checkbox1 = PlusInterface.createCheckbox({
             label: "Option 1",
             name: "options",
             value: "option1",
@@ -187,7 +182,7 @@ function init() {
             checked: false
         });
         
-        const checkbox2 = Universal.createCheckbox({
+        const checkbox2 = PlusInterface.createCheckbox({
             label: "Option 2",
             name: "options",
             value: "option2",
@@ -202,9 +197,8 @@ function init() {
     // SMART component examples
     const smartContainer = document.getElementById("smart-examples");
     if (smartContainer) {
-        // Using new modular import
-        const statusTag = Universal.createContentStatusTag("complete");
-        const pill = Universal.createSuperCompPillDiv("Social-Emotional", false);
+        const statusTag = PlusSmartComponents.createContentStatusTag("complete");
+        const pill = PlusSmartComponents.createSuperCompPillDiv("Social-Emotional", false);
         
         smartContainer.appendChild(statusTag);
         smartContainer.appendChild(pill);

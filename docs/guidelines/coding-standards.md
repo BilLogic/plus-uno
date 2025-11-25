@@ -54,7 +54,7 @@ This document outlines the coding standards, project rules, and best practices f
 
 ### Component Creation
 - Always use existing PLUS components when possible
-- Import components: `import { PlusInterface } from "./components/general_interface.js"`
+- Import components: `import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js"`
 - Use component creation methods: `PlusInterface.createButton()`, `PlusSmartComponents.createStatusIcon()`, etc.
 - Follow component API patterns from `docs/COMPONENTS.md`
 
@@ -78,7 +78,7 @@ When designing a specific type of UI, reference the appropriate guideline:
 - Examples: `examples/`
 
 ### Naming Conventions
-- Files: kebab-case (e.g., `general_interface.js`)
+- Files: kebab-case (e.g., `button.js`, `index.js`)
 - Classes: PascalCase (e.g., `PlusInterface`)
 - Functions: camelCase (e.g., `createButton`)
 - Constants: UPPER_SNAKE_CASE (e.g., `BUTTON_FILL`)
@@ -146,6 +146,8 @@ When designing a specific type of UI, reference the appropriate guideline:
  * Creates a primary filled button
  * @returns {HTMLElement} Button element
  */
+import { PlusInterface } from "../design-system/components/local/index.js";
+
 const button = PlusInterface.createButton({
     btnText: "Click me",
     btnStyle: "primary",

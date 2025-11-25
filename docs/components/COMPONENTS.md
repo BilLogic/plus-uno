@@ -21,8 +21,7 @@ This document describes the PLUS component library and how to use components in 
 
 ### Import Pattern
 ```javascript
-import { PlusInterface } from "./components/general_interface.js";
-import { PlusSmartComponents } from "./components/plus_smart_components.js";
+import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
 ```
 
 ## Core Components

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PLUS Personalized Learning</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&family=Merriweather+Sans:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 4 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PLUS Design System CSS -->
+    <link rel="stylesheet" href="dist/css/main.css">
+    
+    <style>
+        /**
+         * Login Portal Page Styles
+         * Following PLUS Design System guidelines and Figma design
+         */
+        
+        /* Page Container - Surface */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-surface-container);
+            color: var(--color-on-surface);
+            font-family: var(--font-family-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Container - Surface Container */
+        .login-main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--size-surface-gap-lg);
+            width: 100%;
+            padding: var(--size-surface-pad-x) var(--size-surface-pad-y);
+            min-height: 100vh;
+        }
+        
+        /* Logo Container */
+        .login-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--size-section-gap-md);
+            padding: var(--size-section-pad-y-sm);
+        }
+        
+        /* Empty block for logo icon - replace with actual logo when source is available */
+        .login-logo-icon {
+            width: 64px;
+            height: 64px;
+            background-color: var(--color-surface-container-low);
+            border-radius: var(--size-card-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .login-logo-text {
+            font-family: var(--font-family-header);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-h3);
+            color: var(--color-on-surface);
+        }
+        
+        /* Login Card - Card Layer */
+        .login-card {
+            background-color: var(--color-surface-container-lowest);
+            border-radius: var(--size-card-radius-md);
+            box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+            padding: var(--size-card-pad-x-lg) var(--size-card-pad-y-lg);
+            width: 100%;
+            max-width: 445px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--size-card-gap-lg);
+        }
+        
+        /* Login Content */
+        .login-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--size-element-gap-lg);
+        }
+        
+        .login-heading {
+            font-family: var(--font-family-header);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-h1);
+            line-height: 1.6;
+            color: var(--color-on-surface);
+            margin: 0;
+        }
+        
+        .login-subtitle {
+            font-family: var(--font-family-body);
+            font-weight: var(--font-weight-normal);
+            font-size: var(--font-size-body1);
+            line-height: 1.5;
+            color: var(--color-on-surface);
+            margin: 0;
+        }
+        
+        /* Button Container */
+        .login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--size-element-gap-lg);
+        }
+        
+        /* Alert Custom Styling for Login Page */
+        .login-card .plus-alert.primary {
+            background-color: var(--color-primary-state-08);
+            border-color: var(--color-primary);
+        }
+        
+        .login-card .plus-alert.primary .plus-alert-text {
+            color: var(--color-on-surface);
+        }
+        
+        /* Clever Button Custom Style */
+        .pbtn-clever {
+            background-color: #4285f4 !important;
+            color: #ffffff !important;
+        }
+        
+        .pbtn-clever .pbtn-state-screen {
+            background-color: #4285f4 !important;
+            color: #ffffff !important;
+        }
+        
+        .pbtn-clever:hover .pbtn-state-screen {
+            background-color: color-mix(in srgb, #4285f4 92%, black) !important;
+        }
+        
+        .pbtn-clever .pbtn-content {
+            color: #ffffff !important;
+        }
+        
+        /* Button Icon Spacing */
+        .login-google-btn .pbtn-content,
+        .pbtn-clever .pbtn-content {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-md);
+        }
+        
+        /* Empty blocks for icons - replace with actual icon images when sources are available */
+        .google-icon-placeholder,
+        .clever-icon-placeholder {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            background-color: transparent;
+            flex-shrink: 0;
+        }
+        
+        /* Divider Container */
+        .login-divider-container {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-lg);
+            width: 100%;
+        }
+        
+        .login-divider-line {
+            flex: 1 0 0;
+            height: 1px;
+            background-color: var(--color-outline-variant);
+        }
+        
+        .login-divider-text {
+            font-family: var(--font-family-body);
+            font-weight: var(--font-weight-normal);
+            font-size: var(--font-size-body1);
+            line-height: 1.5;
+            color: var(--color-on-surface);
+            white-space: nowrap;
+        }
+        
+        /* Footer - Section Layer */
+        .login-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .login-footer-text {
+            font-family: var(--font-family-body);
+            font-weight: var(--font-weight-normal);
+            font-size: var(--font-size-body1);
+            line-height: 1.5;
+            color: var(--color-on-surface);
+            text-align: center;
+        }
+        
+        .login-footer-link {
+            font-family: var(--font-family-body);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            text-decoration: underline;
+            text-underline-position: from-font;
+        }
+        
+        .login-footer-link:hover {
+            color: var(--color-primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-main-container">
+        <!-- Logo -->
+        <div class="login-logo-container">
+            <!-- Empty block for logo icon - replace with actual logo when source is available -->
+            <div class="login-logo-icon"></div>
+            <div class="login-logo-text">PLUS</div>
+        </div>
+        
+        <!-- Login Card -->
+        <div class="login-card" id="login-card">
+            <!-- Alert will be inserted here by JavaScript -->
+            
+            <!-- Login Content -->
+            <div class="login-content">
+                <h1 class="login-heading">Login</h1>
+                <p class="login-subtitle">Double Math Learning with PLUS.</p>
+            </div>
+            
+            <!-- Login Buttons -->
+            <div class="login-buttons" id="login-buttons">
+                <!-- Buttons will be inserted here by JavaScript -->
+            </div>
+            
+            <!-- Divider -->
+            <div class="login-divider-container">
+                <div class="login-divider-line"></div>
+                <span class="login-divider-text">or</span>
+                <div class="login-divider-line"></div>
+            </div>
+            
+            <!-- Try Demo Button -->
+            <div id="demo-button-container">
+                <!-- Button will be inserted here by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="login-footer">
+            <p class="login-footer-text">
+                Need help? <a href="#" class="login-footer-link">Contact us</a>.
+            </p>
+        </footer>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap 4 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.js"></script>
+    
+    <!-- PLUS Components -->
+    <script type="module" src="src/js/login.js"></script>
+</body>
+</html>
+

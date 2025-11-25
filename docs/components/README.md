@@ -21,12 +21,13 @@ Component implementation code is located in:
 
 ### Import Pattern
 ```javascript
-import { PlusInterface } from "./components/general_interface.js";
-import { PlusSmartComponents } from "./components/plus_smart_components.js";
+import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
 ```
 
 ### Component Creation
 ```javascript
+import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
+
 // Button
 const button = PlusInterface.createButton({
     btnText: "Click me",
@@ -43,6 +44,13 @@ const checkbox = PlusInterface.createCheckbox({
     id: "option-id"
 });
 
+// Alert
+const alert = PlusInterface.createAlert({
+    style: "primary",
+    text: "Alert message",
+    dismissable: true
+});
+
 // SMART Status Icon
 const statusIcon = PlusSmartComponents.createStatusIcon("complete");
 ```
@@ -53,15 +61,25 @@ const statusIcon = PlusSmartComponents.createStatusIcon("complete");
 - `createButton()` - Create buttons with various styles and fills
 - `createCheckbox()` - Create checkboxes
 - `createCheckboxGroup()` - Create checkbox groups
-- `createTabPanel()` - Create tab panels
+- `createRadio()` - Create radio buttons
+- `createSwitch()` - Create toggle switches
 - `createAlert()` - Create alert messages
-- `createToast()` - Create toast notifications
+- `createBadge()` - Create badges
+- `createChip()` - Create chips
+- `createBreadcrumb()` - Create breadcrumbs
+- `createDivider()` - Create dividers
+- `createDropdown()` - Create dropdown menus
+- `createCard()` - Create cards
+- `createModal()` - Create modals
+- `createNavigation()` - Create navigation components
+- `createTextarea()` - Create textareas
+- `createSelect()` - Create select dropdowns
+- `createDatePicker()` - Create date pickers
 
 ### PlusSmartComponents
 - `createStatusIcon()` - Create status icons
 - `createContentStatusTag()` - Create content status tags
 - `createSuperCompPillDiv()` - Create competency area pills
-- `getColorClassForCompetencyArea()` - Get color class for competency area
 
 ## Reference
 

@@ -163,7 +163,7 @@ When designing a specific type of UI component:
 - Examples: `examples/`
 
 ### Naming Conventions
-- Files: kebab-case (e.g., `general_interface.js`)
+- Files: kebab-case (e.g., `button.js`, `index.js`)
 - Classes: PascalCase (e.g., `PlusInterface`)
 - Functions: camelCase (e.g., `createButton`)
 - Constants: UPPER_SNAKE_CASE (e.g., `BUTTON_FILL`)
@@ -173,8 +173,8 @@ When designing a specific type of UI component:
 
 ### Using Components
 - Always use existing PLUS components when possible
-- Import components: `import { Universal } from "../design-system/components/local/index.js"`
-- Use component creation methods: `Universal.createButton()`, `Universal.createStatusIcon()`, etc.
+- Import components: `import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js"`
+- Use component creation methods: `PlusInterface.createButton()`, `PlusSmartComponents.createStatusIcon()`, etc.
 - Follow component API patterns from `docs/components/COMPONENTS.md`
 
 ### Button Components
@@ -230,6 +230,8 @@ When designing a specific type of UI component:
  * Creates a primary filled button
  * @returns {HTMLElement} Button element
  */
+import { PlusInterface } from "../design-system/components/local/index.js";
+
 const button = PlusInterface.createButton({
     btnText: "Click me",
     btnStyle: "primary",

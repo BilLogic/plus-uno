@@ -1,0 +1,369 @@
+/**
+ * Skills Home Page Styles
+ * Uses PLUS design system tokens
+ */
+
+/* Page Container */
+.skills-home-page {
+    min-height: 100vh;
+    background-color: var(--color-surface-container);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Bar (Surface Container) */
+.skills-top-bar {
+    background-color: var(--color-surface-container);
+    padding: var(--size-surface-container-pad-y-sm) var(--size-surface-container-pad-x-sm);
+    gap: var(--size-surface-container-gap-sm);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.sidebar-control {
+    display: flex;
+    align-items: center;
+    width: 168px;
+    flex-shrink: 0;
+}
+
+.page-control {
+    flex: 1 0 0;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.page-control .plus-breadcrumb {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    gap: var(--size-element-gap-sm);
+}
+
+.user-avatar {
+    background-color: var(--color-surface-container-lowest);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    gap: var(--size-element-gap-md);
+    border-radius: var(--size-modal-radius-md);
+    display: flex;
+    align-items: center;
+    width: 168px;
+    flex-shrink: 0;
+}
+
+.user-name-container {
+    flex: 1 0 0;
+    display: flex;
+    gap: var(--size-element-gap-sm);
+    align-items: center;
+    min-width: 0;
+}
+
+.name-pill {
+    background-color: var(--color-primary-state-08);
+    padding: 0 4px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.name-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 24px;
+    color: var(--color-primary);
+    font-family: var(--font-family-body);
+    font-size: 14px;
+    font-weight: var(--font-weight-semibold-1);
+    line-height: 1.571;
+}
+
+.user-name-text {
+    flex: 1 0 0;
+    font-family: var(--font-family-body);
+    font-size: 14px;
+    font-weight: var(--font-weight-normal);
+    line-height: 1.571;
+    color: var(--color-on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
+    min-width: 0;
+}
+
+.notification-badge {
+    background-color: var(--color-danger-state-08);
+    padding: 0 var(--size-element-pad-x-sm);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.badge-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 12px;
+    color: var(--color-danger);
+    font-family: var(--font-family-body);
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold-1);
+    line-height: 1.667;
+}
+
+/* Main Container (Surface) */
+.skills-main-container {
+    flex: 1;
+    display: flex;
+    gap: var(--size-surface-container-gap-sm);
+    padding: var(--size-surface-container-pad-x-sm);
+    box-sizing: border-box;
+}
+
+/* Content Container (Surface) */
+.skills-content-container {
+    background-color: var(--color-surface);
+    flex: 1 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-surface-gap-md);
+    padding: var(--size-surface-pad-y) var(--size-surface-pad-x);
+    border-radius: var(--size-surface-radius);
+    box-sizing: border-box;
+}
+
+/* Skills Overview Section */
+.skills-overview-section {
+    display: flex;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+}
+
+.skills-overview-placeholder {
+    flex: 1 0 0;
+    min-width: 0;
+}
+
+.placeholder-content {
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+}
+
+/* Metrics Section (Card) */
+.metrics-section {
+    background-color: var(--color-surface-container-low);
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    gap: var(--size-card-gap-lg);
+    border-radius: var(--size-card-radius-md);
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0;
+    min-width: 0;
+}
+
+.metrics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.metrics-header .h4 {
+    margin: 0;
+    font-family: var(--font-family-header);
+    font-size: 24px;
+    font-weight: var(--font-weight-semibold-2);
+    line-height: 1.333;
+    color: var(--color-on-surface);
+}
+
+.controls {
+    display: flex;
+    gap: var(--size-element-gap-sm);
+    align-items: center;
+    justify-content: center;
+}
+
+.control-button {
+    min-width: 36px;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+}
+
+.progress-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circular-progress-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circular-progress {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.progress-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-background {
+    fill: none;
+    stroke: var(--color-outline-variant);
+    stroke-width: 8;
+}
+
+.progress-foreground {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+}
+
+.progress-text .body1-txt,
+.progress-text .body2-txt {
+    margin: 0;
+    color: var(--color-on-surface);
+}
+
+/* Personalized Recommendations Section */
+.recommendations-section {
+    background-color: var(--color-surface-container-low);
+    padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
+    gap: var(--size-section-gap-lg);
+    border-radius: var(--size-section-radius-lg);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}
+
+.recommendations-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.recommendations-header .h4 {
+    margin: 0;
+    font-family: var(--font-family-header);
+    font-size: 24px;
+    font-weight: var(--font-weight-semibold-2);
+    line-height: 1.333;
+    color: var(--color-on-surface);
+}
+
+/* Recommendations List */
+.recommendations-list {
+    display: flex;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Recommendation Card */
+.recommendation-card {
+    background-color: var(--color-surface-container-lowest);
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    gap: var(--size-card-gap-md);
+    border-radius: var(--size-card-radius-sm);
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+    flex-shrink: 0;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-sm);
+}
+
+.card-competency-pill {
+    flex-shrink: 0;
+}
+
+.duration-text {
+    color: var(--color-on-surface-variant);
+    white-space: nowrap;
+}
+
+.card-title {
+    margin: 0;
+    font-family: var(--font-family-header);
+    font-size: 16px;
+    font-weight: var(--font-weight-semibold-2);
+    line-height: 1.5;
+    color: var(--color-on-surface);
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+.card-icons {
+    display: flex;
+    gap: var(--size-element-gap-sm);
+    color: var(--color-on-surface-variant);
+    font-size: 14px;
+}
+
+.card-icons i {
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .skills-top-bar {
+        flex-wrap: wrap;
+    }
+    
+    .sidebar-control,
+    .user-avatar {
+        width: auto;
+    }
+    
+    .skills-overview-section {
+        flex-direction: column;
+    }
+    
+    .recommendations-list {
+        flex-direction: column;
+    }
+    
+    .recommendation-card {
+        min-width: 100%;
+    }
+}
+

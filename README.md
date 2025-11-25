@@ -145,18 +145,7 @@ Always use semantic tokens (CSS variables) instead of hardcoded values. Referenc
 Use existing PLUS components when possible:
 
 ```javascript
-// New modular import (preferred)
-import { Universal } from "./design-system/components/local/index.js";
-
-const button = Universal.createButton({
-    btnText: "Click me",
-    btnStyle: "primary",
-    btnFill: "filled",
-    btnSize: "default"
-});
-
-// Legacy import (still works for backward compatibility)
-import { PlusInterface } from "./design-system/components/local/index.js";
+import { PlusInterface, PlusSmartComponents } from "./design-system/components/local/index.js";
 
 const button = PlusInterface.createButton({
     btnText: "Click me",
