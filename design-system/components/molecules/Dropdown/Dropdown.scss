@@ -201,26 +201,32 @@
             margin: 0;
             margin-right: 0;
             margin-left: 0;
+            /* Ensure background matches toggle button for seamless connection */
+            background: var(--color-surface);
         }
         
         /* Default order: text on left, toggle on right (for dropdown, dropup, dropright) */
         .pdropdown-split-text-btn {
+            /* Remove right border completely - toggle button will provide the border */
             border-right: none !important;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
             /* Ensure buttons are connected - no margin between them */
             margin-right: 0;
             position: relative;
+            /* Ensure background matches toggle button for seamless connection */
+            background: var(--color-surface);
         }
         .pdropdown-split-toggle-btn {
+            /* Remove left border completely - text button's border continues through */
             border-left: none !important;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            /* No separator border - buttons are connected as one unit */
-            /* Overlap by border width + small amount to ensure seamless connection */
-            margin-left: calc(-1 * var(--size-element-stroke-md) - 0.5px);
+            /* Overlap by border width to ensure seamless connection - buttons share the border */
+            /* Use a slightly larger overlap to ensure no gap is visible */
+            margin-left: calc(-1 * var(--size-element-stroke-md) - 1px);
             position: relative;
-            z-index: 1;
+            z-index: 2;
             /* Ensure toggle button has enough space for the caret icon */
             min-width: fit-content;
             white-space: nowrap;
@@ -228,6 +234,24 @@
             margin-right: 0;
             margin-top: 0;
             margin-bottom: 0;
+            /* Ensure background matches text button for seamless connection */
+            background: var(--color-surface);
+            /* Ensure the border from text button doesn't show through */
+            box-shadow: none;
+            outline: none;
+            /* Ensure toggle button covers any potential gap */
+            overflow: visible;
+            /* Use a pseudo-element to visually connect the buttons if needed */
+            &::before {
+                content: '';
+                position: absolute;
+                left: calc(-1 * var(--size-element-stroke-md) - 1px);
+                top: 0;
+                bottom: 0;
+                width: calc(var(--size-element-stroke-md) + 1px);
+                background: var(--color-surface);
+                z-index: -1;
+            }
         }
         
         /* Reversed order for dropleft: toggle on left, text on right */
@@ -239,11 +263,12 @@
                 border-bottom-left-radius: var(--size-element-radius-sm);
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
-                /* Overlap by border width + small amount to ensure seamless connection */
-                margin-right: calc(-1 * var(--size-element-stroke-md) - 0.5px);
+                /* Overlap by border width to ensure seamless connection - buttons share the border */
+                /* Use a slightly larger overlap to ensure no gap is visible */
+                margin-right: calc(-1 * var(--size-element-stroke-md) - 1px);
                 margin-left: 0;
                 position: relative;
-                z-index: 1;
+                z-index: 2;
             }
             .pdropdown-split-text-btn {
                 border-right: none !important;
@@ -254,6 +279,8 @@
                 border-bottom-right-radius: var(--size-element-radius-sm);
                 margin-left: 0;
                 position: relative;
+                /* Ensure background matches toggle button for seamless connection */
+                background: var(--color-surface);
             }
         }
         
@@ -274,6 +301,7 @@
             /* Ensure no background artifacts */
             background: var(--color-surface);
             /* Ensure caret icon is visible and centered - content will be set by direction classes */
+            /* Figma: Split dropdown toggle caret - Font Awesome B3 (10px) */
             &::after {
                 display: inline-flex;
                 align-items: center;
@@ -282,6 +310,9 @@
                 margin-right: 0;
                 /* Ensure caret is vertically aligned */
                 vertical-align: middle;
+                /* Figma: Split dropdown caret size - 10px (fa-body3) */
+                font-size: var(--font-size-fa-body3);
+                line-height: var(--font-line-height-fa-body3);
                 /* Content will be set by direction-specific classes (pdropdown-caret-*) */
                 /* Ensure no background or border artifacts */
                 background: none !important;
@@ -340,6 +371,17 @@
             &[aria-expanded="true"] {
                 background-color: var(--color-primary-state-08);
                 border-color: var(--color-primary);
+                color: var(--color-primary-text);
+            }
+        }
+        
+        /* Figma: Split dropdown toggle button open state - 16% opacity state layer */
+        .pdropdown-split-toggle-btn[aria-expanded="true"] {
+            background-color: var(--color-primary-state-16);
+            border-color: var(--color-primary);
+            color: var(--color-primary-text);
+            
+            &::after {
                 color: var(--color-primary-text);
             }
         }
@@ -543,6 +585,32 @@
         /* Ensure no background or border artifacts */
         background: none !important;
         box-shadow: none !important;
+    }
+    
+    /* Split dropdown toggle button - use smaller caret size (10px) for all directions */
+    &.pdropdown-split-toggle-btn {
+        /* Figma: Split dropdown default direction (dropdown) - always caret-down, regardless of open/closed */
+        /* For split dropdowns, caret direction matches dropdown direction and doesn't change when open */
+        &:not(.pdropdown-caret-up):not(.pdropdown-caret-left):not(.pdropdown-caret-right)::after {
+            content: "\f0d7" !important; /* caret-down - default direction for split dropdowns */
+            font-size: var(--font-size-fa-body3);
+            line-height: var(--font-line-height-fa-body3);
+        }
+        &.pdropdown-caret-up::after {
+            content: "\f0d8" !important; /* caret-up */
+            font-size: var(--font-size-fa-body3);
+            line-height: var(--font-line-height-fa-body3);
+        }
+        &.pdropdown-caret-left::after {
+            content: "\f0d9" !important; /* caret-left */
+            font-size: var(--font-size-fa-body3);
+            line-height: var(--font-line-height-fa-body3);
+        }
+        &.pdropdown-caret-right::after {
+            content: "\f0da" !important; /* caret-right */
+            font-size: var(--font-size-fa-body3);
+            line-height: var(--font-line-height-fa-body3);
+        }
     }
     
     /* Ensure no ::before pseudo-element creates duplicate icons */

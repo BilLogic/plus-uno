@@ -3,6 +3,7 @@ const path = require('path');
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 const config = {
   stories: [
+    '../../design-system/components/organisms/**/*.stories.@(js|jsx|ts|tsx)',
     '../../design-system/components/molecules/**/*.stories.@(js|jsx|ts|tsx)',
     '../../design-system/components/atoms/**/*.stories.@(js|jsx|ts|tsx)',
     '../../design-system/components/*.stories.@(js|jsx|ts|tsx)',
