@@ -77,8 +77,8 @@ import { PlusInterface, PlusSmartComponents } from "../design-system/components/
 ```
 
 ### Import Paths
-- From `prototyping/templates/{pillar}/`: `"../../design-system/components/index.js"`
-- From `prototyping/playground/{name}/`: `"../../design-system/components/index.js"`
+- From `playground/templates/{pillar}/`: `"../../../design-system/components/index.js"`
+- From `playground/{name}/`: `"../../design-system/components/index.js"`
 - From root `index.html`: `"./design-system/components/index.js"`
 - From `src/js/`: `"../design-system/components/index.js"`
 
@@ -200,7 +200,7 @@ Clever authentication uses PNG file from `design-system/assets/images/auth-provi
 
 **Using Clever Image:**
 ```javascript
-// From prototyping/templates/login/
+// From playground/templates/login/
 const cleverImagePath = "../../../design-system/assets/images/auth-providers/clever-image.png";
 const img = document.createElement('img');
 img.src = cleverImagePath;
@@ -293,7 +293,7 @@ Extract component specifications including:
 - Token SCSS: `develop/tokens/`
 - Token Docs: `design-system/styles/`
 - Component Styles: `design-system/components/{atoms|molecules}/{ComponentName}/`
-- Prototyping: `prototyping/templates/` and `prototyping/playground/`
+- Prototyping: `playground/templates/` and `playground/{your-name}/`
 
 ### Naming Conventions
 - Files: kebab-case (e.g., `button.js`, `index.js`)

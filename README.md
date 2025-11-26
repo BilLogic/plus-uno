@@ -48,27 +48,27 @@ See **[`develop/PROJECT_STRUCTURE.md`](develop/PROJECT_STRUCTURE.md)** for compl
 - **`design-system/`** - Design system source (components, assets, styles documentation)
 - **`develop/`** - Technical documentation and token SCSS source files
 - **`src/`** - Application source files
-- **`prototyping/`** - Prototyping workspace (templates and playground)
+- **`playground/`** - Prototyping workspace (templates and designer playgrounds)
 
 ## Usage
 
 ### Prototyping Workflow
 
 1. **Choose Your Workspace:**
-   - **Templates** (`prototyping/templates/`): Use curated templates organized by product pillar (admin, toolkit, login, profile, home, training, universal)
-   - **Playground** (`prototyping/playground/`): Create designer-specific directories for experimentation
+   - **Templates** (`playground/templates/`): Use curated templates organized by product pillar (admin, toolkit, login, profile, home, training, universal)
+   - **Playground** (`playground/{your-name}/`): Create designer-specific directories for experimentation
 
 2. **Creating a New Prototype:**
-   - For designer-specific work: Create `prototyping/playground/{your-name}/{prototype-name}/`
-   - For reusable templates: Create `prototyping/templates/{product-pillar}/{template-name}/`
+   - For designer-specific work: Create `playground/{your-name}/{prototype-name}/`
+   - For reusable templates: Create `playground/templates/{product-pillar}/{template-name}/`
    - **Never create HTML/JS files in root directory** (except `index.html`)
 
 3. **Using Templates:**
-   - Browse `prototyping/templates/` for starting points
+   - Browse `playground/templates/` for starting points
    - Copy a template to your playground directory
    - Customize for your specific prototype
 
-See `prototyping/templates/README.md` and `prototyping/playground/README.md` for detailed guidelines.
+See `playground/templates/README.md` and `playground/README.md` for detailed guidelines.
 
 ### Using Cursor AI
 
@@ -79,7 +79,7 @@ See `prototyping/templates/README.md` and `prototyping/playground/README.md` for
    - `develop/standards.md` - Project rules and coding standards
    - `design-system/styles/` - Token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
    - `design-system/components/overview.md` - Component types and terminology
-5. **Use designated areas**: Always create prototypes in `prototyping/templates/` or `prototyping/playground/` directories
+5. **Use designated areas**: Always create prototypes in `playground/templates/` or `playground/{your-name}/` directories
 
 ### Example Prompts
 
@@ -125,10 +125,9 @@ const button = PlusInterface.createButton({
 });
 ```
 
-Components are organized by atomic design principles:
-- **Atoms**: Fundamental building blocks (Input, StatusIndicator)
-- **Molecules**: Simple functional units (Button, Card, Alert, Form, etc.)
-- **Organisms**: Complex interface sections (Login, Home, Profile, Training, Toolkit)
+Components are organized into two main categories:
+- **Components**: Reusable UI components (Input, Button, Card, Alert, Form, etc.)
+- **Specs**: Complex interface sections composed of multiple components (Login, Home, Profile, Training, Toolkit, Universal, Admin)
 
 See `design-system/components/overview.md` for component details and `develop/PROJECT_STRUCTURE.md` for complete project organization.
 
@@ -199,10 +198,10 @@ npm run watch:css
 
 ### Adding New Components
 
-1. Create component file in `design-system/components/molecules/{ComponentName}/index.js` (or `atoms/` or `organisms/` as appropriate)
-2. Create component SCSS file in `design-system/components/molecules/{ComponentName}/{ComponentName}.scss`
+1. Create component file in `design-system/components/{ComponentName}/index.js`
+2. Create component SCSS file in `design-system/components/{ComponentName}/{ComponentName}.scss`
 3. Create Storybook story file `{ComponentName}.stories.js` in the component folder
-4. Add component export to `design-system/components/molecules/index.js`
+4. Add component export to `design-system/components/index.js`
 5. Import component styles in `src/css/main.scss`
 6. Document in `design-system/components/overview.md`
 
@@ -214,7 +213,7 @@ npm run watch:css
 
 ## Reference Prototypes
 
-See `prototyping/templates/` for curated templates demonstrating:
+See `playground/templates/` for curated templates demonstrating:
 - Button variants and usage
 - Form elements and validation
 - SMART components

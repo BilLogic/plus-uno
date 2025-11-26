@@ -4,11 +4,17 @@ const path = require('path');
 const config = {
   stories: [
     '../design-system/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/components/atoms/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/components/molecules/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/components/organisms/**/*.stories.@(js|jsx|ts|tsx)',
+    '../design-system/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '../design-system/specs/**/*.stories.@(js|jsx|ts|tsx)',
     '../design-system/assets/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/components/*.stories.@(js|jsx|ts|tsx)',
+  ],
+  // Explicitly exclude old directory structures that no longer exist
+  // This prevents Storybook from trying to index cached/stale paths
+  exclude: [
+    '**/molecules/**',
+    '**/organisms/**',
+    '**/components/assets/**',
+    '**/assets/components/**',
   ],
   addons: [
     '@storybook/addon-essentials',
@@ -47,7 +53,7 @@ const config = {
     config.resolve.alias = config.resolve.alias || {};
     
     // Add alias for design-system components FIRST (more specific aliases should come first)
-    // Map @/js/components to design-system/components (molecules)
+    // Map @/js/components to design-system/components
     config.resolve.alias['@/js/components'] = path.resolve(designSystemPath, 'components');
     
     // Add alias for src directory - use absolute path (for backward compatibility)
@@ -107,6 +113,7 @@ const config = {
       path.resolve(rootDir, 'design-system'),
       path.resolve(rootDir, 'design-system/assets'),
       path.resolve(rootDir, 'design-system/components'),
+      path.resolve(rootDir, 'design-system/specs'),
       path.resolve(rootDir, 'design-system/styles'),
     ];
     

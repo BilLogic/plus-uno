@@ -20,19 +20,19 @@ plus-vibe-coding-starting-kit/
 │   │   │   └── Logo/          # Logo component
 │   │   ├── images/            # Static image assets
 │   │   └── index.js           # Asset exports
-│   ├── components/
+│   ├── components/              # Reusable UI components
 │   │   ├── overview.md       # Components overview + terminology
-│   │   ├── atoms/             # Atom components
-│   │   ├── molecules/         # Molecule components
-│   │   ├── organisms/         # Organism components
-│   │   │   ├── Universal/    # Universal organisms (formerly Shared)
-│   │   │   ├── Admin/        # Admin organisms
-│   │   │   ├── Home/         # Home organisms
-│   │   │   ├── Login/        # Login organisms
-│   │   │   ├── Profile/      # Profile organisms
-│   │   │   ├── Training/    # Training organisms
-│   │   │   └── Toolkit/     # Toolkit organisms
+│   │   ├── (all component folders) # All reusable components
 │   │   └── index.js           # Component exports
+│   ├── specs/                  # Complex components (specs)
+│   │   ├── README.md         # Specs overview
+│   │   ├── Universal/        # Universal specs (formerly Shared)
+│   │   ├── Admin/            # Admin specs
+│   │   ├── Home/             # Home specs
+│   │   ├── Login/            # Login specs
+│   │   ├── Profile/          # Profile specs
+│   │   ├── Training/         # Training specs
+│   │   └── Toolkit/          # Toolkit specs
 │
 ├── develop/                    # Technical documentation + token SCSS
 │   ├── overview.md            # Development docs overview
@@ -61,20 +61,19 @@ plus-vibe-coding-starting-kit/
 │   ├── preview.js
 │   └── preview-head.html
 │
-├── prototyping/               # Prototyping workspace
-│   ├── templates/            # Curated templates organized by product pillar
-│   │   ├── README.md         # Templates documentation
-│   │   ├── admin/            # Admin-related templates
-│   │   ├── toolkit/          # Toolkit templates
-│   │   ├── login/            # Login/auth templates
-│   │   ├── profile/          # Profile templates
-│   │   ├── home/             # Home/dashboard templates
-│   │   ├── training/         # Training templates
-│   │   └── universal/        # Universal/shared templates
-│   └── playground/           # Designer-specific prototyping area
-│       ├── README.md         # Playground documentation
-│       └── {designer-name}/  # Individual designer directories
-│           └── {prototype-name}/ # Individual prototypes
+├── playground/               # Prototyping workspace
+│   ├── README.md            # Playground documentation
+│   ├── templates/           # Curated templates organized by product pillar
+│   │   ├── README.md        # Templates documentation
+│   │   ├── admin/           # Admin-related templates
+│   │   ├── toolkit/         # Toolkit templates
+│   │   ├── login/           # Login/auth templates
+│   │   ├── profile/         # Profile templates
+│   │   ├── home/            # Home/dashboard templates
+│   │   ├── training/        # Training templates
+│   │   └── universal/       # Universal/shared templates
+│   └── {designer-name}/     # Individual designer directories
+│       └── {prototype-name}/ # Individual prototypes
 │
 ├── scripts/                   # Token generation scripts
 │   ├── generate-all-tokens.js
@@ -106,15 +105,18 @@ The `design-system/` folder contains all design system source files:
 - Top-level design system area for brand assets and static images
 
 ### Components (`design-system/components/`)
-- **`atoms/`**: Atom-level components with Storybook stories and styles
-- **`molecules/`**: Molecule-level components with Storybook stories and styles
-- **`organisms/`**: Organism-level components with Storybook stories
-  - **`Universal/`**: Universal organisms (formerly Shared) - commonly used across pillars
-  - **`Admin/`**: Admin-specific organisms
-  - **`Home/`**, **`Login/`**, **`Profile/`**, **`Training/`**, **`Toolkit/`**: Pillar-specific organisms
+- **All reusable UI components**: All components (formerly atoms and molecules) are in the `components/` directory
 - **`overview.md`**: Components overview and terminology
 - **`index.js`**: Component exports
 - Component-based structure: each component has its own folder with both `.stories.js` and `.scss` files
+
+### Specs (`design-system/specs/`)
+- **Complex components**: Specs (formerly organisms) are complex components composed of multiple components
+  - **`Universal/`**: Universal specs (formerly Shared) - commonly used across pillars
+  - **`Admin/`**: Admin-specific specs
+  - **`Home/`**, **`Login/`**, **`Profile/`**, **`Training/`**, **`Toolkit/`**: Pillar-specific specs
+- **`README.md`**: Specs overview
+- Each spec folder contains subcategories: Elements, Cards, Tables, Modals, Sections, Pages
 
 ### Token SCSS (`develop/tokens/`)
 - All design token SCSS source files
@@ -148,9 +150,9 @@ The `src/` folder contains application code that references the design system:
 
 ## Prototyping Workspace
 
-### Templates (`prototyping/templates/`)
+### Templates (`playground/templates/`)
 
-Curated templates organized by product pillar matching the Figma design system sidebar:
+Curated templates organized by product pillar matching the Figma design system sidebar. Each template folder contains `STRUCTURE.md` documentation that replicates the page documentation from `design-system/specs/{pillar}/STRUCTURE.md`.
 
 - **`admin/`** - Admin-related templates (Tutors, Sessions, Students, Groups)
 - **`toolkit/`** - Toolkit templates (Sessions, Slack)
@@ -160,26 +162,31 @@ Curated templates organized by product pillar matching the Figma design system s
 - **`training/`** - Training templates (Lessons, Onboarding)
 - **`universal/`** - Universal/shared component templates
 
-Each template should include:
-- `index.html` - Main HTML file
-- `styles.css` or `script.js` - If needed (or reference design-system)
-- `README.md` - Template documentation
+Each template directory should include:
+- `STRUCTURE.md` - Complete page documentation based on specs
+- `index.html` - Main HTML file implementing documented pages
+- Template files - HTML/JS files for specific page implementations
+- `README.md` - Template-specific documentation (if needed)
 
-**Usage**: Copy templates to `prototyping/playground/{designer-name}/` for customization, or use directly as starting points.
+**Usage**: Copy templates to `playground/{designer-name}/` for customization, or use directly as starting points.
 
-### Playground (`prototyping/playground/`)
+### Playground (`playground/{designer-name}/`)
 
 Designer-specific prototyping area for experimentation:
 
-- Each designer creates their own directory: `prototyping/playground/{designer-name}/`
+- Each designer creates their own directory: `playground/{designer-name}/`
 - Designer name can be auto-generated from git user.name or provided by designer
 - Create subdirectories for different prototypes
 - By default, playground directories are ignored by git (opt-in to commit)
 
 **Structure**:
 ```
-prototyping/playground/
+playground/
 ├── README.md
+├── templates/
+│   └── {pillar}/
+│       ├── STRUCTURE.md
+│       └── [template-files]
 └── {designer-name}/
     └── {prototype-name}/
         ├── index.html
@@ -189,10 +196,10 @@ prototyping/playground/
 ```
 
 **When to use**:
-- **Templates**: For reusable, curated templates that others can benefit from
+- **Templates**: For reusable, curated templates that demonstrate complete page implementations based on specs documentation
 - **Playground**: For experimentation, one-off prototypes, and personal exploration
 
-See `prototyping/templates/README.md` and `prototyping/playground/README.md` for detailed guidelines.
+See `playground/templates/README.md` and `playground/README.md` for detailed guidelines.
 
 ## Navigation Guide
 
@@ -220,10 +227,10 @@ See `prototyping/templates/README.md` and `prototyping/playground/README.md` for
 1. **Design System**: All design system source in `design-system/` (components, styles documentation)
 2. **Technical Documentation**: All technical docs in `develop/` (standards, imports, Figma guides, token SCSS)
 3. **Application**: Application code in `src/` (references design-system)
-4. **Prototyping**: All prototyping work in `prototyping/` (templates and playground)
+4. **Prototyping**: All prototyping work in `playground/` (templates and designer playgrounds)
 5. **Storybook**: Storybook configuration in `.storybook/` at root
 6. **Stories**: Storybook stories in `design-system/components/molecules/` and `design-system/components/atoms/`
-7. **Never create prototypes in root**: Always use `prototyping/templates/` or `prototyping/playground/` directories
+7. **Never create prototypes in root**: Always use `playground/templates/` or `playground/{your-name}/` directories
 
 ## Key Files
 

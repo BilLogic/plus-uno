@@ -8,8 +8,8 @@
 
 import { LOGO_STYLES, LOGO_SIZES } from './constants.js';
 import { getColoredIconSVG, getFilledIconSVG, getOutlinedIconSVG, getTextWordmarkSVG } from './svg-templates.js';
-// Import SCSS for Storybook - styles are also included in main.css for production
-import './Logo.scss';
+// Note: Logo styles are included in main.css (loaded via preview-head.html in Storybook)
+// No need to import SCSS here as it causes Node parsing errors
 
 /**
  * Creates a logo element styled according to PLUS design system

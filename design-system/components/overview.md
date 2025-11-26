@@ -1,39 +1,29 @@
 # Components Overview
 
-The PLUS Design System components are organized using atomic design principles: atoms, molecules, and organisms.
+The PLUS Design System components are organized into two main categories: Components and Specs.
 
-## Component Hierarchy
+## Component Organization
 
-### Atoms
-Fundamental building blocks that cannot be broken down further.
-
-**Examples:**
-- Input
-- StatusIndicator
-
-### Molecules
-Simple combinations of atoms that form functional units.
+### Components
+Reusable UI components that can be used independently or composed together.
 
 **Examples:**
-- Button
-- Card
-- Alert
-- Badge
-- Breadcrumb
-- Checkbox
-- Radio
-- Switch
-- Form
-- Dropdown
-- Modal
-- Navigation
-- And more...
+- Input - Text fields, textareas with various states and sizes
+- StatusIndicator - Status display components
+- Button - Text + icon + container + styling with multiple variants
+- Checkbox, Radio, Switch - Form input components with labels
+- Alert, Toast - Notification components with dismiss functionality
+- Badge, Chip, Status Tag - Icon + text combinations
+- Card, Modal, Dropdown - Complex interactive components
+- Form, DatePicker, InputGroup - Form building components
+- Navigation, Breadcrumb, Pagination - Navigation components
+- And many more...
 
-### Organisms
-Complex components composed of molecules and atoms, representing complete interface sections.
+### Specs
+Complex components composed of multiple components, representing complete interface sections.
 
 **Examples:**
-- Universal (formerly Shared) - commonly used across pillars
+- Universal - commonly used across pillars
 - Admin - administrative interfaces
 - Home
 - Login
@@ -49,7 +39,7 @@ The PLUS design system organizes UI components into 6 semantic layers, from smal
 2. **Cards** - Self-contained containers displaying information
 3. **Sections** - Containers for cards or forms, grouping related content
 4. **Modals** - Pop-up windows requiring user attention
-5. **Surfaces** - Full screen/organism the user sees at one time
+5. **Surfaces** - Full screen/spec the user sees at one time
 6. **Surface Containers** - Top-level frame (sidebar, top bar) - only one per screen
 
 ### Token Usage by Component Type
@@ -600,9 +590,8 @@ Each status has:
 ## Component Files
 
 Component implementations are located in:
-- `atoms/` - Atom components
-- `molecules/` - Molecule components
-- `organisms/` - Organism components
+- `components/` - All reusable UI components
+- `specs/` - Complex components composed of multiple components
 
 Each component folder contains:
 - Component JavaScript file (`index.js`)

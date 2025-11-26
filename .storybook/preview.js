@@ -14,10 +14,10 @@ const cleanupFunctions = {
 
 // Load cleanup functions asynchronously
 Promise.all([
-  import('../design-system/components/molecules/Toast/index.js').then(m => {
+  import('../design-system/components/Toast/index.js').then(m => {
     cleanupFunctions.clearAllToasts = m.clearAllToasts || (() => {});
   }).catch(() => {}),
-  import('../design-system/components/molecules/Tooltip/index.js').then(m => {
+  import('../design-system/components/Tooltip/index.js').then(m => {
     cleanupFunctions.destroyAllTooltips = m.destroyAllTooltips || (() => {});
   }).catch(() => {}),
 ]);
@@ -38,23 +38,22 @@ const preview = {
           ['Styles', 'Styles/Icons', 'Styles/Typography', 'Styles/Layout', 'Styles/Colors', 'Styles/Elevation'],
           'Assets',
           ['Assets', 'Assets/Logo', 'Assets/Images'],
-          'Atoms',
-          'Molecules',
-          'Organisms',
+          'Components',
+          'Specs',
           [
-            'Organisms/Universal',
-            ['Organisms/Universal', 'Organisms/Universal/Elements', 'Organisms/Universal/Tables', 'Organisms/Universal/Cards', 'Organisms/Universal/Modals', 'Organisms/Universal/Sections', 'Organisms/Universal/Pages'],
-            'Organisms/Admin',
-            'Organisms/Home',
-            ['Organisms/Home', 'Organisms/Home/Elements', 'Organisms/Home/Tables', 'Organisms/Home/Cards', 'Organisms/Home/Modals', 'Organisms/Home/Sections', 'Organisms/Home/Pages'],
-            'Organisms/Login',
-            ['Organisms/Login', 'Organisms/Login/Elements', 'Organisms/Login/Tables', 'Organisms/Login/Cards', 'Organisms/Login/Modals', 'Organisms/Login/Sections', 'Organisms/Login/Pages'],
-            'Organisms/Profile',
-            ['Organisms/Profile', 'Organisms/Profile/Elements', 'Organisms/Profile/Tables', 'Organisms/Profile/Cards', 'Organisms/Profile/Modals', 'Organisms/Profile/Sections', 'Organisms/Profile/Pages'],
-            'Organisms/Training',
-            ['Organisms/Training', 'Organisms/Training/Elements', 'Organisms/Training/Tables', 'Organisms/Training/Cards', 'Organisms/Training/Modals', 'Organisms/Training/Sections', 'Organisms/Training/Pages'],
-            'Organisms/Toolkit',
-            ['Organisms/Toolkit', 'Organisms/Toolkit/Elements', 'Organisms/Toolkit/Tables', 'Organisms/Toolkit/Cards', 'Organisms/Toolkit/Modals', 'Organisms/Toolkit/Sections', 'Organisms/Toolkit/Pages'],
+            'Specs/Universal',
+            ['Specs/Universal', 'Specs/Universal/Elements', 'Specs/Universal/Tables', 'Specs/Universal/Cards', 'Specs/Universal/Modals', 'Specs/Universal/Sections', 'Specs/Universal/Pages'],
+            'Specs/Admin',
+            'Specs/Home',
+            ['Specs/Home', 'Specs/Home/Elements', 'Specs/Home/Tables', 'Specs/Home/Cards', 'Specs/Home/Modals', 'Specs/Home/Sections', 'Specs/Home/Pages'],
+            'Specs/Login',
+            ['Specs/Login', 'Specs/Login/Elements', 'Specs/Login/Tables', 'Specs/Login/Cards', 'Specs/Login/Modals', 'Specs/Login/Sections', 'Specs/Login/Pages'],
+            'Specs/Profile',
+            ['Specs/Profile', 'Specs/Profile/Elements', 'Specs/Profile/Tables', 'Specs/Profile/Cards', 'Specs/Profile/Modals', 'Specs/Profile/Sections', 'Specs/Profile/Pages'],
+            'Specs/Training',
+            ['Specs/Training', 'Specs/Training/Elements', 'Specs/Training/Tables', 'Specs/Training/Cards', 'Specs/Training/Modals', 'Specs/Training/Sections', 'Specs/Training/Pages'],
+            'Specs/Toolkit',
+            ['Specs/Toolkit', 'Specs/Toolkit/Elements', 'Specs/Toolkit/Tables', 'Specs/Toolkit/Cards', 'Specs/Toolkit/Modals', 'Specs/Toolkit/Sections', 'Specs/Toolkit/Pages'],
           ],
           'Introduction',
         ],

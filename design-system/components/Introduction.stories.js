@@ -10,7 +10,7 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Welcome to the PLUS Design System component playground! This Storybook showcases all components organized using atomic design principles.',
+        component: 'Welcome to the PLUS Design System component playground! This Storybook showcases all components organized by type: Components and Specs.',
       },
     },
   },
@@ -47,82 +47,50 @@ export const Welcome = {
     // Description
     const description = document.createElement('p');
     description.className = 'body1-txt';
-    description.textContent = 'Welcome to the PLUS Design System component playground! This Storybook showcases all components organized using atomic design principles, along with comprehensive design token documentation.';
+    description.textContent = 'Welcome to the PLUS Design System component playground! This Storybook showcases all components organized by type: Components and Specs, along with comprehensive design token documentation.';
     description.style.marginBottom = 'var(--size-card-gap-lg)';
     description.style.lineHeight = '1.6';
     container.appendChild(description);
     
-    // Atomic Design Section
-    const atomicSection = document.createElement('section');
-    atomicSection.style.marginBottom = 'var(--size-card-gap-lg)';
+    // Component Organization Section
+    const componentSection = document.createElement('section');
+    componentSection.style.marginBottom = 'var(--size-card-gap-lg)';
     
-    const atomicTitle = document.createElement('h2');
-    atomicTitle.className = 'h2';
-    atomicTitle.textContent = 'Atomic Design Organization';
-    atomicTitle.style.marginBottom = 'var(--size-card-gap-md)';
-    atomicSection.appendChild(atomicTitle);
+    const componentTitle = document.createElement('h2');
+    componentTitle.className = 'h2';
+    componentTitle.textContent = 'Component Organization';
+    componentTitle.style.marginBottom = 'var(--size-card-gap-md)';
+    componentSection.appendChild(componentTitle);
     
-    const atomicDescription = document.createElement('p');
-    atomicDescription.className = 'body2-txt';
-    atomicDescription.textContent = 'Components in this design system are organized into two main categories:';
-    atomicDescription.style.marginBottom = 'var(--size-card-gap-md)';
-    atomicSection.appendChild(atomicDescription);
+    const componentDescription = document.createElement('p');
+    componentDescription.className = 'body2-txt';
+    componentDescription.textContent = 'Components in this design system are organized into two main categories:';
+    componentDescription.style.marginBottom = 'var(--size-card-gap-md)';
+    componentSection.appendChild(componentDescription);
     
-    // Atoms
-    const atomsDiv = document.createElement('div');
-    atomsDiv.style.marginBottom = 'var(--size-section-pad-y-md)';
+    // Components
+    const componentsDiv = document.createElement('div');
+    componentsDiv.style.marginBottom = 'var(--size-section-pad-y-md)';
     
-    const atomsTitle = document.createElement('h3');
-    atomsTitle.className = 'h3';
-    atomsTitle.textContent = 'Atoms';
-    atomsTitle.style.marginBottom = 'var(--size-element-gap-sm)';
-    atomsDiv.appendChild(atomsTitle);
+    const componentsTitle = document.createElement('h3');
+    componentsTitle.className = 'h3';
+    componentsTitle.textContent = 'Components';
+    componentsTitle.style.marginBottom = 'var(--size-element-gap-sm)';
+    componentsDiv.appendChild(componentsTitle);
     
-    const atomsDesc = document.createElement('p');
-    atomsDesc.className = 'body2-txt';
-    atomsDesc.style.fontWeight = 'bold';
-    atomsDesc.textContent = 'Basic building blocks that cannot be broken down further:';
-    atomsDesc.style.marginBottom = 'var(--size-element-gap-sm)';
-    atomsDiv.appendChild(atomsDesc);
+    const componentsDesc = document.createElement('p');
+    componentsDesc.className = 'body2-txt';
+    componentsDesc.style.fontWeight = 'bold';
+    componentsDesc.textContent = 'Reusable UI components:';
+    componentsDesc.style.marginBottom = 'var(--size-element-gap-sm)';
+    componentsDiv.appendChild(componentsDesc);
     
-    const atomsList = document.createElement('ul');
-    atomsList.className = 'body2-txt';
-    atomsList.style.paddingLeft = 'var(--size-section-pad-y-md)';
-    const atomItems = [
-      'Typography - Text elements, labels, headlines, body text',
-      'Icons - Font Awesome icons, status indicator icons',
-      'Inputs - Text fields, textareas (bare input elements)',
-      'Status Indicators - Icon-only status indicators',
-    ];
-    atomItems.forEach((item) => {
-      const li = document.createElement('li');
-      li.textContent = item;
-      li.style.marginBottom = 'var(--size-element-gap-xs)';
-      atomsList.appendChild(li);
-    });
-    atomsDiv.appendChild(atomsList);
-    atomicSection.appendChild(atomsDiv);
-    
-    // Molecules
-    const moleculesDiv = document.createElement('div');
-    
-    const moleculesTitle = document.createElement('h3');
-    moleculesTitle.className = 'h3';
-    moleculesTitle.textContent = 'Molecules';
-    moleculesTitle.style.marginBottom = 'var(--size-element-gap-sm)';
-    moleculesDiv.appendChild(moleculesTitle);
-    
-    const moleculesDesc = document.createElement('p');
-    moleculesDesc.className = 'body2-txt';
-    moleculesDesc.style.fontWeight = 'bold';
-    moleculesDesc.textContent = 'Component combinations built from atoms:';
-    moleculesDesc.style.marginBottom = 'var(--size-element-gap-sm)';
-    moleculesDiv.appendChild(moleculesDesc);
-    
-    const moleculesList = document.createElement('ul');
-    moleculesList.className = 'body2-txt';
-    moleculesList.style.paddingLeft = 'var(--size-section-pad-y-md)';
-    const moleculeItems = [
+    const componentsList = document.createElement('ul');
+    componentsList.className = 'body2-txt';
+    componentsList.style.paddingLeft = 'var(--size-section-pad-y-md)';
+    const componentItems = [
+      'Input - Text fields, textareas with various states and sizes',
+      'StatusIndicator - Status display components',
       'Button - Text + icon + container + styling with multiple variants',
       'Checkbox, Radio, Switch - Form input components with labels',
       'Alert, Toast - Notification components with dismiss functionality',
@@ -132,55 +100,56 @@ export const Welcome = {
       'Navigation, Breadcrumb, Pagination - Navigation components',
       'And many more...',
     ];
-    moleculeItems.forEach((item) => {
+    componentItems.forEach((item) => {
       const li = document.createElement('li');
       li.textContent = item;
       li.style.marginBottom = 'var(--size-element-gap-xs)';
       li.style.lineHeight = '1.5';
-      moleculesList.appendChild(li);
+      componentsList.appendChild(li);
     });
-    moleculesDiv.appendChild(moleculesList);
-    atomicSection.appendChild(moleculesDiv);
+    componentsDiv.appendChild(componentsList);
+    componentSection.appendChild(componentsDiv);
     
-    // Organisms section
-    const organismsDiv = document.createElement('div');
-    organismsDiv.style.marginTop = 'var(--size-section-pad-y-md)';
+    // Specs section
+    const specsDiv = document.createElement('div');
+    specsDiv.style.marginTop = 'var(--size-section-pad-y-md)';
     
-    const organismsTitle = document.createElement('h3');
-    organismsTitle.className = 'h3';
-    organismsTitle.textContent = 'Organisms';
-    organismsTitle.style.marginBottom = 'var(--size-element-gap-sm)';
-    organismsDiv.appendChild(organismsTitle);
+    const specsTitle = document.createElement('h3');
+    specsTitle.className = 'h3';
+    specsTitle.textContent = 'Specs';
+    specsTitle.style.marginBottom = 'var(--size-element-gap-sm)';
+    specsDiv.appendChild(specsTitle);
     
-    const organismsDesc = document.createElement('p');
-    organismsDesc.className = 'body2-txt';
-    organismsDesc.style.fontWeight = 'bold';
-    organismsDesc.textContent = 'Complex components composed of molecules and atoms:';
-    organismsDesc.style.marginBottom = 'var(--size-element-gap-sm)';
-    organismsDiv.appendChild(organismsDesc);
+    const specsDesc = document.createElement('p');
+    specsDesc.className = 'body2-txt';
+    specsDesc.style.fontWeight = 'bold';
+    specsDesc.textContent = 'Complex components composed of multiple components:';
+    specsDesc.style.marginBottom = 'var(--size-element-gap-sm)';
+    specsDiv.appendChild(specsDesc);
     
-    const organismsList = document.createElement('ul');
-    organismsList.className = 'body2-txt';
-    organismsList.style.paddingLeft = 'var(--size-section-pad-y-md)';
-    const organismItems = [
+    const specsList = document.createElement('ul');
+    specsList.className = 'body2-txt';
+    specsList.style.paddingLeft = 'var(--size-section-pad-y-md)';
+    const specItems = [
       'Home - Home page components and sections',
       'Login - Authentication and login components',
       'Profile - User profile components',
       'Training - Training-related components',
       'Toolkit - Toolkit components',
-      'Shared - Shared components used across multiple pillars',
+      'Universal - Universal components used across multiple pillars',
+      'Admin - Administrative interface components',
     ];
-    organismItems.forEach((item) => {
+    specItems.forEach((item) => {
       const li = document.createElement('li');
       li.textContent = item;
       li.style.marginBottom = 'var(--size-element-gap-xs)';
       li.style.lineHeight = '1.5';
-      organismsList.appendChild(li);
+      specsList.appendChild(li);
     });
-    organismsDiv.appendChild(organismsList);
-    atomicSection.appendChild(organismsDiv);
+    specsDiv.appendChild(specsList);
+    componentSection.appendChild(specsDiv);
     
-    container.appendChild(atomicSection);
+    container.appendChild(componentSection);
     
     // Usage Section
     const usageSection = document.createElement('section');
@@ -278,7 +247,7 @@ export const Welcome = {
     stepsList.style.paddingLeft = 'var(--size-section-pad-y-md)';
     const steps = [
       'Explore Styles section to understand design tokens (Colors, Layout, Typography, Icons, Elevation)',
-      'Browse components by category (Atoms → Molecules → Organisms)',
+      'Browse components by category (Components → Specs)',
       'Select a component to view its variations and interactive examples',
       'Use controls panel to test different configurations and property values',
       'Copy code examples for your prototypes and reference implementation patterns',

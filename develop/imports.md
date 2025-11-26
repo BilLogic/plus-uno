@@ -18,39 +18,40 @@ The `{relative-path}` changes based on where your prototype file is located.
 
 ## Import Paths by Location
 
-### From `prototyping/templates/{pillar}/` Directory
+### From `playground/templates/{pillar}/` Directory
 
-If your prototype is in `prototyping/templates/login/`, `prototyping/templates/admin/`, etc.:
+If your prototype is in `playground/templates/login/`, `playground/templates/admin/`, etc.:
 
 ```javascript
-import { PlusInterface, PlusSmartComponents } from "../../design-system/components/index.js";
+import { PlusInterface, PlusSmartComponents } from "../../../design-system/components/index.js";
 ```
 
 **Example locations:**
-- `prototyping/templates/login/login.js`
-- `prototyping/templates/admin/tutor-admin.js`
-- `prototyping/templates/home/dashboard.js`
+- `playground/templates/login/login.js`
+- `playground/templates/admin/tutor-admin.js`
+- `playground/templates/home/dashboard.js`
 
 **Path breakdown:**
 - `../` - Go up to `templates/`
-- `../` - Go up to `prototyping/`
+- `../` - Go up to `playground/`
+- `../` - Go up to project root
 - `design-system/components/index.js` - Path to components
 
-### From `prototyping/playground/{name}/` Directory
+### From `playground/{name}/` Directory
 
-If your prototype is in `prototyping/playground/victor/`, `prototyping/playground/bill/`, etc.:
+If your prototype is in `playground/victor/`, `playground/bill/`, etc.:
 
 ```javascript
 import { PlusInterface, PlusSmartComponents } from "../../design-system/components/index.js";
 ```
 
 **Example locations:**
-- `prototyping/playground/victor/my-prototype/script.js`
-- `prototyping/playground/bill/test/script.js`
+- `playground/victor/my-prototype/script.js`
+- `playground/bill/test/script.js`
 
 **Path breakdown:**
 - `../` - Go up to `playground/`
-- `../` - Go up to `prototyping/`
+- `../` - Go up to project root
 - `design-system/components/index.js` - Path to components
 
 ### From Root `index.html` or `src/js/`
@@ -69,9 +70,9 @@ import { PlusInterface, PlusSmartComponents } from "../../design-system/componen
 
 | Prototype Location | Import Path |
 |-------------------|-------------|
-| `prototyping/templates/{pillar}/*.js` | `"../../design-system/components/index.js"` |
-| `prototyping/playground/{name}/*.js` | `"../../design-system/components/index.js"` |
-| `prototyping/playground/{name}/{prototype}/*.js` | `"../../../design-system/components/index.js"` |
+| `playground/templates/{pillar}/*.js` | `"../../../design-system/components/index.js"` |
+| `playground/{name}/*.js` | `"../../design-system/components/index.js"` |
+| `playground/{name}/{prototype}/*.js` | `"../../../design-system/components/index.js"` |
 | `src/js/*.js` | `"../../design-system/components/index.js"` |
 | Root `index.html` (inline script) | `"./design-system/components/index.js"` |
 
@@ -128,24 +129,25 @@ const button = PlusInterface.createButton({
 3. Add `design-system/components/index.js`
 
 **Example:**
-- File: `prototyping/templates/login/login.js`
-- Levels: 2 (`templates/` → `login/`)
-- Path: `../../design-system/components/index.js`
+- File: `playground/templates/login/login.js`
+- Levels: 3 (`templates/` → `login/` → `playground/`)
+- Path: `../../../design-system/components/index.js`
 
 ### Method 2: Visual Path
 
 Visualize the path from your file to the component:
 
 ```
-prototyping/
+playground/
   └── templates/
       └── login/
           └── login.js  ← Your file
               └── ../  ← Go up to templates/
-                  └── ../  ← Go up to prototyping/
-                      └── design-system/
-                          └── components/
-                              └── index.js  ← Target file
+                  └── ../  ← Go up to playground/
+                      └── ../  ← Go up to project root
+                          └── design-system/
+                              └── components/
+                                  └── index.js  ← Target file
 ```
 
 ## Common Issues and Solutions
