@@ -16,11 +16,7 @@ const config = {
     '**/components/assets/**',
     '**/assets/components/**',
   ],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-    '@storybook/addon-links',
-  ],
+  addons: ['@storybook/addon-links', '@storybook/addon-docs'],
   framework: {
     name: '@storybook/html-vite',
     options: {},
@@ -93,7 +89,7 @@ const config = {
     
     // Improve error handling for module resolution
     config.resolve.dedupe = config.resolve.dedupe || [];
-    config.resolve.dedupe.push('@storybook/html');
+    config.resolve.dedupe.push('@storybook/html-vite');
     
     // Better handling of dynamic imports
     config.optimizeDeps = config.optimizeDeps || {};

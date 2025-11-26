@@ -321,7 +321,7 @@ See `playground/templates/README.md` and `playground/README.md` for detailed gui
 
 5. Update `design-system/components/overview.md`
 
-6. Add examples to `prototyping/templates/` when appropriate
+6. Add examples to `playground/templates/` when appropriate
 
 ### Updating Guidelines
 1. Update appropriate file in `develop/` or `design-system/`

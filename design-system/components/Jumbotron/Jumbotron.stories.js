@@ -328,7 +328,12 @@ Fluid.storyName = 'Fluid';
 
 /**
  * Size Variants
- * Shows all padding and gap size variants
+ * Shows all padding and gap size variants with corresponding radius sizes
+ * 
+ * **Radius-Padding Relationship**: Match radius size to padding size tier
+ * - **Small (sm)**: `section-pad-sm` (16px) → `section-radius-sm` (8px) - Compact sections
+ * - **Medium (md)**: `section-pad-md` (24px) → `section-radius-md` (8px) - Standard sections
+ * - **Large (lg)**: `section-pad-lg` (36px) → `section-radius-lg` (16px) - Spacious sections
  */
 export const SizeVariants = {
   render: () => {
@@ -338,18 +343,21 @@ export const SizeVariants = {
     container.style.gap = 'var(--size-section-gap-lg)';
     
     const sizes = ['sm', 'md', 'lg'];
+    const radiusMap = { sm: 'sm', md: 'md', lg: 'lg' };
+    
     sizes.forEach((size) => {
       const label = document.createElement('div');
       label.className = 'h6';
-      label.textContent = `Size: ${size.toUpperCase()}`;
+      label.textContent = `Size: ${size.toUpperCase()} - Padding: ${size}, Gap: ${size}, Radius: ${radiusMap[size]}`;
       label.style.marginBottom = 'var(--size-element-gap-sm)';
       container.appendChild(label);
       
       const jumbotron = PlusInterface.createJumbotron({
         title: `Jumbotron ${size.toUpperCase()}`,
-        body: `This is a ${size} size jumbotron with ${size} padding and gap.`,
+        body: `This is a ${size} size jumbotron with ${size} padding, ${size} gap, and ${radiusMap[size]} radius. The radius matches the padding size tier for visual consistency.`,
         paddingSize: size,
         gapSize: size,
+        radiusSize: radiusMap[size],
         primaryButton: {
           text: 'Action',
           style: 'primary',

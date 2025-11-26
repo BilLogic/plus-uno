@@ -69,6 +69,48 @@ This document consolidates all technical documentation, coding standards, setup 
 - Cards on hover: `--elevation-light-2`
 - Modals: `--elevation-light-3` to `--elevation-light-5`
 
+### Corner Radius Application
+
+Corner radius (border-radius) selection should be **contextually related to the padding and gap sizes** used within the same component. The radius size should match the padding/gap size tier to maintain visual consistency and hierarchy.
+
+#### Core Principle
+
+**Radius size should match padding/gap size tier**: Small padding → small radius, medium padding → medium radius, large padding → large radius.
+
+#### Component-Specific Guidelines
+
+- **Elements**: All element radius sizes are 4px (except pill). Use `element-radius-sm/md/lg` based on `element-pad-sm/md/lg` respectively. Use `element-radius-pill` (999px) for badges, chips, and toggle switches.
+
+- **Cards**: Use `card-radius-sm` (12px) with `card-pad-sm` (16px). Use `card-radius-md` (16px) with `card-pad-md` (20px) or `card-pad-lg` (24px). Default is `card-radius-sm` for most cards.
+
+- **Sections**: Use `section-radius-sm/md` (8px) with `section-pad-sm` (16px) or `section-pad-md` (24px). Use `section-radius-lg` (16px) with `section-pad-lg` (36px).
+
+- **Modals**: Use `modal-radius-sm` (4px) with `modal-pad-sm` (10px/8px). Use `modal-radius-md` (6px) with `modal-pad-md` (16px/12px) - this is the default. Use `modal-radius-lg` (12px) with `modal-pad-lg` (40px/24px).
+
+- **Surfaces**: Use `surface-radius` (16px) - single size available, use consistently for all surface-level components.
+
+- **Surface Containers**: **No radius tokens** - surface containers are the outermost layer (sidebars, top bars) and don't require corner radius. They extend to screen edges.
+
+- **Tables**: Use `table-radius-sm` (6px) for dense tables or `table-radius-md` (8px) for standard tables. Selection based on table density, not directly tied to padding.
+
+#### Best Practices
+
+1. **Match the tier**: Always match radius size tier to padding/gap size tier
+2. **Consistency**: Use the same radius size for similar components in the same context
+3. **Visual hierarchy**: Larger radius for more prominent components, smaller radius for compact components
+4. **Context matters**: Consider the component's role and importance when selecting radius size
+5. **Surface containers exception**: Remember that surface containers don't use radius
+
+#### Anti-Patterns
+
+❌ **Don't mix tiers**: Using `card-pad-sm` with `card-radius-md` breaks visual consistency
+❌ **Don't ignore context**: Using the same radius for all components regardless of padding size
+❌ **Don't use surface container radius**: Surface containers don't need radius tokens
+✅ **Do match tiers**: Use `card-pad-sm` with `card-radius-sm` for consistency
+✅ **Do consider hierarchy**: Use larger radius for more prominent components
+
+**Reference**: See [Layout Documentation](../design-system/styles/layout.md) for complete corner radius application principles and detailed guidelines for each component layer.
+
 ## Component Creation
 
 ### Import Pattern
@@ -217,6 +259,11 @@ placeholder.title = 'Image placeholder - please provide clever-image.png';
 ```
 
 ## Prototyping Checklist
+
+### Local Development Server
+- [ ] Local server is started (required for ES6 modules)
+- [ ] Prototype is accessed via `http://localhost:8000` (not file://)
+- [ ] Browser DevTools are open for debugging
 
 ### HTML Head Section
 - [ ] Google Fonts are loaded (all three families: Lato, Merriweather Sans, Open Sans)

@@ -22,7 +22,7 @@ Promise.all([
   }).catch(() => {}),
 ]);
 
-/** @type { import('@storybook/html').Preview } */
+/** @type { import('@storybook/html-vite').Preview } */
 const preview = {
   parameters: {
     docs: {
@@ -67,28 +67,30 @@ const preview = {
       },
     },
     backgrounds: {
-      default: 'light',
-      values: [
-        {
+      options: {
+        light: {
           name: 'light',
           value: '#ffffff',
         },
-        {
+
+        dark: {
           name: 'dark',
           value: '#1a1a1a',
         },
-        {
+
+        surface: {
           name: 'surface',
           value: 'var(--color-surface)',
         },
-        {
+
+        "surface-container": {
           name: 'surface-container',
           value: 'var(--color-surface-container)',
-        },
-      ],
+        }
+      }
     },
     viewport: {
-      viewports: {
+      options: {
         mobile: {
           name: 'Mobile',
           styles: {
@@ -113,6 +115,7 @@ const preview = {
       },
     },
   },
+
   decorators: [
     (story) => {
       // Clear all toasts before rendering a new story
@@ -146,6 +149,12 @@ const preview = {
       return container;
     },
   ],
+
+  initialGlobals: {
+    backgrounds: {
+      value: 'light'
+    }
+  }
 };
 
 export default preview;

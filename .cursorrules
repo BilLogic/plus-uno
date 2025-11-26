@@ -108,9 +108,9 @@ When designing a specific type of UI component:
   - Token docs: `design-system/styles/` (colors.md, layout.md, typography.md, icons.md, elevation.md)
   - Component docs: `design-system/components/overview.md`
   - Technical docs: `develop/` (standards.md, imports.md, FIGMA_*.md, PROJECT_STRUCTURE.md)
-- Prototyping: `prototyping/` - Prototyping workspace
-  - Templates: `prototyping/templates/` - Curated templates organized by product pillar
-  - Playground: `prototyping/playground/` - Designer-specific prototyping area
+- Prototyping: `playground/prototyping/` - Prototyping workspace
+  - Templates: `playground/templates/` - Curated templates organized by product pillar
+  - Playground: `playground/prototyping/{designer-name}/` - Designer-specific prototyping area
 
 ### Prototyping and Template Guidelines
 
@@ -119,31 +119,31 @@ When designing a specific type of UI component:
 When creating new prototypes or templates:
 
 1. **For Designer-Specific Prototypes:**
-   - **ALWAYS** create in `prototyping/playground/{designer-name}/` directory
+   - **ALWAYS** create in `playground/prototyping/{designer-name}/` directory
    - Create subdirectories for different prototypes
    - Each prototype should include: `index.html`, optional `styles.css`/`script.js`, `README.md`
 
 2. **For Reusable Templates:**
-   - **ALWAYS** create in `prototyping/templates/{product-pillar}/` directory
+   - **ALWAYS** create in `playground/templates/{product-pillar}/` directory
    - Product pillars: `admin`, `toolkit`, `login`, `profile`, `home`, `training`, `universal`
    - Templates should be curated, well-documented, and follow best practices
 
 3. **Never Create in Root:**
    - **NEVER** create HTML/JS files in root directory (except `index.html` which is the main starter)
    - **NEVER** create standalone prototype files in root
-   - **ALWAYS** use designated areas (`prototyping/templates/` or `prototyping/playground/`)
+   - **ALWAYS** use designated areas (`playground/templates/` or `playground/prototyping/`)
 
 4. **Path References:**
-   - From `prototyping/templates/{pillar}/`: Use `../../../dist/css/main.css` for CSS, `../../../design-system/` for components
-   - From `prototyping/playground/{designer}/`: Use `../../../../dist/css/main.css` for CSS, `../../../../design-system/` for components
+   - From `playground/templates/{pillar}/`: Use `../../../dist/css/main.css` for CSS, `../../../design-system/` for components
+   - From `playground/prototyping/{designer}/`: Use `../../../../dist/css/main.css` for CSS, `../../../../design-system/` for components
    - Always use relative paths based on file location
 
 5. **Best Practices:**
-   - Reference templates in `prototyping/templates/` before starting new prototypes
+   - Reference templates in `playground/templates/` before starting new prototypes
    - Use product pillar structure to organize work
    - Document prototypes with README.md files
    - Follow design system guidelines and use design tokens
-   - When a prototype becomes reusable, move it to `prototyping/templates/`
+   - When a prototype becomes reusable, move it to `playground/templates/`
 
 ### Naming Conventions
 - Files: kebab-case (e.g., `button.js`, `index.js`)
@@ -332,7 +332,7 @@ When user explicitly mentions prototyping/generating images:
 - **ALWAYS include Bootstrap 4.6.2 CSS** before PLUS Design System CSS
 - **ALWAYS include Font Awesome** for icons
 - **ALWAYS include PLUS Design System CSS** (`dist/css/main.css` or relative path)
-- **Reference**: `templates/universal/html-head-template.html` for complete HTML head template
+- **Reference**: `playground/templates/universal/html-head-template.html` for complete HTML head template
 - **Never skip font loading** - missing fonts cause design tokens to default to system fonts
 
 ### Bootstrap Integration

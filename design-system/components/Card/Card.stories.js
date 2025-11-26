@@ -32,6 +32,10 @@
  *   - Padding: `--size-card-pad-x-sm/md/lg`, `--size-card-pad-y-sm/md/lg`
  *   - Gap: `--size-card-gap-sm/md/lg` (for spacing between major sections)
  *   - Radius: `--size-card-radius-sm/md` (12px default)
+ *     - **Radius-Padding Relationship**: Match radius size to padding size tier
+ *     - Use `card-radius-sm` (12px) with `card-pad-sm` (16px padding)
+ *     - Use `card-radius-md` (16px) with `card-pad-md` (20px) or `card-pad-lg` (24px)
+ *     - Default: Most cards use `card-radius-sm` (12px) as the standard
  *   - Border: `--size-card-border-sm/md/lg`
  *   - Surface: `--color-surface-container` for background
  *   - Content: `--color-on-surface` for text
@@ -63,14 +67,17 @@
  * 
  * ### Size Variants
  * - **Small (sm)**: Compact cards for dense interfaces
- *   - Padding: 16px all sides
- *   - Gap: 8px
+ *   - Padding: 16px all sides (`card-pad-sm`)
+ *   - Gap: 8px (`card-gap-sm`)
+ *   - **Radius: 12px (`card-radius-sm`)** - Match small padding with small radius
  * - **Medium (md)**: Standard size (default)
- *   - Padding: Top/Bottom 16px, Left/Right 24px
- *   - Gap: 16px
+ *   - Padding: Top/Bottom 20px, Left/Right 20px (`card-pad-md`)
+ *   - Gap: 16px (`card-gap-md`)
+ *   - **Radius: 12px (`card-radius-sm`) or 16px (`card-radius-md`)** - Typically use sm radius for standard cards
  * - **Large (lg)**: Spacious cards for content-rich layouts
- *   - Padding: 24px all sides
- *   - Gap: 32px
+ *   - Padding: 24px all sides (`card-pad-lg`)
+ *   - Gap: 32px (`card-gap-lg`)
+ *   - **Radius: 16px (`card-radius-md`)** - Match large padding with medium radius
  * 
  * ### Best Practices
  * - Use appropriate padding size based on content density

@@ -6,9 +6,65 @@ This directory is for designer-specific prototyping and experimentation. Each de
 
 ### Option 1: Manual Creation
 
-1. Create a directory with your name (e.g., `playground/victor/` or `playground/bill/`)
-2. Create a `README.md` in your directory to document your work
-3. Start prototyping!
+1. Create a directory with your name (e.g., `playground/prototyping/victor/` or `playground/prototyping/bill/`)
+2. Create a subdirectory for your prototype (e.g., `playground/prototyping/bill/figma-replication-test/`)
+3. Create a `README.md` in your prototype directory to document your work
+4. **Start a local server** (see Local Development Server section below)
+5. Open in browser and start prototyping!
+
+## Local Development Server
+
+**By default, all prototypes should be hosted locally** to ensure proper module loading and asset resolution.
+
+### Starting the Local Server
+
+**IMPORTANT**: The server must be run from the **project root** (not the prototype directory) to ensure relative paths resolve correctly.
+
+```bash
+# From the project root
+cd /path/to/plus-vibe-coding-starting-kit
+
+# Option 1: Python 3 (recommended)
+python3 -m http.server 8000
+
+# Option 2: Python 2
+python -m SimpleHTTPServer 8000
+
+# Option 3: Node.js (if you have http-server installed)
+npx http-server -p 8000
+```
+
+### Accessing Your Prototype
+
+Once the server is running from the project root, access your prototype at:
+
+```
+http://localhost:8000/playground/prototyping/{your-name}/{prototype-name}/
+```
+
+**Example:**
+```
+http://localhost:8000/playground/prototyping/bill/figma-replication-test/
+```
+
+### Opening in Browser
+
+Once the server is running:
+
+1. **Open in Cursor Browser** (recommended):
+   - The prototype will automatically open in Cursor's integrated browser
+   - This allows for easy inspection and debugging
+
+2. **Open in External Browser**:
+   - Navigate to `http://localhost:8000` in your preferred browser
+   - Use DevTools to inspect and debug
+
+### Why Local Server?
+
+- **ES6 Modules**: Required for `import` statements to work correctly
+- **CORS**: Prevents cross-origin issues when loading assets
+- **Path Resolution**: Ensures relative paths resolve correctly
+- **Design Tokens**: CSS variables load properly from compiled CSS
 
 ### Option 2: Using Git User Name (Auto-generated)
 
@@ -27,13 +83,13 @@ playground/
 │   ├── toolkit/
 │   ├── training/
 │   └── universal/
-└── {your-name}/                 # Your playground directory
-    ├── README.md               # Your notes and documentation
-    └── {prototype-name}/       # Individual prototypes
-        ├── index.html
-        ├── styles.css (if needed)
-        ├── script.js (if needed)
-        └── README.md
+└── prototyping/                 # Designer-specific prototyping area
+    └── {your-name}/            # Your prototyping directory
+        └── {prototype-name}/   # Individual prototypes
+            ├── index.html
+            ├── styles.css (if needed)
+            ├── script.js (if needed)
+            └── README.md
 ```
 
 ## Best Practices
@@ -44,9 +100,9 @@ playground/
 4. **Follow design system**: Always use PLUS design tokens and components
 5. **Keep it clean**: Remove experimental code that didn't work out
 
-## When to Use Playground vs Templates
+## When to Use Prototyping vs Templates
 
-- **Playground**: Use for experimentation, one-off prototypes, and personal exploration
+- **Prototyping**: Use for experimentation, one-off prototypes, and personal exploration
 - **Templates**: Use for reusable, curated templates that demonstrate complete page implementations based on specs documentation
 
 ## Moving to Templates
@@ -60,10 +116,10 @@ If your prototype becomes a useful template for others:
 
 ## Git Integration
 
-By default, playground directories are ignored by git (see `.gitignore`). If you want to commit your playground work:
+By default, prototyping directories are ignored by git (see `.gitignore`). If you want to commit your prototyping work:
 
 1. Remove the ignore pattern for your specific directory, OR
-2. Use `git add -f playground/{your-name}/` to force add
+2. Use `git add -f playground/prototyping/{your-name}/` to force add
 
 ## See Also
 

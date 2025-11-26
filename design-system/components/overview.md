@@ -45,11 +45,21 @@ The PLUS design system organizes UI components into 6 semantic layers, from smal
 ### Token Usage by Component Type
 
 - **Elements**: Use `element-*` tokens (padding, gap, radius, border)
+  - **Radius-Padding Relationship**: Match radius size to padding size tier (sm/md/lg)
+  - Use `element-radius-sm/md/lg` (all 4px) with corresponding `element-pad-sm/md/lg`
+  - Use `element-radius-pill` (999px) for badges, chips, and toggle switches
 - **Cards**: Use `card-*` tokens (padding, gap, radius, border)
+  - **Radius-Padding Relationship**: Use `card-radius-sm` (12px) with `card-pad-sm` (16px), `card-radius-md` (16px) with `card-pad-md` (20px) or `card-pad-lg` (24px)
+  - Default: Most cards use `card-radius-sm` (12px)
 - **Sections**: Use `section-*` tokens (padding, gap, radius, border)
+  - **Radius-Padding Relationship**: Use `section-radius-sm/md` (8px) with `section-pad-sm` (16px) or `section-pad-md` (24px), `section-radius-lg` (16px) with `section-pad-lg` (36px)
 - **Modals**: Use `modal-*` tokens (padding, gap, radius, border)
+  - **Radius-Padding Relationship**: Use `modal-radius-sm` (4px) with `modal-pad-sm` (10px/8px), `modal-radius-md` (6px) with `modal-pad-md` (16px/12px), `modal-radius-lg` (12px) with `modal-pad-lg` (40px/24px)
+  - Default: Most modals use `modal-radius-md` (6px)
 - **Surfaces**: Use `surface-*` tokens (padding, gap, radius, border)
+  - **Radius**: Use `surface-radius` (16px) - single size available, use consistently for all surface-level components
 - **Surface Containers**: Use `surface-container-*` tokens (padding, gap, border)
+  - **No radius tokens**: Surface containers are the outermost layer (sidebars, top bars) and do not require corner radius - they extend to screen edges
 
 ### Element Typography Hierarchy
 

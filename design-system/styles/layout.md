@@ -47,6 +47,84 @@ However, mixing tokens is still allowed if absolutely necessary (see Mixing Toke
 
 **`element-gap-xs` is reserved for label-to-input spacing only.** This token (4px) should only be used for the space between a form label and its input field (e.g., a text field or dropdown menu).
 
+## Corner Radius Application Principles
+
+Corner radius (border-radius) selection should be **contextually related to the padding and gap sizes** used within the same component. The radius size should match the padding/gap size tier to maintain visual consistency and hierarchy.
+
+### Core Principle
+
+**Radius size should match padding/gap size tier**: Small padding → small radius, medium padding → medium radius, large padding → large radius.
+
+### Contextual Selection Guidelines
+
+When selecting corner radius for a component, consider:
+1. **Padding size**: The radius should align with the padding size tier (sm/md/lg)
+2. **Gap size**: The radius should align with the gap size tier when gap is the primary spacing mechanism
+3. **Component context**: The radius should match the visual weight and importance of the component
+4. **Hierarchy**: Larger components with more padding typically use larger radius values
+
+### Layer-Specific Guidelines
+
+#### Elements Layer
+- **All element radius sizes are 4px** (except pill shape which is 999px)
+- Use `element-radius-sm/md/lg` based on element padding size:
+  - `element-pad-sm` → `element-radius-sm` (4px)
+  - `element-pad-md` → `element-radius-md` (4px)
+  - `element-pad-lg` → `element-radius-lg` (4px)
+- **Pill shape**: Use `element-radius-pill` (999px) for fully rounded elements like badges, chips, and toggle switches
+
+#### Cards Layer
+- **Small radius (12px)**: Use `card-radius-sm` with `card-pad-sm` (16px padding)
+  - Best for: Compact cards, dense interfaces, smaller content areas
+- **Medium radius (16px)**: Use `card-radius-md` with `card-pad-md` (20px padding) or `card-pad-lg` (24px padding)
+  - Best for: Standard cards, content-rich layouts, prominent card displays
+- **Default**: Cards typically use `card-radius-sm` (12px) as the default
+
+#### Sections Layer
+- **Small/Medium radius (8px)**: Use `section-radius-sm` or `section-radius-md` (both 8px) with `section-pad-sm` (16px) or `section-pad-md` (24px)
+  - Best for: Standard sections, containers for cards or forms
+- **Large radius (16px)**: Use `section-radius-lg` with `section-pad-lg` (36px padding)
+  - Best for: Spacious sections, prominent content areas, hero sections
+
+#### Modals Layer
+- **Small radius (4px)**: Use `modal-radius-sm` with `modal-pad-sm` (10px/8px padding)
+  - Best for: Compact modals, alerts, small dialogs
+- **Medium radius (6px)**: Use `modal-radius-md` with `modal-pad-md` (16px/12px padding)
+  - Best for: Standard modals, default dialog windows (most common)
+- **Large radius (12px)**: Use `modal-radius-lg` with `modal-pad-lg` (40px/24px padding)
+  - Best for: Spacious modals, important dialogs, content-rich modals
+
+#### Surfaces Layer
+- **Single radius (16px)**: Use `surface-radius` (16px) - only one size available
+  - Best for: Full screen/organism layouts, page-level containers
+  - Surfaces typically use consistent radius regardless of padding size
+
+#### Surface Containers Layer
+- **No radius tokens**: Surface containers are the outermost layer (sidebars, top bars) and **do not require corner radius**
+  - This is intentional design - surface containers extend to screen edges
+  - They are typically full-width or full-height elements that don't need rounded corners
+
+#### Tables Layer
+- **Small radius (6px)**: Use `table-radius-sm` for dense tables, compact data displays
+- **Medium radius (8px)**: Use `table-radius-md` for standard tables, typical data displays
+- **Selection**: Choose based on table density and visual weight, not directly tied to padding
+
+### Best Practices
+
+1. **Match the tier**: Always match radius size tier to padding/gap size tier
+2. **Consistency**: Use the same radius size for similar components in the same context
+3. **Visual hierarchy**: Larger radius for more prominent components, smaller radius for compact components
+4. **Context matters**: Consider the component's role and importance when selecting radius size
+5. **Surface containers exception**: Remember that surface containers don't use radius
+
+### Anti-Patterns
+
+❌ **Don't mix tiers**: Using `card-pad-sm` with `card-radius-md` breaks visual consistency
+❌ **Don't ignore context**: Using the same radius for all components regardless of padding size
+❌ **Don't use surface container radius**: Surface containers don't need radius tokens
+✅ **Do match tiers**: Use `card-pad-sm` with `card-radius-sm` for consistency
+✅ **Do consider hierarchy**: Use larger radius for more prominent components
+
 ## Elements Layer Tokens
 
 Use for: buttons, forms, badges, items
@@ -67,9 +145,17 @@ Use for: buttons, forms, badges, items
 
 ### Radius
 - `--size-element-radius-sm` - 4px
+  - Use with: `element-pad-sm` (8px/4px padding)
+  - Best for: Small buttons, compact form inputs, dense interfaces
 - `--size-element-radius-md` - 4px
+  - Use with: `element-pad-md` (10px/6px padding)
+  - Best for: Standard buttons, default form inputs, typical element sizes
 - `--size-element-radius-lg` - 4px
+  - Use with: `element-pad-lg` (16px/8px padding)
+  - Best for: Large buttons, prominent form inputs, spacious interfaces
 - `--size-element-radius-pill` - 999px (Fully rounded pill shape)
+  - Use for: Badges, chips, toggle switches, fully rounded elements
+  - Note: Pill shape is independent of padding size
 
 ### Border/Stroke
 - `--size-element-stroke-sm` - 1px
@@ -97,7 +183,13 @@ Use for: self-contained containers displaying information
 
 ### Radius
 - `--size-card-radius-sm` - 12px
+  - Use with: `card-pad-sm` (16px padding)
+  - Best for: Compact cards, dense interfaces, smaller content areas
+  - Default: Most cards use this as the standard radius
 - `--size-card-radius-md` - 16px
+  - Use with: `card-pad-md` (20px padding) or `card-pad-lg` (24px padding)
+  - Best for: Standard cards, content-rich layouts, prominent card displays
+  - Note: Use when card has medium or large padding for visual consistency
 
 ### Border
 - `--size-card-border-sm` - 1px
@@ -123,8 +215,14 @@ Use for: containers for cards or forms, grouping related content
 
 ### Radius
 - `--size-section-radius-sm` - 8px
+  - Use with: `section-pad-sm` (16px padding)
+  - Best for: Compact sections, dense layouts, smaller containers
 - `--size-section-radius-md` - 8px
+  - Use with: `section-pad-md` (24px padding)
+  - Best for: Standard sections, containers for cards or forms, typical layouts
 - `--size-section-radius-lg` - 16px
+  - Use with: `section-pad-lg` (36px padding)
+  - Best for: Spacious sections, prominent content areas, hero sections
 
 ### Border
 - `--size-section-border` - 1.5px
@@ -148,8 +246,15 @@ Use for: pop-up windows, dialogs, date pickers, alerts, breadcrumbs
 
 ### Radius
 - `--size-modal-radius-sm` - 4px
+  - Use with: `modal-pad-sm` (10px/8px padding)
+  - Best for: Compact modals, alerts, small dialogs, dense interfaces
 - `--size-modal-radius-md` - 6px
+  - Use with: `modal-pad-md` (16px/12px padding)
+  - Best for: Standard modals, default dialog windows (most common)
+  - Default: Most modals use this as the standard radius
 - `--size-modal-radius-lg` - 12px
+  - Use with: `modal-pad-lg` (40px/24px padding)
+  - Best for: Spacious modals, important dialogs, content-rich modals
 
 ### Border
 - `--size-modal-border-sm` - 1px
@@ -171,6 +276,9 @@ Use for: full screen/organism the user sees at one time
 
 ### Radius
 - `--size-surface-radius` - 16px
+  - Use for: Full screen/organism layouts, page-level containers
+  - Note: Single size available - use consistently for all surface-level components
+  - Relationship: Surfaces use consistent radius regardless of padding size
 
 ### Border
 - `--size-surface-border` - 2px
@@ -192,6 +300,12 @@ Use for: top-level frame (sidebar, top bar) - only one per screen
 ### Border
 - `--size-surface-container-border` - 2.5px
 
+### Radius
+- **No radius tokens**: Surface containers are the outermost layer and **do not require corner radius**
+  - This is intentional design - surface containers extend to screen edges
+  - They are typically full-width or full-height elements (sidebars, top bars) that don't need rounded corners
+  - Surface containers are the structural frame of the interface, not content containers
+
 ## Table Tokens
 
 Use for: table cells and spacing
@@ -203,7 +317,11 @@ Use for: table cells and spacing
 
 ### Row Tokens
 - `--size-table-radius-sm` - 6px (Row border radius - small)
+  - Use for: Dense tables, compact data displays, smaller table rows
+  - Selection: Based on table density and visual weight, not directly tied to padding
 - `--size-table-radius-md` - 8px (Row border radius - medium)
+  - Use for: Standard tables, typical data displays, normal table rows
+  - Selection: Based on table density and visual weight, not directly tied to padding
 
 ### Special Circumstances
 
@@ -235,6 +353,8 @@ Use for: table cells and spacing
 6. **Determine from parent**: Look at immediate parent container and cascade down
 7. **Element typography hierarchy**: H3→lg, H6→md, B3→sm for element spacing
 8. **element-gap-xs reserved**: Only for label-to-input spacing
+9. **Match radius to padding/gap tier**: Small padding → small radius, medium padding → medium radius, large padding → large radius
+10. **Surface containers exception**: Surface containers don't use radius (outermost layer)
 
 ## See Also
 

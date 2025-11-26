@@ -3,7 +3,7 @@
  * Status icon only (no text container)
  */
 
-import { PlusSmartComponents } from '../index.js';
+import { PlusSmartComponents } from './index.js';
 
 export default {
   title: 'Components/StatusIndicator',

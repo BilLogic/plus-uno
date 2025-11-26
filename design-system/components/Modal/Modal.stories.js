@@ -25,6 +25,10 @@
  *   - Padding: `--size-modal-pad-x-sm/md/lg`, `--size-modal-pad-y-sm/md/lg`
  *   - Gap: `--size-modal-gap-sm/md/lg` (for spacing between major sections)
  *   - Radius: `--size-modal-radius-sm/md/lg` (6px default)
+ *     - **Radius-Padding Relationship**: Match radius size to padding size tier
+ *     - **Small (sm)**: Use `modal-radius-sm` (4px) with `modal-pad-sm` (10px/8px padding) - Compact modals, alerts, small dialogs
+ *     - **Medium (md)**: Use `modal-radius-md` (6px) with `modal-pad-md` (16px/12px padding) - Standard modals, default dialog windows (most common)
+ *     - **Large (lg)**: Use `modal-radius-lg` (12px) with `modal-pad-lg` (40px/24px padding) - Spacious modals, important dialogs, content-rich modals
  *   - Surface: `--color-surface-container-high` for background
  *   - Content: `--color-on-surface` for text
  * - **Typography Token Usage**:

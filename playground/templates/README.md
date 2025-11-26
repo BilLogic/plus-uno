@@ -23,9 +23,65 @@ Each template folder contains:
 1. **Review the STRUCTURE.md** in the template folder to understand the complete page structure
 2. **Reference the specs documentation** at `../../design-system/specs/{pillar}/` for detailed component breakdowns
 3. **Choose a template** from the appropriate product pillar directory
-4. **Copy the template** to your `playground/{your-name}/` directory
+4. **Copy the template** to your `playground/prototyping/{your-name}/` directory
 5. **Customize** the template for your specific prototype
-6. **Reference** the design system components and tokens
+6. **Start a local server** (see Local Development Server section below)
+7. **Open in browser** and test your prototype
+8. **Reference** the design system components and tokens
+
+## Local Development Server
+
+**By default, all prototypes should be hosted locally** to ensure proper module loading and asset resolution.
+
+### Starting the Local Server
+
+**IMPORTANT**: The server must be run from the **project root** (not the prototype directory) to ensure relative paths resolve correctly.
+
+```bash
+# From the project root
+cd /path/to/plus-vibe-coding-starting-kit
+
+# Option 1: Python 3 (recommended)
+python3 -m http.server 8000
+
+# Option 2: Python 2
+python -m SimpleHTTPServer 8000
+
+# Option 3: Node.js (if you have http-server installed)
+npx http-server -p 8000
+```
+
+### Accessing Your Prototype
+
+Once the server is running from the project root, access your prototype at:
+
+```
+http://localhost:8000/playground/prototyping/{your-name}/{prototype-name}/
+```
+
+**Example:**
+```
+http://localhost:8000/playground/prototyping/bill/figma-replication-test/
+```
+
+### Opening in Browser
+
+Once the server is running:
+
+1. **Open in Cursor Browser** (recommended):
+   - The prototype will automatically open in Cursor's integrated browser
+   - This allows for easy inspection and debugging
+
+2. **Open in External Browser**:
+   - Navigate to `http://localhost:8000` in your preferred browser
+   - Use DevTools to inspect and debug
+
+### Why Local Server?
+
+- **ES6 Modules**: Required for `import` statements to work correctly
+- **CORS**: Prevents cross-origin issues when loading assets
+- **Path Resolution**: Ensures relative paths resolve correctly
+- **Design Tokens**: CSS variables load properly from compiled CSS
 
 ## Setup Requirements
 
@@ -71,7 +127,7 @@ Each template folder contains:
 **ALWAYS use correct import paths** based on your prototype location:
 
 - **From `playground/templates/{pillar}/`**: `"../../../design-system/components/index.js"`
-- **From `playground/{name}/`**: `"../../design-system/components/index.js"`
+- **From `playground/prototyping/{name}/`**: `"../../../../design-system/components/index.js"`
 - **From root**: `"./design-system/components/index.js"`
 
 **Example:**
@@ -163,7 +219,7 @@ When creating a new template:
 - **Table Example**: `universal/table-example.html` - Table styling example
 - **Coding Standards**: `../../develop/standards.md` - Coding standards, setup guides, and best practices
 - **Import Paths**: `../../develop/imports.md` - Import path reference
-- **Playground**: `../` - For designer-specific prototyping
+- **Playground**: `../prototyping/` - For designer-specific prototyping
 - **Design System**: `../../design-system/` - Component library and tokens
 - **Token Documentation**: `../../design-system/styles/` - Complete token reference
 - **Component Documentation**: `../../design-system/components/overview.md` - Component API documentation

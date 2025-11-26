@@ -70,6 +70,14 @@ function createSpacingTable(headers, rows) {
     descCell.className = 'body2-txt';
     row.appendChild(descCell);
     
+    // Extra column (Best For) if provided
+    if (rowData.extra) {
+      const extraCell = document.createElement('td');
+      extraCell.textContent = rowData.extra;
+      extraCell.className = 'body2-txt';
+      row.appendChild(extraCell);
+    }
+    
     tbody.appendChild(row);
   });
   
@@ -288,6 +296,25 @@ export const ElementSpacings = {
     );
     container.appendChild(gapTable);
     
+    // Radius
+    const radiusTitle = document.createElement('h3');
+    radiusTitle.className = 'h3';
+    radiusTitle.textContent = 'Radius';
+    radiusTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    radiusTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(radiusTitle);
+    
+    const radiusTable = createSpacingTable(
+      ['Token', 'Value', 'Description'],
+      [
+        { token: '--size-element-radius-sm', value: '4px', description: 'Small radius - use with element-pad-sm (8px/4px padding)' },
+        { token: '--size-element-radius-md', value: '4px', description: 'Medium radius - use with element-pad-md (10px/6px padding)' },
+        { token: '--size-element-radius-lg', value: '4px', description: 'Large radius - use with element-pad-lg (16px/8px padding)' },
+        { token: '--size-element-radius-pill', value: '999px', description: 'Pill shape - for badges, chips, toggle switches' },
+      ]
+    );
+    container.appendChild(gapTable);
+    
     return container;
   },
 };
@@ -364,8 +391,8 @@ export const CardSpacings = {
         { token: '--size-card-gap-lg', value: '32px', description: 'Large gap within cards' },
         { token: '--size-card-gap-md', value: '16px', description: 'Medium gap within cards (default)' },
         { token: '--size-card-gap-sm', value: '8px', description: 'Small gap within cards' },
-        { token: '--size-card-radius-sm', value: '12px', description: 'Small border radius for cards' },
-        { token: '--size-card-radius-md', value: '16px', description: 'Medium border radius (default)' },
+        { token: '--size-card-radius-sm', value: '12px', description: 'Small border radius - use with card-pad-sm (16px padding)' },
+        { token: '--size-card-radius-md', value: '16px', description: 'Medium border radius - use with card-pad-md (20px) or card-pad-lg (24px)' },
       ]
     );
     container.appendChild(cardTable);
@@ -408,9 +435,9 @@ export const ModalSpacings = {
         { token: '--size-modal-gap-lg', value: '32px', description: 'Large gap within modals' },
         { token: '--size-modal-gap-md', value: '12px', description: 'Medium gap within modals (default)' },
         { token: '--size-modal-gap-sm', value: '8px', description: 'Small gap within modals' },
-        { token: '--size-modal-radius-sm', value: '4px', description: 'Small border radius for modals' },
-        { token: '--size-modal-radius-md', value: '6px', description: 'Medium border radius (default)' },
-        { token: '--size-modal-radius-lg', value: '12px', description: 'Large border radius for modals' },
+        { token: '--size-modal-radius-sm', value: '4px', description: 'Small border radius - use with modal-pad-sm (10px/8px padding)' },
+        { token: '--size-modal-radius-md', value: '6px', description: 'Medium border radius (default) - use with modal-pad-md (16px/12px padding)' },
+        { token: '--size-modal-radius-lg', value: '12px', description: 'Large border radius - use with modal-pad-lg (40px/24px padding)' },
       ]
     );
     container.appendChild(modalTable);
@@ -453,9 +480,9 @@ export const SectionSpacings = {
         { token: '--size-section-gap-lg', value: '24px', description: 'Large gap within sections' },
         { token: '--size-section-gap-md', value: '16px', description: 'Medium gap within sections (default)' },
         { token: '--size-section-gap-sm', value: '8px', description: 'Small gap within sections' },
-        { token: '--size-section-radius-sm', value: '8px', description: 'Small border radius for sections' },
-        { token: '--size-section-radius-md', value: '8px', description: 'Medium border radius (default)' },
-        { token: '--size-section-radius-lg', value: '16px', description: 'Large border radius for sections' },
+        { token: '--size-section-radius-sm', value: '8px', description: 'Small border radius - use with section-pad-sm (16px padding)' },
+        { token: '--size-section-radius-md', value: '8px', description: 'Medium border radius (default) - use with section-pad-md (24px padding)' },
+        { token: '--size-section-radius-lg', value: '16px', description: 'Large border radius - use with section-pad-lg (36px padding)' },
       ]
     );
     container.appendChild(sectionTable);
@@ -463,6 +490,147 @@ export const SectionSpacings = {
     return container;
   },
 };
+
+/**
+ * Corner Radius Application
+ * Demonstrates radius tokens and their relationship to padding/gap sizes
+ */
+export const CornerRadiusApplication = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
+    container.style.maxWidth = '1200px';
+    container.style.margin = '0 auto';
+    
+    const title = document.createElement('h2');
+    title.className = 'h2';
+    title.textContent = 'Corner Radius Application';
+    title.style.marginBottom = 'var(--size-section-pad-y-md)';
+    container.appendChild(title);
+    
+    const description = document.createElement('p');
+    description.className = 'body1-txt';
+    description.textContent = 'Corner radius (border-radius) selection should be contextually related to the padding and gap sizes used within the same component. The radius size should match the padding/gap size tier to maintain visual consistency and hierarchy.';
+    description.style.marginBottom = 'var(--size-card-gap-lg)';
+    container.appendChild(description);
+    
+    const principleTitle = document.createElement('h3');
+    principleTitle.className = 'h3';
+    principleTitle.textContent = 'Core Principle';
+    principleTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    principleTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(principleTitle);
+    
+    const principleText = document.createElement('p');
+    principleText.className = 'body1-txt';
+    principleText.textContent = 'Radius size should match padding/gap size tier: Small padding → small radius, medium padding → medium radius, large padding → large radius.';
+    principleText.style.marginBottom = 'var(--size-card-gap-lg)';
+    container.appendChild(principleText);
+    
+    // Elements Layer
+    const elementsTitle = document.createElement('h3');
+    elementsTitle.className = 'h3';
+    elementsTitle.textContent = 'Elements Layer';
+    elementsTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    elementsTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(elementsTitle);
+    
+    const elementsTable = createSpacingTable(
+      ['Token', 'Value', 'Use With', 'Best For'],
+      [
+        { token: '--size-element-radius-sm', value: '4px', description: 'element-pad-sm (8px/4px)', extra: 'Small buttons, compact form inputs' },
+        { token: '--size-element-radius-md', value: '4px', description: 'element-pad-md (10px/6px)', extra: 'Standard buttons, default form inputs' },
+        { token: '--size-element-radius-lg', value: '4px', description: 'element-pad-lg (16px/8px)', extra: 'Large buttons, prominent form inputs' },
+        { token: '--size-element-radius-pill', value: '999px', description: 'Independent of padding', extra: 'Badges, chips, toggle switches' },
+      ]
+    );
+    container.appendChild(elementsTable);
+    
+    // Cards Layer
+    const cardsTitle = document.createElement('h3');
+    cardsTitle.className = 'h3';
+    cardsTitle.textContent = 'Cards Layer';
+    cardsTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    cardsTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(cardsTitle);
+    
+    const cardsTable = createSpacingTable(
+      ['Token', 'Value', 'Use With', 'Best For'],
+      [
+        { token: '--size-card-radius-sm', value: '12px', description: 'card-pad-sm (16px)', extra: 'Compact cards, dense interfaces (default)' },
+        { token: '--size-card-radius-md', value: '16px', description: 'card-pad-md (20px) or card-pad-lg (24px)', extra: 'Standard cards, content-rich layouts' },
+      ]
+    );
+    container.appendChild(cardsTable);
+    
+    // Sections Layer
+    const sectionsTitle = document.createElement('h3');
+    sectionsTitle.className = 'h3';
+    sectionsTitle.textContent = 'Sections Layer';
+    sectionsTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    sectionsTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(sectionsTitle);
+    
+    const sectionsTable = createSpacingTable(
+      ['Token', 'Value', 'Use With', 'Best For'],
+      [
+        { token: '--size-section-radius-sm', value: '8px', description: 'section-pad-sm (16px)', extra: 'Compact sections, dense layouts' },
+        { token: '--size-section-radius-md', value: '8px', description: 'section-pad-md (24px)', extra: 'Standard sections, typical layouts' },
+        { token: '--size-section-radius-lg', value: '16px', description: 'section-pad-lg (36px)', extra: 'Spacious sections, hero sections' },
+      ]
+    );
+    container.appendChild(sectionsTable);
+    
+    // Modals Layer
+    const modalsTitle = document.createElement('h3');
+    modalsTitle.className = 'h3';
+    modalsTitle.textContent = 'Modals Layer';
+    modalsTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    modalsTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(modalsTitle);
+    
+    const modalsTable = createSpacingTable(
+      ['Token', 'Value', 'Use With', 'Best For'],
+      [
+        { token: '--size-modal-radius-sm', value: '4px', description: 'modal-pad-sm (10px/8px)', extra: 'Compact modals, alerts, small dialogs' },
+        { token: '--size-modal-radius-md', value: '6px', description: 'modal-pad-md (16px/12px)', extra: 'Standard modals, default dialogs (most common)' },
+        { token: '--size-modal-radius-lg', value: '12px', description: 'modal-pad-lg (40px/24px)', extra: 'Spacious modals, important dialogs' },
+      ]
+    );
+    container.appendChild(modalsTable);
+    
+    // Surfaces Layer
+    const surfacesTitle = document.createElement('h3');
+    surfacesTitle.className = 'h3';
+    surfacesTitle.textContent = 'Surfaces Layer';
+    surfacesTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    surfacesTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(surfacesTitle);
+    
+    const surfacesTable = createSpacingTable(
+      ['Token', 'Value', 'Use With', 'Best For'],
+      [
+        { token: '--size-surface-radius', value: '16px', description: 'All surface components', extra: 'Full screen/organism layouts, page-level containers' },
+      ]
+    );
+    container.appendChild(surfacesTable);
+    
+    // Surface Containers Note
+    const surfaceContainersNote = document.createElement('div');
+    surfaceContainersNote.className = 'body1-txt';
+    surfaceContainersNote.style.marginTop = 'var(--size-section-pad-y-md)';
+    surfaceContainersNote.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
+    surfaceContainersNote.style.backgroundColor = 'var(--color-surface-container-low)';
+    surfaceContainersNote.style.borderRadius = 'var(--size-card-radius-sm)';
+    surfaceContainersNote.style.border = '1px solid var(--color-outline-variant)';
+    surfaceContainersNote.innerHTML = '<strong>Surface Containers:</strong> No radius tokens - surface containers are the outermost layer (sidebars, top bars) and do not require corner radius. They extend to screen edges.';
+    container.appendChild(surfaceContainersNote);
+    
+    return container;
+  },
+};
+
+CornerRadiusApplication.storyName = 'Corner Radius Application';
 
 /**
  * Page Spacings
