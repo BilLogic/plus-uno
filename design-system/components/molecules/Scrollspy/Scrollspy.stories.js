@@ -30,11 +30,11 @@
  * ### Properties
  * - **item**: Choose "1", "2", or "3" to determine the current scroll position within the scrollspy
  * 
- * See docs/guidelines/terminology.md for Section Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Section Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Scrollspy',

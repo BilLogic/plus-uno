@@ -1,0 +1,101 @@
+<!--
+    PLUS Design System - HTML Head Template
+    
+    This template provides a standardized HTML head section with all required
+    dependencies for PLUS design system prototypes.
+    
+    Usage:
+    1. Copy this head section into your HTML file
+    2. Update the title and CSS path as needed
+    3. Include Highcharts only if creating data visualizations
+    4. Adjust relative paths based on your prototype location
+    
+    Reference:
+    - develop/standards.md (prototyping checklist, Highcharts setup)
+    - develop/imports.md (import paths)
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Prototype Title - PLUS Design System</title>
+    
+    <!-- Google Fonts -->
+    <!-- CRITICAL: Fonts must be loaded before CSS to ensure design tokens work correctly -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&family=Merriweather+Sans:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 4.6.2 CSS -->
+    <!-- MUST use version 4.6.2 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <!-- For icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PLUS Design System CSS -->
+    <!-- Update path based on prototype location:
+         - From templates/{pillar}/: ../../dist/css/main.css
+         - From playground/{name}/: ../../dist/css/main.css
+         - From root: ./dist/css/main.css
+    -->
+    <link rel="stylesheet" href="../../dist/css/main.css">
+    
+    <!-- Highcharts (OPTIONAL - Only include if creating data visualizations) -->
+    <!-- CRITICAL: Include these scripts if your prototype uses charts/graphs -->
+    <!--
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    -->
+    
+    <!-- Custom Styles (if needed) -->
+    <!--
+    <style>
+        /* Your custom styles here */
+        /* Always use design tokens - never hardcode values */
+    </style>
+    -->
+</head>
+<body>
+    <!-- Your content here -->
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap 4.6.2 JS -->
+    <!-- MUST use version 4.6.2 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Highcharts (OPTIONAL - Only include if creating data visualizations) -->
+    <!-- CRITICAL: Include these scripts if your prototype uses charts/graphs -->
+    <!-- Place Highcharts scripts BEFORE your custom JavaScript -->
+    <!--
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    -->
+    
+    <!-- Your Custom JavaScript -->
+    <!-- ALWAYS use type="module" for ES6 imports -->
+    <!-- Update import path based on prototype location:
+         - From templates/{pillar}/: ../../design-system/components/index.js
+         - From playground/{name}/: ../../design-system/components/index.js
+         - From root: ./design-system/components/index.js
+    -->
+    <!--
+    <script type="module">
+        import { PlusInterface, PlusSmartComponents } from "../../design-system/components/index.js";
+        
+        // Your code here
+    </script>
+    -->
+    
+    <!-- Or use external script file -->
+    <!--
+    <script type="module" src="your-script.js"></script>
+    -->
+</body>
+</html>
+

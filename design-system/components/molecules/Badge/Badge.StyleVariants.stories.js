@@ -1,20 +1,10 @@
-/**
- * Badge Visual Style Variants Stories
- * Visual style variants organized under "Visual Style Variants" subcategory
- * Includes color/style variations (primary, secondary, success, etc.)
- */
-
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Badge/Visual Style Variants',
   tags: ['autodocs'],
 };
 
-/**
- * Primary Badge
- * Shows primary style with default size (b2) for style comparison
- */
 export const Primary = {
   render: () => {
     const container = document.createElement('div');
@@ -28,10 +18,6 @@ export const Primary = {
   },
 };
 
-/**
- * Secondary Badge
- * Shows secondary style with default size (b2) for style comparison
- */
 export const Secondary = {
   render: () => {
     const container = document.createElement('div');
@@ -45,10 +31,6 @@ export const Secondary = {
   },
 };
 
-/**
- * Tertiary Badge
- * Shows tertiary style with default size (b2) for style comparison
- */
 export const Tertiary = {
   render: () => {
     const container = document.createElement('div');
@@ -62,10 +44,6 @@ export const Tertiary = {
   },
 };
 
-/**
- * Success Badge
- * Shows success style with default size (b2) for style comparison
- */
 export const Success = {
   render: () => {
     const container = document.createElement('div');
@@ -79,10 +57,6 @@ export const Success = {
   },
 };
 
-/**
- * Danger Badge
- * Shows danger style with default size (b2) for style comparison
- */
 export const Danger = {
   render: () => {
     const container = document.createElement('div');
@@ -96,10 +70,6 @@ export const Danger = {
   },
 };
 
-/**
- * Warning Badge
- * Shows warning style with default size (b2) for style comparison
- */
 export const Warning = {
   render: () => {
     const container = document.createElement('div');

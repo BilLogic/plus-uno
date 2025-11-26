@@ -62,12 +62,12 @@
  * - Ensure sufficient contrast for accessibility
  * - Don't overuse toasts - reserve for truly non-intrusive notifications
  * 
- * See docs/guidelines/terminology.md for Modal Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Modal Component Guidelines
+ * See design-system/styles/ for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
-import { createStaticToast } from '../../local/universal/elements/toast.js';
+import { PlusInterface } from '../../index.js';
+import { createStaticToast } from './index.js';
 
 export default {
   title: 'Molecules/Toast',

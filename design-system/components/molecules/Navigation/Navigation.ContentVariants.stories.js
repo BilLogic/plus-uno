@@ -3,7 +3,7 @@
  * Shows navigation with different content configurations
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Navigation/Content Variants',

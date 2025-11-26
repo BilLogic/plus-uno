@@ -41,11 +41,11 @@
  * - Consider using skeleton loaders for content placeholders
  * - Use progress bars when you know the completion percentage
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Spinner',

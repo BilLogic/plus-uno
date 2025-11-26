@@ -5,7 +5,7 @@
  * Organized exactly as shown in Figma design system
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Dropdown/Dropdown List',

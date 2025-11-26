@@ -29,11 +29,11 @@
  * - **read-only**: Read-only state with surface-variant background, toolbar disabled
  * - **disabled**: Disabled state with reduced opacity
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Component Guidelines
+ * See design-system/styles/ for Token Reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
  */
 
-import { createRichTextEditor } from '../../local/universal/elements/rich-text-editor.js';
+import { createRichTextEditor } from './index.js';
 
 export default {
   title: 'Molecules/RichTextEditor',

@@ -617,16 +617,16 @@ function validateSemanticTokens(scssContent, filename) {
 console.log('Generating token SCSS files...');
 
 const colorsSCSS = generateColorsSCSS();
-fs.writeFileSync('design-system/tokens/_colors.scss', colorsSCSS);
-console.log('✅ Generated design-system/tokens/_colors.scss');
+fs.writeFileSync('develop/tokens/_colors.scss', colorsSCSS);
+console.log('✅ Generated develop/tokens/_colors.scss');
 
 const primitivesSCSS = generatePrimitivesSCSS();
-fs.writeFileSync('design-system/tokens/_primitives.scss', primitivesSCSS);
-console.log('✅ Generated design-system/tokens/_primitives.scss');
+fs.writeFileSync('develop/tokens/_primitives.scss', primitivesSCSS);
+console.log('✅ Generated develop/tokens/_primitives.scss');
 
 const semanticsSCSS = generateSemanticsSCSS();
-fs.writeFileSync('design-system/tokens/_spacing_semantics.scss', semanticsSCSS);
-console.log('✅ Generated design-system/tokens/_spacing_semantics.scss');
+fs.writeFileSync('develop/tokens/_spacing_semantics.scss', semanticsSCSS);
+console.log('✅ Generated develop/tokens/_spacing_semantics.scss');
 
 // Validate semantic tokens
 const validationErrors = validateSemanticTokens(semanticsSCSS, '_spacing_semantics.scss');
@@ -638,8 +638,8 @@ if (validationErrors.length > 0) {
 }
 
 const layoutSCSS = generateLayoutSCSS();
-fs.writeFileSync('design-system/tokens/_layout.scss', layoutSCSS);
-console.log('✅ Generated design-system/tokens/_layout.scss');
+fs.writeFileSync('develop/tokens/_layout.scss', layoutSCSS);
+console.log('✅ Generated develop/tokens/_layout.scss');
 
 console.log('\n✅ All token files generated successfully!');
 console.log('✅ Validation passed: No primitive tokens found in semantic files');

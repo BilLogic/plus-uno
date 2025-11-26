@@ -4,7 +4,7 @@
  * Shows all range input variations: sizes, states, and value ranges
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Form/Range Input Variants',

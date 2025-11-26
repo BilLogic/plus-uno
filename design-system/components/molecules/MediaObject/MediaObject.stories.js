@@ -7,7 +7,7 @@
  * 6 variants based on media position alignment
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/MediaObject',

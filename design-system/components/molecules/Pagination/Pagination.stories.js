@@ -51,12 +51,12 @@
  * - Ensure sufficient spacing between page items
  * - Test with various page counts (1, 5, 10, 50+ pages)
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=53-19822
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Pagination',

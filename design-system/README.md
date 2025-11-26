@@ -4,41 +4,12 @@ This directory contains the PLUS design system source files organized by type.
 
 ## Structure
 
-```
-design-system/
-├── tokens/                    # Design token SCSS files
-│   ├── _colors.scss          # Material Design 3 colors
-│   ├── _primitives.scss      # Primitive size tokens
-│   ├── _spacing_semantics.scss # Semantic spacing tokens
-│   ├── _layout.scss          # Layout and breakpoint tokens
-│   ├── _fonts.scss           # Typography tokens
-│   ├── _plus_spacing.scss    # PLUS-specific spacing
-│   └── _mixins.scss          # SCSS mixins
-│
-└── components/
-    ├── atoms/               # Atom-level components
-    │   └── Input/          # Each component has its own folder
-    │       ├── Input.stories.js
-    │       └── Input.scss
-    ├── molecules/           # Molecule-level components
-    │   ├── Button/         # Each component has its own folder
-    │   │   ├── Button.stories.js
-    │   │   └── Button.scss
-    │   ├── Alert/
-    │   ├── Badge/
-    │   ├── Breadcrumb/
-    │   ├── ButtonGroup/
-    │   ├── Divider/
-    │   └── Dropdown/
-    └── local/               # Local component implementations
-        ├── universal/       # Universal components (used across all products)
-        ├── login/           # Login-specific components
-        ├── profile/         # Profile-specific components
-        ├── home/            # Home/dashboard components
-        ├── training/        # Training components
-        ├── toolkit/         # Toolkit components
-        └── admin/           # Admin components
-```
+See **[`../develop/PROJECT_STRUCTURE.md`](../develop/PROJECT_STRUCTURE.md)** for complete project structure documentation.
+
+**Design System Overview:**
+- **`styles/`** - Token documentation (colors.md, layout.md, typography.md, icons.md, elevation.md)
+- **`assets/`** - Asset components (Logo) and static images
+- **`components/`** - Component implementations (atoms, molecules, organisms)
 
 ## Usage
 
@@ -47,13 +18,13 @@ design-system/
 Import components from the design system:
 
 ```javascript
-import { Universal } from "../design-system/components/local/index.js";
+import { PlusInterface, PlusSmartComponents } from "../design-system/components/index.js";
 ```
 
 Import styles in SCSS:
 
 ```scss
-@use "../design-system/tokens/colors" as *;
+@use "../../develop/tokens/colors" as *;
 @use "../design-system/components/molecules/Button/Button" as *;
 ```
 
@@ -67,6 +38,8 @@ npm run storybook
 
 ## Documentation
 
-- **Guidelines**: See `docs/guidelines/` for coding standards, token reference, and terminology
-- **Components**: See `docs/components/` for component API documentation
-- **Tokens**: See `docs/tokens/` for token system documentation
+- **Token Documentation**: See `styles/` for complete token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
+- **Component Documentation**: See `components/overview.md` for component API documentation and terminology
+- **Design Patterns**: See `develop/standards.md` for design patterns and examples (integrated into standards)
+- **Technical Documentation**: See `../develop/` for coding standards, import paths, and Figma integration guides
+- **Token SCSS Files**: All token SCSS source files are in `../develop/tokens/`

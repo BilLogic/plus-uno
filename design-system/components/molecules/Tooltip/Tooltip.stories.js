@@ -61,11 +61,11 @@
  * - Use tooltips for brief hints, popovers for detailed information
  * - Consider using focus trigger for form fields to improve accessibility
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ for Token Reference
  */
 
-import { createTooltip, createTooltipButton, destroyAllTooltips } from '@/js/components/index.js';
+import { createTooltip, createTooltipButton, destroyAllTooltips } from '../../index.js';
 
 export default {
   title: 'Molecules/Tooltip',

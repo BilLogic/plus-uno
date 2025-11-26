@@ -3,7 +3,7 @@
  */
 
 // Import PLUS design system components
-import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js";
+import { PlusInterface, PlusSmartComponents } from "../../design-system/components/index.js";
 
 // Network utilities
 import { PlusNetworkUtil } from "./utils/plus_util.js";

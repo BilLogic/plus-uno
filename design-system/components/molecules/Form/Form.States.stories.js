@@ -3,7 +3,7 @@
  * State variants organized under "States" subcategory
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Form/States',

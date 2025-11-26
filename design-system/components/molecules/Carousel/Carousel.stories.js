@@ -64,11 +64,11 @@
  * - Test on mobile devices for touch interaction
  * - Consider accessibility for users with motion sensitivity
  * 
- * See docs/guidelines/terminology.md for Section Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Section Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Carousel',

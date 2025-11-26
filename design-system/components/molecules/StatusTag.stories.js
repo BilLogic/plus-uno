@@ -22,11 +22,11 @@
  * - **Not Started**: Content has not been started yet
  * - **Complete**: Content work has been completed
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusSmartComponents } from '@/js/components/index.js';
+import { PlusSmartComponents } from '../index.js';
 
 export default {
   title: 'Molecules/StatusTag',

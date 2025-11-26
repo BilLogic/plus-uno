@@ -23,11 +23,11 @@
  *   - Colors: `--color-outline-variant` for borders, `--color-on-surface` for text
  *   - Typography: body1/body2/body3 classes based on size
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/InputGroup',

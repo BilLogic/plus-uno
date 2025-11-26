@@ -23,11 +23,11 @@
  *   - Border: `--size-element-border` for split dropdown separator
  * - **Bootstrap Integration**: Uses Bootstrap 4 dropdown component for menu functionality
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Dropdown',

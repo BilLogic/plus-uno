@@ -54,6 +54,28 @@ organisms/
 
 ## Current Organisms
 
+### Universal
+Universal organisms (formerly Shared) are commonly used across multiple product pillars.
+
+**Structure:**
+- **Elements**: SidebarTab, UserAvatar, StaticBadgeSmart
+- **Cards**: (to be added as needed)
+- **Tables**: (to be added as needed)
+- **Modals**: (to be added as needed)
+- **Sections**: Sidebar, TopBar, Footer
+- **Pages**: (to be added as needed)
+
+### Admin
+Admin organisms are specific to administrative interfaces and functionality.
+
+**Structure:**
+- **Elements**: (to be implemented)
+- **Cards**: (to be implemented)
+- **Tables**: (to be implemented)
+- **Modals**: (to be implemented)
+- **Sections**: (to be implemented)
+- **Pages**: (to be implemented)
+
 ### Login
 The Login organism contains components for authentication and login flows.
 

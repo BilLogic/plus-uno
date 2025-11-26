@@ -36,11 +36,11 @@
  * - **multiple target**: Each content takes up half of the container width. Both pieces of content can be toggled independently or together.
  * - **accordion**: Toggle the item name to show/hide corresponding content. Only one content can be shown at a time.
  * 
- * See docs/guidelines/terminology.md for Element Component Guidelines
- * See docs/guidelines/token-reference.md for Token Reference
+ * See design-system/components/overview.md for Element Component Guidelines
+ * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Collapse',

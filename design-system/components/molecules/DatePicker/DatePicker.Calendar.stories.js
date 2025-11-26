@@ -3,7 +3,7 @@
  * Calendar widget component shown as standalone for design reference
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/DatePicker/Calendar',

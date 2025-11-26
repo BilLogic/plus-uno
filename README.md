@@ -42,74 +42,44 @@ This repository contains:
 
 ## Project Structure
 
-### Core Guidelines (Always Reference)
-```
-docs/guidelines/              # Core guidelines and reference documents
-├── coding-standards.md      # Project rules and coding standards
-├── token-reference.md        # Complete token reference
-├── terminology.md            # UI component types and terminology
-└── README.md                 # Guidelines overview
-```
+See **[`develop/PROJECT_STRUCTURE.md`](develop/PROJECT_STRUCTURE.md)** for complete structure documentation.
 
-### Documentation
-```
-docs/                          # All documentation consolidated
-├── guidelines/               # Core guidelines
-├── components/               # Component documentation
-│   └── COMPONENTS.md        # Component library documentation
-├── tokens/                   # Token system documentation
-│   └── README.md
-├── DESIGN_PATTERNS.md
-├── DEV_STANDARDS.md
-└── FIGMA_DESIGN_SYSTEM.md
-```
-
-### Design System Source
-```
-design-system/                # Design system source files
-├── tokens/                   # Token SCSS files
-│   ├── _colors.scss         # Material Design 3 colors
-│   ├── _primitives.scss     # Primitive tokens
-│   ├── _spacing_semantics.scss # Semantic spacing
-│   └── ...
-├── components/
-│   ├── local/               # Component implementations
-│   ├── molecules/          # Molecule components
-│   ├── atoms/              # Atom components
-└── styles/                  # Component styles
-```
-
-### Application Source
-```
-src/                          # Application source files
-├── css/
-│   └── main.scss           # Main stylesheet (references design-system)
-└── js/
-    ├── components/          # (references design-system)
-    ├── utils/               # Utility functions
-    └── main.js             # Main JavaScript (references design-system)
-```
-
-### Configuration
-```
-.cursorrules                  # Cursor AI configuration
-package.json                  # Project configuration
-index.html                    # Main HTML file
-```
-
-See `PROJECT_STRUCTURE.md` for complete structure documentation.
+**Quick Overview:**
+- **`design-system/`** - Design system source (components, assets, styles documentation)
+- **`develop/`** - Technical documentation and token SCSS source files
+- **`src/`** - Application source files
+- **`prototyping/`** - Prototyping workspace (templates and playground)
 
 ## Usage
+
+### Prototyping Workflow
+
+1. **Choose Your Workspace:**
+   - **Templates** (`prototyping/templates/`): Use curated templates organized by product pillar (admin, toolkit, login, profile, home, training, universal)
+   - **Playground** (`prototyping/playground/`): Create designer-specific directories for experimentation
+
+2. **Creating a New Prototype:**
+   - For designer-specific work: Create `prototyping/playground/{your-name}/{prototype-name}/`
+   - For reusable templates: Create `prototyping/templates/{product-pillar}/{template-name}/`
+   - **Never create HTML/JS files in root directory** (except `index.html`)
+
+3. **Using Templates:**
+   - Browse `prototyping/templates/` for starting points
+   - Copy a template to your playground directory
+   - Customize for your specific prototype
+
+See `prototyping/templates/README.md` and `prototyping/playground/README.md` for detailed guidelines.
 
 ### Using Cursor AI
 
 1. **Open this project in Cursor**
 2. **Start a new conversation** with Cursor AI
 3. **Ask for prototypes** using PLUS design system
-4. **Always reference guideline files** in `docs/guidelines/` folder:
-   - `docs/guidelines/coding-standards.md` - Project rules
-   - `docs/guidelines/token-reference.md` - Token reference
-   - `docs/guidelines/terminology.md` - Component types
+4. **Always reference guideline files**:
+   - `develop/standards.md` - Project rules and coding standards
+   - `design-system/styles/` - Token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
+   - `design-system/components/overview.md` - Component types and terminology
+5. **Use designated areas**: Always create prototypes in `prototyping/templates/` or `prototyping/playground/` directories
 
 ### Example Prompts
 
@@ -120,7 +90,7 @@ See `PROJECT_STRUCTURE.md` for complete structure documentation.
 
 ### Design Tokens
 
-Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `docs/guidelines/token-reference.md` for all available tokens.
+Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `design-system/styles/` for all available tokens (colors.md, layout.md, typography.md, icons.md, elevation.md).
 
 ```css
 /* ✅ Good - Using semantic tokens */
@@ -145,7 +115,7 @@ Always use semantic tokens (CSS variables) instead of hardcoded values. Referenc
 Use existing PLUS components when possible:
 
 ```javascript
-import { PlusInterface, PlusSmartComponents } from "./design-system/components/local/index.js";
+import { PlusInterface, PlusSmartComponents } from "./design-system/components/index.js";
 
 const button = PlusInterface.createButton({
     btnText: "Click me",
@@ -155,24 +125,26 @@ const button = PlusInterface.createButton({
 });
 ```
 
-Components are organized by:
-- **Product Pillar**: universal, login, profile, home, training, toolkit, admin
-- **Component Type**: elements, cards, modals, sections, tables, pages
+Components are organized by atomic design principles:
+- **Atoms**: Fundamental building blocks (Input, StatusIndicator)
+- **Molecules**: Simple functional units (Button, Card, Alert, Form, etc.)
+- **Organisms**: Complex interface sections (Login, Home, Profile, Training, Toolkit)
 
-See `docs/components/COMPONENTS.md` for component details and `PROJECT_STRUCTURE.md` for complete project organization.
+See `design-system/components/overview.md` for component details and `develop/PROJECT_STRUCTURE.md` for complete project organization.
 
 ## Documentation
 
 ### Essential Guidelines (Always Reference)
-- **[Coding Standards](docs/guidelines/coding-standards.md)** - Project rules and coding standards
-- **[Token Reference](docs/guidelines/token-reference.md)** - Complete token reference (colors, spacing, typography, layout)
-- **[Terminology](docs/guidelines/terminology.md)** - UI component types and terminology
+- **[Coding Standards](develop/standards.md)** - Project rules, coding standards, setup guides, best practices
+- **[Token Reference](design-system/styles/)** - Complete token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
+- **[Component Terminology](design-system/components/overview.md)** - UI component types and terminology
+- **[Import Paths](develop/imports.md)** - Component import path reference
 
 ### Additional Documentation
-- **[Components](docs/components/COMPONENTS.md)** - Component library documentation
-- **[Design Patterns](docs/DESIGN_PATTERNS.md)** - Design patterns and examples
-- **[Development Standards](docs/DEV_STANDARDS.md)** - Detailed development guidelines
-- **[Project Structure](PROJECT_STRUCTURE.md)** - Complete project structure guide
+- **[Components](design-system/components/overview.md)** - Component library documentation
+- **[Styles Overview](design-system/styles/overview.md)** - Design token system overview
+- **[Figma Integration](develop/FIGMA_DESIGN_SYSTEM.md)** - Figma integration guide
+- **[Project Structure](develop/PROJECT_STRUCTURE.md)** - Complete project structure guide
 
 ## Design System Principles
 
@@ -227,24 +199,24 @@ npm run watch:css
 
 ### Adding New Components
 
-1. Create component file in `design-system/components/local/`
-2. Create component folder in `design-system/components/` (in `molecules/` or `atoms/` subfolder)
-3. Add component styles (`.scss`) and Storybook story (`.stories.js`) in the component folder
-4. Import styles in `src/css/main.scss`
-5. Import component in `src/js/main.js`
-6. Document in `docs/components/COMPONENTS.md`
+1. Create component file in `design-system/components/molecules/{ComponentName}/index.js` (or `atoms/` or `organisms/` as appropriate)
+2. Create component SCSS file in `design-system/components/molecules/{ComponentName}/{ComponentName}.scss`
+3. Create Storybook story file `{ComponentName}.stories.js` in the component folder
+4. Add component export to `design-system/components/molecules/index.js`
+5. Import component styles in `src/css/main.scss`
+6. Document in `design-system/components/overview.md`
 
 ### Updating Design Tokens
 
-1. Update token files in `design-system/tokens/`
-2. Rebuild CSS: `npm run build:css`
-3. Update documentation in `docs/DESIGN_TOKENS.md`
+1. Update token SCSS files in `develop/tokens/`
+2. Update token documentation in `design-system/styles/` (colors.md, layout.md, typography.md, icons.md, elevation.md)
+3. Rebuild CSS: `npm run build:css`
 
 ## Reference Prototypes
 
-See [examples/README.md](examples/README.md) for reference prototypes demonstrating:
-- Button showcase
-- Form elements
+See `prototyping/templates/` for curated templates demonstrating:
+- Button variants and usage
+- Form elements and validation
 - SMART components
 - Card layouts
 - Dashboard layouts

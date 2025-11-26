@@ -285,7 +285,7 @@ function generateColors() {
 
 // Generate and save
 const colorsScss = generateColors();
-fs.writeFileSync('design-system/tokens/_colors_new.scss', colorsScss);
-console.log('Generated new colors SCSS file: design-system/tokens/_colors_new.scss');
+fs.writeFileSync('develop/tokens/_colors_new.scss', colorsScss);
+console.log('Generated new colors SCSS file: develop/tokens/_colors_new.scss');
 console.log('File size:', colorsScss.length, 'characters');
 

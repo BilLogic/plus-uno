@@ -4,7 +4,7 @@
  * Shows all form components (input, textarea, select) in different sizes
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Form/Size Variants',

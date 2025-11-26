@@ -3,7 +3,7 @@
  * Content-based variants organized under "Content Variants" subcategory
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Card/Content Variants',

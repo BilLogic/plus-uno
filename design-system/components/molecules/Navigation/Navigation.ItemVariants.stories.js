@@ -4,7 +4,7 @@
  * Shows Tab Item, Pill Item, Tab Item Dropdown, and Pill Item Dropdown with all states
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Navigation/Item Variants',

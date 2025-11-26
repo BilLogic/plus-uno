@@ -4,7 +4,7 @@
  * Includes color/style variations (primary, secondary, success, etc.)
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Alert/Visual Style Variants',

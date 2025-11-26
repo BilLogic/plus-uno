@@ -10,58 +10,79 @@ You are helping designers prototype interactive high-fidelity work using the PLU
 **When implementing components from Figma:**
 
 1. **ALWAYS check the Figma design system file or Figma selection/link FIRST**
-2. **ALWAYS use Figma MCP tools** (design context and/or screenshot) to see exactly what the Figma selection/link looks like - this is critical for understanding what needs to be implemented
-3. **ALWAYS access Figma via Figma MCP** - use `mcp_Figma_Desktop_get_design_context` and/or `mcp_Figma_Desktop_get_screenshot` to view the design
-4. **ALWAYS study the Figma design carefully** before writing any code - examine spacing, colors, typography, variants, and all visual details
-5. **ALWAYS implement components/molecules EXACTLY as shown in Figma** - pixel-perfect accuracy required
-6. **ALWAYS implement ALL variants** exactly as they appear in Figma
-7. **ALWAYS use the exact text/content** shown in Figma - never invent or make up content
-8. **ALWAYS use Bootstrap 4.6.2 as a foundation/base** for functional implementation, then customize ALL styling to match Figma exactly
-9. **ALWAYS use design tokens** for all spacing, colors, typography, and visual properties
+2. **ALWAYS use Figma MCP tools** (`mcp_Figma_Desktop_get_design_context` and/or `mcp_Figma_Desktop_get_screenshot`) to see exactly what the Figma selection/link looks like - this is critical
+3. **ALWAYS study the Figma design carefully** before writing any code - examine spacing, colors, typography, variants, and all visual details
+4. **ALWAYS implement components/molecules EXACTLY as shown in Figma** - pixel-perfect accuracy required
+5. **ALWAYS implement ALL variants** exactly as they appear in Figma
+6. **ALWAYS use the exact text/content** shown in Figma - never invent or make up content
+7. **ALWAYS use Bootstrap 4.6.2 as a foundation/base** for functional implementation, then customize ALL styling to match Figma exactly
+8. **ALWAYS use design tokens** for all spacing, colors, typography, and visual properties
 
-**Figma accuracy is the highest priority** - if a Figma link or selection is provided, it takes absolute precedence over any assumptions or existing patterns. **You MUST see what it looks like first** using Figma MCP tools (design context and/or screenshot).
+**Figma accuracy is the highest priority** - if a Figma link or selection is provided, it takes absolute precedence over any assumptions. **You MUST see what it looks like first** using Figma MCP tools.
 
 ## Critical Guidelines - Always Reference
 
 **When generating code, ALWAYS reference these guideline files:**
 
-1. **`docs/guidelines/coding-standards.md`** - Project rules, coding standards, best practices, and anti-patterns
-2. **`docs/guidelines/token-reference.md`** - Complete token reference (colors, spacing, typography, layout)
-3. **`docs/guidelines/terminology.md`** - UI component types (Elements, Cards, Sections, Modals, Surfaces, Surface Containers)
+1. **`develop/standards.md`** - Project rules, coding standards, best practices, and anti-patterns
+2. **`design-system/styles/`** - Complete token reference (Icons, Colors, Typography, Layout, Elevation) - **Single source of truth for all tokens**
+   - `colors.md` - Color tokens
+   - `layout.md` - Layout and spacing tokens
+   - `typography.md` - Typography tokens
+   - `icons.md` - Icon tokens
+   - `elevation.md` - Elevation tokens
+3. **`design-system/components/overview.md`** - UI component types (Elements, Cards, Sections, Modals, Surfaces, Surface Containers)
+4. **`develop/imports.md`** - Component import path reference
 
 ## Key Principles
 
 ### Design Tokens
-- **ALWAYS** use CSS variables for design tokens (colors, spacing, typography)
+- **ALWAYS** use CSS variables for design tokens (icons, colors, typography, spacing, elevation)
 - **NEVER** hardcode values - always use semantic tokens
-- **Reference**: `docs/guidelines/token-reference.md` for all available tokens
+- **Reference**: `design-system/styles/` for all available tokens
 - Follow Material Design 3 (M3) naming conventions and color roles
-- **CRITICAL**: Every spacing, color, typography, and layout value MUST come from design tokens - no exceptions
+- **CRITICAL**: Every spacing, color, typography, elevation, and layout value MUST come from design tokens - no exceptions
 
-### Figma Implementation Requirements
-- **ALWAYS** reference the Figma design system file or Figma selection/link provided
-- **ALWAYS access Figma via Figma MCP** - use `mcp_Figma_Desktop_get_design_context` and/or `mcp_Figma_Desktop_get_screenshot` to view designs
-- **ALWAYS** implement components/molecules EXACTLY as shown in Figma - pixel-perfect accuracy
-- **ALWAYS** list and implement ALL variants exactly as shown in Figma
-- **ALWAYS** use the exact text/content shown in Figma - never make up or invent content
-- **ALWAYS** match spacing, colors, typography, borders, shadows, and all visual properties exactly from Figma
-- **ALWAYS** check the Figma selection/component before implementing - study it carefully using Figma MCP tools
-- If a Figma link or selection is provided, it takes absolute priority over any assumptions
+### Spacing Token Principles
+- **Primitives vs. Semantic Tokens**: Primitives are infrastructure (DO NOT USE DIRECTLY), Semantics are what you use
+- **Always use semantic tokens**: ✅ `card-pad-x-md` ❌ `20px` or `space-400`
+- **Match token to context**: Cards → `card-*` tokens, Sections → `section-*` tokens
+- **Respect hierarchy**: Use smaller gaps for dense UI, larger gaps for content-rich layouts
+- **Determining token type**: Look at component's immediate parent container - spacing rules cascade down
+- **Element Typography Hierarchy**: H3→lg, H6→md, B3→sm for element spacing
+- **element-gap-xs**: Reserved for label-to-input spacing only
 
-### Component Design Workflow
+### Elevation Tokens
+- **ALWAYS** use elevation tokens (`--elevation-light-1` through `--elevation-light-5`) for box-shadow values
+- **NEVER** hardcode box-shadow values
+- Cards at rest: Use `--elevation-light-1`
+- Cards on hover: Use `--elevation-light-2`
+- Modals and dialogs: Use `--elevation-light-3` to `--elevation-light-5` (higher for more important content)
+- **Reference**: `design-system/styles/elevation.md` for exact values
+
+### Table Color States
+- **ALWAYS** use table color state tokens for table buttons and interactive elements
+- Default: `transparent` background, no stroke, 100% opacity
+- Hover: `--color-on-surface-state-08` background, no stroke, 100% opacity
+- Pressed: `--color-on-surface-state-16` background, no stroke, 100% opacity
+- Focus: `--color-on-surface-state-12` background, `--color-inverse-primary` stroke (2px), 100% opacity
+- Disabled: `--color-on-surface-state-08` background, no stroke, 38% opacity
+- **Reference**: `design-system/styles/colors.md` - Table Color States section
+
+## Component Design Workflow
 
 When designing a specific type of UI component:
 
 1. **Identify Component Type**
-   - Reference `docs/guidelines/terminology.md` to determine if it's an Element, Card, Section, Modal, Surface, or Surface Container
+   - Reference `design-system/components/overview.md` to determine if it's an Element, Card, Section, Modal, Surface, or Surface Container
 
 2. **Select Appropriate Tokens**
-   - Reference `docs/guidelines/token-reference.md` for available tokens
-   - Use tokens that match the component type from `terminology.md`
+   - Reference `design-system/styles/` for available tokens
+   - Use tokens that match the component type from `components/overview.md`
    - Match token prefix to component type: `element-*`, `card-*`, `section-*`, `modal-*`, `surface-*`, `surface-container-*`
 
 3. **Follow Coding Standards**
-   - Reference `docs/guidelines/coding-standards.md` for code style and patterns
+   - Reference `develop/standards.md` for code style and patterns
    - Use existing components when possible
    - Follow naming conventions
 
@@ -71,26 +92,209 @@ When designing a specific type of UI component:
    - Include proper accessibility attributes
    - Ensure responsive design
 
-## Quick Reference
+## File Structure
 
-### Token Usage
-- **Colors**: Use M3 color roles (`--color-primary`, `--color-on-primary`, etc.)
-- **Spacing**: Use semantic tokens (`--size-card-pad-x-md`, `--size-element-gap-xs`, etc.)
-- **Never use primitives directly**: ❌ `--size-space-300` ✅ `--size-card-pad-x-md`
+### Organization
+- Design System Source:
+  - Components: `design-system/components/` (atoms, molecules, organisms)
+  - Assets: `design-system/assets/` (Logo component, images)
+  - Token SCSS: `develop/tokens/`
+  - Token Docs: `design-system/styles/`
+- Application Source:
+  - Components: `src/js/components/` (references design-system)
+  - Utilities: `src/js/utils/`
+  - Styles: `src/css/` (references design-system)
+- Documentation:
+  - Token docs: `design-system/styles/` (colors.md, layout.md, typography.md, icons.md, elevation.md)
+  - Component docs: `design-system/components/overview.md`
+  - Technical docs: `develop/` (standards.md, imports.md, FIGMA_*.md, PROJECT_STRUCTURE.md)
+- Prototyping: `prototyping/` - Prototyping workspace
+  - Templates: `prototyping/templates/` - Curated templates organized by product pillar
+  - Playground: `prototyping/playground/` - Designer-specific prototyping area
 
-### Component Types
-- **Elements**: Buttons, forms, badges, items → Use `element-*` tokens
-- **Cards**: Self-contained containers → Use `card-*` tokens
-- **Sections**: Containers for cards/forms → Use `section-*` tokens
-- **Modals**: Pop-up windows → Use `modal-*` tokens
-- **Surfaces**: Full screen/organism → Use `surface-*` tokens
-- **Surface Containers**: Top-level frame → Use `surface-container-*` tokens
+### Prototyping and Template Guidelines
 
-### Special Rules
-- `element-gap-xs` is **reserved for label-to-input spacing only**
-- Always match token prefix to component type
-- Use state layers (`--color-{role}-state-08/12/16`) for interactive elements
-- Follow surface color hierarchy when selecting container levels
+**CRITICAL: Where to Create New Code**
+
+When creating new prototypes or templates:
+
+1. **For Designer-Specific Prototypes:**
+   - **ALWAYS** create in `prototyping/playground/{designer-name}/` directory
+   - Create subdirectories for different prototypes
+   - Each prototype should include: `index.html`, optional `styles.css`/`script.js`, `README.md`
+
+2. **For Reusable Templates:**
+   - **ALWAYS** create in `prototyping/templates/{product-pillar}/` directory
+   - Product pillars: `admin`, `toolkit`, `login`, `profile`, `home`, `training`, `universal`
+   - Templates should be curated, well-documented, and follow best practices
+
+3. **Never Create in Root:**
+   - **NEVER** create HTML/JS files in root directory (except `index.html` which is the main starter)
+   - **NEVER** create standalone prototype files in root
+   - **ALWAYS** use designated areas (`prototyping/templates/` or `prototyping/playground/`)
+
+4. **Path References:**
+   - From `prototyping/templates/{pillar}/`: Use `../../../dist/css/main.css` for CSS, `../../../design-system/` for components
+   - From `prototyping/playground/{designer}/`: Use `../../../../dist/css/main.css` for CSS, `../../../../design-system/` for components
+   - Always use relative paths based on file location
+
+5. **Best Practices:**
+   - Reference templates in `prototyping/templates/` before starting new prototypes
+   - Use product pillar structure to organize work
+   - Document prototypes with README.md files
+   - Follow design system guidelines and use design tokens
+   - When a prototype becomes reusable, move it to `prototyping/templates/`
+
+### Naming Conventions
+- Files: kebab-case (e.g., `button.js`, `index.js`)
+- Classes: PascalCase (e.g., `PlusInterface`)
+- Functions: camelCase (e.g., `createButton`)
+- Constants: UPPER_SNAKE_CASE (e.g., `BUTTON_FILL`)
+- CSS classes: kebab-case (e.g., `plus-text-field`)
+
+## Component Patterns
+
+### Using Components
+- Always use existing PLUS components when possible
+- **ALWAYS use correct import paths** based on prototype location - see `develop/imports.md` for reference
+- **ALWAYS verify import paths** - incorrect paths cause component imports to fail
+- Import components: `import { PlusInterface, PlusSmartComponents } from "../../design-system/components/index.js"`
+- Use component creation methods: `PlusInterface.createButton()`, `PlusSmartComponents.createStatusIcon()`, etc.
+- Follow component API patterns from `design-system/components/overview.md`
+
+### Button Components
+- Use `PlusInterface.createButton()` for all buttons
+- Button variants: "filled", "outline", "tonal", "text"
+- Button styles: "primary", "secondary", "tertiary", "success", "info", "warning", "error", "default"
+- Button sizes: "small", "default", "large"
+- Always include JSDoc comments for button creation
+
+### Form Components
+- Use `PlusInterface.createCheckbox()` for checkboxes
+- Use `.plus-text-field` class for text inputs
+- Use `.plus-textarea` class for textareas
+- Use design tokens for form styling
+- Use `element-gap-xs` for label-to-input spacing
+
+### SMART Components
+- Use `PlusSmartComponents` for SMART-related components
+- Competency areas: "Social-Emotional", "Mastering Content", "Advocacy", "Relationships", "Technology Tools"
+- Status values: "assigned", "started", "not started", "complete"
+- Use SMART color classes: `.color-smartClrSe`, `.bg-color-smartClrMc`, etc.
+
+### Table Components
+- **ALWAYS use design tokens for table styling** - never hardcode table cell padding, spacing, or borders
+- **ALWAYS use table-specific tokens:**
+  - Cell padding: `--size-table-cell-x` (10px) and `--size-table-cell-y` (8px)
+  - Cell gap: `--size-table-cell-gap` (10px) - **Omit when texts should be close together**
+  - Border radius: `--size-table-radius-sm` (6px) or `--size-table-radius-md` (8px) for row radius
+- **ALWAYS use table color state tokens for table buttons and interactive elements:**
+  - Default: `transparent` background, no stroke, 100% opacity
+  - Hover: `--color-on-surface-state-08` background, no stroke, 100% opacity
+  - Pressed: `--color-on-surface-state-16` background, no stroke, 100% opacity
+  - Focus: `--color-on-surface-state-12` background, `--color-inverse-primary` stroke (2px), 100% opacity
+  - Disabled: `--color-on-surface-state-08` background, no stroke, 38% opacity
+- **ALWAYS style table headers, rows, and cells** using design tokens
+- **ALWAYS use proper table structure** with `<thead>`, `<tbody>`, `<th>`, and `<td>` elements
+- **Reference**: `design-system/styles/colors.md` - Table Color States section
+- **Reference**: `develop/standards.md` - Table Styling section for complete table styling patterns
+- **Never use hardcoded values** for table styling - always use design tokens
+
+## Dependencies
+
+### Required
+- Bootstrap 4.6.2 (CSS and JS) - **MUST use version 4.6.2**
+- jQuery
+- Font Awesome (for icons)
+- SASS (for CSS preprocessing)
+
+### Optional
+- DataTables (for tables)
+- Highcharts (for data visualization) - **ALWAYS include Highcharts CDN when creating data visualizations**
+
+### Highcharts Setup
+- **ALWAYS include Highcharts CDN links** in the HTML `<head>` section when creating data visualizations
+- **ALWAYS include both core and exporting modules:**
+```html
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+```
+- **ALWAYS place Highcharts scripts** before your custom JavaScript that uses Highcharts
+- **Reference**: `develop/standards.md` - Highcharts Setup section for complete setup guide and usage examples
+- **Never create data visualizations without Highcharts** - always include the CDN links
+
+## Image Handling
+
+### Image Location and Organization
+- **ALWAYS check** `design-system/assets/images/` before creating/using images
+- **ALWAYS use** organized directory structure:
+  - `design-system/assets/images/auth-providers/` - Authentication provider images (Clever, Google, etc.)
+  - `design-system/assets/images/icons/` - Custom icon images (if not using Font Awesome)
+- **For logos**: Use the Logo component (`PlusInterface.createLogo()`) from `design-system/assets/Logo/` - do NOT use static logo image files
+- **NEVER hardcode** image paths - use relative paths from component location
+- **NEVER create** images in `public/images/` - all images belong in `design-system/assets/images/`
+
+### Image Format Selection
+- **ALWAYS use SVG** for logos, icons, and simple graphics (scalable, small file size)
+- **ALWAYS use PNG** for complex images, photos, or images requiring transparency
+- **ALWAYS use JPG** for photos without transparency needs
+
+### Standard Placeholder Workflow
+When an image is referenced but doesn't exist:
+
+1. **ALWAYS check** if image exists in `design-system/assets/images/`
+2. **ALWAYS ask user** to upload image if it doesn't exist
+3. **ALWAYS use placeholder** pattern in first pass (filled div with dimensions)
+4. **ALWAYS replace** placeholder with actual image once provided
+
+### Image Generation/Prototyping Workflow
+When user explicitly mentions prototyping/generating images:
+
+1. **ALWAYS check** if similar image exists in `design-system/assets/images/` (reuse if found)
+2. **If not found**, generate or fetch image:
+   - **Option A**: Fetch placeholder from service (placeholder.com, via.placeholder.com) matching style/size
+   - **Option B**: Auto-generate simple image (SVG for graphics, PNG for photos)
+3. **ALWAYS save** generated/fetched image to `design-system/assets/images/{category}/` with descriptive name
+4. **ALWAYS use** the saved asset in implementation (never use inline/temporary images)
+5. **ALWAYS document** the image in assets README for future reference
+6. **ALWAYS make** generated/fetched images reusable by saving them to assets directory
+
+### Placeholder Pattern
+- **ALWAYS use** this standard placeholder pattern:
+```html
+<div class="image-placeholder" 
+     style="width: {width}px; height: {height}px;" 
+     title="Image placeholder - please provide {image-name}">
+</div>
+```
+- **ALWAYS include** `.image-placeholder` CSS class with filled background and border
+- **NEVER create** temporary placeholder images - always use CSS placeholder divs
+
+### Special Cases
+- **Clever Image**: Uses PNG file from `design-system/assets/images/auth-providers/clever-image.png`
+
+### Anti-Patterns
+- **NEVER hardcode** image paths - always use relative paths from component location
+- **NEVER create** placeholder images - use CSS placeholder divs
+- **NEVER use** inline base64 images - always save to assets directory
+- **NEVER create** temporary images - always save to assets for reusability
+
+## Documentation References
+
+### Primary Guidelines (Always Reference)
+- **Coding Standards**: `develop/standards.md` - Project rules, coding standards, setup guides, best practices
+- **Token Reference**: `design-system/styles/` - Complete token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
+- **Component Terminology**: `design-system/components/overview.md` - UI component types and terminology
+- **Import Paths**: `develop/imports.md` - Component import path reference
+- **Figma Integration**: `develop/FIGMA_DESIGN_SYSTEM.md` - Figma integration guide
+- **Figma Token Mapping**: `develop/FIGMA_TOKEN_MAPPING.md` - Figma to PLUS token mapping
+- **Project Structure**: `develop/PROJECT_STRUCTURE.md` - Complete project structure documentation
+
+### Additional Documentation
+- **Components**: `design-system/components/overview.md` - Component library documentation
+- **Design Patterns**: `develop/standards.md` - Design patterns and examples (integrated into standards)
+- **Styles Overview**: `design-system/styles/overview.md` - Design token system overview
 
 ## Code Style
 
@@ -115,6 +319,21 @@ When designing a specific type of UI component:
 - Use Bootstrap 4 classes for layout
 - Use PLUS utility classes for styling
 - Maintain consistent structure
+
+### HTML Head Requirements
+- **ALWAYS include Google Fonts in the `<head>` section** - Font styles must be loaded before CSS to ensure design tokens work correctly
+- **ALWAYS include the following font links in every HTML file:**
+```html
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&family=Merriweather+Sans:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+```
+- **ALWAYS include Bootstrap 4.6.2 CSS** before PLUS Design System CSS
+- **ALWAYS include Font Awesome** for icons
+- **ALWAYS include PLUS Design System CSS** (`dist/css/main.css` or relative path)
+- **Reference**: `templates/universal/html-head-template.html` for complete HTML head template
+- **Never skip font loading** - missing fonts cause design tokens to default to system fonts
 
 ### Bootstrap Integration
 - **ALWAYS use Bootstrap 4.6.2 as a foundation/base** - Bootstrap provides the functional structure and behavior
@@ -143,145 +362,6 @@ When designing a specific type of UI component:
   3. Use design tokens for all spacing, colors, typography, and visual properties
   4. Final result should look EXACTLY like Figma, not like Bootstrap
 
-## File Structure
-
-### Organization
-- Design System Source:
-  - Components: `design-system/components/local/`
-  - Tokens: `design-system/tokens/`
-  - Component Styles: `design-system/styles/`
-  - Storybook Stories: `design-system/components/atoms-molecules/`
-- Application Source:
-  - Components: `src/js/components/` (references design-system)
-  - Utilities: `src/js/utils/`
-  - Styles: `src/css/` (references design-system)
-- Documentation:
-  - Guidelines: `docs/guidelines/`
-  - Component docs: `docs/components/`
-  - Token docs: `docs/tokens/`
-  - Patterns: `docs/` (DESIGN_PATTERNS.md, etc.)
-- Examples: `examples/`
-
-### Naming Conventions
-- Files: kebab-case (e.g., `button.js`, `index.js`)
-- Classes: PascalCase (e.g., `PlusInterface`)
-- Functions: camelCase (e.g., `createButton`)
-- Constants: UPPER_SNAKE_CASE (e.g., `BUTTON_FILL`)
-- CSS classes: kebab-case (e.g., `plus-text-field`)
-
-## Component Patterns
-
-### Using Components
-- Always use existing PLUS components when possible
-- Import components: `import { PlusInterface, PlusSmartComponents } from "../design-system/components/local/index.js"`
-- Use component creation methods: `PlusInterface.createButton()`, `PlusSmartComponents.createStatusIcon()`, etc.
-- Follow component API patterns from `docs/components/COMPONENTS.md`
-
-### Button Components
-- Use `PlusInterface.createButton()` for all buttons
-- Button variants: "filled", "outline", "tonal", "text"
-- Button styles: "primary", "secondary", "tertiary", "success", "info", "warning", "error", "default"
-- Button sizes: "small", "default", "large"
-- Always include JSDoc comments for button creation
-
-### Form Components
-- Use `PlusInterface.createCheckbox()` for checkboxes
-- Use `.plus-text-field` class for text inputs
-- Use `.plus-textarea` class for textareas
-- Use design tokens for form styling
-- Use `element-gap-xs` for label-to-input spacing
-
-### SMART Components
-- Use `PlusSmartComponents` for SMART-related components
-- Competency areas: "Social-Emotional", "Mastering Content", "Advocacy", "Relationships", "Technology Tools"
-- Status values: "assigned", "started", "not started", "complete"
-- Use SMART color classes: `.color-smartClrSe`, `.bg-color-smartClrMc`, etc.
-
-## Dependencies
-
-### Required
-- Bootstrap 4.6.2 (CSS and JS) - **MUST use version 4.6.2**
-- jQuery
-- Font Awesome (for icons)
-- SASS (for CSS preprocessing)
-
-### Optional
-- DataTables (for tables)
-- Highcharts (for data visualization)
-
-## Documentation References
-
-### Primary Guidelines (Always Reference)
-- **Coding Standards**: `docs/guidelines/coding-standards.md` - Project rules and coding standards
-- **Token Reference**: `docs/guidelines/token-reference.md` - Complete token reference
-- **Terminology**: `docs/guidelines/terminology.md` - UI component types and terminology
-
-### Additional Documentation
-- **Components**: `docs/components/COMPONENTS.md` - Component library documentation
-- **Design Patterns**: `docs/DESIGN_PATTERNS.md` - Design patterns and examples
-- **Development Standards**: `docs/DEV_STANDARDS.md` - Detailed development guidelines
-- **Token Documentation**: `docs/tokens/README.md` - Token system documentation
-
-## Common Patterns
-
-### Creating a Button
-```javascript
-/**
- * Creates a primary filled button
- * @returns {HTMLElement} Button element
- */
-import { PlusInterface } from "../design-system/components/local/index.js";
-
-const button = PlusInterface.createButton({
-    btnText: "Click me",
-    btnStyle: "primary",
-    btnFill: "filled",
-    btnSize: "default",
-    buttonOnClick: () => console.log("Clicked")
-});
-```
-
-### Creating a Card Component
-```css
-.card {
-    padding: var(--size-card-pad-x-md) var(--size-card-pad-y-md);
-    gap: var(--size-card-gap-md);
-    border-radius: var(--size-card-radius-sm);
-    background-color: var(--color-surface-container);
-    color: var(--color-on-surface);
-}
-```
-
-### Creating a Form Input
-```html
-<label class="form-label" style="margin-bottom: var(--size-element-gap-xs);">
-    Label Text
-</label>
-<input type="text" class="plus-text-field body2-txt" placeholder="Enter text">
-```
-
-## Anti-Patterns to Avoid
-
-1. **Never hardcode colors**: ❌ `color: #00658e` ✅ `color: var(--color-primary)`
-2. **Never hardcode spacing or use primitives**: ❌ `padding: 16px` ❌ `padding: var(--size-space-300)` ✅ `padding: var(--size-card-pad-x-md)`
-3. **Never mix primitives with semantics**: Always use semantic tokens
-4. **Never use wrong semantic layer**: Match token to component context
-5. **Never use element-gap-xs for anything except label-input spacing**
-6. **Never skip JSDoc**: Always document functions and classes
-7. **Never ignore accessibility**: Always include ARIA attributes
-8. **Never skip responsive design**: Always consider different screen sizes
-9. **Never create components from scratch**: Use existing PLUS components when possible
-10. **Never use inline styles for design tokens**: Use CSS variables and utility classes
-11. **Never mix semantic sizes for same token type**: Use consistent sizes
-12. **Never rely on Bootstrap default spacing**: ❌ Using Bootstrap's default `form-check` padding ✅ Override with `padding-left: 0` and use `gap: var(--size-element-gap-sm)`
-13. **Never assume Bootstrap spacing matches design tokens**: Always explicitly override Bootstrap defaults with PLUS design tokens from Figma
-14. **Never rely on Bootstrap's default appearance**: ❌ Using Bootstrap's default styling ✅ Bootstrap is foundation only - customize ALL styling to match Figma exactly
-15. **Never make up text/content**: ❌ Inventing placeholder text ✅ Use EXACT text/content from Figma
-16. **Never skip variants**: ❌ Implementing only one variant ✅ Implement ALL variants shown in Figma
-17. **Never approximate Figma designs**: ❌ "Close enough" implementation ✅ Pixel-perfect match to Figma
-18. **Never ignore Figma links/selections**: If provided, Figma takes absolute priority over assumptions
-19. **Never implement without seeing the Figma design**: ❌ Guessing what a Figma link looks like ✅ ALWAYS use Figma MCP tools (`mcp_Figma_Desktop_get_design_context` and/or `mcp_Figma_Desktop_get_screenshot`) to see exactly what it looks like first
-
 ## Output Guidelines
 
 ### Code Generation
@@ -296,7 +376,7 @@ const button = PlusInterface.createButton({
      - Measure spacing, colors, typography, and all visual properties
      - Implement EXACTLY as shown - pixel-perfect accuracy required
   2. **Study existing patterns:**
-     - Review similar components in `design-system/components/local/universal/elements/`
+     - Review similar components in `design-system/components/` (atoms, molecules, organisms)
      - Review similar styles in `design-system/styles/`
      - **Reference production repository**: Check the cloned repository at `{cloned-repo-path}/java/docroot/javascript/pl2/plus_components/` for existing component implementations
        - Study production code patterns for functionality, event handling, and DOM structure
@@ -316,7 +396,7 @@ const button = PlusInterface.createButton({
 
 ### Code Organization
 - **Match existing code structure patterns:**
-  - **JavaScript components**: Study `design-system/components/local/universal/elements/*.js` for patterns
+  - **JavaScript components**: Study `design-system/components/` (atoms, molecules, organisms) for patterns
     - Use named exports: `export function createComponentName()`
     - Use options object pattern: `{param1, param2, param3 = defaultValue}`
     - Import constants from `constants.js` when available
@@ -347,6 +427,35 @@ When generating code, consider:
 - Is it production-ready?
 - Does it reference the appropriate guideline files?
 
+## Anti-Patterns to Avoid
+
+1. **Never hardcode colors**: ❌ `color: #00658e` ✅ `color: var(--color-primary)`
+2. **Never hardcode spacing or use primitives**: ❌ `padding: 16px` ❌ `padding: var(--size-space-300)` ✅ `padding: var(--size-card-pad-x-md)`
+3. **Never mix primitives with semantics**: Always use semantic tokens (primitives are infrastructure, not for direct use)
+4. **Never use wrong semantic layer**: Match token to component context (Cards → `card-*` tokens, Sections → `section-*` tokens)
+5. **Never use element-gap-xs for anything except label-to-input spacing**: This token is reserved for form label-input spacing only
+6. **Never ignore element typography hierarchy**: Use H3→lg, H6→md, B3→sm for element spacing
+7. **Never skip JSDoc**: Always document functions and classes
+8. **Never ignore accessibility**: Always include ARIA attributes
+9. **Never skip responsive design**: Always consider different screen sizes
+10. **Never create components from scratch**: Use existing PLUS components when possible
+11. **Never use inline styles for design tokens**: Use CSS variables and utility classes
+12. **Never mix semantic sizes for same token type**: Use consistent sizes
+13. **Never rely on Bootstrap default spacing**: ❌ Using Bootstrap's default `form-check` padding ✅ Override with `padding-left: 0` and use `gap: var(--size-element-gap-sm)`
+14. **Never assume Bootstrap spacing matches design tokens**: Always explicitly override Bootstrap defaults with PLUS design tokens from Figma
+15. **Never rely on Bootstrap's default appearance**: ❌ Using Bootstrap's default styling ✅ Bootstrap is foundation only - customize ALL styling to match Figma exactly
+16. **Never make up text/content**: ❌ Inventing placeholder text ✅ Use EXACT text/content from Figma
+17. **Never skip variants**: ❌ Implementing only one variant ✅ Implement ALL variants shown in Figma
+18. **Never approximate Figma designs**: ❌ "Close enough" implementation ✅ Pixel-perfect match to Figma
+19. **Never ignore Figma links/selections**: If provided, Figma takes absolute priority over assumptions
+20. **Never implement without seeing the Figma design**: ❌ Guessing what a Figma link looks like ✅ ALWAYS use Figma MCP tools (`mcp_Figma_Desktop_get_design_context` and/or `mcp_Figma_Desktop_get_screenshot`) to see exactly what it looks like first
+21. **Never skip font loading in HTML head**: ❌ Missing Google Fonts links ✅ ALWAYS include font links in `<head>` section
+22. **Never create data visualizations without Highcharts**: ❌ Missing Highcharts CDN ✅ ALWAYS include Highcharts CDN links when creating charts
+23. **Never use incorrect component import paths**: ❌ Wrong relative path ✅ ALWAYS verify import path based on prototype location
+24. **Never hardcode table styling**: ❌ Hardcoded padding/spacing ✅ ALWAYS use table design tokens (`--size-table-cell-x`, `--size-table-cell-y`, etc.)
+25. **Never hardcode elevation (box-shadow)**: ❌ Custom box-shadow values ✅ ALWAYS use elevation tokens (`--elevation-light-1` through `--elevation-light-5`)
+26. **Never ignore table color states**: ❌ Custom table button colors ✅ ALWAYS use table color state tokens (Default, Hover, Pressed, Focus, Disabled) from `design-system/styles/colors.md`
+
 ## Remember
 
 - **ALWAYS use design tokens** - no hardcoded values, ever
@@ -363,6 +472,6 @@ When generating code, consider:
 - Always consider accessibility and responsiveness
 - Always follow PLUS design system patterns
 - Always generate production-ready code
-- **When designing a specific UI type, reference `docs/guidelines/terminology.md` first**
-- **When selecting tokens, reference `docs/guidelines/token-reference.md`**
-- **When following code standards, reference `docs/guidelines/coding-standards.md`**
+- **When designing a specific UI type, reference `design-system/components/overview.md` first**
+- **When selecting tokens, reference `design-system/styles/`** - Complete token reference organized as Icons/Colors/Typography/Layout/Elevation
+- **When following code standards, reference `develop/standards.md`**

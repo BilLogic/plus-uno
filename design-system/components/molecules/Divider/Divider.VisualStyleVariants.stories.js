@@ -4,7 +4,7 @@
  * Includes appearance variations (light, dark) with stroke size variants
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Divider/Visual Style Variants',

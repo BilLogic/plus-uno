@@ -4,7 +4,7 @@
  * Includes color/style variations (primary, secondary, etc.) with fill variants (filled, outline, tonal, text)
  */
 
-import { PlusInterface } from '@/js/components/index.js';
+import { PlusInterface } from '../../index.js';
 
 export default {
   title: 'Molecules/Button/Visual Style Variants',
