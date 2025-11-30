@@ -5,7 +5,7 @@
 
 .plus-alert {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     border-radius: var(--size-modal-radius-md);
     width: 100%; /* Full width - responsive */
     max-width: 100%;
@@ -68,9 +68,11 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: var(--size-modal-pad-x-sm);
+    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-sm) 0;
     font-size: 20px;
     line-height: 1.6;
+    flex-shrink: 0;
+    align-self: flex-start;
 }
 
 /* Alert Style Variants */

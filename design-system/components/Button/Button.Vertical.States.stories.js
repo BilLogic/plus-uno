@@ -1,26 +1,26 @@
 /**
- * Button States Stories
+ * Button Vertical States Stories
  * 
- * Shows all 5 interactive states for filled buttons.
+ * Shows all interactive states for vertical outlined buttons.
  * States include: rest (default), hover, pressed, focus, disabled
  */
 
 import { PlusInterface } from "../index.js";
 
 export default {
-  title: 'Components/Button/States',
+  title: 'Components/Button/Vertical/States',
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'Button states show how buttons respond to user interaction. Hover, focus, and pressed states are CSS-driven and appear on user interaction.',
+        component: 'Vertical button states show how vertical outlined buttons respond to user interaction.',
       },
     },
   },
 };
 
 /**
- * All Button States
+ * All Vertical Button States
  * Shows all 5 states: rest (default), hover, pressed, focus, disabled
  */
 export const AllStates = {
@@ -39,38 +39,50 @@ export const AllStates = {
     ];
     
     states.forEach((state) => {
-      const stateRow = document.createElement('div');
-      stateRow.style.display = 'flex';
-      stateRow.style.flexDirection = 'column';
-      stateRow.style.gap = 'var(--size-element-gap-xs)';
+      const stateSection = document.createElement('div');
+      stateSection.style.display = 'flex';
+      stateSection.style.flexDirection = 'column';
+      stateSection.style.gap = 'var(--size-card-gap-md)';
       
       const stateLabel = document.createElement('div');
       stateLabel.className = 'h6';
       stateLabel.textContent = state.name;
-      stateRow.appendChild(stateLabel);
+      stateLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+      stateSection.appendChild(stateLabel);
       
-      const buttonWrapper = document.createElement('div');
-      buttonWrapper.style.display = 'inline-block';
+      const sizesRow = document.createElement('div');
+      sizesRow.style.display = 'flex';
+      sizesRow.style.flexWrap = 'wrap';
+      sizesRow.style.alignItems = 'flex-start';
+      sizesRow.style.gap = 'var(--size-card-gap-md)';
       
-      const button = PlusInterface.createButton({
-        btnText: 'Button',
-        btnStyle: 'primary',
-        btnFill: 'filled',
-        btnSize: 'default',
-        enabled: state.enabled,
-        icon: 'square-plus',
-        trailingIcon: 'square-plus',
+      const sizes = ['small', 'default', 'large'];
+      sizes.forEach((size) => {
+        const buttonWrapper = document.createElement('div');
+        buttonWrapper.style.display = 'inline-block';
+        
+        const button = PlusInterface.createButton({
+          btnText: 'Button',
+          btnStyle: 'primary',
+          btnFill: 'outline',
+          btnSize: size,
+          verticalLayout: true,
+          enabled: state.enabled,
+          icon: 'icons',
+          trailingIcon: 'square-plus',
+        });
+        
+        if (state.stateClass) {
+          button.classList.add(state.stateClass);
+          button.style.pointerEvents = 'none';
+        }
+        
+        buttonWrapper.appendChild(button);
+        sizesRow.appendChild(buttonWrapper);
       });
       
-      if (state.stateClass) {
-        button.classList.add(state.stateClass);
-        // Disable pointer events so the static state is always visible
-        button.style.pointerEvents = 'none';
-      }
-      
-      buttonWrapper.appendChild(button);
-      stateRow.appendChild(buttonWrapper);
-      container.appendChild(stateRow);
+      stateSection.appendChild(sizesRow);
+      container.appendChild(stateSection);
     });
     
     return container;
@@ -79,7 +91,7 @@ export const AllStates = {
 
 /**
  * Rest (Default) State
- * Shows button in default/rest state
+ * Shows vertical button in default/rest state
  */
 export const Rest = {
   render: () => {
@@ -89,10 +101,11 @@ export const Rest = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
       enabled: true,
-      icon: 'square-plus',
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
     
@@ -103,7 +116,7 @@ export const Rest = {
 
 /**
  * Hover State
- * Shows button in hover state with elevation shadow
+ * Shows vertical button in hover state with elevation shadow
  */
 export const Hover = {
   render: () => {
@@ -113,10 +126,11 @@ export const Hover = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
       enabled: true,
-      icon: 'square-plus',
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
     
@@ -130,7 +144,7 @@ export const Hover = {
 
 /**
  * Pressed State
- * Shows button in pressed state
+ * Shows vertical button in pressed state
  */
 export const Pressed = {
   render: () => {
@@ -140,10 +154,11 @@ export const Pressed = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
       enabled: true,
-      icon: 'square-plus',
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
     
@@ -157,7 +172,7 @@ export const Pressed = {
 
 /**
  * Focus State
- * Shows button in focus state with border
+ * Shows vertical button in focus state with border
  */
 export const Focus = {
   render: () => {
@@ -167,10 +182,11 @@ export const Focus = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
       enabled: true,
-      icon: 'square-plus',
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
     
@@ -184,7 +200,7 @@ export const Focus = {
 
 /**
  * Disabled State
- * Shows button in disabled state
+ * Shows vertical button in disabled state
  */
 export const Disabled = {
   render: () => {
@@ -194,10 +210,11 @@ export const Disabled = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
       enabled: false,
-      icon: 'square-plus',
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
     

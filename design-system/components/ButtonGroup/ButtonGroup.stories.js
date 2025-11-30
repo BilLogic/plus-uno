@@ -47,6 +47,11 @@
  * See design-system/components/overview.md for Element Component Guidelines
  * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  * See Molecules/Button for Button component documentation (used for individual buttons in group)
+ * 
+ * ### Variant Stories
+ * - **Orientations**: See `ButtonGroup.Orientations.stories.js` for horizontal/vertical layout examples
+ * - **Size Variants**: See `ButtonGroup.SizeVariants.stories.js` for small/default/large size examples
+ * - **Style Variants**: See `ButtonGroup.StyleVariants.stories.js` for color style examples
  */
 
 import { PlusInterface } from "../index.js";
@@ -64,104 +69,48 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all button group combinations exactly as shown in Figma
- * Layout matches Figma: 3 styles (primary, secondary, tertiary) × 3 sizes (small, medium, large) × 2 alignments (horizontal, vertical) × 4 button counts (2, 3, 4, 5)
- * Text: "Left", "Middle", "Right" (with "Middle" repeated for groups with 4-5 buttons)
- */
-export const AllVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-xl)';
-    
-    const styles = ['primary', 'secondary', 'tertiary'];
-    const sizes = ['small', 'default', 'large'];
-    const buttonCounts = [2, 3, 4, 5];
-    
-    // Organize by style (primary, secondary, tertiary) - each style gets its own section
-    styles.forEach((style) => {
-      const styleSection = document.createElement('div');
-      styleSection.style.display = 'flex';
-      styleSection.style.flexDirection = 'column';
-      styleSection.style.gap = 'var(--size-section-gap-lg)';
-      
-      // For each style, show horizontal alignment first, then vertical
-      ['horizontal', 'vertical'].forEach((alignment) => {
-        const alignmentSection = document.createElement('div');
-        alignmentSection.style.display = 'flex';
-        alignmentSection.style.flexDirection = alignment === 'horizontal' ? 'row' : 'column';
-        alignmentSection.style.flexWrap = 'wrap';
-        alignmentSection.style.gap = 'var(--size-card-gap-lg)';
-        alignmentSection.style.alignItems = 'flex-start';
-        
-        // Show all sizes (small, default, large) for this alignment
-        sizes.forEach((size) => {
-          const sizeColumn = document.createElement('div');
-          sizeColumn.style.display = 'flex';
-          sizeColumn.style.flexDirection = alignment === 'horizontal' ? 'column' : 'row';
-          sizeColumn.style.gap = 'var(--size-element-gap-md)';
-          sizeColumn.style.alignItems = 'flex-start';
-          
-          // Show all button counts (2, 3, 4, 5) for this size
-          buttonCounts.forEach((count) => {
-            const buttonTexts = [];
-            if (count === 2) {
-              buttonTexts.push('Left', 'Right');
-            } else if (count === 3) {
-              buttonTexts.push('Left', 'Middle', 'Right');
-            } else if (count === 4) {
-              buttonTexts.push('Left', 'Middle', 'Middle', 'Right');
-            } else if (count === 5) {
-              buttonTexts.push('Left', 'Middle', 'Middle', 'Middle', 'Right');
-            }
-            
-            const group = PlusInterface.createButtonGroup({
-              buttons: buttonTexts.map(text => ({ btnText: text })),
-              size: size,
-              style: style,
-              alignment: alignment
-            });
-            
-            sizeColumn.appendChild(group);
-          });
-          
-          alignmentSection.appendChild(sizeColumn);
-        });
-        
-        styleSection.appendChild(alignmentSection);
-      });
-      
-      container.appendChild(styleSection);
-    });
-    
-    return container;
-  },
-};
-
-/**
  * Interactive Button Group
  * Interactive playground for testing button group variations
  */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
+    
+    // Generate button texts based on buttonCount
+    const buttonTexts = [];
+    const count = args.buttonCount || 3;
+    
+    if (count === 2) {
+      buttonTexts.push('Button 1', 'Button 2');
+    } else if (count === 3) {
+      buttonTexts.push('Button 1', 'Button 2', 'Button 3');
+    } else if (count === 4) {
+      buttonTexts.push('Button 1', 'Button 2', 'Button 3', 'Button 4');
+    } else if (count === 5) {
+      buttonTexts.push('Button 1', 'Button 2', 'Button 3', 'Button 4', 'Button 5');
+    }
+    
+    const buttons = buttonTexts.map((text, index) => ({
+      btnText: text,
+      buttonOnClick: () => console.log(`${text} clicked`)
+    }));
+    
     const group = PlusInterface.createButtonGroup({
-      buttons: [
-        { btnText: 'Button 1', buttonOnClick: () => console.log('Button 1 clicked') },
-        { btnText: 'Button 2', buttonOnClick: () => console.log('Button 2 clicked') },
-        { btnText: 'Button 3', buttonOnClick: () => console.log('Button 3 clicked') }
-      ],
+      buttons: buttons,
       size: args.size || 'default',
       style: args.style || 'primary',
       fill: args.fill || 'filled',
       alignment: args.alignment || 'horizontal'
     });
+    group.style.width = 'fit-content';
     container.appendChild(group);
     return container;
   },
   argTypes: {
+    buttonCount: {
+      control: { type: 'number', min: 2, max: 5, step: 1 },
+      description: 'Number of buttons in the group',
+    },
     size: {
       control: 'select',
       options: ['small', 'default', 'large'],
@@ -184,6 +133,7 @@ export const Interactive = {
     },
   },
   args: {
+    buttonCount: 3,
     size: 'default',
     style: 'primary',
     fill: 'filled',

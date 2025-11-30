@@ -3,7 +3,7 @@
  * Competency area variants organized under "Competency Areas" subcategory
  */
 
-import { PlusSmartComponents } from '../index.js';
+import { PlusSmartComponents } from './index.js';
 
 export default {
   title: 'Components/CompetencyPill/Competency Areas',

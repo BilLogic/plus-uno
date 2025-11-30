@@ -1,137 +1,136 @@
 /**
- * Button Visual Style Variants Stories
- * Visual style variants organized under "Visual Style Variants" subcategory
- * Includes color/style variations (primary, secondary, etc.) with fill variants (filled, outline, tonal, text)
+ * Button Style Variants Stories
+ * 
+ * Shows all style (color) variants for filled buttons.
+ * Style variants are the color tokens applied to buttons.
  */
 
 import { PlusInterface } from "../index.js";
 
 export default {
-  title: 'Components/Button/Visual Style Variants',
+  title: 'Components/Button/Style Variants',
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'Style variants are color tokens applied to buttons. Shows all available color styles for filled buttons.',
+      },
+    },
+  },
 };
 
 /**
- * Primary Button
- * Shows primary style with default size and filled variant for style comparison
+ * All Filled Button Styles
+ * Shows all available color styles for filled buttons: primary, secondary, tertiary, default
+ */
+export const AllFilledButtonStyles = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexWrap = 'wrap';
+    container.style.alignItems = 'center';
+    container.style.gap = 'var(--size-card-gap-md)';
+    
+    const styles = ['primary', 'secondary', 'tertiary', 'default'];
+    
+    styles.forEach((style) => {
+      const buttonWrapper = document.createElement('div');
+      buttonWrapper.style.display = 'inline-block';
+      
+      const button = PlusInterface.createButton({
+        btnText: style,
+        btnStyle: style,
+        btnFill: 'filled',
+        btnSize: 'default',
+      });
+      
+      buttonWrapper.appendChild(button);
+      container.appendChild(buttonWrapper);
+    });
+    
+    return container;
+  },
+};
+
+/**
+ * Primary Style
+ * Shows primary filled button
  */
 export const Primary = {
   render: () => {
     const container = document.createElement('div');
+    container.style.display = 'inline-block';
+    
     const button = PlusInterface.createButton({
-      btnText: 'Primary',
+      btnText: 'Button',
       btnStyle: 'primary',
       btnFill: 'filled',
       btnSize: 'default',
     });
+    
     container.appendChild(button);
     return container;
   },
 };
 
 /**
- * Secondary Button
- * Shows secondary style with default size and filled variant for style comparison
+ * Secondary Style
+ * Shows secondary filled button
  */
 export const Secondary = {
   render: () => {
     const container = document.createElement('div');
+    container.style.display = 'inline-block';
+    
     const button = PlusInterface.createButton({
-      btnText: 'Secondary',
+      btnText: 'Button',
       btnStyle: 'secondary',
       btnFill: 'filled',
       btnSize: 'default',
     });
+    
     container.appendChild(button);
     return container;
   },
 };
 
 /**
- * Tertiary Button
- * Shows tertiary style with default size and filled variant for style comparison
+ * Tertiary Style
+ * Shows tertiary filled button
  */
 export const Tertiary = {
   render: () => {
     const container = document.createElement('div');
+    container.style.display = 'inline-block';
+    
     const button = PlusInterface.createButton({
-      btnText: 'Tertiary',
+      btnText: 'Button',
       btnStyle: 'tertiary',
       btnFill: 'filled',
       btnSize: 'default',
     });
+    
     container.appendChild(button);
     return container;
   },
 };
 
 /**
- * Success Button
- * Shows success style with default size and filled variant for style comparison
+ * Default Style
+ * Shows default filled button
  */
-export const Success = {
+export const Default = {
   render: () => {
     const container = document.createElement('div');
+    container.style.display = 'inline-block';
+    
     const button = PlusInterface.createButton({
-      btnText: 'Success',
-      btnStyle: 'success',
+      btnText: 'Button',
+      btnStyle: 'default',
       btnFill: 'filled',
       btnSize: 'default',
     });
-    container.appendChild(button);
-    return container;
-  },
-};
-
-/**
- * Info Button
- * Shows info style with default size and filled variant for style comparison
- */
-export const Info = {
-  render: () => {
-    const container = document.createElement('div');
-    const button = PlusInterface.createButton({
-      btnText: 'Info',
-      btnStyle: 'info',
-      btnFill: 'filled',
-      btnSize: 'default',
-    });
-    container.appendChild(button);
-    return container;
-  },
-};
-
-/**
- * Warning Button
- * Shows warning style with default size and filled variant for style comparison
- */
-export const Warning = {
-  render: () => {
-    const container = document.createElement('div');
-    const button = PlusInterface.createButton({
-      btnText: 'Warning',
-      btnStyle: 'warning',
-      btnFill: 'filled',
-      btnSize: 'default',
-    });
-    container.appendChild(button);
-    return container;
-  },
-};
-
-/**
- * Error Button
- * Shows error style with default size and filled variant for style comparison
- */
-export const Error = {
-  render: () => {
-    const container = document.createElement('div');
-    const button = PlusInterface.createButton({
-      btnText: 'Error',
-      btnStyle: 'error',
-      btnFill: 'filled',
-      btnSize: 'default',
-    });
+    
     container.appendChild(button);
     return container;
   },

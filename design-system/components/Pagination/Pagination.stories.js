@@ -314,3 +314,74 @@ export const AllVariants = {
     return container;
   },
 };
+
+/**
+ * Interactive Pagination
+ * Interactive playground for testing pagination variations
+ */
+export const Interactive = {
+  render: (args) => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-element-gap-md)';
+    container.style.padding = 'var(--size-section-pad-y-md)';
+    
+    const pagination = PlusInterface.createPagination({
+      currentPage: args.currentPage || 5,
+      totalPages: args.totalPages || 10,
+      type: args.type || 'icon',
+      size: args.size || 'default',
+      maxVisible: args.maxVisible || 5,
+      prevText: args.prevText || 'Previous',
+      nextText: args.nextText || 'Next',
+      onPageChange: (page) => {
+        console.log('Page changed to:', page);
+      }
+    });
+    
+    container.appendChild(pagination);
+    return container;
+  },
+  argTypes: {
+    currentPage: {
+      control: { type: 'number', min: 1, max: 20, step: 1 },
+      description: 'Current active page (1-indexed)',
+    },
+    totalPages: {
+      control: { type: 'number', min: 1, max: 20, step: 1 },
+      description: 'Total number of pages',
+    },
+    type: {
+      control: 'select',
+      options: ['icon', 'text'],
+      description: 'Pagination type',
+    },
+    size: {
+      control: 'select',
+      options: ['small', 'default', 'large'],
+      description: 'Pagination size',
+    },
+    maxVisible: {
+      control: { type: 'number', min: 3, max: 9, step: 1 },
+      description: 'Maximum number of visible page numbers',
+    },
+    prevText: {
+      control: 'text',
+      description: 'Previous button text (for text type)',
+    },
+    nextText: {
+      control: 'text',
+      description: 'Next button text (for text type)',
+    },
+  },
+  args: {
+    currentPage: 5,
+    totalPages: 10,
+    type: 'icon',
+    size: 'default',
+    maxVisible: 5,
+    prevText: 'Previous',
+    nextText: 'Next',
+  },
+};

@@ -85,6 +85,94 @@ export default {
 };
 
 /**
+ * All Variants
+ * Shows all jumbotron combinations: different content configurations and sizes
+ */
+export const AllVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    
+    // Basic jumbotron with title and body
+    const basicJumbotron = PlusInterface.createJumbotron({
+      title: 'Hello, world!',
+      body: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'md'
+    });
+    container.appendChild(basicJumbotron);
+    
+    // Jumbotron with subtitle
+    const withSubtitle = PlusInterface.createJumbotron({
+      title: 'Hello, world!',
+      subtitle: 'This is a subtitle',
+      body: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'md'
+    });
+    container.appendChild(withSubtitle);
+    
+    // Jumbotron with primary button
+    const withPrimaryButton = PlusInterface.createJumbotron({
+      title: 'Hello, world!',
+      body: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
+      primaryButton: {
+        text: 'Learn more',
+        style: 'primary',
+        fill: 'filled',
+        size: 'default',
+        onClick: () => console.log('Primary button clicked')
+      },
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'md'
+    });
+    container.appendChild(withPrimaryButton);
+    
+    // Jumbotron with both buttons
+    const withBothButtons = PlusInterface.createJumbotron({
+      title: 'Hello, world!',
+      body: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
+      primaryButton: {
+        text: 'Learn more',
+        style: 'primary',
+        fill: 'filled',
+        size: 'default',
+        onClick: () => console.log('Primary button clicked')
+      },
+      secondaryButton: {
+        text: 'Cancel',
+        style: 'secondary',
+        fill: 'outline',
+        size: 'default',
+        onClick: () => console.log('Secondary button clicked')
+      },
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'md'
+    });
+    container.appendChild(withBothButtons);
+    
+    // Fluid jumbotron
+    const fluidJumbotron = PlusInterface.createJumbotron({
+      title: 'Hello, world!',
+      body: 'This is a fluid jumbotron that spans the full width with no border-radius.',
+      fluid: true,
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'md'
+    });
+    container.appendChild(fluidJumbotron);
+    
+    return container;
+  },
+};
+
+/**
  * Interactive
  * Interactive playground with Storybook controls
  */

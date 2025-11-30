@@ -67,6 +67,74 @@ export default {
 };
 
 /**
+ * All Variants
+ * Shows all loading GIF combinations: all animation types × all sizes
+ */
+export const AllVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    
+    const types = ['growing', 'rotating', 'stacking'];
+    const sizes = ['small', 'default', 'large'];
+    
+    // Organize by type - each type shows all sizes
+    types.forEach((type) => {
+      const typeSection = document.createElement('div');
+      typeSection.style.display = 'flex';
+      typeSection.style.flexDirection = 'column';
+      typeSection.style.gap = 'var(--size-card-gap-md)';
+      
+      const typeLabel = document.createElement('div');
+      typeLabel.className = 'h6';
+      const typeLabels = {
+        growing: 'Growing Grid - All Sizes',
+        rotating: 'Rotating Grid - All Sizes',
+        stacking: 'Stacking Grid - All Sizes'
+      };
+      typeLabel.textContent = typeLabels[type];
+      typeLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+      typeSection.appendChild(typeLabel);
+      
+      const sizesRow = document.createElement('div');
+      sizesRow.style.display = 'flex';
+      sizesRow.style.flexWrap = 'wrap';
+      sizesRow.style.alignItems = 'center';
+      sizesRow.style.gap = 'var(--size-card-gap-md)';
+      
+      sizes.forEach((size) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.gap = 'var(--size-element-gap-sm)';
+        
+        const loadingGif = PlusInterface.createLoadingGif({
+          type: type,
+          size: size,
+          label: `Loading (${type} ${size})...`
+        });
+        wrapper.appendChild(loadingGif);
+        
+        const label = document.createElement('div');
+        label.className = 'body2-txt';
+        label.textContent = size.charAt(0).toUpperCase() + size.slice(1);
+        wrapper.appendChild(label);
+        
+        sizesRow.appendChild(wrapper);
+      });
+      
+      typeSection.appendChild(sizesRow);
+      container.appendChild(typeSection);
+    });
+    
+    return container;
+  },
+};
+
+/**
  * All Animation Types
  * Shows all three loading animation types from Figma
  */

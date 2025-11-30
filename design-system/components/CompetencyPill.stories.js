@@ -3,7 +3,7 @@
  * Competency area pill (text + styling container)
  */
 
-import { PlusSmartComponents } from '../index.js';
+import { PlusSmartComponents } from './index.js';
 
 export default {
   title: 'Components/CompetencyPill',

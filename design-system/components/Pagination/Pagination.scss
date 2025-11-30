@@ -3,7 +3,7 @@
  * Bootstrap 4.6.2 pagination with PLUS design token customizations
  * Connected pagination design matching Figma specifications exactly
  * 
- * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=53-19822
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=3497-19505
  * 
  * Component Type: Element (uses `element-*` tokens)
  */
@@ -115,14 +115,16 @@
 }
 
 /* Icon styling */
+/* Figma: Inactive icons use dark grey color (same as inactive text) */
 .plus-pagination .page-item-icon .page-link {
-    /* Icon color */
-    color: var(--color-secondary);
+    /* Icon color - matches inactive text color for consistency */
+    color: var(--color-secondary-text);
     
     /* Icon uses Font Awesome sizing from body2-txt */
     i {
         font-size: var(--font-size-fa-body2); /* 12px */
         line-height: var(--font-line-height-fa-body2); /* 183.3% */
+        color: var(--color-secondary-text); /* Dark grey icon */
     }
 }
 
@@ -188,14 +190,30 @@
 }
 
 /* Active state */
+/* Figma: Light grey state layer (8% opacity) with dark grey text */
+/* Active page should have consistent borders like all other items */
 .plus-pagination .page-item.active .page-link {
-    background-color: var(--color-secondary-state-08);
-    color: var(--color-secondary-text);
+    background-color: var(--color-secondary-state-08); /* Light grey state layer (8% opacity) */
+    color: var(--color-secondary-text); /* Dark grey text */
     cursor: default;
     font-weight: var(--font-weight-semibold-1);
     z-index: 3;
-    /* Remove border-right from active page */
-    border-right: none;
+    /* Keep border-right for active page (unless it's the last item) */
+    /* Border will be removed by :last-child rule if needed */
+    /* Ensure border color is correct (light grey, not blue) */
+    border-right-color: var(--color-outline-variant);
+    /* Prevent focus outline on active page */
+    outline: none;
+    box-shadow: none;
+}
+
+/* Active state - icon color should also be dark grey */
+.plus-pagination .page-item.active.page-item-icon .page-link {
+    color: var(--color-secondary-text); /* Dark grey icon */
+    
+    i {
+        color: var(--color-secondary-text); /* Dark grey icon */
+    }
 }
 
 /* Preserve border radius for first/last items in all states */

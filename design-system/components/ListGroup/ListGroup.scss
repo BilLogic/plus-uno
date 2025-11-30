@@ -106,7 +106,8 @@
 
 /* Divider lines between items - thin border-bottom only */
 /* Figma: Thin divider lines between items (not full borders) */
-.list-group-item.plus-list-group-item:not(:last-child) {
+/* CRITICAL: Active items do NOT have divider lines below them */
+.list-group-item.plus-list-group-item:not(:last-child):not(.active) {
     /* Thin divider line - 1px border-bottom only */
     border-bottom: var(--size-element-border) solid var(--color-outline-variant) !important;
 }
@@ -127,7 +128,8 @@
     border-radius: 0 !important;
 }
 
-.list-group.plus-list-group.list-group-flush .list-group-item.plus-list-group-item:not(:last-child) {
+/* CRITICAL: Active items do NOT have divider lines below them (per Figma design) */
+.list-group.plus-list-group.list-group-flush .list-group-item.plus-list-group-item:not(:last-child):not(.active) {
     border-bottom: var(--size-element-border) solid var(--color-outline-variant) !important;
 }
 
@@ -151,10 +153,20 @@
 /* ============================================
    LIST GROUP ITEM BADGE
    ============================================ */
+/* Figma: Counter badges use px-[var(--spacing/medium/space-200,12px)] = 12px horizontal padding */
+/* Badge default padding is 8px (element-pad-x-sm), so we override for list group badges */
 
 .plus-list-group-item-badge {
     flex-shrink: 0;
     margin-left: var(--size-element-gap-sm);
+}
+
+/* Counter badge padding - Figma uses 12px horizontal padding */
+.plus-list-group-item-badge .plus-badge {
+    /* Figma: px-[var(--spacing/medium/space-200,12px)] = 12px horizontal padding */
+    padding-left: var(--size-spacing-medium-space-200) !important; /* 12px */
+    padding-right: var(--size-spacing-medium-space-200) !important; /* 12px */
+    /* Vertical padding stays at default (element-pad-y-sm = 4px) */
 }
 
 /* ============================================
@@ -169,13 +181,9 @@
     background-color: var(--color-primary-state-08) !important; /* rgba(0, 101, 142, 0.08) */
     /* Figma: text-[color:var(--_primary/on-primary-container,#001e2e)] = #001e2e (token value) */
     color: var(--color-on-primary-container) !important; /* #001e2e */
-    /* Active items use primary color for divider (if not last item) */
+    /* CRITICAL: Active items do NOT have divider lines below them (per Figma design) */
+    border-bottom: none !important;
     z-index: 2;
-}
-
-.list-group-item.plus-list-group-item.active:not(:last-child) {
-    /* Active item divider uses primary color */
-    border-bottom-color: var(--color-primary) !important; /* #0472a8 */
 }
 
 .list-group-item.plus-list-group-item.active .plus-list-group-item-content {
@@ -183,6 +191,7 @@
 }
 
 /* Active item badges use solid primary color background (not state layer) */
+/* Figma: Active item badges have solid primary background with white text */
 .list-group-item.plus-list-group-item.active .plus-list-group-item-badge .plus-badge.primary {
     /* Figma: bg-[var(--_primary/primary,#0472a8)] = solid primary color for active item badge */
     background-color: var(--color-primary) !important; /* #0472a8 */
@@ -234,7 +243,7 @@
 }
 
 .list-group-item.plus-list-group-item.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
-    /* Hover divider uses primary color */
+    /* Hover divider uses primary color (only for non-active items) */
     border-bottom-color: var(--color-primary) !important; /* #0472a8 */
 }
 
@@ -253,8 +262,8 @@
     box-shadow: 0 0 0 2px var(--color-primary-state-16) !important;
 }
 
-.list-group-item.plus-list-group-item.list-group-item-action:focus:not(:last-child) {
-    /* Focus divider uses primary color */
+.list-group-item.plus-list-group-item.list-group-item-action:focus:not(:last-child):not(.active) {
+    /* Focus divider uses primary color (only for non-active items) */
     border-bottom-color: var(--color-primary) !important; /* #0472a8 */
 }
 
@@ -269,15 +278,12 @@
 }
 
 /* Active + Action state */
+/* CRITICAL: Active action items do NOT have divider lines below them (per Figma design) */
 .list-group-item.plus-list-group-item.list-group-item-action.active {
     /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
     background-color: var(--color-primary-state-08) !important;
     color: var(--color-on-primary-container) !important;
-}
-
-.list-group-item.plus-list-group-item.list-group-item-action.active:not(:last-child) {
-    /* Active action item divider uses primary color */
-    border-bottom-color: var(--color-primary) !important; /* #0472a8 */
+    border-bottom: none !important;
 }
 
 .list-group-item.plus-list-group-item.list-group-item-action.active:hover {
@@ -557,8 +563,9 @@
     color: var(--color-on-primary-container) !important;
 }
 
-.list-group-item.active:not(:last-child) {
-    border-bottom-color: var(--color-primary) !important;
+/* CRITICAL: Active items do NOT have divider lines below them (per Figma design) */
+.list-group-item.active {
+    border-bottom: none !important;
 }
 
 /* Override Bootstrap's default disabled state globally */
@@ -574,7 +581,7 @@
     color: var(--color-on-surface) !important;
 }
 
-.list-group-item-action:hover:not(:last-child) {
+.list-group-item-action:hover:not(:last-child):not(.active) {
     border-bottom-color: var(--color-primary) !important;
 }
 
@@ -584,6 +591,6 @@
     box-shadow: 0 0 0 2px var(--color-primary-state-16) !important;
 }
 
-.list-group-item-action:focus:not(:last-child) {
+.list-group-item-action:focus:not(:last-child):not(.active) {
     border-bottom-color: var(--color-primary) !important;
 }

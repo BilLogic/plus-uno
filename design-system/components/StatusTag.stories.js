@@ -26,7 +26,7 @@
  * See design-system/styles/ (colors.md, layout.md, typography.md, icons.md, elevation.md) for Token Reference
  */
 
-import { PlusSmartComponents } from '../index.js';
+import { PlusSmartComponents } from './index.js';
 
 export default {
   title: 'Components/StatusTag',

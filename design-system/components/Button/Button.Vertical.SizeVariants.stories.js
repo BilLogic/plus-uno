@@ -1,26 +1,26 @@
 /**
- * Button Size Variants Stories
+ * Button Vertical Size Variants Stories
  * 
- * Shows all size variants (small, default, large) for filled buttons.
+ * Shows all size variants (small, default, large) for vertical outlined buttons.
  * Includes examples with and without icons to show how sizing affects content.
  */
 
 import { PlusInterface } from "../index.js";
 
 export default {
-  title: 'Components/Button/Size Variants',
+  title: 'Components/Button/Vertical/Size Variants',
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'Button sizes apply consistently. All sizes support icons and text combinations.',
+        component: 'Vertical button sizes apply consistently. All sizes support icons and text combinations.',
       },
     },
   },
 };
 
 /**
- * Small Buttons
+ * Small Vertical Buttons
  * Compact size for dense interfaces
  */
 export const Small = {
@@ -28,35 +28,26 @@ export const Small = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.alignItems = 'center';
+    container.style.alignItems = 'flex-start';
     container.style.gap = 'var(--size-card-gap-md)';
     
-    // Text only
-    const textOnly = PlusInterface.createButton({
+    const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'small',
-    });
-    container.appendChild(textOnly);
-    
-    // With both leading and trailing icons
-    const withIcons = PlusInterface.createButton({
-      btnText: 'Button',
-      btnStyle: 'primary',
-      btnFill: 'filled',
-      btnSize: 'small',
-      icon: 'square-plus',
+      verticalLayout: true,
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
-    container.appendChild(withIcons);
+    container.appendChild(button);
     
     return container;
   },
 };
 
 /**
- * Default Buttons
+ * Default Vertical Buttons
  * Standard size for most use cases
  */
 export const Default = {
@@ -64,35 +55,26 @@ export const Default = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.alignItems = 'center';
+    container.style.alignItems = 'flex-start';
     container.style.gap = 'var(--size-card-gap-md)';
     
-    // Text only
-    const textOnly = PlusInterface.createButton({
+    const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
-    });
-    container.appendChild(textOnly);
-    
-    // With both leading and trailing icons
-    const withIcons = PlusInterface.createButton({
-      btnText: 'Button',
-      btnStyle: 'primary',
-      btnFill: 'filled',
-      btnSize: 'default',
-      icon: 'square-plus',
+      verticalLayout: true,
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
-    container.appendChild(withIcons);
+    container.appendChild(button);
     
     return container;
   },
 };
 
 /**
- * Large Buttons
+ * Large Vertical Buttons
  * Prominent size for primary CTAs
  */
 export const Large = {
@@ -100,28 +82,19 @@ export const Large = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.alignItems = 'center';
+    container.style.alignItems = 'flex-start';
     container.style.gap = 'var(--size-card-gap-md)';
     
-    // Text only
-    const textOnly = PlusInterface.createButton({
+    const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'large',
-    });
-    container.appendChild(textOnly);
-    
-    // With both leading and trailing icons
-    const withIcons = PlusInterface.createButton({
-      btnText: 'Button',
-      btnStyle: 'primary',
-      btnFill: 'filled',
-      btnSize: 'large',
-      icon: 'square-plus',
+      verticalLayout: true,
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
-    container.appendChild(withIcons);
+    container.appendChild(button);
     
     return container;
   },
@@ -136,21 +109,27 @@ export const AllSizes = {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.alignItems = 'center';
+    container.style.alignItems = 'flex-start';
     container.style.gap = 'var(--size-card-gap-md)';
     
     const sizes = ['small', 'default', 'large'];
     
     sizes.forEach((size) => {
+      const buttonWrapper = document.createElement('div');
+      buttonWrapper.style.display = 'inline-block';
+      
       const button = PlusInterface.createButton({
         btnText: size,
         btnStyle: 'primary',
-        btnFill: 'filled',
+        btnFill: 'outline',
         btnSize: size,
-        icon: 'square-plus',
+        verticalLayout: true,
+        icon: 'icons',
         trailingIcon: 'square-plus',
       });
-      container.appendChild(button);
+      
+      buttonWrapper.appendChild(button);
+      container.appendChild(buttonWrapper);
     });
     
     return container;

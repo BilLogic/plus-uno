@@ -37,7 +37,6 @@ const config = {
   },
   staticDirs: [
     { from: path.resolve(__dirname, '../dist'), to: '/dist' },
-    { from: path.resolve(__dirname, '../public'), to: '/public' },
     { from: path.resolve(__dirname, '../design-system/assets'), to: '/assets' },
   ],
   viteFinal: async (config) => {

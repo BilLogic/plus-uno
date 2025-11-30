@@ -95,6 +95,7 @@ export const AllVariants = {
       const sizesContainer = document.createElement('div');
       sizesContainer.style.display = 'flex';
       sizesContainer.style.flexDirection = 'column';
+      sizesContainer.style.alignItems = 'flex-start'; // Prevent badges from stretching full width
       sizesContainer.style.gap = 'var(--size-element-gap-sm)';
       
       sizes.forEach((size) => {

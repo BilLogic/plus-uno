@@ -1,22 +1,22 @@
 /**
- * Button Content Variants Stories
+ * Button Vertical Content Variants Stories
  * 
- * Shows all 4 content variations:
+ * Shows all 4 content variations for vertical buttons:
  * 1. Text only
- * 2. Leading icon (icon on left)
- * 3. Trailing icon (icon on right)
- * 4. Both icons (leading and trailing)
+ * 2. Leading icon (icon on top)
+ * 3. Trailing icon (icon on right of text)
+ * 4. Both icons (leading icon on top, trailing icon on right of text)
  */
 
 import { PlusInterface } from "../index.js";
 
 export default {
-  title: 'Components/Button/Content Variants',
+  title: 'Components/Button/Vertical/Content Variants',
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'Button content variants show different combinations of text and icons. Icons use Font Awesome.',
+        component: 'Vertical button content variants show different combinations of text and icons. Icons use Font Awesome.',
       },
     },
   },
@@ -42,20 +42,20 @@ export const AllContentVariants = {
       },
       { 
         name: 'Leading Icon', 
-        description: 'Button with icon on the left side',
-        icon: 'square-plus',
+        description: 'Button with icon on top',
+        icon: 'icons',
         trailingIcon: null,
       },
       { 
         name: 'Trailing Icon', 
-        description: 'Button with icon on the right side',
+        description: 'Button with icon on the right side of text',
         icon: null,
         trailingIcon: 'square-plus',
       },
       { 
         name: 'Both Icons', 
-        description: 'Button with icons on both left and right sides',
-        icon: 'square-plus',
+        description: 'Button with leading icon on top and trailing icon on right of text',
+        icon: 'icons',
         trailingIcon: 'square-plus',
       },
     ];
@@ -90,8 +90,9 @@ export const AllContentVariants = {
       const button = PlusInterface.createButton({
         btnText: 'Button',
         btnStyle: 'primary',
-        btnFill: 'filled',
+        btnFill: 'outline',
         btnSize: 'default',
+        verticalLayout: true,
         icon: variant.icon,
         trailingIcon: variant.trailingIcon,
       });
@@ -117,8 +118,9 @@ export const TextOnly = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
     });
     
     container.appendChild(button);
@@ -128,7 +130,7 @@ export const TextOnly = {
 
 /**
  * Leading Icon
- * Button with icon on the left side
+ * Button with icon on top
  */
 export const LeadingIcon = {
   render: () => {
@@ -138,9 +140,10 @@ export const LeadingIcon = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
-      icon: 'square-plus',
+      verticalLayout: true,
+      icon: 'icons',
     });
     
     container.appendChild(button);
@@ -150,7 +153,7 @@ export const LeadingIcon = {
 
 /**
  * Trailing Icon
- * Button with icon on the right side
+ * Button with icon on the right side of text
  */
 export const TrailingIcon = {
   render: () => {
@@ -160,8 +163,9 @@ export const TrailingIcon = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
+      verticalLayout: true,
       trailingIcon: 'square-plus',
     });
     
@@ -172,7 +176,7 @@ export const TrailingIcon = {
 
 /**
  * Both Icons
- * Button with icons on both left and right sides
+ * Button with leading icon on top and trailing icon on right of text
  */
 export const BothIcons = {
   render: () => {
@@ -182,9 +186,10 @@ export const BothIcons = {
     const button = PlusInterface.createButton({
       btnText: 'Button',
       btnStyle: 'primary',
-      btnFill: 'filled',
+      btnFill: 'outline',
       btnSize: 'default',
-      icon: 'square-plus',
+      verticalLayout: true,
+      icon: 'icons',
       trailingIcon: 'square-plus',
     });
     

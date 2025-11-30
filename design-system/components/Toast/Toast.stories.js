@@ -83,6 +83,73 @@ export default {
 };
 
 /**
+ * All Variants
+ * Shows all toast combinations: all styles × all content configurations
+ */
+export const AllVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = '20px';
+    
+    const styles = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+    
+    styles.forEach((style) => {
+      const styleSection = document.createElement('div');
+      styleSection.style.display = 'flex';
+      styleSection.style.flexDirection = 'column';
+      styleSection.style.gap = 'var(--size-card-gap-md)';
+      
+      const styleLabel = document.createElement('div');
+      styleLabel.className = 'h6';
+      styleLabel.textContent = `${style.charAt(0).toUpperCase() + style.slice(1)} Style`;
+      styleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+      styleSection.appendChild(styleLabel);
+      
+      // With title and dismissible
+      const toast1 = createStaticToast({
+        style: style,
+        title: 'Toast Title',
+        message: 'This is a toast message with title and dismiss button.',
+        dismissible: true
+      });
+      styleSection.appendChild(toast1);
+      
+      // Without title, dismissible
+      const toast2 = createStaticToast({
+        style: style,
+        message: 'This is a toast message without title, with dismiss button.',
+        dismissible: true
+      });
+      styleSection.appendChild(toast2);
+      
+      // With title, non-dismissible
+      const toast3 = createStaticToast({
+        style: style,
+        title: 'Toast Title',
+        message: 'This is a toast message with title, no dismiss button.',
+        dismissible: false
+      });
+      styleSection.appendChild(toast3);
+      
+      // Without title, non-dismissible
+      const toast4 = createStaticToast({
+        style: style,
+        message: 'This is a toast message without title, no dismiss button.',
+        dismissible: false
+      });
+      styleSection.appendChild(toast4);
+      
+      container.appendChild(styleSection);
+    });
+    
+    return container;
+  },
+};
+
+/**
  * All Style Variants
  * Shows all toast style variants with title and dismissible
  */

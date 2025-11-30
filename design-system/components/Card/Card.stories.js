@@ -100,6 +100,144 @@ export default {
 };
 
 /**
+ * All Variants
+ * Shows all card combinations: different content configurations and sizes
+ */
+export const AllVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    
+    // Basic card with title and body
+    const basicCard = PlusInterface.createCard({
+      title: 'Card Title',
+      body: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(basicCard);
+    
+    // Card with image
+    const imagePlaceholder = document.createElement('div');
+    imagePlaceholder.style.width = '100%';
+    imagePlaceholder.style.height = '200px';
+    imagePlaceholder.style.display = 'flex';
+    imagePlaceholder.style.alignItems = 'center';
+    imagePlaceholder.style.justifyContent = 'center';
+    imagePlaceholder.style.backgroundColor = 'var(--color-surface-variant)';
+    imagePlaceholder.style.color = 'var(--color-on-surface-variant)';
+    imagePlaceholder.textContent = 'Image cap';
+    
+    const cardWithImage = PlusInterface.createCard({
+      image: imagePlaceholder,
+      title: 'Card Title',
+      body: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(cardWithImage);
+    
+    // Card with subtitle
+    const cardWithSubtitle = PlusInterface.createCard({
+      title: 'Card Title',
+      subtitle: 'Card Subtitle',
+      body: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(cardWithSubtitle);
+    
+    // Card with action button
+    const cardWithButton = PlusInterface.createCard({
+      title: 'Card Title',
+      body: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
+      actionButton: {
+        text: 'Go somewhere',
+        style: 'primary',
+        fill: 'filled',
+        size: 'default',
+        onClick: () => console.log('Button clicked')
+      },
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(cardWithButton);
+    
+    // Card with links
+    const cardWithLinks = PlusInterface.createCard({
+      title: 'Card Title',
+      body: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
+      links: [
+        { text: 'Card link', href: '#', onClick: () => console.log('Link 1 clicked') },
+        { text: 'Another link', href: '#', onClick: () => console.log('Link 2 clicked') }
+      ],
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(cardWithLinks);
+    
+    // Card with items
+    const cardWithItems = PlusInterface.createCard({
+      title: 'Card Title',
+      items: ['Item #1', 'Item #2', 'Item #3'],
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(cardWithItems);
+    
+    // Card with all elements
+    const fullCard = PlusInterface.createCard({
+      image: imagePlaceholder.cloneNode(true),
+      title: 'Card Title',
+      subtitle: 'Card Subtitle',
+      body: 'Some quick example text to build on the card title and make up the bulk of the card\'s content.',
+      header: 'Header',
+      items: ['Item #1', 'Item #2'],
+      footer: 'Footer',
+      links: [
+        { text: 'Card link', href: '#' },
+        { text: 'Another link', href: '#' }
+      ],
+      actionButton: {
+        text: 'Action',
+        style: 'primary',
+        fill: 'filled',
+        size: 'default',
+        onClick: () => console.log('Action clicked')
+      },
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'sm',
+      borderSize: 'sm',
+      showBorder: true
+    });
+    container.appendChild(fullCard);
+    
+    return container;
+  },
+};
+
+/**
  * Interactive
  * Interactive playground with Storybook controls
  */

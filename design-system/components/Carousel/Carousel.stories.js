@@ -233,15 +233,15 @@ export const AllVariants = {
 };
 
 /**
- * Slides Only
- * Carousel with just slides, no controls or indicators
+ * Interactive Carousel
+ * Interactive playground for testing carousel variations
  */
-export const SlidesOnly = {
-  render: () => {
+export const Interactive = {
+  render: (args) => {
     const container = document.createElement('div');
     container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-md)';
     container.style.padding = 'var(--size-section-pad-y-md)';
     
     const createSlideContent = (slideNumber) => {
@@ -251,41 +251,51 @@ export const SlidesOnly = {
       slideDiv.style.justifyContent = 'center';
       slideDiv.style.height = '350px';
       slideDiv.style.width = '100%';
-      slideDiv.style.position = 'relative';
+      slideDiv.style.backgroundColor = 'var(--color-surface-variant)';
       
       const slideText = document.createElement('p');
       slideText.style.fontFamily = 'var(--font-family-title, Lato)';
       slideText.style.fontSize = '64px';
       slideText.style.fontWeight = '400';
-      slideText.style.lineHeight = '1.5';
-      slideText.style.color = 'var(--color-on-surface, #191c1e)';
-      slideText.style.margin = '0';
-      slideText.style.whiteSpace = 'nowrap';
-      
-      const slideNames = ['First Slide', 'Second Slide', 'Third Slide'];
-      slideText.textContent = slideNames[slideNumber - 1];
-      
+      slideText.style.color = 'var(--color-on-surface-variant)';
+      slideText.textContent = `Slide ${slideNumber}`;
       slideDiv.appendChild(slideText);
+      
       return slideDiv;
     };
     
+    const slides = [];
+    for (let i = 1; i <= (args.slideCount || 3); i++) {
+      slides.push({
+        content: createSlideContent(i),
+        active: i === 1,
+        title: args.showCaptions ? `Slide ${i} label` : undefined,
+        caption: args.showCaptions ? `Some representative placeholder content for slide ${i}.` : undefined
+      });
+    }
+    
     const carousel = PlusInterface.createCarousel({
-      id: 'carousel-slides-only',
-      slides: [
-        { content: createSlideContent(1), active: true },
-        { content: createSlideContent(2) },
-        { content: createSlideContent(3) }
-      ],
-      showControls: false,
-      showIndicators: false,
-      interval: 0,
-      ride: false
+      id: args.id || 'interactive-carousel',
+      slides: slides,
+      showControls: args.showControls !== false,
+      showIndicators: args.showIndicators !== false,
+      showCaptions: args.showCaptions || false,
+      interval: args.interval || 5000,
+      pauseOnHover: args.pauseOnHover !== false,
+      wrap: args.wrap !== false,
+      keyboard: args.keyboard !== false,
+      ride: args.ride || false,
+      onSlide: (event, slideIndex) => {
+        console.log('Slide changing to:', slideIndex);
+      },
+      onSlid: (event, slideIndex) => {
+        console.log('Slide changed to:', slideIndex);
+      }
     });
     
-    carousel.style.width = '600px';
-    carousel.style.height = '350px';
+    carousel.style.width = args.width || '680px';
+    carousel.style.height = args.height || '350px';
     
-    // Ensure carousel inner and items have proper height
     const carouselInner = carousel.querySelector('.plus-carousel-inner');
     if (carouselInner) {
       carouselInner.style.height = '100%';
@@ -294,227 +304,74 @@ export const SlidesOnly = {
     carouselItems.forEach(item => {
       item.style.height = '100%';
     });
-    container.appendChild(carousel);
     
+    container.appendChild(carousel);
     return container;
   },
-};
-
-/**
- * With Controls
- * Carousel with navigation controls
- */
-export const WithControls = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const createSlideContent = (slideNumber) => {
-      const slideDiv = document.createElement('div');
-      slideDiv.style.display = 'flex';
-      slideDiv.style.alignItems = 'center';
-      slideDiv.style.justifyContent = 'center';
-      slideDiv.style.height = '350px';
-      slideDiv.style.width = '100%';
-      slideDiv.style.position = 'relative';
-      
-      const slideText = document.createElement('p');
-      slideText.style.fontFamily = 'var(--font-family-title, Lato)';
-      slideText.style.fontSize = '64px';
-      slideText.style.fontWeight = '400';
-      slideText.style.lineHeight = '1.5';
-      slideText.style.color = 'var(--color-on-surface, #191c1e)';
-      slideText.style.margin = '0';
-      slideText.style.whiteSpace = 'nowrap';
-      
-      const slideNames = ['First Slide', 'Second Slide', 'Third Slide'];
-      slideText.textContent = slideNames[slideNumber - 1];
-      
-      slideDiv.appendChild(slideText);
-      return slideDiv;
-    };
-    
-    const carousel = PlusInterface.createCarousel({
-      id: 'carousel-with-controls',
-      slides: [
-        { content: createSlideContent(1), active: true },
-        { content: createSlideContent(2) },
-        { content: createSlideContent(3) }
-      ],
-      showControls: true,
-      showIndicators: false,
-      interval: 0,
-      ride: false
-    });
-    
-    carousel.style.width = '680px';
-    carousel.style.height = '350px';
-    
-    // Ensure carousel inner and items have proper height
-    const carouselInner = carousel.querySelector('.plus-carousel-inner');
-    if (carouselInner) {
-      carouselInner.style.height = '100%';
-    }
-    const carouselItems = carousel.querySelectorAll('.plus-carousel-item');
-    carouselItems.forEach(item => {
-      item.style.height = '100%';
-    });
-    container.appendChild(carousel);
-    
-    return container;
+  argTypes: {
+    id: {
+      control: 'text',
+      description: 'Carousel ID (required for Bootstrap functionality)',
+    },
+    slideCount: {
+      control: { type: 'number', min: 1, max: 10, step: 1 },
+      description: 'Number of slides',
+    },
+    showControls: {
+      control: 'boolean',
+      description: 'Show previous/next controls',
+    },
+    showIndicators: {
+      control: 'boolean',
+      description: 'Show slide indicators',
+    },
+    showCaptions: {
+      control: 'boolean',
+      description: 'Show captions on slides',
+    },
+    interval: {
+      control: { type: 'number', min: 0, max: 10000, step: 500 },
+      description: 'Auto-advance interval in milliseconds (0 to disable)',
+    },
+    pauseOnHover: {
+      control: 'boolean',
+      description: 'Pause on hover',
+    },
+    wrap: {
+      control: 'boolean',
+      description: 'Wrap around when reaching start/end',
+    },
+    keyboard: {
+      control: 'boolean',
+      description: 'Enable keyboard navigation',
+    },
+    ride: {
+      control: 'select',
+      options: ['carousel', false],
+      description: 'Auto-start behavior',
+    },
+    width: {
+      control: 'text',
+      description: 'Carousel width',
+    },
+    height: {
+      control: 'text',
+      description: 'Carousel height',
+    },
   },
-};
-
-/**
- * With Indicators
- * Carousel with controls and indicators
- */
-export const WithIndicators = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const createSlideContent = (slideNumber) => {
-      const slideDiv = document.createElement('div');
-      slideDiv.style.display = 'flex';
-      slideDiv.style.alignItems = 'center';
-      slideDiv.style.justifyContent = 'center';
-      slideDiv.style.height = '350px';
-      slideDiv.style.width = '100%';
-      slideDiv.style.position = 'relative';
-      
-      const slideText = document.createElement('p');
-      slideText.style.fontFamily = 'var(--font-family-title, Lato)';
-      slideText.style.fontSize = '64px';
-      slideText.style.fontWeight = '400';
-      slideText.style.lineHeight = '1.5';
-      slideText.style.color = 'var(--color-on-surface, #191c1e)';
-      slideText.style.margin = '0';
-      slideText.style.whiteSpace = 'nowrap';
-      
-      const slideNames = ['First Slide', 'Second Slide', 'Third Slide'];
-      slideText.textContent = slideNames[slideNumber - 1];
-      
-      slideDiv.appendChild(slideText);
-      return slideDiv;
-    };
-    
-    const carousel = PlusInterface.createCarousel({
-      id: 'carousel-with-indicators',
-      slides: [
-        { content: createSlideContent(1), active: true },
-        { content: createSlideContent(2) },
-        { content: createSlideContent(3) }
-      ],
-      showControls: true,
-      showIndicators: true,
-      interval: 0,
-      ride: false
-    });
-    
-    carousel.style.width = '680px';
-    carousel.style.height = '350px';
-    
-    // Ensure carousel inner and items have proper height
-    const carouselInner = carousel.querySelector('.plus-carousel-inner');
-    if (carouselInner) {
-      carouselInner.style.height = '100%';
-    }
-    const carouselItems = carousel.querySelectorAll('.plus-carousel-item');
-    carouselItems.forEach(item => {
-      item.style.height = '100%';
-    });
-    container.appendChild(carousel);
-    
-    return container;
-  },
-};
-
-/**
- * With Captions
- * Carousel with controls, indicators, and captions
- */
-export const WithCaptions = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const createSlideContent = (slideNumber) => {
-      const slideDiv = document.createElement('div');
-      slideDiv.style.display = 'flex';
-      slideDiv.style.alignItems = 'center';
-      slideDiv.style.justifyContent = 'center';
-      slideDiv.style.height = '350px';
-      slideDiv.style.width = '100%';
-      slideDiv.style.position = 'relative';
-      
-      const slideText = document.createElement('p');
-      slideText.style.fontFamily = 'var(--font-family-title, Lato)';
-      slideText.style.fontSize = '64px';
-      slideText.style.fontWeight = '400';
-      slideText.style.lineHeight = '1.5';
-      slideText.style.color = 'var(--color-on-surface, #191c1e)';
-      slideText.style.margin = '0';
-      slideText.style.whiteSpace = 'nowrap';
-      
-      const slideNames = ['First Slide', 'Second Slide', 'Third Slide'];
-      slideText.textContent = slideNames[slideNumber - 1];
-      
-      slideDiv.appendChild(slideText);
-      return slideDiv;
-    };
-    
-    const carousel = PlusInterface.createCarousel({
-      id: 'carousel-with-captions',
-      slides: [
-        { 
-          content: createSlideContent(1), 
-          active: true,
-          title: 'First slide label',
-          caption: 'Some representative placeholder content for the first slide.'
-        },
-        { 
-          content: createSlideContent(2),
-          title: 'Second slide label',
-          caption: 'Some representative placeholder content for the second slide.'
-        },
-        { 
-          content: createSlideContent(3),
-          title: 'Third slide label',
-          caption: 'Some representative placeholder content for the third slide.'
-        }
-      ],
-      showControls: true,
-      showIndicators: true,
-      showCaptions: true,
-      interval: 0,
-      ride: false
-    });
-    
-    carousel.style.width = '680px';
-    carousel.style.height = '350px';
-    
-    // Ensure carousel inner and items have proper height
-    const carouselInner = carousel.querySelector('.plus-carousel-inner');
-    if (carouselInner) {
-      carouselInner.style.height = '100%';
-    }
-    const carouselItems = carousel.querySelectorAll('.plus-carousel-item');
-    carouselItems.forEach(item => {
-      item.style.height = '100%';
-    });
-    container.appendChild(carousel);
-    
-    return container;
+  args: {
+    id: 'interactive-carousel',
+    slideCount: 3,
+    showControls: true,
+    showIndicators: true,
+    showCaptions: false,
+    interval: 5000,
+    pauseOnHover: true,
+    wrap: true,
+    keyboard: true,
+    ride: false,
+    width: '680px',
+    height: '350px',
   },
 };
 

@@ -90,6 +90,91 @@ export const Overview = () => {
 };
 
 /**
+ * All Variants
+ * Shows all form component types: textarea, select, range input, and select multiple
+ */
+export const AllVariants = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = '24px';
+    container.style.backgroundColor = 'var(--color-surface)';
+    container.style.maxWidth = '400px';
+    
+    // Textarea section
+    const textareaLabel = document.createElement('div');
+    textareaLabel.className = 'h6';
+    textareaLabel.textContent = 'Textarea';
+    textareaLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    container.appendChild(textareaLabel);
+    
+    const textarea = PlusInterface.createTextarea({
+      placeholder: 'Placeholder',
+      size: 'medium',
+      rows: 3
+    });
+    container.appendChild(textarea);
+    
+    // Select section
+    const selectLabel = document.createElement('div');
+    selectLabel.className = 'h6';
+    selectLabel.textContent = 'Select';
+    selectLabel.style.marginTop = 'var(--size-section-gap-md)';
+    selectLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    container.appendChild(selectLabel);
+    
+    const select = PlusInterface.createSelect({
+      options: [
+        { value: '', text: 'Choose...' },
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ],
+      size: 'medium'
+    });
+    container.appendChild(select);
+    
+    // Range Input section
+    const rangeLabel = document.createElement('div');
+    rangeLabel.className = 'h6';
+    rangeLabel.textContent = 'Range Input';
+    rangeLabel.style.marginTop = 'var(--size-section-gap-md)';
+    rangeLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    container.appendChild(rangeLabel);
+    
+    const range = PlusInterface.createRangeInput({
+      min: 0,
+      max: 100,
+      value: 50,
+      size: 'medium'
+    });
+    container.appendChild(range);
+    
+    // Select Multiple section
+    const selectMultipleLabel = document.createElement('div');
+    selectMultipleLabel.className = 'h6';
+    selectMultipleLabel.textContent = 'Select Multiple';
+    selectMultipleLabel.style.marginTop = 'var(--size-section-gap-md)';
+    selectMultipleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
+    container.appendChild(selectMultipleLabel);
+    
+    const selectMultiple = PlusInterface.createSelectMultiple({
+      options: [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ],
+      size: 'medium'
+    });
+    container.appendChild(selectMultiple);
+    
+    return container;
+  },
+};
+
+/**
  * Interactive
  * Interactive playground with Storybook controls
  */

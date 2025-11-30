@@ -3,7 +3,7 @@
  * Status type variants organized under "Status Types" subcategory
  */
 
-import { PlusSmartComponents } from '../index.js';
+import { PlusSmartComponents } from './index.js';
 
 export default {
   title: 'Components/StatusTag/Status Types',
