@@ -7,7 +7,6 @@
 import { createAiIndicator } from '../Elements/AIIndicator.js';
 import { createStaticBadgeSmart } from '../../../../components/StaticBadgeSmart/index.js';
 import { PlusInterface } from '../../../../components/index.js';
-import { createStatusIndicator } from '../../../../components/StatusIndicator/index.js';
 
 /**
  * Creates a LessonCardItem component
