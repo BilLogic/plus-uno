@@ -18,16 +18,17 @@
 
 // Components (using load path - load-path is design-system/components, so imports should be relative to that)
 @import "Button/Button";
-@import "Input/Input";
 @import "Alert/Alert";
 @import "Breadcrumb/Breadcrumb";
 @import "Badge/Badge";
+@import "CompetencyBadge/CompetencyBadge";
 @import "Divider/Divider";
 @import "ButtonGroup/ButtonGroup";
 @import "Dropdown/Dropdown";
 @import "Card/Card";
 @import "Modal/Modal";
 @import "Navigation/Navigation";
+@import "Navbar/Navbar";
 @import "Form/Form";
 @import "DatePicker/DatePicker";
 @import "Checkbox/Checkbox";

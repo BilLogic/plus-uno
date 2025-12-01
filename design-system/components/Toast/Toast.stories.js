@@ -33,16 +33,14 @@
  * - **Auto-dismiss**: Default 5 seconds (configurable)
  * 
  * ### Visual Style Variants
- * - **Primary**: Default brand color for general information
- * - **Secondary**: Secondary brand color for alternative information
+ * - **Default**: Default brand color for general information
  * - **Success**: Green for positive confirmations or successful actions
  * - **Danger**: Red for errors or failed actions
  * - **Warning**: Yellow/orange for cautionary information
  * - **Info**: Blue for informational messages
  * 
  * ### Content Variants
- * - **With Title**: Includes a title/header above the message text
- * - **Without Title**: Message-only toasts for simpler notifications
+ * - **With Title**: All toasts include a title/header above the message text (required)
  * - **Dismissible**: Includes a close button for manual dismissal
  * - **Non-dismissible**: Auto-dismiss only (no close button)
  * 
@@ -58,7 +56,7 @@
  * - Set appropriate auto-dismiss delay (5 seconds default)
  * - Position toasts where they won't obstruct important UI
  * - Stack multiple toasts vertically
- * - Use titles for important or complex messages
+ * - Always include a title header for all toasts
  * - Ensure sufficient contrast for accessibility
  * - Don't overuse toasts - reserve for truly non-intrusive notifications
  * 
@@ -83,331 +81,78 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all toast combinations: all styles × all content configurations
+ * Overview
+ * Shows all toast variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = '20px';
+    container.style.padding = '24px';
+    container.style.backgroundColor = 'var(--color-surface)';
     
-    const styles = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
-    
-    styles.forEach((style) => {
-      const styleSection = document.createElement('div');
-      styleSection.style.display = 'flex';
-      styleSection.style.flexDirection = 'column';
-      styleSection.style.gap = 'var(--size-card-gap-md)';
+    // Helper function to create a section
+    const createSection = (heading, items) => {
+      const section = document.createElement('div');
+      section.style.display = 'flex';
+      section.style.flexDirection = 'column';
+      section.style.gap = 'var(--size-card-gap-md)';
       
-      const styleLabel = document.createElement('div');
-      styleLabel.className = 'h6';
-      styleLabel.textContent = `${style.charAt(0).toUpperCase() + style.slice(1)} Style`;
-      styleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-      styleSection.appendChild(styleLabel);
+      const sectionHeading = document.createElement('div');
+      sectionHeading.className = 'h5';
+      sectionHeading.textContent = heading;
+      sectionHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+      section.appendChild(sectionHeading);
       
-      // With title and dismissible
-      const toast1 = createStaticToast({
-        style: style,
-        title: 'Toast Title',
-        message: 'This is a toast message with title and dismiss button.',
-        dismissible: true
+      const itemsContainer = document.createElement('div');
+      itemsContainer.style.display = 'flex';
+      itemsContainer.style.flexDirection = 'column';
+      itemsContainer.style.gap = 'var(--size-element-gap-sm)';
+      
+      items.forEach((item) => {
+        itemsContainer.appendChild(item);
       });
-      styleSection.appendChild(toast1);
       
-      // Without title, dismissible
-      const toast2 = createStaticToast({
+      section.appendChild(itemsContainer);
+      return section;
+    };
+    
+    // Colors Section
+    const colors = ['default', 'success', 'danger', 'warning', 'info'];
+    const colorToasts = colors.map((style) => {
+      return createStaticToast({
+        title: `${style.charAt(0).toUpperCase() + style.slice(1)} Toast`,
+        text: `${style.charAt(0).toUpperCase() + style.slice(1)} toast message`,
         style: style,
-        message: 'This is a toast message without title, with dismiss button.',
-        dismissible: true
-      });
-      styleSection.appendChild(toast2);
-      
-      // With title, non-dismissible
-      const toast3 = createStaticToast({
-        style: style,
-        title: 'Toast Title',
-        message: 'This is a toast message with title, no dismiss button.',
-        dismissible: false
-      });
-      styleSection.appendChild(toast3);
-      
-      // Without title, non-dismissible
-      const toast4 = createStaticToast({
-        style: style,
-        message: 'This is a toast message without title, no dismiss button.',
-        dismissible: false
-      });
-      styleSection.appendChild(toast4);
-      
-      container.appendChild(styleSection);
-    });
-    
-    return container;
-  },
-};
-
-/**
- * All Style Variants
- * Shows all toast style variants with title and dismissible
- */
-export const AllStyles = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = '20px';
-    
-    const stylesSection = document.createElement('div');
-    stylesSection.style.display = 'flex';
-    stylesSection.style.flexDirection = 'column';
-    stylesSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const stylesLabel = document.createElement('div');
-    stylesLabel.className = 'h6';
-    stylesLabel.textContent = 'All Styles';
-    stylesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    stylesSection.appendChild(stylesLabel);
-    
-    // Show all style variants directly (matching Figma order)
-    const styles = [
-      { value: 'default', label: 'Default' },
-      { value: 'danger', label: 'Danger' },
-      { value: 'success', label: 'Success' },
-      { value: 'info', label: 'Info' },
-      { value: 'warning', label: 'Warning' }
-    ];
-    
-    styles.forEach((style) => {
-      const toast = createStaticToast({
-        style: style.value,
-        title: 'Title',
-        text: 'Hello, world! This is a toast message.',
         dismissable: true,
       });
-      stylesSection.appendChild(toast);
     });
+    container.appendChild(createSection('Colors', colorToasts));
     
-    container.appendChild(stylesSection);
-    
-    return container;
-  },
-};
-
-/**
- * Content Variants
- * Shows different content configurations
- */
-export const ContentVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = '20px';
-    
-    const contentSection = document.createElement('div');
-    contentSection.style.display = 'flex';
-    contentSection.style.flexDirection = 'column';
-    contentSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const contentLabel = document.createElement('div');
-    contentLabel.className = 'h6';
-    contentLabel.textContent = 'Content Variants';
-    contentLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    contentSection.appendChild(contentLabel);
-    
-    // With title and dismissible
-    const withTitle = createStaticToast({
-      style: 'success',
-      title: 'Title',
-      text: 'Hello, world! This is a toast message.',
+    // Content Section - With Title
+    const withTitleToast = createStaticToast({
+      text: 'This is a toast with a title header',
+      style: 'info',
+      title: 'Toast Title',
       dismissable: true,
     });
-    contentSection.appendChild(withTitle);
     
-    // Non-dismissible (no close button)
-    const nonDismissible = createStaticToast({
+    // Content Section - Non-dismissable
+    const nonDismissableToast = createStaticToast({
+      title: 'Non-dismissable Toast',
+      text: 'This toast cannot be manually dismissed',
       style: 'info',
-      title: 'Title',
-      text: 'Hello, world! This is a toast message.',
       dismissable: false,
     });
-    contentSection.appendChild(nonDismissible);
     
-    container.appendChild(contentSection);
-    
-    return container;
-  },
-};
-
-/**
- * Position Variants
- * Shows toasts with position labels (static display)
- */
-export const PositionVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = '20px';
-    
-    const positionSection = document.createElement('div');
-    positionSection.style.display = 'flex';
-    positionSection.style.flexDirection = 'column';
-    positionSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const positionLabel = document.createElement('div');
-    positionLabel.className = 'h6';
-    positionLabel.textContent = 'Position Variants';
-    positionLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    positionSection.appendChild(positionLabel);
-    
-    // Show toasts with position labels
-    const positions = [
-      { label: 'Top Right', value: 'top-right' },
-      { label: 'Top Left', value: 'top-left' },
-      { label: 'Bottom Right', value: 'bottom-right' },
-      { label: 'Bottom Left', value: 'bottom-left' },
-    ];
-    
-    positions.forEach((pos) => {
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.style.marginBottom = 'var(--size-element-gap-xs)';
-      label.textContent = `${pos.label}:`;
-      positionSection.appendChild(label);
-      
-      const toast = createStaticToast({
-        style: 'default',
-        title: 'Title',
-        text: 'Hello, world! This is a toast message.',
-        dismissable: true,
-      });
-      positionSection.appendChild(toast);
-    });
-    
-    container.appendChild(positionSection);
+    container.appendChild(createSection('Content', [withTitleToast, nonDismissableToast]));
     
     return container;
   },
 };
 
-/**
- * Auto-dismiss Delay
- * Shows toasts with different auto-dismiss delay configurations
- */
-export const AutoDismissDelay = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = '20px';
-    
-    const delaySection = document.createElement('div');
-    delaySection.style.display = 'flex';
-    delaySection.style.flexDirection = 'column';
-    delaySection.style.gap = 'var(--size-card-gap-md)';
-    
-    const delayLabel = document.createElement('div');
-    delayLabel.className = 'h6';
-    delayLabel.textContent = 'Auto-dismiss Delay Options';
-    delayLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    delaySection.appendChild(delayLabel);
-    
-    // Show toasts with different delay configurations
-    const delays = [
-      { label: '2 seconds', value: 2000 },
-      { label: '5 seconds (default)', value: 5000 },
-      { label: '10 seconds', value: 10000 },
-      { label: 'No auto-dismiss', value: 0 },
-    ];
-    
-    delays.forEach((delay) => {
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.style.marginBottom = 'var(--size-element-gap-xs)';
-      label.textContent = `${delay.label}:`;
-      delaySection.appendChild(label);
-      
-      const toast = createStaticToast({
-        style: 'info',
-        title: 'Title',
-        text: `This toast would ${delay.value === 0 ? 'not auto-dismiss' : `auto-dismiss in ${delay.label}`}.`,
-        dismissable: true,
-      });
-      delaySection.appendChild(toast);
-    });
-    
-    container.appendChild(delaySection);
-    
-    return container;
-  },
-};
-
-/**
- * Stacked Toasts
- * Shows multiple toasts stacked together
- */
-export const StackedToasts = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = '20px';
-    
-    const stackSection = document.createElement('div');
-    stackSection.style.display = 'flex';
-    stackSection.style.flexDirection = 'column';
-    stackSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const stackLabel = document.createElement('div');
-    stackLabel.className = 'h6';
-    stackLabel.textContent = 'Stacked Toasts';
-    stackLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    stackSection.appendChild(stackLabel);
-    
-    // Show multiple toasts stacked
-    const firstToast = createStaticToast({
-      style: 'success',
-      title: 'Title',
-      text: 'Hello, world! This is a toast message.',
-      dismissable: true,
-    });
-    stackSection.appendChild(firstToast);
-    
-    const secondToast = createStaticToast({
-      style: 'info',
-      title: 'Title',
-      text: 'Hello, world! This is a toast message.',
-      dismissable: true,
-    });
-    stackSection.appendChild(secondToast);
-    
-    const thirdToast = createStaticToast({
-      style: 'warning',
-      title: 'Title',
-      text: 'Hello, world! This is a toast message.',
-      dismissable: true,
-    });
-    stackSection.appendChild(thirdToast);
-    
-    container.appendChild(stackSection);
-    
-    return container;
-  },
-};
-
-/**
- * Interactive Toast
- * Interactive playground for testing toast variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
@@ -448,7 +193,7 @@ export const Interactive = {
   argTypes: {
     style: {
       control: 'select',
-      options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
+      options: ['default', 'success', 'danger', 'warning', 'info'],
       description: 'Toast style',
     },
     title: {

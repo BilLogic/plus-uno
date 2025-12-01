@@ -74,10 +74,10 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows all chip combinations: all styles × all sizes
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

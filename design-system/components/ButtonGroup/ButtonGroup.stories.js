@@ -69,6 +69,128 @@ export default {
 };
 
 /**
+ * Overview
+ * Shows all button group variants organized by category in a scrollable format
+ */
+export const Overview = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = '24px';
+    container.style.backgroundColor = 'var(--color-surface)';
+    
+    // Orientations Section
+    const orientationsSection = document.createElement('div');
+    orientationsSection.style.display = 'flex';
+    orientationsSection.style.flexDirection = 'column';
+    orientationsSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const orientationsHeading = document.createElement('div');
+    orientationsHeading.className = 'h5';
+    orientationsHeading.textContent = 'Orientations';
+    orientationsHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    orientationsSection.appendChild(orientationsHeading);
+    
+    const orientationsRow = document.createElement('div');
+    orientationsRow.style.display = 'flex';
+    orientationsRow.style.flexWrap = 'wrap';
+    orientationsRow.style.gap = 'var(--size-card-gap-md)';
+    orientationsRow.style.alignItems = 'flex-start';
+    
+    // Horizontal
+    const horizontalGroup = PlusInterface.createButtonGroup({
+      buttons: [{ btnText: 'Left' }, { btnText: 'Right' }],
+      size: 'default',
+      style: 'primary',
+      alignment: 'horizontal'
+    });
+    horizontalGroup.style.width = 'fit-content';
+    orientationsRow.appendChild(horizontalGroup);
+    
+    // Vertical
+    const verticalGroup = PlusInterface.createButtonGroup({
+      buttons: [{ btnText: 'Top' }, { btnText: 'Bottom' }],
+      size: 'default',
+      style: 'primary',
+      alignment: 'vertical'
+    });
+    verticalGroup.style.width = 'fit-content';
+    orientationsRow.appendChild(verticalGroup);
+    
+    orientationsSection.appendChild(orientationsRow);
+    container.appendChild(orientationsSection);
+    
+    // Sizes Section
+    const sizesSection = document.createElement('div');
+    sizesSection.style.display = 'flex';
+    sizesSection.style.flexDirection = 'column';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
+    
+    const sizesRow = document.createElement('div');
+    sizesRow.style.display = 'flex';
+    sizesRow.style.flexWrap = 'wrap';
+    sizesRow.style.gap = 'var(--size-card-gap-md)';
+    sizesRow.style.alignItems = 'flex-start';
+    
+    ['small', 'default', 'large'].forEach((size) => {
+      const group = PlusInterface.createButtonGroup({
+        buttons: [{ btnText: 'Button' }, { btnText: 'Button' }],
+        size: size,
+        style: 'primary',
+        alignment: 'horizontal'
+      });
+      group.style.width = 'fit-content';
+      sizesRow.appendChild(group);
+    });
+    
+    sizesSection.appendChild(sizesRow);
+    container.appendChild(sizesSection);
+    
+    // Colors Section
+    const colorsSection = document.createElement('div');
+    colorsSection.style.display = 'flex';
+    colorsSection.style.flexDirection = 'column';
+    colorsSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const colorsHeading = document.createElement('div');
+    colorsHeading.className = 'h5';
+    colorsHeading.textContent = 'Colors';
+    colorsHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    colorsSection.appendChild(colorsHeading);
+    
+    const colorsRow = document.createElement('div');
+    colorsRow.style.display = 'flex';
+    colorsRow.style.flexWrap = 'wrap';
+    colorsRow.style.gap = 'var(--size-card-gap-md)';
+    colorsRow.style.alignItems = 'flex-start';
+    
+    ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning'].forEach((style) => {
+      const group = PlusInterface.createButtonGroup({
+        buttons: [{ btnText: 'Button' }, { btnText: 'Button' }],
+        size: 'default',
+        style: style,
+        alignment: 'horizontal'
+      });
+      group.style.width = 'fit-content';
+      colorsRow.appendChild(group);
+    });
+    
+    colorsSection.appendChild(colorsRow);
+    container.appendChild(colorsSection);
+    
+    return container;
+  },
+};
+
+/**
  * Interactive Button Group
  * Interactive playground for testing button group variations
  */

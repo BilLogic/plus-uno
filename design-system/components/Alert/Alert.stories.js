@@ -64,10 +64,10 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows all alert variants: styles and content configurations for comprehensive reference
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

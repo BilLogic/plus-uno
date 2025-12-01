@@ -100,10 +100,10 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows all card combinations: different content configurations and sizes
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

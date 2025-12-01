@@ -49,10 +49,10 @@ export default {
 };
 
 /**
- * Basic
+ * Overview
  * Interactive scrollspy - scroll through the content to see the active nav item change
  */
-export const Basic = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.backgroundColor = 'var(--color-surface)';
@@ -63,7 +63,7 @@ export const Basic = {
     
     // Create scrollspy navbar
     const navbar = PlusInterface.createScrollspy({
-      id: 'scrollspy-nav-basic',
+      id: 'scrollspy-nav-overview',
       brand: 'Navbar',
       items: [
         { text: '@fat', href: '#fat', isDropdown: false },
@@ -71,7 +71,7 @@ export const Basic = {
         { text: 'Dropdown', href: '#one', isDropdown: true }
       ],
       activeIndex: 0,
-      contentId: 'scrollspy-content-basic',
+      contentId: 'scrollspy-content-overview',
       offset: 10
     });
     
@@ -79,8 +79,8 @@ export const Basic = {
     
     // Create scrollable content with enough height for scrolling
     const content = PlusInterface.createScrollspyContent({
-      id: 'scrollspy-content-basic',
-      navbarId: 'scrollspy-nav-basic',
+      id: 'scrollspy-content-overview',
+      navbarId: 'scrollspy-nav-overview',
       sections: [
         {
           id: 'fat',
@@ -125,74 +125,6 @@ export const Basic = {
   },
 };
 
-/**
- * All Variants
- * Shows scrollspy with different configurations
- */
-export const AllVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.backgroundColor = 'var(--color-surface)';
-    
-    // Basic scrollspy
-    const basicWrapper = document.createElement('div');
-    basicWrapper.style.display = 'flex';
-    basicWrapper.style.flexDirection = 'column';
-    basicWrapper.style.width = '648px';
-    basicWrapper.style.maxHeight = '600px';
-    
-    const basicLabel = document.createElement('div');
-    basicLabel.className = 'h6';
-    basicLabel.textContent = 'Basic Scrollspy';
-    basicLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    basicWrapper.appendChild(basicLabel);
-    
-    const navbar1 = PlusInterface.createScrollspy({
-      id: 'scrollspy-nav-1',
-      brand: 'Navbar',
-      items: [
-        { text: '@fat', href: '#fat', isDropdown: false },
-        { text: '@mdo', href: '#mdo', isDropdown: false }
-      ],
-      activeIndex: 0,
-      contentId: 'scrollspy-content-1',
-      offset: 10
-    });
-    basicWrapper.appendChild(navbar1);
-    
-    const content1 = PlusInterface.createScrollspyContent({
-      id: 'scrollspy-content-1',
-      navbarId: 'scrollspy-nav-1',
-      sections: [
-        {
-          id: 'fat',
-          title: '@fat',
-          content: "Placeholder content for the scrollspy example. You got the finest architecture."
-        },
-        {
-          id: 'mdo',
-          title: '@mdo',
-          content: "Placeholder content for the scrollspy example. 'Cause she's the muse and the artist."
-        }
-      ],
-      offset: 10
-    });
-    content1.style.height = '300px';
-    content1.style.overflowY = 'auto';
-    basicWrapper.appendChild(content1);
-    container.appendChild(basicWrapper);
-    
-    return container;
-  },
-};
-
-/**
- * Interactive Scrollspy
- * Interactive playground for testing scrollspy variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');

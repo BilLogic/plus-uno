@@ -6,19 +6,43 @@
  * 
  * Component Type: Element (uses `element-*` tokens)
  * Token Usage:
+ *   - Gap: --size-element-gap-sm (8px between radio and label)
  *   - Border: --color-outline-variant (unchecked), --color-primary (checked)
  *   - Background: --color-primary (checked state)
  *   - Focus: --color-inverse-primary (light blue focus ring, matches Switch pattern)
+ *   - Border width: --size-element-stroke-lg (2px for focus ring)
  * 
  * Bootstrap's default focus uses box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
  * We override this to use PLUS design tokens with proper circular shape.
+ * 
+ * Figma: Radio button is 12px with 8px inner circle, gap of 8px to label
  */
+
+/* ============================================
+   RADIO WRAPPER
+   ============================================ */
+
+.plus-radio-wrapper {
+    display: flex;
+    align-items: center; /* Center align radio with label text (not flex-start like checkbox) */
+    gap: var(--size-element-gap-sm); /* 8px - matches Figma and Checkbox pattern */
+    /* Override Bootstrap's default form-check padding */
+    padding-left: 0;
+}
 
 /* ============================================
    RADIO INPUT (Bootstrap 4.6.2 form-check-input)
    ============================================ */
 
 .plus-radio {
+    /* Radio button size - Figma: 12px */
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
     /* Make radio button circular - required for circular focus ring */
     border-radius: 50% !important;
     position: relative; /* Required for pseudo-element positioning */
@@ -44,12 +68,12 @@
     &::after {
         content: '';
         position: absolute;
-        top: -2px; /* Position directly on the border edge (no gap) */
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
+        top: calc(-1 * var(--size-element-stroke-lg)); /* Position directly on the border edge (no gap) */
+        left: calc(-1 * var(--size-element-stroke-lg));
+        right: calc(-1 * var(--size-element-stroke-lg));
+        bottom: calc(-1 * var(--size-element-stroke-lg));
         border-radius: 50%; /* Make it circular */
-        border: 2px solid var(--color-inverse-primary);
+        border: var(--size-element-stroke-lg) solid var(--color-inverse-primary);
         opacity: 0; /* Hidden by default */
         pointer-events: none; /* Don't interfere with clicks */
         transition: opacity 0.2s;
@@ -83,10 +107,17 @@
         }
     }
     
-    /* Hover state */
-    &:hover:not(:disabled) {
+    /* Hover state - Figma: uses primary state layer 08 */
+    &:hover:not(:disabled):not(:checked) {
         border-color: var(--color-primary) !important;
         accent-color: var(--color-primary) !important;
+        background-color: var(--color-primary-state-08) !important;
+    }
+    
+    &:hover:not(:disabled):checked {
+        border-color: var(--color-primary) !important;
+        accent-color: var(--color-primary) !important;
+        background-color: var(--color-primary-state-12) !important;
     }
     
     /* Disabled state */

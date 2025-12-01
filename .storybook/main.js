@@ -15,6 +15,7 @@ const config = {
     '**/organisms/**',
     '**/components/assets/**',
     '**/assets/components/**',
+    '**/CompetencyPill*.stories.js',
   ],
   addons: [
     '@storybook/addon-essentials',

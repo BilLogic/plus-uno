@@ -57,10 +57,10 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all divider combinations organized by visual style: each style shows all sizes
+ * Overview
+ * Shows all divider variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
@@ -68,81 +68,125 @@ export const AllVariants = {
     container.style.gap = 'var(--size-section-gap-lg)';
     container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     
-    const styles = [
-      { value: 'light', label: 'Light' },
-      { value: 'dark', label: 'Dark' },
-    ];
+    // Sizes Section
+    const sizesSection = document.createElement('div');
+    sizesSection.style.display = 'flex';
+    sizesSection.style.flexDirection = 'column';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
     
-    const sizes = [
-      { value: 'sm', label: 'Small', token: '--size-element-stroke-sm', px: '1px' },
-      { value: 'md', label: 'Medium', token: '--size-element-stroke-md', px: '1.5px' },
-      { value: 'lg', label: 'Large', token: '--size-element-stroke-lg', px: '2px' },
-      { value: 'xl', label: 'Extra Large', token: '--size-element-stroke-xl', px: '2.5px' },
-    ];
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
     
-    // Organize by visual style - each style shows all sizes
-    styles.forEach((style) => {
-      const styleSection = document.createElement('div');
-      styleSection.style.display = 'flex';
-      styleSection.style.flexDirection = 'column';
-      styleSection.style.gap = 'var(--size-section-gap-md)';
-      styleSection.style.width = '100%';
-      styleSection.style.maxWidth = '600px';
-      
-      // Add background for dark style to show contrast
-      if (style.value === 'dark') {
-        styleSection.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
-        styleSection.style.backgroundColor = 'var(--color-surface-container)';
-        styleSection.style.borderRadius = 'var(--size-card-radius-sm)';
-      }
-      
-      const styleLabel = document.createElement('div');
-      styleLabel.className = 'h6';
-      styleLabel.textContent = `${style.label} Style - All Sizes`;
-      styleLabel.style.marginBottom = 'var(--size-element-gap-md)';
-      styleSection.appendChild(styleLabel);
-      
-      sizes.forEach((size) => {
-        // Create a wrapper for each divider example
-        const exampleWrapper = document.createElement('div');
-        exampleWrapper.style.display = 'flex';
-        exampleWrapper.style.flexDirection = 'column';
-        exampleWrapper.style.gap = 'var(--size-element-gap-sm)';
-        exampleWrapper.style.padding = 'var(--size-section-pad-y-sm) 0';
-        
-        // Add label above divider
-        const sizeLabel = document.createElement('div');
-        sizeLabel.className = 'body2-txt';
-        sizeLabel.style.color = 'var(--color-on-surface-variant)';
-        sizeLabel.textContent = `${size.label} (${size.value})`;
-        exampleWrapper.appendChild(sizeLabel);
-        
-        // Add token info
-        const tokenInfo = document.createElement('div');
-        tokenInfo.className = 'body3-txt';
-        tokenInfo.style.color = 'var(--color-on-surface-variant)';
-        tokenInfo.style.fontFamily = 'monospace';
-        tokenInfo.textContent = `${size.token} = ${size.px}`;
-        exampleWrapper.appendChild(tokenInfo);
-        
-        // Add the divider
-        const divider = PlusInterface.createDivider({
-          size: size.value, // Use semantic token (sm, md, lg, xl)
-          style: style.value,
-          width: '100%'
-        });
-        exampleWrapper.appendChild(divider);
-        
-        styleSection.appendChild(exampleWrapper);
+    const sizesRow = document.createElement('div');
+    sizesRow.style.display = 'flex';
+    sizesRow.style.flexDirection = 'column';
+    sizesRow.style.gap = 'var(--size-element-gap-sm)';
+    sizesRow.style.width = '100%';
+    sizesRow.style.maxWidth = '600px';
+    
+    ['sm', 'md', 'lg', 'xl'].forEach((size) => {
+      const divider = PlusInterface.createDivider({
+        size: size,
+        style: 'light',
+        width: '100%'
       });
-      
-      container.appendChild(styleSection);
+      sizesRow.appendChild(divider);
     });
+    sizesSection.appendChild(sizesRow);
+    container.appendChild(sizesSection);
+    
+    // Colors Section
+    const colorsSection = document.createElement('div');
+    colorsSection.style.display = 'flex';
+    colorsSection.style.flexDirection = 'column';
+    colorsSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const colorsHeading = document.createElement('div');
+    colorsHeading.className = 'h5';
+    colorsHeading.textContent = 'Colors';
+    colorsHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    colorsSection.appendChild(colorsHeading);
+    
+    const colorsRow = document.createElement('div');
+    colorsRow.style.display = 'flex';
+    colorsRow.style.flexDirection = 'column';
+    colorsRow.style.gap = 'var(--size-element-gap-sm)';
+    colorsRow.style.width = '100%';
+    colorsRow.style.maxWidth = '600px';
+    
+    // Light
+    const lightDivider = PlusInterface.createDivider({
+      size: 'md',
+      style: 'light',
+      width: '100%'
+    });
+    colorsRow.appendChild(lightDivider);
+    
+    // Dark (with background to show contrast)
+    const darkWrapper = document.createElement('div');
+    darkWrapper.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
+    darkWrapper.style.backgroundColor = 'var(--color-surface-container)';
+    darkWrapper.style.borderRadius = 'var(--size-card-radius-sm)';
+    darkWrapper.style.width = '100%';
+    const darkDivider = PlusInterface.createDivider({
+      size: 'md',
+      style: 'dark',
+      width: '100%'
+    });
+    darkWrapper.appendChild(darkDivider);
+    colorsRow.appendChild(darkWrapper);
+    
+    colorsSection.appendChild(colorsRow);
+    container.appendChild(colorsSection);
+    
+    // Styles Section (Opacity)
+    const stylesSection = document.createElement('div');
+    stylesSection.style.display = 'flex';
+    stylesSection.style.flexDirection = 'column';
+    stylesSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const stylesHeading = document.createElement('div');
+    stylesHeading.className = 'h5';
+    stylesHeading.textContent = 'Styles';
+    stylesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    stylesSection.appendChild(stylesHeading);
+    
+    const stylesRow = document.createElement('div');
+    stylesRow.style.display = 'flex';
+    stylesRow.style.flexDirection = 'column';
+    stylesRow.style.gap = 'var(--size-element-gap-sm)';
+    stylesRow.style.width = '100%';
+    stylesRow.style.maxWidth = '600px';
+    stylesRow.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
+    stylesRow.style.backgroundColor = 'var(--color-surface-container)';
+    stylesRow.style.borderRadius = 'var(--size-card-radius-sm)';
+    
+    // Normal opacity
+    const normalDivider = PlusInterface.createDivider({
+      size: 'sm',
+      style: 'dark',
+      width: '100%'
+    });
+    stylesRow.appendChild(normalDivider);
+    
+    // 10% opacity
+    const opacityDivider = PlusInterface.createDivider({
+      size: 'sm',
+      style: 'dark',
+      opacity10: true,
+      width: '100%'
+    });
+    stylesRow.appendChild(opacityDivider);
+    
+    stylesSection.appendChild(stylesRow);
+    container.appendChild(stylesSection);
     
     return container;
   },
 };
-
 
 /**
  * Interactive Divider

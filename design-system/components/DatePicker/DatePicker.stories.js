@@ -83,79 +83,197 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all date picker sizes and states
+ * Overview
+ * Shows all date picker variants organized by category
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
     container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
-    container.style.maxWidth = '600px';
+    container.style.maxWidth = '800px';
     
-    const sizes = [
-      { value: 'small', label: 'Small' },
-      { value: 'medium', label: 'Medium' },
-      { value: 'large', label: 'Large' },
+    // Date Item Section
+    const dateItemSection = document.createElement('div');
+    dateItemSection.style.display = 'flex';
+    dateItemSection.style.flexDirection = 'column';
+    dateItemSection.style.gap = 'var(--size-element-gap-md)';
+    
+    const dateItemHeading = document.createElement('div');
+    dateItemHeading.className = 'h6';
+    dateItemHeading.textContent = 'Date Item';
+    dateItemHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    dateItemSection.appendChild(dateItemHeading);
+    
+    const dateItemStates = document.createElement('div');
+    dateItemStates.style.display = 'flex';
+    dateItemStates.style.flexWrap = 'wrap';
+    dateItemStates.style.gap = 'var(--size-card-gap-md)';
+    
+    ['Rest', 'Hover', 'Pressed', 'Disabled'].forEach((state, index) => {
+      const dateItem = document.createElement('button');
+      dateItem.type = 'button';
+      dateItem.classList.add('plus-date-picker-calendar-day');
+      dateItem.classList.add('body2-txt');
+      dateItem.textContent = '1';
+      dateItem.style.width = '40px';
+      dateItem.style.height = '40px';
+      dateItem.style.display = 'inline-flex';
+      dateItem.style.alignItems = 'center';
+      dateItem.style.justifyContent = 'center';
+      
+      if (state === 'Hover') {
+        dateItem.style.backgroundColor = 'var(--color-primary-state-08)';
+        dateItem.style.color = 'var(--color-primary)';
+      } else if (state === 'Pressed') {
+        dateItem.classList.add('plus-date-picker-calendar-day-selected');
+      } else if (state === 'Disabled') {
+        dateItem.classList.add('plus-date-picker-calendar-day-disabled');
+        dateItem.disabled = true;
+      }
+      
+      dateItemStates.appendChild(dateItem);
+    });
+    dateItemSection.appendChild(dateItemStates);
+    container.appendChild(dateItemSection);
+    
+    // Calendar Item Section
+    const calendarSection = document.createElement('div');
+    calendarSection.style.display = 'flex';
+    calendarSection.style.flexDirection = 'column';
+    calendarSection.style.gap = 'var(--size-element-gap-md)';
+    
+    const calendarHeading = document.createElement('div');
+    calendarHeading.className = 'h6';
+    calendarHeading.textContent = 'Calendar Item';
+    calendarHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    calendarSection.appendChild(calendarHeading);
+    
+    const calendarPicker = PlusInterface.createDatePicker({
+      id: 'overview-calendar',
+      placeholder: 'Select date',
+      size: 'medium',
+      value: '2025-03-19'
+    });
+    const calendarContainer = calendarPicker.querySelector('.plus-date-picker-calendar');
+    if (calendarContainer) {
+      calendarContainer.style.display = 'block';
+      calendarContainer.style.position = 'relative';
+      calendarContainer.style.top = 'auto';
+      calendarContainer.style.left = 'auto';
+      calendarContainer.style.margin = '0';
+      calendarContainer.style.width = '280px';
+    }
+    const inputWrapper = calendarPicker.querySelector('.plus-date-picker-input-wrapper');
+    if (inputWrapper) {
+      inputWrapper.style.display = 'none';
+    }
+    calendarSection.appendChild(calendarPicker);
+    container.appendChild(calendarSection);
+    
+    // Single Date Section
+    const singleDateSection = document.createElement('div');
+    singleDateSection.style.display = 'flex';
+    singleDateSection.style.flexDirection = 'column';
+    singleDateSection.style.gap = 'var(--size-element-gap-md)';
+    
+    const singleDateHeading = document.createElement('div');
+    singleDateHeading.className = 'h6';
+    singleDateHeading.textContent = 'Single Date';
+    singleDateHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    singleDateSection.appendChild(singleDateHeading);
+    
+    const singleDateStates = [
+      { name: 'Empty', value: null },
+      { name: 'Filled', value: '2025-03-31' },
+      { name: 'Selected', value: '2025-03-31' },
     ];
     
-    sizes.forEach((size) => {
-      const sizeSection = document.createElement('div');
-      sizeSection.style.display = 'flex';
-      sizeSection.style.flexDirection = 'column';
-      sizeSection.style.gap = 'var(--size-element-gap-md)';
+    singleDateStates.forEach((state, index) => {
+      const stateWrapper = document.createElement('div');
+      stateWrapper.style.display = 'flex';
+      stateWrapper.style.flexDirection = 'column';
+      stateWrapper.style.gap = 'var(--size-element-gap-xs)';
       
-      const sizeLabel = document.createElement('div');
-      sizeLabel.className = 'h6';
-      sizeLabel.textContent = `${size.label} Size`;
-      sizeLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-      sizeSection.appendChild(sizeLabel);
+      const stateLabel = document.createElement('label');
+      stateLabel.className = 'body2-txt';
+      stateLabel.textContent = state.name;
+      stateLabel.setAttribute('for', `overview-single-${index}`);
+      stateWrapper.appendChild(stateLabel);
       
-      // Default state
-      const defaultWrapper = document.createElement('div');
-      defaultWrapper.style.display = 'flex';
-      defaultWrapper.style.flexDirection = 'column';
-      defaultWrapper.style.gap = 'var(--size-element-gap-xs)';
-      
-      const defaultLabel = document.createElement('label');
-      defaultLabel.className = 'body2-txt';
-      defaultLabel.textContent = 'Default';
-      defaultLabel.setAttribute('for', `datepicker-${size.value}-default`);
-      defaultWrapper.appendChild(defaultLabel);
-      
-      const defaultPicker = PlusInterface.createDatePicker({
-        id: `datepicker-${size.value}-default`,
-        placeholder: 'Select date',
-        size: size.value
+      const datePicker = PlusInterface.createDatePicker({
+        id: `overview-single-${index}`,
+        placeholder: 'Select Date',
+        size: 'medium',
+        value: state.value
       });
-      defaultWrapper.appendChild(defaultPicker);
-      sizeSection.appendChild(defaultWrapper);
+      stateWrapper.appendChild(datePicker);
       
-      // With value state
-      const valueWrapper = document.createElement('div');
-      valueWrapper.style.display = 'flex';
-      valueWrapper.style.flexDirection = 'column';
-      valueWrapper.style.gap = 'var(--size-element-gap-xs)';
-      
-      const valueLabel = document.createElement('label');
-      valueLabel.className = 'body2-txt';
-      valueLabel.textContent = 'With Value';
-      valueLabel.setAttribute('for', `datepicker-${size.value}-value`);
-      valueWrapper.appendChild(valueLabel);
-      
-      const valuePicker = PlusInterface.createDatePicker({
-        id: `datepicker-${size.value}-value`,
-        placeholder: 'Select date',
-        size: size.value,
-        value: '2024-01-15'
-      });
-      valueWrapper.appendChild(valuePicker);
-      sizeSection.appendChild(valueWrapper);
-      
-      container.appendChild(sizeSection);
+      singleDateSection.appendChild(stateWrapper);
     });
+    container.appendChild(singleDateSection);
+    
+    // Range Section
+    const rangeSection = document.createElement('div');
+    rangeSection.style.display = 'flex';
+    rangeSection.style.flexDirection = 'column';
+    rangeSection.style.gap = 'var(--size-element-gap-md)';
+    
+    const rangeHeading = document.createElement('div');
+    rangeHeading.className = 'h6';
+    rangeHeading.textContent = 'Range';
+    rangeHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    rangeSection.appendChild(rangeHeading);
+    
+    const rangeStates = [
+      { name: 'First Date', startValue: '2025-03-26', endValue: null },
+      { name: 'Second Date', startValue: '2025-03-17', endValue: '2025-03-31' },
+    ];
+    
+    rangeStates.forEach((state, index) => {
+      const stateWrapper = document.createElement('div');
+      stateWrapper.style.display = 'flex';
+      stateWrapper.style.flexDirection = 'column';
+      stateWrapper.style.gap = 'var(--size-element-gap-xs)';
+      
+      const stateLabel = document.createElement('div');
+      stateLabel.className = 'body2-txt';
+      stateLabel.textContent = state.name;
+      stateWrapper.appendChild(stateLabel);
+      
+      const rangeContainer = document.createElement('div');
+      rangeContainer.style.display = 'flex';
+      rangeContainer.style.alignItems = 'center';
+      rangeContainer.style.gap = 'var(--size-element-gap-sm)';
+      
+      const startPicker = PlusInterface.createDatePicker({
+        id: `overview-range-start-${index}`,
+        placeholder: 'Select Date',
+        size: 'medium',
+        value: state.startValue
+      });
+      rangeContainer.appendChild(startPicker);
+      
+      const toLabel = document.createElement('div');
+      toLabel.className = 'body2-txt';
+      toLabel.textContent = 'to';
+      toLabel.style.color = 'var(--color-on-surface)';
+      rangeContainer.appendChild(toLabel);
+      
+      const endPicker = PlusInterface.createDatePicker({
+        id: `overview-range-end-${index}`,
+        placeholder: 'Select Date',
+        size: 'medium',
+        value: state.endValue
+      });
+      rangeContainer.appendChild(endPicker);
+      
+      stateWrapper.appendChild(rangeContainer);
+      rangeSection.appendChild(stateWrapper);
+    });
+    container.appendChild(rangeSection);
     
     return container;
   },

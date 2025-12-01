@@ -83,7 +83,7 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows all carousel types in a 2x2 grid layout exactly as shown in Figma
  * Layout: 
  *   Top-Left: slides only
@@ -91,7 +91,7 @@ export default {
  *   Bottom-Left: with controls
  *   Bottom-Right: with indicators
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

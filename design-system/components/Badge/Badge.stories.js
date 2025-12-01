@@ -66,10 +66,10 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows all badge combinations organized by visual style: each style shows all sizes
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

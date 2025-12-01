@@ -67,10 +67,10 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows all checkbox combinations: states and content variants
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

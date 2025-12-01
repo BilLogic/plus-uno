@@ -59,6 +59,9 @@
  */
 
 import { createProgress, updateProgress } from "../index.js";
+import { AllSizes as ProgressAllSizes } from "./Progress.Sizes.stories.js";
+import { AllColors as ProgressAllColors } from "./Progress.Colors.stories.js";
+import { AllStates as ProgressAllStates } from "./Progress.States.stories.js";
 
 export default {
   title: 'Components/Progress',
@@ -73,241 +76,42 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all progress bar combinations: sizes, styles, and states
+ * Overview
+ * Shows all progress variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     
-    // Size Variants
-    const sizesSection = document.createElement('div');
-    sizesSection.style.display = 'flex';
-    sizesSection.style.flexDirection = 'column';
-    sizesSection.style.gap = 'var(--size-element-gap-md)';
-    
-    const sizesLabel = document.createElement('div');
-    sizesLabel.className = 'h6';
-    sizesLabel.textContent = 'Size Variants';
-    sizesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    sizesSection.appendChild(sizesLabel);
-    
-    const small = createProgress({ value: 50, size: 'small', style: 'primary' });
-    sizesSection.appendChild(small);
-    
-    const medium = createProgress({ value: 50, size: 'medium', style: 'primary' });
-    sizesSection.appendChild(medium);
-    
-    const large = createProgress({ value: 50, size: 'large', style: 'primary' });
-    sizesSection.appendChild(large);
-    
-    container.appendChild(sizesSection);
-    
-    // Style Variants
-    const stylesSection = document.createElement('div');
-    stylesSection.style.display = 'flex';
-    stylesSection.style.flexDirection = 'column';
-    stylesSection.style.gap = 'var(--size-element-gap-md)';
-    
-    const stylesLabel = document.createElement('div');
-    stylesLabel.className = 'h6';
-    stylesLabel.textContent = 'Style Variants';
-    stylesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    stylesSection.appendChild(stylesLabel);
-    
-    const primary = createProgress({ value: 60, style: 'primary' });
-    stylesSection.appendChild(primary);
-    
-    const secondary = createProgress({ value: 60, style: 'secondary' });
-    stylesSection.appendChild(secondary);
-    
-    const success = createProgress({ value: 60, style: 'success' });
-    stylesSection.appendChild(success);
-    
-    const danger = createProgress({ value: 60, style: 'danger' });
-    stylesSection.appendChild(danger);
-    
-    const warning = createProgress({ value: 60, style: 'warning' });
-    stylesSection.appendChild(warning);
-    
-    const info = createProgress({ value: 60, style: 'info' });
-    stylesSection.appendChild(info);
-    
-    container.appendChild(stylesSection);
-    
-    // State Variants
-    const statesSection = document.createElement('div');
-    statesSection.style.display = 'flex';
-    statesSection.style.flexDirection = 'column';
-    statesSection.style.gap = 'var(--size-element-gap-md)';
-    
-    const statesLabel = document.createElement('div');
-    statesLabel.className = 'h6';
-    statesLabel.textContent = 'State Variants';
-    statesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    statesSection.appendChild(statesLabel);
-    
-    const withLabel = createProgress({ value: 75, style: 'primary', showLabel: true });
-    statesSection.appendChild(withLabel);
-    
-    const customLabel = createProgress({ value: 50, style: 'success', label: 'Uploading...' });
-    statesSection.appendChild(customLabel);
-    
-    const striped = createProgress({ value: 65, style: 'primary', striped: true });
-    statesSection.appendChild(striped);
-    
-    const animated = createProgress({ value: 80, style: 'primary', striped: true, animated: true });
-    statesSection.appendChild(animated);
-    
-    container.appendChild(statesSection);
-    
-    // Value Examples
-    const valuesSection = document.createElement('div');
-    valuesSection.style.display = 'flex';
-    valuesSection.style.flexDirection = 'column';
-    valuesSection.style.gap = 'var(--size-element-gap-md)';
-    
-    const valuesLabel = document.createElement('div');
-    valuesLabel.className = 'h6';
-    valuesLabel.textContent = 'Value Examples';
-    valuesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    valuesSection.appendChild(valuesLabel);
-    
-    const zero = createProgress({ value: 0, style: 'primary' });
-    valuesSection.appendChild(zero);
-    
-    const quarter = createProgress({ value: 25, style: 'primary' });
-    valuesSection.appendChild(quarter);
-    
-    const half = createProgress({ value: 50, style: 'primary' });
-    valuesSection.appendChild(half);
-    
-    const threeQuarter = createProgress({ value: 75, style: 'primary' });
-    valuesSection.appendChild(threeQuarter);
-    
-    const full = createProgress({ value: 100, style: 'success' });
-    valuesSection.appendChild(full);
-    
-    container.appendChild(valuesSection);
-    
-    return container;
-  },
-};
-
-/**
- * Size Variants
- * Shows different size options
- */
-export const SizeVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-element-gap-lg)';
-    
-    const small = createProgress({ value: 50, size: 'small', style: 'primary' });
-    const smallLabel = document.createElement('div');
-    smallLabel.className = 'body2-txt';
-    smallLabel.textContent = 'Small (4px)';
-    smallLabel.style.marginBottom = 'var(--size-element-gap-xs)';
-    
-    const medium = createProgress({ value: 50, size: 'medium', style: 'primary' });
-    const mediumLabel = document.createElement('div');
-    mediumLabel.className = 'body2-txt';
-    mediumLabel.textContent = 'Medium (6px)';
-    mediumLabel.style.marginBottom = 'var(--size-element-gap-xs)';
-    
-    const large = createProgress({ value: 50, size: 'large', style: 'primary' });
-    const largeLabel = document.createElement('div');
-    largeLabel.className = 'body2-txt';
-    largeLabel.textContent = 'Large (8px)';
-    largeLabel.style.marginBottom = 'var(--size-element-gap-xs)';
-    
-    container.appendChild(smallLabel);
-    container.appendChild(small);
-    container.appendChild(mediumLabel);
-    container.appendChild(medium);
-    container.appendChild(largeLabel);
-    container.appendChild(large);
-    
-    return container;
-  },
-};
-
-/**
- * Style Variants
- * Shows different color/style options
- */
-export const StyleVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-element-gap-lg)';
-    
-    const styles = ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning', 'info'];
-    
-    styles.forEach(style => {
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.textContent = style.charAt(0).toUpperCase() + style.slice(1);
-      label.style.marginBottom = 'var(--size-element-gap-xs)';
-      container.appendChild(label);
+    const createSection = (title, contentRender) => {
+      const section = document.createElement('div');
+      section.style.display = 'flex';
+      section.style.flexDirection = 'column';
+      section.style.gap = 'var(--size-card-gap-md)';
       
-      const progress = createProgress({ value: 60, style: style });
-      container.appendChild(progress);
-    });
+      const heading = document.createElement('div');
+      heading.className = 'h5';
+      heading.textContent = title;
+      heading.style.marginBottom = 'var(--size-element-gap-sm)';
+      section.appendChild(heading);
+      
+      const content = contentRender();
+      section.appendChild(content);
+      return section;
+    };
     
-    return container;
-  },
-};
-
-/**
- * States
- * Shows different state variants
- */
-export const States = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-element-gap-lg)';
+    // Sizes Section
+    container.appendChild(createSection('Sizes', ProgressAllSizes.render));
     
-    const withLabel = createProgress({ value: 75, style: 'primary', showLabel: true });
-    const withLabelText = document.createElement('div');
-    withLabelText.className = 'body2-txt';
-    withLabelText.textContent = 'With percentage label';
-    withLabelText.style.marginBottom = 'var(--size-element-gap-xs)';
+    // Colors Section
+    container.appendChild(createSection('Colors', ProgressAllColors.render));
     
-    const customLabel = createProgress({ value: 50, style: 'success', label: 'Uploading files...' });
-    const customLabelText = document.createElement('div');
-    customLabelText.className = 'body2-txt';
-    customLabelText.textContent = 'With custom label';
-    customLabelText.style.marginBottom = 'var(--size-element-gap-xs)';
-    
-    const striped = createProgress({ value: 65, style: 'primary', striped: true });
-    const stripedText = document.createElement('div');
-    stripedText.className = 'body2-txt';
-    stripedText.textContent = 'Striped';
-    stripedText.style.marginBottom = 'var(--size-element-gap-xs)';
-    
-    const animated = createProgress({ value: 80, style: 'primary', striped: true, animated: true });
-    const animatedText = document.createElement('div');
-    animatedText.className = 'body2-txt';
-    animatedText.textContent = 'Animated (striped)';
-    animatedText.style.marginBottom = 'var(--size-element-gap-xs)';
-    
-    container.appendChild(withLabelText);
-    container.appendChild(withLabel);
-    container.appendChild(customLabelText);
-    container.appendChild(customLabel);
-    container.appendChild(stripedText);
-    container.appendChild(striped);
-    container.appendChild(animatedText);
-    container.appendChild(animated);
+    // States Section
+    container.appendChild(createSection('States', ProgressAllStates.render));
     
     return container;
   },

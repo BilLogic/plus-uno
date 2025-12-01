@@ -21,222 +21,81 @@ export default {
   },
 };
 
-/**
- * Left
- * Media object with media on left, content on right, top-aligned
- */
-export const Left = {
-  render: () => {
-    const media = document.createElement('div');
-    media.style.width = '64px';
-    media.style.height = '64px';
-    media.style.borderRadius = 'var(--size-element-radius-sm)';
-    media.style.backgroundColor = 'var(--color-surface-variant)';
-    media.style.display = 'flex';
-    media.style.alignItems = 'center';
-    media.style.justifyContent = 'center';
-    media.style.color = 'var(--color-on-surface-variant)';
-    media.textContent = '64';
-    
-    return PlusInterface.createMediaObject({
-      media: media,
-      heading: 'Media heading',
-      body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse. Heard it\'s beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix inside of me. Heaven is jealous of our love, angels are crying from up above. Yeah, you take me to utopia.',
-    });
-  },
-};
 
 /**
- * Left Center
- * Media object with media on left, content on right, vertically centered
+ * Overview
+ * Shows all media object variants organized by category in a scrollable format
  */
-export const LeftCenter = {
-  render: () => {
-    const media = document.createElement('div');
-    media.style.width = '64px';
-    media.style.height = '64px';
-    media.style.borderRadius = 'var(--size-element-radius-sm)';
-    media.style.backgroundColor = 'var(--color-surface-variant)';
-    media.style.display = 'flex';
-    media.style.alignItems = 'center';
-    media.style.justifyContent = 'center';
-    media.style.color = 'var(--color-on-surface-variant)';
-    media.textContent = '64';
-    
-    return PlusInterface.createMediaObject({
-      media: media,
-      heading: 'Media heading',
-      body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse. Heard it\'s beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix inside of me. Heaven is jealous of our love, angels are crying from up above. Yeah, you take me to utopia.',
-      alignment: 'left-center',
-    });
-  },
-};
-
-/**
- * Left Bottom
- * Media object with media on left, content on right, bottom-aligned
- */
-export const LeftBottom = {
-  render: () => {
-    const media = document.createElement('div');
-    media.style.width = '64px';
-    media.style.height = '64px';
-    media.style.borderRadius = 'var(--size-element-radius-sm)';
-    media.style.backgroundColor = 'var(--color-surface-variant)';
-    media.style.display = 'flex';
-    media.style.alignItems = 'center';
-    media.style.justifyContent = 'center';
-    media.style.color = 'var(--color-on-surface-variant)';
-    media.textContent = '64';
-    
-    return PlusInterface.createMediaObject({
-      media: media,
-      heading: 'Media heading',
-      body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse. Heard it\'s beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix inside of me. Heaven is jealous of our love, angels are crying from up above. Yeah, you take me to utopia.',
-      alignment: 'left-bottom',
-    });
-  },
-};
-
-/**
- * Right
- * Media object with media on right, content on left, top-aligned
- */
-export const Right = {
-  render: () => {
-    const media = document.createElement('div');
-    media.style.width = '64px';
-    media.style.height = '64px';
-    media.style.borderRadius = 'var(--size-element-radius-sm)';
-    media.style.backgroundColor = 'var(--color-surface-variant)';
-    media.style.display = 'flex';
-    media.style.alignItems = 'center';
-    media.style.justifyContent = 'center';
-    media.style.color = 'var(--color-on-surface-variant)';
-    media.textContent = '64';
-    
-    return PlusInterface.createMediaObject({
-      media: media,
-      heading: 'Media heading',
-      body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse. Heard it\'s beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix inside of me. Heaven is jealous of our love, angels are crying from up above. Yeah, you take me to utopia.',
-      alignment: 'right',
-    });
-  },
-};
-
-/**
- * Right Center
- * Media object with media on right, content on left, vertically centered
- */
-export const RightCenter = {
-  render: () => {
-    const media = document.createElement('div');
-    media.style.width = '64px';
-    media.style.height = '64px';
-    media.style.borderRadius = 'var(--size-element-radius-sm)';
-    media.style.backgroundColor = 'var(--color-surface-variant)';
-    media.style.display = 'flex';
-    media.style.alignItems = 'center';
-    media.style.justifyContent = 'center';
-    media.style.color = 'var(--color-on-surface-variant)';
-    media.textContent = '64';
-    
-    return PlusInterface.createMediaObject({
-      media: media,
-      heading: 'Media heading',
-      body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse. Heard it\'s beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix inside of me. Heaven is jealous of our love, angels are crying from up above. Yeah, you take me to utopia.',
-      alignment: 'right-center',
-    });
-  },
-};
-
-/**
- * Right Bottom
- * Media object with media on right, content on left, bottom-aligned
- */
-export const RightBottom = {
-  render: () => {
-    const media = document.createElement('div');
-    media.style.width = '64px';
-    media.style.height = '64px';
-    media.style.borderRadius = 'var(--size-element-radius-sm)';
-    media.style.backgroundColor = 'var(--color-surface-variant)';
-    media.style.display = 'flex';
-    media.style.alignItems = 'center';
-    media.style.justifyContent = 'center';
-    media.style.color = 'var(--color-on-surface-variant)';
-    media.textContent = '64';
-    
-    return PlusInterface.createMediaObject({
-      media: media,
-      heading: 'Media heading',
-      body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse. Heard it\'s beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix inside of me. Heaven is jealous of our love, angels are crying from up above. Yeah, you take me to utopia.',
-      alignment: 'right-bottom',
-    });
-  },
-};
-
-/**
- * All Variants
- * Shows all media object alignment variants
- */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
     
-    const alignments = [
-      { alignment: 'left', label: 'Left (Top-aligned)' },
-      { alignment: 'left-center', label: 'Left Center (Vertically centered)' },
-      { alignment: 'left-bottom', label: 'Left Bottom (Bottom-aligned)' },
-      { alignment: 'right', label: 'Right (Top-aligned)' },
-      { alignment: 'right-center', label: 'Right Center (Vertically centered)' },
-      { alignment: 'right-bottom', label: 'Right Bottom (Bottom-aligned)' }
-    ];
+    // Orientations Section
+    const orientationsSection = document.createElement('div');
+    orientationsSection.style.display = 'flex';
+    orientationsSection.style.flexDirection = 'column';
+    orientationsSection.style.gap = 'var(--size-card-gap-md)';
     
-    alignments.forEach(({ alignment, label }) => {
-      const wrapper = document.createElement('div');
-      wrapper.style.display = 'flex';
-      wrapper.style.flexDirection = 'column';
-      wrapper.style.gap = 'var(--size-element-gap-sm)';
-      
-      const labelEl = document.createElement('div');
-      labelEl.className = 'h6';
-      labelEl.textContent = label;
-      wrapper.appendChild(labelEl);
-      
-      const media = document.createElement('div');
-      media.style.width = '64px';
-      media.style.height = '64px';
-      media.style.borderRadius = 'var(--size-element-radius-sm)';
-      media.style.backgroundColor = 'var(--color-surface-variant)';
-      media.style.display = 'flex';
-      media.style.alignItems = 'center';
-      media.style.justifyContent = 'center';
-      media.style.color = 'var(--color-on-surface-variant)';
-      media.textContent = '64';
-      
-      const mediaObject = PlusInterface.createMediaObject({
-        media: media,
-        heading: 'Media heading',
-        body: 'Will you do the same for me? It\'s time to face the music I\'m no longer your muse.',
-        alignment: alignment
-      });
-      
-      wrapper.appendChild(mediaObject);
-      container.appendChild(wrapper);
+    const orientationsHeading = document.createElement('div');
+    orientationsHeading.className = 'h5';
+    orientationsHeading.textContent = 'Orientations';
+    orientationsHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    orientationsSection.appendChild(orientationsHeading);
+    
+    const orientationsRow = document.createElement('div');
+    orientationsRow.style.display = 'flex';
+    orientationsRow.style.flexDirection = 'column';
+    orientationsRow.style.gap = 'var(--size-section-gap-md)';
+    
+    // Left alignment
+    const mediaLeft = document.createElement('div');
+    mediaLeft.style.width = '64px';
+    mediaLeft.style.height = '64px';
+    mediaLeft.style.borderRadius = 'var(--size-element-radius-sm)';
+    mediaLeft.style.backgroundColor = 'var(--color-surface-variant)';
+    mediaLeft.style.display = 'flex';
+    mediaLeft.style.alignItems = 'center';
+    mediaLeft.style.justifyContent = 'center';
+    mediaLeft.style.color = 'var(--color-on-surface-variant)';
+    mediaLeft.textContent = '64';
+    
+    const leftObject = PlusInterface.createMediaObject({
+      media: mediaLeft,
+      heading: 'Media heading',
+      body: 'Will you do the same for me? It\'s time to face the music.',
     });
+    orientationsRow.appendChild(leftObject);
+    
+    // Right alignment
+    const mediaRight = document.createElement('div');
+    mediaRight.style.width = '64px';
+    mediaRight.style.height = '64px';
+    mediaRight.style.borderRadius = 'var(--size-element-radius-sm)';
+    mediaRight.style.backgroundColor = 'var(--color-surface-variant)';
+    mediaRight.style.display = 'flex';
+    mediaRight.style.alignItems = 'center';
+    mediaRight.style.justifyContent = 'center';
+    mediaRight.style.color = 'var(--color-on-surface-variant)';
+    mediaRight.textContent = '64';
+    
+    const rightObject = PlusInterface.createMediaObject({
+      media: mediaRight,
+      heading: 'Media heading',
+      body: 'Will you do the same for me? It\'s time to face the music.',
+      alignment: 'right',
+    });
+    orientationsRow.appendChild(rightObject);
+    
+    orientationsSection.appendChild(orientationsRow);
+    container.appendChild(orientationsSection);
     
     return container;
   },
 };
 
-/**
- * Interactive Media Object
- * Interactive playground for testing media object variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');

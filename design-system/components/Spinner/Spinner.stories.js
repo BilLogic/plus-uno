@@ -60,68 +60,45 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all spinner size variants
+ * Overview
+ * Shows all spinner variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
     
-    // Sizes section
+    // Sizes Section
     const sizesSection = document.createElement('div');
     sizesSection.style.display = 'flex';
     sizesSection.style.flexDirection = 'column';
-    sizesSection.style.gap = 'var(--size-element-gap-sm)';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
     
-    const sizesLabel = document.createElement('div');
-    sizesLabel.className = 'h6';
-    sizesLabel.textContent = 'Sizes';
-    sizesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    sizesSection.appendChild(sizesLabel);
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
     
-    const sizesContainer = document.createElement('div');
-    sizesContainer.style.display = 'flex';
-    sizesContainer.style.flexDirection = 'row';
-    sizesContainer.style.alignItems = 'center';
-    sizesContainer.style.gap = 'var(--size-card-gap-md)';
-    sizesContainer.style.flexWrap = 'wrap';
+    const sizesRow = document.createElement('div');
+    sizesRow.style.display = 'flex';
+    sizesRow.style.flexWrap = 'wrap';
+    sizesRow.style.gap = 'var(--size-card-gap-md)';
+    sizesRow.style.alignItems = 'center';
     
-    const sizes = ['small', 'default', 'large'];
-    sizes.forEach((size) => {
-      const wrapper = document.createElement('div');
-      wrapper.style.display = 'flex';
-      wrapper.style.flexDirection = 'column';
-      wrapper.style.alignItems = 'center';
-      wrapper.style.gap = 'var(--size-element-gap-sm)';
-      
-      const spinner = PlusInterface.createSpinner({
-        size: size,
-        label: `Loading (${size})...`
-      });
-      wrapper.appendChild(spinner);
-      
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.textContent = size.charAt(0).toUpperCase() + size.slice(1);
-      wrapper.appendChild(label);
-      
-      sizesContainer.appendChild(wrapper);
+    ['small', 'default', 'large'].forEach((size) => {
+      const spinner = PlusInterface.createSpinner({ size: size });
+      sizesRow.appendChild(spinner);
     });
-    
-    sizesSection.appendChild(sizesContainer);
+    sizesSection.appendChild(sizesRow);
     container.appendChild(sizesSection);
     
     return container;
   },
 };
 
-/**
- * Interactive Spinner
- * Interactive playground for testing spinner variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
@@ -153,53 +130,6 @@ export const Interactive = {
   args: {
     size: 'default',
     label: 'Loading...',
-  },
-};
-
-/**
- * Inline Usage
- * Examples of spinner used inline with text
- */
-export const InlineUsage = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-md)';
-    
-    // Inline with text
-    const inline1 = document.createElement('div');
-    inline1.className = 'body1-txt';
-    inline1.style.display = 'flex';
-    inline1.style.alignItems = 'center';
-    inline1.style.gap = 'var(--size-element-gap-sm)';
-    inline1.appendChild(PlusInterface.createSpinner({ size: 'small', label: 'Loading...' }));
-    inline1.appendChild(document.createTextNode('Loading data...'));
-    container.appendChild(inline1);
-    
-    // In button
-    const buttonWrapper = document.createElement('div');
-    const button = document.createElement('button');
-    button.className = 'btn btn-primary';
-    button.style.display = 'flex';
-    button.style.alignItems = 'center';
-    button.style.gap = 'var(--size-element-gap-sm)';
-    button.appendChild(PlusInterface.createSpinner({ size: 'small', label: 'Submitting...' }));
-    button.appendChild(document.createTextNode('Submit'));
-    buttonWrapper.appendChild(button);
-    container.appendChild(buttonWrapper);
-    
-    // Center aligned
-    const centerWrapper = document.createElement('div');
-    centerWrapper.style.display = 'flex';
-    centerWrapper.style.flexDirection = 'column';
-    centerWrapper.style.alignItems = 'center';
-    centerWrapper.style.gap = 'var(--size-element-gap-sm)';
-    centerWrapper.appendChild(PlusInterface.createSpinner({ size: 'large', label: 'Loading page...' }));
-    centerWrapper.appendChild(document.createTextNode('Loading page content...'));
-    container.appendChild(centerWrapper);
-    
-    return container;
   },
 };
 
