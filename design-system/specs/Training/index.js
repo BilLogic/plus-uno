@@ -6,21 +6,21 @@
  * to create complete training experiences.
  */
 
-// Elements
-export * from './Elements/index.js';
+// Lessons - Elements
+export * from './Lessons/Elements/index.js';
 
-// Cards
-export * from './Cards/index.js';
+// Lessons - Cards
+export * from './Lessons/Cards/index.js';
 
-// Tables
-export * from './Tables/index.js';
+// Lessons - Tables
+export * from './Lessons/Tables/index.js';
 
-// Modals
-export * from './Modals/index.js';
+// Lessons - Modals
+export * from './Lessons/Modals/index.js';
 
-// Sections
-export * from './Sections/index.js';
+// Lessons - Sections
+export * from './Lessons/Sections/index.js';
 
-// Pages
-export * from './Pages/index.js';
+// Lessons - Pages
+export * from './Lessons/Pages/index.js';
 

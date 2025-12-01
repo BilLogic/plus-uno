@@ -6,9 +6,9 @@
  * Figma: node-id 111-227859 (expanded and collapsed variants)
  */
 
-import { createBreadcrumb } from '../../components/Breadcrumb/index.js';
-import { createUserAvatar } from '../../components/UserAvatar/index.js';
-import { createButton } from '../../components/Button/index.js';
+import { createBreadcrumb } from '../../../components/Breadcrumb/index.js';
+import { createUserAvatar } from '../../../components/UserAvatar/index.js';
+import { createButton } from '../../../components/Button/index.js';
 
 /**
  * Creates a top bar organism component

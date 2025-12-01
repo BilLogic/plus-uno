@@ -76,6 +76,11 @@ const config = {
     // Configure Vite to resolve modules from project root
     config.resolve.preserveSymlinks = false;
     
+    // Ensure story files are treated as ES modules
+    config.optimizeDeps.esbuildOptions = config.optimizeDeps.esbuildOptions || {};
+    config.optimizeDeps.esbuildOptions.loader = config.optimizeDeps.esbuildOptions.loader || {};
+    config.optimizeDeps.esbuildOptions.loader['.js'] = 'jsx';
+    
     // Ensure proper ES module handling
     config.optimizeDeps = config.optimizeDeps || {};
     config.optimizeDeps.include = config.optimizeDeps.include || [];
@@ -97,7 +102,14 @@ const config = {
     
     // Better handling of dynamic imports
     config.optimizeDeps = config.optimizeDeps || {};
-    config.optimizeDeps.force = config.optimizeDeps.force || [];
+    
+    // Ensure story files are properly handled as modules
+    // Don't exclude them from optimization - they need to be processed
+    config.optimizeDeps.include = config.optimizeDeps.include || [];
+    config.optimizeDeps.include.push(
+      'design-system/components/index.js',
+      'design-system/components/**/*.js'
+    );
     
     // Configure static asset serving
     // Disable default publicDir to use staticDirs instead
