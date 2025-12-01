@@ -240,7 +240,9 @@ export function createStaticBadgeSmart({
     } else if (['b1', 'b2', 'b3'].includes(size)) {
         textEl.style.flex = '1 0 0';
         textEl.style.fontFamily = 'var(--font-family-body)';
-        textEl.style.fontWeight = 'var(--font-weight-normal)';
+        // Figma: Body/B1-B3/Semibold uses Regular (400), not Light (300)
+        // font-normal in Tailwind = Regular (400) = --font-weight-semibold-1
+        textEl.style.fontWeight = 'var(--font-weight-semibold-1)'; // Regular (400)
         textEl.style.minHeight = '1px';
         textEl.style.minWidth = '1px';
         if (size === 'b1') {

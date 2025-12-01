@@ -920,3 +920,126 @@ export const InteractionStates = {
   },
 };
 
+/**
+ * Interactive Color Playground
+ * Interactive playground with Storybook controls to test color tokens
+ */
+export const Interactive = {
+  render: (args) => {
+    const container = document.createElement('div');
+    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
+    container.style.maxWidth = '1200px';
+    container.style.margin = '0 auto';
+    
+    const title = document.createElement('h2');
+    title.className = 'h2';
+    title.textContent = 'Interactive Color Playground';
+    title.style.marginBottom = 'var(--size-section-pad-y-md)';
+    container.appendChild(title);
+    
+    const description = document.createElement('p');
+    description.className = 'body1-txt';
+    description.textContent = 'Use the controls below to test different color tokens and see how they look in context.';
+    description.style.marginBottom = 'var(--size-card-gap-lg)';
+    container.appendChild(description);
+    
+    // Color swatch example
+    const swatchContainer = document.createElement('div');
+    swatchContainer.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
+    swatchContainer.style.backgroundColor = args.backgroundColor || 'var(--color-surface)';
+    swatchContainer.style.borderRadius = 'var(--size-card-radius-sm)';
+    swatchContainer.style.border = `2px solid ${args.borderColor || 'var(--color-outline)'}`;
+    swatchContainer.style.marginBottom = 'var(--size-card-gap-md)';
+    
+    const swatchTitle = document.createElement('h3');
+    swatchTitle.className = 'h3';
+    swatchTitle.textContent = args.title || 'Color Example';
+    swatchTitle.style.color = args.textColor || 'var(--color-on-surface)';
+    swatchTitle.style.marginBottom = 'var(--size-element-gap-sm)';
+    swatchContainer.appendChild(swatchTitle);
+    
+    const swatchText = document.createElement('p');
+    swatchText.className = 'body2-txt';
+    swatchText.textContent = args.description || 'This is example text showing how colors work together.';
+    swatchText.style.color = args.textColor || 'var(--color-on-surface)';
+    swatchContainer.appendChild(swatchText);
+    
+    container.appendChild(swatchContainer);
+    
+    // Button example
+    if (args.showButton) {
+      const button = PlusInterface.createButton({
+        btnText: args.buttonText || 'Example Button',
+        btnStyle: args.buttonStyle || 'primary',
+        btnFill: args.buttonFill || 'filled',
+        btnSize: args.buttonSize || 'default',
+      });
+      button.style.marginTop = 'var(--size-element-gap-md)';
+      container.appendChild(button);
+    }
+    
+    return container;
+  },
+  argTypes: {
+    backgroundColor: {
+      control: 'text',
+      description: 'Background color token (e.g., var(--color-surface))',
+    },
+    borderColor: {
+      control: 'text',
+      description: 'Border color token (e.g., var(--color-outline))',
+    },
+    textColor: {
+      control: 'text',
+      description: 'Text color token (e.g., var(--color-on-surface))',
+    },
+    title: {
+      control: 'text',
+      description: 'Example title text',
+    },
+    description: {
+      control: 'text',
+      description: 'Example description text',
+    },
+    showButton: {
+      control: 'boolean',
+      description: 'Show example button',
+    },
+    buttonText: {
+      control: 'text',
+      description: 'Button text',
+      if: { arg: 'showButton', eq: true },
+    },
+    buttonStyle: {
+      control: 'select',
+      options: ['primary', 'secondary', 'tertiary', 'success', 'info', 'warning', 'error', 'default'],
+      description: 'Button style',
+      if: { arg: 'showButton', eq: true },
+    },
+    buttonFill: {
+      control: 'select',
+      options: ['filled', 'outline', 'tonal', 'text'],
+      description: 'Button fill variant',
+      if: { arg: 'showButton', eq: true },
+    },
+    buttonSize: {
+      control: 'select',
+      options: ['small', 'default', 'large'],
+      description: 'Button size',
+      if: { arg: 'showButton', eq: true },
+    },
+  },
+  args: {
+    backgroundColor: 'var(--color-surface)',
+    borderColor: 'var(--color-outline)',
+    textColor: 'var(--color-on-surface)',
+    title: 'Color Example',
+    description: 'This is example text showing how colors work together.',
+    showButton: true,
+    buttonText: 'Example Button',
+    buttonStyle: 'primary',
+    buttonFill: 'filled',
+    buttonSize: 'default',
+  },
+};
+

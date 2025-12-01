@@ -134,6 +134,27 @@ const preview = {
         // Silently fail if tooltip module isn't loaded yet
       }
       
+      // Remove all modals and scrims from previous stories
+      // This prevents modals from persisting across different stories
+      // Remove modals by class
+      const modals = document.querySelectorAll('.plus-modal');
+      modals.forEach(modal => modal.remove());
+      
+      // Remove scrims (fixed position overlays with high z-index)
+      const allDivs = document.querySelectorAll('div');
+      allDivs.forEach(div => {
+        const style = window.getComputedStyle(div);
+        const inlineStyle = div.style;
+        // Check if it's a scrim: fixed position, high z-index, and either has scrim background or contains a modal
+        if (style.position === 'fixed' && 
+            (inlineStyle.zIndex === '1000' || parseInt(style.zIndex) >= 1000) &&
+            (div.querySelector('.plus-modal') || 
+             inlineStyle.backgroundColor === 'var(--color-scrim)' ||
+             style.backgroundColor.includes('rgba'))) {
+          div.remove();
+        }
+      });
+      
       // Create a container with proper structure
       const container = document.createElement('div');
       container.style.padding = '2rem';
