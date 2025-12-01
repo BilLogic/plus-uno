@@ -65,10 +65,10 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all input combinations organized by type: each type shows all sizes and states
+ * Overview
+ * Shows all input variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
@@ -76,25 +76,24 @@ export const AllVariants = {
     container.style.gap = 'var(--size-section-gap-lg)';
     container.style.width = 'var(--size-card-pad-x-lg)';
     
-    const sizes = [
-      { class: 'body1-txt', label: 'Body 1' },
-      { class: 'body2-txt', label: 'Body 2 (Default)' },
-      { class: 'body3-txt', label: 'Body 3' },
-    ];
+    // Sizes Section
+    const sizesSection = document.createElement('div');
+    sizesSection.style.display = 'flex';
+    sizesSection.style.flexDirection = 'column';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
     
-    // Text Input - All Sizes
-    const textInputSection = document.createElement('div');
-    textInputSection.style.display = 'flex';
-    textInputSection.style.flexDirection = 'column';
-    textInputSection.style.gap = 'var(--size-card-gap-md)';
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
     
-    const textInputLabel = document.createElement('div');
-    textInputLabel.className = 'h6';
-    textInputLabel.textContent = 'Text Input - All Sizes';
-    textInputLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    textInputSection.appendChild(textInputLabel);
+    const sizesRow = document.createElement('div');
+    sizesRow.style.display = 'flex';
+    sizesRow.style.flexDirection = 'column';
+    sizesRow.style.gap = 'var(--size-card-gap-md)';
     
-    sizes.forEach((size) => {
+    ['body1-txt', 'body2-txt', 'body3-txt'].forEach((sizeClass) => {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
@@ -102,51 +101,140 @@ export const AllVariants = {
       
       const label = document.createElement('label');
       label.className = 'body3-txt';
-      label.textContent = size.label;
+      label.textContent = sizeClass === 'body1-txt' ? 'Body 1' : sizeClass === 'body2-txt' ? 'Body 2 (Default)' : 'Body 3';
       wrapper.appendChild(label);
       
       const input = document.createElement('input');
       input.type = 'text';
-      input.className = `plus-text-field ${size.class}`;
-      input.placeholder = `Input with ${size.label} size`;
+      input.className = `plus-text-field ${sizeClass}`;
+      input.placeholder = `Input with ${sizeClass}`;
       wrapper.appendChild(input);
       
-      textInputSection.appendChild(wrapper);
+      sizesRow.appendChild(wrapper);
     });
-    container.appendChild(textInputSection);
+    sizesSection.appendChild(sizesRow);
+    container.appendChild(sizesSection);
     
-    // Textarea - All Sizes
-    const textareaSection = document.createElement('div');
-    textareaSection.style.display = 'flex';
-    textareaSection.style.flexDirection = 'column';
-    textareaSection.style.gap = 'var(--size-card-gap-md)';
+    // Types Section
+    const typesSection = document.createElement('div');
+    typesSection.style.display = 'flex';
+    typesSection.style.flexDirection = 'column';
+    typesSection.style.gap = 'var(--size-card-gap-md)';
     
-    const textareaLabel = document.createElement('div');
-    textareaLabel.className = 'h6';
-    textareaLabel.textContent = 'Textarea - All Sizes';
-    textareaLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    textareaSection.appendChild(textareaLabel);
+    const typesHeading = document.createElement('div');
+    typesHeading.className = 'h5';
+    typesHeading.textContent = 'Types';
+    typesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    typesSection.appendChild(typesHeading);
     
-    sizes.forEach((size) => {
-      const wrapper = document.createElement('div');
-      wrapper.style.display = 'flex';
-      wrapper.style.flexDirection = 'column';
-      wrapper.style.gap = 'var(--size-element-gap-xs)';
-      
-      const label = document.createElement('label');
-      label.className = 'body3-txt';
-      label.textContent = size.label;
-      wrapper.appendChild(label);
-      
-      const textarea = document.createElement('textarea');
-      textarea.className = `plus-textarea ${size.class}`;
-      textarea.placeholder = `Textarea with ${size.label} size`;
-      textarea.rows = 4;
-      wrapper.appendChild(textarea);
-      
-      textareaSection.appendChild(wrapper);
-    });
-    container.appendChild(textareaSection);
+    const typesRow = document.createElement('div');
+    typesRow.style.display = 'flex';
+    typesRow.style.flexDirection = 'column';
+    typesRow.style.gap = 'var(--size-card-gap-md)';
+    
+    // Text Input
+    const textWrapper = document.createElement('div');
+    textWrapper.style.display = 'flex';
+    textWrapper.style.flexDirection = 'column';
+    textWrapper.style.gap = 'var(--size-element-gap-xs)';
+    const textLabel = document.createElement('label');
+    textLabel.className = 'body3-txt';
+    textLabel.textContent = 'Text Input';
+    textWrapper.appendChild(textLabel);
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'plus-text-field body2-txt';
+    textInput.placeholder = 'Enter text...';
+    textWrapper.appendChild(textInput);
+    typesRow.appendChild(textWrapper);
+    
+    // Textarea
+    const textareaWrapper = document.createElement('div');
+    textareaWrapper.style.display = 'flex';
+    textareaWrapper.style.flexDirection = 'column';
+    textareaWrapper.style.gap = 'var(--size-element-gap-xs)';
+    const textareaLabel = document.createElement('label');
+    textareaLabel.className = 'body3-txt';
+    textareaLabel.textContent = 'Textarea';
+    textareaWrapper.appendChild(textareaLabel);
+    const textarea = document.createElement('textarea');
+    textarea.className = 'plus-textarea body2-txt';
+    textarea.placeholder = 'Enter text...';
+    textarea.rows = 4;
+    textareaWrapper.appendChild(textarea);
+    typesRow.appendChild(textareaWrapper);
+    
+    typesSection.appendChild(typesRow);
+    container.appendChild(typesSection);
+    
+    // States Section
+    const statesSection = document.createElement('div');
+    statesSection.style.display = 'flex';
+    statesSection.style.flexDirection = 'column';
+    statesSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const statesHeading = document.createElement('div');
+    statesHeading.className = 'h5';
+    statesHeading.textContent = 'States';
+    statesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    statesSection.appendChild(statesHeading);
+    
+    const statesRow = document.createElement('div');
+    statesRow.style.display = 'flex';
+    statesRow.style.flexDirection = 'column';
+    statesRow.style.gap = 'var(--size-card-gap-md)';
+    
+    // Default
+    const defaultWrapper = document.createElement('div');
+    defaultWrapper.style.display = 'flex';
+    defaultWrapper.style.flexDirection = 'column';
+    defaultWrapper.style.gap = 'var(--size-element-gap-xs)';
+    const defaultLabel = document.createElement('label');
+    defaultLabel.className = 'body3-txt';
+    defaultLabel.textContent = 'Default';
+    defaultWrapper.appendChild(defaultLabel);
+    const defaultInput = document.createElement('input');
+    defaultInput.type = 'text';
+    defaultInput.className = 'plus-text-field body2-txt';
+    defaultInput.placeholder = 'Enter text...';
+    defaultWrapper.appendChild(defaultInput);
+    statesRow.appendChild(defaultWrapper);
+    
+    // With Value
+    const valueWrapper = document.createElement('div');
+    valueWrapper.style.display = 'flex';
+    valueWrapper.style.flexDirection = 'column';
+    valueWrapper.style.gap = 'var(--size-element-gap-xs)';
+    const valueLabel = document.createElement('label');
+    valueLabel.className = 'body3-txt';
+    valueLabel.textContent = 'With Value';
+    valueWrapper.appendChild(valueLabel);
+    const valueInput = document.createElement('input');
+    valueInput.type = 'text';
+    valueInput.className = 'plus-text-field body2-txt';
+    valueInput.value = 'Sample text';
+    valueWrapper.appendChild(valueInput);
+    statesRow.appendChild(valueWrapper);
+    
+    // Disabled
+    const disabledWrapper = document.createElement('div');
+    disabledWrapper.style.display = 'flex';
+    disabledWrapper.style.flexDirection = 'column';
+    disabledWrapper.style.gap = 'var(--size-element-gap-xs)';
+    const disabledLabel = document.createElement('label');
+    disabledLabel.className = 'body3-txt';
+    disabledLabel.textContent = 'Disabled';
+    disabledWrapper.appendChild(disabledLabel);
+    const disabledInput = document.createElement('input');
+    disabledInput.type = 'text';
+    disabledInput.className = 'plus-text-field body2-txt';
+    disabledInput.placeholder = 'Enter text...';
+    disabledInput.disabled = true;
+    disabledWrapper.appendChild(disabledInput);
+    statesRow.appendChild(disabledWrapper);
+    
+    statesSection.appendChild(statesRow);
+    container.appendChild(statesSection);
     
     return container;
   },

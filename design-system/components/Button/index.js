@@ -15,8 +15,9 @@ import { BUTTON_CONSTANTS } from '../constants.js';
  * @param {string} options.btnFill - Button fill (see BUTTON_FILL)
  * @param {string} [options.btnSize] - Button size ("small", "default", "large")
  * @param {Function} [options.buttonOnClick] - Click handler function
- * @param {string} [options.icon] - Font Awesome icon name (without "fa-" prefix)
- * @param {string} [options.iconPosition] - Icon position ("left" or "right"), default "left"
+ * @param {string} [options.icon] - Font Awesome icon name (without "fa-" prefix) - used for leading icon
+ * @param {string} [options.trailingIcon] - Font Awesome icon name for trailing icon (right side)
+ * @param {string} [options.iconPosition] - Icon position ("left" or "right"), default "left" - deprecated, use icon for leading and trailingIcon for trailing
  * @param {string} [options.iconStyle] - Icon style ("solid" or "regular"), default "solid"
  * @param {string|Object} [options.btnLink] - If provided, creates anchor tag instead of button
  * @param {Array} [options.classes] - Additional CSS classes
@@ -36,6 +37,7 @@ export function createButton({
     btnSize = "default",
     buttonOnClick = null,
     icon = null,
+    trailingIcon = null,
     iconPosition = "left",
     iconStyle = "solid",
     btnLink = false,
@@ -76,20 +78,52 @@ export function createButton({
         stateScreen.classList.add(btnSize);
     }
 
-    let iconHtml = "";
+    let leadingIconHtml = "";
     if (icon) {
-        iconHtml = `<span><i class="${BUTTON_CONSTANTS.ICON_STYLES[iconStyle]} fa-${icon}"></i></span>`;
+        leadingIconHtml = `<span class="pbtn-leading-icon"><i class="${BUTTON_CONSTANTS.ICON_STYLES[iconStyle]} fa-${icon}"></i></span>`;
     } else if (imageUrl) {
-        iconHtml = `<img class="pbtn-image" src="${imageUrl}" alt="">`;
+        leadingIconHtml = `<img class="pbtn-image" src="${imageUrl}" alt="">`;
+    }
+    
+    let trailingIconHtml = "";
+    if (trailingIcon) {
+        trailingIconHtml = `<span class="pbtn-trailing-icon"><i class="${BUTTON_CONSTANTS.ICON_STYLES[iconStyle]} fa-${trailingIcon}"></i></span>`;
     }
     
     let textHtml;
-    if (btnText) {
-        textHtml = iconPosition === 'left' 
-            ? iconHtml + `<span>${btnText}</span>` 
-            : `<span>${btnText}</span>` + iconHtml;
+    if (verticalLayout) {
+        // Vertical layout: leading icon above, text and trailing icon horizontal
+        if (btnText) {
+            const textRow = trailingIconHtml 
+                ? `<div class="pbtn-text-row"><span>${btnText}</span>${trailingIconHtml}</div>`
+                : `<div class="pbtn-text-row"><span>${btnText}</span></div>`;
+            textHtml = leadingIconHtml ? leadingIconHtml + textRow : textRow;
+        } else {
+            // No text - only show leading icon if present
+            textHtml = leadingIconHtml || trailingIconHtml;
+        }
     } else {
-        textHtml = iconHtml;
+        // Horizontal layout: standard button layout
+        if (btnText) {
+            // If both leading and trailing icons exist, show both
+            if (leadingIconHtml && trailingIconHtml) {
+                textHtml = leadingIconHtml + `<span>${btnText}</span>` + trailingIconHtml;
+            } else if (trailingIconHtml) {
+                // Only trailing icon
+                textHtml = `<span>${btnText}</span>` + trailingIconHtml;
+            } else if (leadingIconHtml) {
+                // Only leading icon (or legacy iconPosition support)
+                textHtml = iconPosition === 'left' 
+                    ? leadingIconHtml + `<span>${btnText}</span>` 
+                    : `<span>${btnText}</span>` + leadingIconHtml;
+            } else {
+                // No icons
+                textHtml = `<span>${btnText}</span>`;
+            }
+        } else {
+            // No text - only show leading icon if present (for icon-only buttons, though these shouldn't be used per design)
+            textHtml = leadingIconHtml || trailingIconHtml;
+        }
     }
 
     const buttonContent = document.createElement("div");

@@ -7,10 +7,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    /* Figma: px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-sm,4px)] */
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
     /* Figma: Badges use pill shape - Border/Radius/radius-1000 (999px) */
     border-radius: var(--size-border-radius-radius-1000);
     white-space: nowrap;
+    /* Ensure badges don't spread full width */
+    width: auto;
+    max-width: 100%;
 }
 
 .plus-badge-text {
@@ -119,6 +123,72 @@
     font-weight: 400;
     line-height: 1.5;
     font-size: 16px; /* Figma: Body/B1 - 16px */
+}
+
+/* Chip Size Variants - Typography-based font sizes */
+.plus-chip.h1 .plus-badge-text {
+    font-size: 32px;
+    line-height: 1.5;
+}
+
+.plus-chip.h2 .plus-badge-text {
+    font-size: 28px;
+    line-height: 1.429;
+}
+
+.plus-chip.h3 .plus-badge-text {
+    font-size: 24px;
+    line-height: 1.333;
+}
+
+.plus-chip.h4 .plus-badge-text {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.plus-chip.h5 .plus-badge-text {
+    font-size: 18px;
+    line-height: 1.333;
+}
+
+.plus-chip.h6 .plus-badge-text {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.plus-chip.b1 .plus-badge-text {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.plus-chip.b2 .plus-badge-text {
+    font-size: 14px;
+    line-height: 1.571;
+}
+
+.plus-chip.b3 .plus-badge-text {
+    font-size: 12px;
+    line-height: 1.667;
+}
+
+/* Chip Size Variants - Padding based on Element Typography Hierarchy */
+/* H3→lg, H6→md, B3→sm for element spacing */
+.plus-chip.h1,
+.plus-chip.h2,
+.plus-chip.h3 {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+}
+
+.plus-chip.h4,
+.plus-chip.h5,
+.plus-chip.h6 {
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+}
+
+.plus-chip.b1,
+.plus-chip.b2,
+.plus-chip.b3 {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
 }
 
 /* Chip Style Variants - Default state (transparent background, border only) */
@@ -344,6 +414,7 @@
 }
 
 /* Chip Remove Button */
+/* Figma: Gap between text and x icon is element-gap-sm (8px) - handled by parent container gap */
 .plus-chip-remove {
     display: inline-flex;
     align-items: center;
@@ -352,7 +423,7 @@
     border: none;
     padding: 0;
     margin: 0;
-    margin-left: var(--size-element-gap-xs);
+    /* No margin-left - gap is handled by parent container's gap property */
     cursor: pointer;
     color: inherit;
     opacity: 0.7;
@@ -381,17 +452,30 @@
 }
 
 /* Chip remove button icon colors */
-/* Figma: X icon uses style color (main color, not text color) - except default uses on-surface-variant */
+/* Figma: X icon color varies by style and state */
+/* Default: on-surface-variant for all states */
 .plus-chip.default .plus-chip-remove i {
     color: var(--color-on-surface-variant);
 }
 
+/* Primary: primary color for default/focus/pressed, primary-text for hover */
 .plus-chip.primary .plus-chip-remove i {
     color: var(--color-primary);
 }
 
+.plus-chip.primary:not(.plus-chip-disabled):hover .plus-chip-remove i {
+    color: var(--color-primary-text);
+}
+
+/* Secondary: secondary-text for default, secondary for hover/focus/pressed */
 .plus-chip.secondary .plus-chip-remove i {
     color: var(--color-secondary-text);
+}
+
+.plus-chip.secondary:not(.plus-chip-disabled):hover .plus-chip-remove i,
+.plus-chip.secondary:not(.plus-chip-disabled):focus .plus-chip-remove i,
+.plus-chip.secondary:not(.plus-chip-disabled):active .plus-chip-remove i {
+    color: var(--color-secondary);
 }
 
 .plus-chip.info .plus-chip-remove i {

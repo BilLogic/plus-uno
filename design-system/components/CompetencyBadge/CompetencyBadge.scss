@@ -1,0 +1,345 @@
+/**
+ * Competency Badge Component Styles
+ * Matches Figma design system specifications exactly
+ * Figma: node-id 1044-31786
+ */
+
+.plus-competency-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: auto;
+}
+
+.plus-competency-badge-container {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    position: relative;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    /* Default border-radius - will be overridden by size variants */
+    border-radius: 999px;
+    width: auto;
+    /* Background color will be set by competency area variants */
+    white-space: nowrap;
+}
+
+.plus-competency-badge-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    /* Gap will be set by size variants */
+}
+
+.plus-competency-badge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.plus-competency-badge-icon i {
+    font-style: normal;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 0;
+}
+
+.plus-competency-badge-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 0;
+    position: relative;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.plus-competency-badge-text p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Size Variants - Padding */
+/* Figma: H1-H3 use pad-x-lg, H4-H6 use pad-x-md, B1-B3 use pad-x-sm */
+.plus-competency-badge.h1 .plus-competency-badge-container,
+.plus-competency-badge.h2 .plus-competency-badge-container,
+.plus-competency-badge.h3 .plus-competency-badge-container {
+    padding-left: var(--size-element-pad-x-lg);
+    padding-right: var(--size-element-pad-x-lg);
+}
+
+.plus-competency-badge.h4 .plus-competency-badge-container,
+.plus-competency-badge.h5 .plus-competency-badge-container,
+.plus-competency-badge.h6 .plus-competency-badge-container {
+    padding-left: var(--size-element-pad-x-md);
+    padding-right: var(--size-element-pad-x-md);
+}
+
+.plus-competency-badge.b1 .plus-competency-badge-container,
+.plus-competency-badge.b2 .plus-competency-badge-container,
+.plus-competency-badge.b3 .plus-competency-badge-container {
+    padding-left: var(--size-element-pad-x-sm);
+    padding-right: var(--size-element-pad-x-sm);
+}
+
+/* Size Variants - Border Radius */
+/* Figma: H6 uses 50px, B3 technology-tools uses 16px (radius-400), others use 999px (radius-1000) */
+.plus-competency-badge.h6 .plus-competency-badge-container {
+    border-radius: 50px;
+}
+
+.plus-competency-badge.b3.plus-competency-badge-technology-tools .plus-competency-badge-container {
+    border-radius: var(--size-border-radius-radius-400, 16px);
+}
+
+/* Size Variants - Gap */
+/* Figma: H1-H3 use gap-lg, H4-H6 use gap-md, B1-B3 use gap-sm */
+.plus-competency-badge.h1 .plus-competency-badge-content,
+.plus-competency-badge.h2 .plus-competency-badge-content,
+.plus-competency-badge.h3 .plus-competency-badge-content {
+    gap: var(--size-element-gap-lg);
+}
+
+.plus-competency-badge.h4 .plus-competency-badge-content,
+.plus-competency-badge.h5 .plus-competency-badge-content,
+.plus-competency-badge.h6 .plus-competency-badge-content {
+    gap: var(--size-element-gap-md);
+}
+
+.plus-competency-badge.b1 .plus-competency-badge-content,
+.plus-competency-badge.b2 .plus-competency-badge-content,
+.plus-competency-badge.b3 .plus-competency-badge-content {
+    gap: var(--size-element-gap-sm);
+}
+
+/* Size Variants - Min Width for Body Sizes */
+.plus-competency-badge.b1 .plus-competency-badge-content {
+    min-width: 20px;
+}
+
+.plus-competency-badge.b2 .plus-competency-badge-content {
+    min-width: 16px;
+}
+
+.plus-competency-badge.b3 .plus-competency-badge-content {
+    min-width: 12px;
+}
+
+/* Size Variants - Icon Font Sizes */
+/* Figma: Icon sizes match Font Awesome typography scales */
+.plus-competency-badge.h1 .plus-competency-badge-icon i {
+    font-size: 36px;
+    line-height: 1.778;
+}
+
+.plus-competency-badge.h2 .plus-competency-badge-icon i {
+    font-size: 28px;
+    line-height: 1.714;
+}
+
+.plus-competency-badge.h3 .plus-competency-badge-icon i {
+    font-size: 24px;
+    line-height: 1.667;
+}
+
+.plus-competency-badge.h4 .plus-competency-badge-icon i {
+    font-size: 20px;
+    line-height: 1.6;
+}
+
+.plus-competency-badge.h5 .plus-competency-badge-icon i {
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.plus-competency-badge.h6 .plus-competency-badge-icon i,
+.plus-competency-badge.b1 .plus-competency-badge-icon i {
+    font-size: 14px;
+    line-height: 1.714;
+}
+
+.plus-competency-badge.b2 .plus-competency-badge-icon i {
+    font-size: 12px;
+    line-height: 1.833;
+}
+
+.plus-competency-badge.b3 .plus-competency-badge-icon i {
+    font-size: 10px;
+    line-height: 2;
+}
+
+/* Size Variants - Text Typography */
+/* Figma: H1-H3 use Lato Bold, H4-H6 use Lato SemiBold, B1-B3 use Merriweather Sans Regular */
+.plus-competency-badge.h1 .plus-competency-badge-text,
+.plus-competency-badge.h2 .plus-competency-badge-text,
+.plus-competency-badge.h3 .plus-competency-badge-text {
+    font-family: var(--font-family-header, 'Lato');
+    font-weight: var(--font-weight-bold, 700);
+    font-style: normal;
+}
+
+.plus-competency-badge.h1 .plus-competency-badge-text {
+    white-space: nowrap;
+}
+
+.plus-competency-badge.h1 .plus-competency-badge-text p {
+    font-size: var(--font-size-h1, 40px);
+    line-height: 1.6;
+    white-space: pre;
+}
+
+.plus-competency-badge.h2 .plus-competency-badge-text {
+    white-space: nowrap;
+}
+
+.plus-competency-badge.h2 .plus-competency-badge-text p {
+    font-size: var(--font-size-h2, 32px);
+    line-height: 1.5;
+    white-space: pre;
+}
+
+.plus-competency-badge.h3 .plus-competency-badge-text {
+    white-space: nowrap;
+}
+
+.plus-competency-badge.h3 .plus-competency-badge-text p {
+    font-size: var(--font-size-h3, 28px);
+    line-height: 1.429;
+    white-space: pre;
+}
+
+.plus-competency-badge.h4 .plus-competency-badge-text,
+.plus-competency-badge.h5 .plus-competency-badge-text,
+.plus-competency-badge.h6 .plus-competency-badge-text {
+    font-family: var(--font-family-header, 'Lato');
+    font-weight: var(--font-weight-semibold-2, 600);
+    font-style: normal;
+    white-space: nowrap;
+}
+
+.plus-competency-badge.h4 .plus-competency-badge-text p {
+    font-size: var(--font-size-h4, 24px);
+    line-height: 1.333;
+    white-space: pre;
+}
+
+.plus-competency-badge.h5 .plus-competency-badge-text p {
+    font-size: var(--font-size-h5, 20px);
+    line-height: 1.4;
+    white-space: pre;
+}
+
+.plus-competency-badge.h6 .plus-competency-badge-text p {
+    font-size: var(--font-size-h6, 16px);
+    line-height: 1.5;
+    white-space: pre;
+}
+
+.plus-competency-badge.b1 .plus-competency-badge-text,
+.plus-competency-badge.b2 .plus-competency-badge-text,
+.plus-competency-badge.b3 .plus-competency-badge-text {
+    flex: 1 0 0;
+    font-family: var(--font-family-body, 'Merriweather Sans');
+    font-weight: var(--font-weight-normal, 400);
+    min-height: 1px;
+    min-width: 1px;
+}
+
+.plus-competency-badge.b1 .plus-competency-badge-text p {
+    font-size: var(--font-size-body1, 16px);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.plus-competency-badge.b2 .plus-competency-badge-text p {
+    font-size: var(--font-size-body2, 14px);
+    line-height: 1.571;
+    white-space: pre-wrap;
+}
+
+.plus-competency-badge.b3 .plus-competency-badge-text p {
+    font-size: var(--font-size-body3, 12px);
+    line-height: 1.667;
+    white-space: pre-wrap;
+}
+
+/* Competency Area Color Variants */
+/* Background uses state-layer-08, icon uses main color, text uses text color */
+
+/* Social-Emotional */
+.plus-competency-badge-socio-emotional .plus-competency-badge-container {
+    background-color: var(--color-social-emotional-state-08) !important;
+}
+
+.plus-competency-badge-socio-emotional .plus-competency-badge-icon i {
+    color: var(--color-social-emotional);
+}
+
+.plus-competency-badge-socio-emotional .plus-competency-badge-text,
+.plus-competency-badge-socio-emotional .plus-competency-badge-text p {
+    color: var(--color-social-emotional-text);
+}
+
+/* Mastering Content */
+.plus-competency-badge-mastering-content .plus-competency-badge-container {
+    background-color: var(--color-mastering-content-state-08) !important;
+}
+
+.plus-competency-badge-mastering-content .plus-competency-badge-icon i {
+    color: var(--color-mastering-content);
+}
+
+.plus-competency-badge-mastering-content .plus-competency-badge-text,
+.plus-competency-badge-mastering-content .plus-competency-badge-text p {
+    color: var(--color-mastering-content-text);
+}
+
+/* Advocacy */
+.plus-competency-badge-advocacy .plus-competency-badge-container {
+    background-color: var(--color-advocacy-state-08) !important;
+}
+
+.plus-competency-badge-advocacy .plus-competency-badge-icon i {
+    color: var(--color-advocacy);
+}
+
+.plus-competency-badge-advocacy .plus-competency-badge-text,
+.plus-competency-badge-advocacy .plus-competency-badge-text p {
+    color: var(--color-advocacy-text);
+}
+
+/* Relationships */
+.plus-competency-badge-relationships .plus-competency-badge-container {
+    background-color: var(--color-relationship-state-08) !important;
+}
+
+.plus-competency-badge-relationships .plus-competency-badge-icon i {
+    color: var(--color-relationship);
+}
+
+.plus-competency-badge-relationships .plus-competency-badge-text,
+.plus-competency-badge-relationships .plus-competency-badge-text p {
+    color: var(--color-relationship-text);
+}
+
+/* Technology Tools */
+.plus-competency-badge-technology-tools .plus-competency-badge-container {
+    background-color: var(--color-technology-tools-state-08) !important;
+}
+
+.plus-competency-badge-technology-tools .plus-competency-badge-icon i {
+    color: var(--color-technology-tools);
+}
+
+.plus-competency-badge-technology-tools .plus-competency-badge-text,
+.plus-competency-badge-technology-tools .plus-competency-badge-text p {
+    color: var(--color-technology-tools-text);
+}
+

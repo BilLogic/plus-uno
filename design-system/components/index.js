@@ -15,14 +15,12 @@ export { createToast, showToast, hideToastElement, clearAllToasts, createStaticT
 export { createBreadcrumb } from './Breadcrumb/index.js';
 export { createBadge, createChip } from './Badge/index.js';
 export { createDivider } from './Divider/index.js';
-export { createStatusIcon } from './StatusIcon/index.js';
-export { createContentStatusTag } from './ContentStatusTag/index.js';
 export { createSuperCompPillDiv } from './SuperCompPill/index.js';
-export { createStatusIndicator } from './StatusIndicator/index.js';
 export { createDropdown } from './Dropdown/index.js';
 export { createCard } from './Card/index.js';
 export { createModal } from './Modal/index.js';
 export { createNavigation } from './Navigation/index.js';
+export { createNavbar } from './Navbar/index.js';
 export { createTextarea, createSelect, createRangeInput, createSelectMultiple } from './Form/index.js';
 export { createDatePicker } from './DatePicker/index.js';
 export { createInputGroup } from './InputGroup/index.js';
@@ -34,14 +32,15 @@ export { createMediaObject, createNestedMediaObject } from './MediaObject/index.
 export { createProgress, updateProgress } from './Progress/index.js';
 export { createSpinner } from './Spinner/index.js';
 export { createLoadingGif } from './LoadingGif/index.js';
-export { createPopover, createPopoverButton } from './Popover/index.js';
+export { createPopover, createPopoverButton, createStaticPopover } from './Popover/index.js';
 export { createPagination } from './Pagination/index.js';
-export { createTooltip, createTooltipButton, destroyAllTooltips } from './Tooltip/index.js';
+export { createTooltip, createTooltipButton, destroyAllTooltips, createStaticTooltip } from './Tooltip/index.js';
 export { createScrollspy, createScrollspyContent } from './Scrollspy/index.js';
 export { createRichTextEditor } from './RichTextEditor/index.js';
 export { createSidebarTab } from './SidebarTab/index.js';
 export { createUserAvatar } from './UserAvatar/index.js';
 export { createStaticBadgeSmart } from './StaticBadgeSmart/index.js';
+export { createCompetencyBadge } from './CompetencyBadge/index.js';
 export { createCheckbox, createCheckboxGroup } from './Checkbox/index.js';
 export { createRadio, createRadioGroup } from './Radio/index.js';
 export { createSwitch } from './Switch/index.js';
@@ -79,6 +78,7 @@ import { createDropdown } from './Dropdown/index.js';
 import { createCard } from './Card/index.js';
 import { createModal } from './Modal/index.js';
 import { createNavigation } from './Navigation/index.js';
+import { createNavbar } from './Navbar/index.js';
 import { createTextarea, createSelect, createRangeInput, createSelectMultiple } from './Form/index.js';
 import { createDatePicker } from './DatePicker/index.js';
 import { createInputGroup } from './InputGroup/index.js';
@@ -90,14 +90,13 @@ import { createMediaObject, createNestedMediaObject } from './MediaObject/index.
 import { createProgress, updateProgress } from './Progress/index.js';
 import { createSpinner } from './Spinner/index.js';
 import { createLoadingGif } from './LoadingGif/index.js';
-import { createPopover, createPopoverButton } from './Popover/index.js';
+import { createPopover, createPopoverButton, createStaticPopover } from './Popover/index.js';
 import { createPagination } from './Pagination/index.js';
-import { createTooltip, createTooltipButton, destroyAllTooltips } from './Tooltip/index.js';
+import { createTooltip, createTooltipButton, destroyAllTooltips, createStaticTooltip } from './Tooltip/index.js';
 import { createScrollspy, createScrollspyContent } from './Scrollspy/index.js';
 import { createRichTextEditor } from './RichTextEditor/index.js';
-import { createStatusIcon } from './StatusIcon/index.js';
-import { createContentStatusTag } from './ContentStatusTag/index.js';
 import { createSuperCompPillDiv } from './SuperCompPill/index.js';
+import { createCompetencyBadge } from './CompetencyBadge/index.js';
 import { BUTTON_CONSTANTS, SMART_CONSTANTS } from './constants.js';
 
 /**
@@ -123,6 +122,7 @@ export class PlusInterface {
     static createCard = createCard;
     static createModal = createModal;
     static createNavigation = createNavigation;
+    static createNavbar = createNavbar;
     static createTextarea = createTextarea;
     static createSelect = createSelect;
     static createRangeInput = createRangeInput;
@@ -139,6 +139,7 @@ export class PlusInterface {
     static createNestedMediaObject = createNestedMediaObject;
     static createPopover = createPopover;
     static createPopoverButton = createPopoverButton;
+    static createStaticPopover = createStaticPopover;
     static createPagination = createPagination;
     static createTooltip = createTooltip;
     static createTooltipButton = createTooltipButton;
@@ -150,6 +151,7 @@ export class PlusInterface {
     static createLoadingGif = createLoadingGif;
     static createRichTextEditor = createRichTextEditor;
     static createLogo = AssetComponents.createLogo;
+    static createCompetencyBadge = createCompetencyBadge;
     
     // Legacy constants
     static BUTTON_FILL = BUTTON_CONSTANTS.FILL;
@@ -162,8 +164,6 @@ export class PlusInterface {
  * Legacy PlusSmartComponents class for backward compatibility
  */
 export class PlusSmartComponents {
-    static createStatusIcon = createStatusIcon;
-    static createContentStatusTag = createContentStatusTag;
     static createSuperCompPillDiv = createSuperCompPillDiv;
     
     // Legacy constants

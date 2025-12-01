@@ -1,17 +1,111 @@
 /**
  * Divider Content Variants Stories
- * Content-based variants organized under "Content Variants" subcategory
+ * 
+ * Shows content variants for dividers (normal opacity, 10% opacity).
+ * All other properties are kept constant (size: sm, style: dark).
  */
 
 import { PlusInterface } from "../index.js";
 
 export default {
-  title: 'Components/Divider/Content Variants',
+  title: 'Components/Divider/Content',
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'Divider content variants show different opacity options. 10% opacity is used for accordion/collapse use cases.',
+      },
+    },
+  },
+};
+
+/**
+ * Normal Opacity
+ * Standard divider with full opacity
+ */
+export const NormalOpacity = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.width = '100%';
+    container.style.maxWidth = '600px';
+    container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
+    container.style.backgroundColor = 'var(--color-surface-container)';
+    container.style.borderRadius = 'var(--size-card-radius-sm)';
+    
+    const divider = PlusInterface.createDivider({
+      size: 'sm',
+      style: 'dark',
+      width: '100%'
+    });
+    container.appendChild(divider);
+    return container;
+  },
+};
+
+/**
+ * 10% Opacity
+ * Divider with 10% opacity for subtle separation (accordion/collapse use cases)
+ */
+export const Opacity10 = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.width = '100%';
+    container.style.maxWidth = '600px';
+    container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
+    container.style.backgroundColor = 'var(--color-surface-container)';
+    container.style.borderRadius = 'var(--size-card-radius-sm)';
+    
+    const divider = PlusInterface.createDivider({
+      size: 'sm',
+      style: 'dark',
+      opacity10: true,
+      width: '100%'
+    });
+    container.appendChild(divider);
+    return container;
+  },
+};
+
+/**
+ * All Content Variants
+ * Side-by-side comparison of normal and 10% opacity
+ */
+export const AllContent = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-element-gap-sm)';
+    container.style.width = '100%';
+    container.style.maxWidth = '600px';
+    container.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
+    container.style.backgroundColor = 'var(--color-surface-container)';
+    container.style.borderRadius = 'var(--size-card-radius-sm)';
+    
+    // Normal opacity
+    const normalDivider = PlusInterface.createDivider({
+      size: 'sm',
+      style: 'dark',
+      width: '100%'
+    });
+    container.appendChild(normalDivider);
+    
+    // 10% opacity
+    const opacityDivider = PlusInterface.createDivider({
+      size: 'sm',
+      style: 'dark',
+      opacity10: true,
+      width: '100%'
+    });
+    container.appendChild(opacityDivider);
+    
+    return container;
+  },
 };
 
 /**
  * Divider with Opacity
+ * @deprecated Use NormalOpacity or Opacity10 instead
  */
 export const WithOpacity = {
   render: () => {
