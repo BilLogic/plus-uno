@@ -70,20 +70,105 @@ export default {
   },
 };
 
+
 /**
- * Default Pagination (Icon Type, Medium Size)
- * Standard pagination with icon Previous/Next buttons
+ * Overview
+ * Shows all pagination variants organized by category in a scrollable format
  */
-export const Default = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
     container.style.padding = 'var(--size-section-pad-y-md)';
     
-    const pagination = PlusInterface.createPagination({
+    // Content Section
+    const contentSection = document.createElement('div');
+    contentSection.style.display = 'flex';
+    contentSection.style.flexDirection = 'column';
+    contentSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const contentHeading = document.createElement('div');
+    contentHeading.className = 'h5';
+    contentHeading.textContent = 'Content';
+    contentHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    contentSection.appendChild(contentHeading);
+    
+    const iconPagination = PlusInterface.createPagination({
       currentPage: 5,
       totalPages: 10,
       type: 'icon',
       size: 'default',
+      onPageChange: () => {},
+    });
+    contentSection.appendChild(iconPagination);
+    container.appendChild(contentSection);
+    
+    // Sizes Section
+    const sizesSection = document.createElement('div');
+    sizesSection.style.display = 'flex';
+    sizesSection.style.flexDirection = 'column';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
+    
+    const smallPagination = PlusInterface.createPagination({
+      currentPage: 3,
+      totalPages: 5,
+      type: 'icon',
+      size: 'small',
+      onPageChange: () => {},
+    });
+    sizesSection.appendChild(smallPagination);
+    container.appendChild(sizesSection);
+    
+    // States Section
+    const statesSection = document.createElement('div');
+    statesSection.style.display = 'flex';
+    statesSection.style.flexDirection = 'column';
+    statesSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const statesHeading = document.createElement('div');
+    statesHeading.className = 'h5';
+    statesHeading.textContent = 'States';
+    statesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    statesSection.appendChild(statesHeading);
+    
+    const firstPagePagination = PlusInterface.createPagination({
+      currentPage: 1,
+      totalPages: 10,
+      type: 'icon',
+      size: 'default',
+      onPageChange: () => {},
+    });
+    statesSection.appendChild(firstPagePagination);
+    container.appendChild(statesSection);
+    
+    return container;
+  },
+};
+
+export const Interactive = {
+  render: (args) => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-element-gap-md)';
+    container.style.padding = 'var(--size-section-pad-y-md)';
+    
+    const pagination = PlusInterface.createPagination({
+      currentPage: args.currentPage || 5,
+      totalPages: args.totalPages || 10,
+      type: args.type || 'icon',
+      size: args.size || 'default',
+      maxVisible: args.maxVisible || 5,
+      prevText: args.prevText || 'Previous',
+      nextText: args.nextText || 'Next',
       onPageChange: (page) => {
         console.log('Page changed to:', page);
       }
@@ -92,225 +177,45 @@ export const Default = {
     container.appendChild(pagination);
     return container;
   },
-};
-
-/**
- * Text Type Pagination
- * Pagination with text Previous/Next buttons
- */
-export const TextType = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const pagination = PlusInterface.createPagination({
-      currentPage: 5,
-      totalPages: 10,
-      type: 'text',
-      size: 'default',
-      onPageChange: (page) => console.log('Page:', page)
-    });
-    
-    container.appendChild(pagination);
-    return container;
+  argTypes: {
+    currentPage: {
+      control: { type: 'number', min: 1, max: 20, step: 1 },
+      description: 'Current active page (1-indexed)',
+    },
+    totalPages: {
+      control: { type: 'number', min: 1, max: 20, step: 1 },
+      description: 'Total number of pages',
+    },
+    type: {
+      control: 'select',
+      options: ['icon', 'text'],
+      description: 'Pagination type',
+    },
+    size: {
+      control: 'select',
+      options: ['small', 'default', 'large'],
+      description: 'Pagination size',
+    },
+    maxVisible: {
+      control: { type: 'number', min: 3, max: 9, step: 1 },
+      description: 'Maximum number of visible page numbers',
+    },
+    prevText: {
+      control: 'text',
+      description: 'Previous button text (for text type)',
+    },
+    nextText: {
+      control: 'text',
+      description: 'Next button text (for text type)',
+    },
   },
-};
-
-/**
- * First Page
- * Pagination showing the first page
- */
-export const FirstPage = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const pagination = PlusInterface.createPagination({
-      currentPage: 1,
-      totalPages: 10,
-      type: 'icon',
-      onPageChange: (page) => console.log('Page:', page)
-    });
-    
-    container.appendChild(pagination);
-    return container;
-  },
-};
-
-/**
- * Last Page
- * Pagination showing the last page
- */
-export const LastPage = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const pagination = PlusInterface.createPagination({
-      currentPage: 10,
-      totalPages: 10,
-      type: 'icon',
-      onPageChange: (page) => console.log('Page:', page)
-    });
-    
-    container.appendChild(pagination);
-    return container;
-  },
-};
-
-/**
- * Many Pages with Ellipsis
- * Pagination with many pages showing ellipsis for page ranges
- */
-export const ManyPages = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const pagination = PlusInterface.createPagination({
-      currentPage: 25,
-      totalPages: 50,
-      type: 'icon',
-      maxVisible: 5,
-      onPageChange: (page) => console.log('Page:', page)
-    });
-    
-    container.appendChild(pagination);
-    return container;
-  },
-};
-
-/**
- * Size Variants
- * All size variants: small, default, and large
- */
-export const SizeVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-md)';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const sizes = ['small', 'default', 'large'];
-    
-    sizes.forEach(size => {
-      const sizeContainer = document.createElement('div');
-      sizeContainer.style.display = 'flex';
-      sizeContainer.style.flexDirection = 'column';
-      sizeContainer.style.gap = 'var(--size-element-gap-sm)';
-      
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} Size (Icon Type):`;
-      label.style.marginBottom = 'var(--size-element-gap-xs)';
-      sizeContainer.appendChild(label);
-      
-      const pagination = PlusInterface.createPagination({
-        currentPage: 5,
-        totalPages: 10,
-        type: 'icon',
-        size: size,
-        onPageChange: (page) => console.log(`${size} pagination - Page:`, page)
-      });
-      
-      sizeContainer.appendChild(pagination);
-      container.appendChild(sizeContainer);
-    });
-    
-    return container;
-  },
-};
-
-/**
- * Type Variants
- * Icon and text type variants
- */
-export const TypeVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-md)';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const types = [
-      { type: 'icon', label: 'Icon Type' },
-      { type: 'text', label: 'Text Type' }
-    ];
-    
-    types.forEach(({ type, label }) => {
-      const typeContainer = document.createElement('div');
-      typeContainer.style.display = 'flex';
-      typeContainer.style.flexDirection = 'column';
-      typeContainer.style.gap = 'var(--size-element-gap-sm)';
-      
-      const typeLabel = document.createElement('div');
-      typeLabel.className = 'body2-txt';
-      typeLabel.textContent = `${label}:`;
-      typeLabel.style.marginBottom = 'var(--size-element-gap-xs)';
-      typeContainer.appendChild(typeLabel);
-      
-      const pagination = PlusInterface.createPagination({
-        currentPage: 5,
-        totalPages: 10,
-        type: type,
-        size: 'default',
-        onPageChange: (page) => console.log(`${type} pagination - Page:`, page)
-      });
-      
-      typeContainer.appendChild(pagination);
-      container.appendChild(typeContainer);
-    });
-    
-    return container;
-  },
-};
-
-/**
- * All Variants
- * Comprehensive showcase of all pagination variants
- */
-export const AllVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const variants = [
-      { type: 'icon', size: 'small', label: 'Small Icon Type' },
-      { type: 'icon', size: 'default', label: 'Default Icon Type' },
-      { type: 'icon', size: 'large', label: 'Large Icon Type' },
-      { type: 'text', size: 'small', label: 'Small Text Type' },
-      { type: 'text', size: 'default', label: 'Default Text Type' },
-      { type: 'text', size: 'large', label: 'Large Text Type' }
-    ];
-    
-    variants.forEach(({ type, size, label }) => {
-      const variantContainer = document.createElement('div');
-      variantContainer.style.display = 'flex';
-      variantContainer.style.flexDirection = 'column';
-      variantContainer.style.gap = 'var(--size-element-gap-sm)';
-      
-      const variantLabel = document.createElement('div');
-      variantLabel.className = 'h6';
-      variantLabel.textContent = `${label}:`;
-      variantContainer.appendChild(variantLabel);
-      
-      const pagination = PlusInterface.createPagination({
-        currentPage: 5,
-        totalPages: 10,
-        type: type,
-        size: size,
-        onPageChange: () => {}
-      });
-      
-      variantContainer.appendChild(pagination);
-      container.appendChild(variantContainer);
-    });
-    
-    return container;
+  args: {
+    currentPage: 5,
+    totalPages: 10,
+    type: 'icon',
+    size: 'default',
+    maxVisible: 5,
+    prevText: 'Previous',
+    nextText: 'Next',
   },
 };

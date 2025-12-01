@@ -146,3 +146,55 @@ export function createPopoverButton({
     });
 }
 
+/**
+ * Creates a static popover element for Storybook display (always visible, no interaction required)
+ * Matches Figma design system specifications exactly
+ * @param {Object} options - Static popover configuration options
+ * @param {string} options.content - Popover content text
+ * @param {string} [options.title] - Popover title (optional - creates "title + content" type)
+ * @param {string} [options.placement="top"] - Popover placement ("top", "bottom", "left", "right")
+ * @returns {HTMLElement} Static popover element
+ */
+export function createStaticPopover({
+    content,
+    title,
+    placement = "top"
+} = {}) {
+    const popover = document.createElement("div");
+    popover.className = `popover plus-popover bs-popover-${placement}`;
+    popover.setAttribute("data-placement", placement);
+    
+    // Create arrow
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    popover.appendChild(arrow);
+    
+    // Create popover body container (this has the box styling: border-radius, shadow, width)
+    const popoverBody = document.createElement("div");
+    popoverBody.className = "popover-body";
+    
+    // Add title if provided
+    if (title) {
+        const titleElement = document.createElement("div");
+        titleElement.className = "plus-popover-title";
+        titleElement.textContent = title;
+        popoverBody.appendChild(titleElement);
+    }
+    
+    // Add body content
+    const bodyElement = document.createElement("div");
+    bodyElement.className = "plus-popover-body";
+    bodyElement.textContent = content;
+    
+    // Apply special padding for top direction with title
+    if (placement === "top" && title) {
+        bodyElement.style.paddingLeft = "var(--size-modal-pad-x-sm)";
+        bodyElement.style.paddingRight = "var(--size-modal-pad-x-sm)";
+    }
+    
+    popoverBody.appendChild(bodyElement);
+    popover.appendChild(popoverBody);
+    
+    return popover;
+}
+

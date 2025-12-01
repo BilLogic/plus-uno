@@ -66,6 +66,8 @@
  */
 
 import { createTooltip, createTooltipButton, destroyAllTooltips } from "../index.js";
+import { AllOrientations as TooltipAllOrientations } from "./Tooltip.Orientations.stories.js";
+import { AllSizes as TooltipAllSizes } from "./Tooltip.Sizes.stories.js";
 
 export default {
   title: 'Components/Tooltip',
@@ -89,10 +91,10 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all tooltip combinations: placements, sizes, and trigger types
+ * Overview
+ * Shows all tooltip variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
@@ -100,136 +102,33 @@ export const AllVariants = {
     container.style.gap = 'var(--size-section-gap-lg)';
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     
-    // Placements section
-    const placementsSection = document.createElement('div');
-    placementsSection.style.display = 'flex';
-    placementsSection.style.flexDirection = 'column';
-    placementsSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const placementsLabel = document.createElement('div');
-    placementsLabel.className = 'h4';
-    placementsLabel.textContent = 'Placements';
-    placementsLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    placementsSection.appendChild(placementsLabel);
-    
-    const placementsContainer = document.createElement('div');
-    placementsContainer.style.display = 'flex';
-    placementsContainer.style.flexWrap = 'wrap';
-    placementsContainer.style.gap = 'var(--size-card-gap-md)';
-    placementsContainer.style.alignItems = 'center';
-    
-    const placements = ['top', 'bottom', 'left', 'right'];
-    placements.forEach((placement) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-primary';
-      button.textContent = `Tooltip ${placement.charAt(0).toUpperCase() + placement.slice(1)}`;
+    const createSection = (title, contentRender) => {
+      const section = document.createElement('div');
+      section.style.display = 'flex';
+      section.style.flexDirection = 'column';
+      section.style.gap = 'var(--size-card-gap-md)';
       
-      createTooltip({
-        trigger: button,
-        text: `This is a tooltip positioned ${placement} of the trigger element.`,
-        placement: placement,
-        triggerType: 'hover',
-        size: 'default'
-      });
+      const heading = document.createElement('div');
+      heading.className = 'h5';
+      heading.textContent = title;
+      heading.style.marginBottom = 'var(--size-element-gap-sm)';
+      section.appendChild(heading);
       
-      placementsContainer.appendChild(button);
-    });
+      const content = contentRender();
+      section.appendChild(content);
+      return section;
+    };
     
-    placementsSection.appendChild(placementsContainer);
-    container.appendChild(placementsSection);
+    // Orientations Section
+    container.appendChild(createSection('Orientations', TooltipAllOrientations.render));
     
-    // Sizes section
-    const sizesSection = document.createElement('div');
-    sizesSection.style.display = 'flex';
-    sizesSection.style.flexDirection = 'column';
-    sizesSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const sizesLabel = document.createElement('div');
-    sizesLabel.className = 'h4';
-    sizesLabel.textContent = 'Sizes';
-    sizesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    sizesSection.appendChild(sizesLabel);
-    
-    const sizesContainer = document.createElement('div');
-    sizesContainer.style.display = 'flex';
-    sizesContainer.style.flexWrap = 'wrap';
-    sizesContainer.style.gap = 'var(--size-card-gap-md)';
-    sizesContainer.style.alignItems = 'center';
-    
-    const sizes = ['small', 'default', 'large'];
-    sizes.forEach((size) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-primary';
-      button.textContent = `${size.charAt(0).toUpperCase() + size.slice(1)} Tooltip`;
-      
-      createTooltip({
-        trigger: button,
-        text: `This is a ${size} tooltip with different padding and typography.`,
-        placement: 'top',
-        triggerType: 'hover',
-        size: size
-      });
-      
-      sizesContainer.appendChild(button);
-    });
-    
-    sizesSection.appendChild(sizesContainer);
-    container.appendChild(sizesSection);
-    
-    // Trigger types section
-    const triggersSection = document.createElement('div');
-    triggersSection.style.display = 'flex';
-    triggersSection.style.flexDirection = 'column';
-    triggersSection.style.gap = 'var(--size-card-gap-md)';
-    
-    const triggersLabel = document.createElement('div');
-    triggersLabel.className = 'h4';
-    triggersLabel.textContent = 'Trigger Types';
-    triggersLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    triggersSection.appendChild(triggersLabel);
-    
-    const triggersContainer = document.createElement('div');
-    triggersContainer.style.display = 'flex';
-    triggersContainer.style.flexWrap = 'wrap';
-    triggersContainer.style.gap = 'var(--size-card-gap-md)';
-    triggersContainer.style.alignItems = 'center';
-    
-    const triggerTypes = [
-      { type: 'hover', label: 'Hover Trigger' },
-      { type: 'focus', label: 'Focus Trigger' },
-      { type: 'click', label: 'Click Trigger' }
-    ];
-    
-    triggerTypes.forEach(({ type, label }) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-primary';
-      button.textContent = label;
-      
-      createTooltip({
-        trigger: button,
-        text: `This tooltip is triggered by ${type}.`,
-        placement: 'top',
-        triggerType: type,
-        size: 'default'
-      });
-      
-      triggersContainer.appendChild(button);
-    });
-    
-    triggersSection.appendChild(triggersContainer);
-    container.appendChild(triggersSection);
+    // Sizes Section
+    container.appendChild(createSection('Sizes', TooltipAllSizes.render));
     
     return container;
   },
 };
 
-/**
- * Interactive Tooltip
- * Interactive playground for testing tooltip variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
@@ -289,214 +188,4 @@ export const Interactive = {
   },
 };
 
-/**
- * Contextual Help Example
- * Shows tooltip used for form field help text and icon buttons
- */
-export const ContextualHelp = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    container.style.maxWidth = '500px';
-    
-    const form = document.createElement('form');
-    form.style.display = 'flex';
-    form.style.flexDirection = 'column';
-    form.style.gap = 'var(--size-card-gap-md)';
-    
-    // Form field with help tooltip
-    const fieldGroup = document.createElement('div');
-    fieldGroup.style.display = 'flex';
-    fieldGroup.style.flexDirection = 'column';
-    fieldGroup.style.gap = 'var(--size-element-gap-xs)';
-    
-    const labelContainer = document.createElement('div');
-    labelContainer.style.display = 'flex';
-    labelContainer.style.alignItems = 'center';
-    labelContainer.style.gap = 'var(--size-element-gap-sm)';
-    
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = 'Email Address';
-    labelContainer.appendChild(label);
-    
-    const helpIcon = document.createElement('i');
-    helpIcon.className = 'fas fa-question-circle';
-    helpIcon.style.cursor = 'help';
-    helpIcon.style.color = 'var(--color-primary)';
-    helpIcon.setAttribute('aria-label', 'Help');
-    
-    createTooltip({
-      trigger: helpIcon,
-      text: 'Enter your email address. We will use this to send you important updates.',
-      placement: 'right',
-      triggerType: 'hover',
-      size: 'default'
-    });
-    
-    labelContainer.appendChild(helpIcon);
-    fieldGroup.appendChild(labelContainer);
-    
-    const input = document.createElement('input');
-    input.type = 'email';
-    input.className = 'form-control plus-text-field body2-txt';
-    input.placeholder = 'example@email.com';
-    fieldGroup.appendChild(input);
-    
-    form.appendChild(fieldGroup);
-    
-    // Icon button with tooltip
-    const iconButtonGroup = document.createElement('div');
-    iconButtonGroup.style.display = 'flex';
-    iconButtonGroup.style.gap = 'var(--size-element-gap-sm)';
-    iconButtonGroup.style.alignItems = 'center';
-    
-    const iconButton = document.createElement('button');
-    iconButton.type = 'button';
-    iconButton.className = 'btn btn-link';
-    iconButton.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)';
-    iconButton.innerHTML = '<i class="fas fa-info-circle"></i>';
-    iconButton.setAttribute('aria-label', 'More information');
-    
-    createTooltip({
-      trigger: iconButton,
-      text: 'Click for more information about this feature.',
-      placement: 'top',
-      triggerType: 'hover',
-      size: 'default'
-    });
-    
-    iconButtonGroup.appendChild(iconButton);
-    form.appendChild(iconButtonGroup);
-    
-    container.appendChild(form);
-    
-    return container;
-  },
-};
-
-/**
- * Icon Buttons Example
- * Shows tooltips used for icon-only buttons to provide accessible descriptions
- */
-export const IconButtons = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-card-gap-md)';
-    
-    const buttonGroup = document.createElement('div');
-    buttonGroup.style.display = 'flex';
-    buttonGroup.style.gap = 'var(--size-element-gap-sm)';
-    buttonGroup.style.flexWrap = 'wrap';
-    
-    const icons = [
-      { icon: 'fa-edit', text: 'Edit this item', ariaLabel: 'Edit' },
-      { icon: 'fa-trash', text: 'Delete this item', ariaLabel: 'Delete' },
-      { icon: 'fa-save', text: 'Save changes', ariaLabel: 'Save' },
-      { icon: 'fa-share', text: 'Share this item', ariaLabel: 'Share' },
-      { icon: 'fa-download', text: 'Download file', ariaLabel: 'Download' }
-    ];
-    
-    icons.forEach(({ icon, text, ariaLabel }) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'btn btn-outline-primary';
-      button.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)';
-      button.innerHTML = `<i class="fas ${icon}"></i>`;
-      button.setAttribute('aria-label', ariaLabel);
-      
-      createTooltip({
-        trigger: button,
-        text: text,
-        placement: 'top',
-        triggerType: 'hover',
-        size: 'default'
-      });
-      
-      buttonGroup.appendChild(button);
-    });
-    
-    container.appendChild(buttonGroup);
-    
-    return container;
-  },
-};
-
-/**
- * Form Field Focus Example
- * Shows tooltips triggered on focus for form fields
- */
-export const FormFieldFocus = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    container.style.maxWidth = '500px';
-    
-    const form = document.createElement('form');
-    form.style.display = 'flex';
-    form.style.flexDirection = 'column';
-    form.style.gap = 'var(--size-card-gap-md)';
-    
-    // Password field with focus tooltip
-    const fieldGroup = document.createElement('div');
-    fieldGroup.style.display = 'flex';
-    fieldGroup.style.flexDirection = 'column';
-    fieldGroup.style.gap = 'var(--size-element-gap-xs)';
-    
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = 'Password';
-    fieldGroup.appendChild(label);
-    
-    const input = document.createElement('input');
-    input.type = 'password';
-    input.className = 'form-control plus-text-field body2-txt';
-    input.placeholder = 'Enter password';
-    
-    createTooltip({
-      trigger: input,
-      text: 'Password must be at least 8 characters long and include uppercase, lowercase, and numbers.',
-      placement: 'right',
-      triggerType: 'focus',
-      size: 'large'
-    });
-    
-    fieldGroup.appendChild(input);
-    form.appendChild(fieldGroup);
-    
-    // Username field with focus tooltip
-    const fieldGroup2 = document.createElement('div');
-    fieldGroup2.style.display = 'flex';
-    fieldGroup2.style.flexDirection = 'column';
-    fieldGroup2.style.gap = 'var(--size-element-gap-xs)';
-    
-    const label2 = document.createElement('label');
-    label2.className = 'form-label';
-    label2.textContent = 'Username';
-    fieldGroup2.appendChild(label2);
-    
-    const input2 = document.createElement('input');
-    input2.type = 'text';
-    input2.className = 'form-control plus-text-field body2-txt';
-    input2.placeholder = 'Enter username';
-    
-    createTooltip({
-      trigger: input2,
-      text: 'Username must be 3-20 characters and can contain letters, numbers, and underscores.',
-      placement: 'right',
-      triggerType: 'focus',
-      size: 'default'
-    });
-    
-    fieldGroup2.appendChild(input2);
-    form.appendChild(fieldGroup2);
-    
-    container.appendChild(form);
-    
-    return container;
-  },
-};
 

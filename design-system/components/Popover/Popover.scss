@@ -98,7 +98,7 @@
 }
 
 /* Arrow positioning and rotation based on direction */
-/* Top - arrow above, pointing down */
+/* Top - arrow at bottom edge, pointing down (toward trigger) */
 .popover.plus-popover.bs-popover-top .arrow,
 .popover.plus-popover.bs-popover-auto[x-placement^="top"] .arrow {
     bottom: -7px;
@@ -107,28 +107,31 @@
     /* Arrow points down (180deg rotation from default up position) */
 }
 
-/* Bottom - arrow below, pointing up */
+/* Bottom - arrow at top edge, pointing up (toward trigger) */
 .popover.plus-popover.bs-popover-bottom .arrow,
 .popover.plus-popover.bs-popover-auto[x-placement^="bottom"] .arrow {
     top: -7px;
     left: 50%;
-    transform: translateX(-50%) rotate(180deg);
+    transform: translateX(-50%);
+    /* Arrow points up (no rotation needed, default is up) */
 }
 
-/* Left - arrow on left, pointing right */
+/* Left - arrow at right edge, pointing right (toward trigger) */
 .popover.plus-popover.bs-popover-left .arrow,
 .popover.plus-popover.bs-popover-auto[x-placement^="left"] .arrow {
     right: -7px;
     top: 50%;
-    transform: translateY(-50%) rotate(270deg);
+    transform: translateY(-50%);
+    /* Arrow points right (border creates right-pointing arrow, no rotation needed) */
 }
 
-/* Right - arrow on right, pointing left */
+/* Right - arrow at left edge, pointing left (toward trigger) */
 .popover.plus-popover.bs-popover-right .arrow,
 .popover.plus-popover.bs-popover-auto[x-placement^="right"] .arrow {
     left: -7px;
     top: 50%;
-    transform: translateY(-50%) rotate(90deg);
+    transform: translateY(-50%);
+    /* Arrow points left (border creates left-pointing arrow, no rotation needed) */
 }
 
 /* Arrow shape - create triangle pointing up by default */
@@ -160,18 +163,21 @@
 }
 
 /* Adjust arrow for different directions */
-.popover.plus-popover.bs-popover-bottom .arrow::after,
-.popover.plus-popover.bs-popover-auto[x-placement^="bottom"] .arrow::after {
+/* Top - arrow points down */
+.popover.plus-popover.bs-popover-top .arrow::after,
+.popover.plus-popover.bs-popover-auto[x-placement^="top"] .arrow::after {
     border-color: transparent transparent var(--color-surface-container) transparent;
     border-width: 0 7px 7px 7px;
 }
 
-.popover.plus-popover.bs-popover-bottom .arrow::before,
-.popover.plus-popover.bs-popover-auto[x-placement^="bottom"] .arrow::before {
+.popover.plus-popover.bs-popover-top .arrow::before,
+.popover.plus-popover.bs-popover-auto[x-placement^="top"] .arrow::before {
     border-color: transparent transparent rgba(0, 0, 0, 0.25) transparent;
     border-width: 0 7px 7px 7px;
 }
 
+/* Bottom - arrow points up (default, no change needed) */
+/* Left - arrow points right */
 .popover.plus-popover.bs-popover-left .arrow::after,
 .popover.plus-popover.bs-popover-auto[x-placement^="left"] .arrow::after {
     border-color: transparent var(--color-surface-container) transparent transparent;
@@ -184,6 +190,7 @@
     border-width: 7px 7px 7px 0;
 }
 
+/* Right - arrow points left */
 .popover.plus-popover.bs-popover-right .arrow::after,
 .popover.plus-popover.bs-popover-auto[x-placement^="right"] .arrow::after {
     border-color: transparent transparent transparent var(--color-surface-container);

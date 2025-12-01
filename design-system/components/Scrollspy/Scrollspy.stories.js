@@ -49,10 +49,10 @@ export default {
 };
 
 /**
- * Basic
+ * Overview
  * Interactive scrollspy - scroll through the content to see the active nav item change
  */
-export const Basic = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.backgroundColor = 'var(--color-surface)';
@@ -63,7 +63,7 @@ export const Basic = {
     
     // Create scrollspy navbar
     const navbar = PlusInterface.createScrollspy({
-      id: 'scrollspy-nav-basic',
+      id: 'scrollspy-nav-overview',
       brand: 'Navbar',
       items: [
         { text: '@fat', href: '#fat', isDropdown: false },
@@ -71,7 +71,7 @@ export const Basic = {
         { text: 'Dropdown', href: '#one', isDropdown: true }
       ],
       activeIndex: 0,
-      contentId: 'scrollspy-content-basic',
+      contentId: 'scrollspy-content-overview',
       offset: 10
     });
     
@@ -79,8 +79,8 @@ export const Basic = {
     
     // Create scrollable content with enough height for scrolling
     const content = PlusInterface.createScrollspyContent({
-      id: 'scrollspy-content-basic',
-      navbarId: 'scrollspy-nav-basic',
+      id: 'scrollspy-content-overview',
+      navbarId: 'scrollspy-nav-overview',
       sections: [
         {
           id: 'fat',
@@ -122,6 +122,126 @@ export const Basic = {
     container.appendChild(content);
     
     return container;
+  },
+};
+
+export const Interactive = {
+  render: (args) => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-element-gap-md)';
+    container.style.backgroundColor = 'var(--color-surface)';
+    container.style.width = args.width || '648px';
+    container.style.maxHeight = args.maxHeight || '600px';
+    
+    const items = args.items || [
+      { text: '@fat', href: '#fat', isDropdown: false },
+      { text: '@mdo', href: '#mdo', isDropdown: false },
+      { text: 'Dropdown', href: '#one', isDropdown: true }
+    ];
+    
+    const navbar = PlusInterface.createScrollspy({
+      id: args.id || 'interactive-scrollspy-nav',
+      brand: args.brand || 'Navbar',
+      items: items,
+      activeIndex: args.activeIndex || 0,
+      contentId: args.contentId || 'interactive-scrollspy-content',
+      offset: args.offset || 10,
+      onActivate: (index) => {
+        console.log('Nav item activated:', index);
+      }
+    });
+    
+    container.appendChild(navbar);
+    
+    const sections = args.sections || [
+      {
+        id: 'fat',
+        title: '@fat',
+        content: "Placeholder content for the scrollspy example. You got the finest architecture. Passport stamps, she's cosmopolitan."
+      },
+      {
+        id: 'mdo',
+        title: '@mdo',
+        content: "Placeholder content for the scrollspy example. 'Cause she's the muse and the artist. So you wanna play with magic."
+      },
+      {
+        id: 'one',
+        title: 'one',
+        content: "Placeholder content for the scrollspy example. Takes you miles high, so high, 'cause she's got that one international smile."
+      }
+    ];
+    
+    const content = PlusInterface.createScrollspyContent({
+      id: args.contentId || 'interactive-scrollspy-content',
+      navbarId: args.id || 'interactive-scrollspy-nav',
+      sections: sections,
+      offset: args.offset || 10
+    });
+    
+    content.style.height = args.contentHeight || '500px';
+    content.style.overflowY = 'auto';
+    content.style.overflowX = 'hidden';
+    
+    // Add more content to each section
+    const sectionElements = content.querySelectorAll('.plus-scrollspy-section');
+    sectionElements.forEach((section, index) => {
+      for (let i = 0; i < 8; i++) {
+        const p = document.createElement('p');
+        p.className = 'body1-txt';
+        p.style.marginTop = '16px';
+        p.textContent = `Additional content paragraph ${i + 1} in section ${index + 1}.`;
+        section.appendChild(p);
+      }
+    });
+    
+    container.appendChild(content);
+    return container;
+  },
+  argTypes: {
+    id: {
+      control: 'text',
+      description: 'Scrollspy navbar ID',
+    },
+    brand: {
+      control: 'text',
+      description: 'Navbar brand text',
+    },
+    activeIndex: {
+      control: { type: 'number', min: 0, max: 2, step: 1 },
+      description: 'Initially active item index',
+    },
+    contentId: {
+      control: 'text',
+      description: 'Scrollable content container ID',
+    },
+    offset: {
+      control: { type: 'number', min: 0, max: 100, step: 10 },
+      description: 'Scroll offset in pixels',
+    },
+    width: {
+      control: 'text',
+      description: 'Container width',
+    },
+    maxHeight: {
+      control: 'text',
+      description: 'Container max height',
+    },
+    contentHeight: {
+      control: 'text',
+      description: 'Content scrollable height',
+    },
+  },
+  args: {
+    id: 'interactive-scrollspy-nav',
+    brand: 'Navbar',
+    activeIndex: 0,
+    contentId: 'interactive-scrollspy-content',
+    offset: 10,
+    width: '648px',
+    maxHeight: '600px',
+    contentHeight: '500px',
   },
 };
 

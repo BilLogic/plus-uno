@@ -118,10 +118,11 @@
         background-color: var(--color-primary-state-12);
     }
 
-    /* Focus state */
+    /* Focus state - Figma: 2px border with --color-inverse-primary */
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 2px var(--color-primary-state-16);
+        /* Create focus ring using box-shadow to simulate 2px border */
+        box-shadow: 0 0 0 2px var(--color-inverse-primary);
     }
 
     /* Disabled state */
@@ -155,5 +156,15 @@
 .plus-checkbox-wrapper.plus-checkbox-disabled .plus-checkbox-label {
     opacity: 0.38;
     cursor: not-allowed;
+}
+
+/* ============================================
+   REQUIRED INDICATOR
+   ============================================ */
+
+.plus-checkbox-required {
+    color: var(--color-danger);
+    margin-left: 2px;
+    font-weight: 400;
 }
 
