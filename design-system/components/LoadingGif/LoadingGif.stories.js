@@ -67,42 +67,35 @@ export default {
 };
 
 /**
- * All Animation Types
- * Shows all three loading animation types from Figma
+ * Overview
+ * Shows all loading GIF variants organized by category in a scrollable format
  */
-export const AllAnimationTypes = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
     
-    // Animation types section
-    const typesSection = document.createElement('div');
-    typesSection.style.display = 'flex';
-    typesSection.style.flexDirection = 'column';
-    typesSection.style.gap = 'var(--size-element-gap-sm)';
+    // Content Section (Animation Types)
+    const contentSection = document.createElement('div');
+    contentSection.style.display = 'flex';
+    contentSection.style.flexDirection = 'column';
+    contentSection.style.gap = 'var(--size-card-gap-md)';
     
-    const typesLabel = document.createElement('div');
-    typesLabel.className = 'h6';
-    typesLabel.textContent = 'Animation Types';
-    typesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    typesSection.appendChild(typesLabel);
+    const contentHeading = document.createElement('div');
+    contentHeading.className = 'h5';
+    contentHeading.textContent = 'Content';
+    contentHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    contentSection.appendChild(contentHeading);
     
-    const typesContainer = document.createElement('div');
-    typesContainer.style.display = 'flex';
-    typesContainer.style.flexDirection = 'row';
-    typesContainer.style.alignItems = 'center';
-    typesContainer.style.gap = 'var(--size-card-gap-lg)';
-    typesContainer.style.flexWrap = 'wrap';
+    const typesRow = document.createElement('div');
+    typesRow.style.display = 'flex';
+    typesRow.style.flexWrap = 'wrap';
+    typesRow.style.gap = 'var(--size-card-gap-md)';
+    typesRow.style.alignItems = 'center';
     
-    const types = [
-      { type: 'growing', label: 'Growing Grid', description: 'For Generating Content' },
-      { type: 'rotating', label: 'Rotating Grid', description: 'For Working with Existing Content' },
-      { type: 'stacking', label: 'Stacking Grid', description: 'For Uploading/Importing Content' }
-    ];
-    
-    types.forEach((typeInfo) => {
+    ['growing', 'rotating', 'stacking'].forEach((type) => {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
@@ -110,45 +103,35 @@ export const AllAnimationTypes = {
       wrapper.style.gap = 'var(--size-element-gap-sm)';
       
       const loadingGif = PlusInterface.createLoadingGif({
-        type: typeInfo.type,
+        type: type,
         size: 'default',
-        label: `${typeInfo.label}...`
+        label: `${type} loading...`
       });
       wrapper.appendChild(loadingGif);
-      
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.style.textAlign = 'center';
-      label.innerHTML = `<strong>${typeInfo.label}</strong><br>${typeInfo.description}`;
-      wrapper.appendChild(label);
-      
-      typesContainer.appendChild(wrapper);
+      typesRow.appendChild(wrapper);
     });
+    contentSection.appendChild(typesRow);
+    container.appendChild(contentSection);
     
-    typesSection.appendChild(typesContainer);
-    container.appendChild(typesSection);
-    
-    // Sizes section
+    // Sizes Section
     const sizesSection = document.createElement('div');
     sizesSection.style.display = 'flex';
     sizesSection.style.flexDirection = 'column';
-    sizesSection.style.gap = 'var(--size-element-gap-sm)';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
     
-    const sizesLabel = document.createElement('div');
-    sizesLabel.className = 'h6';
-    sizesLabel.textContent = 'Sizes';
-    sizesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    sizesSection.appendChild(sizesLabel);
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
     
-    const sizesContainer = document.createElement('div');
-    sizesContainer.style.display = 'flex';
-    sizesContainer.style.flexDirection = 'row';
-    sizesContainer.style.alignItems = 'center';
-    sizesContainer.style.gap = 'var(--size-card-gap-md)';
-    sizesContainer.style.flexWrap = 'wrap';
+    const sizesRow = document.createElement('div');
+    sizesRow.style.display = 'flex';
+    sizesRow.style.flexWrap = 'wrap';
+    sizesRow.style.gap = 'var(--size-card-gap-md)';
+    sizesRow.style.alignItems = 'center';
     
-    const sizes = ['small', 'default', 'large'];
-    sizes.forEach((size) => {
+    ['small', 'default', 'large'].forEach((size) => {
       const wrapper = document.createElement('div');
       wrapper.style.display = 'flex';
       wrapper.style.flexDirection = 'column';
@@ -161,26 +144,15 @@ export const AllAnimationTypes = {
         label: `Loading (${size})...`
       });
       wrapper.appendChild(loadingGif);
-      
-      const label = document.createElement('div');
-      label.className = 'body2-txt';
-      label.textContent = size.charAt(0).toUpperCase() + size.slice(1);
-      wrapper.appendChild(label);
-      
-      sizesContainer.appendChild(wrapper);
+      sizesRow.appendChild(wrapper);
     });
-    
-    sizesSection.appendChild(sizesContainer);
+    sizesSection.appendChild(sizesRow);
     container.appendChild(sizesSection);
     
     return container;
   },
 };
 
-/**
- * Interactive Loading GIF
- * Interactive playground for testing loading GIF variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
@@ -222,82 +194,4 @@ export const Interactive = {
   },
 };
 
-/**
- * Use Cases
- * Examples showing when to use each animation type
- */
-export const UseCases = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    
-    const useCases = [
-      {
-        type: 'growing',
-        title: 'Generating Content',
-        description: 'Use Growing Grid when user creates new content from scratch using AI or a built-in editor.',
-        example: 'Creating a new document, generating AI content, starting a new project'
-      },
-      {
-        type: 'rotating',
-        title: 'Working with Existing Content',
-        description: 'Use Rotating Grid when user edits or enhances content they previously created or saved.',
-        example: 'Editing a saved document, updating existing content, modifying previous work'
-      },
-      {
-        type: 'stacking',
-        title: 'Uploading/Importing Content',
-        description: 'Use Stacking Grid when user brings in external content (e.g., files, text, media) into the system.',
-        example: 'Uploading files, importing documents, bringing in external media'
-      }
-    ];
-    
-    useCases.forEach((useCase) => {
-      const section = document.createElement('div');
-      section.style.display = 'flex';
-      section.style.flexDirection = 'column';
-      section.style.gap = 'var(--size-element-gap-sm)';
-      section.style.padding = 'var(--size-card-pad-y-md)';
-      section.style.backgroundColor = 'var(--color-surface-container)';
-      section.style.borderRadius = 'var(--size-card-radius-sm)';
-      
-      const header = document.createElement('div');
-      header.style.display = 'flex';
-      header.style.alignItems = 'center';
-      header.style.gap = 'var(--size-element-gap-md)';
-      
-      const loadingGif = PlusInterface.createLoadingGif({
-        type: useCase.type,
-        size: 'default',
-        label: `${useCase.title}...`
-      });
-      header.appendChild(loadingGif);
-      
-      const title = document.createElement('div');
-      title.className = 'h6';
-      title.textContent = useCase.title;
-      header.appendChild(title);
-      
-      section.appendChild(header);
-      
-      const description = document.createElement('div');
-      description.className = 'body2-txt';
-      description.textContent = useCase.description;
-      section.appendChild(description);
-      
-      const example = document.createElement('div');
-      example.className = 'body3-txt';
-      example.style.color = 'var(--color-on-surface-variant)';
-      example.style.fontStyle = 'italic';
-      example.textContent = `Example: ${useCase.example}`;
-      section.appendChild(example);
-      
-      container.appendChild(section);
-    });
-    
-    return container;
-  },
-};
 

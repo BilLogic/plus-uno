@@ -190,3 +190,41 @@ export function destroyAllTooltips() {
     }
 }
 
+/**
+ * Creates a static tooltip element for Storybook display (always visible, no interaction required)
+ * Matches Figma design system specifications exactly
+ * @param {Object} options - Static tooltip configuration options
+ * @param {string} options.text - Tooltip text content
+ * @param {string} [options.placement="top"] - Tooltip placement ("top", "bottom", "left", "right")
+ * @param {string} [options.size="default"] - Tooltip size ("small", "default", "large")
+ * @returns {HTMLElement} Static tooltip element
+ */
+export function createStaticTooltip({
+    text,
+    placement = "top",
+    size = "default"
+} = {}) {
+    const tooltip = document.createElement("div");
+    tooltip.className = `tooltip bs-tooltip-${placement} show`;
+    if (size && size !== "default") {
+        tooltip.classList.add(`plus-tooltip-${size}`);
+    }
+    tooltip.setAttribute("data-placement", placement);
+    tooltip.setAttribute("data-tooltip-size", size);
+    tooltip.style.opacity = "1";
+    
+    // Create arrow
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    tooltip.appendChild(arrow);
+    
+    // Create tooltip inner (this has the box styling: border-radius, background, padding)
+    const tooltipInner = document.createElement("div");
+    tooltipInner.className = "tooltip-inner";
+    tooltipInner.textContent = text;
+    
+    tooltip.appendChild(tooltipInner);
+    
+    return tooltip;
+}
+

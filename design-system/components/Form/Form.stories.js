@@ -49,44 +49,106 @@ export default {
 
 /**
  * Overview
- * Overview of all form components
- * See Size Variants, States, and Content Variants for detailed examples
+ * Shows all form component variants organized by element type in a scrollable format
+ * Form components are organized by type: FormInput, Textarea, Select, and RangeInput
+ * Each type has its own folder with Sizes, States, and Content (where applicable) categories
  */
-export const Overview = () => {
-  const container = document.createElement('div');
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.gap = '48px';
-  container.style.padding = '24px';
-  container.style.backgroundColor = 'var(--color-surface)';
-  
-  const info = document.createElement('div');
-  info.className = 'body2-txt';
-  info.textContent = 'Form components include textarea, select, range input, and select multiple. See the subcategories for detailed variants:';
-  info.style.marginBottom = '24px';
-  container.appendChild(info);
-  
-  const list = document.createElement('ul');
-  list.style.paddingLeft = '24px';
-  list.style.marginBottom = '24px';
-  
-  const items = [
-    'Size Variants - All sizes (small, medium, large)',
-    'States - Default, with value, read-only, disabled',
-    'Content Variants - Options, multiple rows, custom ranges',
-    'Textarea Variants - All textarea-specific variations'
-  ];
-  
-  items.forEach(item => {
-    const li = document.createElement('li');
-    li.className = 'body2-txt';
-    li.textContent = item;
-    list.appendChild(li);
-  });
-  
-  container.appendChild(list);
-  
-  return container;
+export const Overview = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = '24px';
+    container.style.backgroundColor = 'var(--color-surface)';
+    container.style.maxWidth = '400px';
+    
+    // Form Input Section
+    const formInputSection = document.createElement('div');
+    formInputSection.style.display = 'flex';
+    formInputSection.style.flexDirection = 'column';
+    formInputSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const formInputHeading = document.createElement('div');
+    formInputHeading.className = 'h5';
+    formInputHeading.textContent = 'Form Input';
+    formInputHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    formInputSection.appendChild(formInputHeading);
+    
+    const formInput = document.createElement('input');
+    formInput.type = 'text';
+    formInput.className = 'plus-text-field body2-txt';
+    formInput.placeholder = 'Placeholder';
+    formInputSection.appendChild(formInput);
+    container.appendChild(formInputSection);
+    
+    // Textarea Section
+    const textareaSection = document.createElement('div');
+    textareaSection.style.display = 'flex';
+    textareaSection.style.flexDirection = 'column';
+    textareaSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const textareaHeading = document.createElement('div');
+    textareaHeading.className = 'h5';
+    textareaHeading.textContent = 'Textarea';
+    textareaHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    textareaSection.appendChild(textareaHeading);
+    
+    const textarea = PlusInterface.createTextarea({
+      placeholder: 'Placeholder',
+      size: 'medium',
+      rows: 3
+    });
+    textareaSection.appendChild(textarea);
+    container.appendChild(textareaSection);
+    
+    // Select Section
+    const selectSection = document.createElement('div');
+    selectSection.style.display = 'flex';
+    selectSection.style.flexDirection = 'column';
+    selectSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const selectHeading = document.createElement('div');
+    selectHeading.className = 'h5';
+    selectHeading.textContent = 'Select';
+    selectHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    selectSection.appendChild(selectHeading);
+    
+    const select = PlusInterface.createSelect({
+      options: [
+        { value: '', text: 'Choose...' },
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ],
+      size: 'medium'
+    });
+    selectSection.appendChild(select);
+    container.appendChild(selectSection);
+    
+    // Range Input Section
+    const rangeSection = document.createElement('div');
+    rangeSection.style.display = 'flex';
+    rangeSection.style.flexDirection = 'column';
+    rangeSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const rangeHeading = document.createElement('div');
+    rangeHeading.className = 'h5';
+    rangeHeading.textContent = 'Range Input';
+    rangeHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    rangeSection.appendChild(rangeHeading);
+    
+    const range = PlusInterface.createRangeInput({
+      min: 0,
+      max: 100,
+      value: 50,
+      size: 'medium'
+    });
+    rangeSection.appendChild(range);
+    container.appendChild(rangeSection);
+    
+    return container;
+  },
 };
 
 /**

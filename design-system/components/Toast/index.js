@@ -36,8 +36,8 @@ function getToastContainer(position = 'top-right') {
  * Creates a toast notification component
  * @param {Object} options - Toast configuration
  * @param {string} [options.id] - Toast ID
- * @param {string} options.style - Toast style (primary, secondary, success, danger, warning, info)
- * @param {string} [options.title] - Toast title/header
+ * @param {string} options.style - Toast style (default, success, danger, warning, info)
+ * @param {string} options.title - Toast title/header (required)
  * @param {string} options.text - Toast body text
  * @param {boolean} [options.dismissable=true] - Whether toast can be dismissed
  * @param {number} [options.delay=5000] - Auto-hide delay in milliseconds (0 to disable auto-hide)
@@ -63,6 +63,9 @@ export function createToast({
     if (!style) {
         throw new Error('Toast style is required');
     }
+    if (!title) {
+        throw new Error('Toast title is required');
+    }
     if (!text) {
         throw new Error('Toast text is required');
     }
@@ -82,59 +85,57 @@ export function createToast({
         toast.classList.add(style);
     }
 
-    // Create toast header if title is provided
-    if (title) {
-        const header = document.createElement('div');
-        header.className = 'plus-toast-header';
-        
-        // Icon
-        const icon = document.createElement('div');
-        icon.className = 'plus-toast-icon';
-        const iconMap = {
-            'danger': 'fa-triangle-exclamation',
-            'success': 'fa-circle-check',
-            'info': 'fa-circle-info',
-            'warning': 'fa-circle-exclamation',
-            'primary': 'fa-circle',
-            'secondary': 'fa-circle',
-            'default': 'fa-circle'
-        };
-        const iconClass = iconMap[style] || 'fa-circle';
-        icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
-        header.appendChild(icon);
-        
-        // Title
-        const titleEl = document.createElement('strong');
-        titleEl.className = 'plus-toast-title';
-        titleEl.textContent = title;
-        header.appendChild(titleEl);
-        
-        // Timestamp
-        const timestamp = document.createElement('div');
-        timestamp.className = 'plus-toast-timestamp';
-        timestamp.textContent = '11 mins ago';
-        header.appendChild(timestamp);
+    // Create toast header (always required)
+    const header = document.createElement('div');
+    header.className = 'plus-toast-header';
+    
+    // Icon
+    const icon = document.createElement('div');
+    icon.className = 'plus-toast-icon';
+    const iconMap = {
+        'danger': 'fa-triangle-exclamation',
+        'success': 'fa-circle-check',
+        'info': 'fa-circle-info',
+        'warning': 'fa-circle-exclamation',
+        'primary': 'fa-circle',
+        'secondary': 'fa-circle',
+        'default': 'fa-circle'
+    };
+    const iconClass = iconMap[style] || 'fa-circle';
+    icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+    header.appendChild(icon);
+    
+    // Title
+    const titleEl = document.createElement('strong');
+    titleEl.className = 'plus-toast-title';
+    titleEl.textContent = title;
+    header.appendChild(titleEl);
+    
+    // Timestamp
+    const timestamp = document.createElement('div');
+    timestamp.className = 'plus-toast-timestamp';
+    timestamp.textContent = '11 mins ago';
+    header.appendChild(timestamp);
 
-        // Dismiss button
-        if (dismissable) {
-            const dismissBtn = document.createElement('button');
-            dismissBtn.type = 'button';
-            dismissBtn.className = 'plus-toast-close';
-            dismissBtn.setAttribute('aria-label', 'Close');
-            dismissBtn.innerHTML = '<i class="fas fa-xmark"></i>';
-            dismissBtn.addEventListener('click', () => {
-                hideToast(toast, onDismiss);
-            });
-            header.appendChild(dismissBtn);
-        }
-        
-        toast.appendChild(header);
-        
-        // Divider
-        const divider = document.createElement('div');
-        divider.className = 'plus-toast-divider';
-        toast.appendChild(divider);
+    // Dismiss button
+    if (dismissable) {
+        const dismissBtn = document.createElement('button');
+        dismissBtn.type = 'button';
+        dismissBtn.className = 'plus-toast-close';
+        dismissBtn.setAttribute('aria-label', 'Close');
+        dismissBtn.innerHTML = '<i class="fas fa-xmark"></i>';
+        dismissBtn.addEventListener('click', () => {
+            hideToast(toast, onDismiss);
+        });
+        header.appendChild(dismissBtn);
     }
+    
+    toast.appendChild(header);
+    
+    // Divider
+    const divider = document.createElement('div');
+    divider.className = 'plus-toast-divider';
+    toast.appendChild(divider);
 
     // Create toast body
     const body = document.createElement('div');
@@ -218,8 +219,8 @@ export function hideToastElement(toast) {
  * This creates a toast that is not fixed-position and can be displayed in the document flow
  * @param {Object} options - Toast configuration
  * @param {string} [options.id] - Toast ID
- * @param {string} options.style - Toast style (primary, secondary, success, danger, warning, info)
- * @param {string} [options.title] - Toast title/header
+ * @param {string} options.style - Toast style (default, success, danger, warning, info)
+ * @param {string} options.title - Toast title/header (required)
  * @param {string} options.text - Toast body text
  * @param {boolean} [options.dismissable=true] - Whether toast can be dismissed
  * @returns {HTMLElement} Static toast element
@@ -234,6 +235,9 @@ export function createStaticToast({
     // Validate required parameters
     if (!style) {
         throw new Error('Toast style is required');
+    }
+    if (!title) {
+        throw new Error('Toast title is required');
     }
     if (!text) {
         throw new Error('Toast text is required');
@@ -254,57 +258,55 @@ export function createStaticToast({
         toast.classList.add(style);
     }
 
-    // Create toast header if title is provided
-    if (title) {
-        const header = document.createElement('div');
-        header.className = 'plus-toast-header';
-        
-        // Icon
-        const icon = document.createElement('div');
-        icon.className = 'plus-toast-icon';
-        const iconMap = {
-            'danger': 'fa-triangle-exclamation',
-            'success': 'fa-circle-check',
-            'info': 'fa-circle-info',
-            'warning': 'fa-circle-exclamation',
-            'primary': 'fa-circle',
-            'secondary': 'fa-circle',
-            'default': 'fa-circle'
-        };
-        const iconClass = iconMap[style] || 'fa-circle';
-        icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
-        header.appendChild(icon);
-        
-        // Title
-        const titleEl = document.createElement('strong');
-        titleEl.className = 'plus-toast-title';
-        titleEl.textContent = title;
-        header.appendChild(titleEl);
-        
-        // Timestamp
-        const timestamp = document.createElement('div');
-        timestamp.className = 'plus-toast-timestamp';
-        timestamp.textContent = '11 mins ago';
-        header.appendChild(timestamp);
+    // Create toast header (always required)
+    const header = document.createElement('div');
+    header.className = 'plus-toast-header';
+    
+    // Icon
+    const icon = document.createElement('div');
+    icon.className = 'plus-toast-icon';
+    const iconMap = {
+        'danger': 'fa-triangle-exclamation',
+        'success': 'fa-circle-check',
+        'info': 'fa-circle-info',
+        'warning': 'fa-circle-exclamation',
+        'primary': 'fa-circle',
+        'secondary': 'fa-circle',
+        'default': 'fa-circle'
+    };
+    const iconClass = iconMap[style] || 'fa-circle';
+    icon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+    header.appendChild(icon);
+    
+    // Title
+    const titleEl = document.createElement('strong');
+    titleEl.className = 'plus-toast-title';
+    titleEl.textContent = title;
+    header.appendChild(titleEl);
+    
+    // Timestamp
+    const timestamp = document.createElement('div');
+    timestamp.className = 'plus-toast-timestamp';
+    timestamp.textContent = '11 mins ago';
+    header.appendChild(timestamp);
 
-        // Dismiss button
-        if (dismissable) {
-            const dismissBtn = document.createElement('button');
-            dismissBtn.type = 'button';
-            dismissBtn.className = 'plus-toast-close';
-            dismissBtn.setAttribute('aria-label', 'Close');
-            dismissBtn.innerHTML = '<i class="fas fa-xmark"></i>';
-            // Don't add click handler for static display
-            header.appendChild(dismissBtn);
-        }
-        
-        toast.appendChild(header);
-        
-        // Divider
-        const divider = document.createElement('div');
-        divider.className = 'plus-toast-divider';
-        toast.appendChild(divider);
+    // Dismiss button
+    if (dismissable) {
+        const dismissBtn = document.createElement('button');
+        dismissBtn.type = 'button';
+        dismissBtn.className = 'plus-toast-close';
+        dismissBtn.setAttribute('aria-label', 'Close');
+        dismissBtn.innerHTML = '<i class="fas fa-xmark"></i>';
+        // Don't add click handler for static display
+        header.appendChild(dismissBtn);
     }
+    
+    toast.appendChild(header);
+    
+    // Divider
+    const divider = document.createElement('div');
+    divider.className = 'plus-toast-divider';
+    toast.appendChild(divider);
 
     // Create toast body
     const body = document.createElement('div');

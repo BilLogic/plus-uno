@@ -85,6 +85,67 @@ export default {
 };
 
 /**
+ * Overview
+ * Shows all jumbotron variants organized by category in a scrollable format
+ */
+export const Overview = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    
+    // Content Section
+    const contentSection = document.createElement('div');
+    contentSection.style.display = 'flex';
+    contentSection.style.flexDirection = 'column';
+    contentSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const contentHeading = document.createElement('div');
+    contentHeading.className = 'h5';
+    contentHeading.textContent = 'Content';
+    contentHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    contentSection.appendChild(contentHeading);
+    
+    // Basic jumbotron
+    const basic = PlusInterface.createJumbotron({
+      title: 'Hello, world!',
+      body: 'This is a simple hero unit.',
+      paddingSize: 'md',
+      gapSize: 'md',
+      radiusSize: 'md'
+    });
+    contentSection.appendChild(basic);
+    container.appendChild(contentSection);
+    
+    // Sizes Section
+    const sizesSection = document.createElement('div');
+    sizesSection.style.display = 'flex';
+    sizesSection.style.flexDirection = 'column';
+    sizesSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const sizesHeading = document.createElement('div');
+    sizesHeading.className = 'h5';
+    sizesHeading.textContent = 'Sizes';
+    sizesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    sizesSection.appendChild(sizesHeading);
+    
+    const small = PlusInterface.createJumbotron({
+      title: 'Small',
+      body: 'Small size jumbotron.',
+      paddingSize: 'sm',
+      gapSize: 'sm',
+      radiusSize: 'sm'
+    });
+    sizesSection.appendChild(small);
+    container.appendChild(sizesSection);
+    
+    return container;
+  },
+};
+
+
+/**
  * Interactive
  * Interactive playground with Storybook controls
  */
@@ -251,212 +312,6 @@ export const Interactive = {
 
 Interactive.storyName = 'Interactive';
 
-/**
- * Default
- * Standard jumbotron with title, body, and primary button
- */
-export const Default = {
-  render: () => {
-    return PlusInterface.createJumbotron({
-      title: 'Hello, world!',
-      body: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
-      primaryButton: {
-        text: 'Learn more',
-        style: 'primary',
-        fill: 'filled',
-        size: 'default',
-        onClick: () => alert('Learn more clicked')
-      }
-    });
-  },
-};
-
-Default.storyName = 'Default';
-
-/**
- * With Subtitle
- * Jumbotron with title, subtitle, body, and buttons
- */
-export const WithSubtitle = {
-  render: () => {
-    return PlusInterface.createJumbotron({
-      title: 'Hello, world!',
-      subtitle: 'It uses utility classes for typography and spacing to space content out within the larger container.',
-      body: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
-      primaryButton: {
-        text: 'Learn more',
-        style: 'primary',
-        fill: 'filled',
-        size: 'default',
-        onClick: () => alert('Learn more clicked')
-      },
-      secondaryButton: {
-        text: 'Get started',
-        style: 'secondary',
-        fill: 'outline',
-        size: 'default',
-        onClick: () => alert('Get started clicked')
-      }
-    });
-  },
-};
-
-WithSubtitle.storyName = 'With Subtitle';
-
-/**
- * Fluid
- * Full-width jumbotron with no border-radius
- */
-export const Fluid = {
-  render: () => {
-    return PlusInterface.createJumbotron({
-      title: 'Fluid Jumbotron',
-      body: 'This is a fluid jumbotron that spans the full width of its container with no border-radius.',
-      fluid: true,
-      primaryButton: {
-        text: 'Learn more',
-        style: 'primary',
-        fill: 'filled',
-        size: 'default',
-        onClick: () => alert('Learn more clicked')
-      }
-    });
-  },
-};
-
-Fluid.storyName = 'Fluid';
-
-/**
- * Size Variants
- * Shows all padding and gap size variants with corresponding radius sizes
- * 
- * **Radius-Padding Relationship**: Match radius size to padding size tier
- * - **Small (sm)**: `section-pad-sm` (16px) → `section-radius-sm` (8px) - Compact sections
- * - **Medium (md)**: `section-pad-md` (24px) → `section-radius-md` (8px) - Standard sections
- * - **Large (lg)**: `section-pad-lg` (36px) → `section-radius-lg` (16px) - Spacious sections
- */
-export const SizeVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    
-    const sizes = ['sm', 'md', 'lg'];
-    const radiusMap = { sm: 'sm', md: 'md', lg: 'lg' };
-    
-    sizes.forEach((size) => {
-      const label = document.createElement('div');
-      label.className = 'h6';
-      label.textContent = `Size: ${size.toUpperCase()} - Padding: ${size}, Gap: ${size}, Radius: ${radiusMap[size]}`;
-      label.style.marginBottom = 'var(--size-element-gap-sm)';
-      container.appendChild(label);
-      
-      const jumbotron = PlusInterface.createJumbotron({
-        title: `Jumbotron ${size.toUpperCase()}`,
-        body: `This is a ${size} size jumbotron with ${size} padding, ${size} gap, and ${radiusMap[size]} radius. The radius matches the padding size tier for visual consistency.`,
-        paddingSize: size,
-        gapSize: size,
-        radiusSize: radiusMap[size],
-        primaryButton: {
-          text: 'Action',
-          style: 'primary',
-          fill: 'filled',
-          size: 'default',
-          onClick: () => {}
-        }
-      });
-      container.appendChild(jumbotron);
-    });
-    
-    return container;
-  },
-};
-
-SizeVariants.storyName = 'Size Variants';
-
-/**
- * Content Variants
- * Shows different content configurations
- */
-export const ContentVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-section-gap-lg)';
-    
-    // Title only
-    const titleOnlyLabel = document.createElement('div');
-    titleOnlyLabel.className = 'h6';
-    titleOnlyLabel.textContent = 'Title Only';
-    titleOnlyLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    container.appendChild(titleOnlyLabel);
-    
-    const titleOnly = PlusInterface.createJumbotron({
-      title: 'Title Only Jumbotron',
-    });
-    container.appendChild(titleOnly);
-    
-    // Title + Body
-    const titleBodyLabel = document.createElement('div');
-    titleBodyLabel.className = 'h6';
-    titleBodyLabel.textContent = 'Title + Body';
-    titleBodyLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    container.appendChild(titleBodyLabel);
-    
-    const titleBody = PlusInterface.createJumbotron({
-      title: 'Title + Body',
-      body: 'This jumbotron has a title and body text.',
-    });
-    container.appendChild(titleBody);
-    
-    // Title + Subtitle + Body
-    const fullLabel = document.createElement('div');
-    fullLabel.className = 'h6';
-    fullLabel.textContent = 'Title + Subtitle + Body';
-    fullLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    container.appendChild(fullLabel);
-    
-    const full = PlusInterface.createJumbotron({
-      title: 'Full Content',
-      subtitle: 'Subtitle text here',
-      body: 'This jumbotron has title, subtitle, and body text.',
-    });
-    container.appendChild(full);
-    
-    // With buttons
-    const withButtonsLabel = document.createElement('div');
-    withButtonsLabel.className = 'h6';
-    withButtonsLabel.textContent = 'With Action Buttons';
-    withButtonsLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    container.appendChild(withButtonsLabel);
-    
-    const withButtons = PlusInterface.createJumbotron({
-      title: 'With Buttons',
-      body: 'This jumbotron includes action buttons.',
-      primaryButton: {
-        text: 'Primary',
-        style: 'primary',
-        fill: 'filled',
-        size: 'default',
-        onClick: () => {}
-      },
-      secondaryButton: {
-        text: 'Secondary',
-        style: 'secondary',
-        fill: 'outline',
-        size: 'default',
-        onClick: () => {}
-      }
-    });
-    container.appendChild(withButtons);
-    
-    return container;
-  },
-};
-
-ContentVariants.storyName = 'Content Variants';
 
 
 

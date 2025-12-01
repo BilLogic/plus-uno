@@ -8,12 +8,10 @@ The PLUS Design System components are organized into two main categories: Compon
 Reusable UI components that can be used independently or composed together.
 
 **Examples:**
-- Input - Text fields, textareas with various states and sizes
-- StatusIndicator - Status display components
 - Button - Text + icon + container + styling with multiple variants
 - Checkbox, Radio, Switch - Form input components with labels
 - Alert, Toast - Notification components with dismiss functionality
-- Badge, Chip, Status Tag - Icon + text combinations
+- Badge, Chip - Icon + text combinations
 - Card, Modal, Dropdown - Complex interactive components
 - Form, DatePicker, InputGroup - Form building components
 - Navigation, Breadcrumb, Pagination - Navigation components
@@ -400,28 +398,6 @@ Components related to the SMART competency framework.
 - `CA_ADV`: "Advocacy"
 - `CA_RELN`: "Relationships"
 - `CA_TT`: "Technology Tools"
-
-#### createStatusIcon(statusStr)
-Creates a status icon element.
-
-**Parameters:**
-- `statusStr` (string): Status - "assigned", "started", "not started", "complete"
-
-**Example:**
-```javascript
-const icon = PlusSmartComponents.createStatusIcon("complete");
-```
-
-#### createContentStatusTag(status)
-Creates a content status tag with icon and text.
-
-**Parameters:**
-- `status` (string): Status - "assigned", "started", "not started", "complete"
-
-**Example:**
-```javascript
-const statusTag = PlusSmartComponents.createContentStatusTag("started");
-```
 
 #### createSuperCompPillDiv(competencyArea, abbreviate)
 Creates a competency area pill element.

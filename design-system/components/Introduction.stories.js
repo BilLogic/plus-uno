@@ -89,12 +89,10 @@ export const Welcome = {
     componentsList.className = 'body2-txt';
     componentsList.style.paddingLeft = 'var(--size-section-pad-y-md)';
     const componentItems = [
-      'Input - Text fields, textareas with various states and sizes',
-      'StatusIndicator - Status display components',
       'Button - Text + icon + container + styling with multiple variants',
       'Checkbox, Radio, Switch - Form input components with labels',
       'Alert, Toast - Notification components with dismiss functionality',
-      'Badge, Chip, Status Tag - Icon + text combinations',
+      'Badge, Chip - Icon + text combinations',
       'Card, Modal, Dropdown - Complex interactive components',
       'Form, DatePicker, InputGroup - Form building components',
       'Navigation, Breadcrumb, Pagination - Navigation components',

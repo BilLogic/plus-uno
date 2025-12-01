@@ -16,18 +16,19 @@
 @import "_plus_spacing";
 @import "_elevation";
 
-// Components (using load path)
+// Components (using load path - load-path is design-system/components, so imports should be relative to that)
 @import "Button/Button";
-@import "Input/Input";
 @import "Alert/Alert";
 @import "Breadcrumb/Breadcrumb";
 @import "Badge/Badge";
+@import "CompetencyBadge/CompetencyBadge";
 @import "Divider/Divider";
 @import "ButtonGroup/ButtonGroup";
 @import "Dropdown/Dropdown";
 @import "Card/Card";
 @import "Modal/Modal";
 @import "Navigation/Navigation";
+@import "Navbar/Navbar";
 @import "Form/Form";
 @import "DatePicker/DatePicker";
 @import "Checkbox/Checkbox";
@@ -35,21 +36,19 @@
 @import "Switch/Switch";
 @import "InputGroup/InputGroup";
 @import "ListGroup/ListGroup";
-@import "Jumbotron/Jumbotron";
-@import "Toast/Toast";
-@import "Tooltip/Tooltip";
-@import "Spinner/Spinner";
-@import "Progress/Progress";
-@import "Pagination/Pagination";
-@import "Popover/Popover";
-@import "LoadingGif/LoadingGif";
-@import "MediaObject/MediaObject";
-@import "RichTextEditor/RichTextEditor";
-@import "Collapse/Collapse";
 @import "Carousel/Carousel";
-@import "Chip/Chip";
+@import "Collapse/Collapse";
+@import "Jumbotron/Jumbotron";
+@import "MediaObject/MediaObject";
+@import "Progress/Progress";
+@import "Spinner/Spinner";
+@import "LoadingGif/LoadingGif";
+@import "Popover/Popover";
+@import "Pagination/Pagination";
+@import "Tooltip/Tooltip";
+@import "Toast/Toast";
 @import "Scrollspy/Scrollspy";
-// Logo component from assets
+@import "RichTextEditor/RichTextEditor";
 @import "../../design-system/assets/Logo/Logo";
 
 // Base Styles

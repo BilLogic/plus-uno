@@ -76,83 +76,41 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all combinations of type × button variants
+ * Overview
+ * Shows all modal variants organized by category in a scrollable format
  */
-export const AllVariants = () => {
-  const container = document.createElement('div');
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.gap = '24px';
-  container.style.padding = '24px';
-  container.style.backgroundColor = 'var(--color-surface)';
-  
-  // Default type with buttons
-  const modal1 = PlusInterface.createModal({
-    title: 'Modal title',
-    body: 'Modal body text goes here.',
-    type: 'default',
-    showBottomButtons: true,
-    primaryButton: {
-      text: 'Primary',
-      style: 'primary',
-      fill: 'filled',
-      size: 'default',
-      onClick: () => console.log('Primary clicked')
-    },
-    secondaryButton: {
-      text: 'Secondary',
-      style: 'secondary',
-      fill: 'tonal',
-      size: 'default',
-      onClick: () => console.log('Secondary clicked')
-    }
-  });
-  
-  // Default type without buttons
-  const modal2 = PlusInterface.createModal({
-    title: 'Modal title',
-    body: 'Modal body text goes here.',
-    type: 'default',
-    showBottomButtons: false
-  });
-  
-  // Scrollable type with buttons
-  const modal3 = PlusInterface.createModal({
-    title: 'Modal title',
-    body: 'Modal body text goes here.',
-    type: 'scrollable',
-    showBottomButtons: true,
-    primaryButton: {
-      text: 'Primary',
-      style: 'primary',
-      fill: 'filled',
-      size: 'default',
-      onClick: () => console.log('Primary clicked')
-    },
-    secondaryButton: {
-      text: 'Secondary',
-      style: 'secondary',
-      fill: 'tonal',
-      size: 'default',
-      onClick: () => console.log('Secondary clicked')
-    }
-  });
-  
-  // Scrollable type without buttons
-  const modal4 = PlusInterface.createModal({
-    title: 'Modal title',
-    body: 'Modal body text goes here.',
-    type: 'scrollable',
-    showBottomButtons: false
-  });
-  
-  container.appendChild(modal1);
-  container.appendChild(modal2);
-  container.appendChild(modal3);
-  container.appendChild(modal4);
-  
-  return container;
+export const Overview = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = 'var(--size-section-gap-lg)';
+    container.style.padding = '24px';
+    container.style.backgroundColor = 'var(--color-surface)';
+    
+    // Content Section
+    const contentSection = document.createElement('div');
+    contentSection.style.display = 'flex';
+    contentSection.style.flexDirection = 'column';
+    contentSection.style.gap = 'var(--size-card-gap-md)';
+    
+    const contentHeading = document.createElement('div');
+    contentHeading.className = 'h5';
+    contentHeading.textContent = 'Content';
+    contentHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    contentSection.appendChild(contentHeading);
+    
+    const defaultModal = PlusInterface.createModal({
+      title: 'Modal title',
+      body: 'Modal body text goes here.',
+      type: 'default',
+      showBottomButtons: false,
+    });
+    contentSection.appendChild(defaultModal);
+    container.appendChild(contentSection);
+    
+    return container;
+  },
 };
 
 /**

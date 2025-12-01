@@ -20,14 +20,14 @@ export default {
 };
 
 /**
- * All Variants
+ * Overview
  * Shows dropdown lists with 1-9 items
  * Organized exactly as shown in Figma design system
  * 
  * Note: According to Figma documentation, the number of items can be from 1-9.
  * Each item includes: leading icon, text, counter, and dropright arrow.
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';

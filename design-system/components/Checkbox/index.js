@@ -14,6 +14,7 @@
  * @param {boolean} [options.checked=false] - Whether checkbox is checked
  * @param {boolean} [options.indeterminate=false] - Whether checkbox is in indeterminate state (shows dash/minus)
  * @param {boolean} [options.disabled=false] - Whether checkbox is disabled
+ * @param {boolean} [options.required=false] - Whether checkbox is required (shows asterisk)
  * @param {Function} [options.onChange=null] - Change event handler
  * @returns {HTMLElement} Checkbox element
  */
@@ -26,6 +27,7 @@ export function createCheckbox({
     checked = false,
     indeterminate = false,
     disabled = false,
+    required = false,
     onChange = null
 } = {}) {
     const container = document.createElement("div");
@@ -57,10 +59,24 @@ export function createCheckbox({
         container.classList.add("plus-checkbox-disabled");
     }
 
+    if (required) {
+        input.required = true;
+        container.classList.add("plus-checkbox-required-wrapper");
+    }
+
     const labelEl = document.createElement("label");
     labelEl.classList.add("form-check-label", "plus-checkbox-label");
     labelEl.htmlFor = id;
     labelEl.textContent = label;
+
+    // Add required asterisk if needed
+    if (required) {
+        const asterisk = document.createElement("span");
+        asterisk.classList.add("plus-checkbox-required");
+        asterisk.textContent = "*";
+        asterisk.setAttribute("aria-label", "required");
+        labelEl.appendChild(asterisk);
+    }
 
     container.appendChild(input);
     container.appendChild(labelEl);

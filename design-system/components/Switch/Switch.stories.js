@@ -71,87 +71,101 @@ export default {
 };
 
 /**
- * All Variants
- * Shows all switch combinations: states and content variants
+ * Overview
+ * Shows all switch variants organized by category in a scrollable format
  */
-export const AllVariants = {
+export const Overview = {
   render: () => {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.gap = 'var(--size-section-gap-lg)';
     
-    // States
+    // States Section
     const statesSection = document.createElement('div');
     statesSection.style.display = 'flex';
     statesSection.style.flexDirection = 'column';
-    statesSection.style.gap = 'var(--size-element-gap-sm)';
+    statesSection.style.gap = 'var(--size-card-gap-md)';
     
-    const statesLabel = document.createElement('div');
-    statesLabel.className = 'h6';
-    statesLabel.textContent = 'States';
-    statesLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    statesSection.appendChild(statesLabel);
+    const statesHeading = document.createElement('div');
+    statesHeading.className = 'h5';
+    statesHeading.textContent = 'States';
+    statesHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    statesSection.appendChild(statesHeading);
+    
+    const statesRow = document.createElement('div');
+    statesRow.style.display = 'flex';
+    statesRow.style.flexDirection = 'column';
+    statesRow.style.gap = 'var(--size-element-gap-sm)';
     
     const checked = PlusInterface.createSwitch({
-      label: 'Switch on',
-      name: 'switch-on',
-      id: 'switch-checked',
+      label: 'Checked',
+      name: 'overview-switch',
+      id: 'overview-checked',
       checked: true,
     });
-    statesSection.appendChild(checked);
+    statesRow.appendChild(checked);
     
     const unchecked = PlusInterface.createSwitch({
-      label: 'Switch off',
-      name: 'switch-off',
-      id: 'switch-unchecked',
+      label: 'Unchecked',
+      name: 'overview-switch',
+      id: 'overview-unchecked',
       checked: false,
     });
-    statesSection.appendChild(unchecked);
+    statesRow.appendChild(unchecked);
     
     const disabled = PlusInterface.createSwitch({
-      label: 'Disabled switch',
-      name: 'switch-disabled',
-      id: 'switch-disabled',
+      label: 'Disabled',
+      name: 'overview-switch',
+      id: 'overview-disabled',
+      checked: false,
       disabled: true,
     });
-    statesSection.appendChild(disabled);
+    statesRow.appendChild(disabled);
     
+    statesSection.appendChild(statesRow);
     container.appendChild(statesSection);
     
-    // Switch Group
-    const groupSection = document.createElement('div');
-    groupSection.style.display = 'flex';
-    groupSection.style.flexDirection = 'column';
-    groupSection.style.gap = 'var(--size-element-gap-md)';
+    // Content Section
+    const contentSection = document.createElement('div');
+    contentSection.style.display = 'flex';
+    contentSection.style.flexDirection = 'column';
+    contentSection.style.gap = 'var(--size-card-gap-md)';
     
-    const groupLabel = document.createElement('div');
-    groupLabel.className = 'h6';
-    groupLabel.textContent = 'Switch Group (Settings Example)';
-    groupLabel.style.marginBottom = 'var(--size-element-gap-sm)';
-    groupSection.appendChild(groupLabel);
+    const contentHeading = document.createElement('div');
+    contentHeading.className = 'h5';
+    contentHeading.textContent = 'Content';
+    contentHeading.style.marginBottom = 'var(--size-element-gap-sm)';
+    contentSection.appendChild(contentHeading);
     
-    const switches = [
-      { label: 'Enable notifications', name: 'notifications', id: 'switch-notifications', checked: true },
-      { label: 'Auto-save drafts', name: 'autosave', id: 'switch-autosave', checked: false },
-      { label: 'Dark mode', name: 'darkmode', id: 'switch-darkmode', checked: false },
-    ];
+    const contentRow = document.createElement('div');
+    contentRow.style.display = 'flex';
+    contentRow.style.flexDirection = 'column';
+    contentRow.style.gap = 'var(--size-element-gap-md)';
     
-    switches.forEach(sw => {
-      const switchEl = PlusInterface.createSwitch(sw);
-      groupSection.appendChild(switchEl);
+    const switch1 = PlusInterface.createSwitch({
+      label: 'Email notifications',
+      name: 'overview-content',
+      id: 'overview-content-1',
+      checked: true,
     });
+    contentRow.appendChild(switch1);
     
-    container.appendChild(groupSection);
+    const switch2 = PlusInterface.createSwitch({
+      label: 'Push notifications',
+      name: 'overview-content',
+      id: 'overview-content-2',
+      checked: false,
+    });
+    contentRow.appendChild(switch2);
+    
+    contentSection.appendChild(contentRow);
+    container.appendChild(contentSection);
     
     return container;
   },
 };
 
-/**
- * Interactive Switch
- * Interactive playground for testing switch variations
- */
 export const Interactive = {
   render: (args) => {
     const container = document.createElement('div');
