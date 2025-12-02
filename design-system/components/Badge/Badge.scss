@@ -10,7 +10,7 @@
     /* Figma: px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-sm,4px)] */
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
     /* Figma: Badges use pill shape - Border/Radius/radius-1000 (999px) */
-    border-radius: var(--size-border-radius-radius-1000);
+    border-radius: var(--size-element-radius-full);
     white-space: nowrap;
     /* Ensure badges don't spread full width */
     width: auto;
@@ -109,7 +109,7 @@
     justify-content: flex-start;
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
     /* Figma: Border/Radius/radius-1000 (999px) */
-    border-radius: var(--size-border-radius-radius-1000);
+    border-radius: var(--size-element-radius-full);
     white-space: nowrap;
     gap: var(--size-element-gap-sm);
     /* Figma: Default state has transparent background, border only */
@@ -122,7 +122,8 @@
     font-family: var(--font-family-body, 'Merriweather Sans');
     font-weight: 400;
     line-height: 1.5;
-    font-size: 16px; /* Figma: Body/B1 - 16px */
+    font-size: 16px;
+    /* Figma: Body/B1 - 16px */
 }
 
 /* Chip Size Variants - Typography-based font sizes */
@@ -233,7 +234,8 @@
 
 /* Hover state - adds style-state-08 background */
 .plus-chip-hover {
-    background-color: rgba(25, 28, 30, 0.08); /* Default style */
+    background-color: rgba(25, 28, 30, 0.08);
+    /* Default style */
 }
 
 .plus-chip.primary.plus-chip-hover {
@@ -262,7 +264,8 @@
 
 /* Focus state - adds style-state-12 background */
 .plus-chip-focus {
-    background-color: rgba(25, 28, 30, 0.12); /* Default style */
+    background-color: rgba(25, 28, 30, 0.12);
+    /* Default style */
 }
 
 .plus-chip.primary.plus-chip-focus {
@@ -552,4 +555,3 @@
     min-height: 12px;
     font-size: 10px;
 }
-

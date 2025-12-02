@@ -21,7 +21,7 @@
     flex-shrink: 0;
     box-sizing: border-box;
     /* Default border-radius - will be overridden by size variants */
-    border-radius: 999px;
+    border-radius: var(--size-element-radius-full);
     width: auto;
     /* Background color will be set by competency area variants */
     white-space: nowrap;
@@ -92,7 +92,7 @@
 /* Size Variants - Border Radius */
 /* Figma: H6 uses 50px, B3 technology-tools uses 16px (radius-400), others use 999px (radius-1000) */
 .plus-competency-badge.h6 .plus-competency-badge-container {
-    border-radius: 50px;
+    border-radius: var(--size-element-radius-full);
 }
 
 .plus-competency-badge.b3.plus-competency-badge-technology-tools .plus-competency-badge-container {
@@ -342,4 +342,3 @@
 .plus-competency-badge-technology-tools .plus-competency-badge-text p {
     color: var(--color-technology-tools-text);
 }
-

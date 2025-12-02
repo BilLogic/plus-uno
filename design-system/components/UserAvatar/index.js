@@ -34,7 +34,7 @@ export function createUserAvatar({
     // Figma: gap-[var(--element/gap-md,10px)], px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-md,6px)], rounded-[var(--element/radius-md,4px)], w-[168px]
     const avatar = document.createElement('div');
     avatar.classList.add('plus-user-avatar', `plus-user-avatar-${type}`);
-    
+
     avatar.style.display = 'flex';
     avatar.style.gap = 'var(--size-element-gap-md)';
     avatar.style.alignItems = 'center';
@@ -46,25 +46,25 @@ export function createUserAvatar({
     avatar.style.width = '168px';
     avatar.style.boxSizing = 'border-box';
     avatar.style.position = 'relative';
-    
+
     // Background color for default type
     if (type === 'default') {
         avatar.style.backgroundColor = 'var(--color-surface-container-lowest)';
     }
-    
+
     if (id) {
         avatar.id = id;
     }
-    
+
     if (classes && classes.length > 0) {
         avatar.classList.add(...classes);
     }
-    
+
     if (onClick) {
         avatar.style.cursor = 'pointer';
         avatar.addEventListener('click', onClick);
     }
-    
+
     // User name section - Figma: flex-[1_0_0], gap-[var(--spacing/small/space-075,6px)]
     const nameSection = document.createElement('div');
     nameSection.style.display = 'flex';
@@ -75,7 +75,7 @@ export function createUserAvatar({
     nameSection.style.minWidth = '1px';
     nameSection.style.position = 'relative';
     nameSection.style.flexShrink = '0';
-    
+
     // Name pill (avatar circle) - Figma: bg-[var(--_primary/state-layers/primary-08)], px-[4px] py-0, rounded-[var(--border/radius/radius-1000,999px)]
     const namePill = document.createElement('div');
     namePill.style.display = 'flex';
@@ -84,12 +84,12 @@ export function createUserAvatar({
     namePill.style.paddingRight = '4px';
     namePill.style.paddingTop = '0';
     namePill.style.paddingBottom = '0';
-    namePill.style.borderRadius = '999px'; // radius-1000 = 999px
+    namePill.style.borderRadius = 'var(--size-element-radius-full)'; // radius-1000 = 999px
     namePill.style.backgroundColor = 'var(--color-primary-state-08)';
     namePill.style.flexShrink = '0';
     namePill.style.boxSizing = 'border-box';
     namePill.style.position = 'relative';
-    
+
     // Badge container - Figma: gap-[10px] h-[24px], min-w-[16px]
     const pillContent = document.createElement('div');
     pillContent.style.display = 'flex';
@@ -100,7 +100,7 @@ export function createUserAvatar({
     pillContent.style.minWidth = '16px';
     pillContent.style.position = 'relative';
     pillContent.style.flexShrink = '0';
-    
+
     // Text - Figma: Body/B2/Semibold (Regular, 14px), color var(--_primary/primary-(text),#00547e)
     const pillText = document.createElement('div');
     pillText.style.display = 'flex';
@@ -117,17 +117,17 @@ export function createUserAvatar({
     pillText.style.fontSize = 'var(--font-size-body2)';
     pillText.style.color = 'var(--color-primary-text)';
     pillText.style.textAlign = 'center';
-    
+
     const pillTextP = document.createElement('p');
     pillTextP.style.lineHeight = '1.571';
     pillTextP.style.whiteSpace = 'pre-wrap';
     pillTextP.textContent = firstChar;
     pillText.appendChild(pillTextP);
-    
+
     pillContent.appendChild(pillText);
     namePill.appendChild(pillContent);
     nameSection.appendChild(namePill);
-    
+
     // Name text - Figma: Body/B2/Regular (Light, 14px), color var(--neutral-colors/on-surface,#191c1e)
     if (showName) {
         const nameText = document.createElement('p');
@@ -147,9 +147,9 @@ export function createUserAvatar({
         nameText.textContent = name;
         nameSection.appendChild(nameText);
     }
-    
+
     avatar.appendChild(nameSection);
-    
+
     // Counter badge - Figma: bg-[var(--_danger/state-layers/danger-08)], px-[var(--element/pad-x-sm,8px)] py-0, rounded-[var(--border/radius/radius-1000,999px)]
     if (counter) {
         const counterBadge = document.createElement('div');
@@ -159,12 +159,12 @@ export function createUserAvatar({
         counterBadge.style.paddingRight = 'var(--size-element-pad-x-sm)';
         counterBadge.style.paddingTop = '0';
         counterBadge.style.paddingBottom = '0';
-        counterBadge.style.borderRadius = '999px'; // radius-1000 = 999px
+        counterBadge.style.borderRadius = 'var(--size-element-radius-full)'; // radius-1000 = 999px
         counterBadge.style.backgroundColor = 'var(--color-danger-state-08)';
         counterBadge.style.flexShrink = '0';
         counterBadge.style.boxSizing = 'border-box';
         counterBadge.style.position = 'relative';
-        
+
         // Badge content - Figma: gap-[var(--element/gap-sm,8px)], min-w-[12px]
         const counterContent = document.createElement('div');
         counterContent.style.display = 'flex';
@@ -174,7 +174,7 @@ export function createUserAvatar({
         counterContent.style.minWidth = '12px';
         counterContent.style.position = 'relative';
         counterContent.style.flexShrink = '0';
-        
+
         // Text - Figma: Body/B3/Semibold (Regular, 12px), color var(--_danger/danger-(text),#9b0606)
         const counterText = document.createElement('div');
         counterText.style.display = 'flex';
@@ -191,17 +191,17 @@ export function createUserAvatar({
         counterText.style.fontSize = 'var(--font-size-body3)';
         counterText.style.color = 'var(--color-danger-text)';
         counterText.style.textAlign = 'center';
-        
+
         const counterTextP = document.createElement('p');
         counterTextP.style.lineHeight = '1.667';
         counterTextP.style.whiteSpace = 'pre-wrap';
         counterTextP.textContent = counterValue.toString();
         counterText.appendChild(counterTextP);
-        
+
         counterContent.appendChild(counterText);
         counterBadge.appendChild(counterContent);
         avatar.appendChild(counterBadge);
     }
-    
+
     return avatar;
 }

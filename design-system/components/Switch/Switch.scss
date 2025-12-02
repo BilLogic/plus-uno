@@ -42,8 +42,8 @@
     color: var(--color-primary) !important;
 }
 
-.custom-control-input:checked ~ .custom-control-label::before,
-.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+.custom-control-input:checked~.custom-control-label::before,
+.custom-switch .custom-control-input:checked~.custom-control-label::before {
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
     color: var(--color-primary) !important;
@@ -72,21 +72,23 @@
     /* Bootstrap 4 custom-control-input positioning - keep relative for pseudo-elements */
     position: relative;
     /* Override Bootstrap's default width/height */
-    width: 25px; /* Figma: Track width 25px */
-    height: 12px; /* Figma: Track height 12px */
+    width: 25px;
+    /* Figma: Track width 25px */
+    height: 12px;
+    /* Figma: Track height 12px */
     min-width: 25px;
     min-height: 12px;
     margin: 0;
     padding: 0;
     flex-shrink: 0;
-    
+
     /* Override browser's default accent-color with primary color token */
     accent-color: var(--color-primary) !important;
-    
+
     /* Hide the actual checkbox input visually but keep it for accessibility */
     opacity: 0;
     cursor: pointer;
-    
+
     /* Bootstrap 4 custom-switch uses ::before for track */
     &::before {
         content: '';
@@ -97,122 +99,133 @@
         width: 25px;
         height: 12px;
         border: var(--size-element-stroke-md) solid var(--color-primary) !important;
-        border-radius: 999px; /* Figma: radius-1000 (pill shape) */
-        background-color: var(--color-surface) !important; /* Figma: neutral-colors/surface */
+        border-radius: var(--size-element-radius-full);
+        /* Figma: radius-1000 (pill shape) */
+        background-color: var(--color-surface) !important;
+        /* Figma: neutral-colors/surface */
         cursor: pointer;
         transition: all 0.2s;
         box-sizing: border-box;
         pointer-events: none;
     }
-    
+
     /* Bootstrap 4 custom-switch uses ::after for thumb */
     &::after {
         content: '';
         position: absolute;
-        top: 2px; /* 2px padding from top */
-        left: 2px; /* Start position: 2px from left edge (matches track padding) */
+        top: 2px;
+        /* 2px padding from top */
+        left: 2px;
+        /* Start position: 2px from left edge (matches track padding) */
         /* Figma: Thumb size 8px */
         width: 8px;
         height: 8px;
-        border-radius: 999px; /* Pill shape */
-        background-color: var(--color-primary) !important; /* Figma: primary color for unchecked thumb */
+        border-radius: var(--size-element-radius-full);
+        /* Pill shape */
+        background-color: var(--color-primary) !important;
+        /* Figma: primary color for unchecked thumb */
         transition: transform 0.2s, background-color 0.2s;
         box-sizing: border-box;
         pointer-events: none;
     }
-    
+
     /* Unchecked state - thumb on left, primary colored */
     &:not(:checked) {
         &::before {
             border-color: var(--color-primary) !important;
             background-color: var(--color-surface) !important;
         }
-        
+
         &::after {
             background-color: var(--color-primary) !important;
             transform: translateX(0);
         }
     }
-    
+
     /* Checked state - thumb on right, white colored */
     &:checked {
         &::before {
             background-color: var(--color-primary) !important;
             border-color: var(--color-primary) !important;
         }
-        
+
         &::after {
-            background-color: var(--color-on-primary) !important; /* Figma: white thumb when checked */
+            background-color: var(--color-on-primary) !important;
+            /* Figma: white thumb when checked */
             /* Move right: track width (25px) - thumb width (8px) - left padding (2px) - right padding (2px) = 13px */
             transform: translateX(13px);
         }
     }
-    
+
     /* Hover state - use primary color tokens */
     &:hover:not(:disabled) {
         &::before {
             border-color: var(--color-primary) !important;
         }
-        
+
         &:not(:checked)::before {
             background-color: var(--color-primary-state-08) !important;
         }
-        
+
         &:checked::before {
             background-color: var(--color-primary-state-12) !important;
         }
     }
-    
+
     /* Wrapper hover state - ensures hover works when hovering over wrapper */
     .plus-switch-wrapper:not(.plus-switch-disabled):hover &:not(:checked)::before {
         border-color: var(--color-primary) !important;
         background-color: var(--color-primary-state-08) !important;
     }
-    
+
     .plus-switch-wrapper:not(.plus-switch-disabled):hover &:checked::before {
         border-color: var(--color-primary) !important;
         background-color: var(--color-primary-state-12) !important;
     }
-    
+
     /* Focus state - Figma: 2px border using inverse-primary color */
     .plus-switch-focused &::before {
         /* Create focus ring using box-shadow */
-        box-shadow: 0 0 0 2px var(--color-inverse-primary); /* Figma: primary/inverse-primary, 2px border */
+        box-shadow: 0 0 0 2px var(--color-inverse-primary);
+        /* Figma: primary/inverse-primary, 2px border */
     }
-    
+
     /* Disabled state */
     &:disabled {
         &::before {
-            opacity: 0.38; /* Figma: 38% opacity for disabled */
+            opacity: 0.38;
+            /* Figma: 38% opacity for disabled */
             cursor: not-allowed;
-            border-color: var(--color-on-surface); /* Figma: on-surface border when disabled */
+            border-color: var(--color-on-surface);
+            /* Figma: on-surface border when disabled */
             background-color: var(--color-surface);
         }
-        
+
         &::after {
-            background-color: var(--color-on-surface); /* Figma: on-surface thumb when disabled */
+            background-color: var(--color-on-surface);
+            /* Figma: on-surface thumb when disabled */
             opacity: 0.38;
         }
     }
-    
+
     .plus-switch-disabled & {
         &::before {
             opacity: 0.38;
             cursor: not-allowed;
         }
-        
+
         &::after {
             opacity: 0.38;
         }
     }
-    
+
     /* Disabled checked state */
     .plus-switch-disabled &:checked {
         &::before {
             background-color: var(--color-on-surface);
             border-color: var(--color-on-surface);
         }
-        
+
         &::after {
             background-color: var(--color-on-surface);
         }
@@ -228,22 +241,28 @@
     cursor: pointer;
     user-select: none;
     flex: 1;
-    margin-left: 0; /* Override Bootstrap default margin */
-    padding-left: 0; /* Override Bootstrap default padding */
+    margin-left: 0;
+    /* Override Bootstrap default margin */
+    padding-left: 0;
+    /* Override Bootstrap default padding */
     /* Add spacing after the switch track - Bootstrap 4 positions label after input */
     margin-left: var(--size-element-gap-sm);
-    position: relative; /* Override Bootstrap's absolute positioning */
-    top: 0; /* Reset Bootstrap's top positioning */
+    position: relative;
+    /* Override Bootstrap's absolute positioning */
+    top: 0;
+    /* Reset Bootstrap's top positioning */
 }
 
 /* Unchecked state - label has reduced opacity (38%) */
 .plus-switch-wrapper:not(.plus-switch-checked) .plus-switch-label {
-    color: color-mix(in srgb, var(--color-on-surface) 38%, transparent); /* Figma: 38% opacity when unchecked */
+    color: color-mix(in srgb, var(--color-on-surface) 38%, transparent);
+    /* Figma: 38% opacity when unchecked */
 }
 
 /* Checked state - label has full opacity */
 .plus-switch-wrapper.plus-switch-checked .plus-switch-label {
-    color: var(--color-on-surface); /* Full opacity when checked */
+    color: var(--color-on-surface);
+    /* Full opacity when checked */
 }
 
 /* Hover state - ensure label is clickable */
@@ -253,7 +272,8 @@
 
 /* Disabled state */
 .plus-switch-disabled .plus-switch-label {
-    opacity: 0.38; /* Figma: 38% opacity for disabled */
+    opacity: 0.38;
+    /* Figma: 38% opacity for disabled */
     cursor: not-allowed;
 }
 
@@ -263,9 +283,9 @@
 /* These overrides must be at the end to ensure they override Bootstrap's defaults */
 
 /* Override Bootstrap's default blue (#007bff) with primary color token */
-.custom-control.custom-switch .custom-control-input:checked ~ .custom-control-label::before,
-.custom-switch .custom-control-input:checked ~ .custom-control-label::before,
-.custom-control-input.custom-switch-input:checked ~ .custom-control-label::before {
+.custom-control.custom-switch .custom-control-input:checked~.custom-control-label::before,
+.custom-switch .custom-control-input:checked~.custom-control-label::before,
+.custom-control-input.custom-switch-input:checked~.custom-control-label::before {
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
     color: var(--color-primary) !important;

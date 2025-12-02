@@ -23,7 +23,7 @@
     vertical-align: text-bottom;
     border: 0.25em solid var(--color-on-surface-variant);
     border-right-color: transparent;
-    border-radius: 50%;
+    border-radius: var(--size-element-radius-full);
     animation: spinner-border 0.75s linear infinite;
 }
 
@@ -84,8 +84,3 @@
     outline: 2px solid var(--color-inverse-primary);
     outline-offset: 2px;
 }
-
-
-
-
-
