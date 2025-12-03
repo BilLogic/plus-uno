@@ -1,0 +1,170 @@
+/**
+ * Logo Component Styles
+ * Matches Figma design system specifications
+ * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=1133-12915
+ */
+
+.plus-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.plus-logo-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Ensure image fills the container */
+    flex-shrink: 0;
+}
+
+/* Size Variants - Based on Figma specifications */
+/* Note: Figma shows container sizes, but images should fill the container */
+.plus-logo-xs {
+    /* Figma: XS size - 40px container */
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    gap: 0;
+    border-radius: 4px;
+}
+
+.plus-logo-xs .plus-logo-image {
+    width: 40px;
+    height: 40px;
+}
+
+.plus-logo-s {
+    /* Figma: S size - 64px container */
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    gap: 0;
+    border-radius: 1.778px;
+}
+
+.plus-logo-s .plus-logo-image {
+    width: 64px;
+    height: 64px;
+}
+
+.plus-logo-m {
+    /* Figma: M size - 92px container */
+    width: 92px;
+    height: 92px;
+    padding: 0;
+    gap: 0;
+    border-radius: 2.556px;
+}
+
+.plus-logo-m .plus-logo-image {
+    width: 92px;
+    height: 92px;
+}
+
+.plus-logo-l {
+    /* Figma: L size - 144px container */
+    width: 144px;
+    height: 144px;
+    padding: 0;
+    gap: 0;
+    border-radius: 4px;
+}
+
+.plus-logo-l .plus-logo-image {
+    width: 144px;
+    height: 144px;
+}
+
+.plus-logo-xl {
+    /* Figma: XL size - 160px container */
+    width: 160px;
+    height: 160px;
+    padding: 0;
+    gap: 0;
+    border-radius: 4px;
+}
+
+.plus-logo-xl .plus-logo-image {
+    width: 160px;
+    height: 160px;
+}
+
+/* Style Variants */
+.plus-logo-colored {
+    /* Colored style uses gradient background - handled by image */
+}
+
+.plus-logo-filled {
+    /* Filled style uses solid white background - handled by image */
+}
+
+.plus-logo-outlined {
+    /* Outlined style uses white outline - handled by image */
+}
+
+/* Text Variants - When text is included, adjust container width */
+/* Note: Using data attribute instead of :has() for better browser support */
+.plus-logo[data-has-text="true"] {
+    /* When text is included, the container expands horizontally */
+    width: auto;
+    height: auto;
+}
+
+/* Specific width adjustments for text variants based on Figma */
+/* Text variants have horizontal layout: icon + wordmark */
+.plus-logo-xs[data-has-text="true"] {
+    width: auto;
+    height: 40px;
+}
+
+.plus-logo-xs[data-has-text="true"] .plus-logo-image {
+    width: auto;
+    height: 40px;
+}
+
+.plus-logo-s[data-has-text="true"] {
+    width: auto;
+    height: 64px;
+}
+
+.plus-logo-s[data-has-text="true"] .plus-logo-image {
+    width: auto;
+    height: 64px;
+}
+
+.plus-logo-m[data-has-text="true"] {
+    width: auto;
+    height: 92px;
+}
+
+.plus-logo-m[data-has-text="true"] .plus-logo-image {
+    width: auto;
+    height: 92px;
+}
+
+.plus-logo-l[data-has-text="true"] {
+    width: auto;
+    height: 144px;
+}
+
+.plus-logo-l[data-has-text="true"] .plus-logo-image {
+    width: auto;
+    height: 144px;
+}
+
+.plus-logo-xl[data-has-text="true"] {
+    width: auto;
+    height: 160px;
+}
+
+.plus-logo-xl[data-has-text="true"] .plus-logo-image {
+    width: auto;
+    height: 160px;
+}
+

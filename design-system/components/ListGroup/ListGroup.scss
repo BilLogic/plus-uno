@@ -1,0 +1,596 @@
+/**
+ * List Group Component Styles
+ * Matches Figma design system specifications exactly
+ * Built on Bootstrap 4.6.2 list-group with PLUS design token customizations
+ * 
+ * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=69-16193&t=XxnevshHwphhdAOI-4
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/list-group/
+ * 
+ * Component Type: Element (list items use `element-*` tokens)
+ * 
+ * Figma Specifications:
+ * - Container: border-radius 4px (--element/radius-sm), border 1px solid outline-variant
+ * - Items: padding vertical 6px (--element/pad-y-md), horizontal 10px (--element/pad-x-md)
+ * - Typography: Body/B2/Regular (Merriweather Sans Light, 14px, weight 300, line-height 157.1%)
+ * - Colors: surface-container background, on-surface text, outline-variant borders
+ * - Active: primary-container background, on-primary-container text, primary border
+ * - Disabled: 38% opacity
+ * - Hover: primary state 8% (--state-layers/primary-08)
+ * - Focus: 2px focus ring (primary state 16%)
+ */
+
+/* ============================================
+   LIST GROUP CONTAINER (Bootstrap 4.6.2 list-group)
+   ============================================ */
+/* Bootstrap 4.6.2: .list-group is a flex container with no default border/background */
+/* We override to match Figma design exactly */
+
+.list-group.plus-list-group {
+    /* Override Bootstrap's default display: flex */
+    display: flex;
+    flex-direction: column;
+    
+    /* Figma: border-radius-[var(--element/radius-sm,4px)] = 4px */
+    border-radius: var(--size-element-radius-sm);
+    /* Figma: No border - use shadow instead */
+    border: none;
+    /* Figma: bg-[var(--neutral-colors/surface-container,#f0f1f4)] */
+    background-color: var(--color-surface-container);
+    /* Figma: Shadow instead of border */
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.30), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    
+    /* Override Bootstrap defaults */
+    margin-bottom: 0; /* Bootstrap default: 1rem */
+    padding-left: 0; /* Bootstrap default: 0 */
+    list-style: none; /* Bootstrap default: none */
+}
+
+/* Flush variant - no borders or rounded corners */
+/* Bootstrap 4.6.2: .list-group-flush removes borders and border-radius */
+.list-group.plus-list-group.list-group-flush {
+    border: none;
+    border-radius: 0;
+}
+
+/* ============================================
+   LIST GROUP ITEM (Bootstrap 4.6.2 list-group-item)
+   ============================================ */
+/* Bootstrap 4.6.2: .list-group-item has default padding, border, background */
+/* We override ALL Bootstrap defaults to match Figma design exactly */
+
+.list-group-item.plus-list-group-item {
+    /* Override Bootstrap's default padding: 0.75rem 1.25rem (12px 20px) */
+    /* Figma: py-[var(--element/pad-y-lg,8px)] px-[var(--element/pad-x-lg,16px)] = 8px vertical, 16px horizontal */
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg) !important;
+    
+    /* No borders on items - only divider lines between items */
+    border: none !important;
+    
+    /* Override Bootstrap's default background: #fff */
+    /* Figma: bg-[var(--neutral-colors/surface-container,#f0f1f4)] = surface-container background */
+    background-color: var(--color-surface-container) !important; /* #edeef0 - matches Figma specification */
+    
+    /* Override Bootstrap's default color: #212529 */
+    /* Figma: text-[color:var(--neutral-colors/on-surface,#191c1e)] = #191c1e */
+    color: var(--color-on-surface) !important; /* #191c1e - matches Figma exactly */
+    
+    /* Layout - Bootstrap uses block, we use flex for content/badge layout */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Figma: gap-[var(--element/gap-lg,12px)] = 12px between content and badge */
+    gap: var(--size-element-gap-lg);
+    
+    /* Typography handled by .body1-txt class */
+    /* Figma: Body/B1/Regular - Merriweather Sans Light, 16px, weight 300, line-height 1.5 */
+    
+    /* Override Bootstrap defaults */
+    margin-bottom: 0; /* Bootstrap default: -1px */
+    position: relative;
+}
+
+/* First item - rounded top corners, no borders */
+.list-group-item.plus-list-group-item:first-child {
+    border-top-left-radius: var(--size-element-radius-sm) !important;
+    border-top-right-radius: var(--size-element-radius-sm) !important;
+    margin-top: 0; /* Bootstrap default: 0 */
+}
+
+/* Last item - rounded bottom corners, no divider */
+.list-group-item.plus-list-group-item:last-child {
+    border-bottom-left-radius: var(--size-element-radius-sm) !important;
+    border-bottom-right-radius: var(--size-element-radius-sm) !important;
+    margin-bottom: 0; /* Bootstrap default: 0 */
+}
+
+/* Divider lines between items - thin border-bottom only */
+/* Figma: Thin divider lines between items (not full borders) */
+/* CRITICAL: Active items do NOT have divider lines below them */
+.list-group-item.plus-list-group-item:not(:last-child):not(.active) {
+    /* Thin divider line - 1px border-bottom only */
+    border-bottom: var(--size-element-border) solid var(--color-outline-variant) !important;
+}
+
+/* Adjacent items - ensure dividers are visible */
+.list-group-item.plus-list-group-item + .list-group-item.plus-list-group-item {
+    margin-top: 0; /* Bootstrap default: 0 */
+}
+
+/* Flush variant - no shadow, no rounded corners, no dividers */
+/* Bootstrap 4.6.2: .list-group-flush removes all borders and border-radius */
+.list-group.plus-list-group.list-group-flush {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+.list-group.plus-list-group.list-group-flush .list-group-item.plus-list-group-item {
+    border-radius: 0 !important;
+}
+
+/* CRITICAL: Active items do NOT have divider lines below them (per Figma design) */
+.list-group.plus-list-group.list-group-flush .list-group-item.plus-list-group-item:not(:last-child):not(.active) {
+    border-bottom: var(--size-element-border) solid var(--color-outline-variant) !important;
+}
+
+/* ============================================
+   LIST GROUP ITEM CONTENT
+   ============================================ */
+
+.plus-list-group-item-content {
+    flex: 1;
+    /* Inherit color from parent (.plus-list-group-item) */
+    /* Figma: text-[color:var(--neutral-colors/on-surface,#191c1e)] = #191c1e */
+    color: inherit; /* Inherits from .plus-list-group-item which uses --color-on-surface */
+    word-wrap: break-word;
+    /* Typography: body2-txt class provides:
+       - Font: Merriweather Sans Light (300)
+       - Size: 14px (0.875rem)
+       - Line height: 157.1%
+       Matches Figma: Body/B2/Regular */
+}
+
+/* ============================================
+   LIST GROUP ITEM BADGE
+   ============================================ */
+/* Figma: Counter badges use px-[var(--spacing/medium/space-200,12px)] = 12px horizontal padding */
+/* Badge default padding is 8px (element-pad-x-sm), so we override for list group badges */
+
+.plus-list-group-item-badge {
+    flex-shrink: 0;
+    margin-left: var(--size-element-gap-sm);
+}
+
+/* Counter badge padding - Figma uses 12px horizontal padding */
+.plus-list-group-item-badge .plus-badge {
+    /* Figma: px-[var(--spacing/medium/space-200,12px)] = 12px horizontal padding */
+    padding-left: var(--size-spacing-medium-space-200) !important; /* 12px */
+    padding-right: var(--size-spacing-medium-space-200) !important; /* 12px */
+    /* Vertical padding stays at default (element-pad-y-sm = 4px) */
+}
+
+/* ============================================
+   ACTIVE STATE (Bootstrap 4.6.2 .active)
+   ============================================ */
+/* Bootstrap 4.6.2: .active uses primary color (#007bff) and white text */
+/* We override to match Figma: primary-state-08 background, on-primary-container text */
+
+.list-group-item.plus-list-group-item.active {
+    /* Override Bootstrap's default: background-color: #007bff, color: #fff */
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important; /* rgba(0, 101, 142, 0.08) */
+    /* Figma: text-[color:var(--_primary/on-primary-container,#001e2e)] = #001e2e (token value) */
+    color: var(--color-on-primary-container) !important; /* #001e2e */
+    /* CRITICAL: Active items do NOT have divider lines below them (per Figma design) */
+    border-bottom: none !important;
+    z-index: 2;
+}
+
+.list-group-item.plus-list-group-item.active .plus-list-group-item-content {
+    color: var(--color-on-primary-container) !important;
+}
+
+/* Active item badges use solid primary color background (not state layer) */
+/* Figma: Active item badges have solid primary background with white text */
+.list-group-item.plus-list-group-item.active .plus-list-group-item-badge .plus-badge.primary {
+    /* Figma: bg-[var(--_primary/primary,#0472a8)] = solid primary color for active item badge */
+    background-color: var(--color-primary) !important; /* #0472a8 */
+    color: var(--color-on-primary) !important; /* #ffffff */
+}
+
+/* ============================================
+   DISABLED STATE (Bootstrap 4.6.2 .disabled)
+   ============================================ */
+/* Bootstrap 4.6.2: .disabled uses gray color (#6c757d) and pointer-events: none */
+/* We override to match Figma: 38% opacity */
+
+.list-group-item.plus-list-group-item.disabled {
+    /* Override Bootstrap's default: color: #6c757d */
+    background-color: var(--color-surface-container) !important; /* #edeef0 - matches Figma specification */
+    color: var(--color-on-surface) !important; /* #191c1e */
+    /* Figma: opacity-0_38 = 38% opacity for disabled state */
+    opacity: 0.38 !important;
+    cursor: not-allowed;
+    pointer-events: none; /* Bootstrap default */
+}
+
+.list-group-item.plus-list-group-item.disabled .plus-list-group-item-content {
+    /* Inherit color from parent (already set to on-surface) */
+    color: inherit; /* Inherits disabled color from parent */
+    /* Opacity is already applied to parent, don't double-apply */
+}
+
+/* ============================================
+   ACTION ITEMS (Bootstrap 4.6.2 .list-group-item-action)
+   ============================================ */
+/* Bootstrap 4.6.2: .list-group-item-action makes items hoverable/clickable */
+/* We override hover/focus styles to match Figma design */
+
+.list-group-item.plus-list-group-item.list-group-item-action {
+    cursor: pointer; /* Bootstrap default */
+    text-decoration: none; /* Bootstrap default for links */
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+/* Hover state */
+/* Bootstrap 4.6.2: Hover uses light gray background (#f8f9fa) */
+/* We override to match Figma: primary state 8% */
+.list-group-item.plus-list-group-item.list-group-item-action:hover:not(.active):not(.disabled) {
+    /* Override Bootstrap's default: background-color: #f8f9fa */
+    /* Figma: bg-[var(--state-layers/primary/opacity-0_08,rgba(4,114,168,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important; /* rgba(4, 114, 168, 0.08) */
+    color: var(--color-on-surface) !important; /* #191c1e */
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    /* Hover divider uses primary color (only for non-active items) */
+    border-bottom-color: var(--color-primary) !important; /* #0472a8 */
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action:hover:not(.active):not(.disabled) .plus-list-group-item-content {
+    /* Inherit color from parent */
+    color: inherit; /* Inherits hover color from parent */
+}
+
+/* Focus state */
+/* Bootstrap 4.6.2: Focus uses box-shadow outline */
+/* We override to match Figma: 2px focus ring using primary state 16% */
+.list-group-item.plus-list-group-item.list-group-item-action:focus {
+    outline: none !important; /* Override Bootstrap default */
+    /* Override Bootstrap's default box-shadow */
+    /* Figma: focus ring 2px using --state-layers/primary/opacity-0_16 */
+    box-shadow: 0 0 0 2px var(--color-primary-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action:focus:not(:last-child):not(.active) {
+    /* Focus divider uses primary color (only for non-active items) */
+    border-bottom-color: var(--color-primary) !important; /* #0472a8 */
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action:focus:not(.active) {
+    background-color: var(--color-primary-state-08) !important; /* rgba(4, 114, 168, 0.08) */
+    color: var(--color-on-surface) !important; /* #191c1e */
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action:focus:not(.active) .plus-list-group-item-content {
+    /* Inherit color from parent */
+    color: inherit; /* Inherits focus color from parent */
+}
+
+/* Active + Action state */
+/* CRITICAL: Active action items do NOT have divider lines below them (per Figma design) */
+.list-group-item.plus-list-group-item.list-group-item-action.active {
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important;
+    color: var(--color-on-primary-container) !important;
+    border-bottom: none !important;
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action.active:hover {
+    /* Figma: bg-[var(--_primary/state-layers/primary-12)] = primary state 12% */
+    background-color: var(--color-primary-state-12) !important;
+    color: var(--color-on-primary-container) !important;
+}
+
+.list-group-item.plus-list-group-item.list-group-item-action.active:focus {
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important;
+    color: var(--color-on-primary-container) !important;
+    box-shadow: 0 0 0 2px var(--color-primary-state-16) !important;
+}
+
+/* ============================================
+   COLOR STYLE VARIANTS
+   ============================================ */
+/* Support for different color tokens: primary, secondary, tertiary, success, danger, warning, info */
+
+/* Secondary Style Variant */
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.active {
+    background-color: var(--color-secondary-container) !important;
+    color: var(--color-on-secondary-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.active:not(:last-child) {
+    border-bottom-color: var(--color-secondary) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.active .plus-list-group-item-content {
+    color: var(--color-on-secondary-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-secondary-state-08) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    border-bottom-color: var(--color-secondary) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px var(--color-secondary-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.list-group-item-action:focus:not(:last-child) {
+    border-bottom-color: var(--color-secondary) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.list-group-item-action.active:hover {
+    background-color: var(--color-secondary-container-state-12) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-secondary.list-group-item-action.active:focus {
+    box-shadow: 0 0 0 2px var(--color-secondary-state-16) !important;
+}
+
+/* Tertiary Style Variant */
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.active {
+    background-color: var(--color-tertiary-container) !important;
+    color: var(--color-on-tertiary-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.active:not(:last-child) {
+    border-bottom-color: var(--color-tertiary) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.active .plus-list-group-item-content {
+    color: var(--color-on-tertiary-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-tertiary-state-08) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    border-bottom-color: var(--color-tertiary) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px var(--color-tertiary-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.list-group-item-action:focus:not(:last-child) {
+    border-bottom-color: var(--color-tertiary) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.list-group-item-action.active:hover {
+    background-color: var(--color-tertiary-container-state-12) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-tertiary.list-group-item-action.active:focus {
+    box-shadow: 0 0 0 2px var(--color-tertiary-state-16) !important;
+}
+
+/* Success Style Variant */
+.list-group-item.plus-list-group-item.plus-list-group-item-success.active {
+    background-color: var(--color-success-container) !important;
+    color: var(--color-on-success-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.active:not(:last-child) {
+    border-bottom-color: var(--color-success) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.active .plus-list-group-item-content {
+    color: var(--color-on-success-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-success-state-08) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    border-bottom-color: var(--color-success) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px var(--color-success-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.list-group-item-action:focus:not(:last-child) {
+    border-bottom-color: var(--color-success) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.list-group-item-action.active:hover {
+    background-color: var(--color-success-container-state-12) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-success.list-group-item-action.active:focus {
+    box-shadow: 0 0 0 2px var(--color-success-state-16) !important;
+}
+
+/* Danger Style Variant */
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.active {
+    background-color: var(--color-danger-container) !important;
+    color: var(--color-on-danger-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.active:not(:last-child) {
+    border-bottom-color: var(--color-danger) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.active .plus-list-group-item-content {
+    color: var(--color-on-danger-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-danger-state-08) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    border-bottom-color: var(--color-danger) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px var(--color-danger-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.list-group-item-action:focus:not(:last-child) {
+    border-bottom-color: var(--color-danger) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.list-group-item-action.active:hover {
+    background-color: var(--color-danger-container-state-12) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-danger.list-group-item-action.active:focus {
+    box-shadow: 0 0 0 2px var(--color-danger-state-16) !important;
+}
+
+/* Warning Style Variant */
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.active {
+    background-color: var(--color-warning-container) !important;
+    color: var(--color-on-warning-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.active:not(:last-child) {
+    border-bottom-color: var(--color-warning) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.active .plus-list-group-item-content {
+    color: var(--color-on-warning-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-warning-state-08) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    border-bottom-color: var(--color-warning) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px var(--color-warning-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.list-group-item-action:focus:not(:last-child) {
+    border-bottom-color: var(--color-warning) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.list-group-item-action.active:hover {
+    background-color: var(--color-warning-container-state-12) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-warning.list-group-item-action.active:focus {
+    box-shadow: 0 0 0 2px var(--color-warning-state-16) !important;
+}
+
+/* Info Style Variant */
+.list-group-item.plus-list-group-item.plus-list-group-item-info.active {
+    background-color: var(--color-info-container) !important;
+    color: var(--color-on-info-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.active:not(:last-child) {
+    border-bottom-color: var(--color-info) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.active .plus-list-group-item-content {
+    color: var(--color-on-info-container) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.list-group-item-action:hover:not(.active):not(.disabled) {
+    background-color: var(--color-info-state-08) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.list-group-item-action:hover:not(.active):not(.disabled):not(:last-child) {
+    border-bottom-color: var(--color-info) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.list-group-item-action:focus {
+    box-shadow: 0 0 0 2px var(--color-info-state-16) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.list-group-item-action:focus:not(:last-child) {
+    border-bottom-color: var(--color-info) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.list-group-item-action.active:hover {
+    background-color: var(--color-info-container-state-12) !important;
+}
+
+.list-group-item.plus-list-group-item.plus-list-group-item-info.list-group-item-action.active:focus {
+    box-shadow: 0 0 0 2px var(--color-info-state-16) !important;
+}
+
+/* ============================================
+   LIST GROUP LIST ITEM (when using <ul> with <li>)
+   ============================================ */
+
+.plus-list-group-list-item {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plus-list-group-list-item > .plus-list-group-item {
+    width: 100%;
+}
+
+/* ============================================
+   BOOTSTRAP 4.6.2 GLOBAL OVERRIDES
+   ============================================ */
+/* These overrides ensure Bootstrap defaults don't interfere with Figma design */
+
+/* Base list-group-item - ensure our styles take precedence */
+.list-group-item {
+    position: relative;
+}
+
+/* Override Bootstrap's default active state globally */
+.list-group-item.active {
+    /* Figma: bg-[var(--_primary/state-layers/primary-08,rgba(0,101,142,0.08))] = primary state 8% */
+    background-color: var(--color-primary-state-08) !important;
+    color: var(--color-on-primary-container) !important;
+}
+
+/* CRITICAL: Active items do NOT have divider lines below them (per Figma design) */
+.list-group-item.active {
+    border-bottom: none !important;
+}
+
+/* Override Bootstrap's default disabled state globally */
+.list-group-item.disabled {
+    background-color: var(--color-surface-container) !important; /* #edeef0 - matches Figma specification */
+    color: var(--color-on-surface) !important;
+    opacity: 0.38 !important;
+}
+
+/* Override Bootstrap's default hover for action items */
+.list-group-item-action:hover {
+    background-color: var(--color-primary-state-08) !important;
+    color: var(--color-on-surface) !important;
+}
+
+.list-group-item-action:hover:not(:last-child):not(.active) {
+    border-bottom-color: var(--color-primary) !important;
+}
+
+/* Override Bootstrap's default focus for action items */
+.list-group-item-action:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px var(--color-primary-state-16) !important;
+}
+
+.list-group-item-action:focus:not(:last-child):not(.active) {
+    border-bottom-color: var(--color-primary) !important;
+}

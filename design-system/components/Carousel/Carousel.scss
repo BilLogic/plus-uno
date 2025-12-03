@@ -1,0 +1,519 @@
+/**
+ * Carousel Component Styles
+ * Bootstrap 4.6.2 carousel with PLUS design token customizations
+ * Matches Figma design system specifications exactly
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/carousel/
+ * 
+ * Component Type: Section (uses `section-*` tokens for container, `element-*` tokens for controls)
+ * Token Usage:
+ *   - Colors: --color-primary, --color-on-surface, --color-outline-variant, --color-surface-container-high
+ *   - Spacing: --size-section-gap-* for container spacing
+ *   - Controls: --size-element-* tokens for control buttons
+ *   - Typography: Body typography scales for captions
+ * 
+ * Figma Specs:
+ *   - Height: 350px
+ *   - Width: 680px (with controls), 600px (slides only)
+ *   - Indicators: 6px height, 100px width, 16px gap, rounded 6px
+ *   - Active indicator: primary color (#0472a8)
+ *   - Inactive indicator: surface-container-high (#e7e8eb) or surface-container-lowest (#ffffff)
+ */
+
+/* ============================================
+   GLOBAL BOOTSTRAP CAROUSEL OVERRIDES
+   ============================================ */
+
+/* These overrides must come first to ensure they override Bootstrap's defaults */
+/* Bootstrap 4.6.2 carousel controls use width: 15% and background images for circular buttons */
+/* Bootstrap uses: background: no-repeat 50% / 100% 100%; with SVG data URI for icons */
+.carousel-control-prev,
+.carousel-control-next,
+a.carousel-control-prev,
+a.carousel-control-next {
+    width: auto !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    
+    &::before,
+    &::after {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        background-image: none !important;
+    }
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon,
+span.carousel-control-prev-icon,
+span.carousel-control-next-icon {
+    width: auto !important;
+    height: auto !important;
+    min-width: auto !important;
+    min-height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    /* Bootstrap uses: background: no-repeat 50% / 100% 100%; with SVG data URI */
+    /* This creates the circular appearance - we must completely remove it */
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-size: auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    
+    &::before,
+    &::after {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        background-image: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+}
+
+/* ============================================
+   CAROUSEL CONTAINER
+   ============================================ */
+
+.plus-carousel {
+    position: relative;
+    width: 100%;
+    
+    /* Default height from Figma: 350px */
+    height: 350px;
+    
+    /* Use section tokens for container spacing if needed */
+    margin-bottom: var(--size-section-gap-md, 0);
+    
+    /* Override Bootstrap's default carousel control width (Bootstrap uses width: 15%) */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: auto !important;
+    }
+}
+
+/* ============================================
+   CAROUSEL INNER (Slide Container)
+   ============================================ */
+
+.plus-carousel-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+    /* Ensure proper aspect ratio handling */
+    &::after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+}
+
+/* ============================================
+   CAROUSEL ITEM (Individual Slides)
+   ============================================ */
+
+.plus-carousel-item {
+    position: relative;
+    display: none;
+    float: left;
+    width: 100%;
+    height: 100%;
+    margin-right: -100%;
+    backface-visibility: hidden;
+    transition: transform 0.6s ease-in-out;
+    
+    /* Active slide */
+    &.active {
+        display: block;
+    }
+    
+    /* Next/Prev slide positioning */
+    &.carousel-item-next:not(.carousel-item-left),
+    &.active.carousel-item-right {
+        transform: translateX(100%);
+    }
+    
+    &.carousel-item-prev:not(.carousel-item-right),
+    &.active.carousel-item-left {
+        transform: translateX(-100%);
+    }
+}
+
+/* ============================================
+   CAROUSEL IMAGE
+   ============================================ */
+
+.plus-carousel-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================
+   CAROUSEL CONTROLS (Previous/Next Buttons)
+   ============================================ */
+
+/* Override Bootstrap's default carousel control styles completely */
+/* Bootstrap uses: width: 15% on .carousel-control-prev/next (a elements) */
+/* Target both Bootstrap classes and our custom classes, including a elements */
+.plus-carousel a.carousel-control-prev,
+.plus-carousel a.carousel-control-next,
+.plus-carousel .carousel-control-prev,
+.plus-carousel .carousel-control-next,
+a.plus-carousel-control-prev,
+a.plus-carousel-control-next,
+.plus-carousel-control-prev,
+.plus-carousel-control-next {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: auto !important; /* Override Bootstrap's width: 15% */
+    height: auto !important;
+    min-width: auto !important;
+    min-height: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: var(--color-on-surface-variant, #3f484a);
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.15s ease;
+    z-index: 1;
+    /* Completely remove Bootstrap's default circular button background */
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    /* Remove any pseudo-elements Bootstrap might use */
+    &::before,
+    &::after {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        background-image: none !important;
+    }
+    
+    /* Hover state */
+    &:hover,
+    &:focus,
+    &:active,
+    &:visited {
+        color: var(--color-on-surface-variant, #3f484a);
+        text-decoration: none;
+        outline: 0;
+        opacity: 1;
+        background: none !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+.plus-carousel .carousel-control-prev,
+.plus-carousel-control-prev {
+    left: 0;
+}
+
+.plus-carousel .carousel-control-next,
+.plus-carousel-control-next {
+    right: 0;
+}
+
+/* Control Icons - Use Font Awesome chevron icons directly (no circular button) */
+/* Bootstrap default: width: 20px; height: 20px; background: no-repeat 50% / 100% 100%; */
+/* Bootstrap uses background-image with SVG data URI which creates circular appearance */
+.plus-carousel .carousel-control-prev-icon,
+.plus-carousel .carousel-control-next-icon,
+.plus-carousel span.carousel-control-prev-icon,
+.plus-carousel span.carousel-control-next-icon,
+.plus-carousel-control-prev-icon,
+.plus-carousel-control-next-icon,
+.plus-carousel-control-icon,
+span.plus-carousel-control-prev-icon,
+span.plus-carousel-control-next-icon,
+span.plus-carousel-control-icon {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: auto !important; /* Override Bootstrap's width: 20px */
+    height: auto !important; /* Override Bootstrap's height: 20px */
+    min-width: auto !important;
+    min-height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    /* Completely remove Bootstrap's default background image and circular shape */
+    /* Bootstrap uses: background: no-repeat 50% / 100% 100%; with SVG data URI */
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-size: auto !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    /* Remove any padding that might create circular appearance */
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Remove any pseudo-elements */
+    &::before,
+    &::after {
+        display: none !important;
+        content: none !important;
+        background: none !important;
+        background-image: none !important;
+    }
+    
+    /* Font Awesome icon styling - direct icon, no wrapper */
+    i {
+        color: var(--color-on-surface-variant, #3f484a);
+        font-size: 24px;
+        line-height: 1.667;
+        font-weight: 900; /* Font Awesome Solid */
+        display: block;
+        width: auto;
+        height: auto;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+/* ============================================
+   CAROUSEL INDICATORS (Rectangular Bars)
+   ============================================ */
+
+/* Override Bootstrap's default carousel indicator styles completely */
+/* Target both Bootstrap classes and our custom classes */
+.plus-carousel .carousel-indicators,
+.plus-carousel-indicators {
+    position: absolute;
+    right: 0;
+    bottom: 16px; /* Figma: bottom-[16px] */
+    left: 0;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 0 !important;
+    margin: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+    list-style: none;
+    
+    /* Gap between indicators from Figma: var(--element/gap-lg,12px) */
+    gap: var(--size-element-gap-lg, 12px);
+    
+    li {
+        box-sizing: border-box !important;
+        flex: 0 0 auto;
+        /* Figma specs: 100px width, 6px height - rectangular bars, not circular dots */
+        width: 100px !important;
+        height: 6px !important;
+        min-width: 100px !important;
+        min-height: 6px !important;
+        max-width: 100px !important;
+        max-height: 6px !important;
+        text-indent: -999px;
+        cursor: pointer;
+        /* Inactive indicator: surface-container-high from Figma */
+        background-color: var(--color-surface-container-high, #e7e8eb) !important;
+        background-clip: padding-box;
+        /* Completely override Bootstrap's default transparent borders that create circular dots */
+        /* Bootstrap uses: border-top: 10px solid transparent; border-bottom: 10px solid transparent; */
+        /* This creates a larger clickable area but makes them look circular - we want rectangular bars */
+        border: none !important;
+        border-top: 0 !important;
+        border-bottom: 0 !important;
+        border-left: 0 !important;
+        border-right: 0 !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        border-color: transparent !important;
+        opacity: 1;
+        transition: background-color 0.6s ease;
+        /* Figma: rounded-[var(--border/radius/radius-150,6px)] - 6px border radius for rounded rectangular bars */
+        border-radius: 6px !important;
+        /* Override Bootstrap default margins - Bootstrap uses margin-right: 3px; margin-left: 3px; */
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        
+        /* Active indicator - primary color from Figma */
+        &.active {
+            background-color: var(--color-primary, #0472a8) !important;
+        }
+        
+        /* Hover state */
+        &:hover:not(.active) {
+            background-color: var(--color-surface-container-high, #e7e8eb) !important;
+            opacity: 0.75;
+        }
+        
+        &.active:hover {
+            background-color: var(--color-primary, #0472a8) !important;
+            opacity: 1;
+        }
+    }
+}
+
+/* ============================================
+   CAROUSEL CAPTION (Optional)
+   ============================================ */
+
+.plus-carousel-caption {
+    position: absolute;
+    right: 60px; /* Figma: left-[60px] right-[60px] */
+    bottom: 38px; /* Figma: bottom-[38px] - positioned above indicators */
+    left: 60px;
+    z-index: 10;
+    padding-top: 0;
+    padding-bottom: 0;
+    color: var(--color-on-surface-variant, #3f484a);
+    text-align: center;
+    
+    /* Use body typography */
+    font-family: var(--font-family-body);
+    
+    /* Title (H5) - Figma: Lato SemiBold 20px, line-height 1.4 */
+    h5 {
+        font-family: var(--font-family-title, 'Lato');
+        font-size: var(--font-size-h5, 20px);
+        font-weight: var(--font-weight-title, 600);
+        line-height: var(--font-line-height-h5, 1.4);
+        margin-bottom: 0;
+        color: var(--color-on-surface-variant, #3f484a);
+    }
+    
+    /* Caption text - Figma: Merriweather Sans Light 16px, line-height 1.5 */
+    p {
+        font-family: var(--font-family-body, 'Merriweather Sans');
+        font-size: var(--font-size-body1, 16px);
+        font-weight: var(--font-weight-normal, 300);
+        line-height: var(--font-line-height-body1, 1.5);
+        margin-bottom: 0;
+        color: var(--color-on-surface-variant, #3f484a);
+    }
+}
+
+/* ============================================
+   CAROUSEL VARIANTS
+   ============================================ */
+
+/* Slides only - no controls, no indicators */
+.plus-carousel-slides-only {
+    width: 600px; /* Figma: w-[600px] */
+    margin: 0 auto;
+}
+
+/* With controls - 680px width */
+.plus-carousel-with-controls {
+    width: 680px; /* Figma: w-[680px] */
+    margin: 0 auto;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .plus-carousel {
+        height: 250px;
+    }
+    
+    .plus-carousel-control-prev,
+    .plus-carousel-control-next {
+        width: 10%;
+    }
+    
+    .plus-carousel-control-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+    }
+    
+    .plus-carousel-indicators {
+        margin-right: 10%;
+        margin-left: 10%;
+        bottom: 12px;
+        
+        li {
+            width: 60px;
+            height: 4px;
+        }
+    }
+    
+    .plus-carousel-caption {
+        right: 20px;
+        left: 20px;
+        bottom: 30px;
+        
+        h5 {
+            font-size: var(--font-size-body1, 16px);
+        }
+        
+        p {
+            font-size: var(--font-size-body2, 14px);
+        }
+    }
+}
+
+/* ============================================
+   FINAL OVERRIDES - Maximum Specificity
+   ============================================ */
+
+/* These overrides use maximum specificity to ensure they override Bootstrap's defaults */
+/* This section should be at the end of the file to ensure it takes precedence */
+.plus-carousel a.carousel-control-prev.carousel-control-prev,
+.plus-carousel a.carousel-control-next.carousel-control-next,
+.plus-carousel a.plus-carousel-control-prev.plus-carousel-control-prev,
+.plus-carousel a.plus-carousel-control-next.plus-carousel-control-next {
+    width: auto !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.plus-carousel span.carousel-control-prev-icon.carousel-control-prev-icon,
+.plus-carousel span.carousel-control-next-icon.carousel-control-next-icon,
+.plus-carousel span.plus-carousel-control-prev-icon.plus-carousel-control-prev-icon,
+.plus-carousel span.plus-carousel-control-next-icon.plus-carousel-control-next-icon,
+.plus-carousel span.plus-carousel-control-icon.plus-carousel-control-icon {
+    width: auto !important;
+    height: auto !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-size: auto !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+

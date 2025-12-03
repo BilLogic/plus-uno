@@ -1,0 +1,357 @@
+/**
+ * Card Component Styles
+ * Matches Figma design system specifications
+ * Cards are self-contained containers that display related information
+ * 
+ * Figma Specs:
+ * - Corner radius: 12px
+ * - Top padding when image present: 15px (content area below image)
+ * - Vertical spacing between elements: multiples of 4px
+ * - General padding (top/bottom): multiples of 8px (preferably) or 4px
+ * - Horizontal padding (left/right): >= top/bottom padding
+ * - Spacing between title and subtitle: 4px
+ */
+
+.plus-card {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: var(--color-surface); /* Figma: bg-[var(--neutral-colors/surface,#f9f9fc)] */
+    color: var(--color-on-surface);
+    
+    /* Default padding: elements handle their own horizontal padding */
+    /* Vertical padding handled by content sections */
+    padding: 0;
+    
+    /* Default gap - spacing between major sections is handled by .plus-card-content gap */
+    gap: 0;
+    
+    /* Default radius from Figma specs: 12px */
+    border-radius: var(--size-card-radius-sm);
+    
+    /* Default border - Figma: border border-[var(--neutral-colors/outline-variant,#bec8ca)] border-solid */
+    border: var(--size-card-border-sm) solid var(--color-outline-variant);
+    
+    /* No box-shadow in Figma design */
+}
+
+/* Padding Size Variants */
+.plus-card-pad-sm {
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+}
+
+.plus-card-pad-md {
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+}
+
+.plus-card-pad-lg {
+    padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
+}
+
+/* Gap Size Variants */
+.plus-card-gap-sm {
+    gap: var(--size-card-gap-sm);
+}
+
+.plus-card-gap-md {
+    gap: var(--size-card-gap-md);
+}
+
+.plus-card-gap-lg {
+    gap: var(--size-card-gap-lg);
+}
+
+/* Radius Size Variants */
+.plus-card-radius-sm {
+    border-radius: var(--size-card-radius-sm);
+}
+
+.plus-card-radius-md {
+    border-radius: var(--size-card-radius-md);
+}
+
+/* Border Size Variants */
+.plus-card-border-sm {
+    border-width: var(--size-card-border-sm);
+}
+
+.plus-card-border-md {
+    border-width: var(--size-card-border-md);
+}
+
+.plus-card-border-lg {
+    border-width: var(--size-card-border-lg);
+}
+
+/* No border variant */
+.plus-card:not(.plus-card-border-sm):not(.plus-card-border-md):not(.plus-card-border-lg) {
+    border: none;
+}
+
+/* Card Image/Media Area */
+/* Figma: Image extends to card edges with zero padding */
+/* Image should match card's top border-radius */
+.plus-card-image {
+    width: calc(100% + 2 * var(--size-card-border-sm)); /* Extend to include border width */
+    margin: calc(-1 * var(--size-card-border-sm)) calc(-1 * var(--size-card-border-sm)) 0 calc(-1 * var(--size-card-border-sm)); /* Negative margins to extend to card edges */
+    padding: 0; /* Zero padding - image extends to card edges */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface-variant);
+    color: var(--color-on-surface-variant);
+    min-height: 200px;
+    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0; /* Match card's top border-radius */
+    overflow: hidden; /* Ensure content respects border-radius */
+    box-sizing: border-box;
+    
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0; /* Match card's top border-radius */
+        object-fit: cover; /* Ensure image fills container properly */
+    }
+}
+
+/* Card Content Container */
+/* Figma: spacing between major sections in multiples of 8px (preferably) or 4px */
+.plus-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-md); /* 16px between major sections (multiple of 8px) */
+    flex: 1 1 auto;
+}
+
+/* When image is present, add 15px top padding to content area */
+/* 15px = calc(16px - 1px) for exact match, or use closest semantic token */
+.plus-card-image + .plus-card-content {
+    padding-top: calc(var(--size-spacing-medium-space-300) - 1px); /* 15px top padding when image present (16px - 1px) */
+}
+
+/* Card Description Container - wraps title, subtitle, body */
+/* Figma: gap-[var(--spacing/small/space-050,4px)] between title, subtitle, body */
+/* Figma: vertical spacing between elements in multiples of 4px */
+.plus-card-description {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs); /* 4px gap between title, subtitle, body (multiple of 4px) */
+    margin: 0;
+    padding: 0; /* No container padding - individual elements handle their own padding */
+}
+
+/* Card Title */
+/* Figma: Title/H5 - Lato SemiBold, 20px, lineHeight 1.4 */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+/* Typography handled by .h5 class - only override color and padding */
+.plus-card-title {
+    color: var(--color-on-surface);
+    margin: 0;
+    /* Top padding: 16px (multiple of 8px) when no image, or handled by content padding when image present */
+    /* Bottom padding: 4px (multiple of 4px) for spacing to subtitle */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: var(--size-card-gap-md); /* 16px top (multiple of 8px) */
+    padding-bottom: var(--size-element-gap-xs); /* 4px bottom (multiple of 4px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+}
+
+/* When image is present, title top padding is handled by content container */
+.plus-card-image + .plus-card-content .plus-card-title {
+    padding-top: 0; /* Top padding handled by content container's 15px padding */
+}
+
+/* Card Subtitle - 4px gap from title (Figma spec) */
+/* Figma: Body/B3/Regular - Merriweather Sans Light, 12px, lineHeight 1.667 */
+/* Figma: vertical spacing between elements in multiples of 4px */
+/* Typography handled by .body3-txt class - only override color and padding */
+.plus-card-subtitle {
+    color: var(--color-on-surface-variant);
+    margin: 0;
+    /* Top padding: 0 (gap from title is handled by title's bottom padding) */
+    /* Bottom padding: 4px (multiple of 4px) for spacing to body */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by title's bottom padding */
+    padding-bottom: var(--size-element-gap-xs); /* 4px bottom (multiple of 4px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+}
+
+/* Card Body */
+/* Figma: Body/B1/Regular - Merriweather Sans Light, 16px, lineHeight 1.5 */
+/* Figma: text-[color:var(--neutral-colors/on-surface-variant,#3f484a)] */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+/* Typography handled by .body1-txt class - only override color and padding */
+.plus-card-body {
+    color: var(--color-on-surface-variant); /* Figma: on-surface-variant, not on-surface */
+    flex: 1 1 auto;
+    margin: 0;
+    /* Top padding: 0 (gap from subtitle is handled by subtitle's bottom padding) */
+    /* Bottom padding: 16px (multiple of 8px) for spacing to next section */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by subtitle's bottom padding */
+    padding-bottom: var(--size-card-gap-md); /* 16px bottom (multiple of 8px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+}
+
+/* Card Header Section */
+/* Figma: bg-[var(--neutral-colors/surface,#f9f9fc)] border-[0px_0px_1px] */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+/* Header stretches full width - background extends to card edges */
+/* Typography handled by .body1-txt class - only override color, padding, border, and background */
+.plus-card-header {
+    background-color: var(--color-surface); /* Figma: surface background */
+    color: var(--color-on-surface);
+    margin: 0;
+    /* Top padding: 0 (gap from previous section handled by content gap) */
+    /* Bottom padding: 16px (multiple of 8px) */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by content container gap */
+    padding-bottom: var(--size-card-gap-md); /* 16px bottom (multiple of 8px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+    border-bottom: 1px solid var(--color-outline-variant); /* Figma: border at bottom, part of header */
+    width: calc(100% + 2 * var(--size-card-pad-x-md)); /* Extend to card edges */
+    margin-left: calc(-1 * var(--size-card-pad-x-md)); /* Extend to left edge */
+    margin-right: calc(-1 * var(--size-card-pad-x-md)); /* Extend to right edge */
+    box-sizing: border-box;
+}
+
+/* Card Items List */
+/* Figma: bg-[var(--neutral-colors/surface-container/surface-container-lowest,#ffffff)] */
+/* List stretches full width - background extends to card edges */
+.plus-card-items {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background-color: var(--color-surface-container-lowest); /* Figma: surface-container-lowest background for items container */
+    width: calc(100% + 2 * var(--size-card-pad-x-md)); /* Extend to card edges */
+    margin-left: calc(-1 * var(--size-card-pad-x-md)); /* Extend to left edge */
+    margin-right: calc(-1 * var(--size-card-pad-x-md)); /* Extend to right edge */
+    box-sizing: border-box;
+}
+
+/* Typography handled by .body1-txt class - only override color, padding, and background */
+/* Figma: bg-[var(--neutral-colors/surface-container/surface-container-lowest,#ffffff)] */
+/* Figma: text-[color:var(--neutral-colors/on-surface-variant,#3f484a)] */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+/* Items have horizontal padding for content - no border (dividers are separate elements) */
+.plus-card-item {
+    background-color: var(--color-surface-container-lowest); /* Figma: surface-container-lowest background */
+    color: var(--color-on-surface-variant); /* Figma: on-surface-variant, not on-surface */
+    /* Top padding: 0 (gap from previous section handled by content gap, or divider handles spacing) */
+    /* Bottom padding: 12px (multiple of 4px) - using space-200 */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by content container gap or divider */
+    padding-bottom: var(--size-spacing-medium-space-200); /* 12px bottom (multiple of 4px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+}
+
+/* First item in list - add top padding */
+.plus-card-item:first-child {
+    padding-top: var(--size-spacing-medium-space-200); /* 12px top (multiple of 4px) */
+}
+
+/* Card Item Divider */
+/* Figma: h-px bg-[var(--state-layers/on-surface/opacity-0_08,rgba(25,28,30,0.08))] */
+.plus-card-item-divider {
+    height: 1px;
+    width: 100%;
+    background-color: color-mix(in srgb, var(--color-on-surface) 8%, transparent); /* 8% opacity state layer */
+    margin: 0;
+    padding: 0;
+}
+
+/* Card Footer */
+.plus-card-footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    margin: 0;
+}
+
+/* Typography handled by .body1-txt class - only override color, padding, border, and background */
+/* Figma: bg-[var(--neutral-colors/surface,#f9f9fc)] border-[1px_0px_0px] */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+/* Footer stretches full width - background extends to card edges */
+.plus-card-footer-text {
+    background-color: var(--color-surface); /* Figma: surface background */
+    color: var(--color-on-surface);
+    /* Top padding: 0 (gap from previous section handled by content gap) */
+    /* Bottom padding: 16px (multiple of 8px) */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by content container gap */
+    padding-bottom: var(--size-card-gap-md); /* 16px bottom (multiple of 8px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+    border-top: 1px solid var(--color-outline-variant); /* Figma: border at top, part of footer */
+    width: calc(100% + 2 * var(--size-card-pad-x-md)); /* Extend to card edges */
+    margin-left: calc(-1 * var(--size-card-pad-x-md)); /* Extend to left edge */
+    margin-right: calc(-1 * var(--size-card-pad-x-md)); /* Extend to right edge */
+    box-sizing: border-box;
+}
+
+/* Card Links */
+/* Figma: justify-end gap-[var(--spacing/medium/space-300,16px)] px-[var(--spacing/medium/space-400,20px)] py-[var(--spacing/medium/space-300,16px)] */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+.plus-card-links {
+    display: flex;
+    justify-content: flex-end; /* Figma: right aligned */
+    gap: var(--size-card-gap-md); /* 16px gap between links (multiple of 8px) */
+    flex-wrap: wrap;
+    /* Top padding: 0 (gap from previous section handled by content gap) */
+    /* Bottom padding: 16px (multiple of 8px) */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by content container gap */
+    padding-bottom: var(--size-card-gap-md); /* 16px bottom (multiple of 8px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+}
+
+/* Typography handled by .body1-txt class - only override color */
+.plus-card-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    
+    &:hover {
+        text-decoration: underline;
+        color: color-mix(in srgb, var(--color-primary) 85%, black);
+    }
+    
+    &:active {
+        color: color-mix(in srgb, var(--color-primary) 75%, black);
+    }
+}
+
+/* Card Action Button Wrapper */
+/* Figma: justify-end px-[var(--spacing/medium/space-400,20px)] py-[var(--spacing/medium/space-200,12px)] */
+/* Figma: padding in multiples of 8px (preferably) or 4px */
+/* Wrapper provides card-level spacing and right alignment */
+.plus-card-action-button {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+    /* Top padding: 0 (gap from previous section handled by content gap) */
+    /* Bottom padding: 12px (multiple of 4px) */
+    /* Horizontal padding: 20px (>= vertical padding) */
+    padding-top: 0; /* Gap handled by content container gap */
+    padding-bottom: var(--size-spacing-medium-space-200); /* 12px bottom (multiple of 4px) */
+    padding-left: var(--size-card-pad-x-md); /* 20px left */
+    padding-right: var(--size-card-pad-x-md); /* 20px right */
+    width: 100%; /* Full width to allow right alignment */
+}
+
+/* Interactive Card (clickable) */
+/* No box-shadow in Figma design - using border color change for hover state if needed */
+.plus-card[style*="cursor: pointer"]:hover,
+.plus-card[style*="cursor:pointer"]:hover {
+    /* Optional: Could add subtle border color change for hover feedback */
+    transition: border-color 0.2s ease;
+}
+
+/* Card without border */
+.plus-card:not([class*="border"]) {
+    border: none;
+}

@@ -1,0 +1,342 @@
+/**
+ * Toast Component Styles
+ * Bootstrap 4.6.2 toast with PLUS design token customizations
+ * 
+ * Bootstrap 4.6.2 Reference: https://getbootstrap.com/docs/4.6/components/toasts/
+ * 
+ * Component Type: Modal (uses `modal-*` tokens)
+ * Token Usage:
+ *   - Padding: --size-modal-pad-x-md, --size-modal-pad-y-md
+ *   - Gap: --size-modal-gap-sm
+ *   - Radius: --size-modal-radius-md
+ *   - Colors: Style-specific color tokens (primary, success, danger, etc.)
+ * 
+ * Toasts are positioned fixed and overlay the UI, making them Modal-type components.
+ */
+
+/* ============================================
+   TOAST CONTAINER
+   ============================================ */
+
+.plus-toast-container {
+    position: fixed;
+    z-index: 1050; /* Above modals (1040) but below tooltips/popovers */
+    padding: var(--size-modal-pad-x-md);
+    pointer-events: none; /* Allow clicks to pass through container */
+    
+    /* Default: top-right */
+    &.plus-toast-top-right {
+        top: 0;
+        right: 0;
+    }
+    
+    &.plus-toast-top-left {
+        top: 0;
+        left: 0;
+    }
+    
+    &.plus-toast-bottom-right {
+        bottom: 0;
+        right: 0;
+    }
+    
+    &.plus-toast-bottom-left {
+        bottom: 0;
+        left: 0;
+    }
+}
+
+/* ============================================
+   TOAST ELEMENT
+   ============================================ */
+
+.plus-toast {
+    display: flex;
+    flex-direction: column;
+    width: 300px; /* Fixed width per Figma */
+    background-color: var(--color-surface, #f9f9fc);
+    border: none; /* No border per Figma */
+    border-radius: var(--size-modal-radius-md, 6px); /* 6px per Figma */
+    box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3); /* Figma shadow */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    pointer-events: auto; /* Enable clicks on toast */
+    margin-bottom: var(--size-modal-gap-sm);
+    overflow: hidden; /* Clip content per Figma */
+    
+    /* Default: slide in from right (top-right) */
+    transform: translateX(100%);
+    
+    /* Show state - slide in from edge */
+    &.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Position-specific animations */
+.plus-toast-top-right .plus-toast {
+    transform: translateX(100%);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+.plus-toast-top-left .plus-toast {
+    transform: translateX(-100%);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+.plus-toast-bottom-right .plus-toast {
+    transform: translateX(100%);
+    margin-bottom: 0;
+    margin-top: var(--size-modal-gap-sm);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+.plus-toast-bottom-left .plus-toast {
+    transform: translateX(-100%);
+    margin-bottom: 0;
+    margin-top: var(--size-modal-gap-sm);
+    &.show {
+        transform: translateX(0);
+    }
+}
+
+/* ============================================
+   STATIC TOAST (for Storybook/documentation)
+   ============================================ */
+
+.plus-toast-static {
+    position: relative !important; /* Override fixed positioning */
+    opacity: 1 !important; /* Always visible */
+    transform: none !important; /* No slide animation */
+    margin-bottom: var(--size-modal-gap-sm);
+    margin-right: 0;
+    margin-left: 0;
+    width: 300px !important; /* Fixed width per Figma */
+    max-width: 300px !important;
+}
+
+/* ============================================
+   TOAST HEADER
+   ============================================ */
+
+.plus-toast-header {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px); /* 8px gap per Figma */
+    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px); /* 8px y, 16px x per Figma */
+    border-radius: var(--size-modal-radius-md, 6px) var(--size-modal-radius-md, 6px) 0 0;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.plus-toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 1.714;
+    color: var(--color-surface, #f9f9fc); /* White icon on colored background */
+    
+    i {
+        font-size: 14px;
+        line-height: 1.714;
+    }
+}
+
+.plus-toast-title {
+    font-family: var(--font-family-body, 'Merriweather Sans');
+    font-weight: var(--font-weight-bold, 700); /* Bold per Figma */
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-surface, #f9f9fc); /* White text on colored background */
+    flex: 1 0 0; /* Grow to fill space */
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.plus-toast-timestamp {
+    font-family: var(--font-family-body, 'Merriweather Sans');
+    font-weight: var(--font-weight-normal, 300); /* Light per Figma */
+    font-size: 12px;
+    line-height: 1.667;
+    color: var(--color-surface, #f9f9fc); /* White text on colored background */
+    flex-shrink: 0;
+    white-space: nowrap;
+    text-align: right;
+}
+
+/* ============================================
+   TOAST DIVIDER
+   ============================================ */
+
+.plus-toast-divider {
+    height: 1px;
+    width: 100%;
+    flex-shrink: 0;
+    background-color: var(--color-surface-container-high, #e7e8eb); /* Per Figma */
+    border-radius: 1px;
+}
+
+/* ============================================
+   TOAST BODY
+   ============================================ */
+
+.plus-toast-body {
+    padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-md, 12px); /* 8px y, 12px x per Figma */
+    font-family: var(--font-family-body, 'Merriweather Sans');
+    font-weight: var(--font-weight-normal, 300); /* Light per Figma */
+    font-size: 12px; /* 12px per Figma */
+    line-height: 1.667; /* Per Figma */
+    color: var(--color-on-surface, #191c1e); /* Dark text on white background */
+    flex-shrink: 0;
+    width: 100%;
+}
+
+/* ============================================
+   TOAST CLOSE BUTTON
+   ============================================ */
+
+.plus-toast-close {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-surface, #f9f9fc); /* White icon on colored background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px; /* 14px per Figma */
+    line-height: 1.714;
+    transition: opacity 0.2s ease;
+    
+    &:hover:not(:disabled) {
+        opacity: 0.8;
+    }
+    
+    &:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+    
+    i {
+        font-size: 14px;
+        line-height: 1.714;
+    }
+}
+
+/* ============================================
+   TOAST STYLE VARIANTS
+   ============================================ */
+
+.plus-toast.primary,
+.plus-toast.default {
+    .plus-toast-header {
+        background-color: var(--color-inverse-surface, #2e3133); /* Dark grey per Figma */
+    }
+    
+    .plus-toast-icon {
+        color: var(--color-inverse-primary, #84cfff); /* Light blue icon per Figma */
+    }
+    
+    .plus-toast-title,
+    .plus-toast-timestamp,
+    .plus-toast-close {
+        color: var(--color-inverse-on-surface, #f0f1f3); /* White text per Figma */
+    }
+}
+
+.plus-toast.secondary {
+    .plus-toast-header {
+        background-color: var(--color-inverse-surface, #2e3133); /* Same as primary */
+    }
+    
+    .plus-toast-icon {
+        color: var(--color-inverse-primary, #84cfff);
+    }
+    
+    .plus-toast-title,
+    .plus-toast-timestamp,
+    .plus-toast-close {
+        color: var(--color-inverse-on-surface, #f0f1f3);
+    }
+}
+
+.plus-toast.success {
+    .plus-toast-header {
+        background-color: var(--color-success, #3e691a); /* Solid green per Figma */
+    }
+    
+    .plus-toast-icon,
+    .plus-toast-title,
+    .plus-toast-timestamp,
+    .plus-toast-close {
+        color: var(--color-surface, #f9f9fc); /* White on green */
+    }
+}
+
+.plus-toast.danger {
+    .plus-toast-header {
+        background-color: var(--color-danger, #ba1a1a); /* Solid red per Figma */
+    }
+    
+    .plus-toast-icon,
+    .plus-toast-title,
+    .plus-toast-timestamp,
+    .plus-toast-close {
+        color: var(--color-surface, #f9f9fc); /* White on red */
+    }
+}
+
+.plus-toast.warning {
+    border-radius: 4px; /* 4px per Figma (different from others) */
+    
+    .plus-toast-header {
+        background-color: var(--color-warning, #9f8205); /* Solid yellow per Figma */
+    }
+    
+    .plus-toast-icon,
+    .plus-toast-title,
+    .plus-toast-timestamp,
+    .plus-toast-close {
+        color: var(--color-surface, #f9f9fc); /* White on yellow */
+    }
+}
+
+.plus-toast.info {
+    .plus-toast-header {
+        background-color: var(--color-info, #0e8175); /* Solid teal per Figma */
+    }
+    
+    .plus-toast-icon,
+    .plus-toast-title,
+    .plus-toast-timestamp,
+    .plus-toast-close {
+        color: var(--color-surface, #f9f9fc); /* White on teal */
+    }
+}
+
+/* ============================================
+   RESPONSIVE BEHAVIOR
+   ============================================ */
+
+@media (max-width: 576px) {
+    .plus-toast {
+        min-width: calc(100vw - var(--size-modal-pad-x-md) * 2);
+        max-width: calc(100vw - var(--size-modal-pad-x-md) * 2);
+    }
+    
+    .plus-toast-container {
+        padding: var(--size-modal-pad-x-sm);
+    }
+}
+
