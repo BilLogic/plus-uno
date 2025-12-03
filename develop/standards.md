@@ -68,6 +68,16 @@ This document consolidates all technical documentation, coding standards, setup 
 - Cards at rest: `--elevation-light-1`
 - Cards on hover: `--elevation-light-2`
 - Modals: `--elevation-light-3` to `--elevation-light-5`
+- **Reference**: `design-system/styles/elevation.md` for exact values
+
+### Table Color States
+- **ALWAYS** use table color state tokens for table buttons and interactive elements
+- Default: `transparent` background, no stroke, 100% opacity
+- Hover: `--color-on-surface-state-08` background, no stroke, 100% opacity
+- Pressed: `--color-on-surface-state-16` background, no stroke, 100% opacity
+- Focus: `--color-on-surface-state-12` background, `--color-inverse-primary` stroke (2px), 100% opacity
+- Disabled: `--color-on-surface-state-08` background, no stroke, 38% opacity
+- **Reference**: `design-system/styles/colors.md` - Table Color States section
 
 ### Corner Radius Application
 
@@ -316,6 +326,90 @@ ComponentName/
 - States: `{ComponentName}.States.stories.js`
 - Content variants: `{ComponentName}.ContentVariants.stories.js`
 
+### Storybook Maintenance
+
+**Goal**: Ensure Storybook always reflects the current state of the code and Figma design.
+
+#### Workflow: Figma Update -> Code Update -> Storybook Update
+1.  **Trigger**: A change is made in Figma (e.g., new token, new component variant).
+2.  **Code Update**: Update the SCSS/JS implementation first.
+3.  **Storybook Update**:
+    - **Tokens**: If a token changed, update `design-system/styles/{Type}.stories.js`.
+    - **Components**: If a component changed, update `{ComponentName}.stories.js`.
+    - **Verify**: Run `npm run storybook` and visually verify the change matches Figma.
+
+#### Storybook Layout Best Practices
+1.  **Avoid Fixed Widths**: Do not place `max-width` constraints on story containers if the component content is dynamic. This can cause "bleeding" or clipping.
+2.  **Prevent Stretching**: For "Interactive" stories using flex columns, always set `alignItems: 'flex-start'` on the container to prevent components from stretching to the full width.
+
+#### Updating Component Stories
+When adding a new prop or variant:
+1.  **Update `argTypes`**: Add the new control (select, boolean, text).
+2.  **Update `args`**: Set a default value.
+3.  **Update `render` function**: Ensure the new prop is passed to the component creation function.
+
+```javascript
+// Example: Adding a 'size' prop
+argTypes: {
+  size: {
+    control: 'select',
+    options: ['small', 'default', 'large'],
+    description: 'Size of the component'
+  }
+},
+args: {
+  size: 'default'
+}
+```
+
+## Developer Handoff Checklist
+
+**Goal**: Ensure code is production-ready and easy for developers to integrate.
+
+### Pre-Flight Check
+- [ ] **No Hardcoded Values**: All colors, spacing, and typography use `var(--token-name)`.
+- [ ] **No Inline Styles**: All styling is in SCSS files or uses utility classes.
+- [ ] **Clean Console**: No errors or warnings in the browser console.
+- [ ] **Accessibility**: All interactive elements have `aria-label` or visible text. Images have `alt` text.
+- [ ] **Highcharts**: Configuration is separated from data. Colors use design tokens.
+- [ ] **Imports**: All imports use the correct relative paths (see `imports.md`).
+- [ ] **Cleanup**: Removed all temporary debugging code (console.log, debugger).
+
+### Handoff Artifacts
+- **HTML/JS**: The functional prototype files.
+- **Assets**: Any new images saved to `design-system/assets/images/`.
+- **Notes**: A brief summary of any complex logic or assumptions made.
+
+## Text-to-Prototype Workflow
+
+**Goal**: Create high-fidelity prototypes from text descriptions *without* a Figma file.
+
+### Protocol
+1.  **Clarify (Ambiguity Check)**:
+    -   If requirements are vague, ask clarifying questions *before* planning.
+    -   *Key Questions*: "What is the user goal?", "Which product pillar?", "What data is shown?"
+2.  **Plan (User Approval)**:
+    -   Propose a text-based plan in the chat.
+    -   Define the **Template** (e.g., Admin), **Components** (e.g., Table, Filter), and **Layout**.
+    -   **Get User Approval** before writing code.
+3.  **Select Template**: Choose the closest match from `playground/templates/`.
+    -   *Example*: "Create a student list" -> Use `playground/templates/admin/`.
+4.  **Select Components**: Use `design-system/components/overview.md` to pick the right building blocks.
+    -   *Rule*: **Never create custom UI**. Assemble existing components (Cards, Tables, Buttons).
+5.  **Apply Standards**:
+    -   Use **Standard Spacing** (Layout tokens).
+    -   Use **Standard Typography** (Header/Body tokens).
+    -   Use **Standard Colors** (Surface/On-Surface tokens).
+6.  **Iterate**:
+    -   Build the layout using Bootstrap grid + PLUS utilities.
+    -   Insert components via `PlusInterface`.
+    -   Verify against `standards.md` patterns.
+
+**Validation**: Since there is no Figma to match pixels against, validate against **Consistency**:
+- Does it look like the other templates?
+- Does it use the correct tokens?
+- Is the spacing consistent?
+
 ## Figma Integration
 
 ### Design Token Extraction
@@ -367,6 +461,11 @@ Extract component specifications including:
 5. Provide sensible defaults
 6. Document all parameters with JSDoc
 7. Match production implementation patterns exactly
+
+### Component Layout
+1. **Hugging Content**: Use `display: inline-flex`, `width: auto`, `max-width: 100%`, and `flex: 0 0 auto` for components that should hug their content (like badges).
+2. **Vertical Alignment**: **NEVER** use hardcoded `line-height: 1`. Always use semantic line-height tokens (e.g., `var(--font-line-height-h1)`) to ensure text centers correctly with icons.
+3. **Flex Containers**: Be aware of default `align-items: stretch` in flex containers. Use `align-self: flex-start` on the child or `align-items: flex-start` on the parent to prevent unwanted stretching.
 
 ### Accessibility
 - Include proper ARIA attributes
@@ -515,6 +614,19 @@ This section describes common design patterns and best practices for creating pr
     Social-Emotional content
 </div>
 ```
+
+#### SMART Competency Areas
+- **Social-Emotional Learning** (SE): `.color-smartClrSe`, `.bg-color-smartClrSe`
+- **Mastering Content** (MC): `.color-smartClrMc`, `.bg-color-smartClrMc`
+- **Advocacy** (ADV): `.color-smartClrAdv`, `.bg-color-smartClrAdv`
+- **Relationships** (RELN): `.color-smartClrReln`, `.bg-color-smartClrReln`
+- **Technology Tools** (TT): `.color-smartClrTt`, `.bg-color-smartClrTt`
+
+#### Status Values
+- `"assigned"`: Content is assigned
+- `"started"`: Content has been started
+- `"not started"`: Content has not been started
+- `"complete"`: Content is complete
 
 ### Spacing Patterns
 

@@ -36,7 +36,7 @@ export const SidebarTabStates = {
     container.style.gap = 'var(--size-element-gap-md)';
     container.style.padding = 'var(--size-section-pad-y-lg)';
     container.style.maxWidth = '300px';
-    
+
     const states = [
       { state: 'enabled', text: 'Tab Title' },
       { state: 'hover', text: 'Tab Title' },
@@ -44,7 +44,7 @@ export const SidebarTabStates = {
       { state: 'disabled', text: 'Tab Title' },
       { state: 'focus', text: 'Tab Title' }
     ];
-    
+
     states.forEach(({ state, text }) => {
       const tab = createSidebarTab({
         text: text,
@@ -54,87 +54,56 @@ export const SidebarTabStates = {
       });
       container.appendChild(tab);
     });
-    
+
     return container;
   },
 };
 
 /**
- * User Avatar - Variants
- * Shows user avatar with different configurations
+ * User Avatar - Interactive
+ * Interactive user avatar with controls
  */
-export const UserAvatarVariants = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-element-gap-md)';
-    container.style.padding = 'var(--size-section-pad-y-lg)';
-    container.style.maxWidth = '300px';
-    
-    const variants = [
-      { name: 'John Doe', firstChar: 'J', counter: true, counterValue: 2 },
-      { name: 'Jane Smith', firstChar: 'J', counter: true, counterValue: 5 },
-      { name: 'Bob Wilson', firstChar: 'B', counter: false }
-    ];
-    
-    variants.forEach((variant) => {
-      const avatar = createUserAvatar({
-        firstChar: variant.firstChar,
-        name: variant.name,
-        showName: true,
-        counter: variant.counter,
-        counterValue: variant.counterValue
-      });
-      container.appendChild(avatar);
-    });
-    
-    return container;
-  },
-};
-
-/**
- * Static Badge SMART
- * Interactive SMART competency area badge with type and size properties
- */
-export const StaticBadgeSmart = {
+export const UserAvatarInteractive = {
   render: (args) => {
     const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = 'var(--size-element-gap-md)';
     container.style.padding = 'var(--size-section-pad-y-lg)';
-    container.style.maxWidth = '400px';
-    
-    const badge = createStaticBadgeSmart({
-      type: args.type,
-      size: args.size
+
+    const avatar = createUserAvatar({
+      firstChar: args.firstChar,
+      name: args.name,
+      counter: args.counter,
+      counterValue: args.counterValue
     });
-    container.appendChild(badge);
-    
+
+    container.appendChild(avatar);
     return container;
   },
-  argTypes: {
-    type: {
-      control: 'select',
-      options: [
-        'socio-emotional',
-        'mastering-content',
-        'advocacy',
-        'relationships',
-        'technology-tools'
-      ],
-      description: 'SMART competency area type',
-    },
-    size: {
-      control: 'select',
-      options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'],
-      description: 'Badge size',
-    },
-  },
   args: {
-    type: 'socio-emotional',
-    size: 'h1',
+    firstChar: 'J',
+    name: 'John Doe',
+    counter: true,
+    counterValue: 2
   },
+  argTypes: {
+    firstChar: {
+      name: 'First Char',
+      control: 'text'
+    },
+    name: {
+      name: 'Name',
+      control: 'text'
+    },
+    counter: {
+      name: 'Counter',
+      control: 'boolean'
+    },
+    counterValue: {
+      name: 'Counter Value',
+      control: 'number',
+      if: { arg: 'counter' }
+    }
+  }
 };
+
+
 

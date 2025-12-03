@@ -24,100 +24,91 @@ export default {
   },
 };
 
+
+
 /**
- * Sidebar - Tutor Variant
- * Shows sidebar for tutor user type
+ * Sidebar - Interactive
+ * Shows sidebar with interactive controls for user type and visibility
  */
-export const SidebarTutor = {
-  render: () => {
+export const SidebarInteractive = {
+  render: (args) => {
     const container = document.createElement('div');
-    container.style.width = '250px';
+    container.style.width = args.visible ? '250px' : '0px'; // Collapse container if invisible
     container.style.backgroundColor = 'var(--color-surface-container)';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
+    container.style.padding = args.visible ? 'var(--size-section-pad-y-md)' : '0px'; // Remove padding if invisible
+    container.style.height = '100vh'; // Ensure full height for better visualization
+
     const sidebar = createSidebar({
-      user: 'tutor',
+      user: args.user,
+      visible: args.visible,
       onHomeClick: () => console.log('Home clicked'),
       onTabClick: (tabName) => console.log('Tab clicked:', tabName)
     });
-    
+
     container.appendChild(sidebar);
     return container;
+  },
+  argTypes: {
+    user: {
+      control: { type: 'select' },
+      options: ['tutor', 'supervisor'],
+      description: 'User type (determines available sections)'
+    },
+    visible: {
+      control: 'boolean',
+      description: 'Toggle sidebar visibility'
+    }
+  },
+  args: {
+    user: 'supervisor',
+    visible: true,
   },
 };
 
 /**
- * Sidebar - Supervisor Variant
- * Shows sidebar for supervisor user type (includes Admin section)
+ * Top Bar - Interactive
+ * Shows top bar with interactive controls
  */
-export const SidebarSupervisor = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.width = '250px';
-    container.style.backgroundColor = 'var(--color-surface-container)';
-    container.style.padding = 'var(--size-section-pad-y-md)';
-    
-    const sidebar = createSidebar({
-      user: 'supervisor',
-      onHomeClick: () => console.log('Home clicked'),
-      onTabClick: (tabName) => console.log('Tab clicked:', tabName)
-    });
-    
-    container.appendChild(sidebar);
-    return container;
-  },
-};
-
-/**
- * Top Bar - Expanded Mode
- * Shows top bar in expanded mode with sidebar toggle, breadcrumb, and user avatar
- */
-export const TopBarExpanded = {
-  render: () => {
+export const TopBarInteractive = {
+  render: (args) => {
     const container = document.createElement('div');
     container.style.width = '100%';
     container.style.backgroundColor = 'var(--color-surface-container)';
     container.style.padding = 'var(--size-section-pad-y-sm)';
-    
-    const topBar = createTopBar({
-      mode: 'expanded',
-      breadcrumbItems: [{ text: 'Strategies' }],
-      userName: 'John Doe',
-      userFirstChar: 'J',
-      counterValue: 2,
-      onSidebarToggle: () => console.log('Sidebar toggle clicked'),
-      onUserClick: () => console.log('User avatar clicked')
-    });
-    
-    container.appendChild(topBar);
-    return container;
-  },
-};
 
-/**
- * Top Bar - Collapsed Mode
- * Shows top bar in collapsed mode
- */
-export const TopBarCollapsed = {
-  render: () => {
-    const container = document.createElement('div');
-    container.style.width = '100%';
-    container.style.backgroundColor = 'var(--color-surface-container)';
-    container.style.padding = 'var(--size-section-pad-y-sm)';
-    
     const topBar = createTopBar({
-      mode: 'collapsed',
+      mode: args.mode,
       breadcrumbItems: [{ text: 'Strategies' }],
-      userName: 'John Doe',
-      userFirstChar: 'J',
-      counterValue: 2,
+      userName: args.userName,
+      userFirstChar: args.userName.charAt(0),
+      counterValue: args.counterValue,
       onSidebarToggle: () => console.log('Sidebar toggle clicked'),
       onUserClick: () => console.log('User avatar clicked')
     });
-    
+
     container.appendChild(topBar);
     return container;
   },
+  argTypes: {
+    mode: {
+      control: { type: 'select' },
+      options: ['expanded', 'collapsed'],
+      description: 'Top Bar mode'
+    },
+    userName: {
+      control: 'text',
+      description: 'User name'
+    },
+    counterValue: {
+      control: 'number',
+      description: 'Notification counter value'
+    }
+  },
+  args: {
+    mode: 'expanded',
+    userName: 'John Doe',
+    counterValue: 2
+  }
 };
 
 /**
@@ -130,14 +121,14 @@ export const FooterDefault = {
     container.style.width = '100%';
     container.style.backgroundColor = 'var(--color-surface-container)';
     container.style.padding = 'var(--size-section-pad-y-md)';
-    
+
     const footer = createFooter({
       version: 'v5.2.0',
       copyright: 'Copyright © Carnegie Mellon University 2024',
       termsText: 'Terms of Use',
       termsUrl: '#'
     });
-    
+
     container.appendChild(footer);
     return container;
   },

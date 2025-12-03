@@ -1,0 +1,38 @@
+.plus-section {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-section-pad-none {
+    padding: 0;
+}
+
+.plus-section-pad-sm {
+    padding: var(--size-spacing-sm, 8px);
+}
+
+.plus-section-pad-md {
+    padding: var(--size-spacing-md, 16px);
+}
+
+.plus-section-pad-lg {
+    padding: var(--size-spacing-lg, 24px);
+}
+
+.plus-section-pad-xl {
+    padding: var(--size-spacing-xl, 32px);
+}
+
+.plus-section-bg-surface {
+    background-color: var(--neutral-colors-surface-surface, #ffffff);
+}
+
+.plus-section-bg-surface-alt {
+    background-color: var(--neutral-colors-surface-container-surface-container, #edeef0);
+}
+
+.plus-section-title {
+    margin-top: 0;
+    margin-bottom: var(--size-spacing-md, 16px);
+    color: var(--neutral-colors-text-text-primary, #191c1e);
+}

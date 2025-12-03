@@ -26,12 +26,12 @@ function createColorTable(headers, rows) {
   table.style.borderCollapse = 'collapse';
   table.style.marginBottom = 'var(--size-section-pad-y-md)';
   table.style.border = '1px solid var(--color-outline-variant, #bec8ca)';
-  
+
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
   headerRow.style.backgroundColor = 'var(--color-surface-container-low, #f3f3f6)';
   headerRow.style.borderBottom = '2px solid var(--color-outline, #6f797a)';
-  
+
   headers.forEach(header => {
     const th = document.createElement('th');
     th.textContent = header;
@@ -41,15 +41,15 @@ function createColorTable(headers, rows) {
     th.className = 'body2-txt';
     headerRow.appendChild(th);
   });
-  
+
   thead.appendChild(headerRow);
   table.appendChild(thead);
-  
+
   const tbody = document.createElement('tbody');
   rows.forEach(rowData => {
     const row = document.createElement('tr');
     row.style.borderBottom = '1px solid var(--color-outline-variant, #bec8ca)';
-    
+
     // First column - always token/state
     const firstCell = document.createElement('td');
     firstCell.style.padding = 'var(--size-table-cell-y) var(--size-table-cell-x)';
@@ -58,7 +58,7 @@ function createColorTable(headers, rows) {
     code.style.fontSize = '0.875rem';
     firstCell.appendChild(code);
     row.appendChild(firstCell);
-    
+
     // Second column - value/overlay token
     const secondCell = document.createElement('td');
     secondCell.style.fontFamily = 'monospace';
@@ -66,7 +66,7 @@ function createColorTable(headers, rows) {
     secondCell.textContent = rowData.value;
     secondCell.style.padding = 'var(--size-table-cell-y) var(--size-table-cell-x)';
     row.appendChild(secondCell);
-    
+
     // Handle 4-column tables (State, Overlay Token, Border/Stroke, Opacity Rule)
     if (headers.length === 4 && headers.includes('Border / Stroke')) {
       // Third column - Border/Stroke
@@ -75,7 +75,7 @@ function createColorTable(headers, rows) {
       borderCell.className = 'body2-txt';
       borderCell.textContent = rowData.border || '';
       row.appendChild(borderCell);
-      
+
       // Fourth column - Opacity Rule
       const opacityCell = document.createElement('td');
       opacityCell.style.padding = 'var(--size-table-cell-y) var(--size-table-cell-x)';
@@ -96,7 +96,7 @@ function createColorTable(headers, rows) {
         visualCell.appendChild(swatch);
         row.appendChild(visualCell);
       }
-      
+
       // Description column
       const descCell = document.createElement('td');
       descCell.textContent = rowData.description || '';
@@ -104,12 +104,12 @@ function createColorTable(headers, rows) {
       descCell.style.padding = 'var(--size-table-cell-y) var(--size-table-cell-x)';
       row.appendChild(descCell);
     }
-    
+
     tbody.appendChild(row);
   });
-  
+
   table.appendChild(tbody);
-  
+
   return table;
 }
 
@@ -122,19 +122,19 @@ export const Overview = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h1');
     title.className = 'h1';
     title.textContent = 'Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const description = document.createElement('p');
     description.className = 'body1-txt';
     description.textContent = 'PLUS follows Material Design 3 color guidance. All colors follow Material Design 3 roles and are sourced from Figma design system variables. The color system includes accent colors, SMART Framework colors, neutral colors, and state layers for interactive elements.';
     description.style.marginBottom = 'var(--size-card-gap-lg)';
     container.appendChild(description);
-    
+
     return container;
   },
 };
@@ -149,13 +149,13 @@ const AccentPrimarySection = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Primary Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const table = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -168,14 +168,14 @@ const AccentPrimarySection = {
       ]
     );
     container.appendChild(table);
-    
+
     const stateTitle = document.createElement('h3');
     stateTitle.className = 'h3';
     stateTitle.textContent = 'Primary State Layers';
     stateTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     stateTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(stateTitle);
-    
+
     const stateTable = createColorTable(
       ['Token', 'Value', 'Description'],
       [
@@ -188,7 +188,7 @@ const AccentPrimarySection = {
       ]
     );
     container.appendChild(stateTable);
-    
+
     return container;
   },
 };
@@ -202,13 +202,13 @@ const AccentSecondarySection = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Secondary Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const table = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -220,7 +220,7 @@ const AccentSecondarySection = {
       ]
     );
     container.appendChild(table);
-    
+
     return container;
   },
 };
@@ -234,13 +234,13 @@ const AccentTertiarySection = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Tertiary Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const table = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -252,7 +252,7 @@ const AccentTertiarySection = {
       ]
     );
     container.appendChild(table);
-    
+
     const infoNote = document.createElement('p');
     infoNote.className = 'body2-txt';
     infoNote.style.marginTop = 'var(--size-section-pad-y-md)';
@@ -261,7 +261,7 @@ const AccentTertiarySection = {
     infoNote.style.borderRadius = 'var(--size-card-radius-sm, 12px)';
     infoNote.innerHTML = '<strong>Note:</strong> Info colors alias to Tertiary using <code>var()</code> references. Use <code>--color-info</code> which references <code>--color-tertiary</code>.';
     container.appendChild(infoNote);
-    
+
     return container;
   },
 };
@@ -275,32 +275,32 @@ export const AccentColors = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Accent Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const description = document.createElement('p');
     description.className = 'body1-txt';
     description.textContent = 'Accent colors provide primary, secondary, and tertiary emphasis in the UI. Use primary for main actions, secondary for supporting actions, and tertiary (also used for Info) for contextual emphasis.';
     description.style.marginBottom = 'var(--size-card-gap-lg)';
     container.appendChild(description);
-    
+
     // Primary section
     container.appendChild(AccentPrimarySection.render());
-    
+
     // Secondary section
     const secondarySection = AccentSecondarySection.render();
     secondarySection.style.marginTop = 'var(--size-section-pad-y-lg)';
     container.appendChild(secondarySection);
-    
+
     // Tertiary section
     const tertiarySection = AccentTertiarySection.render();
     tertiarySection.style.marginTop = 'var(--size-section-pad-y-lg)';
     container.appendChild(tertiarySection);
-    
+
     // Button Examples Section
     const examplesTitle = document.createElement('h3');
     examplesTitle.className = 'h3';
@@ -308,32 +308,32 @@ export const AccentColors = {
     examplesTitle.style.marginTop = 'var(--size-section-pad-y-lg)';
     examplesTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(examplesTitle);
-    
+
     const examplesDescription = document.createElement('p');
     examplesDescription.className = 'body2-txt';
     examplesDescription.textContent = 'Accent colors are used in buttons with different fill variants. Below are examples showing filled, outline, and tonal buttons for each accent color.';
     examplesDescription.style.marginBottom = 'var(--size-card-gap-md)';
     container.appendChild(examplesDescription);
-    
+
     const styles = ['primary', 'secondary', 'tertiary'];
     const fills = ['filled', 'outline', 'tonal'];
-    
+
     styles.forEach((style) => {
       const styleSection = document.createElement('div');
       styleSection.style.marginBottom = 'var(--size-section-pad-y-md)';
-      
+
       const styleLabel = document.createElement('h4');
       styleLabel.className = 'h4';
       styleLabel.textContent = `${style.charAt(0).toUpperCase() + style.slice(1)} Style`;
       styleLabel.style.marginBottom = 'var(--size-element-gap-sm)';
       styleSection.appendChild(styleLabel);
-      
+
       const buttonRow = document.createElement('div');
       buttonRow.style.display = 'flex';
       buttonRow.style.flexWrap = 'wrap';
       buttonRow.style.gap = 'var(--size-element-gap-md)';
       buttonRow.style.alignItems = 'center';
-      
+
       fills.forEach((fill) => {
         const button = PlusInterface.createButton({
           btnText: `${style.charAt(0).toUpperCase() + style.slice(1)} ${fill.charAt(0).toUpperCase() + fill.slice(1)}`,
@@ -343,11 +343,11 @@ export const AccentColors = {
         });
         buttonRow.appendChild(button);
       });
-      
+
       styleSection.appendChild(buttonRow);
       container.appendChild(styleSection);
     });
-    
+
     return container;
   },
 };
@@ -361,20 +361,20 @@ export const StatusColors = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Status Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const successTitle = document.createElement('h3');
     successTitle.className = 'h3';
     successTitle.textContent = 'Success';
     successTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     successTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(successTitle);
-    
+
     const successTable = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -386,14 +386,14 @@ export const StatusColors = {
       ]
     );
     container.appendChild(successTable);
-    
+
     const dangerTitle = document.createElement('h3');
     dangerTitle.className = 'h3';
     dangerTitle.textContent = 'Danger';
     dangerTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     dangerTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(dangerTitle);
-    
+
     const dangerTable = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -405,14 +405,14 @@ export const StatusColors = {
       ]
     );
     container.appendChild(dangerTable);
-    
+
     const warningTitle = document.createElement('h3');
     warningTitle.className = 'h3';
     warningTitle.textContent = 'Warning';
     warningTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     warningTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(warningTitle);
-    
+
     const warningTable = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -424,7 +424,7 @@ export const StatusColors = {
       ]
     );
     container.appendChild(warningTable);
-    
+
     // Alert Examples Section
     const examplesTitle = document.createElement('h3');
     examplesTitle.className = 'h3';
@@ -432,24 +432,24 @@ export const StatusColors = {
     examplesTitle.style.marginTop = 'var(--size-section-pad-y-lg)';
     examplesTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(examplesTitle);
-    
+
     const examplesDescription = document.createElement('p');
     examplesDescription.className = 'body2-txt';
     examplesDescription.textContent = 'Status colors are used in Alert components to provide contextual feedback. Below are examples showing how each status color is applied in context.';
     examplesDescription.style.marginBottom = 'var(--size-card-gap-md)';
     container.appendChild(examplesDescription);
-    
+
     const alertExamples = document.createElement('div');
     alertExamples.style.display = 'flex';
     alertExamples.style.flexDirection = 'column';
     alertExamples.style.gap = 'var(--size-card-gap-md)';
-    
+
     const statusAlerts = [
       { style: 'success', title: 'Success Alert', text: 'This is a success alert demonstrating the success color tokens.' },
       { style: 'danger', title: 'Danger Alert', text: 'This is a danger alert demonstrating the danger color tokens.' },
       { style: 'warning', title: 'Warning Alert', text: 'This is a warning alert demonstrating the warning color tokens.' },
     ];
-    
+
     statusAlerts.forEach((alertData) => {
       const alert = PlusInterface.createAlert({
         style: alertData.style,
@@ -459,9 +459,9 @@ export const StatusColors = {
       });
       alertExamples.appendChild(alert);
     });
-    
+
     container.appendChild(alertExamples);
-    
+
     return container;
   },
 };
@@ -475,20 +475,20 @@ export const NeutralColors = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Neutral Colors';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const textTitle = document.createElement('h3');
     textTitle.className = 'h3';
     textTitle.textContent = 'Neutral Font Colors';
     textTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     textTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(textTitle);
-    
+
     const textTable = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -497,14 +497,14 @@ export const NeutralColors = {
       ]
     );
     container.appendChild(textTable);
-    
+
     const outlineTitle = document.createElement('h3');
     outlineTitle.className = 'h3';
     outlineTitle.textContent = 'Outline Colors';
     outlineTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     outlineTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(outlineTitle);
-    
+
     const outlineTable = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -513,14 +513,14 @@ export const NeutralColors = {
       ]
     );
     container.appendChild(outlineTable);
-    
+
     const disabledTitle = document.createElement('h3');
     disabledTitle.className = 'h3';
     disabledTitle.textContent = 'Disabled State';
     disabledTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     disabledTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(disabledTitle);
-    
+
     const disabledTable = createColorTable(
       ['Token', 'Value', 'Color', 'Description'],
       [
@@ -528,7 +528,7 @@ export const NeutralColors = {
       ]
     );
     container.appendChild(disabledTable);
-    
+
     // Examples Section
     const examplesTitle = document.createElement('h3');
     examplesTitle.className = 'h3';
@@ -536,7 +536,7 @@ export const NeutralColors = {
     examplesTitle.style.marginTop = 'var(--size-section-pad-y-lg)';
     examplesTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(examplesTitle);
-    
+
     // Font Colors Example
     const fontExampleTitle = document.createElement('h4');
     fontExampleTitle.className = 'h4';
@@ -544,14 +544,14 @@ export const NeutralColors = {
     fontExampleTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     fontExampleTitle.style.marginBottom = 'var(--size-element-gap-sm)';
     container.appendChild(fontExampleTitle);
-    
+
     const formExample = document.createElement('div');
     formExample.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
     formExample.style.backgroundColor = 'var(--color-surface-container-lowest)';
     formExample.style.borderRadius = 'var(--size-card-radius-sm)';
     formExample.style.border = '1px solid var(--color-outline-variant)';
     formExample.style.maxWidth = '400px';
-    
+
     const label1 = document.createElement('label');
     label1.className = 'body2-txt';
     label1.textContent = 'Primary Text (on-surface)';
@@ -559,14 +559,14 @@ export const NeutralColors = {
     label1.style.marginBottom = 'var(--size-element-gap-xs)';
     label1.style.color = 'var(--color-on-surface)';
     formExample.appendChild(label1);
-    
+
     const input1 = document.createElement('input');
     input1.type = 'text';
     input1.className = 'plus-text-field body2-txt';
     input1.value = 'Example input text';
     input1.style.marginBottom = 'var(--size-element-gap-md)';
     formExample.appendChild(input1);
-    
+
     const label2 = document.createElement('label');
     label2.className = 'body2-txt';
     label2.textContent = 'Secondary Text (on-surface-variant)';
@@ -574,15 +574,15 @@ export const NeutralColors = {
     label2.style.marginBottom = 'var(--size-element-gap-xs)';
     label2.style.color = 'var(--color-on-surface-variant)';
     formExample.appendChild(label2);
-    
+
     const metadata = document.createElement('div');
     metadata.className = 'body2-txt';
     metadata.textContent = 'Last updated: 2 hours ago';
     metadata.style.color = 'var(--color-on-surface-variant)';
     formExample.appendChild(metadata);
-    
+
     container.appendChild(formExample);
-    
+
     // Outline Colors Example
     const outlineExampleTitle = document.createElement('h4');
     outlineExampleTitle.className = 'h4';
@@ -590,33 +590,33 @@ export const NeutralColors = {
     outlineExampleTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     outlineExampleTitle.style.marginBottom = 'var(--size-element-gap-sm)';
     container.appendChild(outlineExampleTitle);
-    
+
     const cardExample = document.createElement('div');
     cardExample.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
     cardExample.style.backgroundColor = 'var(--color-surface-container-lowest)';
     cardExample.style.borderRadius = 'var(--size-card-radius-sm)';
     cardExample.style.border = '1px solid var(--color-outline)';
     cardExample.style.maxWidth = '400px';
-    
+
     const cardTitle = document.createElement('div');
     cardTitle.className = 'h4';
     cardTitle.textContent = 'Card with Outer Border';
     cardTitle.style.marginBottom = 'var(--size-element-gap-sm)';
     cardExample.appendChild(cardTitle);
-    
+
     const divider = document.createElement('div');
     divider.style.height = '1px';
     divider.style.backgroundColor = 'var(--color-outline-variant)';
     divider.style.margin = 'var(--size-element-gap-md) 0';
     cardExample.appendChild(divider);
-    
+
     const cardText = document.createElement('div');
     cardText.className = 'body2-txt';
     cardText.textContent = 'This divider uses outline-variant (inner divider).';
     cardExample.appendChild(cardText);
-    
+
     container.appendChild(cardExample);
-    
+
     // Disabled State Example
     const disabledExampleTitle = document.createElement('h4');
     disabledExampleTitle.className = 'h4';
@@ -624,7 +624,7 @@ export const NeutralColors = {
     disabledExampleTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     disabledExampleTitle.style.marginBottom = 'var(--size-element-gap-sm)';
     container.appendChild(disabledExampleTitle);
-    
+
     const disabledButton = PlusInterface.createButton({
       btnText: 'Disabled Button',
       btnStyle: 'primary',
@@ -633,7 +633,7 @@ export const NeutralColors = {
       enabled: false,
     });
     container.appendChild(disabledButton);
-    
+
     return container;
   },
 };
@@ -648,19 +648,19 @@ export const SurfaceColors = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Surface Colors & Elevation';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const description = document.createElement('p');
     description.className = 'body1-txt';
     description.textContent = 'Choose surface tokens based on component type and elevation. Elevation implies visual layering; interaction overlays are always additive on top of these base fills.';
     description.style.marginBottom = 'var(--size-card-gap-lg)';
     container.appendChild(description);
-    
+
     // Element – Default / Read State
     const elementDefaultTitle = document.createElement('h3');
     elementDefaultTitle.className = 'h3';
@@ -668,13 +668,13 @@ export const SurfaceColors = {
     elementDefaultTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     elementDefaultTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(elementDefaultTitle);
-    
+
     const elementDefaultInfo = document.createElement('p');
     elementDefaultInfo.className = 'body2-txt';
     elementDefaultInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface</code> | <strong>Elevation:</strong> 0 on top of surface';
     elementDefaultInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(elementDefaultInfo);
-    
+
     const elementDefaultExample = document.createElement('div');
     elementDefaultExample.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
     elementDefaultExample.style.backgroundColor = 'var(--color-surface)';
@@ -683,7 +683,7 @@ export const SurfaceColors = {
     elementDefaultExample.style.maxWidth = '400px';
     elementDefaultExample.innerHTML = '<div class="body2-txt">Default element using --color-surface</div>';
     container.appendChild(elementDefaultExample);
-    
+
     // Element – Active
     const elementActiveTitle = document.createElement('h3');
     elementActiveTitle.className = 'h3';
@@ -691,13 +691,13 @@ export const SurfaceColors = {
     elementActiveTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     elementActiveTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(elementActiveTitle);
-    
+
     const elementActiveInfo = document.createElement('p');
     elementActiveInfo.className = 'body2-txt';
     elementActiveInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface-container-highest</code> | <strong>Elevation:</strong> Used for active states layered above container';
     elementActiveInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(elementActiveInfo);
-    
+
     const elementActiveExample = document.createElement('div');
     elementActiveExample.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
     elementActiveExample.style.backgroundColor = 'var(--color-surface-container-highest)';
@@ -706,7 +706,7 @@ export const SurfaceColors = {
     elementActiveExample.style.maxWidth = '400px';
     elementActiveExample.innerHTML = '<div class="body2-txt">Active element using --color-surface-container-highest</div>';
     container.appendChild(elementActiveExample);
-    
+
     // Table – Default
     const tableTitle = document.createElement('h3');
     tableTitle.className = 'h3';
@@ -714,13 +714,13 @@ export const SurfaceColors = {
     tableTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     tableTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(tableTitle);
-    
+
     const tableInfo = document.createElement('p');
     tableInfo.className = 'body2-txt';
     tableInfo.innerHTML = '<strong>Token:</strong> <code>no-fill</code> | <strong>Elevation:</strong> 0';
     tableInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(tableInfo);
-    
+
     const tableExample = document.createElement('table');
     tableExample.style.width = '100%';
     tableExample.style.borderCollapse = 'collapse';
@@ -739,7 +739,7 @@ export const SurfaceColors = {
     tableRow.appendChild(tableCell2);
     tableExample.appendChild(tableRow);
     container.appendChild(tableExample);
-    
+
     // Section – Default
     const sectionTitle = document.createElement('h3');
     sectionTitle.className = 'h3';
@@ -747,13 +747,13 @@ export const SurfaceColors = {
     sectionTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     sectionTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(sectionTitle);
-    
+
     const sectionInfo = document.createElement('p');
     sectionInfo.className = 'body2-txt';
     sectionInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface-container-low</code> (or no-fill) | <strong>Elevation:</strong> 0';
     sectionInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(sectionInfo);
-    
+
     const sectionExample = document.createElement('div');
     sectionExample.style.padding = 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)';
     sectionExample.style.backgroundColor = 'var(--color-surface-container-low)';
@@ -762,7 +762,7 @@ export const SurfaceColors = {
     sectionExample.style.maxWidth = '400px';
     sectionExample.innerHTML = '<div class="body2-txt">Section container using --color-surface-container-low</div>';
     container.appendChild(sectionExample);
-    
+
     // Modal – Default
     const modalTitle = document.createElement('h3');
     modalTitle.className = 'h3';
@@ -770,13 +770,13 @@ export const SurfaceColors = {
     modalTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     modalTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(modalTitle);
-    
+
     const modalInfo = document.createElement('p');
     modalInfo.className = 'body2-txt';
     modalInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface-container-high</code> | <strong>Elevation:</strong> <code>--elevation-light-3</code>';
     modalInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(modalInfo);
-    
+
     const modalExample = PlusInterface.createModal({
       modalId: 'surface-color-modal-example',
       modalTitle: 'Modal Example',
@@ -787,7 +787,7 @@ export const SurfaceColors = {
     modalExample.style.position = 'relative';
     modalExample.style.margin = '0';
     container.appendChild(modalExample);
-    
+
     // Card – Default
     const cardTitle = document.createElement('h3');
     cardTitle.className = 'h3';
@@ -795,20 +795,20 @@ export const SurfaceColors = {
     cardTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     cardTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(cardTitle);
-    
+
     const cardInfo = document.createElement('p');
     cardInfo.className = 'body2-txt';
     cardInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface-container-lowest</code> | <strong>Elevation:</strong> <code>--elevation-light-1</code>';
     cardInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(cardInfo);
-    
+
     const cardExample = PlusInterface.createCard({
       cardTitle: 'Card Example',
       cardBody: 'This card uses --color-surface-container-lowest with elevation token --elevation-light-1.',
     });
     cardExample.style.maxWidth = '400px';
     container.appendChild(cardExample);
-    
+
     // Surface Container – General Wrapper
     const surfaceContainerTitle = document.createElement('h3');
     surfaceContainerTitle.className = 'h3';
@@ -816,13 +816,13 @@ export const SurfaceColors = {
     surfaceContainerTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     surfaceContainerTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(surfaceContainerTitle);
-    
+
     const surfaceContainerInfo = document.createElement('p');
     surfaceContainerInfo.className = 'body2-txt';
     surfaceContainerInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface-container</code> | <strong>Elevation:</strong> 0';
     surfaceContainerInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(surfaceContainerInfo);
-    
+
     const surfaceContainerExample = document.createElement('div');
     surfaceContainerExample.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
     surfaceContainerExample.style.backgroundColor = 'var(--color-surface-container)';
@@ -831,7 +831,7 @@ export const SurfaceColors = {
     surfaceContainerExample.style.maxWidth = '400px';
     surfaceContainerExample.innerHTML = '<div class="body2-txt">General wrapper using --color-surface-container</div>';
     container.appendChild(surfaceContainerExample);
-    
+
     // Surface – Base Background
     const surfaceTitle = document.createElement('h3');
     surfaceTitle.className = 'h3';
@@ -839,13 +839,13 @@ export const SurfaceColors = {
     surfaceTitle.style.marginTop = 'var(--size-section-pad-y-md)';
     surfaceTitle.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(surfaceTitle);
-    
+
     const surfaceInfo = document.createElement('p');
     surfaceInfo.className = 'body2-txt';
     surfaceInfo.innerHTML = '<strong>Token:</strong> <code>--color-surface</code> | <strong>Elevation:</strong> 0';
     surfaceInfo.style.marginBottom = 'var(--size-element-gap-md)';
     container.appendChild(surfaceInfo);
-    
+
     const surfaceExample = document.createElement('div');
     surfaceExample.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
     surfaceExample.style.backgroundColor = 'var(--color-surface)';
@@ -854,7 +854,133 @@ export const SurfaceColors = {
     surfaceExample.style.maxWidth = '400px';
     surfaceExample.innerHTML = '<div class="body2-txt">Base background using --color-surface</div>';
     container.appendChild(surfaceExample);
-    
+
+    return container;
+  },
+};
+
+/**
+ * SMART Framework Colors
+ */
+export const SmartColors = {
+  render: () => {
+    const container = document.createElement('div');
+    container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
+    container.style.maxWidth = '1200px';
+    container.style.margin = '0 auto';
+
+    const title = document.createElement('h2');
+    title.className = 'h2';
+    title.textContent = 'SMART Framework Colors';
+    title.style.marginBottom = 'var(--size-section-pad-y-md)';
+    container.appendChild(title);
+
+    const description = document.createElement('p');
+    description.className = 'body1-txt';
+    description.textContent = 'Colors used for the SMART Framework competency areas.';
+    description.style.marginBottom = 'var(--size-card-gap-lg)';
+    container.appendChild(description);
+
+    // Social-Emotional
+    const seTitle = document.createElement('h3');
+    seTitle.className = 'h3';
+    seTitle.textContent = 'Social-Emotional Learning (SE)';
+    seTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    seTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(seTitle);
+
+    const seTable = createColorTable(
+      ['Token', 'Value', 'Color', 'Description'],
+      [
+        { token: '--color-social-emotional', value: '#8c6600', description: 'Main Social-Emotional color' },
+        { token: '--color-social-emotional-text', value: '#674a00', description: 'Social-Emotional text color' },
+        { token: '--color-on-social-emotional', value: '#ffffff', description: 'Content color on Social-Emotional' },
+        { token: '--color-social-emotional-container', value: '#ffdea0', description: 'Social-Emotional container background' },
+        { token: '--color-on-social-emotional-container', value: '#5c4300', description: 'Content color on container' },
+      ]
+    );
+    container.appendChild(seTable);
+
+    // Mastering Content
+    const mcTitle = document.createElement('h3');
+    mcTitle.className = 'h3';
+    mcTitle.textContent = 'Mastering Content (MC)';
+    mcTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    mcTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(mcTitle);
+
+    const mcTable = createColorTable(
+      ['Token', 'Value', 'Color', 'Description'],
+      [
+        { token: '--color-mastering-content', value: '#8659a9', description: 'Main Mastering Content color' },
+        { token: '--color-mastering-content-text', value: '#673a8b', description: 'Mastering Content text color' },
+        { token: '--color-on-mastering-content', value: '#ffffff', description: 'Content color on Mastering Content' },
+        { token: '--color-mastering-content-container', value: '#f2daff', description: 'Mastering Content container background' },
+        { token: '--color-on-mastering-content-container', value: '#583a6f', description: 'Content color on container' },
+      ]
+    );
+    container.appendChild(mcTable);
+
+    // Advocacy
+    const advTitle = document.createElement('h3');
+    advTitle.className = 'h3';
+    advTitle.textContent = 'Advocacy (ADV)';
+    advTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    advTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(advTitle);
+
+    const advTable = createColorTable(
+      ['Token', 'Value', 'Color', 'Description'],
+      [
+        { token: '--color-advocacy', value: '#167745', description: 'Main Advocacy color' },
+        { token: '--color-advocacy-text', value: '#00572a', description: 'Advocacy text color' },
+        { token: '--color-on-advocacy', value: '#ffffff', description: 'Content color on Advocacy' },
+        { token: '--color-advocacy-container', value: '#b3f1bf', description: 'Advocacy container background' },
+        { token: '--color-on-advocacy-container', value: '#16512c', description: 'Content color on container' },
+      ]
+    );
+    container.appendChild(advTable);
+
+    // Relationship
+    const relnTitle = document.createElement('h3');
+    relnTitle.className = 'h3';
+    relnTitle.textContent = 'Relationship (RELN)';
+    relnTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    relnTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(relnTitle);
+
+    const relnTable = createColorTable(
+      ['Token', 'Value', 'Color', 'Description'],
+      [
+        { token: '--color-relationship', value: '#c70b77', description: 'Main Relationship color' },
+        { token: '--color-relationship-text', value: '#940055', description: 'Relationship text color' },
+        { token: '--color-on-relationship', value: '#ffffff', description: 'Content color on Relationship' },
+        { token: '--color-relationship-container', value: '#ffd9e4', description: 'Relationship container background' },
+        { token: '--color-on-relationship-container', value: '#3f001b', description: 'Content color on container' },
+      ]
+    );
+    container.appendChild(relnTable);
+
+    // Technology Tools
+    const ttTitle = document.createElement('h3');
+    ttTitle.className = 'h3';
+    ttTitle.textContent = 'Technology Tools (TT)';
+    ttTitle.style.marginTop = 'var(--size-section-pad-y-md)';
+    ttTitle.style.marginBottom = 'var(--size-element-gap-md)';
+    container.appendChild(ttTitle);
+
+    const ttTable = createColorTable(
+      ['Token', 'Value', 'Color', 'Description'],
+      [
+        { token: '--color-technology-tools', value: '#005cbd', description: 'Main Technology Tools color' },
+        { token: '--color-technology-tools-text', value: '#0b469d', description: 'Technology Tools text color' },
+        { token: '--color-on-technology-tools', value: '#ffffff', description: 'Content color on Technology Tools' },
+        { token: '--color-technology-tools-container', value: '#d7e2ff', description: 'Technology Tools container background' },
+        { token: '--color-on-technology-tools-container', value: '#001a40', description: 'Content color on container' },
+      ]
+    );
+    container.appendChild(ttTable);
+
     return container;
   },
 };
@@ -868,19 +994,19 @@ export const InteractionStates = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Universal Interaction Logic';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const description = document.createElement('p');
     description.className = 'body1-txt';
     description.textContent = 'Interaction states are implemented as additive overlays on top of the base surface token. Do not replace the base fill token – apply on-surface state layers above it.';
     description.style.marginBottom = 'var(--size-card-gap-md)';
     container.appendChild(description);
-    
+
     const logicList = document.createElement('ul');
     logicList.className = 'body2-txt';
     [
@@ -894,7 +1020,7 @@ export const InteractionStates = {
       logicList.appendChild(li);
     });
     container.appendChild(logicList);
-    
+
     const stateTable = createColorTable(
       ['State', 'Overlay Token', 'Border / Stroke', 'Opacity Rule'],
       [
@@ -906,7 +1032,7 @@ export const InteractionStates = {
       ]
     );
     container.appendChild(stateTable);
-    
+
     const tableNote = document.createElement('p');
     tableNote.className = 'body2-txt';
     tableNote.style.marginTop = 'var(--size-section-pad-y-md)';
@@ -915,7 +1041,7 @@ export const InteractionStates = {
     tableNote.style.borderRadius = 'var(--size-card-radius-sm, 12px)';
     tableNote.innerHTML = '<strong>Note:</strong> Table buttons and interactive elements follow the same universal interaction logic shown above.';
     container.appendChild(tableNote);
-    
+
     return container;
   },
 };
@@ -930,19 +1056,19 @@ export const Interactive = {
     container.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
     container.style.maxWidth = '1200px';
     container.style.margin = '0 auto';
-    
+
     const title = document.createElement('h2');
     title.className = 'h2';
     title.textContent = 'Interactive Color Playground';
     title.style.marginBottom = 'var(--size-section-pad-y-md)';
     container.appendChild(title);
-    
+
     const description = document.createElement('p');
     description.className = 'body1-txt';
     description.textContent = 'Use the controls below to test different color tokens and see how they look in context.';
     description.style.marginBottom = 'var(--size-card-gap-lg)';
     container.appendChild(description);
-    
+
     // Color swatch example
     const swatchContainer = document.createElement('div');
     swatchContainer.style.padding = 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)';
@@ -950,22 +1076,22 @@ export const Interactive = {
     swatchContainer.style.borderRadius = 'var(--size-card-radius-sm)';
     swatchContainer.style.border = `2px solid ${args.borderColor || 'var(--color-outline)'}`;
     swatchContainer.style.marginBottom = 'var(--size-card-gap-md)';
-    
+
     const swatchTitle = document.createElement('h3');
     swatchTitle.className = 'h3';
     swatchTitle.textContent = args.title || 'Color Example';
     swatchTitle.style.color = args.textColor || 'var(--color-on-surface)';
     swatchTitle.style.marginBottom = 'var(--size-element-gap-sm)';
     swatchContainer.appendChild(swatchTitle);
-    
+
     const swatchText = document.createElement('p');
     swatchText.className = 'body2-txt';
     swatchText.textContent = args.description || 'This is example text showing how colors work together.';
     swatchText.style.color = args.textColor || 'var(--color-on-surface)';
     swatchContainer.appendChild(swatchText);
-    
+
     container.appendChild(swatchContainer);
-    
+
     // Button example
     if (args.showButton) {
       const button = PlusInterface.createButton({
@@ -977,7 +1103,7 @@ export const Interactive = {
       button.style.marginTop = 'var(--size-element-gap-md)';
       container.appendChild(button);
     }
-    
+
     return container;
   },
   argTypes: {

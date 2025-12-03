@@ -23,3 +23,8 @@ export const LOGO_SIZES = {
     XL: 'XL'
 };
 
+/**
+ * Logo assets (legacy support)
+ */
+export const LOGO_ASSETS = {};
+

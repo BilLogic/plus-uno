@@ -19,6 +19,8 @@ export { createSuperCompPillDiv } from './SuperCompPill/index.js';
 export { createDropdown } from './Dropdown/index.js';
 export { createCard } from './Card/index.js';
 export { createModal } from './Modal/index.js';
+export { createSection } from './Section/index.js';
+export { createTable } from './Table/index.js';
 export { createNavigation } from './Navigation/index.js';
 export { createNavbar } from './Navbar/index.js';
 export { createTextarea, createSelect, createRangeInput, createSelectMultiple } from './Form/index.js';
@@ -152,7 +154,7 @@ export class PlusInterface {
     static createRichTextEditor = createRichTextEditor;
     static createLogo = AssetComponents.createLogo;
     static createCompetencyBadge = createCompetencyBadge;
-    
+
     // Legacy constants
     static BUTTON_FILL = BUTTON_CONSTANTS.FILL;
     static BUTTON_STYLES = BUTTON_CONSTANTS.STYLES;
@@ -165,7 +167,7 @@ export class PlusInterface {
  */
 export class PlusSmartComponents {
     static createSuperCompPillDiv = createSuperCompPillDiv;
-    
+
     // Legacy constants
     static CA_SE_FULL = SMART_CONSTANTS.CA_SE_FULL;
     static CA_SE = SMART_CONSTANTS.CA_SE;
