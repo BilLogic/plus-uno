@@ -3,7 +3,7 @@
  * Full page layout for Tutors Status & Warnings
  */
 
-import { createTopBar } from '../../../Universal/Sections/topbar.js';
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createNavigation } from '../../../../components/Navigation/index.js';
 import { createButton } from '../../../../components/Button/index.js';
 import { createDataCard } from '../Cards/DataCard.js';
@@ -16,16 +16,8 @@ import { createFilters } from '../Elements/Filters.js';
  * @returns {HTMLElement} Page element
  */
 export function createTutorsStatusWarningsPage() {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface)';
-    page.style.minHeight = '100vh';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
-
-    // Top bar
-    const topBar = createTopBar({
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -34,15 +26,20 @@ export function createTutorsStatusWarningsPage() {
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main content container
-    const mainContent = document.createElement('div');
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    mainContent.style.gap = 'var(--size-section-gap-lg)';
+    const sidebarConfig = {
+        user: 'supervisor',
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
+
+    // --- Content Creation ---
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = 'var(--size-section-gap-lg)';
+    content.style.width = '100%';
 
     // Tab navigation
     const tabs = createNavigation({
@@ -54,7 +51,7 @@ export function createTutorsStatusWarningsPage() {
             { text: 'Training Progress', selected: false }
         ]
     });
-    mainContent.appendChild(tabs);
+    content.appendChild(tabs);
 
     // Action buttons and filters section
     const actionSection = document.createElement('div');
@@ -96,7 +93,7 @@ export function createTutorsStatusWarningsPage() {
     });
     actionSection.appendChild(filters);
 
-    mainContent.appendChild(actionSection);
+    content.appendChild(actionSection);
 
     // Section: Status Overview
     const overviewSection = document.createElement('div');
@@ -153,7 +150,7 @@ export function createTutorsStatusWarningsPage() {
 
     cardsWrapper.appendChild(cardsRow);
     overviewSection.appendChild(cardsWrapper);
-    mainContent.appendChild(overviewSection);
+    content.appendChild(overviewSection);
 
     // Section: Status Details
     const statusSection = document.createElement('div');
@@ -234,9 +231,14 @@ export function createTutorsStatusWarningsPage() {
     });
     statusSection.appendChild(pagination);
 
-    mainContent.appendChild(statusSection);
-    page.appendChild(mainContent);
+    content.appendChild(statusSection);
 
-    return page;
+    // --- Page Layout Composition ---
+    return createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'tutors-status-warnings-page'
+    });
 }
 

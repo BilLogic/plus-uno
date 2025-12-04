@@ -3,7 +3,7 @@
  * Full page layout for Tutors Tool Usage
  */
 
-import { createTopBar } from '../../../Universal/Sections/topbar.js';
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createNavigation } from '../../../../components/Navigation/index.js';
 import { createButton } from '../../../../components/Button/index.js';
 import { createDataCardHorizontalScroll } from '../Sections/DataCardHorizontalScroll.js';
@@ -16,16 +16,8 @@ import { createFilters } from '../Elements/Filters.js';
  * @returns {HTMLElement} Page element
  */
 export function createTutorsToolUsagePage() {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface)';
-    page.style.minHeight = '100vh';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
-
-    // Top bar
-    const topBar = createTopBar({
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -34,15 +26,20 @@ export function createTutorsToolUsagePage() {
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main content container
-    const mainContent = document.createElement('div');
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    mainContent.style.gap = 'var(--size-section-gap-lg)';
+    const sidebarConfig = {
+        user: 'supervisor',
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
+
+    // --- Content Creation ---
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = 'var(--size-section-gap-lg)';
+    content.style.width = '100%';
 
     // Tab navigation and action buttons container
     const headerContainer = document.createElement('div');
@@ -88,7 +85,7 @@ export function createTutorsToolUsagePage() {
     actionSection.appendChild(exportButton);
 
     headerContainer.appendChild(actionSection);
-    mainContent.appendChild(headerContainer);
+    content.appendChild(headerContainer);
 
     // Section: Tool Usage
     const toolUsageSection = document.createElement('div');
@@ -130,6 +127,7 @@ export function createTutorsToolUsagePage() {
         ]
     });
     toolUsageSection.appendChild(cardsSection);
+    content.appendChild(toolUsageSection);
 
     // Section: Tool Usage Details
     const toolUsageDetailsSection = document.createElement('div');
@@ -241,10 +239,13 @@ export function createTutorsToolUsagePage() {
     paginationContainer.appendChild(pagination);
     toolUsageDetailsSection.appendChild(paginationContainer);
 
-    mainContent.appendChild(toolUsageSection);
-    mainContent.appendChild(toolUsageDetailsSection);
-    page.appendChild(mainContent);
+    content.appendChild(toolUsageDetailsSection);
 
-    return page;
+    // --- Page Layout Composition ---
+    return createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'tutors-tool-usage-page'
+    });
 }
-

@@ -13,7 +13,6 @@
 @use "_spacing_semantics" as *;
 @use "_layout" as *;
 @use "_fonts" as *;
-@use "_plus_spacing" as *;
 @use "_elevation" as *;
 
 // Components (using load path - load-path is design-system/components, so imports should be relative to that)
@@ -164,4 +163,3 @@ body {
     font-size: var(--font-size-body3, 10px);
     box-sizing: border-box;
 }
-

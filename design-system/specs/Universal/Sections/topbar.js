@@ -66,8 +66,8 @@ export function createTopBar({
     topBar.style.boxSizing = 'border-box';
     // User requested: gap: var(--Surface-Container-gap-sm, 16px);
     topBar.style.gap = 'var(--Surface-Container-gap-sm, 16px)';
-    // User requested: padding: var(--Surface-Container-pad-y-sm, 12px) var(--Surface-Container-pad-x-sm, 16px);
-    topBar.style.padding = 'var(--Surface-Container-pad-y-sm, 12px) var(--Surface-Container-pad-x-sm, 16px)';
+    // User requested NO padding on sides or top/bottom for TopBar
+    topBar.style.padding = '0';
 
     if (id) {
         topBar.id = id;
@@ -99,7 +99,7 @@ export function createTopBar({
     // Icon: angles-left (expanded) or bars (collapsed), text-[14px] (Font Awesome H6)
     const toggleButton = createButton({
         btnText: '',
-        btnStyle: 'default',
+        btnStyle: 'primary',
         btnFill: 'tonal',
         btnSize: 'default',
         icon: mode === 'expanded' ? 'angles-left' : 'bars',

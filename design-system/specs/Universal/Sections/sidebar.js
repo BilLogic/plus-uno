@@ -37,7 +37,8 @@ export function createSidebar({
     sidebar.style.display = 'flex';
     sidebar.style.flexDirection = 'column';
     sidebar.style.gap = 'var(--size-surface-gap-sm)'; // Gap between blocks (Logo, Home, Sections)
-    sidebar.style.width = '100%';
+    // User requested Sidebar to hug content, so remove fixed width or 100%
+    sidebar.style.width = 'fit-content';
     sidebar.style.height = '100%';
     sidebar.style.boxSizing = 'border-box';
 
@@ -54,12 +55,14 @@ export function createSidebar({
     }
 
     // Logo section - Figma: px-[var(--element/pad-x-sm,8px)] py-[var(--element/pad-y-md,6px)], gap-[var(--element/gap-md,10px)], rounded-[4px]
+    // User requested update to Large tier for padding
     const logoSection = document.createElement('div');
     logoSection.classList.add('plus-sidebar-logo');
     logoSection.style.display = 'flex';
     logoSection.style.alignItems = 'center';
     logoSection.style.gap = 'var(--size-element-gap-md)';
-    logoSection.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-sm)';
+    // User requested NO padding for logo section
+    logoSection.style.padding = '0';
     logoSection.style.borderRadius = 'var(--size-element-radius-sm)';
     logoSection.style.boxSizing = 'border-box';
 
@@ -91,9 +94,12 @@ export function createSidebar({
     trainingSection.style.gap = 'var(--size-element-gap-sm)'; // Gap within section (Title to Tab, Tab to Tab)
 
     // Section title - Figma: px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-md,6px)], Body/B2/Semibold (Regular, 14px)
+    // User requested update to Large tier for padding
     const trainingTitle = document.createElement('div');
     trainingTitle.classList.add('plus-sidebar-section-title');
-    trainingTitle.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0';
+    // Updated to Large tier
+    // Updated to Large tier - User requested NO left padding for titles
+    trainingTitle.style.padding = 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg) 0 0';
     const trainingTitleText = document.createElement('p');
     trainingTitleText.classList.add('body2-txt');
     trainingTitleText.style.fontWeight = 'var(--font-weight-normal)';
@@ -131,7 +137,9 @@ export function createSidebar({
 
     const toolkitTitle = document.createElement('div');
     toolkitTitle.classList.add('plus-sidebar-section-title');
-    toolkitTitle.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0';
+    // Updated to Large tier
+    // Updated to Large tier - User requested NO left padding for titles
+    toolkitTitle.style.padding = 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg) 0 0';
     const toolkitTitleText = document.createElement('p');
     toolkitTitleText.classList.add('body2-txt');
     toolkitTitleText.style.fontWeight = 'var(--font-weight-normal)';
@@ -170,7 +178,9 @@ export function createSidebar({
 
         const adminTitle = document.createElement('div');
         adminTitle.classList.add('plus-sidebar-section-title');
-        adminTitle.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0';
+        // Updated to Large tier
+        // Updated to Large tier - User requested NO left padding for titles
+        adminTitle.style.padding = 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg) 0 0';
         const adminTitleText = document.createElement('p');
         adminTitleText.classList.add('body2-txt');
         adminTitleText.style.fontWeight = 'var(--font-weight-normal)';

@@ -3,6 +3,7 @@
  * Full page layout for Group Training Progress with overview cards and training progress table
  */
 
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createTopBar } from '../../../Universal/Sections/topbar.js';
 import { createNavigation } from '../../../../components/Navigation/index.js';
 import { createButton } from '../../../../components/Button/index.js';
@@ -156,10 +157,10 @@ function createStudentNeedCard() {
         letterLabel.style.fontWeight = 'var(--font-weight-light)';
         letterLabel.style.lineHeight = '1.667';
         letterLabel.style.color = item.letter === 'M' ? 'var(--color-mastering-content-text)' :
-                                  item.letter === 'S' ? 'var(--color-social-emotional-text)' :
-                                  item.letter === 'A' ? 'var(--color-advocacy-text)' :
-                                  item.letter === 'R' ? 'var(--color-relationship-text)' :
-                                  'var(--color-technology-tools-text)';
+            item.letter === 'S' ? 'var(--color-social-emotional-text)' :
+                item.letter === 'A' ? 'var(--color-advocacy-text)' :
+                    item.letter === 'R' ? 'var(--color-relationship-text)' :
+                        'var(--color-technology-tools-text)';
         letterLabel.style.textTransform = 'uppercase';
         letterLabel.textContent = item.letter;
         barContainer.appendChild(letterLabel);
@@ -308,21 +309,8 @@ function createOverviewCard({ title, value, description }) {
  * @returns {HTMLElement} The Group Training Progress Page element
  */
 export function createGroupTrainingProgressPage() {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface-container)';
-    page.style.minHeight = '100vh';
-    page.style.maxWidth = '991.98px';
-    page.style.minWidth = '768px';
-    page.style.padding = 'var(--size-surface-container-pad-y-sm) var(--size-surface-container-pad-x-sm)';
-    page.style.gap = 'var(--size-surface-container-gap-sm)';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
-    page.setAttribute("data-node-id", "531:62962");
-
-    // Top bar
-    const topBar = createTopBar({
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -331,24 +319,21 @@ export function createGroupTrainingProgressPage() {
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main content container
-    const mainContent = document.createElement('div');
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.gap = 'var(--size-surface-container-gap-sm)';
-    mainContent.style.width = '100%';
+    const sidebarConfig = {
+        user: 'supervisor',
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
 
-    // Content container (white background)
-    const contentContainer = document.createElement('div');
-    contentContainer.style.backgroundColor = 'var(--color-surface)';
-    contentContainer.style.borderRadius = 'var(--size-surface-radius)';
-    contentContainer.style.padding = 'var(--size-surface-pad-y) var(--size-surface-pad-x)';
-    contentContainer.style.display = 'flex';
-    contentContainer.style.flexDirection = 'column';
-    contentContainer.style.gap = '24px'; // spacer-3-base-between-sections
+    // --- Content Creation ---
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = '24px'; // spacer-3-base-between-sections
+    content.style.width = '100%';
+    content.setAttribute("data-node-id", "531:62962");
 
     // Tab navigation - INSIDE content container
     const tabsWrapper = document.createElement('div');
@@ -365,7 +350,7 @@ export function createGroupTrainingProgressPage() {
         ]
     });
     tabsWrapper.appendChild(tabs);
-    contentContainer.appendChild(tabsWrapper);
+    content.appendChild(tabsWrapper);
 
     // Inner container
     const innerContainer = document.createElement('div');
@@ -588,10 +573,14 @@ export function createGroupTrainingProgressPage() {
 
     scrollspyWrapper.appendChild(listContainer);
     innerContainer.appendChild(scrollspyWrapper);
-    contentContainer.appendChild(innerContainer);
-    mainContent.appendChild(contentContainer);
-    page.appendChild(mainContent);
+    content.appendChild(innerContainer);
 
-    return page;
+    // --- Page Layout Composition ---
+    return createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'group-training-progress-page'
+    });
 }
 

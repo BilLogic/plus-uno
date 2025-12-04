@@ -72,7 +72,9 @@ export const UserAvatarInteractive = {
       firstChar: args.firstChar,
       name: args.name,
       counter: args.counter,
-      counterValue: args.counterValue
+      counterValue: args.counterValue,
+      state: args.state,
+      type: args.type
     });
 
     container.appendChild(avatar);
@@ -82,7 +84,9 @@ export const UserAvatarInteractive = {
     firstChar: 'J',
     name: 'John Doe',
     counter: true,
-    counterValue: 2
+    counterValue: 2,
+    state: 'enabled',
+    type: 'regular tutor'
   },
   argTypes: {
     firstChar: {
@@ -101,9 +105,59 @@ export const UserAvatarInteractive = {
       name: 'Counter Value',
       control: 'number',
       if: { arg: 'counter' }
+    },
+    state: {
+      name: 'State',
+      control: { type: 'radio' },
+      options: ['enabled', 'hover'],
+      description: 'Component state'
+    },
+    type: {
+      name: 'User Type',
+      control: { type: 'select' },
+      options: ['regular tutor', 'lead tutor', 'admin'],
+      description: 'Type of user (affects badge color)'
     }
   }
 };
 
+/**
+ * Sidebar Tab - Interactive
+ * Interactive sidebar tab with controls
+ */
+export const SidebarTabInteractive = {
+  render: (args) => {
+    const container = document.createElement('div');
+    container.style.padding = 'var(--size-section-pad-y-lg)';
+    container.style.backgroundColor = 'var(--color-surface)'; // Ensure visibility
 
+    const tab = createSidebarTab({
+      text: args.text,
+      icon: args.icon,
+      state: args.state,
+      leadingVisual: args.leadingVisual,
+      trailingVisual: args.trailingVisual
+    });
+
+    container.appendChild(tab);
+    return container;
+  },
+  argTypes: {
+    text: { control: 'text' },
+    icon: { control: 'text' },
+    state: {
+      control: { type: 'select' },
+      options: ['enabled', 'hover', 'selected', 'disabled', 'focus']
+    },
+    leadingVisual: { control: 'boolean' },
+    trailingVisual: { control: 'boolean' }
+  },
+  args: {
+    text: 'Tab Title',
+    icon: 'icons',
+    state: 'enabled',
+    leadingVisual: true,
+    trailingVisual: false
+  }
+};
 

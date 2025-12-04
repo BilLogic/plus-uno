@@ -3,7 +3,7 @@
  * Full page layout for Student Admin with overview statistics and student details table
  */
 
-import { createTopBar } from '../../../Universal/Sections/topbar.js';
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createStudentAdminContainer } from '../Sections/StudentAdminContainer.js';
 import { createStudentsTable } from '../Tables/StudentsTable.js';
 import { createStudentsModal } from '../Modals/StudentsModal.js';
@@ -17,20 +17,8 @@ import { createFilters } from '../../Tutor Admin/Elements/Filters.js';
  * @returns {HTMLElement} The Student Admin Page element
  */
 export function createStudentAdminPage({ showModal = false, modalType = "Info" } = {}) {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface-container)';
-    page.style.minHeight = '100vh';
-    page.style.maxWidth = '991.98px';
-    page.style.minWidth = '768px';
-    page.style.padding = 'var(--size-surface-container-pad-y-sm) var(--size-surface-container-pad-x-sm)';
-    page.style.gap = 'var(--size-surface-container-gap-sm)';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
-
-    // Top bar
-    const topBar = createTopBar({
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -39,25 +27,24 @@ export function createStudentAdminPage({ showModal = false, modalType = "Info" }
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main content container
-    const mainContent = document.createElement('div');
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.gap = 'var(--size-surface-container-gap-sm)';
-    mainContent.style.width = '100%';
+    const sidebarConfig = {
+        user: 'supervisor', // Assuming Supervisor view for Student Admin
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
 
-    // Content container (white background)
-    const contentContainer = document.createElement('div');
-    contentContainer.style.backgroundColor = 'var(--color-surface)';
-    contentContainer.style.borderRadius = 'var(--size-surface-radius)';
-    contentContainer.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    contentContainer.style.display = 'flex';
-    contentContainer.style.flexDirection = 'column';
-    contentContainer.style.gap = 'var(--size-surface-gap-md)';
-    contentContainer.style.width = '100%';
+    // --- Content Creation ---
+    // Note: We are NOT creating a wrapper with surface color here, 
+    // because PageLayout provides the surface container.
+    // We just create the content that goes INSIDE the surface.
+
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = 'var(--size-surface-gap-md)';
+    content.style.width = '100%';
 
     // Student Overview Section
     const overviewSection = document.createElement('div');
@@ -102,7 +89,7 @@ export function createStudentAdminPage({ showModal = false, modalType = "Info" }
     cardsWrapper.appendChild(studentAdminContainer);
     overviewSection.appendChild(cardsWrapper);
 
-    contentContainer.appendChild(overviewSection);
+    content.appendChild(overviewSection);
 
     // Student Details Section - using single table component with title
     const sampleData = [
@@ -130,9 +117,15 @@ export function createStudentAdminPage({ showModal = false, modalType = "Info" }
         onAddStudent: () => console.log("Add Student clicked")
     });
 
-    contentContainer.appendChild(studentsTable);
-    mainContent.appendChild(contentContainer);
-    page.appendChild(mainContent);
+    content.appendChild(studentsTable);
+
+    // --- Page Layout Composition ---
+    const layout = createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'student-admin-page'
+    });
 
     // Scrim and Modal - only show if explicitly requested
     if (showModal) {
@@ -150,9 +143,9 @@ export function createStudentAdminPage({ showModal = false, modalType = "Info" }
 
         const modal = createStudentsModal({ type: modalType });
         scrim.appendChild(modal);
-        page.appendChild(scrim);
+        layout.appendChild(scrim);
     }
 
-    return page;
+    return layout;
 }
 

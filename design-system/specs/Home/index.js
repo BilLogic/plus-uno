@@ -3,8 +3,7 @@
  * Higher-level components for the home page and dashboard.
  */
 
-import { createNavbar } from '../../components/Navbar/index.js';
-import { createNavigation } from '../../components/Navigation/index.js';
+import { createPageLayout } from '../Universal/Pages/PageLayout.js';
 import { createSection } from '../../components/Section/index.js';
 import { createCard } from '../../components/Card/index.js';
 import { createTable } from '../../components/Table/index.js';
@@ -15,15 +14,10 @@ import { createButton } from '../../components/Button/index.js';
  * @returns {HTMLElement} The complete Home page element
  */
 export function createHome() {
-    const homeContainer = document.createElement('div');
-    homeContainer.classList.add('plus-home-page');
-    homeContainer.style.display = 'flex';
-    homeContainer.style.flexDirection = 'column';
-    homeContainer.style.minHeight = '100vh';
-    homeContainer.style.backgroundColor = 'var(--neutral-colors-surface-container-surface-container, #edeef0)';
+    // --- Configuration ---
 
-    // 1. Navbar
-    const navbar = createNavbar({
+    // TopBar Config (formerly Navbar)
+    const topBarConfig = {
         brand: {
             name: 'PLUS',
             logo: 'assets/logo.svg' // Placeholder
@@ -37,56 +31,23 @@ export function createHome() {
             name: 'User Name',
             avatar: 'assets/avatar.png' // Placeholder
         }
-    });
-    homeContainer.appendChild(navbar);
+    };
 
-    // Main Content Area (Sidebar + Content)
-    const mainArea = document.createElement('div');
-    mainArea.style.display = 'flex';
-    mainArea.style.flex = '1';
+    // Sidebar Config
+    const sidebarConfig = {
+        user: 'tutor', // Default user type for Home
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
 
-    // 2. Sidebar (Navigation)
-    const sidebar = createNavigation({
-        items: [
-            { text: 'Home', icon: 'home', active: true },
-            { text: 'Skills', icon: 'star' },
-            { text: 'Learning', icon: 'book' },
-            { text: 'Settings', icon: 'cog' }
-        ],
-        orientation: 'vertical',
-        classes: ['plus-home-sidebar']
-    });
-    sidebar.style.width = '250px';
-    sidebar.style.flexShrink = '0';
-    sidebar.style.backgroundColor = 'white';
-    sidebar.style.borderRight = '1px solid var(--neutral-colors-outline-outline-variant, #c2c7cf)';
-    mainArea.appendChild(sidebar);
-
-    // 3. Content Section
-    const contentContainer = document.createElement('div');
-    contentContainer.style.flex = '1';
-    contentContainer.style.padding = '24px';
-    contentContainer.style.display = 'flex';
-    contentContainer.style.flexDirection = 'column';
-    contentContainer.style.gap = '24px';
+    // --- Content Creation ---
+    const homeContent = document.createElement('div');
+    homeContent.style.display = 'flex';
+    homeContent.style.flexDirection = 'column';
+    homeContent.style.gap = '24px';
+    homeContent.style.width = '100%';
 
     // Skill Overview Section
-    const skillOverviewSection = createSection({
-        title: 'Skill Overview',
-        background: 'surface',
-        padding: 'lg',
-        classes: ['plus-home-skill-overview'],
-        styles: {
-            backgroundColor: 'white',
-            borderRadius: 'var(--element-radius-lg, 12px)',
-            boxShadow: 'var(--elevation-1, 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30))'
-        }
-    });
-
-    // Create the content for the skill overview (Table/List)
-    // Based on the design description "Skill Overview", it looks like a list of skills with status.
-    // I'll use the Table component for this as it's a structured list.
-
     const skillsData = [
         { name: 'UX Design', level: 'Expert', progress: '100%', status: 'Completed' },
         { name: 'React Development', level: 'Intermediate', progress: '65%', status: 'In Progress' },
@@ -140,10 +101,6 @@ export function createHome() {
     sectionContent.appendChild(sectionHeader);
     sectionContent.appendChild(skillsTable);
 
-    // Replace the default content wrapper of the section with our custom content
-    // Note: createSection appends content if provided. Here we are building it manually.
-    // Let's re-create the section with content.
-
     const finalSkillSection = createSection({
         content: sectionContent,
         background: 'surface',
@@ -154,13 +111,13 @@ export function createHome() {
         }
     });
 
-    contentContainer.appendChild(finalSkillSection);
+    homeContent.appendChild(finalSkillSection);
 
-    // Add another section for "Recommended Learning" (Cards)
+    // Recommended Learning Section (Cards)
     const learningSectionTitle = document.createElement('h3');
     learningSectionTitle.textContent = 'Recommended Learning';
     learningSectionTitle.style.marginBottom = '16px';
-    contentContainer.appendChild(learningSectionTitle);
+    homeContent.appendChild(learningSectionTitle);
 
     const cardsContainer = document.createElement('div');
     cardsContainer.style.display = 'grid';
@@ -187,10 +144,13 @@ export function createHome() {
         cardsContainer.appendChild(card);
     });
 
-    contentContainer.appendChild(cardsContainer);
+    homeContent.appendChild(cardsContainer);
 
-    mainArea.appendChild(contentContainer);
-    homeContainer.appendChild(mainArea);
-
-    return homeContainer;
+    // --- Page Layout Composition ---
+    return createPageLayout({
+        content: homeContent,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'home-page'
+    });
 }

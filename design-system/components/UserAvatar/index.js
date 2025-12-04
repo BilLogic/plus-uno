@@ -30,7 +30,22 @@ import { createBadge } from '../Badge/index.js';
  * @param {boolean} [options.showName=true] - Whether to show the name
  * @param {boolean} [options.counter=true] - Whether to show notification counter badge
  * @param {number} [options.counterValue=2] - Counter badge value
- * @param {string} [options.type='default'] - Avatar type (default, focus)
+ * @param {string} [options.type='regular tutor'] - Avatar type (regular tutor, lead tutor, admin)
+ * @param {string} [options.id] - Avatar ID
+ * @param {Function} [options.onClick] - Click handler function
+ * @param {Array} [options.classes] - Additional CSS classes
+ * @returns {HTMLElement} User avatar element
+ */
+/**
+ * Creates a user avatar component
+ * @param {Object} options - User avatar configuration
+ * @param {string} [options.firstChar='J'] - First character to display in avatar
+ * @param {string} [options.name='John Doe'] - User name to display
+ * @param {boolean} [options.showName=true] - Whether to show the name
+ * @param {boolean} [options.counter=true] - Whether to show notification counter badge
+ * @param {number} [options.counterValue=2] - Counter badge value
+ * @param {string} [options.state='enabled'] - Component state (enabled, hover)
+ * @param {string} [options.type='regular tutor'] - Avatar type (regular tutor, lead tutor, admin)
  * @param {string} [options.id] - Avatar ID
  * @param {Function} [options.onClick] - Click handler function
  * @param {Array} [options.classes] - Additional CSS classes
@@ -41,31 +56,44 @@ export function createUserAvatar({
     name = 'John Doe',
     counter = true,
     counterValue = 2,
-    type = 'default',
+    state = 'enabled',
+    type = 'regular tutor',
     id = null,
     onClick = null,
     classes = []
 }) {
     // Figma: gap-[var(--element/gap-md,10px)], px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-md,6px)], rounded-[var(--element/radius-md,4px)], w-[168px]
     const avatar = document.createElement('div');
-    avatar.classList.add('plus-user-avatar', `plus-user-avatar-${type}`);
+    // Clean up type for class name
+    const typeClass = type.replace(/\s+/g, '-');
+    avatar.classList.add('plus-user-avatar', `plus-user-avatar-${typeClass}`, `plus-user-avatar-${state}`);
 
     avatar.style.display = 'flex';
     avatar.style.width = '168px';
     // Padding: var(--Element-pad-y-md, 6px) var(--Element-pad-x-md, 10px)
-    // Mapping to project tokens: var(--size-element-pad-y-md) var(--size-element-pad-x-md)
     avatar.style.padding = 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)';
     avatar.style.alignItems = 'center';
     // Gap: var(--Element-gap-md, 10px)
-    // Mapping to project tokens: var(--size-element-gap-md)
     avatar.style.gap = 'var(--size-element-gap-md)';
 
     avatar.style.borderRadius = 'var(--size-element-radius-md)';
     avatar.style.boxSizing = 'border-box';
     avatar.style.position = 'relative';
 
-    // Background color for default type
-    if (type === 'default') {
+    // Background color logic based on state and type
+    // Default (enabled): surface-container-lowest
+    // Hover: linear-gradient or specific color
+
+    if (state === 'hover') {
+        // Figma hover state usually adds a state layer. 
+        // Based on snippet: linear-gradient(90deg, rgba(25, 28, 30, 0.08)...)
+        // We'll use a simple background color for now that matches the "state-08" convention if gradient isn't perfect.
+        // Or better, use the snippet's logic if possible.
+        // Let's use a safe hover color for now: var(--color-surface-container-highest) or similar.
+        // Or better: rgba(25, 28, 30, 0.08) which is --color-on-surface-state-08 roughly.
+        avatar.style.backgroundColor = 'rgba(25, 28, 30, 0.08)';
+        avatar.style.cursor = 'pointer';
+    } else {
         avatar.style.backgroundColor = 'var(--color-surface-container-lowest)';
     }
 
@@ -86,26 +114,35 @@ export function createUserAvatar({
     const nameSection = document.createElement('div');
     nameSection.style.display = 'flex';
     nameSection.style.alignItems = 'center';
-    // Gap: var(--Spacing-Small-space-075, 6px)
-    // We'll use the fallback 6px or try to find the token. 
-    // Based on previous files, it might be var(--size-spacing-small-space-075) but let's stick to the user's explicit request or a safe fallback.
-    // The user provided: gap: var(--Spacing-Small-space-075, 6px);
-    nameSection.style.gap = '6px'; // Using the value directly to be safe and match the "6px" in the var fallback
+    nameSection.style.gap = '6px';
     nameSection.style.flex = '1 0 0';
 
     nameSection.style.minHeight = '1px';
     nameSection.style.minWidth = '1px';
     nameSection.style.position = 'relative';
 
+    // Determine badge style based on user type
+    // Default to primary (tonal) for regular tutor
+    let badgeStyle = 'primary';
+
     // Name pill (avatar circle) - using Badge component
-    // Figma: bg-[var(--_primary/state-layers/primary-08)], px-[4px] py-0, rounded-[var(--border/radius/radius-1000,999px)]
-    // Text: Body/B2/Semibold (Regular, 14px)
     const namePill = createBadge({
         text: firstChar,
-        style: 'primary',
+        style: badgeStyle,
         size: 'b2',
         classes: ['plus-user-avatar-initial']
     });
+
+    // Override styles for specific types to match Figma (Solid colors)
+    if (type === 'lead tutor') {
+        // Figma: Solid Primary background, On-Primary text
+        namePill.style.backgroundColor = 'var(--color-primary)';
+        namePill.style.color = 'var(--color-on-primary)';
+    } else if (type === 'admin') {
+        // Figma: Solid Secondary background, On-Secondary text
+        namePill.style.backgroundColor = 'var(--color-secondary)';
+        namePill.style.color = 'var(--color-on-secondary)';
+    }
 
     // Force circular shape for the initial
     namePill.style.padding = '0';

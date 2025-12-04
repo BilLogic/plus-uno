@@ -1,105 +1,78 @@
-# PLUS Design System Cursor Rules
+# SYSTEM_INSTRUCTIONS: PLUS Design System
 
-## Overview
-You are helping designers prototype interactive high-fidelity work using the PLUS design system. Your goal is to generate production-ready code that follows PLUS design patterns, uses design tokens correctly, and can be easily handed off to developers.
+## 1. BEHAVIORAL PROTOCOLS (STRICT)
 
-## CRITICAL: Figma Implementation Priority
+### A. Figma Priority
+**IF** a Figma link or selection is provided:
+1.  **MUST** call `mcp_Figma_Desktop_get_design_context` immediately.
+2.  **MUST** implement the design pixel-perfectly.
+3.  **MUST NOT** deviate from spacing, colors, or variants shown.
 
-**BEFORE implementing ANY component from Figma, review these cursor rules to ensure compliance.**
+### B. Integrated Vocabulary (Speak Both)
+**You must understand and use both terms:**
+1.  **PATTERN (Design Intent)**: The "What" & "Why". High-level concept (e.g., "Modal", "Card Layout", "Form"). Used for **Planning**.
+2.  **COMPONENT (Code)**: The "How". Low-level implementation (e.g., `createModal`, `createCard`). Used for **Building**.
 
-**When implementing components from Figma:**
+### C. Protocol: Identify -> Select -> Implement
+**IF** NO Figma is provided OR request is ambiguous:
+1.  **IDENTIFY Pattern**: "We need a *Data Table* pattern for this user list."
+2.  **SELECT Components**: "I will use `createTable` and `createPagination`."
+3.  **IMPLEMENT**: Write code using the Component API.
+4.  **WAIT** for user approval on the Plan (Step 1 & 2) before Building (Step 3).
 
-1. **ALWAYS check the Figma design system file or Figma selection/link FIRST**
-2. **ALWAYS use Figma MCP tools** (`mcp_Figma_Desktop_get_design_context` and/or `mcp_Figma_Desktop_get_screenshot`) to see exactly what the Figma selection/link looks like - this is critical
-3. **ALWAYS study the Figma design carefully** before writing any code - examine spacing, colors, typography, variants, and all visual details
-4. **ALWAYS implement components/molecules EXACTLY as shown in Figma** - pixel-perfect accuracy required
-5. **ALWAYS implement ALL variants** exactly as they appear in Figma
-6. **ALWAYS use the exact text/content** shown in Figma - never invent or make up content
-7. **ALWAYS use Bootstrap 4.6.2 as a foundation/base** for functional implementation, then customize ALL styling to match Figma exactly
-8. **ALWAYS use design tokens** for all spacing, colors, typography, and visual properties
+## 2. RESOURCE PILLARS
 
-**Figma accuracy is the highest priority** - if a Figma link or selection is provided, it takes absolute precedence over any assumptions. **You MUST see what it looks like first** using Figma MCP tools.
+| Pillar | Path | Content | Rule |
+| :--- | :--- | :--- | :--- |
+| **STYLES** | `design-system/styles/` | Tokens (Color, Type, Layout) | **ALWAYS** use Semantic Tokens. |
+| **ASSETS** | `design-system/assets/` | Images, Icons | **USE** relative paths. |
+| **COMPONENTS** | `design-system/components/` | UI Elements (Button, Card) | **NEVER** build from scratch. |
+| **SPECS** | `design-system/specs/` | Page Templates | **REFERENCE** for layouts. |
 
-## CRITICAL: Text-to-Prototype Protocol (No Figma)
+## 3. TECH STACK (CRITICAL CONTEXT)
 
-**If NO Figma file/link is provided:**
+| Technology | Version | Usage Rule |
+| :--- | :--- | :--- |
+| **Bootstrap** | `4.6.2` | **BASE ONLY**. Use for grid/layout. Override ALL styles with Tokens. |
+| **Font Awesome** | `5.x` | **ICONS**. Use `fas fa-*` classes. Size with `var(--font-size-fa-*)`. |
+| **Sass/SCSS** | `Dart Sass` | **STYLING**. Use nested rules and `@use` for tokens. |
+| **HTML5** | `Latest` | **MARKUP**. Semantic tags (`<main>`, `<section>`, `<nav>`). |
 
-1.  **Source of Truth**: Use `develop/standards.md` and `playground/templates/` as your design guide.
-2.  **Protocol (Clarify -> Plan -> Build)**:
-    -   **Step 1: Clarify (Ambiguity Check)**:
-        -   If the request is vague (e.g., "Make a dashboard"), **STOP**.
-        -   **ASK**: "What is the specific user goal? Which components (Table, Chart, Form) are needed? What is the primary action?"
-    -   **Step 2: Plan (Text Flow)**:
-        -   **Before coding**, propose a text-based "User Flow" or "Component Layout" in the chat.
-        -   **Example**: "I plan to use the `admin` template, add a `PlusInterface.createTable` for students, and a `createButton` for 'Add Student'. Is this correct?"
-        -   **WAIT** for user confirmation.
-    -   **Step 3: Build**:
-        -   Once approved, start from the closest template in `playground/templates/`.
-        -   Assemble using existing components from `design-system/components/overview.md`.
-3.  **Rule**: **Do not invent new styles.** Use standard tokens and existing components only.
+## 4. KNOWLEDGE BASE (REQUIRED READING)
 
-## Context Loading & Documentation Routing
+**IF** you are unsure about a specific domain, **READ** these guides first:
 
-**You MUST read the relevant documentation before starting any task.**
+*   **Figma Handoff**: `develop/guides/figma-workflow.md`
+*   **Color System**: `develop/foundations/colors.md`
+*   **Typography**: `develop/foundations/typography.md`
+*   **Layout/Spacing**: `develop/foundations/layout.md`
 
-| Topic | Source of Truth (READ THIS) |
+## 5. ROUTING LOGIC (ALGORITHMIC)
+
+**EVALUATE** User Request -> **SELECT** Workflow:
+
+**IF** (Task == "Build New Feature" OR "Prototype"):
+-> **LOAD**: `develop/workflows/workflow-consumer.md`
+-> **EXECUTE**: Builder Protocol.
+
+**IF** (Task == "Update System" OR "Fix Bug" OR "Refactor"):
+-> **LOAD**: `develop/workflows/workflow-contributor.md`
+-> **EXECUTE**: Maintainer Protocol.
+
+## 4. CONTEXT LOADING (ON DEMAND)
+
+**ONLY** read files relevant to the active component.
+
+| Component Type | File Path |
 | :--- | :--- |
-| **Coding Standards** | `develop/standards.md` |
-| **Component Usage** | `develop/COMPONENTS.md` (Technical) or `design-system/components/overview.md` (Design) |
-| **Design Tokens** | `develop/standards.md` (Primary) or `design-system/styles/` (Deep Dive) |
-| **Imports** | `develop/imports.md` |
-| **Figma Integration** | `develop/FIGMA_DESIGN_SYSTEM.md` |
-| **Storybook Maintenance** | `develop/standards.md` (Storybook Maintenance section) |
-| **Developer Handoff** | `develop/standards.md` (Developer Handoff Checklist) |
+| **Inputs, Buttons, Badges** | `develop/patterns/elements.md` |
+| **Cards, Tiles, Media** | `develop/patterns/cards.md` |
+| **Sections, Lists, Heroes** | `develop/patterns/sections.md` |
+| **Modals, Alerts, Tooltips** | `develop/patterns/modals.md` |
+| **Navbars, Sidebars, Layouts** | `develop/patterns/surfaces.md` |
+| **Tables, Pagination** | `develop/patterns/tables.md` |
 
-### 1. For Code Style & Patterns
-**READ `develop/standards.md`** for:
-- JavaScript, CSS/SCSS, and HTML style guides.
-- Image handling and placeholder workflows.
-- Detailed design patterns (Layout, Typography, Spacing).
-- Anti-patterns to avoid.
+## 5. GLOBAL REFERENCES
 
-### 2. For Component Implementation
-**READ `develop/COMPONENTS.md`** first for:
-- **Master Component Index** (Full list of 40+ components).
-- Quick import paths.
-- `PlusInterface` creation methods (Buttons, Inputs, etc.).
-- Token usage quick guides.
-
-**READ `design-system/components/overview.md`** for:
-- Design concepts and visual hierarchy.
-- Semantic layer definitions (Elements vs Cards vs Sections).
-
-## Prototyping Guidelines
-
-### 1. Prototyping Workflow
-**Where to Find Code (Starting Points):**
-- **Reusable Templates**: `playground/templates/{product-pillar}/` (admin, home, login, etc.).
-- **Use these as your base** if a request matches an existing pattern.
-
-**Where to Create Code (New Work):**
-- **Designer-Specific**: `playground/prototyping/{designer-name}/` (Create subfolders per prototype).
-- **NEVER** create files in the root directory (except `index.html`).
-
-**Setup & Verification:**
-- Ensure `npm run dev` is running.
-- Use relative paths for imports (see `develop/imports.md`).
-- **ALWAYS host on local server** (`http://localhost:8080`) to verify the design in detail.
-
-### 2. Component & Template Usage
-**Reuse Protocol:**
-- **Context Loading**: Always "load context" by reading `develop/COMPONENTS.md` before coding.
-- **Never Create from Scratch**: Unless explicitly authorized.
-- **Prioritize Existing**: Always pick from the list of existing components.
-- **Extend vs Create**: Propose extending an existing component (e.g., adding a variant) rather than duplicating code.
-
-**Anti-Patterns to Avoid:**
-- **Never use** `document.createElement('button')` → **Always use** `PlusInterface.createButton()`.
-- **Never use** raw `<input type="checkbox">` → **Always use** `PlusInterface.createCheckbox()`.
-- **Never create** custom cards with `div` and inline styles → **Always use** standard card structure with `card-*` tokens.
-
-## Remember
-- **Figma First**: See it, study it, then build it.
-- **Read the Docs**: Don't guess—read the `develop/` files.
-- **Use Tokens**: No hardcoded values.
-- **Use Components**: No custom UI elements from scratch.
+*   **Master Index**: `develop/reference/component-index.md`
+*   **Token Map**: `develop/foundations/colors.md`, `develop/foundations/typography.md`

@@ -3,7 +3,7 @@
  * Full page layout for Tutors Overview (Tutor performance)
  */
 
-import { createTopBar } from '../../../Universal/Sections/topbar.js';
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createNavigation } from '../../../../components/Navigation/index.js';
 import { createButton } from '../../../../components/Button/index.js';
 import { createDataCard } from '../Cards/DataCard.js';
@@ -20,16 +20,8 @@ import { createTutorsOverviewModal } from '../Modals/TutorsOverviewModal.js';
  * @returns {HTMLElement} Page element
  */
 export function createTutorsOverviewPage({ showModal = false, modalTab = "Info" } = {}) {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface-container)';
-    page.style.minHeight = '100vh';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
-
-    // Top bar
-    const topBar = createTopBar({
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -38,15 +30,20 @@ export function createTutorsOverviewPage({ showModal = false, modalTab = "Info" 
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main content container
-    const mainContent = document.createElement('div');
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.padding = 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)';
-    mainContent.style.gap = 'var(--size-section-gap-lg)';
+    const sidebarConfig = {
+        user: 'supervisor',
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
+
+    // --- Content Creation ---
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = 'var(--size-section-gap-lg)';
+    content.style.width = '100%';
 
     // Tab navigation and action buttons container
     const headerContainer = document.createElement('div');
@@ -92,7 +89,7 @@ export function createTutorsOverviewPage({ showModal = false, modalTab = "Info" 
     actionSection.appendChild(exportButton);
 
     headerContainer.appendChild(actionSection);
-    mainContent.appendChild(headerContainer);
+    content.appendChild(headerContainer);
 
     // Section: Performance Overview
     const performanceOverviewSection = document.createElement('div');
@@ -152,7 +149,7 @@ export function createTutorsOverviewPage({ showModal = false, modalTab = "Info" 
 
     cardsWrapper.appendChild(cardsRow);
     performanceOverviewSection.appendChild(cardsWrapper);
-    mainContent.appendChild(performanceOverviewSection);
+    content.appendChild(performanceOverviewSection);
 
     // Section: Performance Details
     const performanceDetailsSection = document.createElement('div');
@@ -248,10 +245,21 @@ export function createTutorsOverviewPage({ showModal = false, modalTab = "Info" 
     paginationContainer.appendChild(pagination);
     performanceDetailsSection.appendChild(paginationContainer);
 
-    mainContent.appendChild(performanceDetailsSection);
-    page.appendChild(mainContent);
+    content.appendChild(performanceDetailsSection);
 
     // Scrim and Modal - only show if explicitly requested
+    // Note: PageLayout doesn't natively handle modals yet, so we append it to the layout if needed.
+    // Or we can append it to the content. Appending to content puts it inside the surface, which might be wrong for a fixed scrim.
+    // Ideally, modals should be appended to document.body or a high-level portal.
+    // For now, let's append it to the content, but ensure it has fixed positioning.
+
+    const layout = createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'tutors-overview-page'
+    });
+
     if (showModal) {
         const scrim = document.createElement('div');
         scrim.style.position = 'fixed';
@@ -267,9 +275,9 @@ export function createTutorsOverviewPage({ showModal = false, modalTab = "Info" 
 
         const modal = createTutorsOverviewModal({ tab: modalTab, tutorName: "Amelia Blue" });
         scrim.appendChild(modal);
-        page.appendChild(scrim);
+        layout.appendChild(scrim); // Append to layout to cover everything
     }
 
-    return page;
+    return layout;
 }
 

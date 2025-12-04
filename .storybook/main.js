@@ -41,21 +41,21 @@ const config = {
     const rootDir = path.resolve(__dirname, '..');
     const srcPath = path.resolve(rootDir, 'src');
     const designSystemPath = path.resolve(rootDir, 'design-system');
-    
+
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
-    
+
     config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};
-    
+
     // Add alias for design-system components FIRST (more specific aliases should come first)
     // Map @/js/components to design-system/components
     config.resolve.alias['@/js/components'] = path.resolve(designSystemPath, 'components');
-    
+
     // Add alias for src directory - use absolute path (for backward compatibility)
     config.resolve.alias['@'] = srcPath;
     config.resolve.alias['@design-system'] = designSystemPath;
-    
+
     // Ensure Vite can resolve relative paths from project root
     // This helps with dynamic imports in story files
     if (!config.resolve.modules) {
@@ -63,42 +63,44 @@ const config = {
     } else {
       config.resolve.modules.push(rootDir);
     }
-    
+
     // Ensure proper resolution of .js files
     if (!config.resolve.extensions) {
       config.resolve.extensions = ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'];
     }
-    
+
     // Configure Vite to resolve modules from project root
     config.resolve.preserveSymlinks = false;
-    
+
     // Ensure story files are treated as ES modules
+    // Ensure story files are treated as ES modules
+    config.optimizeDeps = config.optimizeDeps || {};
     config.optimizeDeps.esbuildOptions = config.optimizeDeps.esbuildOptions || {};
     config.optimizeDeps.esbuildOptions.loader = config.optimizeDeps.esbuildOptions.loader || {};
     config.optimizeDeps.esbuildOptions.loader['.js'] = 'jsx';
-    
+
     // Ensure proper ES module handling
     config.optimizeDeps = config.optimizeDeps || {};
     config.optimizeDeps.include = config.optimizeDeps.include || [];
-    
+
     // Ensure CSS is processed and available
     config.css = config.css || {};
     config.css.postcss = config.css.postcss || {};
-    
+
     // Improve module resolution for better compatibility
     config.build = config.build || {};
     config.build.commonjsOptions = {
       include: [/node_modules/],
       transformMixedEsModules: true,
     };
-    
+
     // Improve error handling for module resolution
     config.resolve.dedupe = config.resolve.dedupe || [];
     config.resolve.dedupe.push('@storybook/html-vite');
-    
+
     // Better handling of dynamic imports
     config.optimizeDeps = config.optimizeDeps || {};
-    
+
     // Ensure story files are properly handled as modules
     // Don't exclude them from optimization - they need to be processed
     config.optimizeDeps.include = config.optimizeDeps.include || [];
@@ -106,11 +108,11 @@ const config = {
       'design-system/components/index.js',
       'design-system/components/**/*.js'
     );
-    
+
     // Configure static asset serving
     // Disable default publicDir to use staticDirs instead
     config.publicDir = false;
-    
+
     // Ensure static assets are properly served
     config.server = config.server || {};
     config.server.fs = config.server.fs || {};
@@ -124,7 +126,7 @@ const config = {
       path.resolve(rootDir, 'design-system/specs'),
       path.resolve(rootDir, 'design-system/styles'),
     ];
-    
+
     return config;
   },
 };

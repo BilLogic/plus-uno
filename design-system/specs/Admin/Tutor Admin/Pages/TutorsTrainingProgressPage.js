@@ -3,7 +3,7 @@
  * Full page layout for Tutors Training Progress
  */
 
-import { createTopBar } from '../../../Universal/Sections/topbar.js';
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createNavigation } from '../../../../components/Navigation/index.js';
 import { createButton } from '../../../../components/Button/index.js';
 import { createTutorsTrainingProgressTableRow } from '../Tables/TutorsTrainingProgressTable.js';
@@ -145,11 +145,11 @@ function createTutorNeedCard() {
         label.style.fontSize = 'var(--font-size-body3)';
         label.style.fontWeight = 'var(--font-weight-light)';
         label.style.lineHeight = '1.667';
-        label.style.color = item.letter === 'A' ? 'var(--color-advocacy-text)' : 
-                           item.letter === 'S' ? 'var(--color-social-emotional-text)' :
-                           item.letter === 'M' ? 'var(--color-mastering-content-text)' :
-                           item.letter === 'R' ? 'var(--color-relationship-text)' :
-                           'var(--color-technology-tools-text)';
+        label.style.color = item.letter === 'A' ? 'var(--color-advocacy-text)' :
+            item.letter === 'S' ? 'var(--color-social-emotional-text)' :
+                item.letter === 'M' ? 'var(--color-mastering-content-text)' :
+                    item.letter === 'R' ? 'var(--color-relationship-text)' :
+                        'var(--color-technology-tools-text)';
         label.style.textTransform = 'uppercase';
         label.textContent = item.letter;
         barContainer.appendChild(label);
@@ -295,21 +295,17 @@ function createOverviewCard({ title, value, description }) {
  * Creates a TutorsTrainingProgressPage component
  * @returns {HTMLElement} Page element
  */
-export function createTutorsTrainingProgressPage() {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface-container)';
-    page.style.minHeight = '100vh';
-    page.style.maxWidth = '991.98px';
-    page.style.minWidth = '768px';
-    page.style.padding = 'var(--size-surface-container-pad-y-sm) var(--size-surface-container-pad-x-sm)';
-    page.style.gap = 'var(--size-surface-container-gap-sm)';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
 
-    // Top bar
-    const topBar = createTopBar({
+
+// ... (Helper functions createTutorNeedCard and createOverviewCard remain unchanged) ...
+
+/**
+ * Creates a TutorsTrainingProgressPage component
+ * @returns {HTMLElement} Page element
+ */
+export function createTutorsTrainingProgressPage() {
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -318,26 +314,25 @@ export function createTutorsTrainingProgressPage() {
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main content container
-    const mainContent = document.createElement('div');
-    mainContent.style.display = 'flex';
-    mainContent.style.flexDirection = 'column';
-    mainContent.style.gap = 'var(--size-surface-container-gap-sm)';
-    mainContent.style.width = '100%';
+    const sidebarConfig = {
+        user: 'supervisor',
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
 
-    // Content container (white background) - tabs and buttons go inside
-    const contentContainer = document.createElement('div');
-    contentContainer.style.backgroundColor = 'var(--color-surface)';
-    contentContainer.style.borderRadius = 'var(--size-surface-radius)';
-    contentContainer.style.padding = 'var(--size-surface-pad-y) var(--size-surface-pad-x)';
-    contentContainer.style.display = 'flex';
-    contentContainer.style.flexDirection = 'column';
-    contentContainer.style.gap = '24px'; // spacer-3-base-between-sections
+    // --- Content Creation ---
+    // Note: This page originally had a contentContainer with white background.
+    // PageLayout provides this surface, so we just create the content inside it.
 
-    // Tab navigation and action buttons container - INSIDE content container
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = '24px'; // spacer-3-base-between-sections
+    content.style.width = '100%';
+
+    // Tab navigation and action buttons container
     const headerContainer = document.createElement('div');
     headerContainer.style.display = 'flex';
     headerContainer.style.flexWrap = 'wrap';
@@ -390,7 +385,7 @@ export function createTutorsTrainingProgressPage() {
     actionSection.appendChild(exportButton);
 
     headerContainer.appendChild(actionSection);
-    contentContainer.appendChild(headerContainer);
+    content.appendChild(headerContainer);
 
     // Section: Training Progress Overview
     const trainingOverviewSection = document.createElement('div');
@@ -493,9 +488,7 @@ export function createTutorsTrainingProgressPage() {
     cardsRow.appendChild(onboardingCard);
 
     trainingOverviewSection.appendChild(cardsRow);
-    contentContainer.appendChild(trainingOverviewSection);
-    
-    mainContent.appendChild(contentContainer);
+    content.appendChild(trainingOverviewSection);
 
     // Section: Training Progress Details
     const trainingDetailsSection = document.createElement('div');
@@ -607,9 +600,14 @@ export function createTutorsTrainingProgressPage() {
     paginationContainer.appendChild(pagination);
     trainingDetailsSection.appendChild(paginationContainer);
 
-    contentContainer.appendChild(trainingDetailsSection);
-    page.appendChild(mainContent);
+    content.appendChild(trainingDetailsSection);
 
-    return page;
+    // --- Page Layout Composition ---
+    return createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'tutors-training-progress-page'
+    });
 }
 

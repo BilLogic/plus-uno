@@ -31,14 +31,12 @@ export function createSidebarTab({
     classes = []
 }) {
     // Figma: hover uses button, others use div
-    const tab = document.createElement(state === 'hover' ? 'button' : 'div');
-    
-    if (state === 'hover') {
-        tab.type = 'button';
-    }
-    
+    // Figma: hover uses button, others use div
+    // UPDATED: Use div for all states to ensure consistent styling (font, gap)
+    const tab = document.createElement('div');
+
     tab.classList.add('plus-sidebar-tab', `plus-sidebar-tab-${state}`);
-    
+
     // Figma: w-[184px], gap-[var(--element/gap-md,10px)], px-[var(--element/pad-x-md,10px)] py-[var(--element/pad-y-md,6px)], rounded-[var(--modal/radius-md,6px)]
     tab.style.display = 'flex';
     tab.style.gap = 'var(--size-element-gap-md)';
@@ -51,11 +49,12 @@ export function createSidebarTab({
     tab.style.width = '184px';
     tab.style.boxSizing = 'border-box';
     tab.style.position = 'relative';
-    
+
     // Background colors by state
     if (state === 'hover') {
         tab.style.backgroundColor = 'var(--color-primary-state-12)';
         tab.style.cursor = 'pointer';
+        tab.style.border = 'none';
     } else if (state === 'selected') {
         tab.style.backgroundColor = 'var(--color-primary-state-16)';
     } else if (state === 'focus') {
@@ -65,19 +64,19 @@ export function createSidebarTab({
     } else if (state === 'disabled') {
         tab.style.opacity = '0.38';
     }
-    
+
     if (id) {
         tab.id = id;
     }
-    
+
     if (classes && classes.length > 0) {
         tab.classList.add(...classes);
     }
-    
+
     if (onClick && state !== 'disabled') {
         tab.addEventListener('click', onClick);
     }
-    
+
     // Leading visual (icon) - Figma: w-[11px], text-[12px] (Font Awesome B2)
     if (leadingVisual && icon) {
         const iconContainer = document.createElement('div');
@@ -87,7 +86,7 @@ export function createSidebarTab({
         iconContainer.style.width = '11px';
         iconContainer.style.flexShrink = '0';
         iconContainer.style.position = 'relative';
-        
+
         const iconEl = document.createElement('i');
         iconEl.classList.add('fas', `fa-${icon}`);
         iconEl.style.fontSize = 'var(--font-size-fa-body2-solid)';
@@ -95,7 +94,7 @@ export function createSidebarTab({
         iconEl.style.fontStyle = 'normal';
         iconEl.style.textAlign = 'center';
         iconEl.style.whiteSpace = 'nowrap';
-        
+
         // Icon color varies by state - Figma shows primary color for selected/hover/focus
         if (state === 'selected' || state === 'hover' || state === 'focus') {
             iconEl.style.color = 'var(--color-primary)';
@@ -105,11 +104,11 @@ export function createSidebarTab({
         } else {
             iconEl.style.color = 'var(--color-on-surface-variant)';
         }
-        
+
         iconContainer.appendChild(iconEl);
         tab.appendChild(iconContainer);
     }
-    
+
     // Text - Figma: Body/B2/Regular (Light, 14px, line-height 1.571)
     const textEl = document.createElement('div');
     textEl.classList.add('body2-txt');
@@ -122,7 +121,7 @@ export function createSidebarTab({
     textEl.style.minWidth = '1px';
     textEl.style.position = 'relative';
     textEl.style.flexShrink = '0';
-    
+
     // Text color varies by state
     if (state === 'selected') {
         // Selected uses primary-text color
@@ -136,9 +135,9 @@ export function createSidebarTab({
     } else {
         textEl.style.color = 'var(--color-on-surface)';
     }
-    
+
     tab.appendChild(textEl);
-    
+
     // Trailing visual (icon)
     if (trailingVisual) {
         const trailingContainer = document.createElement('div');
@@ -147,16 +146,16 @@ export function createSidebarTab({
         trailingContainer.style.justifyContent = 'center';
         trailingContainer.style.flexShrink = '0';
         trailingContainer.style.position = 'relative';
-        
+
         const trailingIcon = document.createElement('i');
         trailingIcon.classList.add('fas', 'fa-icons');
         trailingIcon.style.fontSize = 'var(--font-size-fa-body2-solid)';
         trailingIcon.style.lineHeight = 'var(--font-line-height-fa-body2-solid)';
         trailingIcon.style.color = 'var(--color-on-surface-variant)';
         trailingContainer.appendChild(trailingIcon);
-        
+
         tab.appendChild(trailingContainer);
     }
-    
+
     return tab;
 }

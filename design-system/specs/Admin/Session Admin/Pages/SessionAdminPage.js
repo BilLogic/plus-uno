@@ -3,6 +3,7 @@
  * Full page layout for Session Admin
  */
 
+import { createPageLayout } from '../../../Universal/Pages/PageLayout.js';
 import { createTopBar } from '../../../Universal/Sections/topbar.js';
 import { createNavigation } from '../../../../components/Navigation/index.js';
 import { createButton } from '../../../../components/Button/index.js';
@@ -19,21 +20,8 @@ import { createSessionBreakdownModal } from '../Modals/SessionBreakdownModal.js'
  * @returns {HTMLElement} Page element
  */
 export function createSessionAdminPage({ showModal = false } = {}) {
-    const page = document.createElement('div');
-    page.style.display = 'flex';
-    page.style.flexDirection = 'column';
-    page.style.backgroundColor = 'var(--color-surface-container)';
-    page.style.minHeight = '100vh';
-    page.style.maxWidth = '991.98px';
-    page.style.minWidth = '768px';
-    page.style.padding = 'var(--size-surface-container-pad-y-sm) var(--size-surface-container-pad-x-sm)';
-    page.style.gap = 'var(--size-surface-container-gap-sm)';
-    page.style.width = '1400px';
-    page.style.overflowX = 'auto';
-    page.style.overflowY = 'auto';
-
-    // Top bar
-    const topBar = createTopBar({
+    // --- Configuration ---
+    const topBarConfig = {
         mode: 'expanded',
         breadcrumbItems: [
             { text: 'Home', href: '#' },
@@ -42,25 +30,20 @@ export function createSessionAdminPage({ showModal = false } = {}) {
         userName: 'John Doe',
         userFirstChar: 'J',
         counterValue: 2
-    });
-    page.appendChild(topBar);
+    };
 
-    // Main container
-    const mainContainer = document.createElement('div');
-    mainContainer.style.display = 'flex';
-    mainContainer.style.flexDirection = 'column';
-    mainContainer.style.gap = 'var(--size-surface-container-gap-sm)';
-    mainContainer.style.width = '100%';
+    const sidebarConfig = {
+        user: 'supervisor',
+        onTabClick: (tab) => console.log(`Tab clicked: ${tab}`),
+        onHomeClick: () => console.log('Home clicked')
+    };
 
-    // Content container (white background)
-    const contentContainer = document.createElement('div');
-    contentContainer.style.backgroundColor = 'var(--color-surface)';
-    contentContainer.style.borderRadius = 'var(--size-surface-radius)';
-    contentContainer.style.padding = 'var(--size-surface-pad-y) var(--size-surface-pad-x)';
-    contentContainer.style.display = 'flex';
-    contentContainer.style.flexDirection = 'column';
-    contentContainer.style.gap = 'var(--size-surface-gap-md)';
-    contentContainer.style.overflow = 'hidden';
+    // --- Content Creation ---
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = 'var(--size-surface-gap-md)';
+    content.style.width = '100%';
 
     // Tab navigation
     const tabs = createNavigation({
@@ -73,7 +56,7 @@ export function createSessionAdminPage({ showModal = false } = {}) {
         ]
     });
     tabs.style.width = '600px';
-    contentContainer.appendChild(tabs);
+    content.appendChild(tabs);
 
     // Container for overview and session details
     const contentWrapper = document.createElement('div');
@@ -88,7 +71,7 @@ export function createSessionAdminPage({ showModal = false } = {}) {
     overviewSection.style.flexDirection = 'column';
     overviewSection.style.gap = 'var(--size-section-gap-sm)';
     overviewSection.style.width = '100%';
-    
+
     // Overview cards wrapper with horizontal scroll
     const overviewCardsWrapper = document.createElement('div');
     overviewCardsWrapper.style.width = '100%';
@@ -138,7 +121,7 @@ export function createSessionAdminPage({ showModal = false } = {}) {
     sessionDetailsSection.style.flexDirection = 'column';
     sessionDetailsSection.style.gap = 'var(--size-section-gap-sm)';
     sessionDetailsSection.style.width = '100%';
-    
+
     // Table wrapper with horizontal scroll
     const tableWrapper = document.createElement('div');
     tableWrapper.style.width = '100%';
@@ -232,10 +215,15 @@ export function createSessionAdminPage({ showModal = false } = {}) {
     sessionDetailsSection.appendChild(paginationFooter);
 
     contentWrapper.appendChild(sessionDetailsSection);
+    content.appendChild(contentWrapper);
 
-    contentContainer.appendChild(contentWrapper);
-    mainContainer.appendChild(contentContainer);
-    page.appendChild(mainContainer);
+    // --- Page Layout Composition ---
+    const layout = createPageLayout({
+        content: content,
+        sidebarConfig: sidebarConfig,
+        topBarConfig: topBarConfig,
+        id: 'session-admin-page'
+    });
 
     // Scrim and Modal - only show if explicitly requested
     if (showModal) {
@@ -253,9 +241,9 @@ export function createSessionAdminPage({ showModal = false } = {}) {
 
         const modal = createSessionBreakdownModal({ sessionDate: "11/02/12" });
         scrim.appendChild(modal);
-        page.appendChild(scrim);
+        layout.appendChild(scrim);
     }
 
-    return page;
+    return layout;
 }
 
