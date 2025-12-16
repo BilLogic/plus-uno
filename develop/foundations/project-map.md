@@ -6,52 +6,42 @@
 ## 1. File Structure
 ```
 plus-vibe-coding-starting-kit/
-├── design-system/
-│   ├── components/         # Source of Truth for Components (Flat List)
-│   │   ├── index.js        # Main Export File
-│   │   ├── Button/         # Component Folder
-│   │   ├── Card/           # Component Folder
+├── src/                    # SOURCE OF TRUTH (React App)
+│   ├── components/         # Reusable React Components
+│   │   ├── Button.jsx
+│   │   ├── Card.jsx
+│   │   ├── Modal.jsx
+│   │   └── index.js
+│   ├── pages/              # Page Layouts
+│   │   ├── Home.jsx
 │   │   └── ...
-│   ├── specs/              # Page Specifications & Templates
-│   │   ├── Admin/
-│   │   ├── Home/
-│   │   └── ...
-│   ├── styles/             # Source of Truth for Tokens
-│   │   ├── colors.md
-│   │   └── layout.md
-│   └── assets/             # Images and Icons
+│   ├── css/                # Global Styles & Tokens
+│   ├── App.jsx             # Root Component
+│   └── main.jsx            # Entry Point
+├── design-system/          # LEGACY (Reference Only)
+│   ├── components/         # Old Vanilla JS Components
+│   └── specs/              # Old Specs
 ├── develop/                # Documentation (You are here)
 │   ├── workflows/          # Role-based guides
 │   ├── patterns/           # Semantic Layer Packs
 │   ├── foundations/        # Global Tokens
 │   └── reference/          # Master Indices
-├── playground/             # Prototyping Area
-│   ├── templates/          # Standard Templates
-│   └── {your-name}/        # Your Sandbox
 └── index.html              # Main Entry Point
 ```
 
 ## 2. Standard Imports
 
-### JavaScript
-**ALWAYS** use the relative path to `design-system/components/index.js`.
+### React Components
+**ALWAYS** import from `src/components`.
 
-| From Location | Import Path |
-| :--- | :--- |
-| `playground/{name}/` | `../../design-system/components/index.js` |
-| `playground/templates/{pillar}/` | `../../../design-system/components/index.js` |
-| `src/js/` | `../design-system/components/index.js` |
-| Root `index.html` | `./design-system/components/index.js` |
-
-**Example**:
 ```javascript
-import { PlusInterface } from "../../design-system/components/index.js";
+import { Button, Card } from '@/components'; // Alias configured in vite.config.js
+// OR
+import { Button } from '../components';
 ```
 
 ### CSS
-**ALWAYS** include in `<head>`:
-```html
-<link rel="stylesheet" href="dist/css/main.css">
-<!-- OR relative path -->
-<link rel="stylesheet" href="../../dist/css/main.css">
+**Imported in `src/main.jsx`**:
+```javascript
+import './css/main.scss';
 ```

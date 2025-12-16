@@ -4,8 +4,8 @@
   "description": "Starter kit for PLUS design prototyping with Cursor agent",
   "main": "index.js",
   "scripts": {
-    "build:css": "sass --load-path=develop/tokens --load-path=design-system/components src/css/main.scss dist/css/main.css",
-    "watch:css": "sass --load-path=develop/tokens --load-path=design-system/components --watch src/css/main.scss:dist/css/main.css",
+    "build:css": "sass --load-path=develop/tokens --load-path=legacy-ds/components new-ds/styles/main.scss dist/css/main.css",
+    "watch:css": "sass --load-path=develop/tokens --load-path=legacy-ds/components --watch new-ds/styles/main.scss:dist/css/main.css",
     "watch:css:auto": "node scripts/watch-css.js",
     "dev": "npm run watch:css:auto & npm run serve",
     "serve": "python3 -m http.server 8000",
@@ -13,7 +13,10 @@
     "storybook": "storybook dev -p 6006 --config-dir .storybook",
     "build-storybook": "storybook build --config-dir .storybook -o storybook-static",
     "sync:tokens": "node scripts/sync-figma-tokens.js",
-    "generate:tokens": "node scripts/generate-all-tokens.js"
+    "generate:tokens": "node scripts/generate-all-tokens.js",
+    "dev:react": "vite",
+    "build:react": "vite build",
+    "preview:react": "vite preview"
   },
   "keywords": [
     "plus",
@@ -24,13 +27,32 @@
   "author": "PLUS Design Team",
   "license": "ISC",
   "devDependencies": {
+    "@storybook/addon-docs": "^10.1.0",
     "@storybook/addon-links": "^10.1.0",
+    "@storybook/addon-vitest": "^10.1.4",
+    "@storybook/blocks": "^8.6.14",
     "@storybook/html": "^10.1.0",
     "@storybook/html-vite": "^10.1.0",
+    "@storybook/react": "^10.1.4",
+    "@storybook/react-vite": "^10.1.4",
+    "@vitest/browser-playwright": "^4.0.15",
+    "@vitest/coverage-v8": "^4.0.15",
     "dotenv": "^16.4.5",
+    "playwright": "^1.57.0",
     "sass": "^1.77.8",
     "storybook": "^10.1.0",
-    "vite": "^7.2.2",
-    "@storybook/addon-docs": "^10.1.0"
+    "vite": "^7.2.6",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@vitejs/plugin-react": "^5.1.1",
+    "bootstrap": "^5.3.3",
+    "highcharts": "^12.4.0",
+    "highcharts-react-official": "^3.2.3",
+    "react": "^19.2.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.1",
+    "typescript": "^5.9.3"
   }
 }

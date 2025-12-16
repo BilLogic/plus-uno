@@ -1,6 +1,7 @@
-@forward "colors";
-@forward "primitives";
-@forward "spacing_semantics";
-@forward "layout";
+// Export all token modules
+@forward '_primitives';
+@forward '_spacing_semantics';
+@forward '_layout';
+@forward '_react_bootstrap_config';
 @forward "fonts";
 @forward "plus_spacing";

@@ -51,6 +51,8 @@
     <link href="./sb-addons/links-1/manager-bundle.js" rel="modulepreload" />
     
     <link href="./sb-addons/docs-2/manager-bundle.js" rel="modulepreload" />
+    
+    <link href="./sb-addons/vitest-3/manager-bundle.js" rel="modulepreload" />
        
 
     <style>
@@ -95,7 +97,7 @@
         
           window['DOCS_OPTIONS'] = {
   "defaultName": "Docs",
-  "autodocs": false
+  "autodocs": true
 };
         
       
@@ -116,11 +118,11 @@
         
       
         
-          window['STORYBOOK_FRAMEWORK'] = "html-vite";
+          window['STORYBOOK_FRAMEWORK'] = "react-vite";
         
       
         
-          window['STORYBOOK_RENDERER'] = "html";
+          window['STORYBOOK_RENDERER'] = "react";
         
       
         
@@ -137,6 +139,8 @@
         import './sb-addons/links-1/manager-bundle.js';
       
         import './sb-addons/docs-2/manager-bundle.js';
+      
+        import './sb-addons/vitest-3/manager-bundle.js';
       
 
       import './sb-manager/runtime.js';

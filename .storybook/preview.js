@@ -1,3 +1,5 @@
+import React, { useEffect } from 'react';
+
 /**
  * Storybook preview configuration for PLUS Design System
  * Dependencies (Bootstrap, jQuery, Font Awesome, PLUS CSS) are loaded via preview-head.html
@@ -6,20 +8,22 @@
  * The CSS file at /dist/css/main.css contains all color tokens and component styles
  */
 
+import '../new-ds/styles/main.scss'; // Import global styles for dev mode
+
 // Cleanup functions - loaded dynamically in decorator to avoid blocking Storybook startup
 const cleanupFunctions = {
-  clearAllToasts: () => {},
-  destroyAllTooltips: () => {},
+  clearAllToasts: () => { },
+  destroyAllTooltips: () => { },
 };
 
 // Load cleanup functions asynchronously
 Promise.all([
-  import('../design-system/components/Toast/index.js').then(m => {
-    cleanupFunctions.clearAllToasts = m.clearAllToasts || (() => {});
-  }).catch(() => {}),
-  import('../design-system/components/Tooltip/index.js').then(m => {
-    cleanupFunctions.destroyAllTooltips = m.destroyAllTooltips || (() => {});
-  }).catch(() => {}),
+  import('../legacy-ds/components/Toast/index.js').then(m => {
+    cleanupFunctions.clearAllToasts = m.clearAllToasts || (() => { });
+  }).catch(() => { }),
+  import('../legacy-ds/components/Tooltip/index.js').then(m => {
+    cleanupFunctions.destroyAllTooltips = m.destroyAllTooltips || (() => { });
+  }).catch(() => { }),
 ]);
 
 /** @type { import('@storybook/html-vite').Preview } */
@@ -35,7 +39,7 @@ const preview = {
         method: 'configure',
         order: [
           'Styles',
-          ['Styles', 'Styles/Icons', 'Styles/Typography', 'Styles/Layout', 'Styles/Colors', 'Styles/Elevation'],
+          ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           ['Assets', 'Assets/Logo', 'Assets/Images'],
           'Components',
@@ -72,17 +76,14 @@ const preview = {
           name: 'light',
           value: '#ffffff',
         },
-
         dark: {
           name: 'dark',
           value: '#1a1a1a',
         },
-
         surface: {
           name: 'surface',
           value: 'var(--color-surface)',
         },
-
         "surface-container": {
           name: 'surface-container',
           value: 'var(--color-surface-container)',
@@ -117,57 +118,38 @@ const preview = {
   },
 
   decorators: [
-    (story) => {
-      // Clear all toasts before rendering a new story
-      // This prevents toasts from previous stories from persisting
-      try {
-        cleanupFunctions.clearAllToasts();
-      } catch (e) {
-        // Silently fail if toast module isn't loaded yet
-      }
-      
-      // Destroy all tooltips before rendering a new story
-      // This prevents tooltips from previous stories from persisting
-      try {
-        cleanupFunctions.destroyAllTooltips();
-      } catch (e) {
-        // Silently fail if tooltip module isn't loaded yet
-      }
-      
-      // Remove all modals and scrims from previous stories
-      // This prevents modals from persisting across different stories
-      // Remove modals by class
-      const modals = document.querySelectorAll('.plus-modal');
-      modals.forEach(modal => modal.remove());
-      
-      // Remove scrims (fixed position overlays with high z-index)
-      const allDivs = document.querySelectorAll('div');
-      allDivs.forEach(div => {
-        const style = window.getComputedStyle(div);
-        const inlineStyle = div.style;
-        // Check if it's a scrim: fixed position, high z-index, and either has scrim background or contains a modal
-        if (style.position === 'fixed' && 
+    (Story) => {
+      useEffect(() => {
+        // Cleanup functions
+        try {
+          cleanupFunctions.clearAllToasts();
+        } catch (e) { }
+
+        try {
+          cleanupFunctions.destroyAllTooltips();
+        } catch (e) { }
+
+        // Remove modals and scrims
+        const modals = document.querySelectorAll('.plus-modal');
+        modals.forEach(modal => modal.remove());
+
+        const allDivs = document.querySelectorAll('div');
+        allDivs.forEach(div => {
+          const style = window.getComputedStyle(div);
+          const inlineStyle = div.style;
+          if (style.position === 'fixed' &&
             (inlineStyle.zIndex === '1000' || parseInt(style.zIndex) >= 1000) &&
-            (div.querySelector('.plus-modal') || 
-             inlineStyle.backgroundColor === 'var(--color-scrim)' ||
-             style.backgroundColor.includes('rgba'))) {
-          div.remove();
-        }
+            (div.querySelector('.plus-modal') ||
+              inlineStyle.backgroundColor === 'var(--color-scrim)' ||
+              style.backgroundColor.includes('rgba'))) {
+            div.remove();
+          }
+        });
       });
-      
-      // Create a container with proper structure
-      const container = document.createElement('div');
-      container.style.padding = '2rem';
-      container.style.minHeight = '100vh';
-      container.style.backgroundColor = 'var(--color-surface, #ffffff)';
-      
-      // Append the story content
-      const storyElement = story();
-      if (storyElement) {
-        container.appendChild(storyElement);
-      }
-      
-      return container;
+
+      return React.createElement('div', {
+        style: { padding: '2rem', minHeight: '100vh', backgroundColor: 'var(--color-surface, #ffffff)' }
+      }, React.createElement(Story));
     },
   ],
 
@@ -179,4 +161,3 @@ const preview = {
 };
 
 export default preview;
-

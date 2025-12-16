@@ -8,8 +8,9 @@ Welcome to the developer documentation for the PLUS Design System. This director
 
 | I want to... | Go to... |
 | :--- | :--- |
-| **Build** a prototype, feature, or page | [**Consumer Workflow**](workflows/workflow-consumer.md) |
-| **Update** the design system itself | [**Contributor Workflow**](workflows/workflow-contributor.md) |
+| **Develop** React Components/Pages | Run `npm run dev:react` |
+| **View** Component Library | Run `npm run storybook` |
+| **Migrate** Legacy Specs | Reference `src/components/` |
 
 ## 📚 Documentation Structure
 

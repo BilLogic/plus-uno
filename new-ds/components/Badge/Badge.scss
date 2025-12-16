@@ -1,0 +1,155 @@
+@use "sass:map";
+
+/* 
+ * Badge Component Styles
+ * Implements Static Badge and Dismissible Badge specs
+ * strictly using Design System tokens.
+ */
+
+.plus-badge {
+    // Layout
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: fit-content;
+
+    // Spacing - Figma spec: horizontal padding only, NO vertical padding (py-0)
+    padding-left: var(--size-element-pad-x-lg);
+    padding-right: var(--size-element-pad-x-lg);
+
+    // Shape
+    border-radius: var(--size-element-radius-full); // 999px pill
+
+    // Default Font (overridden by size classes)
+    text-align: center;
+    white-space: nowrap;
+
+
+
+    // --- SIZES ---
+    // Override padding based on size class
+    &.h4,
+    &.h5,
+    &.h6 {
+        padding-left: var(--size-element-pad-x-md);
+        padding-right: var(--size-element-pad-x-md);
+    }
+
+    &.b1,
+    &.b2,
+    &.b3 {
+        padding-left: var(--size-element-pad-x-sm);
+        padding-right: var(--size-element-pad-x-sm);
+        // Ensure bold/semibold weight for readability
+        font-weight: var(--font-weight-semibold-1);
+    }
+
+
+    // --- COLOR THEMES ---
+    // Mixin to generate color styles
+    // --- COLOR THEMES ---
+    // Mixin to generate color styles
+    // $main-color used for dismissible border
+    @mixin badge-theme($color-name, $bg-token, $text-token, $main-color-token: null) {
+        &--#{$color-name} {
+            background-color: var($bg-token);
+            color: var($text-token);
+
+            // Styling for icons within the badge to match text color
+            .plus-badge-visual {
+                color: inherit;
+            }
+
+            // Integrated Dismissible Style
+            &.plus-badge--dismissible {
+                border-color: var($main-color-token);
+
+                &:hover {
+                    // Darken bg on hover (state-12 logic inferred from map or simplistic darken)
+                    // For simplicity, we use color-mix for automatic handling or state 12 if strict
+                    // Using provided token pattern:
+                    background-color: color-mix(in srgb, var($bg-token), black 10%);
+                }
+            }
+        }
+    }
+
+    // Using Semantic Tokens mapping
+    @include badge-theme('primary', --color-primary-state-08, --color-primary-text, --color-primary);
+    @include badge-theme('secondary', --color-secondary-state-08, --color-secondary-text, --color-secondary);
+    @include badge-theme('tertiary', --color-tertiary-state-08, --color-tertiary-text, --color-tertiary);
+    @include badge-theme('success', --color-success-state-08, --color-success-text, --color-success);
+    @include badge-theme('warning', --color-warning-state-08, --color-warning-text, --color-warning);
+    @include badge-theme('danger', --color-danger-state-08, --color-danger-text, --color-danger);
+    @include badge-theme('info', --color-info-state-08, --color-info-text, --color-info);
+
+    // Extended Palette (Dismissible not explicitly defined in spec but handling safe fallback if needed)
+    @include badge-theme('social-emotional', --color-social-emotional-state-08, --color-social-emotional-text, --color-social-emotional);
+    @include badge-theme('mastering-content', --color-mastering-content-state-08, --color-mastering-content-text, --color-mastering-content);
+    @include badge-theme('advocacy', --color-advocacy-state-08, --color-advocacy-text, --color-advocacy);
+    @include badge-theme('relationship', --color-relationship-state-08, --color-relationship-text, --color-relationship);
+    @include badge-theme('technology-tools', --color-technology-tools-state-08, --color-technology-tools-text, --color-technology-tools);
+
+
+    // --- DISMISSIBLE VARIANT ---
+    &--dismissible {
+        cursor: pointer;
+
+        // Border: 1px Solid [ThemeColor]
+        // Defined in badge-theme mixin
+        border-style: solid;
+        border-width: var(--size-element-border);
+
+        // Hover logic handled in mixin for background
+
+
+        // Action icon (xmark) specific styling
+        .plus-badge-visual--trailing {
+            margin-left: var(--size-element-gap-sm);
+            cursor: pointer;
+            font-size: 0.8em; // Slightly smaller X
+        }
+    }
+
+    // --- ELEMENTS ---
+    &-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        // Icon gap
+        &--leading {
+            margin-right: var(--size-element-gap-sm);
+        }
+
+        &--trailing {
+            margin-left: var(--size-element-gap-sm);
+        }
+    }
+
+    &-text {
+        // Ensure text aligns cleanly
+        display: block;
+    }
+
+    // --- COUNTER ---
+    &-counter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: var(--size-element-gap-sm);
+
+        background-color: var(--color-surface-container-highest); // Contrast bg
+        color: var(--color-on-surface);
+
+        border-radius: 999px; // Pill
+        padding: 0 0.4em; // Minimal padding
+        min-width: 1.5em;
+        height: 1.5em;
+
+        font-size: 0.75em; // Smaller than badge text
+        font-weight: var(--font-weight-bold);
+        line-height: 1;
+    }
+}

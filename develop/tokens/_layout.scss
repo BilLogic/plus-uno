@@ -5,14 +5,18 @@
 
 :root {
     /* Breakpoints */
+    /* Breakpoints */
     --breakpoint-md-min: 768px;
-    --breakpoint-md-max: 991.98px;
-    --breakpoint-lg-min: 992px;
-    --breakpoint-lg-max: 1199.98px;
-    --breakpoint-xl-min: 1200px;
-    --breakpoint-xl-max: 1399.98px;
-    --breakpoint-xxl-min: 1400px;
-    --breakpoint-xxl-max: 1800px;
+    --breakpoint-md-max: 1023.98px;
+    /* Up to Desktop Large start */
+    --breakpoint-lg-min: 1024px;
+    /* Size=02 Desktop (Large) */
+    --breakpoint-lg-max: 1439.98px;
+    --breakpoint-xl-min: 1440px;
+    /* Size=01 Desktop HD (Extra large) */
+    --breakpoint-xl-max: 1919.98px;
+    --breakpoint-xxl-min: 1920px;
+    /* Assuming next generic step or keep open */
 
     /* Containers */
     /* Note: Container and column width tokens are available but may require responsive handling */

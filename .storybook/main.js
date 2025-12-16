@@ -1,46 +1,44 @@
 const path = require('path');
 
-/** @type { import('@storybook/html-vite').StorybookConfig } */
+/** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    '../design-system/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/components/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/specs/**/*.stories.@(js|jsx|ts|tsx)',
-    '../design-system/assets/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/assets/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/patterns/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/patterns/**/*.mdx',
+    '../new-ds/specs/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/styles/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/styles/**/*.mdx',
   ],
-  // Explicitly exclude old directory structures that no longer exist
-  // This prevents Storybook from trying to index cached/stale paths
-  exclude: [
-    '**/molecules/**',
-    '**/organisms/**',
-    '**/components/assets/**',
-    '**/assets/components/**',
-    '**/CompetencyPill*.stories.js',
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-docs',
+    '@storybook/addon-vitest'
   ],
-  addons: ['@storybook/addon-links', '@storybook/addon-docs'],
   framework: {
-    name: '@storybook/html-vite',
+    name: '@storybook/react-vite',
     options: {},
   },
   typescript: {
     check: false,
-    reactDocgen: false,
+    reactDocgen: 'react-docgen-typescript',
   },
   features: {
     storyStoreV7: true,
   },
   docs: {
-    autodocs: false,
+    autodocs: true,
   },
   staticDirs: [
     { from: path.resolve(__dirname, '../dist'), to: '/dist' },
-    { from: path.resolve(__dirname, '../design-system/assets'), to: '/assets' },
+    { from: path.resolve(__dirname, '../legacy-ds/assets'), to: '/assets' },
   ],
   viteFinal: async (config) => {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
-    const srcPath = path.resolve(rootDir, 'src');
-    const designSystemPath = path.resolve(rootDir, 'design-system');
+    const srcPath = path.resolve(rootDir, 'new-ds');
+    const designSystemPath = path.resolve(rootDir, 'legacy-ds');
 
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
@@ -73,7 +71,6 @@ const config = {
     config.resolve.preserveSymlinks = false;
 
     // Ensure story files are treated as ES modules
-    // Ensure story files are treated as ES modules
     config.optimizeDeps = config.optimizeDeps || {};
     config.optimizeDeps.esbuildOptions = config.optimizeDeps.esbuildOptions || {};
     config.optimizeDeps.esbuildOptions.loader = config.optimizeDeps.esbuildOptions.loader || {};
@@ -96,17 +93,16 @@ const config = {
 
     // Improve error handling for module resolution
     config.resolve.dedupe = config.resolve.dedupe || [];
-    config.resolve.dedupe.push('@storybook/html-vite');
+    config.resolve.dedupe.push('@storybook/react-vite');
 
     // Better handling of dynamic imports
     config.optimizeDeps = config.optimizeDeps || {};
 
     // Ensure story files are properly handled as modules
-    // Don't exclude them from optimization - they need to be processed
     config.optimizeDeps.include = config.optimizeDeps.include || [];
     config.optimizeDeps.include.push(
-      'design-system/components/index.js',
-      'design-system/components/**/*.js'
+      'legacy-ds/components/index.js',
+      'legacy-ds/components/**/*.js'
     );
 
     // Configure static asset serving
@@ -120,11 +116,11 @@ const config = {
     config.server.fs.allow = [
       ...(config.server.fs.allow || []),
       rootDir, // Allow access to entire project root
-      path.resolve(rootDir, 'design-system'),
-      path.resolve(rootDir, 'design-system/assets'),
-      path.resolve(rootDir, 'design-system/components'),
-      path.resolve(rootDir, 'design-system/specs'),
-      path.resolve(rootDir, 'design-system/styles'),
+      path.resolve(rootDir, 'legacy-ds'),
+      path.resolve(rootDir, 'legacy-ds/assets'),
+      path.resolve(rootDir, 'legacy-ds/components'),
+      path.resolve(rootDir, 'legacy-ds/specs'),
+      path.resolve(rootDir, 'legacy-ds/styles'),
     ];
 
     return config;
