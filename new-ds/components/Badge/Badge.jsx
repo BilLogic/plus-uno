@@ -31,7 +31,6 @@ export const Badge = ({
                     if (onDismiss) onDismiss();
                 }}
                 aria-label="Dismiss"
-                style={{ background: 'none', border: 'none', padding: 0, color: 'inherit', cursor: 'pointer' }}
             >
                 <i className="fa-solid fa-xmark"></i>
             </button>

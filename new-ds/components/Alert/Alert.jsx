@@ -51,7 +51,7 @@ const Alert = ({
             {dismissable && (
                 <button
                     type="button"
-                    className="plus-alert-dismiss-btn"
+                    className="plus-alert-dismiss-btn h4"
                     onClick={handleClose}
                     aria-label="Close alert"
                 >

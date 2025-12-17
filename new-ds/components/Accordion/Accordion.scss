@@ -1,0 +1,154 @@
+/*
+ * Accordion Component Styles
+ * Implements Design System tokens for collapsible content sections.
+ * Built on React Bootstrap Accordion with custom styling.
+ */
+
+.plus-accordion {
+    // Base accordion styling - must take full width
+    width: 100%;
+    border-radius: var(--size-element-radius-md);
+
+    // --- ACCORDION ITEM ---
+    .plus-accordion-item,
+    .accordion-item {
+        background-color: var(--color-surface);
+        border: var(--size-card-border-sm) solid var(--color-outline-variant);
+
+        &:first-of-type {
+            border-top-left-radius: var(--size-element-radius-md);
+            border-top-right-radius: var(--size-element-radius-md);
+
+            .plus-accordion-header .accordion-button {
+                border-top-left-radius: var(--size-element-radius-md);
+                border-top-right-radius: var(--size-element-radius-md);
+            }
+        }
+
+        &:last-of-type {
+            border-bottom-left-radius: var(--size-element-radius-md);
+            border-bottom-right-radius: var(--size-element-radius-md);
+
+            .plus-accordion-header .accordion-button.collapsed {
+                border-bottom-left-radius: var(--size-element-radius-md);
+                border-bottom-right-radius: var(--size-element-radius-md);
+            }
+        }
+
+        // Remove double borders between items
+        &:not(:first-of-type) {
+            border-top: 0;
+        }
+    }
+
+    // --- ACCORDION HEADER ---
+    .plus-accordion-header,
+    .accordion-header {
+        margin-bottom: 0;
+    }
+
+    .accordion-button {
+        padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+        background-color: var(--color-surface);
+        color: var(--color-on-surface-variant);
+        font-family: var(--font-family-lato);
+        font-size: var(--font-size-h6);
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--font-line-height-h6);
+        box-shadow: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+
+        &:not(.collapsed) {
+            background-color: var(--color-surface);
+            color: var(--color-on-surface-variant);
+            box-shadow: none;
+        }
+
+        &:hover {
+            background-color: var(--color-neutral-state-08);
+        }
+
+        &:focus {
+            box-shadow: none;
+            border-color: var(--color-primary);
+            outline: var(--size-card-border-lg) solid var(--color-inverse-primary);
+            outline-offset: -2px;
+        }
+
+        // Custom chevron icon styling
+        &::after {
+            background-image: none;
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            content: '\f078'; // fa-chevron-down
+            font-size: var(--font-size-fa-h6-solid);
+            color: var(--color-on-surface-variant);
+            transform: rotate(0deg);
+            transition: transform 0.2s ease;
+            width: auto;
+            height: auto;
+            background-size: unset;
+        }
+
+        &:not(.collapsed)::after {
+            transform: rotate(-180deg);
+        }
+    }
+
+    // --- ACCORDION BODY ---
+    .plus-accordion-body,
+    .accordion-body {
+        padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+        background-color: var(--color-surface);
+        color: var(--color-on-surface-variant);
+        font-family: var(--font-family-merriweather-sans);
+        font-size: var(--font-size-b1);
+        font-weight: var(--font-weight-light);
+        line-height: var(--font-line-height-b1);
+        border-top: var(--size-card-border-sm) solid var(--color-outline-variant);
+    }
+
+    // --- FLUSH MODE ---
+    &--flush,
+    &.accordion-flush {
+
+        .plus-accordion-item,
+        .accordion-item {
+            border-left: 0;
+            border-right: 0;
+            border-radius: 0;
+
+            &:first-of-type {
+                border-top: 0;
+                border-radius: 0;
+
+                .accordion-button {
+                    border-radius: 0;
+                }
+            }
+
+            &:last-of-type {
+                border-bottom: 0;
+                border-radius: 0;
+
+                .accordion-button.collapsed {
+                    border-radius: 0;
+                }
+            }
+        }
+
+        .accordion-body {
+            border-top: 0;
+        }
+    }
+
+    // --- DISABLED STATE ---
+    .plus-accordion-item--disabled {
+        opacity: 0.65;
+        pointer-events: none;
+
+        .accordion-button {
+            cursor: not-allowed;
+        }
+    }
+}

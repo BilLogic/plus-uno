@@ -40,14 +40,11 @@
 
 .plus-alert-title {
     white-space: pre-wrap;
-    margin: 0;
-    padding: 0;
 }
 
 .plus-alert-text {
     white-space: pre-wrap;
     margin: 0;
-    padding: 0;
 }
 
 .plus-alert-dismiss-btn {
@@ -57,11 +54,6 @@
     cursor: pointer;
     padding: 0;
     /* No padding */
-    font-size: 20px;
-    line-height: 1;
-    /* Tight hug */
-    flex-shrink: 0;
-    align-self: flex-start;
     color: var(--color-on-surface-variant);
     background: none;
     border: none;

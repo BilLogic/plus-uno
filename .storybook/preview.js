@@ -36,13 +36,15 @@ const preview = {
     },
     options: {
       storySort: {
-        method: 'configure',
+        method: 'alphabetical',
         order: [
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           ['Assets', 'Assets/Logo', 'Assets/Images'],
           'Components',
+          '*', // This allows alphabetical sorting for components
+          'DataViz',
           'Specs',
           [
             'Specs/Universal',

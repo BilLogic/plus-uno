@@ -2,7 +2,7 @@ import React from 'react';
 import UserAvatar from '@/components/UserAvatar';
 
 export default {
-    title: 'Components/UserAvatar',
+    title: 'Specs/Universal/UserAvatar',
     component: UserAvatar,
     tags: ['autodocs'],
     argTypes: {

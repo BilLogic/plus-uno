@@ -39,7 +39,7 @@ export const DismissButton = () => (
     <div style={{ display: 'inline-block' }}>
         <button
             type="button"
-            className="plus-alert-dismiss-btn"
+            className="plus-alert-dismiss-btn h4"
             aria-label="Close alert"
         >
             <i className="fa-solid fa-xmark"></i>

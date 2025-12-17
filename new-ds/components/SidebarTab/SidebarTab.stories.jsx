@@ -2,7 +2,7 @@ import React from 'react';
 import SidebarTab from '@/components/SidebarTab';
 
 export default {
-    title: 'Components/Navigation/SidebarTab',
+    title: 'Specs/Universal/SidebarTab',
     component: SidebarTab,
     tags: ['autodocs'],
     argTypes: {

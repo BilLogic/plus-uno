@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Carousel as BootstrapCarousel } from 'react-bootstrap';
+import './Carousel.scss';
 
 const Carousel = ({
     id,

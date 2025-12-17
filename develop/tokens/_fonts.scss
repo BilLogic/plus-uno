@@ -267,18 +267,36 @@
     --font-line-height-fa-body3: var(--font-line-height-fa-body3-solid);
 }
 
+// Mixin for FontAwesome icon sizing
+@mixin fa-icon-size($size-token, $line-height-token) {
+
+    .far,
+    .fas,
+    .fa-solid,
+    .fa-regular {
+        font-size: $size-token;
+        line-height: $line-height-token;
+    }
+}
+
 %default-font-color {
     color: var(--color-neutral-on-surface);
 }
 
 /** set default text styles **/
-body {
+body,
+.body2-txt {
     @extend %default-font-color;
+    @extend %font-body;
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);
-    line-height: var(--font-line-height-150);
+    // Use B2 token values as default
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
     /* next rule prevents "rubberband" nudging of topbar in OSX/Chrome browser */
     overscroll-behavior: none;
+
+    @include fa-icon-size(var(--font-size-fa-body2), var(--font-line-height-fa-body2));
 }
 
 /* rules for display text*/
@@ -346,11 +364,7 @@ h1,
     line-height: var(--font-line-height-h1);
 
 
-    .far,
-    .fas {
-        font-size: var(--font-size-fa-h1);
-        line-height: var(--font-line-height-fa-h1);
-    }
+    @include fa-icon-size(var(--font-size-fa-h1), var(--font-line-height-fa-h1));
 }
 
 h2,
@@ -360,13 +374,7 @@ h2,
     line-height: var(--font-line-height-h2);
 
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-h2);
-        line-height: var(--font-line-height-fa-h2);
-    }
+    @include fa-icon-size(var(--font-size-fa-h2), var(--font-line-height-fa-h2));
 }
 
 h3,
@@ -376,13 +384,7 @@ h3,
     line-height: var(--font-line-height-h3);
 
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-h1);
-        line-height: var(--font-line-height-fa-h1);
-    }
+    @include fa-icon-size(var(--font-size-fa-h1), var(--font-line-height-fa-h1));
 }
 
 /* rules for titles (h4,h5,h6) */
@@ -400,13 +402,7 @@ h4,
     line-height: var(--font-line-height-h4);
 
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-h4);
-        line-height: var(--font-line-height-fa-h4);
-    }
+    @include fa-icon-size(var(--font-size-fa-h4), var(--font-line-height-fa-h4));
 }
 
 h5,
@@ -416,13 +412,7 @@ h5,
     line-height: var(--font-line-height-h5);
 
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-h5);
-        line-height: var(--font-line-height-fa-h5);
-    }
+    @include fa-icon-size(var(--font-size-fa-h5), var(--font-line-height-fa-h5));
 }
 
 h6,
@@ -432,13 +422,7 @@ h6,
     line-height: var(--font-line-height-h6);
 
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-h6);
-        line-height: var(--font-line-height-fa-h6);
-    }
+    @include fa-icon-size(var(--font-size-fa-h6), var(--font-line-height-fa-h6));
 }
 
 /* rules for body txt */
@@ -452,41 +436,17 @@ h6,
     font-size: var(--font-size-body1);
     line-height: var(--font-line-height-body1);
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-body1);
-        line-height: var(--font-line-height-fa-body1);
-    }
+    @include fa-icon-size(var(--font-size-fa-body1), var(--font-line-height-fa-body1));
 }
 
-.body2-txt {
-    @extend %font-body;
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-body2);
-        line-height: var(--font-line-height-fa-body2);
-    }
-}
 
 .body3-txt {
     @extend %font-body;
     font-size: var(--font-size-body3);
     line-height: var(--font-line-height-body3);
 
-    .far,
-    .fas,
-    .fa-solid,
-    .fa-regular {
-        font-size: var(--font-size-fa-body3);
-        line-height: var(--font-line-height-fa-body3);
-    }
+    @include fa-icon-size(var(--font-size-fa-body3), var(--font-line-height-fa-body3));
 }
 
 .body1-txt.font-weight-semibold,

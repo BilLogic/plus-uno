@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import LikertScale from './LikertScale';
 
 export default {
-    title: 'Components/Training/LikertScale',
+    title: 'Specs/Training/LikertScale',
     component: LikertScale,
     tags: ['autodocs'],
     argTypes: {

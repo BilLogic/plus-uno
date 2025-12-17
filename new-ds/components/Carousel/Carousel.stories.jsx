@@ -8,73 +8,283 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Carousel component for displaying a rotating set of content slides. wrapper around react-bootstrap Carousel.'
+                component: 'Carousel component for displaying a rotating set of content slides. Supports controls, indicators, captions, and fade transitions. Built on React Bootstrap.'
             }
         }
     },
     argTypes: {
-        interval: {
-            control: 'number',
-            description: 'Interval in milliseconds'
+        // DESIGN
+        fade: {
+            control: 'boolean',
+            description: 'Use fade transition instead of slide',
+            table: { category: 'Design' }
         },
+
+        // CONTENT
+        slideCount: {
+            control: { type: 'range', min: 2, max: 6, step: 1 },
+            description: 'Number of slides to display',
+            table: { category: 'Content' }
+        },
+        showCaptions: {
+            control: 'boolean',
+            description: 'Show title and caption on slides',
+            table: { category: 'Content' }
+        },
+
+        // BEHAVIOR
         controls: {
-            control: 'boolean'
+            control: 'boolean',
+            description: 'Show previous/next navigation controls',
+            table: { category: 'Behavior' }
         },
         indicators: {
-            control: 'boolean'
+            control: 'boolean',
+            description: 'Show slide position indicators',
+            table: { category: 'Behavior' }
+        },
+        interval: {
+            control: { type: 'number', min: 1000, max: 10000, step: 500 },
+            description: 'Auto-advance interval in milliseconds (0 to disable)',
+            table: { category: 'Behavior' }
+        },
+        wrap: {
+            control: 'boolean',
+            description: 'Whether to wrap around at the ends',
+            table: { category: 'Behavior' }
+        },
+        pause: {
+            control: 'select',
+            options: ['hover', false],
+            description: 'Pause on hover behavior',
+            table: { category: 'Behavior' }
+        },
+        keyboard: {
+            control: 'boolean',
+            description: 'Enable keyboard navigation',
+            table: { category: 'Behavior' }
+        },
+
+        // DEVELOPMENT
+        id: {
+            control: 'text',
+            description: 'HTML ID attribute',
+            table: { category: 'Development' }
+        },
+        className: {
+            control: 'text',
+            description: 'Additional CSS classes',
+            table: { category: 'Development' }
+        },
+        slides: {
+            table: { disable: true, category: 'Development' }
+        },
+        children: {
+            table: { disable: true, category: 'Development' }
         }
     }
 };
 
-const createSlideContent = (text, bg = '#eee') => (
-    <div style={{ height: '300px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>
+// Helper to create slide content
+const createSlideContent = (text, bgColor) => (
+    <div style={{
+        height: '300px',
+        background: bgColor,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '2rem',
+        fontFamily: 'var(--font-family-lato)',
+        color: 'var(--color-on-surface)'
+    }}>
         {text}
     </div>
 );
 
-export const Overview = () => {
-    const slides = [
-        { content: createSlideContent('First Slide', '#e2e2e2'), title: 'First Slide', caption: 'Caption for first slide' },
-        { content: createSlideContent('Second Slide', '#d2d2d2'), title: 'Second Slide', caption: 'Caption for second slide' },
-        { content: createSlideContent('Third Slide', '#c2c2c2'), title: 'Third Slide', caption: 'Caption for third slide' }
-    ];
+// Sample slide configurations
+const slideColors = [
+    'var(--color-surface-container)',
+    'var(--color-surface-container-high)',
+    'var(--color-surface-container-highest)',
+    'var(--color-primary-state-08)',
+    'var(--color-secondary-state-08)',
+    'var(--color-tertiary-state-08)'
+];
 
-    return (
-        <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
-            <Carousel slides={slides} />
-        </div>
-    );
-};
+const slideLabels = ['First Slide', 'Second Slide', 'Third Slide', 'Fourth Slide', 'Fifth Slide', 'Sixth Slide'];
 
-export const SlidesOnly = () => {
-    const slides = [
-        { content: createSlideContent('Slide 1', '#ffc107') },
-        { content: createSlideContent('Slide 2', '#0dcaf0') },
-        { content: createSlideContent('Slide 3', '#198754') }
-    ];
+/**
+ * Overview
+ * Comprehensive view of Carousel configurations matching Figma specifications.
+ */
+export const Overview = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
 
-    return (
-        <div style={{ width: '600px', margin: '0 auto' }}>
-            <Carousel slides={slides} controls={false} indicators={false} interval={2000} />
-        </div>
-    );
-};
+        {/* 1. Slides Only */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Slides Only</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Basic carousel with only slide content, no controls or indicators.
+            </p>
+            <Carousel
+                slides={[
+                    { content: createSlideContent('First Slide', slideColors[0]) },
+                    { content: createSlideContent('Second Slide', slideColors[1]) },
+                    { content: createSlideContent('Third Slide', slideColors[2]) }
+                ]}
+                controls={false}
+                indicators={false}
+                interval={3000}
+            />
+        </section>
 
-export const ManualComposition = () => (
-    <div style={{ padding: '20px' }}>
-        <p>Composed using children (Carousel.Item)</p>
-        {/* Note: we can't easily export subcomponents from our wrapper unless we attach them or re-export RB components. 
-             Since our wrapper handles logic, users might just use RB components directly if they want full composition, 
-             or we attach them. Let's see if our wrapper supports it. 
-             Our wrapper iterates slides OR renders children. If children are passed, they must be Carousel.Items.
-             But we didn't export Carousel.Item from our component file.
-             User would need to import { Carousel as RBCarousel } from 'react-bootstrap' to get Item, 
-             or we export it.
-         */}
-        <Carousel>
-            {/* This example won't work unless we export Item. 
-                 Let's stick to 'slides' prop for the primary story or updated export.
-             */}
-        </Carousel>
+        {/* 2. With Controls */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>With Controls</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Carousel with previous/next navigation arrows for manual control.
+            </p>
+            <Carousel
+                slides={[
+                    { content: createSlideContent('First Slide', slideColors[0]) },
+                    { content: createSlideContent('Second Slide', slideColors[1]) },
+                    { content: createSlideContent('Third Slide', slideColors[2]) }
+                ]}
+                controls={true}
+                indicators={false}
+                interval={0}
+            />
+        </section>
+
+        {/* 3. With Indicators */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>With Indicators</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Carousel with pill-style indicators showing current slide position.
+            </p>
+            <Carousel
+                slides={[
+                    { content: createSlideContent('First Slide', slideColors[0]) },
+                    { content: createSlideContent('Second Slide', slideColors[1]) },
+                    { content: createSlideContent('Third Slide', slideColors[2]) }
+                ]}
+                controls={false}
+                indicators={true}
+                interval={4000}
+            />
+        </section>
+
+        {/* 4. With Captions */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>With Captions</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Carousel with title and caption text overlaid on slides.
+            </p>
+            <Carousel
+                slides={[
+                    {
+                        content: createSlideContent('', slideColors[3]),
+                        title: 'First Slide Title',
+                        caption: 'This is the caption for the first slide with additional context.'
+                    },
+                    {
+                        content: createSlideContent('', slideColors[4]),
+                        title: 'Second Slide Title',
+                        caption: 'Another descriptive caption providing more information.'
+                    },
+                    {
+                        content: createSlideContent('', slideColors[5]),
+                        title: 'Third Slide Title',
+                        caption: 'The third slide caption with helpful details.'
+                    }
+                ]}
+                controls={true}
+                indicators={true}
+                interval={5000}
+            />
+        </section>
+
+        {/* 5. Full Featured */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Full Featured</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Complete carousel with controls, indicators, and captions enabled.
+            </p>
+            <Carousel
+                slides={[
+                    {
+                        content: createSlideContent('', slideColors[0]),
+                        title: 'Welcome',
+                        caption: 'Start your journey here'
+                    },
+                    {
+                        content: createSlideContent('', slideColors[1]),
+                        title: 'Features',
+                        caption: 'Discover what we offer'
+                    },
+                    {
+                        content: createSlideContent('', slideColors[2]),
+                        title: 'Get Started',
+                        caption: 'Begin today'
+                    }
+                ]}
+                controls={true}
+                indicators={true}
+                interval={0}
+            />
+        </section>
+
+        {/* 6. Fade Transition */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Fade Transition</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Uses fade effect instead of slide animation for smoother transitions.
+            </p>
+            <Carousel
+                slides={[
+                    { content: createSlideContent('Fade In', slideColors[3]) },
+                    { content: createSlideContent('Fade Out', slideColors[4]) },
+                    { content: createSlideContent('Smooth', slideColors[5]) }
+                ]}
+                controls={true}
+                indicators={true}
+                fade={true}
+                interval={3000}
+            />
+        </section>
     </div>
 );
+
+/**
+ * Interactive Playground
+ * Customize the carousel attributes in real-time.
+ */
+export const Interactive = (args) => {
+    // Generate slides based on slideCount
+    const slides = Array.from({ length: args.slideCount || 3 }, (_, i) => ({
+        content: createSlideContent(slideLabels[i], slideColors[i % slideColors.length]),
+        title: args.showCaptions ? `${slideLabels[i]} Title` : undefined,
+        caption: args.showCaptions ? `Caption for ${slideLabels[i].toLowerCase()}` : undefined
+    }));
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <Carousel
+                {...args}
+                slides={slides}
+            />
+        </div>
+    );
+};
+
+Interactive.args = {
+    controls: true,
+    indicators: true,
+    interval: 5000,
+    wrap: true,
+    pause: 'hover',
+    keyboard: true,
+    fade: false,
+    slideCount: 3,
+    showCaptions: false
+};

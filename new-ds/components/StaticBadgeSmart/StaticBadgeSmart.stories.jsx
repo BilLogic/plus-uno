@@ -2,7 +2,7 @@ import React from 'react';
 import StaticBadgeSmart from '@/components/StaticBadgeSmart';
 
 export default {
-    title: 'Components/StaticBadgeSmart',
+    title: 'Specs/Universal/StaticBadgeSmart',
     component: StaticBadgeSmart,
     tags: ['autodocs'],
     argTypes: {
