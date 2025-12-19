@@ -1,0 +1,245 @@
+@use "sass:map";
+@use "sass:list";
+
+/* 
+ * Button Component Styles
+ * Strictly implements Design System tokens using Sass maps for 
+ * extensive Style x Variant matrix.
+ */
+
+.plus-btn {
+    // Layout
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: fit-content;
+    position: relative;
+
+    // Default Shape & Typography
+    // Consistent height with Outline (borders on all variants, transparent by default)
+    border: var(--size-element-border) solid transparent;
+    border-radius: var(--size-element-radius-md);
+
+    // Typography handled by utility classes
+    text-align: center;
+    white-space: nowrap;
+    text-decoration: none;
+
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, filter 0.2s;
+
+    // --- STATES ---
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.65;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    // Active / Pressed
+    &.active,
+    &:active {
+        // Visual feedback for click
+        transform: translateY(1px);
+    }
+
+    // Block logic
+    &--block {
+        display: flex;
+        width: 100%;
+    }
+
+    // Loading logic
+    &--loading {
+        pointer-events: none;
+        color: transparent !important;
+
+
+
+        .plus-btn-visual {
+            opacity: 0;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 1em;
+            height: 1em;
+            top: calc(50% - 0.5em);
+            left: calc(50% - 0.5em);
+
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            color: var(--color-on-primary); // Fallback
+        }
+    }
+
+
+    // --- SIZES CONFIGURATION ---
+    // Map: Size Name -> (Pad-Y, Pad-X, Radius, Gap, Icon-Size)
+    $btn-sizes: (
+        'small': ('--size-element-pad-y-sm',
+            '--size-element-pad-x-sm',
+            '--size-element-radius-sm',
+            '--size-element-gap-sm',
+            '--font-size-fa-body3-solid' // 10px
+        ),
+        'medium': ('--size-element-pad-y-md',
+            '--size-element-pad-x-md',
+            '--size-element-radius-md',
+            '--size-element-gap-sm',
+            '--font-size-fa-h6-solid' // 14px
+        ),
+        'large': ('--size-element-pad-y-lg',
+            '--size-element-pad-x-lg',
+            '--size-element-radius-md',
+            '--size-element-gap-md',
+            '--font-size-fa-h3-solid' // 24px
+        )
+    );
+
+@each $size, $config in $btn-sizes {
+    &--#{$size} {
+        // Unquote variable names for var()
+        padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+        border-radius: var(unquote(list.nth($config, 3)));
+        gap: var(unquote(list.nth($config, 4)));
+
+        .plus-btn-visual {
+            font-size: var(unquote(list.nth($config, 5)));
+        }
+    }
+}
+
+
+// --- COLOR THEMES CONFIGURATION ---
+// Using EXPLICIT STRINGS to avoid Sass interpretation issues
+// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe
+$btn-themes: (
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text'),
+    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text'),
+    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text'),
+    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral-state-08', '--color-neutral-text')
+);
+
+// --- VARIANTS (Fill Types) ---
+
+// --- BUTTON VARIANTS GENERATION ---
+@each $theme, $config in $btn-themes {
+    $col-main: unquote(list.nth($config, 1));
+    $col-on-main: unquote(list.nth($config, 2));
+    $col-state: unquote(list.nth($config, 3));
+    $col-text: unquote(list.nth($config, 4));
+
+    &--#{$theme} {
+
+        // 1. FILLED
+        &.plus-btn--filled {
+            background-color: var($col-main);
+            color: var($col-on-main);
+
+            &:hover,
+            &.active,
+            &:active {
+                filter: brightness(0.92);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-on-main);
+            }
+        }
+
+        // 2. TONAL
+        &.plus-btn--tonal {
+            background-color: var($col-state);
+            color: var($col-text);
+
+            &:hover,
+            &.active,
+            &:active {
+                background-color: color-mix(in srgb, var($col-state), black 12%);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-text);
+            }
+        }
+
+        // 3. OUTLINE
+        &.plus-btn--outline {
+            background-color: transparent;
+            border-color: var($col-main);
+            color: var($col-text);
+
+            &:hover,
+            &.active,
+            &:active {
+                background-color: var($col-state);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-text);
+            }
+        }
+
+        // 4. GHOST
+        &.plus-btn--ghost {
+            background-color: transparent;
+            border-color: transparent;
+            color: var($col-text);
+
+            &:hover,
+            &.active,
+            &:active {
+                background-color: var($col-state);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-text);
+            }
+        }
+    }
+}
+
+
+// --- VERTICAL LAYOUT ---
+&--vertical {
+    flex-direction: column;
+    gap: var(--size-element-gap-md);
+
+    .plus-btn-visual--leading {
+        margin-right: 0;
+        margin-bottom: var(--size-element-gap-sm);
+        font-size: 1.5em;
+    }
+}
+
+// --- ELEMENTS ---
+&-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &--leading {
+        margin-right: var(--size-element-gap-sm);
+    }
+
+    &--trailing {
+        margin-left: var(--size-element-gap-sm);
+    }
+}
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
