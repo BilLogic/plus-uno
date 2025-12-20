@@ -4,4 +4,4 @@ export { default as SelectMultiple } from './SelectMultiple';
 export { default as RangeInput } from './RangeInput';
 export { default as TagInput } from './TagInput';
 export { default as Rating } from './Rating';
-export { default as RadioButtonGroup } from './RadioButtonGroup';
+export { default as Scale } from './RadioButtonGroup';

@@ -40,15 +40,6 @@ const Input = ({
         if (onBlur) onBlur(e);
     };
 
-    // Determine border color based on state
-    const getBorderColor = () => {
-        if (disabled || readonly) return 'var(--color-outline-variant)';
-        if (validation === 'invalid') return 'var(--color-danger)';
-        if (validation === 'success') return 'var(--color-success)';
-        if (isFocused) return 'var(--color-primary)';
-        return 'var(--color-outline-variant)';
-    };
-
     // Determine background color based on state
     const getBackgroundColor = () => {
         if (disabled) return 'var(--color-surface-container-low)';
@@ -75,7 +66,7 @@ const Input = ({
     ].filter(Boolean).join(' ');
 
     const inputStyle = {
-        borderColor: getBorderColor(),
+        // Removed borderColor - now handled entirely by CSS for hover/focus states
         backgroundColor: getBackgroundColor(),
         color: getTextColor(),
         ...style
@@ -126,7 +117,7 @@ const Input = ({
                     <div className="plus-input-trailing-visual">
                         {typeof trailingVisual === 'string' ? (
                             trailingVisual === 'dropdown' ? (
-                                <i className="fa-solid fa-chevron-down" aria-hidden="true" />
+                                <i className="fa-solid fa-caret-down" aria-hidden="true" />
                             ) : (
                                 <i className={trailingVisual} aria-hidden="true" />
                             )
@@ -176,4 +167,5 @@ Input.propTypes = {
 };
 
 export default Input;
+
 

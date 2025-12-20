@@ -8,20 +8,6 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: var(--size-element-gap-sm, 8px);
-}
-
-.plus-form-select-label {
-    margin-bottom: 0;
-    color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
-    
-    .plus-form-select-required {
-        color: var(--color-danger);
-        margin-left: 2px;
-    }
 }
 
 .plus-form-select {
@@ -29,12 +15,12 @@
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-md, 4px);
     background-color: var(--color-surface-container-lowest);
-    color: var(--color-on-surface);
+    color: var(--color-on-surface-variant);
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);
     padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
     padding-right: calc(var(--size-element-pad-x-md, 16px) + 24px); // Extra space for dropdown arrow
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: border-color 0.15s ease-in-out, border-width 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -55,12 +41,9 @@
         background-color: var(--color-surface-container-lowest);
     }
     
-    &:focus,
-    &.plus-form-select-focused {
-        outline: none;
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236750a4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    // Hover state - use inverse primary color token for border
+    &:hover:not(.plus-form-select-readonly):not(:focus):not(.plus-form-select-focused) {
+        border-color: var(--color-inverse-primary);
     }
     
     // Has value state - darker border and text
@@ -69,18 +52,13 @@
         color: var(--color-on-surface);
     }
     
-    // Disabled state
-    &.plus-form-select-disabled {
-        background-color: var(--color-surface-container-low);
-        border-color: var(--color-outline-variant);
-        color: var(--color-on-surface-variant);
-        opacity: 0.6;
-        cursor: not-allowed;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-        
-        option {
-            color: var(--color-on-surface-variant);
-        }
+    // Focus state - must come after has-value to override it
+    &:focus,
+    &.plus-form-select-focused {
+        outline: none;
+        border: 2px solid var(--color-inverse-primary) !important;
+        box-shadow: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236750a4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     }
     
     // Read-only state
@@ -150,4 +128,5 @@
         background-image: none;
     }
 }
+
 

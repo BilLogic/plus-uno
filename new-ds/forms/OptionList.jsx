@@ -35,7 +35,7 @@ const OptionList = ({
                             onClick={() => handleSelect(option, index)}
                         >
                             <span className="plus-option-list-text">{optionText}</span>
-                            <i className="fa-solid fa-chevron-right plus-option-list-chevron" aria-hidden="true" />
+                            <i className="fa-solid fa-caret-right plus-option-list-chevron" aria-hidden="true" />
                         </ListGroup.Item>
                     );
                 })}
@@ -64,4 +64,6 @@ OptionList.propTypes = {
 };
 
 export default OptionList;
+
+
 

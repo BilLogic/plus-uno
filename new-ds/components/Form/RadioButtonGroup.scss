@@ -1,89 +1,77 @@
 /**
- * RadioButtonGroup Component Styles
- * Implements radio button group component with horizontal layout,
+ * Scale Component Styles
+ * Implements scale component with horizontal layout,
  * end labels, and radio buttons with labels above them
  * using Design System tokens to match Figma specifications exactly.
  */
 
-.plus-radio-button-group-wrapper {
+.plus-scale-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
     gap: var(--size-element-gap-sm, 8px);
 }
 
-.plus-radio-button-group-label {
+.plus-scale-label {
     margin-bottom: var(--size-element-gap-xs, 4px);
     color: var(--color-on-surface);
     font-weight: var(--font-weight-normal);
     
-    .plus-radio-button-group-required {
+    .plus-scale-required {
         color: var(--color-danger);
         margin-left: 2px;
     }
 }
 
-.plus-radio-button-group-container {
+.plus-scale-container {
     display: flex;
-    align-items: flex-end; // Align items to bottom
-    gap: var(--size-element-gap-md, 10px);
+    align-items: center; // Center align all items vertically
+    gap: var(--size-section-gap-md, 16px); // Gap between options matches Figma
     padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
     background-color: var(--color-surface-container-low, #f3f3f6);
     border-radius: var(--size-element-radius-md, 4px);
 }
 
-.plus-radio-button-group-end-label {
+.plus-scale-end-label {
     color: var(--color-on-surface);
     font-weight: var(--font-weight-normal);
     white-space: nowrap;
     flex-shrink: 0;
     // Align with the center of radio button circles (12px diameter)
-    // Radio buttons are at the bottom of their containers, so align end labels to bottom
-    // then adjust upward by half the radio button height to center with the circle
-    align-self: flex-end;
-    margin-bottom: 6px; // Half of 12px radio button height to center with circle
+    // Since container uses align-items: center, end labels align with radio button centers
 }
 
-.plus-radio-button-group-end-label-left {
-    // Left end label (e.g., "Lowest")
-}
+// End label modifiers are handled by base class
 
-.plus-radio-button-group-end-label-right {
-    // Right end label (e.g., "Highest")
-}
-
-.plus-radio-button-group-options {
+.plus-scale-options {
     display: flex;
-    align-items: flex-start;
-    gap: var(--size-element-gap-md, 10px);
+    align-items: center; // Center align options vertically
+    gap: var(--size-section-gap-md, 16px); // Gap between options matches Figma
     flex: 1;
     justify-content: space-between;
 }
 
-.plus-radio-button-group-option {
+.plus-scale-option {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--size-element-gap-xs, 4px);
+    align-items: center; // Center align label and radio button horizontally
+    gap: var(--size-element-gap-sm, 8px); // Gap between label and radio button matches Figma
     flex: 1;
-    // Ensure the radio button itself aligns with end labels
-    // The radio button should be at the bottom of the option container
-    justify-content: flex-end;
-    // Add padding to account for label above, so radio button aligns with end labels
-    padding-bottom: 0;
 }
 
-.plus-radio-button-group-option-label {
+.plus-scale-option-label {
     color: var(--color-on-surface);
     font-weight: var(--font-weight-normal);
-    text-align: center;
+    text-align: center; // Center align text
     white-space: nowrap;
-    // Label above radio button
-    margin-bottom: var(--size-element-gap-xs, 4px);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 // Disabled wrapper state
-.plus-radio-button-group-disabled {
+.plus-scale-disabled {
     opacity: 0.38;
     cursor: not-allowed;
     pointer-events: none;
@@ -97,14 +85,27 @@
 
 .plus-radio-button-wrapper {
     display: flex;
+    flex-direction: column;
     align-items: center;
     width: 100%;
+    gap: var(--size-element-gap-sm, 8px); // Gap between label and radio button
 
     // Override Bootstrap's default form-check padding
     .form-check {
         padding-left: 0;
         margin-bottom: 0;
     }
+}
+
+.plus-radio-button-label {
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    text-align: center;
+    white-space: nowrap;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .plus-radio-button {
@@ -125,9 +126,9 @@
         // Override browser's default accent-color with primary color token
         accent-color: var(--color-primary) !important;
 
-        // Unchecked state - use outline-variant for border
-        border-color: var(--color-outline-variant) !important;
-        background-color: transparent !important;
+        // Unchecked state - white background with primary border (matching Figma)
+        border-color: var(--color-primary) !important;
+        background-color: var(--color-on-primary, white) !important;
 
         // Checked state - use primary color
         &:checked {
@@ -204,15 +205,9 @@
         }
     }
 
-    // Label styling
+    // Hide the default label since we render it separately above
     .form-check-label {
-        color: var(--color-on-surface);
-        cursor: pointer;
-        user-select: none;
-        flex: 1;
-        padding-left: 0;
-        font-family: var(--font-family-body);
-        font-weight: var(--font-weight-normal);
+        display: none;
     }
 }
 
@@ -223,3 +218,4 @@
         cursor: not-allowed;
     }
 }
+

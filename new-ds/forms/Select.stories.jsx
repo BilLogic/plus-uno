@@ -19,11 +19,6 @@ export default {
             description: 'Available in 3 sizes: small, medium (default), large.',
             table: { category: 'Design' }
         },
-        disabled: {
-            control: 'boolean',
-            description: 'Disable the select component',
-            table: { category: 'Behavior' }
-        },
         readOnly: {
             control: 'boolean',
             description: 'Make the select read-only',
@@ -33,16 +28,6 @@ export default {
             control: 'boolean',
             description: 'Enable multiple selection. When enabled, users can select multiple options.',
             table: { category: 'Behavior' }
-        },
-        required: {
-            control: 'boolean',
-            description: 'Toggle the required switch to show or hide a * next to the label to show if the select is required.',
-            table: { category: 'Content' }
-        },
-        label: {
-            control: 'text',
-            description: 'Label text for the select field',
-            table: { category: 'Content' }
         },
         placeholder: {
             control: 'text',
@@ -95,8 +80,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-small"
-                            label="Label"
-                            required
                             placeholder="Placeholder"
                             options={defaultOptions}
                             size="small"
@@ -105,8 +88,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-medium"
-                            label="Label"
-                            required
                             placeholder="Placeholder"
                             options={defaultOptions}
                             size="medium"
@@ -115,8 +96,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-large"
-                            label="Label"
-                            required
                             placeholder="Placeholder"
                             options={defaultOptions}
                             size="large"
@@ -129,58 +108,25 @@ export const Overview = () => {
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>State</h6>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Select dropdowns have 3 states: default, disabled, read-only.
+                    Select dropdowns have 3 states: default, focus, read-only.
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                     <Select
-                        id="select-default-placeholder"
-                        label="Label"
-                        required
+                        id="select-default"
                         placeholder="Placeholder"
                         options={defaultOptions}
                         value={value1}
                         onChange={(e) => setValue1(e.target.value)}
                     />
                     <Select
-                        id="select-default-value"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        options={defaultOptions}
-                        value={value2}
-                        onChange={(e) => setValue2(e.target.value)}
-                    />
-                    <Select
-                        id="select-disabled-placeholder"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        options={defaultOptions}
-                        disabled
-                    />
-                    <Select
-                        id="select-disabled-value"
-                        label="Label"
-                        required
+                        id="select-focus"
                         placeholder="Placeholder"
                         options={defaultOptions}
                         value="option2"
-                        disabled
-                    />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginTop: '16px' }}>
-                    <Select
-                        id="select-readonly-placeholder"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        options={defaultOptions}
-                        readOnly
+                        className="plus-form-select-focused"
                     />
                     <Select
-                        id="select-readonly-value"
-                        label="Label"
-                        required
+                        id="select-readonly"
                         placeholder="Placeholder"
                         options={defaultOptions}
                         value="option3"
@@ -199,8 +145,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-placeholder-style"
-                            label="Label"
-                            required
                             placeholder="Placeholder"
                             options={defaultOptions}
                             value={value5}
@@ -210,8 +154,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-value-style"
-                            label="Label"
-                            required
                             placeholder="Placeholder"
                             options={defaultOptions}
                             value={value6}
@@ -231,8 +173,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-multiple-options"
-                            label="Label"
-                            required
                             placeholder="Select an option"
                             options={[
                                 { value: 'opt1', text: 'First Option' },
@@ -248,8 +188,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-options-value-only"
-                            label="Label"
-                            required
                             placeholder="Select an option"
                             options={[
                                 { value: 'value1' },
@@ -263,59 +201,6 @@ export const Overview = () => {
                 </div>
             </section>
 
-            {/* Label Section */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Label</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Select can be displayed with or without a label. The label is optional and will only render if provided.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Select
-                            id="select-with-label"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            options={defaultOptions}
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Select
-                            id="select-without-label"
-                            placeholder="Placeholder"
-                            options={defaultOptions}
-                        />
-                    </div>
-                </div>
-            </section>
-
-            {/* Required Section */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Required?</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Toggle the required switch to show or hide a * next to the label to show if the select is required.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Select
-                            id="select-required"
-                            label="Label"
-                            required={true}
-                            placeholder="Placeholder"
-                            options={defaultOptions}
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Select
-                            id="select-not-required"
-                            label="Label"
-                            required={false}
-                            placeholder="Placeholder"
-                            options={defaultOptions}
-                        />
-                    </div>
-                </div>
-            </section>
 
             {/* Multiple Select Section */}
             <section>
@@ -327,8 +212,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-multiple-default"
-                            label="Label"
-                            required
                             placeholder="Select multiple options"
                             options={[
                                 { value: 'opt1', text: 'Option 1' },
@@ -344,8 +227,6 @@ export const Overview = () => {
                     <div style={{ flex: '1', minWidth: '200px' }}>
                         <Select
                             id="select-multiple-disabled"
-                            label="Label"
-                            required
                             placeholder="Select multiple options"
                             options={[
                                 { value: 'opt1', text: 'Option 1' },
@@ -354,7 +235,6 @@ export const Overview = () => {
                                 { value: 'opt4', text: 'Option 4' }
                             ]}
                             multiple
-                            disabled
                         />
                     </div>
                 </div>
@@ -389,11 +269,8 @@ export const Interactive = (args) => {
                 value={value}
                 onChange={handleChange}
                 size={args.size}
-                disabled={args.disabled}
                 readOnly={args.readOnly}
                 multiple={args.multiple}
-                required={args.required}
-                label={args.label}
                 placeholder={args.placeholder}
                 options={args.options || defaultOptions}
             />
@@ -403,11 +280,8 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     size: 'medium',
-    disabled: false,
     readOnly: false,
     multiple: false,
-    required: true,
-    label: 'Label',
     placeholder: 'Placeholder',
     value: '',
     options: defaultOptions

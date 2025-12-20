@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import './ChoiceGrid.scss';
@@ -145,12 +145,31 @@ const ChoiceGridCheckboxItem = ({
     id,
     name,
     checked = false,
+    indeterminate = false,
     disabled = false,
     size = 'medium',
     onChange,
     className = '',
     ...props
 }) => {
+    const inputRef = useRef(null);
+    
+    // Callback ref to get the actual input element from Form.Check
+    const setInputRef = useCallback((node) => {
+        if (node) {
+            const input = node.querySelector('input[type="checkbox"]');
+            if (input) {
+                inputRef.current = input;
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.indeterminate = indeterminate;
+        }
+    }, [indeterminate]);
+
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
     const wrapperClasses = [
@@ -163,16 +182,18 @@ const ChoiceGridCheckboxItem = ({
 
     return (
         <div className={wrapperClasses}>
-            <Form.Check
-                type="checkbox"
-                id={id}
-                name={name}
-                checked={checked}
-                disabled={disabled}
-                onChange={onChange}
-                className="plus-choice-grid-checkbox"
-                {...props}
-            />
+            <div ref={setInputRef}>
+                <Form.Check
+                    type="checkbox"
+                    id={id}
+                    name={name}
+                    checked={checked}
+                    disabled={disabled}
+                    onChange={onChange}
+                    className="plus-choice-grid-checkbox"
+                    {...props}
+                />
+            </div>
         </div>
     );
 };
@@ -181,6 +202,7 @@ ChoiceGridCheckboxItem.propTypes = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string,
     checked: PropTypes.bool,
+    indeterminate: PropTypes.bool,
     disabled: PropTypes.bool,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     onChange: PropTypes.func,
@@ -242,3 +264,4 @@ ChoiceGrid.CheckboxItem = ChoiceGridCheckboxItem;
 ChoiceGrid.RadioItem = ChoiceGridRadioItem;
 
 export default ChoiceGrid;
+

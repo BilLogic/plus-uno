@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Input from './Input';
 
 export default {
@@ -56,9 +56,24 @@ export default {
             table: { category: 'Content' }
         },
         trailingVisual: {
+            control: 'text',
+            description: 'Trailing visual can be an icon class (e.g., "fa-solid fa-icons") or "dropdown" for a dropdown arrow. Matching the trailingVisual size to the form size.',
+            table: { category: 'Content' }
+        },
+        type: {
             control: 'select',
-            options: ['', 'dropdown', 'icon'],
-            description: 'Trailing visual can be an icon or a dropdown arrow. Matching the trailingVisual size to the form size.',
+            options: ['text', 'password', 'email', 'number', 'tel', 'url', 'search'],
+            description: 'Input type',
+            table: { category: 'Content' }
+        },
+        id: {
+            control: 'text',
+            description: 'Input ID',
+            table: { category: 'Content' }
+        },
+        name: {
+            control: 'text',
+            description: 'Input name',
             table: { category: 'Content' }
         },
         placeholder: {
@@ -108,6 +123,7 @@ export const Overview = () => {
                             required
                             placeholder="Placeholder"
                             size="small"
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -117,6 +133,7 @@ export const Overview = () => {
                             required
                             placeholder="Placeholder"
                             size="medium"
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -126,6 +143,7 @@ export const Overview = () => {
                             required
                             placeholder="Placeholder"
                             size="large"
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                 </div>
@@ -145,6 +163,7 @@ export const Overview = () => {
                         placeholder="Placeholder"
                         value={value1}
                         onChange={(e) => setValue1(e.target.value)}
+                        trailingVisual="fa-solid fa-icons"
                     />
                     <Input
                         id="input-default-value"
@@ -153,15 +172,17 @@ export const Overview = () => {
                         placeholder="Placeholder"
                         value={value2}
                         onChange={(e) => setValue2(e.target.value)}
+                        trailingVisual="fa-solid fa-icons"
                     />
                     <Input
-                        id="input-focus-placeholder"
+                        id="input-hover-placeholder"
                         label="Label"
                         required
                         placeholder="Placeholder"
                         value={value3}
                         onChange={(e) => setValue3(e.target.value)}
-                        autoFocus
+                        className="plus-input-hover"
+                        trailingVisual="fa-solid fa-icons"
                     />
                     <Input
                         id="input-focus-value"
@@ -170,6 +191,8 @@ export const Overview = () => {
                         placeholder="Placeholder"
                         value={value4}
                         onChange={(e) => setValue4(e.target.value)}
+                        autoFocus
+                        trailingVisual="fa-solid fa-icons"
                     />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginTop: '16px' }}>
@@ -179,6 +202,7 @@ export const Overview = () => {
                         required
                         placeholder="Placeholder"
                         disabled
+                        trailingVisual="fa-solid fa-icons"
                     />
                     <Input
                         id="input-disabled-value"
@@ -187,6 +211,7 @@ export const Overview = () => {
                         placeholder="Placeholder"
                         value="Value"
                         disabled
+                        trailingVisual="fa-solid fa-icons"
                     />
                     <Input
                         id="input-readonly-placeholder"
@@ -194,6 +219,7 @@ export const Overview = () => {
                         required
                         placeholder="Placeholder"
                         readonly
+                        trailingVisual="fa-solid fa-icons"
                     />
                     <Input
                         id="input-readonly-value"
@@ -202,6 +228,7 @@ export const Overview = () => {
                         placeholder="Placeholder"
                         value="Value"
                         readonly
+                        trailingVisual="fa-solid fa-icons"
                     />
                 </div>
             </section>
@@ -221,6 +248,7 @@ export const Overview = () => {
                             placeholder="Placeholder"
                             value={value5}
                             onChange={(e) => setValue5(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -231,6 +259,7 @@ export const Overview = () => {
                             placeholder="Placeholder"
                             value={value6}
                             onChange={(e) => setValue6(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                 </div>
@@ -252,6 +281,7 @@ export const Overview = () => {
                             validation="none"
                             value={value7}
                             onChange={(e) => setValue7(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -264,6 +294,7 @@ export const Overview = () => {
                             validationMessage="Validation message"
                             value={value8}
                             onChange={(e) => setValue8(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -276,6 +307,7 @@ export const Overview = () => {
                             validationMessage="Validation message"
                             value={value9}
                             onChange={(e) => setValue9(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                 </div>
@@ -290,6 +322,7 @@ export const Overview = () => {
                             validationMessage="Validation message"
                             value={value10}
                             onChange={(e) => setValue10(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -302,6 +335,7 @@ export const Overview = () => {
                             validationMessage="Validation message"
                             value={value11}
                             onChange={(e) => setValue11(e.target.value)}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                 </div>
@@ -321,6 +355,7 @@ export const Overview = () => {
                             required
                             placeholder="Placeholder"
                             showLabel={true}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -330,6 +365,7 @@ export const Overview = () => {
                             required
                             placeholder="Placeholder"
                             showLabel={false}
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                 </div>
@@ -348,6 +384,7 @@ export const Overview = () => {
                             label="Label"
                             required={true}
                             placeholder="Placeholder"
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                     <div style={{ flex: '1', minWidth: '200px' }}>
@@ -356,6 +393,7 @@ export const Overview = () => {
                             label="Label"
                             required={false}
                             placeholder="Placeholder"
+                            trailingVisual="fa-solid fa-icons"
                         />
                     </div>
                 </div>
@@ -394,10 +432,19 @@ export const Overview = () => {
 export const Interactive = (args) => {
     const [value, setValue] = useState(args.value || '');
 
+    // Update value when args.value changes (for controlled component)
+    useEffect(() => {
+        if (args.value !== undefined) {
+            setValue(args.value);
+        }
+    }, [args.value]);
+
     return (
         <div style={{ maxWidth: '600px' }}>
             <Input
-                id="input-interactive"
+                id={args.id || 'input-interactive'}
+                name={args.name}
+                type={args.type}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 size={args.size}
@@ -409,8 +456,8 @@ export const Interactive = (args) => {
                 required={args.required}
                 label={args.label}
                 placeholder={args.placeholder}
-                leadingVisual={args.leadingVisual ? args.leadingVisual : undefined}
-                trailingVisual={args.trailingVisual === 'dropdown' ? 'dropdown' : (args.trailingVisual ? args.trailingVisual : undefined)}
+                leadingVisual={args.leadingVisual || undefined}
+                trailingVisual={args.trailingVisual === 'dropdown' ? 'dropdown' : (args.trailingVisual || undefined)}
             />
         </div>
     );
@@ -428,5 +475,8 @@ Interactive.args = {
     placeholder: 'Placeholder',
     value: '',
     leadingVisual: '',
-    trailingVisual: ''
+    trailingVisual: 'fa-solid fa-icons',
+    type: 'text',
+    id: 'input-interactive',
+    name: 'input-interactive'
 };

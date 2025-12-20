@@ -42,8 +42,9 @@ const preview = {
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           ['Assets', 'Assets/Logo', 'Assets/Images'],
+          'Forms',
           'Components',
-          '*', // This allows alphabetical sorting for components
+          '*', // This allows alphabetical sorting for remaining items
           'DataViz',
           'Specs',
           [

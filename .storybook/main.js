@@ -84,6 +84,24 @@ const config = {
     // Ensure CSS is processed and available
     config.css = config.css || {};
     config.css.postcss = config.css.postcss || {};
+    
+    // Configure SCSS preprocessor options (matching vite.config.js)
+    // Merge with existing options if they exist
+    config.css.preprocessorOptions = config.css.preprocessorOptions || {};
+    const existingLoadPaths = config.css.preprocessorOptions.scss?.loadPaths || [];
+    config.css.preprocessorOptions.scss = {
+      api: 'modern-compiler',
+      loadPaths: [
+        ...new Set([ // Use Set to avoid duplicates
+          ...existingLoadPaths,
+          path.resolve(rootDir, 'develop/tokens'),
+          path.resolve(rootDir, 'legacy-ds/components'),
+          path.resolve(rootDir, 'new-ds/forms'),
+          path.resolve(rootDir, 'new-ds/components')
+        ])
+      ],
+      silenceDeprecations: ['legacy-js-api']
+    };
 
     // Improve module resolution for better compatibility
     config.build = config.build || {};

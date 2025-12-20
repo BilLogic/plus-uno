@@ -151,7 +151,7 @@ const Cascader = ({
                     onClick={handleInputClick}
                     {...props}
                 />
-                <i className={`fa-solid fa-chevron-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
+                <i className={`fa-solid fa-caret-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
             </div>
 
             {/* Dropdown Menu with Columns */}
@@ -218,3 +218,5 @@ Cascader.propTypes = {
 };
 
 export default Cascader;
+
+

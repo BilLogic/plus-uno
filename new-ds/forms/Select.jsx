@@ -6,15 +6,12 @@ import './Select.scss';
 const Select = ({
     id,
     name,
-    label,
-    required = false,
     value,
     defaultValue,
     placeholder,
     options = [],
     multiple = false,
     size = 'medium',
-    disabled = false,
     readOnly = false,
     onChange,
     onFocus,
@@ -47,26 +44,17 @@ const Select = ({
 
     return (
         <div className="plus-form-select-wrapper" id={id ? `${id}-wrapper` : undefined}>
-            {label && (
-                <Form.Label htmlFor={id || name} className="plus-form-select-label">
-                    {label}
-                    {required && (
-                        <span className="plus-form-select-required" aria-label="required">*</span>
-                    )}
-                </Form.Label>
-            )}
             <Form.Select
                 id={id}
                 name={name}
                 multiple={multiple}
                 value={value}
                 defaultValue={defaultValue}
-                disabled={disabled}
                 readOnly={readOnly}
                 onChange={onChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                className={`${selectClass} ${valueClass} ${readOnly ? 'plus-form-select-readonly' : ''} ${disabled ? 'plus-form-select-disabled' : ''} ${isFocused ? 'plus-form-select-focused' : ''} ${className}`}
+                className={`${selectClass} ${valueClass} ${readOnly ? 'plus-form-select-readonly' : ''} ${isFocused ? 'plus-form-select-focused' : ''} ${className}`}
                 style={style}
                 {...props}
             >
@@ -84,8 +72,6 @@ const Select = ({
 Select.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
-    label: PropTypes.node,
-    required: PropTypes.bool,
     value: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string)
@@ -101,7 +87,6 @@ Select.propTypes = {
     })),
     multiple: PropTypes.bool,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,

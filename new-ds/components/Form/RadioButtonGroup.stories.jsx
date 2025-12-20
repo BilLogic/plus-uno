@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import RadioButtonGroup from './RadioButtonGroup';
+import Scale from './RadioButtonGroup';
 
 export default {
-    title: 'Forms/Radio Button Group',
+    title: 'Forms/Scale',
     tags: ['autodocs'],
     parameters: {
         docs: {
             description: {
-                component: 'RadioButtonGroup component with horizontal layout, end labels, and radio buttons with labels above them.'
+                component: 'Scale component with horizontal layout, end labels, and radio buttons with labels above them.'
             }
         }
     }
 };
 
-export const RadioButtonGroupStory = () => {
+export const Overview = () => {
     const [value1, setValue1] = useState('option2');
     const [value2, setValue2] = useState('option1');
     const [value3, setValue3] = useState('option3');
@@ -68,14 +68,14 @@ export const RadioButtonGroupStory = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             {/* Default (3 options) */}
             <div>
-                <h2 className="h2" style={{ marginBottom: '16px' }}>Radio Button Group</h2>
+                <h2 className="h2" style={{ marginBottom: '16px' }}>Scale</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     {/* Default */}
                     <div>
                         <h3 className="h3" style={{ marginBottom: '16px' }}>Default (3 Options)</h3>
-                        <RadioButtonGroup
-                            id="radio-group-default"
-                            name="radio-group-default"
+                        <Scale
+                            id="scale-default"
+                            name="scale-default"
                             lowestLabel="Lowest"
                             highestLabel="Highest"
                             options={defaultOptions}
@@ -87,9 +87,9 @@ export const RadioButtonGroupStory = () => {
                     {/* 4 Options */}
                     <div>
                         <h3 className="h3" style={{ marginBottom: '16px' }}>4 Options</h3>
-                        <RadioButtonGroup
-                            id="radio-group-4"
-                            name="radio-group-4"
+                        <Scale
+                            id="scale-4"
+                            name="scale-4"
                             lowestLabel="Lowest"
                             highestLabel="Highest"
                             options={options4}
@@ -101,9 +101,9 @@ export const RadioButtonGroupStory = () => {
                     {/* 5 Options */}
                     <div>
                         <h3 className="h3" style={{ marginBottom: '16px' }}>5 Options</h3>
-                        <RadioButtonGroup
-                            id="radio-group-5"
-                            name="radio-group-5"
+                        <Scale
+                            id="scale-5"
+                            name="scale-5"
                             lowestLabel="Lowest"
                             highestLabel="Highest"
                             options={options5}
@@ -115,9 +115,9 @@ export const RadioButtonGroupStory = () => {
                     {/* 6 Options */}
                     <div>
                         <h3 className="h3" style={{ marginBottom: '16px' }}>6 Options</h3>
-                        <RadioButtonGroup
-                            id="radio-group-6"
-                            name="radio-group-6"
+                        <Scale
+                            id="scale-6"
+                            name="scale-6"
                             lowestLabel="Lowest"
                             highestLabel="Highest"
                             options={options6}
@@ -129,42 +129,13 @@ export const RadioButtonGroupStory = () => {
                     {/* 7 Options */}
                     <div>
                         <h3 className="h3" style={{ marginBottom: '16px' }}>7 Options</h3>
-                        <RadioButtonGroup
-                            id="radio-group-7"
-                            name="radio-group-7"
+                        <Scale
+                            id="scale-7"
+                            name="scale-7"
                             lowestLabel="Lowest"
                             highestLabel="Highest"
                             options={options7}
                             defaultValue="option4"
-                        />
-                    </div>
-
-                    {/* With Label */}
-                    <div>
-                        <h3 className="h3" style={{ marginBottom: '16px' }}>With Label</h3>
-                        <RadioButtonGroup
-                            id="radio-group-labeled"
-                            name="radio-group-labeled"
-                            label="Rating"
-                            required
-                            lowestLabel="Lowest"
-                            highestLabel="Highest"
-                            options={defaultOptions}
-                            defaultValue="option2"
-                        />
-                    </div>
-
-                    {/* Disabled */}
-                    <div>
-                        <h3 className="h3" style={{ marginBottom: '16px' }}>Disabled</h3>
-                        <RadioButtonGroup
-                            id="radio-group-disabled"
-                            name="radio-group-disabled"
-                            lowestLabel="Lowest"
-                            highestLabel="Highest"
-                            options={defaultOptions}
-                            value="option2"
-                            disabled
                         />
                     </div>
                 </div>
@@ -172,3 +143,4 @@ export const RadioButtonGroupStory = () => {
         </div>
     );
 };
+

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Dropdown } from 'react-bootstrap';
+import { Form, Dropdown, InputGroup } from 'react-bootstrap';
 import './DateAndTimePicker.scss';
 
 const DateAndTimePicker = ({
@@ -364,8 +364,9 @@ const DateAndTimePicker = ({
                 </Form.Label>
             )}
             
-            <div className="plus-datetime-container">
-                {/* Date Picker */}
+            {/* Date Picker Section */}
+            <div className="plus-datetime-section">
+                <div className="plus-datetime-section-label">Date</div>
                 <div className="plus-datetime-date-wrapper">
                     <Dropdown
                         show={isCalendarOpen}
@@ -438,74 +439,76 @@ const DateAndTimePicker = ({
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
+            </div>
 
-                {/* Time Picker */}
-                <div className="plus-datetime-time-wrapper">
-                    <div className="plus-datetime-time-input-container">
-                        <Form.Control
-                            ref={timeInputRef}
-                            type="text"
-                            id={id ? `${id}-time` : undefined}
-                            name={name ? `${name}-time` : undefined}
-                            placeholder={timePlaceholder}
-                            value={timeHours && timeMinutes ? `${timeHours}:${timeMinutes}` : (timeHours ? `${timeHours}:` : '')}
-                            disabled={disabled}
-                            readOnly={readonly}
-                            className={`plus-datetime-time-input ${sizeClass}`}
-                            style={{
-                                borderColor: getBorderColor(),
-                                backgroundColor: timeFocused ? 'var(--color-primary-state-08)' : getBackgroundColor(),
-                                color: getTextColor()
-                            }}
-                            onFocus={handleTimeFocus}
-                            onBlur={handleBlur}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/\s/g, '');
-                                // Handle format like "HH:MM" or "HHMM" or "H:MM"
-                                const match = value.match(/(\d{1,2}):?(\d{0,2})/);
-                                if (match) {
-                                    const hours = match[1];
-                                    const minutes = match[2] || '';
-                                    handleTimeChange('hours', hours);
-                                    if (minutes) {
-                                        handleTimeChange('minutes', minutes);
-                                    }
-                                } else if (value === '') {
-                                    setTimeHours('');
-                                    setTimeMinutes('');
-                                    if (onChange) {
-                                        onChange({
-                                            date: selectedDate ? formatDateForInput(selectedDate) : null,
-                                            time: null
-                                        });
-                                    }
+            {/* Time Picker Section */}
+            <div className="plus-datetime-section">
+                <div className="plus-datetime-section-label">Time</div>
+                <InputGroup className="plus-datetime-time-input-group">
+                    <Form.Control
+                        ref={timeInputRef}
+                        type="text"
+                        id={id ? `${id}-time` : undefined}
+                        name={name ? `${name}-time` : undefined}
+                        placeholder={timePlaceholder}
+                        value={timeHours && timeMinutes ? `${timeHours}:${timeMinutes}` : (timeHours ? `${timeHours}:` : '')}
+                        disabled={disabled}
+                        readOnly={readonly}
+                        className={`plus-datetime-time-input ${sizeClass}`}
+                        style={{
+                            borderColor: getBorderColor(),
+                            backgroundColor: timeFocused ? 'var(--color-primary-state-08)' : getBackgroundColor(),
+                            color: getTextColor()
+                        }}
+                        onFocus={handleTimeFocus}
+                        onBlur={handleBlur}
+                        onChange={(e) => {
+                            const value = e.target.value.replace(/\s/g, '');
+                            // Handle format like "HH:MM" or "HHMM" or "H:MM"
+                            const match = value.match(/(\d{1,2}):?(\d{0,2})/);
+                            if (match) {
+                                const hours = match[1];
+                                const minutes = match[2] || '';
+                                handleTimeChange('hours', hours);
+                                if (minutes) {
+                                    handleTimeChange('minutes', minutes);
                                 }
-                            }}
-                        />
-                    </div>
-                    <Dropdown
-                        show={isAmPmOpen}
-                        onToggle={setIsAmPmOpen}
-                        className="plus-datetime-am-pm-dropdown"
-                    >
-                        <Dropdown.Toggle
-                            className={`plus-datetime-am-pm-toggle ${sizeClass} ${isAmPmOpen ? 'plus-datetime-am-pm-toggle-active' : ''}`}
-                            disabled={disabled || readonly}
-                            style={{
-                                borderColor: getBorderColor(),
-                                backgroundColor: isAmPmOpen ? 'var(--color-primary-state-08)' : (timeFocused ? 'var(--color-primary-state-08)' : getBackgroundColor()),
-                                color: isAmPmOpen ? 'var(--color-primary)' : getTextColor()
-                            }}
+                            } else if (value === '') {
+                                setTimeHours('');
+                                setTimeMinutes('');
+                                if (onChange) {
+                                    onChange({
+                                        date: selectedDate ? formatDateForInput(selectedDate) : null,
+                                        time: null
+                                    });
+                                }
+                            }
+                        }}
+                    />
+                    <div className="plus-datetime-am-pm-wrapper">
+                        <Dropdown
+                            show={isAmPmOpen}
+                            onToggle={setIsAmPmOpen}
+                            className="plus-datetime-am-pm-dropdown"
                         >
-                            {amPm}
-                            <i className="fa-solid fa-chevron-down" aria-hidden="true" />
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => handleAmPmChange('AM')}>AM</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handleAmPmChange('PM')}>PM</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
+                            <Dropdown.Toggle
+                                className={`plus-datetime-am-pm-toggle ${sizeClass} ${isAmPmOpen ? 'plus-datetime-am-pm-toggle-active' : ''} ${readonly ? 'plus-datetime-am-pm-toggle-readonly' : ''}`}
+                                disabled={disabled || readonly}
+                                style={{
+                                    backgroundColor: isAmPmOpen ? 'var(--color-primary-state-12)' : (timeFocused ? 'var(--color-primary-state-12)' : 'transparent'),
+                                    color: isAmPmOpen ? 'var(--color-primary-text)' : 'var(--color-primary-text)'
+                                }}
+                            >
+                                {amPm}
+                                {!readonly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => handleAmPmChange('AM')}>AM</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleAmPmChange('PM')}>PM</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </div>
+                </InputGroup>
             </div>
 
             {validation !== 'none' && validationMessage && (
@@ -544,3 +547,4 @@ DateAndTimePicker.propTypes = {
 };
 
 export default DateAndTimePicker;
+

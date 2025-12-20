@@ -1,6 +1,6 @@
 /**
  * OptionList Component Styles
- * Implements option list component with chevron icons
+ * Implements option list component with caret icons
  * using Design System tokens to match Figma specifications exactly.
  */
 
@@ -82,4 +82,6 @@
 .plus-option-list-item:hover:not(:disabled):not(.disabled) .plus-option-list-chevron {
     color: var(--color-on-surface);
 }
+
+
 

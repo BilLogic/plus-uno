@@ -6,16 +6,12 @@ import './Range.scss';
 const Range = ({
     id,
     name,
-    label,
-    required = false,
-    showLabel = true,
     min = 0,
     max = 100,
     value,
     defaultValue,
     step = 1,
     size = 'medium',
-    disabled = false,
     onChange,
     onInput,
     className = '',
@@ -73,20 +69,11 @@ const Range = ({
     const rangeClasses = [
         'plus-form-range',
         `plus-form-range-${size}`,
-        disabled ? 'plus-form-range-disabled' : '',
         className
     ].filter(Boolean).join(' ');
 
     return (
-        <div className={`plus-form-range-wrapper ${disabled ? 'plus-form-range-disabled' : ''}`}>
-            {showLabel && label && (
-                <Form.Label htmlFor={id || name} className="plus-form-range-label">
-                    {label}
-                    {required && (
-                        <span className="plus-form-range-required" aria-label="required">*</span>
-                    )}
-                </Form.Label>
-            )}
+        <div className="plus-form-range-wrapper">
             <Form.Range
                 ref={rangeRef}
                 id={id}
@@ -96,7 +83,6 @@ const Range = ({
                 step={step}
                 value={value}
                 defaultValue={defaultValue}
-                disabled={disabled}
                 onChange={handleChange}
                 onInput={handleInput}
                 className={rangeClasses}
@@ -110,16 +96,12 @@ const Range = ({
 Range.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
-    label: PropTypes.node,
-    required: PropTypes.bool,
-    showLabel: PropTypes.bool,
     min: PropTypes.number,
     max: PropTypes.number,
     value: PropTypes.number,
     defaultValue: PropTypes.number,
     step: PropTypes.number,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
     onChange: PropTypes.func,
     onInput: PropTypes.func,
     className: PropTypes.string,
@@ -127,4 +109,5 @@ Range.propTypes = {
 };
 
 export default Range;
+
 

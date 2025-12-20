@@ -72,43 +72,45 @@ const MultipleChoice = ({
 
     return (
         <div className={wrapperClasses} style={style} {...props}>
-            {options.map((option, index) => {
-                const optionId = option.id || `${id || name}-option-${index}`;
-                const optionValue = option.value !== undefined ? option.value : (typeof option === 'string' ? option : index);
-                const optionLabel = option.label !== undefined ? option.label : (typeof option === 'string' ? option : 'Text');
+            <div className="plus-multiple-choice-options">
+                {options.map((option, index) => {
+                    const optionId = option.id || `${id || name}-option-${index}`;
+                    const optionValue = option.value !== undefined ? option.value : (typeof option === 'string' ? option : index);
+                    const optionLabel = option.label !== undefined ? option.label : (typeof option === 'string' ? option : 'Text');
 
-                if (type === 'radio') {
-                    const isChecked = currentValue === optionValue;
-                    return (
-                        <Radio
-                            key={optionId}
-                            id={optionId}
-                            name={name}
-                            value={optionValue}
-                            label={optionLabel}
-                            checked={isChecked}
-                            disabled={disabled}
-                            size={size}
-                            onChange={() => handleRadioChange(optionValue)}
-                        />
-                    );
-                } else {
-                    const isChecked = Array.isArray(currentValue) && currentValue.includes(optionValue);
-                    return (
-                        <Checkbox
-                            key={optionId}
-                            id={optionId}
-                            name={name}
-                            value={optionValue}
-                            label={optionLabel}
-                            checked={isChecked}
-                            disabled={disabled}
-                            size={size}
-                            onChange={(e) => handleCheckboxChange(optionValue, e.target.checked)}
-                        />
-                    );
-                }
-            })}
+                    if (type === 'radio') {
+                        const isChecked = currentValue === optionValue;
+                        return (
+                            <Radio
+                                key={optionId}
+                                id={optionId}
+                                name={name}
+                                value={optionValue}
+                                label={optionLabel}
+                                checked={isChecked}
+                                disabled={disabled}
+                                size={size}
+                                onChange={() => handleRadioChange(optionValue)}
+                            />
+                        );
+                    } else {
+                        const isChecked = Array.isArray(currentValue) && currentValue.includes(optionValue);
+                        return (
+                            <Checkbox
+                                key={optionId}
+                                id={optionId}
+                                name={name}
+                                value={optionValue}
+                                label={optionLabel}
+                                checked={isChecked}
+                                disabled={disabled}
+                                size={size}
+                                onChange={(e) => handleCheckboxChange(optionValue, e.target.checked)}
+                            />
+                        );
+                    }
+                })}
+            </div>
         </div>
     );
 };
@@ -145,3 +147,4 @@ MultipleChoice.propTypes = {
 };
 
 export default MultipleChoice;
+

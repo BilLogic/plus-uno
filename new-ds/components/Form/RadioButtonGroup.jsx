@@ -4,11 +4,73 @@ import { Form } from 'react-bootstrap';
 import './RadioButtonGroup.scss';
 
 /**
- * RadioButtonGroup Component
+ * Sub-component: RadioButton
+ * Individual radio button with label, supporting all states
+ * This is the subcomponent that should be used for Scale
+ */
+const RadioButton = ({
+    id,
+    name,
+    label,
+    value,
+    checked = false,
+    disabled = false,
+    onChange,
+    onFocus,
+    onBlur,
+    className = '',
+    ...props
+}) => {
+    const wrapperClasses = [
+        'plus-radio-button-wrapper',
+        disabled ? 'plus-radio-button-disabled' : '',
+        className
+    ].filter(Boolean).join(' ');
+
+    return (
+        <div className={wrapperClasses}>
+            {label && (
+                <div className="plus-radio-button-label body2-txt">
+                    {label}
+                </div>
+            )}
+            <Form.Check
+                type="radio"
+                id={id}
+                name={name}
+                value={value}
+                checked={checked}
+                disabled={disabled}
+                onChange={onChange}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className="plus-radio-button"
+                {...props}
+            />
+        </div>
+    );
+};
+
+RadioButton.propTypes = {
+    id: PropTypes.string,
+    name: PropTypes.string.isRequired,
+    label: PropTypes.node,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    checked: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+    className: PropTypes.string
+};
+
+/**
+ * Scale Component
  * Horizontal radio button group with end labels (e.g., "Lowest" and "Highest")
  * and radio buttons with labels in between.
+ * Uses Scale.Button subcomponent for individual radio buttons.
  */
-const RadioButtonGroup = ({
+const Scale = ({
     id,
     name,
     label,
@@ -42,29 +104,29 @@ const RadioButtonGroup = ({
     };
 
     const wrapperClasses = [
-        'plus-radio-button-group-wrapper',
-        disabled ? 'plus-radio-button-group-disabled' : '',
+        'plus-scale-wrapper',
+        disabled ? 'plus-scale-disabled' : '',
         className
     ].filter(Boolean).join(' ');
 
     return (
         <div className={wrapperClasses} style={style} {...props}>
             {label && (
-                <Form.Label htmlFor={id || name} className="plus-radio-button-group-label">
+                <Form.Label htmlFor={id || name} className="plus-scale-label">
                     {label}
                     {required && (
-                        <span className="plus-radio-button-group-required" aria-label="required">*</span>
+                        <span className="plus-scale-required" aria-label="required">*</span>
                     )}
                 </Form.Label>
             )}
-            <div className="plus-radio-button-group-container">
+            <div className="plus-scale-container">
                 {/* Left End Label */}
-                <div className="plus-radio-button-group-end-label plus-radio-button-group-end-label-left body2-txt">
+                <div className="plus-scale-end-label plus-scale-end-label-left body2-txt">
                     {lowestLabel}
                 </div>
 
                 {/* Radio Buttons */}
-                <div className="plus-radio-button-group-options">
+                <div className="plus-scale-options">
                     {options.map((option, index) => {
                         const optionId = option.id || `${id || name}-option-${index}`;
                         const optionValue = option.value !== undefined ? option.value : option;
@@ -72,8 +134,8 @@ const RadioButtonGroup = ({
                         const isChecked = currentValue === optionValue;
 
                         return (
-                            <div key={index} className="plus-radio-button-group-option">
-                                <div className="plus-radio-button-group-option-label body2-txt">
+                            <div key={index} className="plus-scale-option">
+                                <div className="plus-scale-option-label body2-txt">
                                     {optionLabel}
                                 </div>
                                 <RadioButton
@@ -90,7 +152,7 @@ const RadioButtonGroup = ({
                 </div>
 
                 {/* Right End Label */}
-                <div className="plus-radio-button-group-end-label plus-radio-button-group-end-label-right body2-txt">
+                <div className="plus-scale-end-label plus-scale-end-label-right body2-txt">
                     {highestLabel}
                 </div>
             </div>
@@ -98,7 +160,7 @@ const RadioButtonGroup = ({
     );
 };
 
-RadioButtonGroup.propTypes = {
+Scale.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string.isRequired,
     label: PropTypes.node,
@@ -123,63 +185,8 @@ RadioButtonGroup.propTypes = {
     style: PropTypes.object
 };
 
-/**
- * Sub-component: RadioButton
- * Individual radio button with label, supporting all states
- */
-const RadioButton = ({
-    id,
-    name,
-    label,
-    value,
-    checked = false,
-    disabled = false,
-    onChange,
-    onFocus,
-    onBlur,
-    className = '',
-    ...props
-}) => {
-    const wrapperClasses = [
-        'plus-radio-button-wrapper',
-        disabled ? 'plus-radio-button-disabled' : '',
-        className
-    ].filter(Boolean).join(' ');
+// Attach subcomponent - Scale.Button is the subcomponent used for scale
+Scale.Button = RadioButton;
 
-    return (
-        <div className={wrapperClasses}>
-            <Form.Check
-                type="radio"
-                id={id}
-                name={name}
-                value={value}
-                checked={checked}
-                disabled={disabled}
-                onChange={onChange}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                label={label}
-                className="plus-radio-button"
-                {...props}
-            />
-        </div>
-    );
-};
+export default Scale;
 
-RadioButton.propTypes = {
-    id: PropTypes.string,
-    name: PropTypes.string.isRequired,
-    label: PropTypes.node,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    checked: PropTypes.bool,
-    disabled: PropTypes.bool,
-    onChange: PropTypes.func,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    className: PropTypes.string
-};
-
-// Attach subcomponent
-RadioButtonGroup.Button = RadioButton;
-
-export default RadioButtonGroup;

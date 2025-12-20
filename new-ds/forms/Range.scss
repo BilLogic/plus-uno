@@ -8,20 +8,6 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: var(--size-element-gap-sm, 8px);
-}
-
-.plus-form-range-label {
-    margin-bottom: 0;
-    color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
-    
-    .plus-form-range-required {
-        color: var(--color-danger);
-        margin-left: 2px;
-    }
 }
 
 .plus-form-range {
@@ -95,7 +81,7 @@
     }
     
     // Hover state
-    &:hover:not(:disabled) {
+    &:hover {
         &::-webkit-slider-thumb {
             background: var(--color-primary-state-12, var(--color-primary));
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -121,7 +107,7 @@
     }
     
     // Active/dragging state
-    &:active:not(:disabled) {
+    &:active {
         &::-webkit-slider-thumb {
             background: var(--color-primary-state-16, var(--color-primary));
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -130,32 +116,6 @@
         &::-moz-range-thumb {
             background: var(--color-primary-state-16, var(--color-primary));
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-    }
-    
-    // Disabled state
-    &:disabled {
-        opacity: 0.38;
-        cursor: not-allowed;
-        
-        &::-webkit-slider-runnable-track {
-            background: var(--color-outline-variant);
-        }
-        
-        &::-moz-range-track {
-            background: var(--color-outline-variant);
-        }
-        
-        &::-webkit-slider-thumb {
-            background: var(--color-outline-variant);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        &::-moz-range-thumb {
-            background: var(--color-outline-variant);
-            cursor: not-allowed;
-            box-shadow: none;
         }
     }
 }
@@ -216,10 +176,4 @@
     }
 }
 
-// Disabled wrapper state
-.plus-form-range-disabled {
-    .plus-form-range-label {
-        opacity: 0.38;
-    }
-}
 
