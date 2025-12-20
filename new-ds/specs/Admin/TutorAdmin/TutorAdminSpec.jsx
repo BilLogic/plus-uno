@@ -1,5 +1,6 @@
 import React from 'react';
-import { PageLayout, Section, Card, Table, Button, Pagination, Navigation, Select, Input, Badge } from '@/components';
+import { PageLayout, Section, Card, Table, Button, Pagination, Navigation, Input, Badge } from '@/components';
+import { Select } from '@/forms';
 
 export const TutorAdminSpec = ({ showModal = false }) => {
     // Configuration

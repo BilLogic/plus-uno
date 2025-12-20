@@ -1,0 +1,160 @@
+/**
+ * Cascader Component Styles
+ * Implements cascading select component with horizontal multi-column dropdown
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-cascader-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.plus-cascader-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.plus-cascader-input {
+    width: 100%;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md, 4px);
+    background-color: var(--color-surface-container-lowest);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+    padding-right: calc(var(--size-element-pad-x-md, 10px) + 20px); // Space for arrow
+    cursor: pointer;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+    
+    &.plus-cascader-input-open,
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+    }
+    
+    &:disabled {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.plus-cascader-arrow {
+    position: absolute;
+    right: var(--size-element-pad-x-md, 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-on-surface-variant);
+    font-size: 14px; // From Figma: Fontawesome/Solid/H6 size 14
+    font-weight: 900; // From Figma: Fontawesome/Solid/H6 weight 900
+    pointer-events: none;
+    transition: transform 0.15s ease-in-out;
+    
+    &.plus-cascader-arrow-open {
+        transform: translateY(-50%) rotate(180deg);
+    }
+}
+
+.plus-cascader-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 1000;
+    background-color: var(--color-surface-container-high);
+    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm, 4px);
+    box-shadow: var(--elevation-light-2);
+    padding: var(--size-element-pad-y-sm, 4px) 0;
+    min-width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.plus-cascader-columns {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.plus-cascader-column {
+    display: flex;
+    flex-direction: column;
+    min-width: 105px; // From Figma: Columns/col-2: 105.33px
+    max-width: 250px;
+    border-right: 1px solid var(--color-outline-variant);
+    
+    &:last-child {
+        border-right: none;
+    }
+}
+
+.plus-cascader-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+    color: var(--color-secondary-text); // From Figma: _Secondary/Secondary (Text) (#3b525f)
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    white-space: nowrap;
+    
+    &:hover:not(.plus-cascader-option-disabled) {
+        background-color: var(--color-surface-container);
+    }
+    
+    &.plus-cascader-option-selected {
+        background-color: var(--color-secondary-state-16); // From Figma: _Secondary/State-layers/Secondary 16 (#445c6a29)
+        color: var(--color-secondary-text); // From Figma: _Secondary/Secondary (Text) (#3b525f)
+        
+        .plus-cascader-option-chevron {
+            color: var(--color-secondary-text); // Same color as text (secondary text color)
+        }
+        
+        &:hover {
+            background-color: var(--color-secondary-state-16);
+        }
+    }
+    
+    &.plus-cascader-option-disabled {
+        background-color: transparent;
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+        
+        .plus-cascader-option-chevron {
+            color: var(--color-on-surface-variant);
+            opacity: 0.6;
+        }
+    }
+}
+
+.plus-cascader-option-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.plus-cascader-option-chevron {
+    color: var(--color-secondary-text); // From Figma: _Secondary/Secondary (Text) (#3b525f)
+    font-size: 14px; // From Figma: Fontawesome/Solid/H6 size 14
+    font-weight: 900; // From Figma: Fontawesome/Solid/H6 weight 900
+    margin-left: var(--size-element-gap-sm, 8px);
+    flex-shrink: 0;
+}

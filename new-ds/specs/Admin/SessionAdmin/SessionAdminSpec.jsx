@@ -1,5 +1,6 @@
 import React from 'react';
-import { PageLayout, Section, Card, Table, Button, Navigation, Pagination, Input, Select } from '@/components';
+import { PageLayout, Section, Card, Table, Button, Navigation, Pagination, Input } from '@/components';
+import { Select } from '@/forms';
 
 export const SessionAdminSpec = ({ showModal = false }) => {
     // Configuration

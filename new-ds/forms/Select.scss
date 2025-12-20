@@ -1,0 +1,153 @@
+/**
+ * Select Component Styles
+ * Implements select dropdown component with all states, sizes, and validation
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-form-select-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-sm, 8px);
+}
+
+.plus-form-select-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    
+    .plus-form-select-required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+}
+
+.plus-form-select {
+    width: 100%;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md, 4px);
+    background-color: var(--color-surface-container-lowest);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    padding-right: calc(var(--size-element-pad-x-md, 16px) + 24px); // Extra space for dropdown arrow
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--size-element-pad-x-md, 16px) center;
+    background-size: 12px 12px;
+    cursor: pointer;
+    
+    // Style placeholder option
+    option[value=""][disabled] {
+        color: var(--color-on-surface-variant);
+    }
+    
+    // Style regular options
+    option {
+        color: var(--color-on-surface);
+        background-color: var(--color-surface-container-lowest);
+    }
+    
+    &:focus,
+    &.plus-form-select-focused {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236750a4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    }
+    
+    // Has value state - darker border and text
+    &.plus-form-select-has-value {
+        border-color: var(--color-outline);
+        color: var(--color-on-surface);
+    }
+    
+    // Disabled state
+    &.plus-form-select-disabled {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        
+        option {
+            color: var(--color-on-surface-variant);
+        }
+    }
+    
+    // Read-only state
+    &.plus-form-select-readonly {
+        background-color: var(--color-surface-container);
+        border-color: var(--color-outline-variant);
+        cursor: default;
+        
+        &:focus {
+            border-color: var(--color-outline-variant);
+            box-shadow: none;
+        }
+    }
+}
+
+// Multiple select variant
+.plus-form-select-multiple {
+    min-height: 120px; // Default height for multiple select
+    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    // Remove dropdown arrow for multiple select
+    background-image: none;
+    padding-right: var(--size-element-pad-x-md, 16px);
+    
+    option {
+        padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
+        
+        &:checked {
+            background-color: var(--color-primary-state-12);
+            color: var(--color-on-surface);
+        }
+        
+        &:hover {
+            background-color: var(--color-surface-container);
+        }
+    }
+}
+
+// Size variants
+.plus-form-select-small {
+    padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
+    padding-right: calc(var(--size-element-pad-x-sm, 12px) + 20px);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    min-height: 40px;
+    background-size: 10px 10px;
+    background-position: right var(--size-element-pad-x-sm, 12px) center;
+    
+    &.plus-form-select-multiple {
+        min-height: 100px;
+        padding-right: var(--size-element-pad-x-sm, 12px);
+        background-image: none;
+    }
+}
+
+.plus-form-select-large {
+    padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
+    padding-right: calc(var(--size-element-pad-x-lg, 20px) + 28px);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+    min-height: 56px;
+    background-size: 14px 14px;
+    background-position: right var(--size-element-pad-x-lg, 20px) center;
+    
+    &.plus-form-select-multiple {
+        min-height: 140px;
+        padding-right: var(--size-element-pad-x-lg, 20px);
+        background-image: none;
+    }
+}
+

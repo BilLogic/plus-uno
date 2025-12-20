@@ -7,10 +7,9 @@ export { default as Card } from '@/components/Card';
 export { default as Carousel } from '@/components/Carousel';
 export { default as Checkbox } from '@/components/Checkbox';
 export { default as Collapse } from '@/components/Collapse';
-export { default as DatePicker } from '@/components/DatePicker';
 export { default as Divider } from '@/components/Divider';
 export { default as Footer } from '@/components/Footer/Footer';
-export { Textarea, Select, SelectMultiple, RangeInput } from '@/components/Form';
+// Form components moved to @/forms
 export { default as Input } from '@/components/Input';
 export { default as InputGroup } from '@/components/InputGroup';
 export { default as Jumbotron } from '@/components/Jumbotron';
@@ -34,7 +33,6 @@ export { default as PageLayout } from './PageLayout/PageLayout';
 
 export { default as Spinner } from '@/components/Spinner';
 export { default as StaticBadgeSmart } from '@/components/StaticBadgeSmart';
-export { default as Switch } from '@/components/Switch';
 export { default as Table } from '@/components/Table';
 export { default as Toast } from '@/components/Toast';
 export { default as Tooltip } from '@/components/Tooltip';

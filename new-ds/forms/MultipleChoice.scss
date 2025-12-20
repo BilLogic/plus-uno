@@ -1,0 +1,19 @@
+/**
+ * MultipleChoice Component Styles
+ * Implements multiple choice component with vertical list of radio buttons or checkboxes
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-multiple-choice-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-sm, 8px);
+}
+
+// Disabled wrapper state
+.plus-multiple-choice-disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}

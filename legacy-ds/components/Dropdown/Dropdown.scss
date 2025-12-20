@@ -795,7 +795,7 @@
             align-items: center;
             
             input[type="checkbox"] {
-                @extend .plus-checkbox;
+                @extend .plus-checkbox !optional;
                 padding: 0;
                 margin-top: 0;
                 

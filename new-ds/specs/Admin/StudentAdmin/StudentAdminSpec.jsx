@@ -1,5 +1,6 @@
 import React from 'react';
-import { PageLayout, Section, Card, Table, Button, Pagination, Input, Select, Badge } from '@/components';
+import { PageLayout, Section, Card, Table, Button, Pagination, Input, Badge } from '@/components';
+import { Select } from '@/forms';
 
 export const StudentAdminSpec = ({ showModal = false, modalType = 'Info' }) => {
     // Configuration

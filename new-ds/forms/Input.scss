@@ -1,0 +1,265 @@
+/**
+ * Input Component Styles
+ * Implements text input component with all states, sizes, and validation
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-sm, 8px);
+}
+
+.plus-input-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    
+    .plus-input-required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+}
+
+.plus-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.plus-input {
+    width: 100%;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md, 4px);
+    background-color: var(--color-surface-container-lowest);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+    
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+    }
+    
+    // Disabled state
+    &.plus-input-disabled {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+        
+        &::placeholder {
+            color: var(--color-on-surface-variant);
+            opacity: 0.6;
+        }
+    }
+    
+    // Read-only state
+    &.plus-input-readonly {
+        background-color: var(--color-surface-container);
+        border-color: var(--color-outline-variant);
+        cursor: default;
+        
+        &:focus {
+            border-color: var(--color-outline-variant);
+            box-shadow: none;
+        }
+    }
+    
+    // Validation states
+    &.plus-input-invalid {
+        border-color: var(--color-danger);
+        
+        &:focus {
+            border-color: var(--color-danger);
+            box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
+        }
+    }
+    
+    &.plus-input-success {
+        border-color: var(--color-success);
+        
+        &:focus {
+            border-color: var(--color-success);
+            box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
+        }
+    }
+}
+
+// Leading visual (icon on the left)
+.plus-input-leading-visual {
+    position: absolute;
+    left: var(--size-element-pad-x-md, 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    z-index: 1;
+    pointer-events: none;
+    width: 24px;
+    height: 24px;
+    
+    i {
+        font-size: var(--font-size-body2);
+    }
+}
+
+// Adjust input padding when leading visual exists
+.plus-input-container:has(.plus-input-leading-visual) .plus-input {
+    padding-left: calc(var(--size-element-pad-x-md, 16px) + 24px + var(--size-element-gap-sm, 8px));
+}
+
+// Trailing visual (icon or dropdown arrow on the right)
+.plus-input-trailing-visual {
+    position: absolute;
+    right: var(--size-element-pad-x-md, 16px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-on-surface-variant);
+    z-index: 1;
+    pointer-events: none;
+    background-color: var(--color-surface-container-low);
+    width: 24px;
+    height: 24px;
+    border-radius: var(--size-element-radius-sm, 2px);
+    
+    i {
+        font-size: var(--font-size-body3);
+    }
+}
+
+// Adjust input padding when trailing visual exists
+.plus-input-container:has(.plus-input-trailing-visual) .plus-input {
+    padding-right: calc(var(--size-element-pad-x-md, 16px) + 24px + var(--size-element-gap-sm, 8px));
+}
+
+// Validation message
+.plus-input-validation {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    margin-top: var(--size-element-gap-xs, 4px);
+    
+    i {
+        font-size: var(--font-size-body3);
+        flex-shrink: 0;
+    }
+}
+
+.plus-input-validation-invalid {
+    color: var(--color-danger);
+    
+    i {
+        color: var(--color-danger);
+    }
+}
+
+.plus-input-validation-success {
+    color: var(--color-success);
+    
+    i {
+        color: var(--color-success);
+    }
+}
+
+.plus-input-validation-message {
+    flex: 1;
+}
+
+// Size variants
+.plus-input-small {
+    padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    min-height: 40px;
+    
+    &::placeholder {
+        font-size: var(--font-size-body3);
+    }
+}
+
+// Small size adjustments for leading/trailing visuals
+.plus-input-container:has(.plus-input-small) .plus-input-leading-visual {
+    left: var(--size-element-pad-x-sm, 12px);
+    width: 20px;
+    height: 20px;
+    
+    i {
+        font-size: var(--font-size-body3);
+    }
+}
+
+.plus-input-container:has(.plus-input-small):has(.plus-input-leading-visual) .plus-input {
+    padding-left: calc(var(--size-element-pad-x-sm, 12px) + 20px + var(--size-element-gap-xs, 4px));
+}
+
+.plus-input-container:has(.plus-input-small) .plus-input-trailing-visual {
+    right: var(--size-element-pad-x-sm, 12px);
+    width: 20px;
+    height: 20px;
+    
+    i {
+        font-size: var(--font-size-body3);
+    }
+}
+
+.plus-input-container:has(.plus-input-small):has(.plus-input-trailing-visual) .plus-input {
+    padding-right: calc(var(--size-element-pad-x-sm, 12px) + 20px + var(--size-element-gap-xs, 4px));
+}
+
+.plus-input-large {
+    padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+    min-height: 56px;
+    
+    &::placeholder {
+        font-size: var(--font-size-body1);
+    }
+}
+
+// Large size adjustments for leading/trailing visuals
+.plus-input-container:has(.plus-input-large) .plus-input-leading-visual {
+    left: var(--size-element-pad-x-lg, 20px);
+    width: 28px;
+    height: 28px;
+    
+    i {
+        font-size: var(--font-size-body1);
+    }
+}
+
+.plus-input-container:has(.plus-input-large):has(.plus-input-leading-visual) .plus-input {
+    padding-left: calc(var(--size-element-pad-x-lg, 20px) + 28px + var(--size-element-gap-sm, 8px));
+}
+
+.plus-input-container:has(.plus-input-large) .plus-input-trailing-visual {
+    right: var(--size-element-pad-x-lg, 20px);
+    width: 28px;
+    height: 28px;
+    
+    i {
+        font-size: var(--font-size-body1);
+    }
+}
+
+.plus-input-container:has(.plus-input-large):has(.plus-input-trailing-visual) .plus-input {
+    padding-right: calc(var(--size-element-pad-x-lg, 20px) + 28px + var(--size-element-gap-sm, 8px));
+}
+

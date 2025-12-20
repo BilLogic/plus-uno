@@ -1,0 +1,225 @@
+/**
+ * RadioButtonGroup Component Styles
+ * Implements radio button group component with horizontal layout,
+ * end labels, and radio buttons with labels above them
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-radio-button-group-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-sm, 8px);
+}
+
+.plus-radio-button-group-label {
+    margin-bottom: var(--size-element-gap-xs, 4px);
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    
+    .plus-radio-button-group-required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+}
+
+.plus-radio-button-group-container {
+    display: flex;
+    align-items: flex-end; // Align items to bottom
+    gap: var(--size-element-gap-md, 10px);
+    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    background-color: var(--color-surface-container-low, #f3f3f6);
+    border-radius: var(--size-element-radius-md, 4px);
+}
+
+.plus-radio-button-group-end-label {
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    white-space: nowrap;
+    flex-shrink: 0;
+    // Align with the center of radio button circles (12px diameter)
+    // Radio buttons are at the bottom of their containers, so align end labels to bottom
+    // then adjust upward by half the radio button height to center with the circle
+    align-self: flex-end;
+    margin-bottom: 6px; // Half of 12px radio button height to center with circle
+}
+
+.plus-radio-button-group-end-label-left {
+    // Left end label (e.g., "Lowest")
+}
+
+.plus-radio-button-group-end-label-right {
+    // Right end label (e.g., "Highest")
+}
+
+.plus-radio-button-group-options {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-element-gap-md, 10px);
+    flex: 1;
+    justify-content: space-between;
+}
+
+.plus-radio-button-group-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    flex: 1;
+    // Ensure the radio button itself aligns with end labels
+    // The radio button should be at the bottom of the option container
+    justify-content: flex-end;
+    // Add padding to account for label above, so radio button aligns with end labels
+    padding-bottom: 0;
+}
+
+.plus-radio-button-group-option-label {
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    text-align: center;
+    white-space: nowrap;
+    // Label above radio button
+    margin-bottom: var(--size-element-gap-xs, 4px);
+}
+
+// Disabled wrapper state
+.plus-radio-button-group-disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/**
+ * RadioButton Subcomponent Styles
+ * Individual radio button with label, supporting all states
+ * Reuses design tokens from Radio component
+ */
+
+.plus-radio-button-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    // Override Bootstrap's default form-check padding
+    .form-check {
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+}
+
+.plus-radio-button {
+    // Target the Form.Check container
+    .form-check-input {
+        // Radio button size - Figma: 12px
+        width: 12px;
+        height: 12px;
+        min-width: 12px;
+        min-height: 12px;
+        padding: 0;
+        margin: 0;
+        margin-right: var(--size-element-gap-xs, 4px); // Spacing between radio and label
+        flex-shrink: 0;
+        border-radius: var(--size-element-radius-full, 50%) !important;
+        position: relative;
+
+        // Override browser's default accent-color with primary color token
+        accent-color: var(--color-primary) !important;
+
+        // Unchecked state - use outline-variant for border
+        border-color: var(--color-outline-variant) !important;
+        background-color: transparent !important;
+
+        // Checked state - use primary color
+        &:checked {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+        }
+
+        // Create circular focus ring using pseudo-element
+        &::after {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--size-element-stroke-lg, 2px));
+            left: calc(-1 * var(--size-element-stroke-lg, 2px));
+            right: calc(-1 * var(--size-element-stroke-lg, 2px));
+            bottom: calc(-1 * var(--size-element-stroke-lg, 2px));
+            border-radius: var(--size-element-radius-full, 50%);
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-inverse-primary);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        // Focus state - show circular ring only for keyboard navigation
+        &:focus-visible {
+            outline: none !important;
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            box-shadow: none !important;
+
+            &::after {
+                opacity: 1;
+            }
+        }
+
+        // Regular :focus state - update colors but don't show focus ring
+        &:focus:not(:focus-visible) {
+            outline: none !important;
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            box-shadow: none !important;
+
+            &::after {
+                opacity: 0;
+            }
+        }
+
+        // Hover state
+        &:hover:not(:disabled):not(:checked) {
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            background-color: var(--color-primary-state-08) !important;
+        }
+
+        &:hover:not(:disabled):checked {
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            background-color: var(--color-primary-state-12) !important;
+        }
+
+        // Disabled state
+        &:disabled {
+            opacity: 0.38;
+            cursor: not-allowed;
+            border-color: var(--color-outline-variant) !important;
+            background-color: var(--color-surface-variant) !important;
+            accent-color: var(--color-outline-variant) !important;
+        }
+
+        &:disabled:checked {
+            background-color: var(--color-outline-variant) !important;
+            border-color: var(--color-outline-variant) !important;
+            accent-color: var(--color-outline-variant) !important;
+        }
+    }
+
+    // Label styling
+    .form-check-label {
+        color: var(--color-on-surface);
+        cursor: pointer;
+        user-select: none;
+        flex: 1;
+        padding-left: 0;
+        font-family: var(--font-family-body);
+        font-weight: var(--font-weight-normal);
+    }
+}
+
+// Disabled wrapper state
+.plus-radio-button-disabled {
+    .form-check-label {
+        opacity: 0.38;
+        cursor: not-allowed;
+    }
+}

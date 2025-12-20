@@ -5,6 +5,7 @@ const config = {
   stories: [
     '../new-ds/assets/**/*.stories.@(js|jsx|ts|tsx)',
     '../new-ds/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '../new-ds/forms/**/*.stories.@(js|jsx|ts|tsx)',
     '../new-ds/patterns/**/*.stories.@(js|jsx|ts|tsx)',
     '../new-ds/patterns/**/*.mdx',
     '../new-ds/specs/**/*.stories.@(js|jsx|ts|tsx)',
@@ -122,6 +123,19 @@ const config = {
       path.resolve(rootDir, 'legacy-ds/specs'),
       path.resolve(rootDir, 'legacy-ds/styles'),
     ];
+
+    // Enable HMR and file watching
+    config.server.watch = {
+      ...config.server.watch,
+      usePolling: false,
+      interval: 100,
+    };
+
+    // Ensure HMR is enabled
+    config.server.hmr = {
+      ...config.server.hmr,
+      overlay: true,
+    };
 
     return config;
   },

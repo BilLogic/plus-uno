@@ -1,0 +1,154 @@
+/**
+ * Radio Form Component Styles
+ * Implements radio component using React Bootstrap Form.Check
+ * with Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-form-radio-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    // Override Bootstrap's default form-check padding
+    .form-check {
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+}
+
+.plus-form-radio {
+    // Target the Form.Check container
+    .form-check-input {
+        // Radio button size - Figma: 12px
+        width: 12px;
+        height: 12px;
+        min-width: 12px;
+        min-height: 12px;
+        padding: 0;
+        margin: 0;
+        margin-right: var(--size-element-gap-xs, 4px); // Spacing between radio and label
+        flex-shrink: 0;
+        border-radius: var(--size-element-radius-full, 50%) !important;
+        position: relative;
+
+        // Override browser's default accent-color with primary color token
+        accent-color: var(--color-primary) !important;
+
+        // Unchecked state - use outline-variant for border
+        border-color: var(--color-outline-variant) !important;
+        background-color: transparent !important;
+
+        // Checked state - use primary color
+        &:checked {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+        }
+
+        // Create circular focus ring using pseudo-element
+        &::after {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--size-element-stroke-lg, 2px));
+            left: calc(-1 * var(--size-element-stroke-lg, 2px));
+            right: calc(-1 * var(--size-element-stroke-lg, 2px));
+            bottom: calc(-1 * var(--size-element-stroke-lg, 2px));
+            border-radius: var(--size-element-radius-full, 50%);
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-inverse-primary);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        // Focus state - show circular ring only for keyboard navigation
+        &:focus-visible {
+            outline: none !important;
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            box-shadow: none !important;
+
+            &::after {
+                opacity: 1;
+            }
+        }
+
+        // Regular :focus state - update colors but don't show focus ring
+        &:focus:not(:focus-visible) {
+            outline: none !important;
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            box-shadow: none !important;
+
+            &::after {
+                opacity: 0;
+            }
+        }
+
+        // Hover state
+        &:hover:not(:disabled):not(:checked) {
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            background-color: var(--color-primary-state-08) !important;
+        }
+
+        &:hover:not(:disabled):checked {
+            border-color: var(--color-primary) !important;
+            accent-color: var(--color-primary) !important;
+            background-color: var(--color-primary-state-12) !important;
+        }
+
+        // Disabled state
+        &:disabled {
+            opacity: 0.38;
+            cursor: not-allowed;
+            border-color: var(--color-outline-variant) !important;
+            background-color: var(--color-surface-variant) !important;
+            accent-color: var(--color-outline-variant) !important;
+        }
+
+        &:disabled:checked {
+            background-color: var(--color-outline-variant) !important;
+            border-color: var(--color-outline-variant) !important;
+            accent-color: var(--color-outline-variant) !important;
+        }
+    }
+
+    // Label styling
+    .form-check-label {
+        color: var(--color-on-surface);
+        cursor: pointer;
+        user-select: none;
+        flex: 1;
+        padding-left: 0;
+        font-family: var(--font-family-body);
+        font-weight: var(--font-weight-normal);
+    }
+}
+
+// Disabled wrapper state
+.plus-form-radio-disabled {
+    .form-check-label {
+        opacity: 0.38;
+        cursor: not-allowed;
+    }
+}
+
+// Size variants
+.plus-form-radio-small {
+    .plus-form-radio .form-check-input {
+        width: 10px;
+        height: 10px;
+        min-width: 10px;
+        min-height: 10px;
+    }
+}
+
+.plus-form-radio-large {
+    .plus-form-radio .form-check-input {
+        width: 14px;
+        height: 14px;
+        min-width: 14px;
+        min-height: 14px;
+    }
+}
+

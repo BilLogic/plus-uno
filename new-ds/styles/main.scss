@@ -30,10 +30,9 @@
 @import "Modal/Modal";
 @import "Navigation/Navigation";
 @import "Navbar/Navbar";
-@import "Form/Form";
-@import "DatePicker/DatePicker";
+@import "../forms/Form";
+@import "../forms/DatePicker/DatePicker.scss";
 @import "Radio/Radio";
-@import "Switch/Switch";
 @import "InputGroup/InputGroup";
 @import "ListGroup/ListGroup";
 @import "Carousel/Carousel";
