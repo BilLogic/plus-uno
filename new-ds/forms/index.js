@@ -16,3 +16,5 @@ export { default as Cascader } from './Cascader';
 export { default as ChoiceGrid } from './ChoiceGrid';
 export { default as MultipleChoice } from './MultipleChoice';
 export { default as FileUpload } from './FileUpload';
+export { default as Rating } from './Rating';
+export { default as Scale } from './RadioButtonGroup';

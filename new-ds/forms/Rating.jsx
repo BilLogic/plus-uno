@@ -145,3 +145,4 @@ RatingItem.propTypes = {
 Rating.Item = RatingItem;
 
 export default Rating;
+
