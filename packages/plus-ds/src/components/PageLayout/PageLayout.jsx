@@ -51,8 +51,8 @@ const PageLayout = ({
                 overflow: 'hidden',
                 border: '1px solid var(--color-outline-variant)',
                 boxSizing: 'border-box',
-                padding: 'var(--Surface-Container-pad-y-sm, 12px) var(--Surface-Container-pad-x-sm, 16px)',
-                gap: 'var(--Surface-Container-gap-sm, 16px)',
+                padding: 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)', // Using element tokens for 12px/16px
+                gap: 'var(--size-element-gap-md, 16px)', // 16px
                 alignItems: 'flex-start',
                 ...style
             }}
@@ -80,7 +80,7 @@ const PageLayout = ({
                 overflow: 'hidden',
                 position: 'relative',
                 width: '100%',
-                gap: 'var(--Surface-Container-gap-sm, 16px)',
+                gap: 'var(--size-element-gap-md, 16px)',
                 alignItems: 'stretch'
             }}>
                 {/* Sidebar Wrapper */}
@@ -108,8 +108,8 @@ const PageLayout = ({
                 <div className="plus-page-content-wrapper" style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    padding: 'var(--Surface-pad-y, 24px) var(--Surface-pad-x, 32px)',
-                    gap: 'var(--Surface-gap-md, 24px)',
+                    padding: 'var(--size-surface-pad-y, 24px) var(--size-surface-pad-x, 32px)',
+                    gap: 'var(--size-surface-gap-md, 24px)',
                     flex: '1 0 0',
                     alignItems: 'flex-start',
                     minWidth: 0,
