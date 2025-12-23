@@ -2,7 +2,7 @@ import React from 'react';
 import LineChart from './LineChart';
 
 export default {
-    title: 'Components/DataViz/LineChart',
+    title: 'Data Visualizations/LineChart',
     component: LineChart,
     tags: ['autodocs']
 };

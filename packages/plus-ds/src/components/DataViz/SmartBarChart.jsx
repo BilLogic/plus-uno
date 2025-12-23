@@ -42,8 +42,8 @@ const SmartBarChart = ({ data, height = 200 }) => {
             categories: categories,
             labels: {
                 style: {
-                    fontSize: '10px',
-                    color: '#666' // muted text
+                    fontSize: 'var(--font-size-body3, 12px)',
+                    color: 'var(--color-on-surface-variant, #3f484a)' // Use token
                 }
             },
             lineWidth: 0,
@@ -84,7 +84,7 @@ const SmartBarChart = ({ data, height = 200 }) => {
             {
                 name: 'Background',
                 data: data.map(() => 100),
-                color: 'var(--color-surface-neutral-tertiary)', // bg-light equivalent
+                color: 'var(--color-surface-container-high, #dde3e5)', // Use proper token
                 enableMouseTracking: false,
                 pointPadding: 0.3, // Match width of foreground
             },

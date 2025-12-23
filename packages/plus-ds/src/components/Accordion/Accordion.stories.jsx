@@ -33,13 +33,21 @@ export default {
             description: 'Allow multiple items to be open simultaneously',
             table: { category: 'Behavior' }
         },
+
+        // DEVELOPMENT
         defaultActiveKey: {
             control: 'text',
             description: 'Initially expanded item key (or comma-separated keys for alwaysOpen)',
-            table: { category: 'Behavior' }
+            table: { category: 'Development' }
         },
-
-        // DEVELOPMENT
+        activeKey: {
+            control: 'text',
+            description: 'Controlled active key(s)',
+            table: { category: 'Development' }
+        },
+        onSelect: {
+            table: { disable: true, category: 'Development' }
+        },
         id: {
             control: 'text',
             description: 'HTML ID attribute',

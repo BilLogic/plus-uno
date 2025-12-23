@@ -2,7 +2,7 @@ import React from 'react';
 import SmartBarChart from './SmartBarChart';
 
 export default {
-    title: 'Components/DataViz/SmartBarChart',
+    title: 'Data Visualizations/SmartBarChart',
     component: SmartBarChart,
     tags: ['autodocs'],
     argTypes: {
@@ -10,15 +10,16 @@ export default {
     }
 };
 
+// Using design system container-tier color tokens
 export const Default = {
     args: {
         height: 200,
         data: [
-            { letter: 'A', height: '100', color: '#4CAF50' }, // Green
-            { letter: 'B', height: '75', color: '#2196F3' },  // Blue
-            { letter: 'C', height: '50', color: '#FFC107' },  // Amber
-            { letter: 'D', height: '25', color: '#F44336' },  // Red
-            { letter: 'E', height: '0', color: '#9E9E9E' }    // Grey
+            { letter: 'A', height: '100', color: 'var(--color-success-container, #ceeaaf)' },
+            { letter: 'B', height: '75', color: 'var(--color-primary-container, #c3e8ff)' },
+            { letter: 'C', height: '50', color: 'var(--color-warning-container, #fcdf8e)' },
+            { letter: 'D', height: '25', color: 'var(--color-danger-container, #ffdad6)' },
+            { letter: 'E', height: '0', color: 'var(--color-neutral-container, #dde3ea)' }
         ]
     }
 };
@@ -27,11 +28,11 @@ export const Interactive = {
     args: {
         height: 300,
         data: [
-            { letter: 'M', height: '40', color: '#673AB7' },
-            { letter: 'T', height: '80', color: '#3F51B5' },
-            { letter: 'W', height: '60', color: '#00BCD4' },
-            { letter: 'T', height: '90', color: '#009688' },
-            { letter: 'F', height: '20', color: '#8BC34A' }
+            { letter: 'M', height: '40', color: 'var(--color-tertiary-container, #e8deff)' },
+            { letter: 'T', height: '80', color: 'var(--color-secondary-container, #cfe4ff)' },
+            { letter: 'W', height: '60', color: 'var(--color-info-container, #dde3ea)' },
+            { letter: 'T', height: '90', color: 'var(--color-primary-container, #c3e8ff)' },
+            { letter: 'F', height: '20', color: 'var(--color-success-container, #ceeaaf)' }
         ]
     }
 };

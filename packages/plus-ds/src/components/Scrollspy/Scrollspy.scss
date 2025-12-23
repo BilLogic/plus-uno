@@ -1,0 +1,128 @@
+/*
+ * Scrollspy Component Styles
+ * Per design system tokens - no hardcoded values
+ * Navigation bar with pills and scroll tracking
+ */
+
+.plus-scrollspy-navbar {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-lg);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-lg);
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--size-element-radius-md);
+
+    // --- BRAND ---
+    .plus-scrollspy-brand {
+        flex-shrink: 0;
+
+        p {
+            font-family: var(--font-family-header);
+            font-size: var(--font-size-h6);
+            font-weight: var(--font-weight-title);
+            line-height: var(--font-line-height-h6);
+            color: var(--color-on-surface);
+            margin: 0;
+        }
+    }
+
+    // --- SPACER ---
+    .plus-scrollspy-spacer {
+        flex: 1;
+    }
+
+    // --- NAV LIST ---
+    .plus-nav-list {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm);
+    }
+
+    // --- NAV ITEM ---
+    .plus-nav-item {
+        position: relative;
+
+        // --- NAV LINK ---
+        .plus-nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-sm);
+            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+            background-color: transparent;
+            border-radius: var(--size-element-radius-md);
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+
+            .plus-nav-text {
+                font-family: var(--font-family-body);
+                font-size: var(--font-size-body1);
+                font-weight: var(--font-weight-normal);
+                line-height: var(--font-line-height-body1);
+                color: var(--color-on-surface-variant);
+            }
+
+            .plus-nav-dropdown-icon {
+                font-size: var(--font-size-fa-body2-solid);
+                color: var(--color-on-surface-variant);
+            }
+
+            &:hover {
+                background-color: var(--color-neutral-state-08);
+            }
+
+            &.active,
+            &:focus {
+                background-color: var(--color-primary-state-16);
+
+                .plus-nav-text {
+                    color: var(--color-primary-text);
+                    font-weight: var(--font-weight-semibold-1);
+                }
+            }
+        }
+
+        // Selected state
+        &.plus-nav-item-selected {
+            .plus-nav-link {
+                background-color: var(--color-primary-state-16);
+
+                .plus-nav-text {
+                    color: var(--color-primary-text);
+                    font-weight: var(--font-weight-semibold-1);
+                }
+            }
+        }
+    }
+
+    // --- PILLS VARIANT ---
+    &.plus-nav-pills {
+        .plus-nav-link.active {
+            background-color: var(--color-primary);
+
+            .plus-nav-text {
+                color: var(--color-on-primary);
+            }
+        }
+    }
+}
+
+// --- SCROLLSPY CONTENT ---
+.plus-scrollspy-content {
+    position: relative;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+
+    // Scrollbar styling
+    &::-webkit-scrollbar {
+        width: var(--size-element-gap-sm);
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: var(--color-surface-container);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-outline-variant);
+        border-radius: var(--size-element-radius-full);
+    }
+}

@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
+import './Popover.scss';
 import { Popover as BootstrapPopover, OverlayTrigger } from 'react-bootstrap';
 import Button from '@/components/Button/Button';
 

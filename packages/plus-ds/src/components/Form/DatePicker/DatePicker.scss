@@ -1,0 +1,201 @@
+/*
+ * DatePicker Component Styles
+ * Uses context-aware M3 color roles.
+ * Calendar on surface bg → on-surface-variant text
+ * Selected day on primary bg → on-primary text
+ */
+
+.plus-date-picker-wrapper {
+    position: relative;
+    display: inline-block;
+
+    // --- TOGGLE BUTTON ---
+    // Uses Dropdown toggle styling (inherits from pdropdown)
+    .pdropdown-default-toggle {
+        min-width: 140px;
+        text-align: left;
+    }
+
+    .plus-date-picker-content {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm);
+        flex-grow: 1;
+    }
+
+    .plus-date-picker-input {
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        outline: none;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        color: inherit;
+        cursor: inherit;
+
+        &::placeholder {
+            color: var(--color-on-surface-variant);
+            opacity: 0.7;
+        }
+    }
+}
+
+// --- CALENDAR DROPDOWN ---
+// Per Material Design: popups/modals use surface-container-high with elevation
+.plus-date-picker-calendar {
+    min-width: 280px;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    // M3 popup background: surface-container-high
+    background-color: var(--color-surface-container-high);
+    border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md);
+    // M3 elevation level 2 for dropdowns/popups
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+}
+
+// --- CALENDAR HEADER ---
+.plus-date-picker-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--size-element-gap-md);
+}
+
+.plus-date-picker-calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--size-element-radius-sm);
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background-color: var(--color-surface-container-high);
+    }
+
+    i {
+        color: inherit;
+    }
+}
+
+.plus-date-picker-calendar-month-year {
+    // Uses h6 class styling already
+    color: var(--color-on-surface);
+}
+
+// --- WEEKDAY HEADERS ---
+.plus-date-picker-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--size-element-gap-xs);
+    margin-bottom: var(--size-element-gap-sm);
+}
+
+.plus-date-picker-calendar-weekday {
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-weight: var(--font-weight-semibold-1);
+}
+
+// --- DAY CELLS ---
+.plus-date-picker-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-date-picker-calendar-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    border-radius: var(--size-element-radius-full);
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover:not(.plus-date-picker-calendar-day-disabled):not(.plus-date-picker-calendar-day-other-month) {
+        background-color: var(--color-surface-container-high);
+    }
+
+    // Other month days - muted
+    &-other-month {
+        color: var(--color-outline);
+        pointer-events: none;
+    }
+
+    // Today indicator
+    &-today {
+        border: var(--size-element-stroke-sm) solid var(--color-primary);
+        color: var(--color-primary-text);
+    }
+
+    // Selected day - primary bg → on-primary text
+    &-selected {
+        background-color: var(--color-primary);
+        color: var(--color-on-primary);
+
+        &:hover {
+            filter: brightness(0.92);
+        }
+    }
+
+    // Disabled
+    &-disabled {
+        opacity: var(--color-disabled-opacity);
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+}
+
+// --- ALIGNMENT VARIANTS ---
+.plus-date-picker-calendar-align-left {
+    left: 0;
+}
+
+.plus-date-picker-calendar-align-center {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.plus-date-picker-calendar-align-right {
+    left: auto;
+    right: 0;
+}
+
+// --- SIZE VARIANTS ---
+.plus-date-picker-wrapper.small {
+    .plus-date-picker-calendar-day {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+.plus-date-picker-wrapper.large {
+    .plus-date-picker-calendar-day {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+// --- STATE VARIANTS ---
+.plus-date-picker-disabled {
+    opacity: var(--color-disabled-opacity);
+    pointer-events: none;
+}
+
+.plus-date-picker-readonly {
+    pointer-events: none;
+}

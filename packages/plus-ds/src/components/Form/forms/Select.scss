@@ -1,0 +1,280 @@
+/**
+ * Enhanced Select Component Styles
+ * Custom dropdown using existing DS components:
+ * - Checkbox for multi-select
+ * - Radio for single-select
+ * - Badge for selected values
+ * - Ghost Button for creatable
+ */
+
+// ===== WRAPPER =====
+.plus-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    &.plus-select-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+// ===== TRIGGER / INPUT FIELD =====
+.plus-select-trigger {
+    display: flex;
+    align-items: flex-start; // Allow badges to wrap from top
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 6px);
+    width: 100%;
+    min-height: 48px;
+    padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 16px);
+    background-color: var(--color-surface-container-lowest);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md, 4px);
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+        border-color: var(--color-outline);
+    }
+
+    .plus-select-open & {
+        border-color: var(--color-primary);
+        border-width: 2px;
+        box-shadow: none;
+    }
+}
+
+// Size variants
+.plus-select-sm .plus-select-trigger {
+    min-height: 40px;
+    padding: var(--size-element-pad-y-sm, 6px) var(--size-element-pad-x-sm, 12px);
+    font-size: var(--font-size-body3);
+}
+
+.plus-select-lg .plus-select-trigger {
+    min-height: 56px;
+    padding: var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-lg, 20px);
+    font-size: var(--font-size-body1);
+}
+
+// ===== BADGES - Full width wrapping =====
+.plus-select-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 6px);
+    flex: 1 1 100%; // Take full width
+    min-width: 0; // Allow shrinking
+    max-width: calc(100% - 24px); // Leave room for chevron
+
+    // Badge styling adjustments
+    .plus-badge {
+        flex-shrink: 0;
+    }
+}
+
+// ===== NOWRAP MODE - Single line with overflow =====
+.plus-select-nowrap {
+    .plus-select-trigger {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--color-outline-variant);
+            border-radius: 2px;
+        }
+    }
+
+    .plus-select-badges {
+        flex-wrap: nowrap;
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+}
+
+// ===== TRUNCATE MODE - Show overflow indicator =====
+.plus-select-truncate {
+    .plus-select-trigger {
+        overflow: hidden;
+    }
+
+    .plus-select-badges {
+        position: relative;
+        overflow: hidden;
+
+        // Fade gradient on right edge when truncated
+        &::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 32px;
+            background: linear-gradient(to right, transparent, var(--color-surface-container-lowest));
+            pointer-events: none;
+        }
+    }
+}
+
+// ===== TEXT DISPLAY =====
+.plus-select-text {
+    flex: 1;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-light);
+    color: var(--color-on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    align-self: center;
+
+    &.plus-select-placeholder {
+        color: var(--color-on-surface-variant);
+    }
+}
+
+// ===== CHEVRON ICON =====
+.plus-select-chevron {
+    flex-shrink: 0;
+    font-size: var(--font-size-fa-body2-solid, 12px);
+    color: var(--color-on-surface-variant);
+    margin-left: auto;
+    align-self: center;
+    transition: transform 0.2s ease;
+
+    .plus-select-open & {
+        color: var(--color-primary);
+    }
+}
+
+// ===== DROPDOWN MENU / POPUP =====
+// Popup must have correct surface-container background and elevation per DS specs
+.plus-select-menu {
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 0 !important;
+    margin-top: 4px !important;
+
+    // Background: surface-container-low for popups per DS (not plain surface)
+    background-color: var(--color-surface-container-low, #f5f5f5) !important;
+
+    // Border for definition
+    border: 1px solid var(--color-outline-variant) !important;
+    border-radius: var(--size-modal-radius-sm, 8px) !important;
+
+    // Elevation 2 shadow per DS popup specs
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+        0px 2px 6px 2px rgba(0, 0, 0, 0.15) !important;
+}
+
+// ===== SEARCH =====
+.plus-select-search {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px);
+    padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+    border-bottom: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface-container-lowest);
+}
+
+.plus-select-search-icon {
+    font-size: var(--font-size-fa-body2-solid, 12px);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-select-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    color: var(--color-on-surface);
+    outline: none;
+
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+    }
+}
+
+// ===== OPTIONS LIST =====
+.plus-select-options {
+    padding: var(--size-element-pad-y-sm, 4px) 0;
+}
+
+// ===== OPTION ITEM =====
+.plus-select-option {
+    display: flex;
+    align-items: center;
+    padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 16px);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover:not(.plus-select-option-disabled) {
+        background-color: var(--color-neutral-state-08);
+    }
+
+    &.plus-select-option-selected {
+        background-color: var(--color-primary-state-08);
+    }
+
+    &.plus-select-option-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    // Override Checkbox/Radio wrapper styles for dropdown context
+    .plus-form-checkbox-wrapper,
+    .plus-form-radio-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    // Prevent double hover effects
+    .plus-form-checkbox,
+    .plus-form-radio {
+        pointer-events: none; // Let parent div handle clicks
+    }
+}
+
+// ===== ADD NEW OPTION (Ghost Button) =====
+.plus-select-option-add {
+    padding: var(--size-element-pad-y-xs, 2px) var(--size-element-pad-x-md, 16px);
+
+    .plus-select-add-button {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+// ===== NO RESULTS =====
+.plus-select-no-results {
+    padding: var(--size-element-pad-y-lg, 16px);
+    text-align: center;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body3);
+    color: var(--color-on-surface-variant);
+}
+
+// ===== DROPDOWN OVERRIDE =====
+// Override Bootstrap dropdown styles
+.plus-select-wrapper.dropdown {
+    .dropdown-toggle {
+        &::after {
+            display: none; // Remove default caret
+        }
+    }
+
+    .dropdown-menu {
+        &.show {
+            display: block;
+        }
+    }
+}

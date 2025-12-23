@@ -60,24 +60,26 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
             categories: dates,
             labels: {
                 style: {
-                    fontSize: '10px',
-                    color: '#666'
+                    fontSize: 'var(--font-size-body3, 12px)',
+                    color: 'var(--color-on-surface-variant, #3f484a)'
                 }
             },
-            lineColor: '#e0e0e0', // border-bottom
+            lineColor: 'var(--color-outline-variant, #bec8ca)',
             tickWidth: 0
         },
         yAxis: {
             min: 0,
             max: 100, // Stacked percent
             title: { text: null },
-            gridLineWidth: 1, // d-flex border lines effect
-            gridLineColor: '#f0f0f0',
-            tickPositions: [0, 25, 50, 75, 100], // Match yLabels 0-100%
+            gridLineWidth: 1,
+            gridLineColor: 'var(--color-surface-container, #eaeef0)',
+            tickPositions: [0, 25, 50, 75, 100],
             labels: {
-                // Use custom formatter or map logic if yLabels props are strict strings not nums
                 format: '{value}%',
-                style: { fontSize: '10px', color: '#666' }
+                style: {
+                    fontSize: 'var(--font-size-body3, 12px)',
+                    color: 'var(--color-on-surface-variant, #3f484a)'
+                }
             }
         },
         plotOptions: {
@@ -90,10 +92,10 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
                         return this.point.customValue;
                     },
                     style: {
-                        color: 'white', // Default, superseded by point.textColor if we could apply it easily
+                        color: 'var(--color-on-primary, #ffffff)',
                         textOutline: 'none',
-                        fontWeight: 'normal',
-                        fontSize: '10px'
+                        fontWeight: 'var(--font-weight-normal, 400)',
+                        fontSize: 'var(--font-size-body3, 12px)'
                     }
                 },
                 borderWidth: 0,

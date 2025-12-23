@@ -1,0 +1,175 @@
+/*
+ * Spinner Styles
+ * Includes default Bootstrap spinner overrides and Custom Figma Variants (Growing, Rotating, etc.)
+ */
+
+// Default Spinner
+.spinner-border {
+    color: var(--color-primary);
+}
+
+// Custom Spinner Container - provides the base sizing for all custom variants
+// NOTE: variant classes (.plus-spinner-growing, etc.) are applied to the SAME element
+.plus-spinner-custom {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+
+    &.plus-spinner-sm {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+// --- VARIANT 1: GROWING (Grid/Wave) ---
+// Applied to same element as .plus-spinner-custom, so do NOT override width/height
+.plus-spinner-growing {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+
+    .spinner-block {
+        background-color: var(--color-on-surface-variant);
+        border-radius: 1px;
+        animation: spinner-scale 1.5s infinite ease-in-out both;
+    }
+
+    .spinner-block:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .spinner-block:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .spinner-block:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    .spinner-block:nth-child(4) {
+        animation-delay: 0.1s;
+    }
+
+    .spinner-block:nth-child(5) {
+        animation-delay: 0.2s;
+    }
+
+    .spinner-block:nth-child(6) {
+        animation-delay: 0.3s;
+    }
+
+    .spinner-block:nth-child(7) {
+        animation-delay: 0.2s;
+    }
+
+    .spinner-block:nth-child(8) {
+        animation-delay: 0.3s;
+    }
+
+    .spinner-block:nth-child(9) {
+        animation-delay: 0.4s;
+    }
+}
+
+@keyframes spinner-scale {
+
+    0%,
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+// --- VARIANT 2: ROTATING (Grid Rotation) ---
+.plus-spinner-rotating {
+    display: block !important;
+    position: relative;
+    animation: spinner-rotate-main 2s linear infinite;
+
+    .spinner-block {
+        position: absolute;
+        width: 30%;
+        height: 30%;
+        background-color: var(--color-on-surface-variant);
+        border-radius: 1px;
+    }
+
+    // 4 Blocks in corners
+    .spinner-block:nth-child(1) {
+        top: 0;
+        left: 0;
+    }
+
+    .spinner-block:nth-child(2) {
+        top: 0;
+        right: 0;
+    }
+
+    .spinner-block:nth-child(3) {
+        bottom: 0;
+        right: 0;
+    }
+
+    .spinner-block:nth-child(4) {
+        bottom: 0;
+        left: 0;
+    }
+}
+
+@keyframes spinner-rotate-main {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+// --- VARIANT 3: STACKING (Steps/Bars) ---
+.plus-spinner-stacking {
+    display: flex !important;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    .spinner-block {
+        width: 20%;
+        background-color: var(--color-on-surface-variant);
+        border-radius: 1px;
+        animation: spinner-stack 1s infinite ease-in-out alternate;
+    }
+
+    .spinner-block:nth-child(1) {
+        animation-delay: 0s;
+        height: 40%;
+    }
+
+    .spinner-block:nth-child(2) {
+        animation-delay: 0.2s;
+        height: 60%;
+    }
+
+    .spinner-block:nth-child(3) {
+        animation-delay: 0.4s;
+        height: 100%;
+    }
+
+    .spinner-block:nth-child(4) {
+        animation-delay: 0.2s;
+        height: 60%;
+    }
+}
+
+@keyframes spinner-stack {
+    0% {
+        transform: scaleY(0.5);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}

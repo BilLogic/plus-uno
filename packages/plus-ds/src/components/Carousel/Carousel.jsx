@@ -10,7 +10,7 @@ const Carousel = ({
     onSelect,
     controls = true,
     indicators = true,
-    interval = 5000,
+    interval = null,
     pause = 'hover',
     wrap = true,
     keyboard = true,
@@ -67,6 +67,8 @@ const Carousel = ({
             style={style}
             prevIcon={prevIcon || defaultPrevIcon}
             nextIcon={nextIcon || defaultNextIcon}
+            prevLabel={null}
+            nextLabel={null}
             {...props}
         >
             {content}

@@ -192,16 +192,13 @@ export const Overview = () => {
                     <Button onClick={() => setOpen2(!open2)} text="Toggle Second" size="sm" />
                     <Button onClick={() => { setOpen1(true); setOpen2(true); }} text="Open Both" size="sm" style="secondary" />
                 </div>
-                <div style={{ display: 'flex', gap: '16px' }}>
-                    <div style={{ flex: 1 }}>
-                        <div className={`collapse ${open1 ? 'show' : ''}`}>
-                            <Card body="First panel content." showBorder />
-                        </div>
+                {/* Panels stack vertically and take full width */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+                    <div className={`collapse ${open1 ? 'show' : ''}`} style={{ width: '100%' }}>
+                        <Card body="First panel content." showBorder />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <div className={`collapse ${open2 ? 'show' : ''}`}>
-                            <Card body="Second panel content." showBorder />
-                        </div>
+                    <div className={`collapse ${open2 ? 'show' : ''}`} style={{ width: '100%' }}>
+                        <Card body="Second panel content." showBorder />
                     </div>
                 </div>
             </section>

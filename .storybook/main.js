@@ -3,13 +3,13 @@ const path = require('path');
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    '../new-ds/assets/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/components/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/patterns/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/patterns/**/*.mdx',
-    '../new-ds/specs/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/styles/**/*.mdx',
+    '../packages/plus-ds/src/assets/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/patterns/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/patterns/**/*.mdx',
+    '../packages/plus-ds/src/specs/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/styles/**/*.mdx',
   ],
   addons: [
     '@storybook/addon-links',
@@ -31,14 +31,14 @@ const config = {
     autodocs: true,
   },
   staticDirs: [
-    { from: path.resolve(__dirname, '../dist'), to: '/dist' },
-    { from: path.resolve(__dirname, '../legacy-ds/assets'), to: '/assets' },
+    { from: path.resolve(__dirname, '../packages/plus-ds/dist'), to: '/dist' },
+    // Keeping legacy assets mapping if potentially needed, but standardizing primarily on new package
+    { from: path.resolve(__dirname, '../packages/plus-ds/src/assets'), to: '/assets' },
   ],
   viteFinal: async (config) => {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
-    const srcPath = path.resolve(rootDir, 'new-ds');
-    const designSystemPath = path.resolve(rootDir, 'legacy-ds');
+    const srcPath = path.resolve(rootDir, 'packages/plus-ds/src');
 
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
@@ -46,16 +46,10 @@ const config = {
     config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};
 
-    // Add alias for design-system components FIRST (more specific aliases should come first)
-    // Map @/js/components to design-system/components
-    config.resolve.alias['@/js/components'] = path.resolve(designSystemPath, 'components');
-
-    // Add alias for src directory - use absolute path (for backward compatibility)
+    // Map @ to src
     config.resolve.alias['@'] = srcPath;
-    config.resolve.alias['@design-system'] = designSystemPath;
 
     // Ensure Vite can resolve relative paths from project root
-    // This helps with dynamic imports in story files
     if (!config.resolve.modules) {
       config.resolve.modules = ['node_modules', rootDir];
     } else {
@@ -77,50 +71,25 @@ const config = {
     config.optimizeDeps.esbuildOptions.loader['.js'] = 'jsx';
 
     // Ensure proper ES module handling
-    config.optimizeDeps = config.optimizeDeps || {};
     config.optimizeDeps.include = config.optimizeDeps.include || [];
 
-    // Ensure CSS is processed and available
+    // Config css
     config.css = config.css || {};
-    config.css.postcss = config.css.postcss || {};
-
-    // Improve module resolution for better compatibility
-    config.build = config.build || {};
-    config.build.commonjsOptions = {
-      include: [/node_modules/],
-      transformMixedEsModules: true,
+    config.css.preprocessorOptions = config.css.preprocessorOptions || {};
+    config.css.preprocessorOptions.scss = {
+      includePaths: [path.resolve(srcPath, 'components')]
     };
 
-    // Improve error handling for module resolution
-    config.resolve.dedupe = config.resolve.dedupe || [];
-    config.resolve.dedupe.push('@storybook/react-vite');
-
-    // Better handling of dynamic imports
-    config.optimizeDeps = config.optimizeDeps || {};
-
-    // Ensure story files are properly handled as modules
-    config.optimizeDeps.include = config.optimizeDeps.include || [];
-    config.optimizeDeps.include.push(
-      'legacy-ds/components/index.js',
-      'legacy-ds/components/**/*.js'
-    );
-
-    // Configure static asset serving
-    // Disable default publicDir to use staticDirs instead
+    // Use staticDirs instead
     config.publicDir = false;
 
-    // Ensure static assets are properly served
+    // Allow serving from root and package src
     config.server = config.server || {};
     config.server.fs = config.server.fs || {};
-    // Allow Vite to access the entire project root and design-system directory
     config.server.fs.allow = [
       ...(config.server.fs.allow || []),
-      rootDir, // Allow access to entire project root
-      path.resolve(rootDir, 'legacy-ds'),
-      path.resolve(rootDir, 'legacy-ds/assets'),
-      path.resolve(rootDir, 'legacy-ds/components'),
-      path.resolve(rootDir, 'legacy-ds/specs'),
-      path.resolve(rootDir, 'legacy-ds/styles'),
+      rootDir,
+      srcPath
     ];
 
     return config;

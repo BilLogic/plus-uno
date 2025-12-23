@@ -76,6 +76,14 @@ export default {
             description: 'Additional CSS classes',
             table: { category: 'Development' }
         },
+        activeIndex: {
+            control: { type: 'number' },
+            description: 'Controlled active slide index',
+            table: { category: 'Development' }
+        },
+        onSelect: {
+            table: { disable: true, category: 'Development' }
+        },
         slides: {
             table: { disable: true, category: 'Development' }
         },
@@ -89,6 +97,7 @@ export default {
 const createSlideContent = (text, bgColor) => (
     <div style={{
         height: '300px',
+        width: '100%',
         background: bgColor,
         display: 'flex',
         alignItems: 'center',
@@ -134,7 +143,6 @@ export const Overview = () => (
                 ]}
                 controls={false}
                 indicators={false}
-                interval={3000}
             />
         </section>
 
@@ -152,7 +160,6 @@ export const Overview = () => (
                 ]}
                 controls={true}
                 indicators={false}
-                interval={0}
             />
         </section>
 
@@ -170,7 +177,6 @@ export const Overview = () => (
                 ]}
                 controls={false}
                 indicators={true}
-                interval={4000}
             />
         </section>
 
@@ -200,7 +206,6 @@ export const Overview = () => (
                 ]}
                 controls={true}
                 indicators={true}
-                interval={5000}
             />
         </section>
 
@@ -230,7 +235,6 @@ export const Overview = () => (
                 ]}
                 controls={true}
                 indicators={true}
-                interval={0}
             />
         </section>
 
@@ -249,7 +253,6 @@ export const Overview = () => (
                 controls={true}
                 indicators={true}
                 fade={true}
-                interval={3000}
             />
         </section>
     </div>

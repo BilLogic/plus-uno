@@ -1,0 +1,149 @@
+/*
+ * ListGroup Component Styles
+ * Per Figma specs - counter badges, states, flush mode, contextual styles
+ * Uses design system tokens
+ */
+
+.plus-list-group,
+.list-group {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    // Default: surface-container-low bg with elevation
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--size-card-radius-sm);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+
+    // --- LIST GROUP ITEM ---
+    .plus-list-group-item,
+    .list-group-item {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-lg); // 12px per Figma
+        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg); // 8px 16px per Figma
+        background-color: transparent;
+        border-bottom: 1px solid var(--color-outline-variant);
+        color: var(--color-on-surface);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body1);
+        font-weight: var(--font-weight-normal);
+        line-height: var(--font-line-height-body1);
+        text-decoration: none;
+        transition: background-color 0.15s ease;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        // Wrapper for content (Children)
+        // Ensures proper spacing between text and badge (if present)
+        .plus-list-group-item-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: var(--size-element-gap-lg); // Tokenized gap (12px)
+        }
+
+        // --- ACTIVE STATE ---
+        &.active,
+        &.plus-list-group-item--active {
+            z-index: 2;
+            color: var(--color-primary-text); // Primary Text
+            background-color: var(--color-primary-08); // Primary 08 Opacity
+            border-color: var(--color-outline-variant); // Keep border or change? Usually active has border change?
+            // User requested active colors. Default BS removes border or colors it.
+            // We keep it simple to match design system "Selected/Active" state.
+        }
+
+        // --- HOVER STATE ---
+        &:hover:not(.disabled) {
+            background-color: var(--color-neutral-state-08);
+        }
+
+        // --- DISABLED STATE ---
+        &.disabled,
+        &.plus-list-group-item--disabled {
+            opacity: 0.38;
+            pointer-events: none;
+        }
+
+        // --- COUNTER BADGE ---
+        .plus-list-group-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            padding: 0 var(--size-spacing-md); // 12px
+            background-color: var(--color-on-surface);
+            color: var(--color-surface);
+            border-radius: var(--size-element-radius-full);
+            font-size: var(--font-size-body1);
+            font-weight: var(--font-weight-semibold-1);
+            line-height: var(--font-line-height-body1);
+        }
+    }
+
+    // --- FLUSH MODE (No border radius, no shadow) ---
+    &.plus-list-group--flush,
+    &.list-group-flush {
+        border-radius: 0;
+        box-shadow: none;
+        background-color: transparent;
+
+        .plus-list-group-item,
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+
+            &:first-child {
+                border-top: none;
+            }
+        }
+    }
+
+    // --- CONTEXTUAL STYLES ---
+    .plus-list-group-item--primary,
+    .list-group-item-primary {
+        background-color: var(--color-primary-container);
+        color: var(--color-on-primary-container);
+    }
+
+    .plus-list-group-item--secondary,
+    .list-group-item-secondary {
+        background-color: var(--color-secondary-container);
+        color: var(--color-on-secondary-container);
+    }
+
+    .plus-list-group-item--success,
+    .list-group-item-success {
+        background-color: var(--color-success-container);
+        color: var(--color-on-success-container);
+    }
+
+    .plus-list-group-item--danger,
+    .list-group-item-danger {
+        background-color: var(--color-danger-container);
+        color: var(--color-on-danger-container);
+    }
+
+    .plus-list-group-item--warning,
+    .list-group-item-warning {
+        background-color: var(--color-warning-container);
+        color: var(--color-on-warning-container);
+    }
+
+    .plus-list-group-item--info,
+    .list-group-item-info {
+        background-color: var(--color-info-container);
+        color: var(--color-on-info-container);
+    }
+
+    .plus-list-group-item--dark,
+    .list-group-item-dark {
+        background-color: var(--color-on-surface);
+        color: var(--color-surface);
+    }
+}

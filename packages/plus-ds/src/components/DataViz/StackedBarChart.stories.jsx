@@ -2,7 +2,7 @@ import React from 'react';
 import StackedBarChart from './StackedBarChart';
 
 export default {
-    title: 'Components/DataViz/StackedBarChart',
+    title: 'Data Visualizations/StackedBarChart',
     component: StackedBarChart,
     tags: ['autodocs'],
     argTypes: {
@@ -10,6 +10,7 @@ export default {
     }
 };
 
+// Using container-tier color tokens with matching on-container text colors
 export const Default = {
     args: {
         height: 300,
@@ -17,32 +18,32 @@ export const Default = {
         data: [
             {
                 segments: [
-                    { value: '10', color: '#4CAF50', height: '20', textColor: '#fff' },
-                    { value: '40', color: '#FFC107', height: '80', textColor: '#000' }
+                    { value: '10', color: 'var(--color-success-container, #ceeaaf)', height: '20', textColor: 'var(--color-on-success-container, #0a2000)' },
+                    { value: '40', color: 'var(--color-warning-container, #fcdf8e)', height: '80', textColor: 'var(--color-on-warning-container, #211b00)' }
                 ]
             },
             {
                 segments: [
-                    { value: '20', color: '#4CAF50', height: '40', textColor: '#fff' },
-                    { value: '30', color: '#FFC107', height: '60', textColor: '#000' }
+                    { value: '20', color: 'var(--color-success-container, #ceeaaf)', height: '40', textColor: 'var(--color-on-success-container, #0a2000)' },
+                    { value: '30', color: 'var(--color-warning-container, #fcdf8e)', height: '60', textColor: 'var(--color-on-warning-container, #211b00)' }
                 ]
             },
             {
                 segments: [
-                    { value: '15', color: '#4CAF50', height: '30', textColor: '#fff' },
-                    { value: '35', color: '#FFC107', height: '70', textColor: '#000' }
+                    { value: '15', color: 'var(--color-success-container, #ceeaaf)', height: '30', textColor: 'var(--color-on-success-container, #0a2000)' },
+                    { value: '35', color: 'var(--color-warning-container, #fcdf8e)', height: '70', textColor: 'var(--color-on-warning-container, #211b00)' }
                 ]
             },
             {
                 segments: [
-                    { value: '25', color: '#4CAF50', height: '50', textColor: '#fff' },
-                    { value: '25', color: '#FFC107', height: '50', textColor: '#000' }
+                    { value: '25', color: 'var(--color-success-container, #ceeaaf)', height: '50', textColor: 'var(--color-on-success-container, #0a2000)' },
+                    { value: '25', color: 'var(--color-warning-container, #fcdf8e)', height: '50', textColor: 'var(--color-on-warning-container, #211b00)' }
                 ]
             },
             {
                 segments: [
-                    { value: '5', color: '#4CAF50', height: '10', textColor: '#fff' },
-                    { value: '45', color: '#FFC107', height: '90', textColor: '#000' }
+                    { value: '5', color: 'var(--color-success-container, #ceeaaf)', height: '10', textColor: 'var(--color-on-success-container, #0a2000)' },
+                    { value: '45', color: 'var(--color-warning-container, #fcdf8e)', height: '90', textColor: 'var(--color-on-warning-container, #211b00)' }
                 ]
             }
         ]

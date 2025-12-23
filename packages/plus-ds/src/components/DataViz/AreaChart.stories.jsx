@@ -2,7 +2,7 @@ import React from 'react';
 import AreaChart from './AreaChart';
 
 export default {
-    title: 'Components/DataViz/AreaChart',
+    title: 'Data Visualizations/AreaChart',
     component: AreaChart,
     tags: ['autodocs']
 };

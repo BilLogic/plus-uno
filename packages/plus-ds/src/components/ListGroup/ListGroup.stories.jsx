@@ -5,8 +5,9 @@ import { Badge } from '@/components/Badge';
 export default {
     title: 'Components/ListGroup',
     component: ListGroup,
-    subcomponents: { ListGroupItem: ListGroup.Item },
+    subcomponents: { 'ListGroup.Item': ListGroup.Item },
     tags: ['autodocs'],
+    argTypes: { ListGroupItem: ListGroup.Item },
     parameters: {
         docs: {
             description: {
@@ -70,13 +71,13 @@ export const Overview = () => (
         <section>
             <h5>With Badges</h5>
             <ListGroup>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
+                <ListGroup.Item>
                     Item with badge
-                    <Badge text="14" style="primary" size="b2" />
+                    <Badge counter="14" style="primary" size="b1" />
                 </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between align-items-center">
+                <ListGroup.Item>
                     Item with badge
-                    <Badge text="2" style="primary" size="b2" />
+                    <Badge counter="2" style="primary" size="b1" />
                 </ListGroup.Item>
             </ListGroup>
         </section>
@@ -93,4 +94,31 @@ export const Interactive = (args) => (
 Interactive.args = {
     flush: false,
     horizontal: false,
+    as: 'div'
+};
+Interactive.argTypes = {
+    children: {
+        table: { disable: true }
+    },
+    flush: {
+        control: 'boolean',
+        description: 'Remove borders and rounded corners to render list group items edge-to-edge',
+        table: { category: 'Design' }
+    },
+    horizontal: {
+        control: 'boolean',
+        description: 'Change the layout of list group items from vertical to horizontal',
+        table: { category: 'Design' }
+    },
+    as: {
+        control: 'select',
+        options: ['div', 'ul', 'ol'],
+        description: 'The underlying HTML element to use for the ListGroup',
+        table: { category: 'Behavior' }
+    },
+    className: {
+        control: 'text',
+        description: 'Check class propagation',
+        table: { category: 'System' }
+    }
 };

@@ -47,6 +47,12 @@ export default {
             description: 'Split button style with separate action and toggle',
             table: { category: 'Design' }
         },
+        fill: {
+            control: 'select',
+            options: ['filled', 'tonal', 'outline', 'ghost'],
+            description: 'Button fill style',
+            table: { category: 'Design' }
+        },
 
         // DEVELOPMENT
         id: {
@@ -147,15 +153,31 @@ export const Overview = () => {
                 </div>
             </section>
 
-            {/* 4. Split Button */}
+            {/* 4. Fill Variants */}
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Fill Variants</h6>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                    Different button fill styles: filled, tonal, outline, and ghost.
+                </p>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <Dropdown buttonText="Filled" style="primary" fill="filled" items={basicItems} />
+                    <Dropdown buttonText="Tonal" style="primary" fill="tonal" items={basicItems} />
+                    <Dropdown buttonText="Outline" style="primary" fill="outline" items={basicItems} />
+                    <Dropdown buttonText="Ghost" style="primary" fill="ghost" items={basicItems} />
+                </div>
+            </section>
+
+            {/* 5. Split Button */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Split Button</h6>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Separate clickable action from the dropdown toggle.
                 </p>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <Dropdown buttonText="Split Action" split items={basicItems} />
-                    <Dropdown buttonText="Primary Split" split style="primary" items={basicItems} />
+                    <Dropdown buttonText="Filled Split" split style="primary" fill="filled" items={basicItems} />
+                    <Dropdown buttonText="Tonal Split" split style="primary" fill="tonal" items={basicItems} />
+                    <Dropdown buttonText="Outline Split" split style="primary" fill="outline" items={basicItems} />
+                    <Dropdown buttonText="Ghost Split" split style="primary" fill="ghost" items={basicItems} />
                 </div>
             </section>
 

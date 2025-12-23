@@ -2,7 +2,7 @@ import React from 'react';
 import ComboChart from './ComboChart';
 
 export default {
-    title: 'Components/DataViz/ComboChart',
+    title: 'Data Visualizations/ComboChart',
     component: ComboChart,
     tags: ['autodocs']
 };

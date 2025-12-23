@@ -2,7 +2,7 @@ import React from 'react';
 import ScatterChart from './ScatterChart';
 
 export default {
-    title: 'Components/DataViz/ScatterChart',
+    title: 'Data Visualizations/ScatterChart',
     component: ScatterChart,
     tags: ['autodocs']
 };

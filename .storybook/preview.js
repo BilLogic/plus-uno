@@ -2,29 +2,16 @@ import React, { useEffect } from 'react';
 
 /**
  * Storybook preview configuration for PLUS Design System
- * Dependencies (Bootstrap, jQuery, Font Awesome, PLUS CSS) are loaded via preview-head.html
- * 
- * Note: CSS is loaded via preview-head.html to avoid Vite module resolution issues
- * The CSS file at /dist/css/main.css contains all color tokens and component styles
  */
 
-import '../new-ds/styles/main.scss'; // Import global styles for dev mode
+import '../packages/plus-ds/src/styles/main.scss';
+import './storybook-overrides.css';
 
-// Cleanup functions - loaded dynamically in decorator to avoid blocking Storybook startup
+// Cleanup functions - using dummy no-ops as legacy components are being phased out or moved
 const cleanupFunctions = {
   clearAllToasts: () => { },
   destroyAllTooltips: () => { },
 };
-
-// Load cleanup functions asynchronously
-Promise.all([
-  import('../legacy-ds/components/Toast/index.js').then(m => {
-    cleanupFunctions.clearAllToasts = m.clearAllToasts || (() => { });
-  }).catch(() => { }),
-  import('../legacy-ds/components/Tooltip/index.js').then(m => {
-    cleanupFunctions.destroyAllTooltips = m.destroyAllTooltips || (() => { });
-  }).catch(() => { }),
-]);
 
 /** @type { import('@storybook/html-vite').Preview } */
 const preview = {
@@ -42,9 +29,9 @@ const preview = {
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           ['Assets', 'Assets/Logo', 'Assets/Images'],
+          'Forms',
           'Components',
-          '*', // This allows alphabetical sorting for components
-          'DataViz',
+          'Data Visualizations',
           'Specs',
           [
             'Specs/Universal',
@@ -64,6 +51,7 @@ const preview = {
           'Introduction',
         ],
       },
+
     },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
+import './Toast.scss';
 
 export const Toast = ({
     id,
-    style = 'default', // 'default', 'success', 'danger', 'warning', 'info', 'primary', 'secondary'
+    style = 'secondary', // 'secondary' (default), 'success', 'danger', 'warning', 'info', 'primary'
     title,
     children, // Body text/content
     dismissible = true,
@@ -45,14 +46,24 @@ export const Toast = ({
             {...props}
         >
             <BootstrapToast.Header
-                closeButton={dismissible}
+                closeButton={false}
                 className={`plus-toast-header ${headerClass}`}
             >
                 <div className="plus-toast-icon">
                     <i className={`fas ${iconClass}`}></i>
                 </div>
-                <strong className="plus-toast-title me-auto">{title}</strong>
-                {timestamp && <small className="plus-toast-timestamp text-muted">{timestamp}</small>}
+                <strong className="plus-toast-title">{title}</strong>
+                {timestamp && <small className="plus-toast-timestamp">{timestamp}</small>}
+                {dismissible && (
+                    <button
+                        type="button"
+                        className="plus-toast-close"
+                        aria-label="Close"
+                        onClick={onClose}
+                    >
+                        <i className="fas fa-xmark"></i>
+                    </button>
+                )}
             </BootstrapToast.Header>
             <div className="plus-toast-divider"></div>
             <BootstrapToast.Body className={`plus-toast-body ${bodyClass}`}>
@@ -64,7 +75,7 @@ export const Toast = ({
 
 Toast.propTypes = {
     id: PropTypes.string,
-    style: PropTypes.oneOf(['default', 'success', 'danger', 'warning', 'info', 'primary', 'secondary']),
+    style: PropTypes.oneOf(['secondary', 'success', 'danger', 'warning', 'info', 'primary']),
     title: PropTypes.node.isRequired,
     children: PropTypes.node.isRequired,
     dismissible: PropTypes.bool,
@@ -84,8 +95,7 @@ export const ToastContainer = ({
     children,
     ...props
 }) => {
-    // Map legacy positions if needed, or just use RB/Bootstrap 5 positions
-    // Legacy 'top-right' -> 'top-end', 'top-left' -> 'top-start' assuming LTR
+    // Map legacy positions if needed
     const mapPosition = (pos) => {
         if (pos === 'top-right') return 'top-end';
         if (pos === 'top-left') return 'top-start';

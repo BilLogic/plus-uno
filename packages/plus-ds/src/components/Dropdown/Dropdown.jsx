@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import './Dropdown.scss';
 
 const Dropdown = ({
     id,
@@ -7,6 +8,7 @@ const Dropdown = ({
     items = [],
     size = "default",
     style = "default",
+    fill = "filled", // NEW: filled, tonal, outline, ghost
     split = false,
     direction = "dropdown",
     className = ""
@@ -33,7 +35,8 @@ const Dropdown = ({
         'dropdown',
         direction !== 'dropdown' ? direction : '',
         size !== 'default' ? size : '',
-        style !== 'default' ? `pdropdown-${style}` : '',
+        style !== 'default' ? `pdropdown-${style}` : 'pdropdown-default',
+        fill !== 'filled' ? `pdropdown-${fill}` : '', // NEW: fill variant class
         split ? 'pdropdown-split-dropdown' : '',
         isOpen ? 'show' : '',
         className
@@ -99,24 +102,7 @@ const Dropdown = ({
                             disabled={item.disabled}
                             onClick={item.onClick}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', width: '100%' }}>
-                                {item.multiSelectCheckbox && (
-                                    <div style={{
-                                        width: '12px',
-                                        height: '12px',
-                                        border: '1px solid var(--color-primary)',
-                                        borderRadius: '2px',
-                                        backgroundColor: item.multiSelectChecked ? 'var(--color-primary)' : 'transparent',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0
-                                    }}>
-                                        {item.multiSelectChecked && (
-                                            <i className="fas fa-check" style={{ color: 'var(--color-on-primary)', fontSize: '8px' }}></i>
-                                        )}
-                                    </div>
-                                )}
+                            <div className="dropdown-item-inner">
 
                                 <i className="fas fa-check selected-icon" style={{ opacity: item.selected ? 1 : 0 }}></i>
 
@@ -129,19 +115,7 @@ const Dropdown = ({
                                 {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`}></i>}
 
                                 {item.counter !== undefined && (
-                                    <span style={{
-                                        backgroundColor: 'color-mix(in srgb, var(--color-on-surface) 16%, transparent)',
-                                        borderRadius: 'var(--size-border-radius-radius-1000)',
-                                        padding: '0 var(--size-element-pad-x-sm)',
-                                        height: '16px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: 'var(--font-size-body3)',
-                                        lineHeight: 'var(--font-line-height-body3)',
-                                        fontWeight: 'var(--font-weight-semibold-1)',
-                                        flexShrink: 0
-                                    }}>
+                                    <span className="pdropdown-counter">
                                         {item.counter}
                                     </span>
                                 )}
@@ -150,7 +124,7 @@ const Dropdown = ({
                             </div>
                         </button>
                         {item.divider && index < items.length - 1 && (
-                            <div style={{ height: '1px', backgroundColor: 'var(--color-outline-variant)', width: '100%' }}></div>
+                            <div className="pdropdown-divider"></div>
                         )}
                     </React.Fragment>
                 ))}
@@ -179,6 +153,7 @@ Dropdown.propTypes = {
     })),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default']),
+    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
     split: PropTypes.bool,
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
     className: PropTypes.string

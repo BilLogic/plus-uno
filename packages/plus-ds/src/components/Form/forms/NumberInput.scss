@@ -1,0 +1,395 @@
+/**
+ * NumberInput Component Styles
+ * Implements number input component with increment/decrement buttons
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-number-input-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-sm, 8px);
+}
+
+.plus-number-input-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+
+    .plus-number-input-required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+}
+
+.plus-number-input-wrapper {
+    display: flex;
+    width: 100%;
+
+    // Remove Bootstrap's default border radius override
+    .input-group-text {
+        border-radius: 0;
+    }
+
+    // Input field gets left border radius
+    >.form-control:first-child {
+        border-top-left-radius: var(--size-element-radius-md, 4px);
+        border-bottom-left-radius: var(--size-element-radius-md, 4px);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    // Button group gets right border radius on outer corners only
+    >.input-group-text:last-child {
+        border-top-right-radius: var(--size-element-radius-md, 4px);
+        border-bottom-right-radius: var(--size-element-radius-md, 4px);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    // Buttons should be square (no border radius on buttons themselves)
+    .plus-number-input-button {
+        border-radius: 0;
+    }
+}
+
+// Main input field
+.plus-number-input-field {
+    border: 1px solid var(--border-color, var(--color-outline-variant));
+    background-color: var(--bg-color, var(--color-surface-container-lowest));
+    color: var(--text-color, var(--color-on-surface));
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-right: none;
+
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+        z-index: 1;
+    }
+
+    // Disabled state
+    &:disabled {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    // Read-only state
+    &[readonly] {
+        background-color: var(--color-surface-container);
+        border-color: var(--color-outline-variant);
+        cursor: default;
+
+        &:focus {
+            border-color: var(--color-outline-variant);
+            box-shadow: none;
+        }
+    }
+}
+
+// Size variants for input
+.plus-number-input-small {
+    .plus-number-input-field {
+        padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
+        font-size: var(--font-size-body3);
+        line-height: var(--font-line-height-body3);
+        min-height: 40px;
+
+        &::placeholder {
+            font-size: var(--font-size-body3);
+        }
+    }
+}
+
+.plus-number-input-medium {
+    .plus-number-input-field {
+        padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+        font-size: var(--font-size-body2);
+        line-height: var(--font-line-height-body2);
+        min-height: 48px;
+
+        &::placeholder {
+            font-size: var(--font-size-body2);
+        }
+    }
+}
+
+.plus-number-input-large {
+    .plus-number-input-field {
+        padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
+        font-size: var(--font-size-body1);
+        line-height: var(--font-line-height-body1);
+        min-height: 56px;
+
+        &::placeholder {
+            font-size: var(--font-size-body1);
+        }
+    }
+}
+
+// Button group container
+.plus-number-input-buttons {
+    border: 1px solid var(--border-color, var(--color-outline-variant));
+    background-color: var(--bg-color, var(--color-surface-container-lowest));
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin: 0;
+    border-left: none;
+    gap: 0;
+    overflow: hidden;
+}
+
+// Individual buttons - stroke style (borders only, no fill)
+.plus-number-input-button {
+    border: none;
+    border-left: 1px solid var(--border-color, var(--color-outline-variant));
+    background-color: var(--bg-color, var(--color-surface-container-lowest));
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s ease-in-out, color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    flex: 1;
+    min-width: 32px;
+    height: 100%;
+
+    // First button (increment) KEEP left border as separator from input
+    // This creates the outline/stroke appearance per Figma
+
+    i {
+        font-size: var(--font-size-body2);
+        color: var(--color-on-surface);
+    }
+
+    &:hover:not(:disabled) {
+        background-color: var(--color-primary-state-08);
+    }
+
+    &:active:not(:disabled) {
+        background-color: var(--color-primary-state-12);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        color: var(--color-on-surface-variant);
+        background-color: var(--color-surface-container-low);
+
+        i {
+            color: var(--color-on-surface-variant);
+        }
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: inset 0 0 0 1px var(--color-primary);
+    }
+}
+
+// Size variants for buttons
+.plus-number-input-small {
+    .plus-number-input-button {
+        min-width: 28px;
+
+        i {
+            font-size: var(--font-size-body3);
+        }
+    }
+}
+
+.plus-number-input-large {
+    .plus-number-input-button {
+        min-width: 36px;
+
+        i {
+            font-size: var(--font-size-body1);
+        }
+    }
+}
+
+// Validation states - stroke style (colored borders, white background)
+.plus-number-input-invalid {
+    .plus-number-input-field {
+        border-color: var(--color-danger);
+
+        &:focus {
+            border-color: var(--color-danger);
+            box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
+        }
+    }
+
+    .plus-number-input-buttons {
+        border-color: var(--color-danger);
+        background-color: var(--color-surface-container-lowest);
+    }
+
+    .plus-number-input-button {
+        background-color: var(--color-surface-container-lowest);
+        border-left-color: var(--color-danger);
+        color: var(--color-danger);
+
+        // First button has no left border, but second button has danger-colored separator
+        &:not(:first-child) {
+            border-left-color: var(--color-danger);
+        }
+
+        i {
+            color: var(--color-danger);
+        }
+
+        &:hover:not(:disabled) {
+            background-color: var(--color-danger-state-08);
+        }
+
+        &:active:not(:disabled) {
+            background-color: var(--color-danger-state-12);
+        }
+    }
+}
+
+.plus-number-input-success {
+    .plus-number-input-field {
+        border-color: var(--color-success);
+
+        &:focus {
+            border-color: var(--color-success);
+            box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
+        }
+    }
+
+    .plus-number-input-buttons {
+        border-color: var(--color-success);
+        background-color: var(--color-surface-container-lowest);
+    }
+
+    .plus-number-input-button {
+        background-color: var(--color-surface-container-lowest);
+        border-left-color: var(--color-success);
+        color: var(--color-success);
+
+        // First button has no left border, but second button has success-colored separator
+        &:not(:first-child) {
+            border-left-color: var(--color-success);
+        }
+
+        i {
+            color: var(--color-success);
+        }
+
+        &:hover:not(:disabled) {
+            background-color: var(--color-success-state-08);
+        }
+
+        &:active:not(:disabled) {
+            background-color: var(--color-success-state-12);
+        }
+    }
+}
+
+// Focused state
+.plus-number-input-focused {
+    .plus-number-input-field {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+    }
+
+    .plus-number-input-buttons {
+        border-color: var(--color-primary);
+    }
+
+    .plus-number-input-button {
+        border-left-color: var(--color-primary);
+    }
+}
+
+// Disabled state
+.plus-number-input-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+
+    .plus-number-input-field {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+    }
+
+    .plus-number-input-buttons {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+    }
+
+    .plus-number-input-button {
+        background-color: var(--color-surface-container-low);
+        border-left-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+
+        i {
+            color: var(--color-on-surface-variant);
+        }
+    }
+}
+
+// Read-only state
+.plus-number-input-readonly {
+    .plus-number-input-field {
+        background-color: var(--color-surface-container);
+        cursor: default;
+    }
+
+    .plus-number-input-buttons {
+        background-color: var(--color-surface-container);
+    }
+}
+
+// Validation message
+.plus-number-input-validation {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    margin-top: var(--size-element-gap-xs, 4px);
+
+    i {
+        font-size: var(--font-size-body3);
+        flex-shrink: 0;
+    }
+}
+
+.plus-number-input-validation-invalid {
+    color: var(--color-danger);
+
+    i {
+        color: var(--color-danger);
+    }
+}
+
+.plus-number-input-validation-success {
+    color: var(--color-success);
+
+    i {
+        color: var(--color-success);
+    }
+}
+
+.plus-number-input-validation-message {
+    flex: 1;
+}

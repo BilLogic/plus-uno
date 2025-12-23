@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './ListGroup.scss';
 
 export const ListGroupItem = ({
     children,
@@ -105,7 +106,18 @@ ListGroup.propTypes = {
     className: PropTypes.string
 };
 
-// Sub-component export
+// Sub-component exports
 ListGroup.Item = ListGroupItem;
 
+// Import and attach ListOption for individual option use cases
+import { ListOption as ListOptionComponent } from './ListOption';
+ListGroup.Option = ListOptionComponent;
+
+// Import and attach OptionList for full option list container use cases
+// This consolidates OptionList into ListGroup as ListGroup.OptionList
+import OptionListComponent from '../Form/forms/OptionList';
+ListGroup.OptionList = OptionListComponent;
+
 export default ListGroup;
+export { ListOption as ListOptionComponent } from './ListOption';
+export { default as OptionList } from '../Form/forms/OptionList';

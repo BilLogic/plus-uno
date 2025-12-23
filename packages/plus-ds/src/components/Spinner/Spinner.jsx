@@ -1,31 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Spinner as BootstrapSpinner } from 'react-bootstrap';
+import './Spinner.scss';
 
 const Spinner = ({
-    size = 'default',
-    label = 'Loading...',
-    id,
-    className = ''
+    variant = 'border', // 'border', 'grow', 'growing', 'rotating', 'stacking'
+    color = 'primary',
+    size, // 'sm' or null
+    className = '',
+    role = 'status',
+    ...props
 }) => {
-    const classes = [
-        'spinner-border',
-        'plus-spinner',
-        `plus-spinner-${size}`,
-        className
-    ].filter(Boolean).join(' ');
+    // Custom Variants handled via CSS/Divs
+    if (['growing', 'rotating', 'stacking'].includes(variant)) {
+        const blocks = {
+            'growing': 9,
+            'rotating': 4,
+            'stacking': 4
+        }[variant];
 
+        return (
+            <div
+                className={`plus-spinner-custom plus-spinner-${variant} ${size ? `plus-spinner-${size}` : ''} ${className}`}
+                role={role}
+                aria-label="Loading"
+                {...props}
+            >
+                {Array.from({ length: blocks }).map((_, i) => (
+                    <div key={i} className="spinner-block"></div>
+                ))}
+            </div>
+        );
+    }
+
+    // Simple Bootstrap Mappings ('border', 'grow')
     return (
-        <div id={id} className={classes} role="status" aria-label={label}>
-            <span className="sr-only">{label}</span>
-        </div>
+        <BootstrapSpinner
+            animation={variant === 'default' ? 'border' : variant}
+            variant={color}
+            size={size}
+            className={`plus-spinner ${className}`}
+            role={role}
+            {...props}
+        >
+            <span className="visually-hidden">Loading...</span>
+        </BootstrapSpinner>
     );
 };
 
 Spinner.propTypes = {
-    size: PropTypes.oneOf(['small', 'default', 'large']),
-    label: PropTypes.string,
-    id: PropTypes.string,
-    className: PropTypes.string
+    variant: PropTypes.oneOf(['border', 'grow', 'growing', 'rotating', 'stacking', 'default']),
+    color: PropTypes.string,
+    size: PropTypes.string,
+    className: PropTypes.string,
+    role: PropTypes.string
 };
 
 export default Spinner;

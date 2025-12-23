@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayTrigger, Tooltip as BSTooltip } from 'react-bootstrap';
+import './Tooltip.scss';
 
 const Tooltip = ({
     text,

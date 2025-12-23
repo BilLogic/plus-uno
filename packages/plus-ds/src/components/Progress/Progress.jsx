@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './Progress.scss';
 
 const Progress = ({
     value = 0,

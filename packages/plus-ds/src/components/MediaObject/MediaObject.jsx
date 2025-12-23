@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './MediaObject.scss';
 
 const MediaObject = ({
     media, // Image URL string or React Node
