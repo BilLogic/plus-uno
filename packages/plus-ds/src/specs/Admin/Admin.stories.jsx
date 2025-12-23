@@ -1,18 +1,18 @@
 /**
- * Home Specs Overview
+ * Admin Specs Overview
  * 
- * Home organisms for dashboard and home page interfaces.
+ * Admin organisms for group, session, student, and tutor management.
  */
 
 import React from 'react';
 
 export default {
-    title: 'Specs/Home',
+    title: 'Specs/Admin',
     tags: ['autodocs'],
     parameters: {
         docs: {
             description: {
-                component: 'Home organisms for dashboard and home page interfaces. Components organized by: Elements, Cards, Tables, Sections, Modals, Pages.',
+                component: 'Admin organisms for management dashboards. Organized by: Group Admin, Session Admin, Student Admin, Tutor Admin.',
             },
         },
     },
@@ -20,26 +20,36 @@ export default {
 
 /**
  * Overview
- * Home specs organization.
+ * Admin specs organization.
  */
 export const Overview = () => (
     <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
         <h2 className="h2" style={{ marginBottom: 'var(--size-section-pad-y-md)' }}>
-            Home Organisms
+            Admin Organisms
         </h2>
 
         <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-lg)' }}>
-            Home organisms combine multiple components for dashboard and home page experiences.
+            Admin organisms for management dashboards. Organized by admin type.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {[
-                { title: 'Elements', items: ['ResourceType', 'ProductAreaDropdown', 'CardBadges', 'ButtonContainer'] },
-                { title: 'Cards', items: ['OverviewCard', 'MetricsCard', 'ResourceCard', 'DataVisualization', 'RecommendedLessons', 'TrainingProgressCard'] },
-                { title: 'Tables', items: ['(To be added)'] },
-                { title: 'Sections', items: ['HomepageJumbotron', 'BottomDiv'] },
-                { title: 'Modals', items: ['UserFeedbackModal'] },
-                { title: 'Pages', items: ['HomePage', 'SkillsOverview'] }
+                {
+                    title: 'Group Admin',
+                    items: ['GroupsTable', 'GroupInfoCard', 'GroupTrainingProgress', 'GroupAdminPage']
+                },
+                {
+                    title: 'Session Admin',
+                    items: ['SessionsTable', 'SessionBreakdownModal', 'SessionOverviewSection']
+                },
+                {
+                    title: 'Student Admin',
+                    items: ['StudentsTable', 'StudentDetailModal', 'StudentAdminContainer']
+                },
+                {
+                    title: 'Tutor Admin',
+                    items: ['TutorsTable', 'TutorOverviewModal', 'DataCard', 'TutorToolUsageSection']
+                }
             ].map(section => (
                 <section key={section.title} style={{
                     padding: '24px',

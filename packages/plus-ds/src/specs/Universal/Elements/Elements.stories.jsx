@@ -1,10 +1,24 @@
+/**
+ * Universal Specs - Elements
+ * 
+ * Element-level components for universal organisms.
+ * These are reusable building blocks used in universal navigation and UI patterns.
+ * 
+ * Components:
+ * - SidebarTab: Sidebar navigation tab with states
+ * - UserAvatar: User avatar with name and notification counter
+ * - StaticBadgeSmart: SMART competency area badge
+ */
+
 import React from 'react';
-import { SidebarTab, UserAvatar, StaticBadgeSmart } from '@/components';
+import SidebarTab from '@/components/SidebarTab';
+import UserAvatar from '@/components/UserAvatar';
+import StaticBadgeSmart from '@/components/StaticBadgeSmart';
 
 export default {
     title: 'Specs/Universal/Elements',
+    tags: ['autodocs'],
     parameters: {
-        layout: 'padded',
         docs: {
             description: {
                 component: 'Element-level components for universal organisms. These are reusable building blocks used in universal navigation and UI patterns.',
@@ -14,87 +28,156 @@ export default {
 };
 
 /**
- * Sidebar Tab - All States
- * Showing all visual states simultaneously for review.
+ * Overview
+ * Comprehensive view of universal element components.
+ */
+export const Overview = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '600px' }}>
+        {/* SidebarTab */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>SidebarTab</h6>
+            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                Sidebar navigation tabs with icon and text. Supports enabled, hover, selected, disabled, and focus states.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', maxWidth: '300px' }}>
+                <SidebarTab text="Enabled Tab" icon="home" state="enabled" leadingVisual />
+                <SidebarTab text="Selected Tab" icon="star" state="selected" leadingVisual />
+                <SidebarTab text="Hover Tab" icon="cog" state="hover" leadingVisual />
+                <SidebarTab text="Disabled Tab" icon="ban" state="disabled" leadingVisual />
+            </div>
+        </section>
+
+        {/* UserAvatar */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>UserAvatar</h6>
+            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                User avatar component with name display and optional notification counter.
+            </p>
+            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                <UserAvatar firstChar="J" name="John Doe" type="regular tutor" />
+                <UserAvatar firstChar="S" name="Sarah Admin" type="admin" counter counterValue={5} />
+                <UserAvatar firstChar="L" name="Lead Tutor" type="lead tutor" />
+            </div>
+        </section>
+
+        {/* StaticBadgeSmart */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>StaticBadgeSmart</h6>
+            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                SMART competency area badges for skill categorization.
+            </p>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <StaticBadgeSmart competency="specific" />
+                <StaticBadgeSmart competency="measurable" />
+                <StaticBadgeSmart competency="attainable" />
+                <StaticBadgeSmart competency="relevant" />
+                <StaticBadgeSmart competency="timely" />
+            </div>
+        </section>
+    </div>
+);
+
+/**
+ * SidebarTab States
+ * All sidebar tab states: enabled, hover, selected, disabled, focus
  */
 export const SidebarTabStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '300px' }}>
-        <SidebarTab text="Enabled" icon="icons" state="enabled" leadingVisual={true} />
-        <SidebarTab text="Hover" icon="icons" state="hover" leadingVisual={true} />
-        <SidebarTab text="Selected" icon="icons" state="selected" leadingVisual={true} />
-        <SidebarTab text="Disabled" icon="icons" state="disabled" leadingVisual={true} />
-        <SidebarTab text="Focus" icon="icons" state="focus" leadingVisual={true} />
+    <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--size-element-gap-md)',
+        padding: 'var(--size-section-pad-y-lg)',
+        maxWidth: '300px'
+    }}>
+        {['enabled', 'hover', 'selected', 'disabled', 'focus'].map(state => (
+            <SidebarTab
+                key={state}
+                text={`${state.charAt(0).toUpperCase() + state.slice(1)} Tab`}
+                icon="icons"
+                state={state}
+                leadingVisual
+            />
+        ))}
     </div>
 );
 
 /**
- * Sidebar Tab - Interactive
- * Fully interactive playground for SidebarTab props.
+ * SidebarTab Interactive
+ * Interactive sidebar tab with controls
  */
-export const SidebarTabInteractive = {
-    render: (args) => (
-        <div style={{ padding: '20px', maxWidth: '300px', backgroundColor: 'var(--color-surface-container)' }}>
-            <SidebarTab {...args} />
-        </div>
-    ),
-    argTypes: {
-        text: { control: 'text' },
-        icon: { control: 'text' },
-        state: {
-            control: { type: 'select' },
-            options: ['enabled', 'hover', 'selected', 'disabled', 'focus']
-        },
-        leadingVisual: { control: 'boolean' },
-        trailingVisual: { control: 'boolean' }
+export const SidebarTabInteractive = (args) => (
+    <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface)' }}>
+        <SidebarTab {...args} />
+    </div>
+);
+SidebarTabInteractive.args = {
+    text: 'Tab Title',
+    icon: 'icons',
+    state: 'enabled',
+    leadingVisual: true,
+    trailingVisual: false
+};
+SidebarTabInteractive.argTypes = {
+    text: { control: 'text', description: 'Tab label text' },
+    icon: { control: 'text', description: 'Icon name (Font Awesome)' },
+    state: {
+        control: { type: 'select' },
+        options: ['enabled', 'hover', 'selected', 'disabled', 'focus'],
+        description: 'Tab state'
     },
-    args: {
-        text: 'Tab Title',
-        icon: 'icons',
-        state: 'enabled',
-        leadingVisual: true,
-        trailingVisual: false
-    }
+    leadingVisual: { control: 'boolean', description: 'Show leading icon' },
+    trailingVisual: { control: 'boolean', description: 'Show trailing visual' }
 };
 
 /**
- * User Avatar - Interactive
- * Fully interactive playground for UserAvatar props.
+ * UserAvatar Interactive
+ * Interactive user avatar with controls
  */
-export const UserAvatarInteractive = {
-    render: (args) => (
+export const UserAvatarInteractive = (args) => (
+    <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
         <UserAvatar {...args} />
-    ),
-    argTypes: {
-        firstChar: { control: 'text' },
-        name: { control: 'text' },
-        counter: { control: 'boolean' },
-        counterValue: { control: 'number', if: { arg: 'counter' } },
-        state: {
-            control: { type: 'radio' },
-            options: ['enabled', 'hover']
-        },
-        type: {
-            control: { type: 'select' },
-            options: ['regular tutor', 'lead tutor', 'admin']
-        }
+    </div>
+);
+UserAvatarInteractive.args = {
+    firstChar: 'J',
+    name: 'John Doe',
+    counter: true,
+    counterValue: 2,
+    state: 'enabled',
+    type: 'regular tutor'
+};
+UserAvatarInteractive.argTypes = {
+    firstChar: { control: 'text', description: 'First character for avatar' },
+    name: { control: 'text', description: 'User name' },
+    counter: { control: 'boolean', description: 'Show notification counter' },
+    counterValue: { control: 'number', description: 'Counter value', if: { arg: 'counter' } },
+    state: {
+        control: { type: 'radio' },
+        options: ['enabled', 'hover'],
+        description: 'Component state'
     },
-    args: {
-        firstChar: 'J',
-        name: 'John Doe',
-        counter: true,
-        counterValue: 2,
-        state: 'enabled',
-        type: 'regular tutor'
+    type: {
+        control: { type: 'select' },
+        options: ['regular tutor', 'lead tutor', 'admin'],
+        description: 'User type (affects badge color)'
     }
 };
 
 /**
- * Static Badge Smart - Demo
+ * StaticBadgeSmart Variants
+ * All SMART competency badge variants
  */
-export const StaticBadgeSmartDemo = () => (
-    <div style={{ display: 'flex', gap: '8px' }}>
-        <StaticBadgeSmart label="Social-Emotional" type="social-emotional" />
-        <StaticBadgeSmart label="Academic" type="academic" />
+export const StaticBadgeSmartVariants = () => (
+    <div style={{
+        display: 'flex',
+        gap: '16px',
+        flexWrap: 'wrap',
+        padding: 'var(--size-section-pad-y-lg)'
+    }}>
+        <StaticBadgeSmart competency="specific" />
+        <StaticBadgeSmart competency="measurable" />
+        <StaticBadgeSmart competency="attainable" />
+        <StaticBadgeSmart competency="relevant" />
+        <StaticBadgeSmart competency="timely" />
     </div>
 );
-
