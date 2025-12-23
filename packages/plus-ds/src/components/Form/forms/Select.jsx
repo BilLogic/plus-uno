@@ -3,32 +3,55 @@ import PropTypes from 'prop-types';
 import { Dropdown } from 'react-bootstrap';
 import Badge from '@/components/Badge';
 import Button from '@/components/Button';
-import Checkbox from './Checkbox';
-import Radio from './Radio';
+import ListGroup, { ListGroupItem } from '@/components/ListGroup/ListGroup';
+import InputGroup from './InputGroup/InputGroup';
 import './Select.scss';
 
 /**
  * Enhanced Select Component
+ * 
  * Uses existing design system components:
- * - Checkbox for multi-select options
- * - Radio for single-select options
- * - Badge (dismissible) for selected values
- * - Ghost Button for creatable option
+ * - **ListGroup.Item** with selectable prop for options
+ * - **Badge** (dismissible) for selected values
+ * - **Button** (ghost) for creatable option
+ * - **InputGroup** for search field
  */
+// Custom Toggle to ensure proper click handling
+const CustomSelectToggle = React.forwardRef(({ children, onClick, className, disabled, ...props }, ref) => (
+    <div
+        ref={ref}
+        className={`plus-select-trigger ${className || ''}`}
+        onClick={(e) => {
+            e.preventDefault();
+            if (!disabled) {
+                onClick(e);
+            }
+        }}
+        aria-disabled={disabled}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        {...props}
+    >
+        {children}
+    </div>
+));
+
+CustomSelectToggle.displayName = 'CustomSelectToggle';
+
 const Select = ({
     id,
     name,
     mode = 'single', // 'single' or 'multi'
     options = [],
-    value, // For single mode (string) or multi (array)
+    value,
     defaultValue,
     placeholder = 'Select...',
     searchable = false,
-    creatable = false, // Allow adding new values
-    displayMode = 'badges', // 'badges' or 'text' for multi-select display
-    lineWrap = true, // true = multiline badges, false = single line with overflow
-    truncate = false, // true = truncate overflowing badges, false = show all
-    size = 'medium',
+    creatable = false,
+    displayMode = 'badges',
+    lineWrap = true,
+    truncate = false,
+    size = 'medium', // 'small', 'medium', 'large'
     disabled = false,
     required = false,
     onChange,
@@ -55,6 +78,9 @@ const Select = ({
     const selectedValues = mode === 'multi'
         ? (Array.isArray(currentValue) ? currentValue : [])
         : currentValue;
+
+    // Map Select size to ListGroup.Item size
+    const listItemSize = size === 'small' ? 'b3' : size === 'large' ? 'b1' : 'b2';
 
     // Filter options based on search
     const filteredOptions = options.filter(opt => {
@@ -101,7 +127,7 @@ const Select = ({
 
     // Handle badge dismiss
     const handleBadgeDismiss = (val) => {
-        handleSelect(val); // Toggles off
+        handleSelect(val);
     };
 
     // Get display text for selected value(s)
@@ -114,7 +140,7 @@ const Select = ({
                     return opt ? (opt.label || opt.text || opt.value) : v;
                 }).join(', ');
             }
-            return ''; // Badges shown separately
+            return '';
         } else {
             if (!selectedValues) return placeholder;
             const opt = options.find(o => o.value === selectedValues);
@@ -125,7 +151,10 @@ const Select = ({
     // Focus search on open
     useEffect(() => {
         if (isOpen && searchable && searchInputRef.current) {
-            searchInputRef.current.focus();
+            // Small timeout to ensure dropdown is fully rendered/visible
+            setTimeout(() => {
+                if (searchInputRef.current) searchInputRef.current.focus();
+            }, 50);
         }
     }, [isOpen, searchable]);
 
@@ -144,7 +173,6 @@ const Select = ({
         className
     ].filter(Boolean).join(' ');
 
-    // Show badges in trigger area or text?
     const showBadgesInTrigger = mode === 'multi' && displayMode === 'badges' && selectedValues.length > 0;
 
     return (
@@ -156,13 +184,7 @@ const Select = ({
             style={style}
         >
             {/* Trigger / Input Field */}
-            <Dropdown.Toggle
-                as="div"
-                id={id}
-                className="plus-select-trigger"
-                disabled={disabled}
-            >
-                {/* Badges for multi-select using Badge component */}
+            <Dropdown.Toggle as={CustomSelectToggle} id={id} disabled={disabled}>
                 {showBadgesInTrigger && (
                     <div className="plus-select-badges">
                         {selectedValues.map((val) => {
@@ -173,7 +195,11 @@ const Select = ({
                                     key={val}
                                     text={label}
                                     dismissible
-                                    onDismiss={() => handleBadgeDismiss(val)}
+                                    onDismiss={(e) => {
+                                        // Stop propagation to prevent toggling dropdown when dismissing badge
+                                        e && e.stopPropagation && e.stopPropagation();
+                                        handleBadgeDismiss(val);
+                                    }}
                                     size="b3"
                                     style="secondary"
                                 />
@@ -182,37 +208,36 @@ const Select = ({
                     </div>
                 )}
 
-                {/* Text display - only show if no badges or in text mode */}
                 {!showBadgesInTrigger && (
                     <span className={`plus-select-text ${!selectedValues || (Array.isArray(selectedValues) && selectedValues.length === 0) ? 'plus-select-placeholder' : ''}`}>
                         {getDisplayText()}
                     </span>
                 )}
 
-                {/* Chevron icon */}
                 <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'} plus-select-chevron`} />
             </Dropdown.Toggle>
 
             {/* Dropdown Menu */}
             <Dropdown.Menu className="plus-select-menu">
-                {/* Search input */}
+                {/* Search input using InputGroup */}
                 {searchable && (
                     <div className="plus-select-search">
-                        <i className="fas fa-search plus-select-search-icon" />
-                        <input
-                            ref={searchInputRef}
-                            type="text"
+                        <InputGroup
+                            inputRef={searchInputRef}
+                            size="small" // Always small for compact dropdown search
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="plus-select-search-input"
                             onClick={(e) => e.stopPropagation()}
+                            leadingVisual={<InputGroup.Icon size="small" className="text-muted" />}
+                            className="w-100 border-0 rounded-0" // Remove border/radius from input group so it fits flush
+                            style={{ boxShadow: 'none' }} // Ensure no shadow
                         />
                     </div>
                 )}
 
-                {/* Options list */}
-                <div className="plus-select-options">
+                {/* Options list using ListGroup */}
+                <ListGroup flush className="plus-select-options">
                     {filteredOptions.map((opt, idx) => {
                         const optValue = opt.value;
                         const optLabel = opt.label || opt.text || opt.value;
@@ -222,46 +247,23 @@ const Select = ({
                         const isDisabled = opt.disabled;
 
                         return (
-                            <div
+                            <ListGroupItem
                                 key={idx}
-                                className={`plus-select-option ${isSelected ? 'plus-select-option-selected' : ''} ${isDisabled ? 'plus-select-option-disabled' : ''}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (!isDisabled) handleSelect(optValue);
-                                }}
-                            >
-                                {/* Using Checkbox or Radio components */}
-                                {mode === 'multi' ? (
-                                    <Checkbox
-                                        id={`${id || name}-opt-${idx}`}
-                                        name={`${name || id}-option`}
-                                        checked={isSelected}
-                                        disabled={isDisabled}
-                                        label={optLabel}
-                                        size="small"
-                                        onChange={() => { }} // Handled by parent div onClick
-                                        className="plus-select-option-checkbox"
-                                    />
-                                ) : (
-                                    <Radio
-                                        id={`${id || name}-opt-${idx}`}
-                                        name={`${name || id}-radio`}
-                                        value={optValue}
-                                        checked={isSelected}
-                                        disabled={isDisabled}
-                                        label={optLabel}
-                                        size="small"
-                                        onChange={() => { }} // Handled by parent div onClick
-                                        className="plus-select-option-radio"
-                                    />
-                                )}
-                            </div>
+                                value={optValue}
+                                label={optLabel}
+                                selectable={mode === 'multi' ? 'multi' : 'single'}
+                                name={`${name || id}-option`}
+                                selected={isSelected}
+                                disabled={isDisabled}
+                                size={listItemSize}
+                                onClick={() => handleSelect(optValue)}
+                            />
                         );
                     })}
 
                     {/* Add new option using ghost Button */}
                     {canAddNew && (
-                        <div className="plus-select-option plus-select-option-add">
+                        <div className="plus-select-option-add">
                             <Button
                                 text={`Add "${searchTerm}"`}
                                 style="ghost"
@@ -282,11 +284,12 @@ const Select = ({
                             No options found
                         </div>
                     )}
-                </div>
+                </ListGroup>
             </Dropdown.Menu>
         </Dropdown>
     );
 };
+
 
 Select.propTypes = {
     id: PropTypes.string,

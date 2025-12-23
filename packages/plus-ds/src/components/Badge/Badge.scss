@@ -156,6 +156,14 @@
         align-items: center;
         justify-content: center;
 
+        // Constrain icon sizes based on badge size
+        // Use relative sizing so it scales with the badge text (h1-h6, b1-b3)
+        // 0.85em keeps it slightly smaller than text to avoid being "overly big"
+        i,
+        svg {
+            font-size: 0.85em !important;
+        }
+
         // Icon gap
         &--leading {
             margin-right: var(--size-element-gap-sm);

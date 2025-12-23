@@ -43,7 +43,8 @@ const Sidebar = ({
                 { text: 'Tutors', icon: 'chart-pie', id: 'tutors' },
                 { text: 'Sessions', icon: 'calendar-week', id: 'admin-sessions' },
                 { text: 'Students', icon: 'users', id: 'students' },
-                { text: 'Groups', icon: 'users-rectangle', id: 'groups' }
+                { text: 'Groups', icon: 'users-rectangle', id: 'groups' },
+                { text: 'Compliance', icon: 'clipboard-check', id: 'compliance-monitor' }
             ]
         });
     }
@@ -61,16 +62,16 @@ const Sidebar = ({
                 ...style
             }}
         >
-            {/* Logo Section */}
+            {/* Logo Section - per Figma: pad-x-sm (8px), pad-y-md (6px) */}
             <div className="plus-sidebar-logo" style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-md)',
-                padding: '0',
-                borderRadius: 'var(--size-element-radius-sm)',
+                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-sm)',
+                borderRadius: '4px',
                 boxSizing: 'border-box'
             }}>
-                <Logo style="colored" size="XS" text={true} />
+                <Logo style="colored" size="XS" text={true} className="p-0" />
             </div>
 
             {/* Home Tab */}
@@ -89,7 +90,7 @@ const Sidebar = ({
                     gap: 'var(--size-element-gap-sm)'
                 }}>
                     <div className="plus-sidebar-section-title" style={{
-                        padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg) 0 0'
+                        padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0 var(--size-element-pad-x-md)'
                     }}>
                         <p className="body2-txt" style={{
                             fontWeight: 'var(--font-weight-normal)',

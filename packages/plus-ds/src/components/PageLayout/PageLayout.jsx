@@ -13,18 +13,24 @@ const PageLayout = ({
     style,
 }) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-    const breakpoint = 992; // lg breakpoint
+    const containerRef = React.useRef(null);
+    const breakpoint = 1024; // lg-min breakpoint per DS schema
 
     useEffect(() => {
-        const handleResize = () => {
-            setIsSidebarVisible(window.innerWidth >= breakpoint);
-        };
+        if (!containerRef.current) return;
 
-        // Initial check
-        handleResize();
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const width = entry.contentRect.width;
+                // Auto-collapse if smaller than Large breakpoint
+                // Auto-expand if larger (unless user manually toggled? - keeping simple for now)
+                setIsSidebarVisible(width >= breakpoint);
+            }
+        });
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        observer.observe(containerRef.current);
+
+        return () => observer.disconnect();
     }, []);
 
     const toggleSidebar = () => {
@@ -34,6 +40,7 @@ const PageLayout = ({
     return (
         <div
             id={id}
+            ref={containerRef}
             className={`plus-page-layout ${className}`}
             style={{
                 display: 'flex',

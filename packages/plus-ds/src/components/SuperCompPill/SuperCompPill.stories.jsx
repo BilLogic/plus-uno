@@ -3,7 +3,7 @@ import SuperCompPill from '@/components/SuperCompPill';
 import { SMART_CONSTANTS } from '@/components/constants';
 
 export default {
-    title: 'Specs/Universal/SuperCompPill',
+    title: 'Components/SuperCompPill',
     component: SuperCompPill,
     tags: ['autodocs'],
     argTypes: {

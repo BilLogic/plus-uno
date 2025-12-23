@@ -29,12 +29,14 @@ export { default as Scrollspy } from '@/components/Scrollspy';
 export { default as Section } from '@/components/Section';
 export { default as Sidebar } from './Sidebar/Sidebar';
 export { default as SidebarTab } from '@/components/SidebarTab';
-export { default as PageLayout } from './PageLayout/PageLayout';
+// export { default as PageLayout } from './PageLayout/PageLayout';
 
 export { default as Spinner } from '@/components/Spinner';
 export { default as StaticBadgeSmart } from '@/components/StaticBadgeSmart';
+
 export { default as Table } from '@/components/Table';
 export { default as Toast } from '@/components/Toast';
 export { default as Tooltip } from '@/components/Tooltip';
 export { default as UserAvatar } from '@/components/UserAvatar';
+export * from '@/components/DataViz';
 // Note: constants.js is internal and NOT exported publicly

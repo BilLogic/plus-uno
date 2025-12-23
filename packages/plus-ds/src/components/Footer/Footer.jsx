@@ -1,8 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * Footer (Footnote) Component
+ * 
+ * Per Figma spec: node-id=111-227939
+ * Simple footer with version, copyright, and terms - no border/stroke
+ */
 const Footer = ({
-    version = 'v1.0.0',
+    version = 'v5.2.0',
     copyright = 'Copyright © Carnegie Mellon University 2024',
     termsText = 'Terms of Use',
     termsUrl = '#',
@@ -11,19 +17,31 @@ const Footer = ({
 }) => {
     return (
         <footer
-            className={`plus-footer d-flex justify-content-between align-items-center py-2 mt-auto w-100 border-top border-outline-variant ${className}`}
+            className={`plus-footer ${className}`}
             style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                width: '100%',
+                padding: '0 0 var(--size-element-pad-y-lg) 0',
                 ...style
             }}
         >
-            <div className="d-flex gap-3 align-items-center">
-                <span className="body3-txt text-muted">{version}</span>
-                <span className="body3-txt text-muted">|</span>
-                <span className="body3-txt text-muted">{copyright}</span>
-            </div>
-            <div>
-                <a href={termsUrl} className="body3-txt text-primary text-decoration-none">{termsText}</a>
-            </div>
+            <p
+                className="body3-txt m-0"
+                style={{
+                    color: 'var(--color-on-surface)',
+                    fontWeight: 300
+                }}
+            >
+                {version} | {copyright} | <a
+                    href={termsUrl}
+                    style={{
+                        color: 'var(--color-on-surface)',
+                        textDecoration: 'none'
+                    }}
+                >{termsText}</a>
+            </p>
         </footer>
     );
 };

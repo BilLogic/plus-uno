@@ -2,7 +2,7 @@ import React from 'react';
 import Section from '@/components/Section';
 
 export default {
-    title: 'Specs/Universal/Structure/Section',
+    title: 'Components/Section',
     component: Section,
     tags: ['autodocs'],
     argTypes: {

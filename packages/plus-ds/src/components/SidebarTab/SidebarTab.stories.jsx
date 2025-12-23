@@ -2,7 +2,7 @@ import React from 'react';
 import SidebarTab from '@/components/SidebarTab';
 
 export default {
-    title: 'Specs/Universal/SidebarTab',
+    title: 'Components/SidebarTab',
     component: SidebarTab,
     tags: ['autodocs'],
     argTypes: {
@@ -12,6 +12,14 @@ export default {
         },
         icon: { control: 'text' },
     },
+    // Add gap to decorator for better spacing in list
+    decorators: [
+        (Story) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <Story />
+            </div>
+        )
+    ]
 };
 
 export const Default = {

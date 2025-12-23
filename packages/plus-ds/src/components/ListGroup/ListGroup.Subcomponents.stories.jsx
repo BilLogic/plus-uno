@@ -1,179 +1,261 @@
 import React, { useState } from 'react';
 import ListGroup from './ListGroup';
+import Badge from '../Badge/Badge';
 
+/**
+ * ListGroup.Item Component
+ * 
+ * A unified list item supporting three modes:
+ * - **selectable="none"**: Regular clickable/static item (default)
+ * - **selectable="single"**: Radio button selection
+ * - **selectable="multi"**: Checkbox selection
+ * 
+ * All modes support size (b1, b2, b3) and state options.
+ */
 export default {
-    title: 'Components/ListGroup/Subcomponents',
+    title: 'Components/ListGroup/ListItem',
     component: ListGroup.Item,
-    subcomponents: {
-        'ListGroup.Option': ListGroup.Option,
-        'ListGroup.OptionList': ListGroup.OptionList
-    },
     tags: ['autodocs'],
     parameters: {
         docs: {
             description: {
-                component: 'Subcomponents for ListGroup: ListGroup.Item for basic list items, ListGroup.Option for selectable options with checkbox/radio, and ListGroup.OptionList for a complete selection list container.'
+                component: `A flexible list item for navigation, display, or selection.
+
+| Mode | Prop | Use Case |
+|------|------|----------|
+| Default | \`selectable="none"\` | Navigation, menus, clickable items |
+| Single Select | \`selectable="single"\` | Radio-style selection |
+| Multi Select | \`selectable="multi"\` | Checkbox-style selection |
+
+### Size Options
+- \`b1\`: Body 1 - largest
+- \`b2\` (default): Body 2 - medium  
+- \`b3\`: Body 3 - smallest`
             }
-        }
-    },
-    argTypes: {
-        active: {
-            control: 'boolean',
-            description: 'Whether the item is active/selected',
-            table: { category: 'State' }
-        },
-        disabled: {
-            control: 'boolean',
-            description: 'Whether the item is disabled',
-            table: { category: 'State' }
-        },
-        action: {
-            control: 'boolean',
-            description: 'Makes the item actionable (clickable)',
-            table: { category: 'Behavior' }
         }
     }
 };
 
 /**
  * Overview
- * Comprehensive view of all ListGroup subcomponents.
+ * Shows all modes and size variants
  */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '500px' }}>
-        {/* ListGroup.Item */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>ListGroup.Item</h6>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Basic list items for displaying content in a vertical list.
-            </p>
-            <ListGroup>
-                <ListGroup.Item>Default item</ListGroup.Item>
-                <ListGroup.Item active>Active item</ListGroup.Item>
-                <ListGroup.Item disabled>Disabled item</ListGroup.Item>
-            </ListGroup>
-        </section>
+export const Overview = {
+    render: () => {
+        const [singleValue, setSingleValue] = useState('opt1');
+        const [multiValues, setMultiValues] = useState(['opt1', 'opt3']);
 
-        {/* ListGroup.Option */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>ListGroup.Option</h6>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Selectable options with checkbox (multi) or radio (single) controls.
-            </p>
-            <OptionDemo />
-        </section>
+        const handleMultiToggle = (value) => {
+            setMultiValues(prev =>
+                prev.includes(value)
+                    ? prev.filter(v => v !== value)
+                    : [...prev, value]
+            );
+        };
 
-        {/* ListGroup.OptionList */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>ListGroup.OptionList</h6>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Complete selection list container. Pass options array and get selected values.
-            </p>
-            <OptionListDemo />
-        </section>
-    </div>
-);
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' }}>
+                {/* Default Mode */}
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '12px' }}>Default Mode (Navigation)</h6>
+                    <ListGroup>
+                        <ListGroup.Item action>
+                            <i className="fas fa-home me-3" style={{ color: 'var(--color-primary)' }} />
+                            <span className="flex-grow-1">Home</span>
+                        </ListGroup.Item>
+                        <ListGroup.Item action active>
+                            <i className="fas fa-user me-3" style={{ color: 'var(--color-primary)' }} />
+                            <span className="flex-grow-1">Profile</span>
+                            <Badge style="primary" size="b3">New</Badge>
+                        </ListGroup.Item>
+                        <ListGroup.Item action disabled>
+                            <i className="fas fa-lock me-3" />
+                            <span className="flex-grow-1">Disabled</span>
+                        </ListGroup.Item>
+                    </ListGroup>
+                </section>
 
-// Helper for Option demo
-const OptionDemo = () => {
-    const [selected, setSelected] = useState(['opt1']);
+                {/* Single Select Mode */}
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '12px' }}>Single Select</h6>
+                    <ListGroup>
+                        {['opt1', 'opt2', 'opt3'].map((value, i) => (
+                            <ListGroup.Item
+                                key={value}
+                                value={value}
+                                label={`Option ${i + 1}`}
+                                selectable="single"
+                                name="single-demo"
+                                selected={singleValue === value}
+                                onClick={() => setSingleValue(value)}
+                            />
+                        ))}
+                    </ListGroup>
+                </section>
 
-    const handleToggle = (value) => {
-        setSelected(prev =>
-            prev.includes(value)
-                ? prev.filter(v => v !== value)
-                : [...prev, value]
+                {/* Multi Select Mode */}
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '12px' }}>Multi Select</h6>
+                    <ListGroup>
+                        {['opt1', 'opt2', 'opt3'].map((value, i) => (
+                            <ListGroup.Item
+                                key={value}
+                                value={value}
+                                label={`Option ${i + 1}`}
+                                selectable="multi"
+                                selected={multiValues.includes(value)}
+                                onClick={() => handleMultiToggle(value)}
+                            />
+                        ))}
+                    </ListGroup>
+                </section>
+
+                {/* Size Variants */}
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '12px' }}>Sizes</h6>
+                    <ListGroup>
+                        <ListGroup.Item action size="b1">Size B1 (Large)</ListGroup.Item>
+                        <ListGroup.Item action size="b2">Size B2 (Default)</ListGroup.Item>
+                        <ListGroup.Item action size="b3">Size B3 (Small)</ListGroup.Item>
+                    </ListGroup>
+                </section>
+            </div>
         );
-    };
-
-    return (
-        <ListGroup>
-            <ListGroup.Option
-                value="opt1"
-                label="Option One"
-                mode="multi"
-                checked={selected.includes('opt1')}
-                onChange={() => handleToggle('opt1')}
-            />
-            <ListGroup.Option
-                value="opt2"
-                label="Option Two"
-                mode="multi"
-                checked={selected.includes('opt2')}
-                onChange={() => handleToggle('opt2')}
-            />
-            <ListGroup.Option
-                value="opt3"
-                label="Option Three (Disabled)"
-                mode="multi"
-                checked={false}
-                disabled
-            />
-        </ListGroup>
-    );
-};
-
-// Helper for OptionList demo
-const OptionListDemo = () => {
-    const options = [
-        { value: 'react', text: 'React' },
-        { value: 'vue', text: 'Vue' },
-        { value: 'angular', text: 'Angular' },
-        { value: 'svelte', text: 'Svelte' }
-    ];
-
-    return (
-        <ListGroup.OptionList
-            options={options}
-            defaultSelectedValues={['react']}
-            onChange={(result) => console.log('Selected:', result)}
-        />
-    );
+    }
 };
 
 /**
  * Interactive
- * Playground for ListGroup.Item with controls.
+ * Full playground with controls
  */
-export const Interactive = (args) => (
-    <ListGroup style={{ maxWidth: '300px' }}>
-        <ListGroup.Item
-            active={args.active}
-            disabled={args.disabled}
-            action={args.action}
-        >
-            {args.children || 'List Item'}
-        </ListGroup.Item>
-        <ListGroup.Item>Other Item</ListGroup.Item>
-    </ListGroup>
-);
-Interactive.args = {
-    children: 'Interactive Item',
-    active: false,
-    disabled: false,
-    action: true
-};
+export const Interactive = {
+    render: (args) => {
+        const [selected, setSelected] = useState(args.selected);
 
-/**
- * OptionList Modes
- * Single-select vs. multi-select option lists.
- */
-export const OptionListModes = () => {
-    const options = [
-        { value: '1', text: 'First Option' },
-        { value: '2', text: 'Second Option' },
-        { value: '3', text: 'Third Option' }
-    ];
+        const handleClick = (val) => {
+            if (args.selectable !== 'none') {
+                setSelected(!selected);
+            }
+        };
 
-    return (
-        <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
-            <div style={{ width: '200px' }}>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Multi-Select</h6>
-                <ListGroup.OptionList
-                    options={options}
-                    defaultSelectedValues={['1', '2']}
-                />
-            </div>
-        </div>
-    );
+        return (
+            <ListGroup style={{ maxWidth: '400px' }}>
+                <ListGroup.Item
+                    {...args}
+                    selected={selected}
+                    onClick={handleClick}
+                >
+                    {args.selectable === 'none' && (
+                        <>
+                            {args.showLeadingIcon && (
+                                <i className={`fas fa-${args.leadingIcon} me-3`} style={{ color: 'var(--color-primary)' }} />
+                            )}
+                            <span className="flex-grow-1">{args.text}</span>
+                            {args.showCounter && (
+                                <Badge style={args.counterStyle} size={args.size}>{args.counterValue}</Badge>
+                            )}
+                        </>
+                    )}
+                </ListGroup.Item>
+            </ListGroup>
+        );
+    },
+    args: {
+        text: 'List Item',
+        label: 'Option Label',
+        value: 'option-1',
+        size: 'b2',
+        selectable: 'none',
+        active: false,
+        selected: false,
+        disabled: false,
+        action: true,
+        showLeadingIcon: true,
+        leadingIcon: 'star',
+        showCounter: false,
+        counterValue: '5',
+        counterStyle: 'primary'
+    },
+    argTypes: {
+        // Design
+        size: {
+            control: { type: 'select' },
+            options: ['b1', 'b2', 'b3'],
+            table: { category: 'Design' }
+        },
+        selectable: {
+            control: { type: 'select' },
+            options: ['none', 'single', 'multi'],
+            description: 'Selection mode',
+            table: { category: 'Design' }
+        },
+
+        // Content (default mode)
+        text: {
+            control: 'text',
+            if: { arg: 'selectable', eq: 'none' },
+            table: { category: 'Content' }
+        },
+        // Content (selectable mode)
+        label: {
+            control: 'text',
+            if: { arg: 'selectable', neq: 'none' },
+            table: { category: 'Content' }
+        },
+        value: {
+            control: 'text',
+            if: { arg: 'selectable', neq: 'none' },
+            table: { category: 'Content' }
+        },
+
+        // State
+        active: {
+            control: 'boolean',
+            if: { arg: 'selectable', eq: 'none' },
+            table: { category: 'State' }
+        },
+        selected: {
+            control: 'boolean',
+            if: { arg: 'selectable', neq: 'none' },
+            table: { category: 'State' }
+        },
+        disabled: {
+            control: 'boolean',
+            table: { category: 'State' }
+        },
+        action: {
+            control: 'boolean',
+            if: { arg: 'selectable', eq: 'none' },
+            table: { category: 'Behavior' }
+        },
+
+        // Visuals
+        showLeadingIcon: {
+            control: 'boolean',
+            if: { arg: 'selectable', eq: 'none' },
+            table: { category: 'Visuals' }
+        },
+        leadingIcon: {
+            control: { type: 'select' },
+            options: ['star', 'home', 'user', 'cog', 'inbox', 'heart', 'folder'],
+            if: { arg: 'showLeadingIcon' },
+            table: { category: 'Visuals' }
+        },
+        showCounter: {
+            control: 'boolean',
+            if: { arg: 'selectable', eq: 'none' },
+            table: { category: 'Visuals' }
+        },
+        counterValue: {
+            control: 'text',
+            if: { arg: 'showCounter' },
+            table: { category: 'Visuals' }
+        },
+        counterStyle: {
+            control: { type: 'select' },
+            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
+            if: { arg: 'showCounter' },
+            table: { category: 'Visuals' }
+        }
+    }
 };

@@ -22,6 +22,7 @@ const InputGroup = ({
     onChange,
     onFocus,
     onBlur,
+    inputRef,
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -119,6 +120,7 @@ const InputGroup = ({
 
             {/* Main input */}
             <Form.Control
+                ref={inputRef}
                 name={name}
                 type="text"
                 placeholder={placeholder}
@@ -350,7 +352,11 @@ InputGroup.propTypes = {
     style: PropTypes.object,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
-    onBlur: PropTypes.func
+    onBlur: PropTypes.func,
+    inputRef: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+    ])
 };
 
 export default InputGroup;
