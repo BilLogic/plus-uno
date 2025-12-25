@@ -2,7 +2,7 @@ import React from 'react';
 import BottomDiv from './BottomDiv';
 
 export default {
-    title: 'Home/Sections/BottomDiv',
+    title: 'Specs/Home/Sections/BottomDiv',
     component: BottomDiv,
     tags: ['autodocs'],
 };

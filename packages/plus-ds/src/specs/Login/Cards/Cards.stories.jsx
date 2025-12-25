@@ -10,8 +10,8 @@
 import React, { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import Input from '@/components/Form/forms/Input';
-import Select from '@/components/Form/forms/Select';
+import Input from '@/forms/Input';
+import Select from '@/forms/Select';
 import Logo from '@/components/Logo';
 
 export default {

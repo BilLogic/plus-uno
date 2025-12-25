@@ -15,8 +15,8 @@
 import React, { useState } from 'react';
 import Button from '@/components/Button';
 import Alert from '@/components/Alert';
-import Select from '@/components/Form/forms/Select';
-import Input from '@/components/Form/forms/Input';
+import Select from '@/forms/Select';
+import Input from '@/forms/Input';
 import Footer from '@/components/Footer';
 
 export default {

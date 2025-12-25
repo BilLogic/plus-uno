@@ -8,3 +8,6 @@ export { default as HomepageJumbotron } from './HomepageJumbotron';
 
 // Bottom Div
 export { default as BottomDiv } from './BottomDiv';
+
+// Students Overview Section
+export { default as StudentsOverviewSection } from './StudentsOverviewSection';

@@ -14,8 +14,8 @@
  */
 
 import React, { useState } from 'react';
-import Rating from '@/components/Form/forms/Rating';
-import Select from '@/components/Form/forms/Select';
+import Rating from '@/forms/Rating';
+import Select from '@/forms/Select';
 import Badge from '@/components/Badge';
 import Button from '@/components/Button';
 import Toast from '@/components/Toast';
