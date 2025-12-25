@@ -3,4 +3,4 @@
  * Page-level layouts for universal organisms.
  */
 
-// Page layouts will be exported here as they are created
+export { default as PageLayout } from './PageLayout/PageLayout';

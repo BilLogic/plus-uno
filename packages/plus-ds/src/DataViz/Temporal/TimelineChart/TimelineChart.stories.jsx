@@ -1,0 +1,77 @@
+import React from 'react';
+import TimelineChart from './TimelineChart';
+
+export default {
+    title: 'Data Visualizations/Temporal/TimelineChart',
+    component: TimelineChart,
+    tags: ['autodocs'],
+    parameters: {
+        docs: {
+            description: {
+                component: `
+## Timeline Chart
+
+Shows **events or milestones** along a horizontal timeline.
+
+---
+
+### 📖 How to Read
+- **Points** = events/milestones
+- **Position** = chronological order
+- **Labels** = event names and descriptions
+
+---
+
+### 🎯 When to Use
+
+| Use Case | Recommendation |
+|----------|----------------|
+| Project milestones | ✅ Ideal |
+| Historical events | ✅ Ideal |
+| Progress tracking | ✅ Good |
+| Quantitative data | ❌ Use Line Chart |
+
+---
+
+### 🏫 适用场景 (PLUS Context)
+
+| Scenario | Example |
+|----------|---------|
+| **Student Journey** | Enrollment → Completion |
+| **Course Milestones** | Module completion dates |
+| **Project Timeline** | Development phases |
+                `
+            }
+        }
+    }
+};
+
+const studentJourneyData = {
+    data: [
+        { name: 'Application', label: 'Application Submitted', description: 'Student applied for tutoring' },
+        { name: 'Assessment', label: 'Initial Assessment', description: 'Baseline skills evaluated' },
+        { name: 'Enrollment', label: 'Course Enrolled', description: 'Started learning path' },
+        { name: 'Midterm', label: 'Midterm Review', description: 'Progress checkpoint' },
+        { name: 'Completion', label: 'Course Completed', description: 'Certification earned' }
+    ]
+};
+
+export const Overview = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+        <section>
+            <h3 style={{ marginBottom: '16px' }}>Student Learning Journey</h3>
+            <TimelineChart {...studentJourneyData} />
+        </section>
+    </div>
+);
+
+export const Interactive = {
+    args: {
+        data: [
+            { name: 'Step 1', label: 'Start', description: 'Beginning' },
+            { name: 'Step 2', label: 'Middle', description: 'In progress' },
+            { name: 'Step 3', label: 'End', description: 'Complete' }
+        ],
+        height: 400
+    }
+};

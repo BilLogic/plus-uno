@@ -6,12 +6,11 @@
  */
 
 import React, { useState } from 'react';
-import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import UserAvatar from '../../../../components/UserAvatar/UserAvatar';
-import Button from '../../../../components/Button/Button';
+import TopBar from './TopBar';
 
 export default {
     title: 'Specs/Universal/Sections/TopBar',
+    component: TopBar,
     tags: ['autodocs'],
     parameters: {
         docs: {
@@ -37,38 +36,20 @@ export const Overview = {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <section>
                     <h6 className="h6" style={{ marginBottom: '12px' }}>Interactive TopBar (click button to toggle)</h6>
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '16px',
-                            backgroundColor: 'var(--color-surface)',
-                            padding: '12px 16px',
-                            borderRadius: '8px'
-                        }}
-                    >
-                        {/* Sidebar Control - 168px width in expanded mode */}
-                        <div style={{ width: mode === 'expanded' ? '168px' : 'auto' }}>
-                            <Button
-                                style="ghost"
-                                fill="tonal" // Changed to tonal
-                                leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
-                                onClick={() => setMode(mode === 'expanded' ? 'collapsed' : 'expanded')}
-                            />
-                        </div>
-
-                        {/* Page Control - Breadcrumb */}
-                        <div style={{ flex: 1 }}>
-                            <Breadcrumb
-                                items={[
-                                    { text: 'Home', href: '#' },
-                                    { text: 'Dashboard' }
-                                ]}
-                            />
-                        </div>
-
-                        {/* User Avatar */}
-                        <UserAvatar firstChar="J" name="John Doe" counter counterValue={2} />
+                    <div style={{
+                        backgroundColor: 'var(--color-surface-container)',
+                        padding: '12px 16px',
+                        borderRadius: '8px'
+                    }}>
+                        <TopBar
+                            mode={mode}
+                            onToggle={(newMode) => setMode(newMode)}
+                            breadcrumbs={[
+                                { text: 'Home', href: '#' },
+                                { text: 'Dashboard' }
+                            ]}
+                            user={{ name: 'John Doe', counter: true, counterValue: 2 }}
+                        />
                     </div>
                     <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
                         Current mode: <strong>{mode}</strong>
@@ -89,42 +70,23 @@ export const Interactive = {
 
         return (
             <div>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '16px',
-                        backgroundColor: 'var(--color-surface)',
-                        padding: '12px 16px',
-                        borderRadius: '8px'
-                    }}
-                >
-                    {/* Sidebar Control */}
-                    <div style={{ width: mode === 'expanded' ? '168px' : 'auto' }}>
-                        <Button
-                            style="ghost"
-                            fill="tonal"
-                            leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
-                            onClick={() => setMode(mode === 'expanded' ? 'collapsed' : 'expanded')}
-                        />
-                    </div>
-
-                    {/* Breadcrumb */}
-                    <div style={{ flex: 1 }}>
-                        <Breadcrumb
-                            items={[
-                                { text: 'Home', href: '#' },
-                                { text: args.currentPage }
-                            ]}
-                        />
-                    </div>
-
-                    {/* User Avatar */}
-                    <UserAvatar
-                        firstChar={args.userName.charAt(0)}
-                        name={args.userName}
-                        counter={args.showCounter}
-                        counterValue={args.counterValue}
+                <div style={{
+                    backgroundColor: 'var(--color-surface-container)',
+                    padding: '12px 16px',
+                    borderRadius: '8px'
+                }}>
+                    <TopBar
+                        mode={mode}
+                        onToggle={(newMode) => setMode(newMode)}
+                        breadcrumbs={[
+                            { text: 'Home', href: '#' },
+                            { text: args.currentPage }
+                        ]}
+                        user={{
+                            name: args.userName,
+                            counter: args.showCounter,
+                            counterValue: args.counterValue
+                        }}
                     />
                 </div>
                 <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -165,3 +127,5 @@ export const Interactive = {
         }
     }
 };
+
+

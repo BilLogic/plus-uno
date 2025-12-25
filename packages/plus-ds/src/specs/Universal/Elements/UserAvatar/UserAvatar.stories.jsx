@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import UserAvatar from '../../../../components/UserAvatar/UserAvatar';
+import UserAvatar from './UserAvatar';
 
 export default {
     title: 'Specs/Universal/Elements/UserAvatar',

@@ -1,5 +1,10 @@
+/**
+ * OverviewCard Stories
+ * Figma Spec: node-id=83-125838
+ */
+
 import React from 'react';
-import OverviewCard from '../../../../components/Card/OverviewCard/OverviewCard';
+import OverviewCard from './OverviewCard';
 
 export default {
     title: 'Specs/Universal/Cards/OverviewCard',
@@ -8,11 +13,16 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Overview cards for SMART competency metrics and student progress.
+                component: `Overview cards for SMART competency metrics and student progress tracking.
                 
-**Types:**
-- **SMART:** relationships, socio-emotional, mastering-content, advocacy, technology-tools
-- **Metrics:** status, completion, accuracy, time-spent, effort, progress`
+**SMART Types:**
+- **Relationships** - Pink/magenta theme
+- **Socio-Emotional** - Gold/amber theme  
+- **Mastering Content** - Purple theme
+- **Advocacy** - Green theme
+- **Technology Tools** - Blue theme
+
+Each card displays a title, metric value, trend indicator, and optional sparkline chart.`
             }
         }
     },
@@ -25,118 +35,188 @@ export default {
                 'mastering-content',
                 'advocacy',
                 'technology-tools',
-                'status',
-                'completion',
-                'accuracy',
-                'time-spent',
-                'effort',
-                'progress'
-            ]
+                'undefined'
+            ],
+            description: 'SMART competency type - determines color scheme'
         },
-        title: { control: 'text' },
-        value: { control: 'text' },
-        trend: { control: 'text' },
-        subtitle: { control: 'text' }
+        title: {
+            control: 'text',
+            description: 'Card title'
+        },
+        value: {
+            control: 'text',
+            description: 'Large metric value'
+        },
+        trend: {
+            control: 'text',
+            description: 'Trend indicator text'
+        }
+    }
+};
+
+// Sample data for sparklines
+const sampleData = {
+    relationships: [10, 12, 11, 14, 13, 15, 16, 15, 17, 18],
+    'socio-emotional': [5, 8, 6, 9, 7, 10, 9, 11, 10, 12],
+    'mastering-content': [65, 68, 70, 72, 72, 71, 72, 73, 75, 78],
+    advocacy: [0, 1, 0, 0, 2, 1, 3, 2, 4, 3],
+    'technology-tools': [90, 92, 94, 94, 95, 95, 96, 97, 96, 98]
+};
+
+/**
+ * All SMART card variants displayed together
+ */
+export const AllVariants = () => (
+    <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(275px, 1fr))',
+        gap: '16px',
+        padding: '24px',
+        backgroundColor: 'var(--color-surface, #f9f9fc)'
+    }}>
+        <OverviewCard
+            type="relationships"
+            title="Relationships"
+            icon={<i className="fas fa-heart" />}
+            value="85%"
+            trend="+5% from last week"
+            data={sampleData.relationships}
+        />
+        <OverviewCard
+            type="socio-emotional"
+            title="Socio-Emotional"
+            icon={<i className="fas fa-smile" />}
+            value="72%"
+            trend="Steady growth"
+            data={sampleData['socio-emotional']}
+        />
+        <OverviewCard
+            type="mastering-content"
+            title="Mastering Content"
+            icon={<i className="fas fa-book" />}
+            value="78%"
+            trend="Quiz completion"
+            data={sampleData['mastering-content']}
+        />
+        <OverviewCard
+            type="advocacy"
+            title="Advocacy"
+            icon={<i className="fas fa-bullhorn" />}
+            value="3"
+            trend="New cases this week"
+            data={sampleData.advocacy}
+        />
+        <OverviewCard
+            type="technology-tools"
+            title="Tech Tools"
+            icon={<i className="fas fa-laptop" />}
+            value="98%"
+            trend="High adoption"
+            data={sampleData['technology-tools']}
+        />
+        <OverviewCard
+            type="undefined"
+            title="Student Need"
+            icon={<i className="fas fa-info-circle" />}
+            value="--"
+            trend="No data available"
+        />
+    </div>
+);
+
+/**
+ * Relationships card - pink/magenta theme
+ */
+export const Relationships = {
+    args: {
+        type: 'relationships',
+        title: 'Relationships',
+        icon: <i className="fas fa-heart" />,
+        value: '85%',
+        trend: '+5% from last week',
+        data: sampleData.relationships
     }
 };
 
 /**
- * Overview
- * Displays all available variants of the OverviewCard.
+ * Socio-Emotional card - gold/amber theme
  */
-export const Overview = {
-    render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            {/* SMART Competency Cards */}
-            <div>
-                <h6 className="h6 mb-3">SMART Competencies</h6>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                    <OverviewCard
-                        type="socio-emotional"
-                        title="Socio-Emotional"
-                        value="85%"
-                        subtitle="Students displaying growth"
-                        icon={<i className="fas fa-heart" />}
-                    />
-                    <OverviewCard
-                        type="mastering-content"
-                        title="Mastering Content"
-                        value="92%"
-                        subtitle="Concept mastery rate"
-                        icon={<i className="fas fa-brain" />}
-                    />
-                    <OverviewCard
-                        type="advocacy"
-                        title="Advocacy"
-                        value="78%"
-                        subtitle="Self-advocacy instances"
-                        icon={<i className="fas fa-bullhorn" />}
-                    />
-                    <OverviewCard
-                        type="relationships"
-                        title="Relationships"
-                        value="88%"
-                        subtitle="Positive interactions"
-                        icon={<i className="fas fa-users" />}
-                    />
-                    <OverviewCard
-                        type="technology-tools"
-                        title="Technology Tools"
-                        value="95%"
-                        subtitle="Tool proficiency"
-                        icon={<i className="fas fa-laptop" />}
-                    />
-                </div>
-            </div>
-
-            {/* Metric Cards */}
-            <div>
-                <h6 className="h6 mb-3">Metrics</h6>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                    <OverviewCard
-                        type="status"
-                        title="Status"
-                        value="On Track"
-                        trend="↑ 5%"
-                        subtitle="Weekly progress"
-                    />
-                    <OverviewCard
-                        type="completion"
-                        title="Completion"
-                        value="12/15"
-                        trend="+2"
-                        subtitle="Modules completed"
-                    />
-                    <OverviewCard
-                        type="accuracy"
-                        title="Accuracy"
-                        value="94%"
-                        subtitle="Average quiz score"
-                    />
-                    <OverviewCard
-                        type="time-spent"
-                        title="Time Spent"
-                        value="4.5h"
-                        subtitle="Total session time"
-                    />
-                </div>
-            </div>
-        </div>
-    )
-};
-
-/**
- * Interactive
- * Playground for testing component props.
- */
-export const Interactive = {
+export const SocioEmotional = {
     args: {
         type: 'socio-emotional',
         title: 'Socio-Emotional',
+        icon: <i className="fas fa-smile" />,
+        value: '72%',
+        trend: 'Steady growth',
+        data: sampleData['socio-emotional']
+    }
+};
+
+/**
+ * Mastering Content card - purple theme
+ */
+export const MasteringContent = {
+    args: {
+        type: 'mastering-content',
+        title: 'Mastering Content',
+        icon: <i className="fas fa-book" />,
+        value: '78%',
+        trend: 'Quiz completion rate',
+        data: sampleData['mastering-content']
+    }
+};
+
+/**
+ * Advocacy card - green theme
+ */
+export const Advocacy = {
+    args: {
+        type: 'advocacy',
+        title: 'Advocacy',
+        icon: <i className="fas fa-bullhorn" />,
+        value: '3',
+        trend: 'New cases this week',
+        data: sampleData.advocacy
+    }
+};
+
+/**
+ * Technology Tools card - blue theme
+ */
+export const TechnologyTools = {
+    args: {
+        type: 'technology-tools',
+        title: 'Tech Tools',
+        icon: <i className="fas fa-laptop" />,
+        value: '98%',
+        trend: 'High adoption rate',
+        data: sampleData['technology-tools']
+    }
+};
+
+/**
+ * Undefined/neutral state
+ */
+export const Undefined = {
+    args: {
+        type: 'undefined',
+        title: 'Student Need',
+        icon: <i className="fas fa-info-circle" />,
+        value: '--',
+        trend: 'No data available'
+    }
+};
+
+/**
+ * Interactive playground
+ */
+export const Interactive = {
+    args: {
+        type: 'relationships',
+        title: 'Interactive Card',
         value: '85%',
-        subtitle: 'Students displaying growth',
-        icon: <i className="fas fa-heart" />,
-        style: { width: '275px' }
-    },
-    render: (args) => <OverviewCard {...args} />
+        trend: 'Try changing props!',
+        icon: <i className="fas fa-star" />,
+        data: [5, 10, 5, 10, 5, 10, 15, 10]
+    }
 };

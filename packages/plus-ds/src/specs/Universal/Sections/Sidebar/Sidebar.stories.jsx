@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import Sidebar from '../../../../components/Sidebar/Sidebar';
+import Sidebar from './Sidebar';
 
 export default {
     title: 'Specs/Universal/Sections/Sidebar',

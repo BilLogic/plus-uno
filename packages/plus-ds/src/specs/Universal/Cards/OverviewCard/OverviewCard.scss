@@ -1,0 +1,210 @@
+/**
+ * OverviewCard Styles
+ * Figma Spec: node-id=83-125838
+ * 
+ * Overview cards for SMART competency metrics with sparkline graphs.
+ * Fixed height card with title, large metric value, trend indicator, and chart.
+ */
+
+.plus-overview-card {
+    // Dimensions & Shape - match Figma exactly
+    width: var(--col-5, 275px);
+    height: 180px;
+    padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
+    border-radius: var(--size-card-radius-md, 16px);
+
+    // Background - default to neutral variant per spec
+    background-color: var(--color-surface-variant, #dde3ea);
+
+    // Layout - flex column to stack elements
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+
+    // Header row: Title + Icon
+    &__header {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: var(--size-element-gap-xs, 4px);
+        flex-shrink: 0;
+    }
+
+    &__title {
+        // Lato SemiBold 20px - H5 style per Figma
+        font-family: 'Lato', sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 1.4;
+        color: var(--color-on-surface-variant, #3f484a);
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    &__icon {
+        // 20x20 container, 16px icon size per Figma
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        font-size: 16px;
+        color: var(--color-on-surface-variant, #3f484a);
+        flex-shrink: 0;
+
+        i,
+        svg {
+            font-size: inherit;
+            color: inherit;
+        }
+    }
+
+    // Body area: contains value/trend on left, chart on right
+    &__body {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        width: 100%;
+        flex: 1;
+        margin-top: var(--size-element-gap-md, 12px);
+    }
+
+    // Content block: value + trend stacked  
+    &__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: var(--size-element-gap-xs, 4px);
+    }
+
+    &__value {
+        // Large metric value - H4 style (24px)
+        font-family: 'Lato', sans-serif;
+        font-weight: 600;
+        font-size: 24px;
+        line-height: 1.33;
+        color: var(--color-on-surface-variant, #3f484a);
+        margin: 0;
+    }
+
+    &__trend {
+        // Trend/subtitle text - B3 style (12px)
+        font-family: 'Merriweather Sans', sans-serif;
+        font-weight: 300;
+        font-size: 12px;
+        line-height: 1.67;
+        color: var(--color-on-surface-variant, #3f484a);
+        opacity: 0.8;
+        margin: 0;
+    }
+
+    // Chart container - positioned to right
+    &__chart {
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    // Footer for additional subtitle if needed
+    &__footer {
+        margin-top: auto;
+        width: 100%;
+    }
+
+    // =============================================
+    // SMART Type Variants - using container colors
+    // =============================================
+
+    &--socio-emotional {
+        background-color: var(--color-social-emotional-container, #ffdea0);
+
+        .plus-overview-card__title,
+        .plus-overview-card__value {
+            color: var(--color-social-emotional-text, #674a00);
+        }
+
+        .plus-overview-card__icon {
+            color: var(--color-social-emotional-text, #674a00);
+        }
+
+        .plus-overview-card__trend {
+            color: var(--color-social-emotional-text, #674a00);
+        }
+    }
+
+    &--mastering-content {
+        background-color: var(--color-mastering-content-container, #f2daff);
+
+        .plus-overview-card__title,
+        .plus-overview-card__value {
+            color: var(--color-mastering-content-text, #673a8b);
+        }
+
+        .plus-overview-card__icon {
+            color: var(--color-mastering-content-text, #673a8b);
+        }
+
+        .plus-overview-card__trend {
+            color: var(--color-mastering-content-text, #673a8b);
+        }
+    }
+
+    &--advocacy {
+        background-color: var(--color-advocacy-container, #b3f1bf);
+
+        .plus-overview-card__title,
+        .plus-overview-card__value {
+            color: var(--color-advocacy-text, #00572a);
+        }
+
+        .plus-overview-card__icon {
+            color: var(--color-advocacy-text, #00572a);
+        }
+
+        .plus-overview-card__trend {
+            color: var(--color-advocacy-text, #00572a);
+        }
+    }
+
+    &--relationships {
+        background-color: var(--color-relationship-container, #ffd9e4);
+
+        .plus-overview-card__title,
+        .plus-overview-card__value {
+            color: var(--color-relationship-text, #940055);
+        }
+
+        .plus-overview-card__icon {
+            color: var(--color-relationship-text, #940055);
+        }
+
+        .plus-overview-card__trend {
+            color: var(--color-relationship-text, #940055);
+        }
+    }
+
+    &--technology-tools {
+        background-color: var(--color-technology-tools-container, #d7e2ff);
+
+        .plus-overview-card__title,
+        .plus-overview-card__value {
+            color: var(--color-technology-tools-text, #0b469d);
+        }
+
+        .plus-overview-card__icon {
+            color: var(--color-technology-tools-text, #0b469d);
+        }
+
+        .plus-overview-card__trend {
+            color: var(--color-technology-tools-text, #0b469d);
+        }
+    }
+
+    // Undefined/neutral state
+    &--undefined {
+        background-color: var(--color-surface-variant, #dde3ea);
+    }
+}

@@ -14,16 +14,12 @@
  */
 
 import React, { useState } from 'react';
-import Sidebar from '../../../../components/Sidebar/Sidebar';
-import Footer from '../../../../components/Footer/Footer';
-import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
-import UserAvatar from '../../../../components/UserAvatar/UserAvatar';
-import Button from '../../../../components/Button/Button';
+import PageLayout from './PageLayout';
 import Card from '../../../../components/Card/Card';
-import PageLayout from '../../../../components/PageLayout/PageLayout';
 
 export default {
     title: 'Specs/Universal/Pages/PageLayout',
+    component: PageLayout,
     tags: ['autodocs'],
     parameters: {
         layout: 'fullscreen',
@@ -42,143 +38,48 @@ export default {
 
 /**
  * Overview
- * Shows page layout per Figma structure
+ * Shows page layout using the PageLayout component
  */
 export const Overview = {
-    render: () => {
-        const [sidebarExpanded, setSidebarExpanded] = useState(true);
+    render: () => (
+        <div style={{ height: '600px', border: '1px dashed var(--color-outline-variant)' }}>
+            <PageLayout
+                sidebarConfig={{
+                    user: 'tutor'
+                }}
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Dashboard' }
+                    ],
+                    user: { name: 'John Doe', counter: true, counterValue: 2 }
+                }}
+            >
+                <h2 className="h3">Page Title</h2>
+                <p className="body2-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    This demonstrates the PageLayout component with TopBar, Sidebar, and content area.
+                    The sidebar automatically collapses at breakpoints below 1024px.
+                </p>
 
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', padding: '24px' }}>
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '16px' }}>App Outer Layout (Interactive)</h6>
-
-                    {/* App Outer Layout Container */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '16px', // surface-container/gap-sm
-                            alignItems: 'flex-start',
-                            padding: '12px 16px', // pad-y-sm pad-x-sm
-                            backgroundColor: '#edeef0', // surface-container
-                            borderRadius: '8px',
-                            height: '500px',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        {/* Top Bar Row */}
-                        <div
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '16px', // surface-container/gap-sm
-                                width: '100%',
-                                flexShrink: 0
-                            }}
-                        >
-                            {/* Sidebar Control - 168px when expanded */}
-                            <div style={{ width: sidebarExpanded ? '168px' : 'auto' }}>
-                                <Button
-                                    style="ghost"
-                                    leadingVisual={<i className={`fas fa-${sidebarExpanded ? 'angles-left' : 'bars'}`} />}
-                                    onClick={() => setSidebarExpanded(!sidebarExpanded)}
-                                />
-                            </div>
-
-                            {/* Page Control - Breadcrumb (flex: 1) */}
-                            <div style={{ flex: 1 }}>
-                                <Breadcrumb
-                                    items={[
-                                        { text: 'Home', href: '#' },
-                                        { text: 'Dashboard' }
-                                    ]}
-                                />
-                            </div>
-
-                            {/* User Avatar */}
-                            <UserAvatar firstChar="J" name="John Doe" counter counterValue={2} />
-                        </div>
-
-                        {/* Main Content Row: Sidebar + Content */}
-                        <div
-                            style={{
-                                display: 'flex',
-                                gap: '16px', // surface-container/gap-sm
-                                flex: 1,
-                                width: '100%',
-                                overflow: 'hidden'
-                            }}
-                        >
-                            {/* Sidebar - Transparent background (sits on page gray) */}
-                            {sidebarExpanded && (
-                                <div
-                                    style={{
-                                        // No background color - transparent per Figma
-                                        // No extra padding - relies on component padding + outer gap
-                                        width: '200px',
-                                        flexShrink: 0,
-                                        overflow: 'auto',
-                                        display: 'flex',
-                                        flexDirection: 'column'
-                                    }}
-                                >
-                                    <Sidebar user="tutor" visible={true} />
-                                </div>
-                            )}
-
-                            {/* Content Area - White Surface Card */}
-                            <div
-                                style={{
-                                    flex: 1,
-                                    backgroundColor: 'var(--color-surface)',
-                                    borderRadius: 'var(--size-card-radius-md)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    overflow: 'hidden'
-                                    // No internal padding on the card container itself, content inside handles it
-                                }}
-                            >
-                                {/* Content */}
-                                <main style={{ flex: 1, padding: '24px', overflow: 'auto' }}>
-                                    <h2 className="h3">Page Title</h2>
-                                    <p className="body2-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                                        Content area is the only white surface. Sidebar is transparent on the page background.
-                                    </p>
-
-                                    <div
-                                        className="mt-4"
-                                        style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                                            gap: '12px'
-                                        }}
-                                    >
-                                        {Array(4).fill(0).map((_, i) => (
-                                            <Card key={i} className="p-3">
-                                                <h6 className="h6">Card {i + 1}</h6>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                </main>
-
-                                {/* Footer */}
-                                <div style={{ padding: '0 24px 12px' }}>
-                                    <Footer version="v5.2.0" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Sidebar: <strong>{sidebarExpanded ? 'Expanded' : 'Collapsed'}</strong>
-                    </p>
-                </section>
-            </div>
-        );
-    },
+                <div
+                    className="mt-4"
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                        gap: '16px'
+                    }}
+                >
+                    {Array(4).fill(0).map((_, i) => (
+                        <Card key={i} className="p-3">
+                            <h6 className="h6">Card {i + 1}</h6>
+                        </Card>
+                    ))}
+                </div>
+            </PageLayout>
+        </div>
+    ),
     parameters: {
-        layout: 'padded'
+        layout: 'fullscreen'
     }
 };
 

@@ -3,5 +3,6 @@
  * Section-level components for universal organisms.
  */
 
-export { default as Sidebar } from '../../../components/Sidebar/Sidebar';
-export { default as Footer } from '../../../components/Footer/Footer';
+export { default as TopBar } from './TopBar/TopBar';
+export { default as Sidebar } from './Sidebar/Sidebar';
+export { default as Footer } from './Footer/Footer';

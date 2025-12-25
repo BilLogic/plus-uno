@@ -3,4 +3,4 @@
  * Card-level components for universal organisms.
  */
 
-// Card components will be exported here as they are created
+export { default as OverviewCard } from './OverviewCard/OverviewCard';

@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import SidebarTab from '../../../../components/SidebarTab/SidebarTab';
+import SidebarTab from './SidebarTab';
 
 export default {
     title: 'Specs/Universal/Elements/SidebarTab',

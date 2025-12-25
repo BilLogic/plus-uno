@@ -5,7 +5,11 @@ const config = {
   stories: [
     '../packages/plus-ds/src/assets/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/components/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/forms/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/components/**/*.mdx',
+    '../packages/plus-ds/src/DataViz/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/DataViz/**/*.mdx',
+    '../packages/plus-ds/src/patterns/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/patterns/**/*.mdx',
     '../packages/plus-ds/src/specs/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.mdx',
@@ -13,7 +17,8 @@ const config = {
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-docs',
-    '@storybook/addon-vitest'
+
+
   ],
   framework: {
     name: '@storybook/react-vite',
@@ -30,10 +35,7 @@ const config = {
     autodocs: true,
   },
   staticDirs: [
-    // Only include dist if it exists
-    ...(require('fs').existsSync(path.resolve(__dirname, '../packages/plus-ds/dist')) 
-      ? [{ from: path.resolve(__dirname, '../packages/plus-ds/dist'), to: '/dist' }] 
-      : []),
+    { from: path.resolve(__dirname, '../packages/plus-ds/dist'), to: '/dist' },
     // Keeping legacy assets mapping if potentially needed, but standardizing primarily on new package
     { from: path.resolve(__dirname, '../packages/plus-ds/src/assets'), to: '/assets' },
   ],
