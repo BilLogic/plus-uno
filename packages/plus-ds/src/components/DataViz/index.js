@@ -6,3 +6,4 @@ export { default as AreaChart } from './AreaChart';
 export { default as ComboChart } from './ComboChart';
 export { default as ScatterChart } from './ScatterChart';
 export { default as BarChart } from './BarChart';
+export { default as RadarChart } from './RadarChart';

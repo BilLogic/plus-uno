@@ -1,0 +1,103 @@
+.plus-recommended-lessons {
+    width: 100%;
+    background-color: var(--color-surface);
+}
+
+.plus-recommended-lessons-image {
+    width: 100%;
+    height: 184px;
+    background-color: var(--color-tertiary-state-08);
+    opacity: 0.38;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-400);
+    border-radius: var(--size-border-radius-radius-100);
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: var(--size-border-radius-radius-100);
+    }
+}
+
+.plus-recommended-lessons-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.plus-recommended-lessons-top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-spacing-small-space-100);
+    padding: var(--size-spacing-medium-space-300) var(--size-spacing-medium-space-400);
+}
+
+.plus-recommended-lessons-tags {
+    display: flex;
+    align-items: center;
+    gap: var(--size-spacing-small-space-050);
+    padding: var(--size-spacing-small-space-050) 0;
+}
+
+.plus-recommended-lessons-separator {
+    color: var(--color-on-surface-variant);
+    font-size: 12px;
+}
+
+.plus-recommended-lessons-duration {
+    color: var(--color-on-surface-variant);
+}
+
+.plus-recommended-lessons-title {
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-semibold-2);
+    font-size: var(--font-size-h5);
+    line-height: var(--font-line-height-h5);
+    color: var(--color-on-surface);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 28px;
+}
+
+.plus-recommended-lessons-bottom {
+    display: flex;
+    align-items: center;
+    padding: var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-400);
+    gap: var(--size-element-gap-sm);
+}
+
+.plus-recommended-lessons-indicators {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--size-element-gap-sm);
+}
+
+.plus-recommended-lessons-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    i {
+        color: var(--color-warning);
+        font-size: 12px;
+    }
+}
+
+.plus-recommended-lessons-ai-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    i {
+        color: var(--color-primary-text);
+        font-size: 12px;
+    }
+}
+

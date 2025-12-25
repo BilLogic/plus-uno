@@ -26,7 +26,59 @@
 @import "../components/ButtonGroup/ButtonGroup";
 // @import "../components/Checkbox/Checkbox";
 // @import "../components/Dropdown/Dropdown";
-// @import "../components/Card/Card";
+// Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
+// Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
+.plus-card {
+    margin: 0; // Remove any default margin from React Bootstrap Card
+}
+
+.plus-card .plus-card-content {
+    padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
+}
+
+.plus-card-pad-sm {
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+}
+
+.plus-card-pad-md {
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+}
+
+.plus-card-pad-lg {
+    padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
+}
+
+.plus-card-gap-sm {
+    gap: var(--size-card-gap-sm);
+}
+
+.plus-card-gap-md {
+    gap: var(--size-card-gap-md);
+}
+
+.plus-card-gap-lg {
+    gap: var(--size-card-gap-lg);
+}
+
+.plus-card-radius-sm {
+    border-radius: var(--size-card-radius-sm);
+}
+
+.plus-card-radius-md {
+    border-radius: var(--size-card-radius-md);
+}
+
+.plus-card-border-sm {
+    border-width: var(--size-card-border-sm);
+}
+
+.plus-card-border-md {
+    border-width: var(--size-card-border-md);
+}
+
+.plus-card-border-lg {
+    border-width: var(--size-card-border-lg);
+}
 // @import "../components/Modal/Modal";
 // @import "../components/Navigation/Navigation";
 // @import "../components/Navbar/Navbar";

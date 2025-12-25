@@ -4,5 +4,5 @@
  */
 
 // User Feedback Modal
-// export * from './UserFeedbackModal/index.js';
+export { default as UserFeedbackModal } from './UserFeedbackModal';
 

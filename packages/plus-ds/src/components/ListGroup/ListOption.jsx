@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Radio from '../Form/forms/Radio';
-import Checkbox from '../Form/forms/Checkbox';
+import Radio from '@/forms/Radio';
+import Checkbox from '@/forms/Checkbox';
 import './ListGroup.scss';
 
 /**

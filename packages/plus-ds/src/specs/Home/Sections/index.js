@@ -4,8 +4,7 @@
  */
 
 // Homepage Jumbotron
-// export * from './HomepageJumbotron/index.js';
+export { default as HomepageJumbotron } from './HomepageJumbotron';
 
 // Bottom Div
-// export * from './BottomDiv/index.js';
-
+export { default as BottomDiv } from './BottomDiv';

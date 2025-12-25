@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './new-ds'),
+      '@': path.resolve(__dirname, './packages/plus-ds/src'),
       '~': path.resolve(__dirname, './node_modules')
     }
   },

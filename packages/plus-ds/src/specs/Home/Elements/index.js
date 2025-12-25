@@ -4,14 +4,14 @@
  */
 
 // Resource Type Icons
-// export * from './ResourceType/index.js';
+export * from './ResourceType/index.js';
 
 // Product Area Dropdown
-// export * from './ProductAreaDropdown/index.js';
+export * from './ProductAreaDropdown/index.js';
 
 // Card Badges
-// export * from './CardBadges/index.js';
+export * from './CardBadges/index.js';
 
 // Button Container
-// export * from './ButtonContainer/index.js';
+export * from './ButtonContainer/index.js';
 

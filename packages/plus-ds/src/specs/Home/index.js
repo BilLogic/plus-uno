@@ -9,6 +9,9 @@ import { createCard } from '../../components/Card/index.js';
 import { createTable } from '../../components/Table/index.js';
 import { createButton } from '../../components/Button/index.js';
 
+// Export Home Cards
+export * from './Cards';
+
 /**
  * Creates the Home page
  * @returns {HTMLElement} The complete Home page element

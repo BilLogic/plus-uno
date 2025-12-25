@@ -1,0 +1,25 @@
+.plus-navbar {
+    width: 100%;
+    
+    &.plus-navbar-bg-light {
+        background-color: var(--color-surface-container);
+        border-bottom: 1px solid var(--color-outline-variant);
+    }
+    
+    &.plus-navbar-bg-dark {
+        background-color: var(--color-surface-container-low);
+        border-bottom: 1px solid var(--color-outline-variant);
+    }
+    
+    &.plus-navbar-bg-primary {
+        background-color: var(--color-primary);
+        border-bottom: 1px solid var(--color-primary);
+    }
+}
+
+.plus-navbar-brand {
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-on-surface);
+}
+
