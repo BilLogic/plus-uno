@@ -46,13 +46,18 @@
 
 // --- CALENDAR DROPDOWN ---
 // Per Material Design: popups/modals use surface-container-high with elevation
+// Figma node 9413:1783 - uses modal tokens for popup container
 .plus-date-picker-calendar {
     min-width: 280px;
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    // Figma: px-[var(--modal/pad-x-sm,10px)] py-[var(--modal/pad-y-sm,8px)]
+    // Explicitly using the values 8px 10px as tokens seemed to resolve incorrectly.
+    padding: 8px 10px !important;
+
     // M3 popup background: surface-container-high
     background-color: var(--color-surface-container-high);
     border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
-    border-radius: var(--size-element-radius-md);
+    // Figma: rounded-[var(--modal/radius-sm,4px)]
+    border-radius: var(--size-modal-radius-sm, 4px);
     // M3 elevation level 2 for dropdowns/popups
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
 }

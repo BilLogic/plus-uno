@@ -60,7 +60,7 @@
 
         // --- HOVER STATE ---
         &:hover:not(.disabled) {
-            background-color: var(--color-neutral-state-08);
+            background-color: var(--color-on-surface-state-08);
         }
 
         // --- DISABLED STATE ---
@@ -83,6 +83,30 @@
             font-size: var(--font-size-body1);
             font-weight: var(--font-weight-semibold-1);
             line-height: var(--font-line-height-body1);
+        }
+
+        // --- SIZE VARIANTS ---
+        &.plus-list-group-item--b1 {
+            padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+            gap: var(--size-element-gap-lg);
+        }
+
+        &.plus-list-group-item--b2 {
+            padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+            gap: var(--size-element-gap-md);
+
+            .plus-list-group-item-content {
+                gap: var(--size-element-gap-md);
+            }
+        }
+
+        &.plus-list-group-item--b3 {
+            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            gap: var(--size-element-gap-sm);
+
+            .plus-list-group-item-content {
+                gap: var(--size-element-gap-sm);
+            }
         }
     }
 

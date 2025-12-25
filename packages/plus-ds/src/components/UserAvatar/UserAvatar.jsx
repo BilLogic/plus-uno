@@ -1,8 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Stack from 'react-bootstrap/Stack';
-import { Badge } from '@/components/Badge';
+import './UserAvatar.scss';
 
+/**
+ * UserAvatar Component
+ * 
+ * Per Figma spec: node-id=111-227876
+ * 
+ * Colors:
+ * - Initial circle: primary-08 bg (#rgba(0,101,142,0.08)), primary-text color (#00547e)
+ * - Counter: danger-08 bg (#rgba(190,12,22,0.08)), danger-text color (#9b0606)
+ * - Hover: on-surface-08 overlay
+ */
 const UserAvatar = ({
     firstChar = 'J',
     name = 'John Doe',
@@ -14,66 +23,108 @@ const UserAvatar = ({
     onClick,
     className = ''
 }) => {
-    const typeClass = type.replace(/\s+/g, '-');
-
-    // Background color logic mapping
-    // If state is hover, we rely on CSS or a class, but for inline fallback:
-    const bgStyle = state === 'hover' ? 'rgba(25, 28, 30, 0.08)' : 'var(--color-surface-container-lowest)';
-
-    // Badge styles based on type
-    const badgeMap = {
-        'regular tutor': 'primary',
-        'lead tutor': 'primary', // Custom override needed for colors
-        'admin': 'secondary'
-    };
-
-    // For lead/admin we might need custom style overrides if they don't map to standard variants exactly
-    // But assuming 'primary' and 'secondary' map to Bootstrap variants.
-
-    const containerStyle = {
-        width: '168px',
-        padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
-        borderRadius: 'var(--size-element-radius-md)',
-        backgroundColor: bgStyle,
-        cursor: (onClick || state === 'hover') ? 'pointer' : 'default',
-        border: 'none', // Reset button borders if we used Button, but Stack is div
-    };
+    const isHover = state === 'hover';
 
     return (
-        <Stack
-            direction="horizontal"
-            gap={2}
-            className={`plus-user-avatar plus-user-avatar-${typeClass} plus-user-avatar-${state} ${className}`}
-            style={containerStyle}
+        <div
+            className={`plus-user-avatar plus-user-avatar--${state} ${className}`}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--size-element-gap-md)',
+                width: '168px',
+                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                borderRadius: 'var(--size-element-radius-md)',
+                backgroundColor: isHover ? 'rgba(25, 28, 30, 0.08)' : 'transparent',
+                cursor: onClick ? 'pointer' : 'default'
+            }}
             onClick={onClick}
             id={id}
         >
-            {/* Name Section as a nested Stack or just children */}
-            <Stack direction="horizontal" gap={1} className="flex-grow-1 overflow-hidden" style={{ minWidth: 0 }}>
-                <div className="plus-user-avatar-initial" style={{ width: '24px', height: '24px', flexShrink: 0 }}>
-                    <Badge
-                        text={firstChar}
-                        style={badgeMap[type] || 'primary'}
-                        size="b2"
-                        className="p-0 w-100 h-100 rounded-circle d-flex align-items-center justify-content-center"
-                    />
+            {/* Name Section */}
+            <div
+                className="plus-user-avatar__name-section"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px', // spacing/space-075
+                    flex: '1 1 0',
+                    minWidth: 0
+                }}
+            >
+                {/* Initial Badge - primary-08 bg, primary-text color */}
+                <div
+                    className="plus-user-avatar__initial"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '32px',  // Forced width
+                        height: '32px', // Forced height to match
+                        borderRadius: '50%', // Perfect circle
+                        backgroundColor: 'var(--color-primary-state-08, rgba(0, 101, 142, 0.08))',
+                        flexShrink: 0
+                    }}
+                >
+                    <span
+                        className="body2-txt"
+                        style={{
+                            color: 'var(--color-primary-text, #00547e)',
+                            fontWeight: 400,
+                            lineHeight: 1,
+                            textAlign: 'center'
+                        }}
+                    >
+                        {firstChar}
+                    </span>
                 </div>
-                <p className="m-0 text-truncate body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+
+                {/* Name Text */}
+                <p
+                    className="body2-txt plus-user-avatar__name"
+                    style={{
+                        margin: 0,
+                        color: 'var(--color-on-surface)',
+                        fontWeight: 300,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: '1 1 0',
+                        minWidth: 0
+                    }}
+                >
                     {name}
                 </p>
-            </Stack>
+            </div>
 
+            {/* Counter Badge - danger-08 bg, danger-text color */}
             {counter && (
-                <div className="plus-user-avatar-counter flex-shrink-0">
-                    <Badge
-                        text={counterValue.toString()}
-                        style="danger"
-                        size="b3"
-                        className="py-0 px-2"
-                    />
+                <div
+                    className="plus-user-avatar__counter"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '12px',
+                        padding: '0 var(--size-element-pad-x-sm)',
+                        borderRadius: '999px', // radius-full
+                        backgroundColor: 'rgba(190, 12, 22, 0.08)', // danger-08
+                        flexShrink: 0
+                    }}
+                >
+                    <span
+                        className="body3-txt"
+                        style={{
+                            color: '#9b0606', // danger-text
+                            fontWeight: 400,
+                            textAlign: 'center'
+                        }}
+                    >
+                        {counterValue}
+                    </span>
                 </div>
             )}
-        </Stack>
+        </div>
     );
 };
 

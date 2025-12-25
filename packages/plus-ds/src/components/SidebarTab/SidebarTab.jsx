@@ -1,11 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Nav from 'react-bootstrap/Nav';
+import './SidebarTab.scss';
 
 /**
- * SidebarTab component for PLUS design system.
- * Universal element component for sidebar navigation tabs.
- * Uses React Bootstrap Nav.Link as base.
+ * SidebarTab Component
+ * 
+ * Sidebar navigation tab with state-based styling.
+ * Per Figma spec: node-id=111-227838
+ * 
+ * Colors per Figma:
+ * - enabled: transparent bg, on-surface text, ON-SURFACE-VARIANT icon (#3f484a)
+ * - hover: primary-12 bg, primary-text color (#00547e), primary icon (#0472a8)
+ * - selected: primary-16 bg, primary-text color (#00547e), primary icon (#0472a8)
+ * - disabled: transparent bg, on-surface text, 0.38 opacity
+ * - focus: primary-12 bg, primary-text color, 2px outline
  */
 const SidebarTab = ({
     text,
@@ -18,51 +26,107 @@ const SidebarTab = ({
     className = '',
     style
 }) => {
-    // Map 'state' to Bootstrap/Nav props
     const disabled = state === 'disabled';
-    const active = state === 'selected';
+    const isSelected = state === 'selected';
+    const isHover = state === 'hover';
+    const isFocus = state === 'focus';
 
-    // Additional classes for specific states if not covered by standard Bootstrap
-    // 'hover' and 'focus' are usually handled by CSS pseudo-classes on the element, 
-    // but if we need to force it (for storybook demo), we might need a utility class.
-    const stateClass = state === 'hover' ? 'hover' : state === 'focus' ? 'focus' : '';
+    // State-based colors per Figma spec
+    const stateStyles = {
+        enabled: {
+            backgroundColor: 'transparent',
+            color: 'var(--color-on-surface)',
+            iconColor: 'var(--color-on-surface-variant)' // FIX: changed from -primary-text to on-surface-variant
+        },
+        hover: {
+            backgroundColor: 'rgba(0, 101, 142, 0.12)', // primary-12
+            color: 'var(--color-primary-text)',
+            iconColor: 'var(--color-primary)'
+        },
+        selected: {
+            backgroundColor: 'rgba(0, 101, 142, 0.16)', // primary-16
+            color: 'var(--color-primary-text)',
+            iconColor: 'var(--color-primary)',
+            fontWeight: 400
+        },
+        focus: {
+            backgroundColor: 'rgba(0, 101, 142, 0.12)', // primary-12
+            color: 'var(--color-primary-text)',
+            iconColor: 'var(--color-primary)',
+            outline: '2px solid var(--color-primary)',
+            outlineOffset: '-2px'
+        },
+        disabled: {
+            backgroundColor: 'transparent',
+            color: 'var(--color-on-surface)',
+            iconColor: 'var(--color-on-surface-variant)',
+            opacity: 0.38
+        }
+    };
+
+    const currentStateStyle = stateStyles[state] || stateStyles.enabled;
+    const { iconColor, fontWeight, ...containerStyles } = currentStateStyle;
 
     return (
-        <Nav.Link
-            as="div" // Render as div to match legacy structure if needed, or keep as 'a'/button. Legacy used div.
-            // Using 'div' with role='button' is safer for now to avoid anchor styling conflicts unless we want them.
-            // Actually, Nav.Link renders an anchor by default. If we use 'as="div"', we lose some a11y unless we add it back.
-            // Let's us 'div' but add role button to match legacy behavior strictly while using RB styles.
+        <div
             id={id}
-            className={`plus-sidebar-tab ${stateClass} d-flex align-items-center gap-2 ${className}`}
-            active={active}
-            disabled={disabled}
+            className={`plus-sidebar-tab plus-sidebar-tab--${state} ${className}`}
             onClick={!disabled ? onClick : undefined}
-            style={{
-                width: '184px',
-                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
-                borderRadius: 'var(--size-modal-radius-md)',
-                ...style
-            }}
             role="button"
             tabIndex={disabled ? -1 : 0}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '184px',
+                padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg)',
+                gap: 'var(--size-element-gap-md)',
+                borderRadius: 'var(--size-modal-radius-md)',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                transition: 'background-color 0.15s ease',
+                ...containerStyles,
+                ...style
+            }}
         >
             {leadingVisual && icon && (
-                <div className="d-flex align-items-center justify-content-center" style={{ width: '11px', flexShrink: 0 }}>
-                    <i className={`fas fa-${icon}`} style={{ fontSize: 'var(--font-size-fa-body2-solid)' }} />
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '11px',
+                        flexShrink: 0
+                    }}
+                >
+                    <i
+                        className={`fas fa-${icon}`}
+                        style={{
+                            fontSize: '12px',
+                            color: iconColor
+                        }}
+                    />
                 </div>
             )}
 
-            <div className="body2-txt flex-grow-1 text-truncate">
+            <span
+                className="body2-txt"
+                style={{
+                    flexGrow: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontWeight: fontWeight || 300,
+                    textAlign: 'left'
+                }}
+            >
                 {text}
-            </div>
+            </span>
 
             {trailingVisual && (
-                <div className="d-flex align-items-center justify-content-center">
-                    <i className="fas fa-icons text-muted" />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-icons" style={{ color: 'var(--color-on-surface-variant)', fontSize: '12px' }} />
                 </div>
             )}
-        </Nav.Link>
+        </div>
     );
 };
 

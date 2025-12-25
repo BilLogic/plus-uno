@@ -267,7 +267,19 @@ $dropdown-themes: (
             }
 
             &:hover {
-                filter: brightness(0.92);
+                // Use color-mix instead of filter to avoid affecting icon colors
+                background-color: color-mix(in srgb, var($col-main), black 8%);
+            }
+
+            // PRESSED/ACTIVE STATE: Only background changes, NOT icon color
+            &:active,
+            &.active {
+                background-color: color-mix(in srgb, var($col-main), black 12%);
+
+                // Ensure icon color stays the same on pressed
+                &::after {
+                    color: var($col-on-main) !important;
+                }
             }
         }
 
@@ -287,6 +299,12 @@ $dropdown-themes: (
 
                 &:hover {
                     background-color: color-mix(in srgb, var($col-state), black 12%);
+                }
+
+                // PRESSED/ACTIVE: Only background changes
+                &:active,
+                &.active {
+                    background-color: color-mix(in srgb, var($col-state), black 16%);
                 }
             }
         }
@@ -308,6 +326,12 @@ $dropdown-themes: (
                 &:hover {
                     background-color: var($col-state);
                 }
+
+                // PRESSED/ACTIVE: Only background changes
+                &:active,
+                &.active {
+                    background-color: color-mix(in srgb, var($col-state), black 8%);
+                }
             }
         }
 
@@ -328,6 +352,12 @@ $dropdown-themes: (
                 &:hover {
                     background-color: var($col-state);
                 }
+
+                // PRESSED/ACTIVE: Only background changes
+                &:active,
+                &.active {
+                    background-color: color-mix(in srgb, var($col-state), black 8%);
+                }
             }
         }
     }
@@ -344,12 +374,24 @@ $dropdown-themes: (
             color: var($col-on-main);
 
             &:hover {
-                filter: brightness(0.92);
+                // Use color-mix instead of filter to avoid affecting icon colors
+                background-color: color-mix(in srgb, var($col-main), black 8%);
+            }
+
+            // PRESSED/ACTIVE: Only background changes, NOT icon color
+            &:active,
+            &.active {
+                background-color: color-mix(in srgb, var($col-main), black 12%);
             }
         }
 
         .pdropdown-split-toggle-btn {
             border-left-color: rgba(255, 255, 255, 0.3);
+
+            // Ensure caret stays same color on hover/active
+            &::after {
+                color: var($col-on-main) !important;
+            }
         }
 
         // TONAL

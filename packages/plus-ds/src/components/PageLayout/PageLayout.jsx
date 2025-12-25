@@ -13,18 +13,24 @@ const PageLayout = ({
     style,
 }) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-    const breakpoint = 992; // lg breakpoint
+    const containerRef = React.useRef(null);
+    const breakpoint = 1024; // lg-min breakpoint per DS schema
 
     useEffect(() => {
-        const handleResize = () => {
-            setIsSidebarVisible(window.innerWidth >= breakpoint);
-        };
+        if (!containerRef.current) return;
 
-        // Initial check
-        handleResize();
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const width = entry.contentRect.width;
+                // Auto-collapse if smaller than Large breakpoint
+                // Auto-expand if larger (unless user manually toggled? - keeping simple for now)
+                setIsSidebarVisible(width >= breakpoint);
+            }
+        });
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        observer.observe(containerRef.current);
+
+        return () => observer.disconnect();
     }, []);
 
     const toggleSidebar = () => {
@@ -34,6 +40,7 @@ const PageLayout = ({
     return (
         <div
             id={id}
+            ref={containerRef}
             className={`plus-page-layout ${className}`}
             style={{
                 display: 'flex',
@@ -44,8 +51,8 @@ const PageLayout = ({
                 overflow: 'hidden',
                 border: '1px solid var(--color-outline-variant)',
                 boxSizing: 'border-box',
-                padding: 'var(--Surface-Container-pad-y-sm, 12px) var(--Surface-Container-pad-x-sm, 16px)',
-                gap: 'var(--Surface-Container-gap-sm, 16px)',
+                padding: 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)', // Using element tokens for 12px/16px
+                gap: 'var(--size-element-gap-md, 16px)', // 16px
                 alignItems: 'flex-start',
                 ...style
             }}
@@ -73,7 +80,7 @@ const PageLayout = ({
                 overflow: 'hidden',
                 position: 'relative',
                 width: '100%',
-                gap: 'var(--Surface-Container-gap-sm, 16px)',
+                gap: 'var(--size-element-gap-md, 16px)',
                 alignItems: 'stretch'
             }}>
                 {/* Sidebar Wrapper */}
@@ -101,8 +108,8 @@ const PageLayout = ({
                 <div className="plus-page-content-wrapper" style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    padding: 'var(--Surface-pad-y, 24px) var(--Surface-pad-x, 32px)',
-                    gap: 'var(--Surface-gap-md, 24px)',
+                    padding: 'var(--size-surface-pad-y, 24px) var(--size-surface-pad-x, 32px)',
+                    gap: 'var(--size-surface-gap-md, 24px)',
                     flex: '1 0 0',
                     alignItems: 'flex-start',
                     minWidth: 0,

@@ -1,15 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { SMART_CONSTANTS } from '@/components/constants';
+import Badge from '../Badge/Badge';
+import { SMART_CONSTANTS } from '../constants';
 
-const StaticBadgeSmart = ({
+/**
+ * SmartBadges Component
+ * 
+ * SMART competency area badges built on top of the Badge component.
+ * Displays competency labels with appropriate colors and icons.
+ * 
+ * Types:
+ * - socio-emotional (S)
+ * - mastering-content (M)
+ * - advocacy (A)
+ * - relationships (R)
+ * - technology-tools (T)
+ */
+const SmartBadges = ({
     type,
-    size = 'h1',
+    size = 'b2',
     id,
     className = ''
 }) => {
+    // Normalize type string
     const normalizedType = type.replace(/\s+/g, '-').toLowerCase();
 
+    // Map type to display text from SMART constants
     const textMap = {
         'socio-emotional': SMART_CONSTANTS.CA_SE_FULL,
         'mastering-content': SMART_CONSTANTS.CA_MC,
@@ -18,170 +34,51 @@ const StaticBadgeSmart = ({
         'technology-tools': SMART_CONSTANTS.CA_TT
     };
 
+    // Map our type names to Badge style prop names
+    // Badge uses 'social-emotional' (with 'social' not 'socio')
+    // and 'relationship' (singular, not 'relationships')
+    const styleMap = {
+        'socio-emotional': 'social-emotional',
+        'mastering-content': 'mastering-content',
+        'advocacy': 'advocacy',
+        'relationships': 'relationship',
+        'technology-tools': 'technology-tools'
+    };
+
     const displayText = textMap[normalizedType] || SMART_CONSTANTS.CA_SE_FULL;
-
-    const colorMap = {
-        'socio-emotional': {
-            bg: 'var(--color-social-emotional-state-08)',
-            icon: 'var(--color-social-emotional)',
-            text: 'var(--color-social-emotional-text)'
-        },
-        'mastering-content': {
-            bg: 'var(--color-mastering-content-state-08)',
-            icon: 'var(--color-mastering-content)',
-            text: 'var(--color-mastering-content-text)'
-        },
-        'advocacy': {
-            bg: 'var(--color-advocacy-state-08)',
-            icon: 'var(--color-advocacy)',
-            text: 'var(--color-advocacy-text)'
-        },
-        'relationships': {
-            bg: 'var(--color-relationship-state-08)',
-            icon: 'var(--color-relationship)',
-            text: 'var(--color-relationship-text)'
-        },
-        'technology-tools': {
-            bg: 'var(--color-technology-tools-state-08)',
-            icon: 'var(--color-technology-tools)',
-            text: 'var(--color-technology-tools-text)'
-        }
-    };
-
-    const colors = colorMap[normalizedType] || colorMap['socio-emotional'];
-
-    const getStyles = () => {
-        const baseStyles = {
-            backgroundColor: colors.bg,
-            color: colors.text,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 'auto',
-            maxWidth: '100%',
-            alignSelf: 'flex-start',
-            flex: '0 0 auto',
-        };
-
-        if (['h1', 'h2', 'h3'].includes(size)) {
-            return {
-                ...baseStyles,
-                paddingLeft: 'var(--size-element-pad-x-lg)',
-                paddingRight: 'var(--size-element-pad-x-lg)',
-                borderRadius: 'var(--size-element-radius-full)',
-                gap: 'var(--size-element-gap-lg)',
-            };
-        } else if (['h4', 'h5'].includes(size)) {
-            return {
-                ...baseStyles,
-                paddingLeft: 'var(--size-element-pad-x-md)',
-                paddingRight: 'var(--size-element-pad-x-md)',
-                borderRadius: 'var(--size-element-radius-full)',
-                gap: 'var(--size-element-gap-md)',
-            };
-        } else if (size === 'h6') {
-            return {
-                ...baseStyles,
-                paddingLeft: 'var(--size-element-pad-x-md)',
-                paddingRight: 'var(--size-element-pad-x-md)',
-                borderRadius: 'var(--size-element-radius-full)',
-                gap: 'var(--size-element-gap-md)',
-            };
-        } else if (['b1', 'b2'].includes(size)) {
-            return {
-                ...baseStyles,
-                paddingLeft: 'var(--size-element-pad-x-sm)',
-                paddingRight: 'var(--size-element-pad-x-sm)',
-                borderRadius: 'var(--size-element-radius-full)',
-                gap: 'var(--size-element-gap-sm)',
-            };
-        } else if (size === 'b3') {
-            return {
-                ...baseStyles,
-                paddingLeft: 'var(--size-element-pad-x-sm)',
-                paddingRight: 'var(--size-element-pad-x-sm)',
-                gap: 'var(--size-element-gap-sm)',
-                borderRadius: normalizedType === 'technology-tools' ? 'var(--size-border-radius-radius-400)' : 'var(--size-element-radius-full)',
-            };
-        }
-        return baseStyles;
-    };
-
-    const getIconStyles = () => {
-        const baseIconStyles = {
-            color: colors.icon,
-            fontFamily: '"Font Awesome 6 Free"',
-            fontWeight: '900',
-        };
-
-        if (size === 'h1' || size === 'h2') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-h2-solid)', lineHeight: 'var(--font-line-height-fa-h2-solid)' };
-        } else if (size === 'h3') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-h3-solid)', lineHeight: 'var(--font-line-height-fa-h3-solid)' };
-        } else if (size === 'h4') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-h4-solid)', lineHeight: 'var(--font-line-height-fa-h4-solid)' };
-        } else if (size === 'h5') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-h5-solid)', lineHeight: 'var(--font-line-height-fa-h5-solid)' };
-        } else if (size === 'h6' || size === 'b1') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-h6-solid)', lineHeight: 'var(--font-line-height-fa-h6-solid)' };
-        } else if (size === 'b2') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-body2-solid)', lineHeight: 'var(--font-line-height-fa-body2-solid)' };
-        } else if (size === 'b3') {
-            return { ...baseIconStyles, fontSize: 'var(--font-size-fa-body3-solid)', lineHeight: 'var(--font-line-height-fa-body3-solid)' };
-        }
-        return baseIconStyles;
-    };
-
-    const getTextStyles = () => {
-        const baseTextStyles = {
-            display: 'flex',
-            alignItems: 'center',
-            height: 'auto',
-        };
-
-        if (['h1', 'h2', 'h3'].includes(size)) {
-            return {
-                ...baseTextStyles,
-                fontFamily: 'var(--font-family-header)',
-                fontWeight: 'var(--font-weight-bold)',
-                lineHeight: `var(--font-line-height-${size})`,
-                fontSize: size === 'h2' ? 'var(--font-size-h2)' : undefined,
-            };
-        } else if (['h4', 'h5', 'h6'].includes(size)) {
-            return {
-                ...baseTextStyles,
-                fontFamily: 'var(--font-family-header)',
-                fontWeight: 'var(--font-weight-semibold-2)',
-                lineHeight: `var(--font-line-height-${size})`,
-            };
-        } else if (['b1', 'b2', 'b3'].includes(size)) {
-            return {
-                ...baseTextStyles,
-                fontFamily: 'var(--font-family-body)',
-                fontWeight: 'var(--font-weight-semibold-1)',
-                lineHeight: size === 'b1' ? 'var(--font-line-height-body1)' : size === 'b2' ? 'var(--font-line-height-body2)' : 'var(--font-line-height-body3)',
-            };
-        }
-        return baseTextStyles;
-    };
+    const badgeStyle = styleMap[normalizedType] || 'social-emotional';
 
     return (
-        <span
+        <Badge
             id={id}
-            className={`plus-badge plus-static-badge-smart plus-static-badge-smart-${normalizedType} ${size} ${className}`}
-            style={getStyles()}
+            style={badgeStyle}
+            size={size}
+            className={`plus-smart-badge plus-smart-badge--${normalizedType} ${className}`}
+            leadingVisual={<i className="fas fa-circle-dot" />}
         >
-            <i className="fas fa-circle-dot" style={getIconStyles()}></i>
-            <span className="plus-badge-text" style={getTextStyles()}>{displayText}</span>
-        </span>
+            {displayText}
+        </Badge>
     );
 };
 
-StaticBadgeSmart.propTypes = {
-    type: PropTypes.oneOf(['socio-emotional', 'mastering-content', 'advocacy', 'relationships', 'technology-tools']).isRequired,
+SmartBadges.propTypes = {
+    /** SMART competency area type */
+    type: PropTypes.oneOf([
+        'socio-emotional',
+        'mastering-content',
+        'advocacy',
+        'relationships',
+        'technology-tools'
+    ]).isRequired,
+    /** Badge size - uses Badge component sizing */
     size: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3']),
+    /** HTML id attribute */
     id: PropTypes.string,
+    /** Additional CSS classes */
     className: PropTypes.string
 };
 
-export default StaticBadgeSmart;
+export default SmartBadges;
+
+// Also export as StaticBadgeSmart for backwards compatibility
+export { SmartBadges as StaticBadgeSmart };
