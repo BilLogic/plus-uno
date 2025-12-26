@@ -1,7 +1,7 @@
 import React from 'react';
-import DonutChart from '@/components/DataViz/DonutChart';
-import StackedBarChart from '@/components/DataViz/StackedBarChart';
-import SmartBarChart from '@/components/DataViz/SmartBarChart';
+import DonutChart from '@/DataViz/DonutChart';
+import StackedBarChart from '@/DataViz/StackedBarChart';
+import SmartBarChart from '@/DataViz/SmartBarChart';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements',

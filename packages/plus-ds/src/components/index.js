@@ -39,5 +39,5 @@ export { default as Table } from '@/components/Table';
 export { default as Toast } from '@/components/Toast';
 export { default as Tooltip } from '@/components/Tooltip';
 export { default as UserAvatar } from '@/components/UserAvatar';
-export * from '@/components/DataViz';
+export * from '@/DataViz';
 // Note: constants.js is internal and NOT exported publicly

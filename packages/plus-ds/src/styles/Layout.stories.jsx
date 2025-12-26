@@ -38,15 +38,16 @@ export const Overview = () => (
 
 export const Columns = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Columns</h2>
+        <h2 className="h2" style={{ marginBottom: '24px' }}>12-Column Fluid Grid</h2>
         <p className="body1-txt" style={{ marginBottom: '24px' }}>
-            Think of the page as a 12-column grid.
+            The PLUS Design System uses a <strong>fluid 12-column grid</strong> that automatically adapts to the content container width.
         </p>
 
+        {/* Visual Grid */}
         <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(12, 1fr)',
-            gap: '4px',
+            gap: 'var(--layout-grid-gap, 8px)',
             marginBottom: '24px'
         }}>
             {Array.from({ length: 12 }, (_, i) => (
@@ -65,6 +66,74 @@ export const Columns = () => (
                 </div>
             ))}
         </div>
+
+        <h3 className="h3" style={{ marginBottom: '16px' }}>Key Dimensions</h3>
+        <TokenTable
+            headers={['Token', 'Value', 'Description']}
+            rows={[
+                { token: '--layout-grid-gap', value: '8px', description: 'Gap between columns (uses --size-element-gap-sm)' },
+                { token: '--layout-sidebar-width', value: '164px', description: 'Fixed sidebar width (visible at Large+)' },
+                { token: '--size-surface-pad-x', value: '32px', description: 'Content surface horizontal padding' },
+                { token: '--size-surface-container-pad-x-sm', value: '16px', description: 'Outer layout horizontal padding' },
+            ]}
+        />
+
+        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Column Reference Values</h3>
+        <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            Values at the <strong>minimum</strong> of each breakpoint:
+        </p>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', border: '1px solid var(--color-outline-variant)' }}>
+            <thead>
+                <tr style={{ backgroundColor: 'var(--color-surface-container-low)', borderBottom: '2px solid var(--color-outline)' }}>
+                    <th style={{ padding: '12px', textAlign: 'left' }} className="body2-txt">Column</th>
+                    <th style={{ padding: '12px', textAlign: 'right' }} className="body2-txt">Medium (768px)</th>
+                    <th style={{ padding: '12px', textAlign: 'right' }} className="body2-txt">Large (1024px)</th>
+                    <th style={{ padding: '12px', textAlign: 'right' }} className="body2-txt">X-Large (1440px)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style={{ borderBottom: '1px solid var(--color-outline-variant)', backgroundColor: 'var(--color-surface-container-lowest)' }}>
+                    <td style={{ padding: '12px' }}><strong>Content Width</strong></td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>672px</td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>748px</td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>1164px</td>
+                </tr>
+                {[
+                    { col: '--col-1', md: '48.67', lg: '55.00', xl: '89.67' },
+                    { col: '--col-2', md: '105.33', lg: '118.00', xl: '187.33' },
+                    { col: '--col-3', md: '162.00', lg: '181.00', xl: '285.00' },
+                    { col: '--col-4', md: '218.67', lg: '244.00', xl: '382.67' },
+                    { col: '--col-5', md: '275.33', lg: '307.00', xl: '480.33' },
+                    { col: '--col-6', md: '332.00', lg: '370.00', xl: '578.00' },
+                    { col: '--col-7', md: '388.67', lg: '433.00', xl: '675.67' },
+                    { col: '--col-8', md: '445.33', lg: '496.00', xl: '773.33' },
+                    { col: '--col-9', md: '502.00', lg: '559.00', xl: '871.00' },
+                    { col: '--col-10', md: '558.67', lg: '622.00', xl: '968.67' },
+                    { col: '--col-11', md: '615.33', lg: '685.00', xl: '1066.33' },
+                    { col: '--col-12', md: '672.00', lg: '748.00', xl: '1164.00' },
+                ].map((row, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
+                        <td style={{ padding: '12px' }}><code>{row.col}</code></td>
+                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{row.md}px</td>
+                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{row.lg}px</td>
+                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{row.xl}px</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+
+        <h3 className="h3" style={{ marginBottom: '16px' }}>Content Width Calculation</h3>
+        <pre style={{
+            backgroundColor: 'var(--color-surface-container-low)',
+            padding: '16px',
+            borderRadius: '8px',
+            overflow: 'auto',
+            marginBottom: '24px'
+        }}>
+            {`Medium:  768 - 32 (outer) - 64 (surface) = 672px
+Large:   1024 - 32 - 164 (sidebar) - 16 (gap) - 64 = 748px
+X-Large: 1440 - 32 - 164 - 16 - 64 = 1164px`}
+        </pre>
 
         <h3 className="h3" style={{ marginBottom: '16px' }}>Common Column Usage</h3>
         <TokenTable

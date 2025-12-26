@@ -4,3 +4,5 @@ import './styles/main.scss';
 
 // Components
 export * from './components';
+export * from './forms';
+export * from './DataViz';

@@ -1,6 +1,6 @@
 {
     "name": "@tutors.plus/design-system",
-    "version": "0.1.0-pilot.20",
+    "version": "0.1.0-pilot.21",
     "description": "PLUS Design System for Figma Make",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",

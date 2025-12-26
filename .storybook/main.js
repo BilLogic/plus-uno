@@ -5,14 +5,12 @@ const config = {
   stories: [
     '../packages/plus-ds/src/assets/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/components/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/components/**/*.mdx',
+    '../packages/plus-ds/src/forms/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/forms/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/styles/patterns/**/*.mdx',
     '../packages/plus-ds/src/DataViz/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/DataViz/**/*.mdx',
-    '../packages/plus-ds/src/patterns/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/patterns/**/*.mdx',
     '../packages/plus-ds/src/specs/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/styles/**/*.mdx',
   ],
   addons: [
     '@storybook/addon-links',
