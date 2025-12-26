@@ -103,6 +103,7 @@ const Button = ({
             'plus-btn--vertical': vertical,
             'plus-btn--block': block,
             'plus-btn--loading': loading,
+            'plus-btn--icon-only': !text && !children,
             // RB handles 'disabled' class but we enforce ours too
             'active': active
         },

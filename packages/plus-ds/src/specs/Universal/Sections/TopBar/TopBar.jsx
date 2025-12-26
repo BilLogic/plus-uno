@@ -41,7 +41,7 @@ const TopBar = ({
             {/* Sidebar Control - 164px width in expanded mode */}
             <div style={{ width: mode === 'expanded' ? 'var(--layout-sidebar-width, 164px)' : 'auto' }}>
                 <Button
-                    style="ghost"
+                    style="primary"
                     fill="tonal"
                     leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
                     onClick={handleToggle}

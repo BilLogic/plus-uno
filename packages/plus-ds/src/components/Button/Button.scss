@@ -115,6 +115,32 @@
     }
 }
 
+// --- ICON ONLY ---
+&--icon-only {
+    padding: 0;
+
+    // Explicit square sizing based on size map roughly (overriding padding)
+    &.plus-btn--medium {
+        width: 36px;
+        height: 36px;
+    }
+
+    &.plus-btn--small {
+        width: 28px;
+        height: 28px;
+    }
+
+    &.plus-btn--large {
+        width: 48px;
+        height: 48px;
+    }
+
+    .plus-btn-visual--leading,
+    .plus-btn-visual--trailing {
+        margin: 0;
+    }
+}
+
 
 // --- COLOR THEMES CONFIGURATION ---
 // Using EXPLICIT STRINGS to avoid Sass interpretation issues
