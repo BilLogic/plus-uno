@@ -1,0 +1,18 @@
+﻿[22:36:39.147] [INFO] storybook v10.1.10
+[22:36:39.818] [DEBUG] Getting package.json info for C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/package.json...
+[22:36:39.946] [WARN] Using CommonJS in your main configuration file is deprecated with Vite.
+- Refer to the migration guide at https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#commonjs-with-vite-is-deprecated
+[22:36:40.518] [ERROR] [38;2;241;97;97mError: Failed to load static files, no such directory: [36m.\packages\plus-ds\dist[39m
+Make sure this directory exists.[39m
+    at parseStaticDir (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/_node-chunks/chunk-PGCRO4IZ.js:107:11)
+    at file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/core-server/presets/common-preset.js:1419:48
+    at Array.map (<anonymous>)
+    at Object.favicon (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/core-server/presets/common-preset.js:1414:193)
+    at async useStatics (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/_node-chunks/chunk-PGCRO4IZ.js:63:83)
+    at async Promise.all (index 2)
+    at async storybookDevServer (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/core-server/index.js:6793:141)
+    at async buildOrThrow (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/core-server/index.js:5555:12)
+    at async buildDevStandalone (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/core-server/index.js:7208:66)
+    at async withTelemetry (file:///C:/Users/Bryan/Downloads/PLUScode/plus-vibe-coding-starting-kit/node_modules/storybook/dist/_node-chunks/chunk-PGCRO4IZ.js:209:12)
+[22:36:40.520] [WARN] Broken build, fix the error above.
+You may need to refresh the browser.

@@ -4,8 +4,8 @@
   "description": "Starter kit for PLUS design prototyping with Cursor agent",
   "main": "index.js",
   "scripts": {
-    "build:css": "sass --load-path=develop/tokens --load-path=legacy-ds/components new-ds/styles/main.scss dist/css/main.css",
-    "watch:css": "sass --load-path=develop/tokens --load-path=legacy-ds/components --watch new-ds/styles/main.scss:dist/css/main.css",
+    "build:css": "sass packages/plus-ds/src/styles/main.scss dist/css/main.css",
+    "watch:css": "sass --watch packages/plus-ds/src/styles/main.scss:dist/css/main.css",
     "watch:css:auto": "node scripts/watch-css.js",
     "dev": "npm run watch:css:auto & npm run serve",
     "serve": "python3 -m http.server 8000",

@@ -11,6 +11,8 @@ const config = {
     '../packages/plus-ds/src/DataViz/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/specs/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
+    '../design-system/specs/**/*.stories.@(js|jsx|ts|tsx)',
+    '../design-system/specs/**/*.mdx',
   ],
   addons: [
     '@storybook/addon-links',
@@ -33,7 +35,7 @@ const config = {
     autodocs: true,
   },
   staticDirs: [
-    { from: path.resolve(__dirname, '../packages/plus-ds/dist'), to: '/dist' },
+    { from: path.resolve(__dirname, '../dist'), to: '/dist' },
     // Keeping legacy assets mapping if potentially needed, but standardizing primarily on new package
     { from: path.resolve(__dirname, '../packages/plus-ds/src/assets'), to: '/assets' },
   ],
