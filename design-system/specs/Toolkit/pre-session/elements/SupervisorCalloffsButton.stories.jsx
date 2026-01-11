@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../../../../../packages/plus-ds/src/components/Button/Button';
 
 export default {
-    title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Call-offs Button',
+    title: 'Specs/Toolkit/Pre-Session/Elements',
     component: Button,
     parameters: {
         layout: 'padded',
@@ -10,15 +10,15 @@ export default {
 
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+export const SupervisorCalloffsButton = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-lg)' }}>
         <p className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>
             Overview of Supervisor Call-offs buttons.
         </p>
 
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Approve / Reject</h6>
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Approve / Reject</h6>
+            <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Approve: Success style (Green), Check icon */}
                 <Button text="Approve" leadingVisual="circle-check" style="success" />
                 <Button text="Approve" leadingVisual="circle-check" style="success" disabled />
@@ -30,8 +30,8 @@ export const Overview = () => (
         </section>
 
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Excused / Not Excused</h6>
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Excused / Not Excused</h6>
+            <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Excused: Success style (Green), Check icon */}
                 <Button text="Excused" leadingVisual="circle-check" style="success" />
                 <Button text="Excused" leadingVisual="circle-check" style="success" disabled />
@@ -43,3 +43,4 @@ export const Overview = () => (
         </section>
     </div>
 );
+SupervisorCalloffsButton.storyName = 'Supervisor Call-offs Button';

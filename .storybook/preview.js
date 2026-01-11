@@ -23,6 +23,7 @@ const preview = {
     },
     options: {
       storySort: {
+        includeNames: true,
         order: [
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
@@ -43,7 +44,13 @@ const preview = {
             'Training',
             ['Lessons', 'Onboarding'],
             'Toolkit',
-            ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
+            [
+              'Pre-Session',
+              ['Elements', ['Overview', 'Docs', '*']],
+              'In-Session',
+              ['Elements', ['Overview', 'Docs', '*']],
+              'Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'
+            ],
             'Admin',
             ['Group Admin', 'Session Admin', 'Student Admin', 'Tutor Admin'],
           ],
