@@ -1,0 +1,201 @@
+/**
+ * TutorChartsElement Styles
+ * Figma Node: 258-262214
+ */
+
+.tutor-charts-element {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-xl, 40px);
+    width: 100%;
+
+    &__chart-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-section-gap-md, 16px);
+    }
+
+    // Donut Chart
+    &__donut {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-200, 16px);
+    }
+
+    &__donut-chart {
+        position: relative;
+        width: 221px;
+        height: 221px;
+    }
+
+    &__svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    &__donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    &__donut-percentage {
+        font-family: 'Lato', sans-serif;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.6;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__donut-subtitle {
+        font-size: 16px;
+        font-weight: 300;
+        color: var(--color-on-surface, #191c1e);
+        line-height: 1.5;
+        margin-top: 0;
+    }
+
+    // Stacked Bar Chart
+    &__stacked-bar,
+    &__line {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-200, 16px);
+    }
+
+    &__chart-content {
+        display: flex;
+        gap: var(--space-100, 8px);
+        height: 300px;
+    }
+
+    &__y-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        min-width: 40px;
+        padding-right: var(--space-100, 8px);
+    }
+
+    &__main {
+        flex: 1;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    &__grid-line {
+        height: 1px;
+        background-color: var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__bars {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 100%;
+        padding: 0 var(--space-050, 4px);
+    }
+
+    &__bar-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-050, 4px);
+        flex: 1;
+        max-width: 80px;
+    }
+
+    &__bar-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 20px;
+    }
+
+    &__bar-segment {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        transition: height 0.3s ease;
+
+        &--0 {
+            background-color: #61b5cf;
+        }
+
+        &--1 {
+            background-color: #85ecd5;
+        }
+    }
+
+    &__bar-value {
+        color: var(--color-on-surface, #191c1e);
+        font-weight: var(--font-weight-normal, 400);
+        font-size: 12px;
+    }
+
+    // Line Chart
+    &__line-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__x-axis {
+        display: flex;
+        justify-content: space-around;
+        margin-top: auto;
+        padding-top: var(--space-100, 8px);
+    }
+
+    &__date {
+        font-size: 12px;
+        color: var(--color-on-surface, #191c1e);
+        white-space: nowrap;
+    }
+
+    // Legend (shared)
+    &__legend {
+        display: flex;
+        gap: var(--space-500, 24px);
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    &__legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-050, 4px);
+    }
+
+    &__legend-color {
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        flex-shrink: 0;
+    }
+}

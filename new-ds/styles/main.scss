@@ -1,0 +1,25 @@
+/**
+ * PLUS Design System Main Stylesheet
+ * 
+ * This is the main entry point for PLUS design system styles.
+ * Import all design tokens and component styles here.
+ */
+
+// Design Tokens (using load path: develop/tokens)
+@use "tokens" as *;
+
+// Forms (relative to new-ds/styles/)
+@use "../forms/Form" as *;
+@use "../forms/RadioButtonGroup" as *;
+@use "../forms/Rating" as *;
+
+// Base Styles
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    font-weight: var(--font-weight-normal, 400);
+    line-height: var(--font-line-height-150, 1.5);
+    color: var(--color-on-surface, #000);
+    background-color: var(--color-surface, #fff);
+}

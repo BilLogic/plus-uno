@@ -22,11 +22,8 @@
 @import "../components/Badge/Badge";
 
 // @import "../components/Divider/Divider";
-@import "../components/SessionManagementSnackbar/SessionManagementSnackbar";
-@import "../components/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar";
 
 @import "../components/ButtonGroup/ButtonGroup";
-
 // @import "../components/Checkbox/Checkbox";
 // @import "../components/Dropdown/Dropdown";
 // Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
@@ -82,7 +79,6 @@
 .plus-card-border-lg {
     border-width: var(--size-card-border-lg);
 }
-
 // @import "../components/Modal/Modal";
 // @import "../components/Navigation/Navigation";
 // @import "../components/Navbar/Navbar";

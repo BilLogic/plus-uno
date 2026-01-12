@@ -53,6 +53,7 @@ const Select = ({
     truncate = false,
     size = 'medium', // 'small', 'medium', 'large'
     disabled = false,
+    readonly = false,
     required = false,
     onChange,
     onFocus,
@@ -167,6 +168,7 @@ const Select = ({
         sizeClass,
         mode === 'multi' ? 'plus-select-multi' : 'plus-select-single',
         disabled ? 'plus-select-disabled' : '',
+        readonly ? 'plus-select-readonly' : '',
         isOpen ? 'plus-select-open' : '',
         lineWrap ? '' : 'plus-select-nowrap',
         truncate ? 'plus-select-truncate' : '',
@@ -176,15 +178,15 @@ const Select = ({
     const showBadgesInTrigger = mode === 'multi' && displayMode === 'badges' && selectedValues.length > 0;
 
     return (
-        <Dropdown
-            ref={dropdownRef}
-            show={isOpen}
-            onToggle={(nextShow) => !disabled && setIsOpen(nextShow)}
-            className={wrapperClasses}
-            style={style}
-        >
-            {/* Trigger / Input Field */}
-            <Dropdown.Toggle as={CustomSelectToggle} id={id} disabled={disabled}>
+            <Dropdown
+                ref={dropdownRef}
+                show={isOpen}
+                onToggle={(nextShow) => !disabled && !readonly && setIsOpen(nextShow)}
+                className={wrapperClasses}
+                style={style}
+            >
+                {/* Trigger / Input Field */}
+                <Dropdown.Toggle as={CustomSelectToggle} id={id} disabled={disabled || readonly}>
                 {showBadgesInTrigger && (
                     <div className="plus-select-badges">
                         {selectedValues.map((val) => {
@@ -317,6 +319,7 @@ Select.propTypes = {
     truncate: PropTypes.bool,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    readonly: PropTypes.bool,
     required: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,

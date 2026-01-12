@@ -1,0 +1,42 @@
+/**
+ * CardTitleHeader Styles
+ * Figma Node: 258-262205
+ */
+
+.card-title-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-100, 8px);
+
+    &__title {
+        font-family: 'Lato', sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.333;
+        color: var(--color-on-surface, #191c1e);
+        margin: 0;
+    }
+
+    &__info-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: rgba(25, 28, 30, 0.16);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: color 0.15s ease;
+
+        &:hover {
+            color: rgba(25, 28, 30, 0.38);
+        }
+
+        i {
+            font-size: 14px;
+        }
+    }
+}

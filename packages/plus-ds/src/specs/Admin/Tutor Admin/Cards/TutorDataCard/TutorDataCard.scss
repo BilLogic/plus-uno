@@ -1,0 +1,166 @@
+/**
+ * TutorDataCard Styles
+ * Figma Node: 258-262197
+ */
+
+.tutor-data-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-gap-md, 16px);
+    background-color: var(--color-surface-container-lowest, white);
+    border-radius: var(--card-radius-sm, 12px);
+    padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
+    width: 556px;
+    height: 376px;
+
+    &--loading {
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: 'Lato', sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.333;
+        color: var(--color-on-surface, #191c1e);
+        margin: 0;
+    }
+
+    &__info-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: rgba(25, 28, 30, 0.16);
+        cursor: pointer;
+        flex-shrink: 0;
+
+        &:hover {
+            color: rgba(25, 28, 30, 0.38);
+        }
+
+        i {
+            font-size: 14px;
+        }
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        height: 266px;
+        align-items: center;
+        justify-content: center;
+        padding: var(--card-pad-y-sm, 16px) var(--card-pad-x-sm, 16px);
+    }
+
+    &__loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__spinner {
+        font-size: 52px;
+        color: var(--color-on-surface-variant, #3f484a);
+        
+        i {
+            animation: spin 1s linear infinite;
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    &__chart {
+        position: relative;
+        width: 221px;
+        height: auto;
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    &__svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    &__center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    &__percentage {
+        font-family: 'Lato', sans-serif;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.6;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__subtitle {
+        font-size: 16px;
+        font-weight: 300;
+        color: var(--color-on-surface, #191c1e);
+        line-height: 1.5;
+        margin-top: 0;
+    }
+
+    &__legend {
+        display: flex;
+        gap: var(--space-500, 24px);
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    &__legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-050, 4px);
+
+        span:last-child {
+            font-size: 12px;
+            font-weight: 300;
+            color: var(--color-on-surface, #191c1e);
+            white-space: nowrap;
+        }
+    }
+
+    &__legend-color {
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        flex-shrink: 0;
+    }
+}

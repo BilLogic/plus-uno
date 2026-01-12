@@ -1,0 +1,80 @@
+/**
+ * OnboardingAlertCard Component Styles
+ * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=542-50027
+ */
+
+.onboarding-alert-card {
+    display: flex;
+    align-items: flex-start;
+    width: 400px;
+    max-width: 100%;
+
+    &__alert {
+        background-color: var(--color-primary-state-08, rgba(0, 102, 204, 0.08));
+        border: 1px solid var(--color-primary);
+        border-radius: var(--size-modal-radius-md, 12px);
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+        padding: var(--size-modal-pad-y-lg, 24px) var(--size-modal-pad-x-md, 16px);
+        gap: var(--size-modal-pad-x-sm, 12px);
+        align-items: flex-start;
+    }
+
+    &__message {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-xs, 4px);
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+        color: var(--color-on-primary-container);
+    }
+
+    &__title {
+        font-family: var(--font-family-header);
+        font-size: var(--font-size-h5, 20px);
+        font-weight: var(--font-weight-semibold-2, 600);
+        line-height: 1.4;
+        width: 100%;
+        margin: 0;
+        color: var(--color-on-primary-container);
+    }
+
+    &__description {
+        font-size: 0;
+        width: 100%;
+    }
+
+    &__description-text {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body1, 16px);
+        font-weight: var(--font-weight-normal, 400);
+        line-height: 1.5;
+        margin: 0;
+        color: var(--color-on-primary-container);
+    }
+
+    &__close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+            opacity: 0.7;
+        }
+
+        i {
+            font-size: var(--font-size-fa-h4-solid, 20px);
+            color: var(--color-on-surface-variant);
+            line-height: 1.6;
+        }
+    }
+}

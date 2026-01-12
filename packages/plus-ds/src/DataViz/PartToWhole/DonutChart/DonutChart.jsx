@@ -33,12 +33,12 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
         },
         title: {
             text: `<div style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                    <span style="font-family: var(--font-family-header); font-weight: bold; font-size: ${centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)'}; line-height: 1; color: var(--color-on-surface);">${value || ''}</span>
+                    <span style="font-family: ${centerTextSize === 'body3' ? 'var(--font-family-body, "Merriweather Sans", sans-serif)' : 'var(--font-family-header, "Lato", sans-serif)'}; font-weight: ${centerTextSize === 'body3' ? 'var(--font-weight-normal, 300)' : 'bold'}; font-size: ${centerTextSize === 'h1' ? 'var(--font-size-h1)' : centerTextSize === 'h2' ? 'var(--font-size-h2)' : centerTextSize === 'body3' ? '12px' : 'var(--font-size-h2)'}; line-height: ${centerTextSize === 'body3' ? '1.4' : '1'}; color: ${centerTextSize === 'body3' ? 'var(--color-on-surface-variant, #3f484a)' : 'var(--color-on-surface, #191c1e)'}; letter-spacing: 0;">${value || ''}</span>
                     ${label ? `<span style="font-family: var(--font-family-body); font-size: var(--font-size-body3); color: var(--color-on-surface-variant, #666); margin-top: 4px;">${label}</span>` : ''}
                    </div>`,
             align: 'center',
             verticalAlign: 'middle',
-            y: 5, // Optical adjustment
+            y: 2.5, // Optical adjustment - matches Figma's top-[calc(50%+2.5px)]
             useHTML: true,
             style: {
                 fontFamily: 'inherit',
@@ -101,7 +101,7 @@ DonutChart.propTypes = {
     /** Label text below the value */
     label: PropTypes.string,
     /** CSS class for the center value text size */
-    centerTextSize: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5'])
+    centerTextSize: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'body3'])
 };
 
 export default DonutChart;

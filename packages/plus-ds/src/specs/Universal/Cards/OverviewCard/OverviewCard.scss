@@ -2,50 +2,50 @@
  * OverviewCard Styles
  * Figma Spec: node-id=83-125838
  * 
- * Overview cards for SMART competency metrics with sparkline graphs.
- * Fixed height card with title, large metric value, trend indicator, and chart.
+ * Two card types:
+ * 1. SMART Cards - with vertical bar visualization
+ * 2. Metric Cards - with donut chart visualization
  */
 
 .plus-overview-card {
-    // Dimensions & Shape - match Figma exactly
-    width: var(--col-5, 275px);
+    // Base dimensions from Figma
+    width: var(--columns-col-5, 275px);
     height: 180px;
     padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
     border-radius: var(--size-card-radius-md, 16px);
 
-    // Background - default to neutral variant per spec
-    background-color: var(--color-surface-variant, #dde3ea);
+    // Default background
+    background-color: var(--color-surface-bright, #f9f9fc);
 
-    // Layout - flex column to stack elements
+    // Layout
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    gap: var(--size-card-gap-md, 16px);
     overflow: hidden;
-    position: relative;
     box-sizing: border-box;
 
-    // Header row: Title + Icon
+    // =============================================
+    // HEADER
+    // =============================================
     &__header {
         display: flex;
         align-items: center;
-        width: 100%;
         gap: var(--size-element-gap-xs, 4px);
+        width: 100%;
         flex-shrink: 0;
     }
 
     &__title {
-        // Lato SemiBold 20px - H5 style per Figma
         font-family: 'Lato', sans-serif;
         font-weight: 600;
-        font-size: 20px;
-        line-height: 1.4;
+        font-size: 16px;
+        line-height: 1.5;
         color: var(--color-on-surface-variant, #3f484a);
         margin: 0;
         white-space: nowrap;
     }
 
     &__icon {
-        // 20x20 container, 16px icon size per Figma
         display: flex;
         align-items: center;
         justify-content: center;
@@ -55,156 +55,255 @@
         color: var(--color-on-surface-variant, #3f484a);
         flex-shrink: 0;
 
-        i,
-        svg {
+        i, svg {
             font-size: inherit;
             color: inherit;
         }
     }
 
-    // Body area: contains value/trend on left, chart on right
+    // =============================================
+    // BODY
+    // =============================================
     &__body {
         display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        width: 100%;
+        gap: var(--size-card-gap-md, 16px);
         flex: 1;
-        margin-top: var(--size-element-gap-md, 12px);
+        min-height: 0;
     }
 
-    // Content block: value + trend stacked  
-    &__content {
+    &__text {
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
-        gap: var(--size-element-gap-xs, 4px);
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
     }
 
-    &__value {
-        // Large metric value - H4 style (24px)
-        font-family: 'Lato', sans-serif;
-        font-weight: 600;
-        font-size: 24px;
-        line-height: 1.33;
+    &__subtitle {
+        font-family: 'Merriweather Sans', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 1.571;
         color: var(--color-on-surface-variant, #3f484a);
         margin: 0;
     }
 
-    &__trend {
-        // Trend/subtitle text - B3 style (12px)
+    &__description {
         font-family: 'Merriweather Sans', sans-serif;
         font-weight: 300;
         font-size: 12px;
-        line-height: 1.67;
+        line-height: 1.667;
         color: var(--color-on-surface-variant, #3f484a);
-        opacity: 0.8;
         margin: 0;
+        flex: 1;
     }
 
-    // Chart container - positioned to right
-    &__chart {
-        flex-shrink: 0;
+    &__edit-link {
+        color: var(--color-primary, #0e8175);
+        text-decoration: underline;
+        margin-left: 4px;
+    }
+
+    // =============================================
+    // VISUALIZATIONS
+    // =============================================
+    &__visualization {
         display: flex;
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+
+    // SMART Vertical Bars
+    &__smart-viz {
+        display: flex;
+        gap: var(--size-element-gap-xs, 4px);
         align-items: flex-end;
     }
 
-    // Footer for additional subtitle if needed
-    &__footer {
-        margin-top: auto;
+    &__smart-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--size-element-gap-xs, 4px);
+    }
+
+    &__smart-bar-track {
+        width: 6px;
+        height: 80px;
+        background-color: var(--color-surface-container-lowest, white);
+        border-radius: 16px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        overflow: hidden;
+    }
+
+    &__smart-bar-fill {
         width: 100%;
+        border-radius: 16px;
+        transition: height 0.3s ease;
+    }
+
+    &__smart-bar-label {
+        font-family: 'Merriweather Sans', sans-serif;
+        font-weight: 300;
+        font-size: 12px;
+        line-height: 1.667;
+        text-transform: uppercase;
+    }
+
+    // Donut Chart
+    &__donut {
+        position: relative;
+        width: 96px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     // =============================================
-    // SMART Type Variants - using container colors
+    // SMART TYPE VARIANTS
     // =============================================
 
-    &--socio-emotional {
-        background-color: var(--color-social-emotional-container, #ffdea0);
+    &--relationships {
+        background: linear-gradient(90deg, rgba(199, 11, 119, 0.08) 0%, rgba(199, 11, 119, 0.08) 100%),
+                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
-        .plus-overview-card__value {
+        .plus-overview-card__subtitle,
+        .plus-overview-card__description {
+            color: var(--color-relationship-text, #940055);
+        }
+
+        .plus-overview-card__icon {
+            color: var(--color-relationship, #c70b77);
+        }
+    }
+
+    &--socio-emotional {
+        background: linear-gradient(90deg, rgba(125, 87, 0, 0.08) 0%, rgba(125, 87, 0, 0.08) 100%),
+                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
+
+        .plus-overview-card__title,
+        .plus-overview-card__subtitle,
+        .plus-overview-card__description {
             color: var(--color-social-emotional-text, #674a00);
         }
 
         .plus-overview-card__icon {
-            color: var(--color-social-emotional-text, #674a00);
-        }
-
-        .plus-overview-card__trend {
-            color: var(--color-social-emotional-text, #674a00);
+            color: var(--color-social-emotional, #8c6600);
         }
     }
 
     &--mastering-content {
-        background-color: var(--color-mastering-content-container, #f2daff);
+        background: linear-gradient(90deg, rgba(127, 63, 177, 0.08) 0%, rgba(127, 63, 177, 0.08) 100%),
+                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
-        .plus-overview-card__value {
+        .plus-overview-card__subtitle,
+        .plus-overview-card__description {
             color: var(--color-mastering-content-text, #673a8b);
         }
 
         .plus-overview-card__icon {
-            color: var(--color-mastering-content-text, #673a8b);
-        }
-
-        .plus-overview-card__trend {
-            color: var(--color-mastering-content-text, #673a8b);
+            color: var(--color-mastering-content, #8659a9);
         }
     }
 
     &--advocacy {
-        background-color: var(--color-advocacy-container, #b3f1bf);
+        background: linear-gradient(90deg, rgba(22, 119, 69, 0.08) 0%, rgba(22, 119, 69, 0.08) 100%),
+                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
-        .plus-overview-card__value {
+        .plus-overview-card__subtitle,
+        .plus-overview-card__description {
             color: var(--color-advocacy-text, #00572a);
         }
 
         .plus-overview-card__icon {
-            color: var(--color-advocacy-text, #00572a);
-        }
-
-        .plus-overview-card__trend {
-            color: var(--color-advocacy-text, #00572a);
-        }
-    }
-
-    &--relationships {
-        background-color: var(--color-relationship-container, #ffd9e4);
-
-        .plus-overview-card__title,
-        .plus-overview-card__value {
-            color: var(--color-relationship-text, #940055);
-        }
-
-        .plus-overview-card__icon {
-            color: var(--color-relationship-text, #940055);
-        }
-
-        .plus-overview-card__trend {
-            color: var(--color-relationship-text, #940055);
+            color: var(--color-advocacy, #167745);
         }
     }
 
     &--technology-tools {
-        background-color: var(--color-technology-tools-container, #d7e2ff);
+        background: linear-gradient(90deg, rgba(0, 92, 189, 0.08) 0%, rgba(0, 92, 189, 0.08) 100%),
+                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
-        .plus-overview-card__value {
+        .plus-overview-card__subtitle,
+        .plus-overview-card__description {
             color: var(--color-technology-tools-text, #0b469d);
         }
 
         .plus-overview-card__icon {
-            color: var(--color-technology-tools-text, #0b469d);
-        }
-
-        .plus-overview-card__trend {
-            color: var(--color-technology-tools-text, #0b469d);
+            color: var(--color-technology-tools, #005cbd);
         }
     }
 
-    // Undefined/neutral state
     &--undefined {
         background-color: var(--color-surface-variant, #dde3ea);
+    }
+
+    // =============================================
+    // METRIC TYPE VARIANTS (with shadow)
+    // =============================================
+    &--status,
+    &--completion,
+    &--accuracy,
+    &--avg-accuracy,
+    &--avg-completion,
+    &--time-spent,
+    &--effort,
+    &--progress {
+        background-color: var(--color-surface-bright, #f9f9fc);
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+                    0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+
+        .plus-overview-card__header {
+            flex-shrink: 0;
+        }
+
+        .plus-overview-card__title {
+            font-size: 20px;
+            line-height: 1.4;
+        }
+
+        .plus-overview-card__body {
+            align-items: flex-start;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .plus-overview-card__text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .plus-overview-card__subtitle {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .plus-overview-card__description {
+            font-size: 12px;
+            line-height: 1.5;
+            overflow: hidden;
+        }
+
+        .plus-overview-card__visualization {
+            align-items: center;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .plus-overview-card__donut {
+            width: 96px;
+            height: 96px;
+        }
     }
 }

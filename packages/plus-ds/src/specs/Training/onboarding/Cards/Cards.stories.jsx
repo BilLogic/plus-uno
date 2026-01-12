@@ -1,19 +1,14 @@
 /**
- * Training/Onboarding Specs - Cards
+ * Training/Onboarding Specs - Cards Overview
  * 
  * Card components for onboarding.
  * 
  * Components:
- * - OnboardingAlertCard: Alert/welcome card
- * - OnboardingModuleCard: Module card with progress
+ * - OnboardingModuleCard: Card showing module with thumbnail, title, duration, badge, status
+ * - OnboardingAlertCard: Alert card with title, description, and close icon
  */
 
 import React from 'react';
-import Card from '@/components/Card';
-import Badge from '@/components/Badge';
-import Button from '@/components/Button';
-import Progress from '@/components/Progress';
-import Alert from '@/components/Alert';
 
 export default {
     title: 'Specs/Training/Onboarding/Cards',
@@ -21,7 +16,15 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Card components for onboarding interface.',
+                component: `Card components for Training Onboarding interface.
+
+## Available Cards
+
+| Card | Description | Figma Node |
+|------|-------------|------------|
+| OnboardingModuleCard | Module card with thumbnail/description, title, duration, badge, status | 74-122003 |
+| OnboardingAlertCard | Alert card with title, description, and dismiss button | 542-50027 |
+`
             },
         },
     },
@@ -29,73 +32,45 @@ export default {
 
 /**
  * Overview
+ * Shows available card components
  */
-export const Overview = () => (
-    <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Onboarding Cards</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-                { name: 'OnboardingAlertCard', desc: 'Welcome/intro alert card with CTA' },
-                { name: 'OnboardingModuleCard', desc: 'Module card showing progress and actions' }
-            ].map(item => (
-                <div key={item.name} style={{
+export const Overview = {
+    render: () => (
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
+            <h2 className="h2" style={{ marginBottom: '24px' }}>Training Onboarding Cards</h2>
+            <p className="body1-txt" style={{ marginBottom: '24px', color: 'var(--color-on-surface-variant)' }}>
+                Card components for Training Onboarding. Navigate to individual cards for detailed documentation.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{
                     padding: '16px',
                     backgroundColor: 'var(--color-surface-container)',
                     borderRadius: '8px'
                 }}>
-                    <h4 className="h4">{item.name}</h4>
-                    <p className="body2-txt">{item.desc}</p>
+                    <h4 className="h4" style={{ marginBottom: '8px' }}>OnboardingModuleCard</h4>
+                    <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                        Card component showing module with thumbnail or description area, title, duration, strategy badge, and status indicator. Has two variants: thumbnail and description.
+                    </p>
+                    <p className="body3-txt" style={{ marginTop: '8px', color: 'var(--color-on-surface-variant)' }}>
+                        Figma Node: 74-122003
+                    </p>
                 </div>
-            ))}
-        </div>
-    </div>
-);
 
-/**
- * OnboardingAlertCard
- */
-export const OnboardingAlertCard = () => (
-    <div style={{ padding: '24px', maxWidth: '600px' }}>
-        <h6 className="h6" style={{ marginBottom: '16px' }}>Onboarding Alert Card</h6>
-        <Alert style="info">
-            <Alert.Icon><i className="fas fa-graduation-cap" /></Alert.Icon>
-            <Alert.Title>Welcome to Tutor Training!</Alert.Title>
-            <Alert.Content>
-                Complete the onboarding modules to get started. You'll learn essential skills for effective tutoring.
-            </Alert.Content>
-        </Alert>
-    </div>
-);
-
-/**
- * OnboardingModuleCard
- */
-export const OnboardingModuleCard = () => (
-    <div style={{ padding: '24px' }}>
-        <h6 className="h6" style={{ marginBottom: '16px' }}>Onboarding Module Cards</h6>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-            {[
-                { title: 'Platform Overview', status: 'Complete', progress: 100, time: '15 min' },
-                { title: 'Your First Session', status: 'In Progress', progress: 60, time: '20 min' },
-                { title: 'Student Management', status: 'Not Started', progress: 0, time: '25 min' }
-            ].map((mod, i) => (
-                <Card key={i} style={{ padding: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                        <Badge
-                            text={mod.status}
-                            style={mod.status === 'Complete' ? 'success' : mod.status === 'In Progress' ? 'info' : 'secondary'}
-                        />
-                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>{mod.time}</span>
-                    </div>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>{mod.title}</h4>
-                    <Progress now={mod.progress} style={{ marginBottom: '16px' }} />
-                    <Button
-                        text={mod.progress === 100 ? 'Review' : mod.progress > 0 ? 'Continue' : 'Start'}
-                        style="primary"
-                        className="w-100"
-                    />
-                </Card>
-            ))}
+                <div style={{
+                    padding: '16px',
+                    backgroundColor: 'var(--color-surface-container)',
+                    borderRadius: '8px'
+                }}>
+                    <h4 className="h4" style={{ marginBottom: '8px' }}>OnboardingAlertCard</h4>
+                    <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                        Alert card for important reminders with title, description text, and optional dismiss button. Uses primary color scheme.
+                    </p>
+                    <p className="body3-txt" style={{ marginTop: '8px', color: 'var(--color-on-surface-variant)' }}>
+                        Figma Node: 542-50027
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
-);
+    )
+};

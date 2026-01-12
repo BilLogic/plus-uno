@@ -1,0 +1,12 @@
+/**
+ * TutorPerformanceSection Styles
+ * Figma Node: 258-262208
+ */
+
+.tutor-performance-section {
+    display: flex;
+    gap: var(--space-300, 16px);
+    width: 100%;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}

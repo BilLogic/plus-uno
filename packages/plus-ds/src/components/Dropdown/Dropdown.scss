@@ -51,7 +51,6 @@ $dropdown-themes: (
             content: '\f0d7'; // fa-caret-down
             font-size: var(--font-size-fa-body2-solid);
             color: inherit;
-            border: none; // Fix for Bootstrap .dropdown-toggle conflict
         }
     }
 
@@ -96,14 +95,14 @@ $dropdown-themes: (
         align-items: center;
         gap: var(--size-element-gap-md);
         width: 100%;
-        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md); // SCSS UPDATE: Changed y-padding to md (6px) to match Figma spec
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
         background-color: transparent;
         border: none;
         color: var(--color-on-surface);
         font-family: var(--font-family-body);
-        font-size: var(--font-size-body2); // SCSS UPDATE: Changed to body2 (14px) per user feedback
+        font-size: var(--font-size-body1);
         font-weight: var(--font-weight-normal);
-        line-height: var(--font-line-height-body2); // Match body2 line height
+        line-height: var(--font-line-height-body1);
         text-align: left;
         text-decoration: none;
         cursor: pointer;
@@ -142,28 +141,16 @@ $dropdown-themes: (
 
     // --- DROPDOWN HEADER/DIVIDER ---
     .dropdown-header,
-    .pdropdown-header,
-    .dropdown-section-header {
-        // Added to match JSX
+    .pdropdown-header {
         display: block;
-        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md); // SCSS UPDATE: Changed y-padding to md (6px) to match Items/Figma
-        color: var(--color-outline); // Lighter gray to look disabled/header-like
-        font-family: var(--font-family-body); // SCSS UPDATE: Reverted to Body font (Merriweather) for uniformity per user
-        font-size: var(--font-size-body2); // SCSS UPDATE: Changed to body2 (14px) to match items
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+        color: var(--color-on-surface-variant);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3);
         font-weight: var(--font-weight-semibold-1);
         white-space: nowrap;
         pointer-events: none;
         padding-top: var(--size-element-pad-y-md);
-        background: transparent;
-        border: none;
-        text-align: left;
-        width: 100%;
-
-        // Fix for "huge gap" when header follows divider
-        // The divider has margin-bottom, so we don't need padding-top on the header here
-        .pdropdown-divider+& {
-            padding-top: 0;
-        }
     }
 
     .dropdown-item-inner {
@@ -353,10 +340,9 @@ $dropdown-themes: (
 
             .pdropdown-toggle,
             .pdropdown-default-toggle {
-                background-color: transparent !important;
-                border-color: transparent !important; // Keeps border width for alignment
-                box-shadow: none !important;
-                color: var($col-text) !important;
+                background-color: transparent;
+                border-color: transparent;
+                color: var($col-text);
 
                 // CRITICAL: Ghost variant caret uses text color
                 &::after {
@@ -364,13 +350,13 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    background-color: var($col-state) !important;
+                    background-color: var($col-state);
                 }
 
-                // PRESSED/ACTIVE
+                // PRESSED/ACTIVE: Only background changes
                 &:active,
                 &.active {
-                    background-color: color-mix(in srgb, var($col-state), black 8%) !important;
+                    background-color: color-mix(in srgb, var($col-state), black 8%);
                 }
             }
         }

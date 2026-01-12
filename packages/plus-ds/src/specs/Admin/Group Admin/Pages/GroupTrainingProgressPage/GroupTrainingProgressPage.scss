@@ -1,0 +1,141 @@
+/**
+ * GroupTrainingProgressPage Styles
+ * Figma Node: 531-62962
+ */
+
+.group-training-progress-page {
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+    }
+
+    &__tabs {
+        flex-shrink: 0;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-section-gap-lg);
+        width: 100%;
+    }
+
+    &__title-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    &__cards {
+        display: flex;
+        gap: var(--size-section-gap-sm);
+        align-items: center;
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    &__table-container {
+        display: flex;
+        flex-direction: column;
+        height: 696px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+}
+
+// Overview Card Styles
+.overview-card {
+    background-color: var(--color-surface-container-lowest);
+    border-radius: var(--size-card-radius-md);
+    padding: var(--size-card-pad-x-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-md);
+    width: 275.33px;
+    min-width: 162px;
+    height: 180px;
+    max-width: 275.33px;
+    box-shadow: var(--elevation-light-1);
+    flex-shrink: 0;
+
+    &--student-need {
+        background-image: linear-gradient(90deg, rgba(127, 63, 177, 0.08) 0%, rgba(127, 63, 177, 0.08) 100%), 
+                          linear-gradient(90deg, rgb(249, 249, 252) 0%, rgb(249, 249, 252) 100%);
+    }
+
+    &__header {
+        display: flex;
+        gap: var(--size-element-gap-xs);
+        align-items: center;
+        width: 100%;
+    }
+
+    &__body {
+        display: flex;
+        gap: var(--size-card-gap-md);
+        align-items: center;
+        flex: 1;
+        width: 100%;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-xs);
+        flex: 1;
+    }
+
+    &__progress {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 96px;
+        height: 80px;
+    }
+}
+
+// SMART Bars Visualization
+.smart-bars {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+    align-items: flex-start;
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-xs);
+        align-items: center;
+    }
+
+    &__bar-wrapper {
+        position: relative;
+        width: 6px;
+        height: 80px;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    &__bar-bg {
+        width: 6px;
+        height: 80px;
+        background-color: var(--color-surface-container-lowest);
+        border-radius: 16px;
+    }
+
+    &__bar {
+        width: 6px;
+        border-radius: 16px;
+        position: absolute;
+        bottom: 0;
+    }
+}

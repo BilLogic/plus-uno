@@ -15,6 +15,7 @@ const Table = ({
     density = 'md',
     className = '',
     style,
+    onRowClick,
     ...props
 }) => {
     const tableClasses = [

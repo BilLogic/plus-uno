@@ -1,0 +1,66 @@
+/**
+ * ExportSearchFilterBar Styles
+ * Figma Node: 433-370346
+ */
+
+.export-search-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-200, 12px);
+    width: 100%;
+
+    &__export-btn {
+        flex-shrink: 0;
+    }
+
+    &__search {
+        flex: 1;
+        min-width: 200px;
+        max-width: 400px;
+
+        .input-group {
+            height: 100%;
+        }
+
+        .input-group-text {
+            background-color: var(--color-surface-container-lowest, white);
+            border: 1px solid var(--color-outline-variant, #e2e2e5);
+            border-right: none;
+            border-radius: var(--element-radius-sm, 4px) 0 0 var(--element-radius-sm, 4px);
+            padding: 8px 12px;
+            color: var(--color-on-surface-variant, #5a5a5a);
+        }
+    }
+
+    &__search-icon {
+        i {
+            font-size: 14px;
+        }
+    }
+
+    &__search-input {
+        border-left: none;
+        border-radius: 0 var(--element-radius-sm, 4px) var(--element-radius-sm, 4px) 0;
+        font-size: 14px;
+
+        &:focus {
+            border-color: var(--color-outline-variant, #e2e2e5);
+            box-shadow: none;
+        }
+
+        &::placeholder {
+            color: var(--color-on-surface-variant, #5a5a5a);
+        }
+    }
+
+    &__filters {
+        display: flex;
+        align-items: center;
+        gap: var(--space-200, 12px);
+        margin-left: auto;
+    }
+
+    &__filter {
+        white-space: nowrap;
+    }
+}

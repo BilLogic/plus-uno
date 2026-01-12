@@ -1,0 +1,433 @@
+/**
+ * StudentOverviewSection Styles
+ * Figma Node: 999-109007
+ * 
+ * Colors from Figma design tokens:
+ * - relationship-container: #ffd9e4 (pink)
+ * - mastering-content-container: #f2daff (purple)
+ * - success-container: #a1eb83 (green)
+ * - danger-container: #ffdad6 (red/pink)
+ * - warning-container: #ffe17a (yellow)
+ * - surface-container-highest: #e2e2e5 (grey)
+ */
+
+// Color variables from Figma
+$color-relationship: #ffd9e4;
+$color-relationship-text: #c70b77;
+$color-mastering: #f2daff;
+$color-mastering-text: #673a8b;
+$color-success: #a1eb83;
+$color-success-text: #2c5609;
+$color-danger: #ffdad6;
+$color-danger-text: #9b0606;
+$color-warning: #ffe17a;
+$color-warning-text: #6d5e00;
+$color-neutral: #e2e2e5;
+$color-other: #807878;
+
+.student-overview-section {
+    display: flex;
+    gap: var(--space-200, 8px);
+    width: 100%;
+    min-width: min-content;
+    align-items: flex-start;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: var(--size-section-pad-y-sm, 8px);
+
+    // Hide scrollbar on webkit browsers but keep functionality
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--color-surface-container, #f5f5f5);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--color-outline-variant, #c4c4c4);
+        border-radius: 4px;
+
+        &:hover {
+            background: var(--color-outline, #8e8e8e);
+        }
+    }
+}
+
+.stacked-bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-300, 16px);
+    background-color: var(--color-surface-container-lowest, white);
+    border-radius: 8px;
+    padding: var(--space-500, 24px);
+    flex: 0 0 auto;
+    min-width: 320px;
+    width: 445px;
+    max-width: 445px;
+    height: 376px;
+
+    // Header
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: 'Lato', sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.333;
+        color: var(--color-on-surface, #191c1e);
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    &__info-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: rgba(25, 28, 30, 0.16);
+        cursor: pointer;
+
+        &:hover {
+            color: rgba(25, 28, 30, 0.38);
+        }
+
+        i {
+            font-size: 14px;
+        }
+    }
+
+    // Graphs container
+    &__graphs {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-300, 16px);
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__graph {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    // Y-axis
+    &__y-axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 207px;
+        text-align: right;
+        min-width: 33px;
+
+        span {
+            font-family: 'Merriweather Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+            line-height: 1.667;
+            color: var(--color-on-background, #191c1e);
+        }
+    }
+
+    // Main chart area
+    &__main {
+        flex: 1;
+        position: relative;
+        height: 207px;
+    }
+
+    // Grid lines
+    &__grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        pointer-events: none;
+    }
+
+    &__grid-line {
+        width: 100%;
+        height: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+        &:last-child {
+            border-bottom-width: 2px;
+            border-bottom-color: rgba(0, 0, 0, 0.12);
+        }
+    }
+
+    // Columns container
+    &__cols {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        height: 198px;
+        padding-top: 7px;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    // Single column (bar + date)
+    &__col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 34px;
+        height: 100%;
+    }
+
+    // Bar container
+    &__bar-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 0;
+        margin-top: auto;
+    }
+
+    // Individual bar segment
+    &__bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        border-radius: 4px;
+        min-height: 4px;
+        position: relative;
+    }
+
+    &__bar-value {
+        font-family: 'Merriweather Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.571;
+        text-align: center;
+    }
+
+    // Date label
+    &__date {
+        font-family: 'Merriweather Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 1.667;
+        color: var(--color-on-background, #191c1e);
+        margin-top: 8px;
+        white-space: nowrap;
+    }
+
+    // Legend
+    &__legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-500, 24px);
+        align-items: center;
+    }
+
+    &__legend-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-050, 4px);
+
+        span:last-child {
+            font-family: 'Merriweather Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+            line-height: 1.667;
+            color: var(--color-on-surface, #191c1e);
+            white-space: nowrap;
+        }
+    }
+
+    &__legend-color {
+        width: 25px;
+        height: 25px;
+        border-radius: 4px;
+    }
+
+    // ============================================
+    // NEEDS DISTRIBUTION CHART COLORS
+    // ============================================
+    &--needs {
+        .stacked-bar-chart__bar {
+            &--0 {
+                background-color: $color-relationship;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-relationship-text;
+                }
+            }
+
+            &--1 {
+                background-color: $color-mastering;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-mastering-text;
+                }
+            }
+
+            &--2 {
+                background-color: $color-other;
+
+                .stacked-bar-chart__bar-value {
+                    color: white;
+                }
+            }
+        }
+
+        .stacked-bar-chart__legend-color {
+            &--0 {
+                background-color: $color-relationship;
+            }
+
+            &--1 {
+                background-color: $color-mastering;
+            }
+
+            &--2 {
+                background-color: $color-other;
+            }
+        }
+    }
+
+    // ============================================
+    // ATTENDANCE CHART COLORS
+    // ============================================
+    &--attendance {
+        .stacked-bar-chart__bar {
+            &--0 {
+                background-color: $color-success;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-success-text;
+                }
+            }
+
+            &--1 {
+                background-color: $color-danger;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-danger-text;
+                }
+            }
+
+            &--2 {
+                background-color: $color-neutral;
+
+                .stacked-bar-chart__bar-value {
+                    color: var(--color-on-surface, #191c1e);
+                }
+            }
+        }
+
+        .stacked-bar-chart__legend-color {
+            &--0 {
+                background-color: $color-success;
+            }
+
+            &--1 {
+                background-color: $color-danger;
+            }
+
+            &--2 {
+                background-color: $color-neutral;
+            }
+        }
+
+        // Smaller legend icons for attendance
+        .stacked-bar-chart__legend-color {
+            width: 20px;
+            height: 20px;
+        }
+
+        .stacked-bar-chart__legend {
+            gap: var(--space-200, 8px);
+            justify-content: center;
+        }
+    }
+
+    // ============================================
+    // ENGAGEMENT CHART COLORS
+    // ============================================
+    &--engagement {
+        .stacked-bar-chart__bar {
+            &--0 {
+                background-color: $color-success;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-success-text;
+                }
+            }
+
+            &--1 {
+                background-color: $color-warning;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-warning-text;
+                }
+            }
+
+            &--2 {
+                background-color: $color-danger;
+
+                .stacked-bar-chart__bar-value {
+                    color: $color-danger-text;
+                }
+            }
+
+            &--3 {
+                background-color: $color-neutral;
+
+                .stacked-bar-chart__bar-value {
+                    color: var(--color-on-surface, #191c1e);
+                }
+            }
+        }
+
+        .stacked-bar-chart__legend-color {
+            &--0 {
+                background-color: $color-success;
+            }
+
+            &--1 {
+                background-color: $color-warning;
+            }
+
+            &--2 {
+                background-color: $color-danger;
+            }
+
+            &--3 {
+                background-color: $color-neutral;
+            }
+        }
+
+        // Smaller legend icons for engagement
+        .stacked-bar-chart__legend-color {
+            width: 20px;
+            height: 20px;
+        }
+
+        .stacked-bar-chart__legend {
+            gap: var(--space-200, 8px);
+            justify-content: center;
+        }
+    }
+}

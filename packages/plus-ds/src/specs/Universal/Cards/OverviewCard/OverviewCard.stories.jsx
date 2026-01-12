@@ -1,6 +1,10 @@
 /**
  * OverviewCard Stories
  * Figma Spec: node-id=83-125838
+ * 
+ * Two card types:
+ * 1. SMART Cards (tutor needs) - with vertical bar visualization
+ * 2. Metric Cards - with donut chart visualization
  */
 
 import React from 'react';
@@ -13,16 +17,29 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Overview cards for SMART competency metrics and student progress tracking.
-                
-**SMART Types:**
+                component: `Overview cards for SMART competency metrics and training progress tracking.
+
+## Card Types
+
+### SMART Cards (Student Needs)
 - **Relationships** - Pink/magenta theme
 - **Socio-Emotional** - Gold/amber theme  
 - **Mastering Content** - Purple theme
 - **Advocacy** - Green theme
 - **Technology Tools** - Blue theme
+- **Undefined** - Neutral/gray theme (no data state)
 
-Each card displays a title, metric value, trend indicator, and optional sparkline chart.`
+### Metric Cards
+- **Status** - Overall status percentage
+- **Completion Rate** - Lessons completed
+- **Accuracy Rate** - Individual accuracy
+- **Avg Accuracy Rate** - Group average accuracy
+- **Avg Completion Rate** - Group average completion
+- **Avg Time Spent** - Average training time
+- **Effort** - Effort goal fulfillment
+- **Progress** - Progress goal fulfillment
+
+Each card displays a title, subtitle, description, and visualization (SMART bars or donut chart).`
             }
         }
     },
@@ -35,94 +52,149 @@ Each card displays a title, metric value, trend indicator, and optional sparklin
                 'mastering-content',
                 'advocacy',
                 'technology-tools',
-                'undefined'
+                'undefined',
+                'status',
+                'completion',
+                'accuracy',
+                'avg-accuracy',
+                'avg-completion',
+                'time-spent',
+                'effort',
+                'progress'
             ],
-            description: 'SMART competency type - determines color scheme'
+            description: 'Card type - determines styling and visualization'
         },
         title: {
             control: 'text',
             description: 'Card title'
         },
-        value: {
+        subtitle: {
             control: 'text',
-            description: 'Large metric value'
+            description: 'Bold subtitle text'
         },
-        trend: {
+        description: {
             control: 'text',
-            description: 'Trend indicator text'
+            description: 'Description/body text'
+        },
+        chartValue: {
+            control: { type: 'range', min: 0, max: 100, step: 1 },
+            description: 'Donut chart value (0-100) for metric cards'
         }
     }
 };
 
-// Sample data for sparklines
-const sampleData = {
-    relationships: [10, 12, 11, 14, 13, 15, 16, 15, 17, 18],
-    'socio-emotional': [5, 8, 6, 9, 7, 10, 9, 11, 10, 12],
-    'mastering-content': [65, 68, 70, 72, 72, 71, 72, 73, 75, 78],
-    advocacy: [0, 1, 0, 0, 2, 1, 3, 2, 4, 3],
-    'technology-tools': [90, 92, 94, 94, 95, 95, 96, 97, 96, 98]
+// Sample SMART data for visualizations
+const smartDataSets = {
+    relationships: { socio: 0.01, mastering: 0.01, advocacy: 0.01, relationships: 0.85, technology: 0.01 },
+    'socio-emotional': { socio: 0.86, mastering: 0.75, advocacy: 0.75, relationships: 0.75, technology: 0.75 },
+    'mastering-content': { socio: 0.75, mastering: 0.87, advocacy: 0.75, relationships: 0.75, technology: 0.75 },
+    'advocacy': { socio: 0.75, mastering: 0.75, advocacy: 0.88, relationships: 0.75, technology: 0.75 },
+    'technology-tools': { socio: 0.75, mastering: 0.75, advocacy: 0.75, relationships: 0.75, technology: 0.89 },
+    'undefined': { socio: 0.01, mastering: 0.01, advocacy: 0.01, relationships: 0.01, technology: 0.01 }
 };
 
 /**
  * All SMART card variants displayed together
  */
-export const AllVariants = () => (
+export const SMARTCards = () => (
     <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(275px, 1fr))',
+        gridTemplateColumns: 'repeat(3, 275px)',
         gap: '16px',
         padding: '24px',
         backgroundColor: 'var(--color-surface, #f9f9fc)'
     }}>
         <OverviewCard
             type="relationships"
-            title="Relationships"
-            icon={<i className="fas fa-heart" />}
-            value="85%"
-            trend="+5% from last week"
-            data={sampleData.relationships}
+            smartData={smartDataSets.relationships}
         />
         <OverviewCard
             type="socio-emotional"
-            title="Socio-Emotional"
-            icon={<i className="fas fa-smile" />}
-            value="72%"
-            trend="Steady growth"
-            data={sampleData['socio-emotional']}
+            smartData={smartDataSets['socio-emotional']}
         />
         <OverviewCard
             type="mastering-content"
-            title="Mastering Content"
-            icon={<i className="fas fa-book" />}
-            value="78%"
-            trend="Quiz completion"
-            data={sampleData['mastering-content']}
+            smartData={smartDataSets['mastering-content']}
         />
         <OverviewCard
             type="advocacy"
-            title="Advocacy"
-            icon={<i className="fas fa-bullhorn" />}
-            value="3"
-            trend="New cases this week"
-            data={sampleData.advocacy}
+            smartData={smartDataSets.advocacy}
         />
         <OverviewCard
             type="technology-tools"
-            title="Tech Tools"
-            icon={<i className="fas fa-laptop" />}
-            value="98%"
-            trend="High adoption"
-            data={sampleData['technology-tools']}
+            smartData={smartDataSets['technology-tools']}
         />
         <OverviewCard
             type="undefined"
-            title="Student Need"
-            icon={<i className="fas fa-info-circle" />}
-            value="--"
-            trend="No data available"
+            smartData={smartDataSets.undefined}
         />
     </div>
 );
+
+SMARTCards.parameters = {
+    docs: {
+        description: {
+            story: 'All SMART card types showing student needs with vertical bar visualizations.'
+        }
+    }
+};
+
+/**
+ * All Metric card variants displayed together
+ */
+export const MetricCards = () => (
+    <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 275px)',
+        gap: '16px',
+        padding: '24px',
+        backgroundColor: 'var(--color-surface, #f9f9fc)'
+    }}>
+        <OverviewCard
+            type="status"
+            chartValue={37.5}
+            subtitle="37.5%"
+        />
+        <OverviewCard
+            type="completion"
+            chartValue={20}
+        />
+        <OverviewCard
+            type="accuracy"
+            chartValue={20}
+        />
+        <OverviewCard
+            type="avg-accuracy"
+            chartValue={20}
+        />
+        <OverviewCard
+            type="avg-completion"
+            chartValue={20}
+        />
+        <OverviewCard
+            type="time-spent"
+            chartValue={33}
+            subtitle="30 / 90 min"
+            editLink
+        />
+        <OverviewCard
+            type="effort"
+            chartValue={20}
+        />
+        <OverviewCard
+            type="progress"
+            chartValue={20}
+        />
+    </div>
+);
+
+MetricCards.parameters = {
+    docs: {
+        description: {
+            story: 'All metric card types showing various KPIs with donut chart visualizations.'
+        }
+    }
+};
 
 /**
  * Relationships card - pink/magenta theme
@@ -130,11 +202,7 @@ export const AllVariants = () => (
 export const Relationships = {
     args: {
         type: 'relationships',
-        title: 'Relationships',
-        icon: <i className="fas fa-heart" />,
-        value: '85%',
-        trend: '+5% from last week',
-        data: sampleData.relationships
+        smartData: smartDataSets.relationships
     }
 };
 
@@ -144,11 +212,7 @@ export const Relationships = {
 export const SocioEmotional = {
     args: {
         type: 'socio-emotional',
-        title: 'Socio-Emotional',
-        icon: <i className="fas fa-smile" />,
-        value: '72%',
-        trend: 'Steady growth',
-        data: sampleData['socio-emotional']
+        smartData: smartDataSets['socio-emotional']
     }
 };
 
@@ -158,11 +222,7 @@ export const SocioEmotional = {
 export const MasteringContent = {
     args: {
         type: 'mastering-content',
-        title: 'Mastering Content',
-        icon: <i className="fas fa-book" />,
-        value: '78%',
-        trend: 'Quiz completion rate',
-        data: sampleData['mastering-content']
+        smartData: smartDataSets['mastering-content']
     }
 };
 
@@ -172,11 +232,7 @@ export const MasteringContent = {
 export const Advocacy = {
     args: {
         type: 'advocacy',
-        title: 'Advocacy',
-        icon: <i className="fas fa-bullhorn" />,
-        value: '3',
-        trend: 'New cases this week',
-        data: sampleData.advocacy
+        smartData: smartDataSets.advocacy
     }
 };
 
@@ -186,24 +242,100 @@ export const Advocacy = {
 export const TechnologyTools = {
     args: {
         type: 'technology-tools',
-        title: 'Tech Tools',
-        icon: <i className="fas fa-laptop" />,
-        value: '98%',
-        trend: 'High adoption rate',
-        data: sampleData['technology-tools']
+        smartData: smartDataSets['technology-tools']
     }
 };
 
 /**
- * Undefined/neutral state
+ * Undefined/no data state
  */
 export const Undefined = {
     args: {
         type: 'undefined',
-        title: 'Student Need',
-        icon: <i className="fas fa-info-circle" />,
-        value: '--',
-        trend: 'No data available'
+        smartData: smartDataSets.undefined
+    }
+};
+
+/**
+ * Status metric card
+ */
+export const Status = {
+    args: {
+        type: 'status',
+        chartValue: 37.5,
+        subtitle: '37.5%'
+    }
+};
+
+/**
+ * Completion Rate metric card
+ */
+export const CompletionRate = {
+    args: {
+        type: 'completion',
+        chartValue: 20
+    }
+};
+
+/**
+ * Accuracy Rate metric card
+ */
+export const AccuracyRate = {
+    args: {
+        type: 'accuracy',
+        chartValue: 20
+    }
+};
+
+/**
+ * Average Accuracy Rate metric card
+ */
+export const AvgAccuracyRate = {
+    args: {
+        type: 'avg-accuracy',
+        chartValue: 20
+    }
+};
+
+/**
+ * Average Completion Rate metric card
+ */
+export const AvgCompletionRate = {
+    args: {
+        type: 'avg-completion',
+        chartValue: 20
+    }
+};
+
+/**
+ * Average Time Spent metric card
+ */
+export const AvgTimeSpent = {
+    args: {
+        type: 'time-spent',
+        chartValue: 33,
+        subtitle: '30 / 90 min',
+        editLink: true
+    }
+};
+
+/**
+ * Effort metric card
+ */
+export const Effort = {
+    args: {
+        type: 'effort',
+        chartValue: 20
+    }
+};
+
+/**
+ * Progress metric card
+ */
+export const Progress = {
+    args: {
+        type: 'progress',
+        chartValue: 20
     }
 };
 
@@ -213,10 +345,45 @@ export const Undefined = {
 export const Interactive = {
     args: {
         type: 'relationships',
-        title: 'Interactive Card',
-        value: '85%',
-        trend: 'Try changing props!',
-        icon: <i className="fas fa-star" />,
-        data: [5, 10, 5, 10, 5, 10, 15, 10]
+        smartData: { socio: 0.6, mastering: 0.4, advocacy: 0.8, relationships: 0.9, technology: 0.5 },
+        chartValue: 75
     }
 };
+
+/**
+ * Overview - All variants in one view
+ */
+export const Overview = () => (
+    <div style={{ padding: '24px', backgroundColor: 'var(--color-surface, #f9f9fc)' }}>
+        <h3 style={{ marginBottom: '16px', fontFamily: 'Lato, sans-serif' }}>SMART Cards (Student Needs)</h3>
+        <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            marginBottom: '32px'
+        }}>
+            <OverviewCard type="relationships" smartData={smartDataSets.relationships} />
+            <OverviewCard type="socio-emotional" smartData={smartDataSets['socio-emotional']} />
+            <OverviewCard type="mastering-content" smartData={smartDataSets['mastering-content']} />
+            <OverviewCard type="advocacy" smartData={smartDataSets.advocacy} />
+            <OverviewCard type="technology-tools" smartData={smartDataSets['technology-tools']} />
+            <OverviewCard type="undefined" smartData={smartDataSets.undefined} />
+        </div>
+
+        <h3 style={{ marginBottom: '16px', fontFamily: 'Lato, sans-serif' }}>Metric Cards</h3>
+        <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px'
+        }}>
+            <OverviewCard type="status" chartValue={37.5} subtitle="37.5%" />
+            <OverviewCard type="completion" chartValue={20} />
+            <OverviewCard type="accuracy" chartValue={20} />
+            <OverviewCard type="avg-accuracy" chartValue={20} />
+            <OverviewCard type="avg-completion" chartValue={20} />
+            <OverviewCard type="time-spent" chartValue={33} subtitle="30 / 90 min" editLink />
+            <OverviewCard type="effort" chartValue={20} />
+            <OverviewCard type="progress" chartValue={20} />
+        </div>
+    </div>
+);

@@ -8,34 +8,16 @@ const Dropdown = ({
     items = [],
     size = "default",
     style = "default",
-    fill = "filled",
+    fill = "filled", // NEW: filled, tonal, outline, ghost
     split = false,
     direction = "dropdown",
-    className = "",
-    isOpen: controlledIsOpen, // New prop for controlled state
-    onToggle // New prop for toggle callback
+    className = ""
 }) => {
-    const [internalIsOpen, setInternalIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    const isControlled = controlledIsOpen !== undefined;
-    const isOpen = isControlled ? controlledIsOpen : internalIsOpen;
-
-    const toggleDropdown = () => {
-        if (isControlled) {
-            onToggle && onToggle(!isOpen);
-        } else {
-            setInternalIsOpen(!internalIsOpen);
-        }
-    };
-
-    const closeDropdown = () => {
-        if (isControlled) {
-            onToggle && onToggle(false);
-        } else {
-            setInternalIsOpen(false);
-        }
-    };
+    const toggleDropdown = () => setIsOpen(!isOpen);
+    const closeDropdown = () => setIsOpen(false);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -174,9 +156,7 @@ Dropdown.propTypes = {
     fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
     split: PropTypes.bool,
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
-    className: PropTypes.string,
-    isOpen: PropTypes.bool,
-    onToggle: PropTypes.func
+    className: PropTypes.string
 };
 
 export default Dropdown;
