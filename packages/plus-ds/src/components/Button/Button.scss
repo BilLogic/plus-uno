@@ -144,16 +144,16 @@
 
 // --- COLOR THEMES CONFIGURATION ---
 // Using EXPLICIT STRINGS to avoid Sass interpretation issues
-// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe
+// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Container, 6:OnContainer
 $btn-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text'),
-    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text'),
-    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text'),
-    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text'),
-    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text'),
-    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text'),
-    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral-state-08', '--color-neutral-text')
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-container', '--color-on-primary-container'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container'),
+    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-container', '--color-on-success-container'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container'),
+    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container'),
+    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface')
 );
 
 // --- VARIANTS (Fill Types) ---
@@ -164,6 +164,8 @@ $btn-themes: (
     $col-on-main: unquote(list.nth($config, 2));
     $col-state: unquote(list.nth($config, 3));
     $col-text: unquote(list.nth($config, 4));
+    $col-container: unquote(list.nth($config, 5));
+    $col-on-container: unquote(list.nth($config, 6));
 
     &--#{$theme} {
 
@@ -183,19 +185,19 @@ $btn-themes: (
             }
         }
 
-        // 2. TONAL
+        // 2. TONAL (Material Design 3: uses container color, not state layer)
         &.plus-btn--tonal {
-            background-color: var($col-state);
-            color: var($col-text);
+            background-color: var($col-container);
+            color: var($col-on-container);
 
             &:hover,
             &.active,
             &:active {
-                background-color: color-mix(in srgb, var($col-state), black 12%);
+                background-color: color-mix(in srgb, var($col-container), black 12%);
             }
 
             &.plus-btn--loading::after {
-                color: var($col-text);
+                color: var($col-on-container);
             }
         }
 

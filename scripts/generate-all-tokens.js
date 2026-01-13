@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Convert RGB to hex/rgba
@@ -21,7 +21,7 @@ function toM3ColorName(name) {
         .replace(/\//g, '-')
         .toLowerCase()
         .trim();
-    
+
     // Material Design 3 specific mappings
     const mappings = {
         'primary-primary': 'primary',
@@ -74,7 +74,7 @@ function toM3ColorName(name) {
         'technology-tools-technology-tools-container': 'technology-tools-container',
         'technology-tools-on-technology-tools-container': 'on-technology-tools-container',
     };
-    
+
     // Handle state layers
     if (normalized.includes('state-layers')) {
         normalized = normalized
@@ -151,7 +151,7 @@ function toM3ColorName(name) {
             .replace('technology-tools-state-layers-technology-tools-container-12', 'technology-tools-container-state-12')
             .replace('technology-tools-state-layers-technology-tools-container-16', 'technology-tools-container-state-16');
     }
-    
+
     return mappings[normalized] || normalized;
 }
 
@@ -161,10 +161,10 @@ function toM3ColorName(name) {
 function generateColorsSCSS() {
     const accent = JSON.parse(fs.readFileSync('new tokens/colors _ accent.json', 'utf8'));
     const neutral = JSON.parse(fs.readFileSync('new tokens/colors _ neutral.json', 'utf8'));
-    
+
     const accentMode = Object.keys(accent.modes)[0];
     const neutralMode = Object.keys(neutral.modes)[0];
-    
+
     let scss = `/**
  * Material Design 3 Color Tokens
  * Generated from Figma design system
@@ -184,7 +184,7 @@ function generateColorsSCSS() {
     accent.variables.forEach(v => {
         const val = v.valuesByMode[accentMode];
         if (!val) return;
-        
+
         let colorValue;
         if (val.type === 'VARIABLE_ALIAS') {
             // For aliases, we'll resolve them later
@@ -199,11 +199,11 @@ function generateColorsSCSS() {
         } else {
             return;
         }
-        
+
         const cssName = toM3ColorName(v.name);
         colorMap[cssName] = colorValue;
     });
-    
+
     // Organize and output accent colors by category
     const categories = {
         'Primary': ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary'],
@@ -231,7 +231,7 @@ function generateColorsSCSS() {
         'Technology Tools': ['technology-tools', 'on-technology-tools', 'technology-tools-container', 'on-technology-tools-container'],
         'Technology Tools State Layers': Object.keys(colorMap).filter(k => k.startsWith('technology-tools-state') || k.startsWith('technology-tools-container-state')),
     };
-    
+
     Object.entries(categories).forEach(([category, keys]) => {
         if (keys.length > 0 && keys.some(k => colorMap[k])) {
             scss += `\n    /* ${category} */\n`;
@@ -242,19 +242,19 @@ function generateColorsSCSS() {
             });
         }
     });
-    
+
     // Process neutral colors
     scss += `\n    /* ============================================
        NEUTRAL COLORS - Material Design 3
        ============================================ */
     
     /* Surface Colors */\n`;
-    
+
     const neutralMap = {};
     neutral.variables.forEach(v => {
         const val = v.valuesByMode[neutralMode];
         if (!val) return;
-        
+
         let colorValue;
         if (val.type === 'VARIABLE_ALIAS') {
             const resolved = v.resolvedValuesByMode[neutralMode];
@@ -268,14 +268,14 @@ function generateColorsSCSS() {
         } else {
             return;
         }
-        
+
         let cssName = v.name
             .replace(/^Neutral Colors\//i, '')
             .replace(/^State-layers\//i, '')
             .replace(/\//g, '-')
             .toLowerCase()
             .trim();
-        
+
         // Map to M3 names
         if (cssName === 'surface') cssName = 'surface';
         else if (cssName === 'on-surface') cssName = 'on-surface';
@@ -294,15 +294,15 @@ function generateColorsSCSS() {
         else if (cssName === 'on-surface-variant') cssName = 'on-surface-variant';
         else if (cssName.includes('surface-container-surface-container-highest')) cssName = 'surface-container-highest';
         else if (cssName.startsWith('surface-container-on-surface')) cssName = 'on-surface';
-        
+
         // Skip state layers for now (they're handled separately if needed)
         if (cssName.includes('opacity') || cssName.includes('state-layers')) {
             return;
         }
-        
+
         neutralMap[cssName] = colorValue;
     });
-    
+
     // Output neutral colors in organized groups
     const neutralGroups = {
         'Surface': ['surface', 'on-surface'],
@@ -311,7 +311,7 @@ function generateColorsSCSS() {
         'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
         'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'inverse-surface', 'inverse-on-surface'],
     };
-    
+
     Object.entries(neutralGroups).forEach(([group, keys]) => {
         const existingKeys = keys.filter(k => neutralMap[k]);
         if (existingKeys.length > 0) {
@@ -321,9 +321,9 @@ function generateColorsSCSS() {
             });
         }
     });
-    
+
     scss += `}\n`;
-    
+
     return scss;
 }
 
@@ -333,7 +333,7 @@ function generateColorsSCSS() {
 function generatePrimitivesSCSS() {
     const primitives = JSON.parse(fs.readFileSync('new tokens/size _ primitive.json', 'utf8'));
     const mode = Object.keys(primitives.modes)[0];
-    
+
     let scss = `/**
  * Primitive Size Tokens
  * Base values used to build semantic tokens
@@ -342,20 +342,20 @@ function generatePrimitivesSCSS() {
 
 :root {
     /* Spacing Primitives */\n`;
-    
+
     const spacing = [];
     const radius = [];
     const stroke = [];
-    
+
     primitives.variables.forEach(v => {
         const val = v.valuesByMode[mode];
         if (val === undefined || val === null) return;
-        
+
         const resolved = v.resolvedValuesByMode[mode];
         const value = resolved?.resolvedValue ?? val;
-        
+
         const name = v.name.toLowerCase().replace(/\//g, '-');
-        
+
         if (name.includes('spacing') || name.includes('space-')) {
             spacing.push({ name, value });
         } else if (name.includes('radius')) {
@@ -364,45 +364,45 @@ function generatePrimitivesSCSS() {
             stroke.push({ name, value });
         }
     });
-    
+
     // Sort and output spacing
     spacing.sort((a, b) => {
         const numA = parseInt(a.name.match(/\d+/)?.[0] || '0');
         const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
         return numA - numB;
     });
-    
+
     spacing.forEach(item => {
         const varName = item.name.replace(/^spacing\//, '').replace(/^small\//, '').replace(/^medium\//, '').replace(/^large\//, '');
         scss += `    --size-${varName}: ${item.value}px;\n`;
     });
-    
+
     scss += `\n    /* Border Radius Primitives */\n`;
     radius.sort((a, b) => {
         const numA = parseInt(a.name.match(/\d+/)?.[0] || '0');
         const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
         return numA - numB;
     });
-    
+
     radius.forEach(item => {
         const varName = item.name.replace(/^border\/radius\//, '').replace(/^border\/radius\//, '');
         scss += `    --size-${varName}: ${item.value}px;\n`;
     });
-    
+
     scss += `\n    /* Stroke/Border Width Primitives */\n`;
     stroke.sort((a, b) => {
         const numA = parseFloat(a.name.match(/\d+\.?\d*/)?.[0] || '0');
         const numB = parseFloat(b.name.match(/\d+\.?\d*/)?.[0] || '0');
         return numA - numB;
     });
-    
+
     stroke.forEach(item => {
         const varName = item.name.replace(/^border\/stroke\//, '');
         scss += `    --size-${varName}: ${item.value}px;\n`;
     });
-    
+
     scss += `}\n`;
-    
+
     return scss;
 }
 
@@ -412,7 +412,7 @@ function generatePrimitivesSCSS() {
 function generateSemanticsSCSS() {
     const semantics = JSON.parse(fs.readFileSync('new tokens/size _ semantics.json', 'utf8'));
     const mode = Object.keys(semantics.modes)[0];
-    
+
     let scss = `/**
  * Semantic Spacing Tokens
  * These are the tokens designers and developers should use
@@ -421,7 +421,7 @@ function generateSemanticsSCSS() {
 
 :root {
 `;
-    
+
     // Organize by layer
     const layers = {
         'element': [],
@@ -432,25 +432,25 @@ function generateSemanticsSCSS() {
         'surface-container': [],
         'table': [],
     };
-    
+
     semantics.variables.forEach(v => {
         const val = v.valuesByMode[mode];
         if (!val) return;
-        
+
         const resolved = v.resolvedValuesByMode[mode];
         let value;
-        
+
         if (val.type === 'VARIABLE_ALIAS') {
             value = resolved?.resolvedValue;
         } else {
             value = val;
         }
-        
+
         if (value === undefined || value === null) return;
-        
+
         const name = v.name.toLowerCase().replace(/\//g, '-');
         let layer = null;
-        
+
         if (name.startsWith('element')) layer = 'element';
         else if (name.startsWith('card')) layer = 'card';
         else if (name.startsWith('section')) layer = 'section';
@@ -458,21 +458,21 @@ function generateSemanticsSCSS() {
         else if (name.startsWith('surface-container')) layer = 'surface-container';
         else if (name.startsWith('surface') && !name.includes('container')) layer = 'surface';
         else if (name.startsWith('table')) layer = 'table';
-        
+
         if (layer && layers[layer]) {
             layers[layer].push({ name, value });
         }
     });
-    
+
     // Add missing semantic tokens (additive only - never modify existing)
     // Check if element-radius-pill exists, if not add it
     const elementLayer = layers['element'] || [];
-    const hasRadiusPill = elementLayer.some(item => 
-        item.name.includes('element-radius-pill') || 
+    const hasRadiusPill = elementLayer.some(item =>
+        item.name.includes('element-radius-pill') ||
         item.name.includes('radius-pill') ||
         item.name === 'element-radius-pill'
     );
-    
+
     if (!hasRadiusPill) {
         // Get primitive value for radius-1000 (999px)
         let radiusPillValue = 999; // Default fallback
@@ -491,14 +491,14 @@ function generateSemanticsSCSS() {
         } catch (e) {
             console.warn('Warning: Could not read primitives file, using default 999px for radius-pill');
         }
-        
+
         // Add to element layer array so it gets processed naturally
-        layers['element'].push({ 
-            name: 'element-radius-pill', 
-            value: radiusPillValue 
+        layers['element'].push({
+            name: 'element-radius-pill',
+            value: radiusPillValue
         });
     }
-    
+
     // Output by layer
     const layerOrder = ['element', 'card', 'section', 'modal', 'surface', 'surface-container', 'table'];
     const layerLabels = {
@@ -510,11 +510,11 @@ function generateSemanticsSCSS() {
         'surface-container': 'Surface Containers Layer',
         'table': 'Table Tokens',
     };
-    
+
     layerOrder.forEach(layer => {
         if (layers[layer].length > 0) {
             scss += `\n    /* ${layerLabels[layer]} */\n`;
-            
+
             // Sort: padding first, then gap, then radius, then border
             const sorted = layers[layer].sort((a, b) => {
                 const order = ['pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
@@ -523,20 +523,20 @@ function generateSemanticsSCSS() {
                 if (aType !== bType) return aType - bType;
                 return a.name.localeCompare(b.name);
             });
-            
+
             sorted.forEach(item => {
                 const varName = item.name;
                 // Add comment for radius-pill token
-                const comment = varName === 'element-radius-pill' 
-                    ? ' /* Fully rounded (pill shape) - maps to --size-border-radius-radius-1000 */'
+                const comment = varName === 'element-radius-pill'
+                    ? ' /* Fully rounded (pill shape) */'
                     : '';
                 scss += `    --size-${varName}: ${item.value}px;${comment}\n`;
             });
         }
     });
-    
+
     scss += `}\n`;
-    
+
     return scss;
 }
 
@@ -545,7 +545,7 @@ function generateSemanticsSCSS() {
  */
 function generateLayoutSCSS() {
     const layout = JSON.parse(fs.readFileSync('new tokens/size _ layout.json', 'utf8'));
-    
+
     let scss = `/**
  * Layout Tokens
  * Breakpoints, containers, and column widths
@@ -553,7 +553,7 @@ function generateLayoutSCSS() {
 
 :root {
     /* Breakpoints */\n`;
-    
+
     // Extract breakpoints
     const breakpoints = {};
     layout.variables.forEach(v => {
@@ -572,20 +572,20 @@ function generateLayoutSCSS() {
             });
         }
     });
-    
+
     // Output breakpoints
     Object.entries(breakpoints).forEach(([mode, { min, max }]) => {
         if (min) scss += `    --breakpoint-${mode.toLowerCase()}-min: ${min}px;\n`;
         if (max) scss += `    --breakpoint-${mode.toLowerCase()}-max: ${max}px;\n`;
     });
-    
+
     scss += `\n    /* Containers */\n`;
-    
+
     // Extract containers (simplified - would need more parsing for full implementation)
     // For now, output key container values
-    
+
     scss += `}\n`;
-    
+
     return scss;
 }
 
@@ -599,7 +599,7 @@ function validateSemanticTokens(scssContent, filename) {
         /--size-border-radius-radius-/,
         /--size-border-stroke-stroke-/,
     ];
-    
+
     const errors = [];
     primitivePatterns.forEach(pattern => {
         const matches = scssContent.match(new RegExp(pattern, 'g'));
@@ -609,7 +609,7 @@ function validateSemanticTokens(scssContent, filename) {
             });
         }
     });
-    
+
     return errors;
 }
 

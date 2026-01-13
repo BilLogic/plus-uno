@@ -7,9 +7,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
+import Breadcrumb from '../../../../components/Breadcrumb';
 import { UserAvatar } from '../../Elements';
-import Button from '../../../../components/Button/Button';
+import Button from '../../../../components/Button';
+import './TopBar.scss';
 
 const TopBar = ({
     mode = 'expanded',
@@ -26,42 +27,47 @@ const TopBar = ({
         }
     };
 
+    // Calculate sidebar width based on mode or prop
+    // This maintains the layout alignment with the sidebar below
+    const sidebarWidth = mode === 'expanded' ? 'var(--layout-sidebar-width, 164px)' : 'auto';
+
     return (
         <div
             className={`plus-topbar ${className}`}
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                width: '100%',
-                ...style
-            }}
+            style={style}
             {...props}
         >
-            {/* Sidebar Control - 164px width in expanded mode */}
-            <div style={{ width: mode === 'expanded' ? 'var(--layout-sidebar-width, 164px)' : 'auto' }}>
+            {/* Left: Sidebar Control */}
+            <div
+                className="topbar-left-section"
+                style={{ width: sidebarWidth }}
+            >
                 <Button
-                    style="primary"
-                    fill="tonal"
+                    className="topbar-toggle-btn"
+                    style="primary" // Logic handled by class override, but keeping semantically primary
+                    fill="tonal"    // Logic handled by class override
                     leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
                     onClick={handleToggle}
+                    aria-label={mode === 'expanded' ? "Collapse sidebar" : "Expand sidebar"}
                 />
             </div>
 
-            {/* Page Control - Breadcrumb */}
-            <div style={{ flex: 1 }}>
+            {/* Center: Breadcrumbs */}
+            <div className="topbar-center-section">
                 <Breadcrumb items={breadcrumbs} />
             </div>
 
-            {/* User Avatar */}
-            {user && (
-                <UserAvatar
-                    firstChar={user.name?.charAt(0) || 'U'}
-                    name={user.name || 'User'}
-                    counter={user.counter}
-                    counterValue={user.counterValue}
-                />
-            )}
+            {/* Right: User Avatar & Notification */}
+            <div className="topbar-right-section">
+                {user && (
+                    <UserAvatar
+                        firstChar={user.name?.charAt(0) || 'U'}
+                        name={user.name || 'User'}
+                        counter={user.counter}
+                        counterValue={user.counterValue}
+                    />
+                )}
+            </div>
         </div>
     );
 };
