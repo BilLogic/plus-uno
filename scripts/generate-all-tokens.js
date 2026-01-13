@@ -16,64 +16,67 @@ function rgbToHex(r, g, b, a = 1) {
  * Convert Figma variable name to Material Design 3 CSS variable name
  */
 function toM3ColorName(name) {
+    // Remove known Figma group prefixes to simplify the name
     let normalized = name
         .replace(/^_/, '')
+        .replace(/^ColorsElevations\/MaterialDesign-ColorRoles\//, '')
+        .replace(/^ColorsElevations\/colors,guidance\//, '')
+        .replace(/^ColorsElevations\/PLUSBrandcolors,updatedJune2025\//, '')
+        .replace(/^ColorsElevations\//, '')
         .replace(/\//g, '-')
         .toLowerCase()
         .trim();
 
     // Material Design 3 specific mappings
     const mappings = {
+        'primary': 'primary', // Direct match after stripping
+        'on-primary': 'on-primary',
+        'primary-container': 'primary-container',
+        'on-primary-container': 'on-primary-container',
+        'inverse-primary': 'inverse-primary',
+        'secondary': 'secondary',
+        'on-secondary': 'on-secondary',
+        'secondary-container': 'secondary-container',
+        'on-secondary-container': 'on-secondary-container',
+        'tertiary': 'tertiary',
+        'on-tertiary': 'on-tertiary',
+        'tertiary-container': 'tertiary-container',
+        'on-tertiary-container': 'on-tertiary-container',
+        'danger': 'danger',
+        'error': 'danger', // Map Error to Danger
+        'on-danger': 'on-danger',
+        'on-error': 'on-danger',
+        'danger-container': 'danger-container',
+        'error-container': 'danger-container',
+        'on-danger-container': 'on-danger-container',
+        'on-error-container': 'on-danger-container',
+        'success': 'success',
+        'on-success': 'on-success',
+        // Map Add-on to Success for now if needed, or keep separate
+        'add-on': 'success',
+        'warning': 'warning',
+        'on-warning': 'on-warning',
+        'info': 'info',
+        'on-info': 'on-info',
+        'surface': 'surface',
+        'on-surface': 'on-surface',
+        'surface-variant': 'surface-variant',
+        'on-surface-variant': 'on-surface-variant',
+        'outline': 'outline',
+        'outline-variant': 'outline-variant',
+        'background': 'background',
+        'on-background': 'on-background',
+
+        // Legacy/Messy mappings
         'primary-primary': 'primary',
         'primary-on-primary': 'on-primary',
-        'primary-primary-container': 'primary-container',
-        'primary-on-primary-container': 'on-primary-container',
-        'primary-inverse-primary': 'inverse-primary',
         'secondary-secondary': 'secondary',
-        'secondary-on-secondary': 'on-secondary',
-        'secondary-secondary-container': 'secondary-container',
-        'secondary-on-secondary-container': 'on-secondary-container',
-        'tertiary-tertiary': 'tertiary',
-        'tertiary-on-tertiary': 'on-tertiary',
-        'tertiary-tertiary-container': 'tertiary-container',
-        'tertiary-on-tertiary-container': 'on-tertiary-container',
-        'danger-danger': 'danger',
-        'danger-on-danger': 'on-danger',
-        'danger-danger-container': 'danger-container',
-        'danger-on-danger-container': 'on-danger-container',
-        'success-success': 'success',
-        'success-on-success': 'on-success',
-        'success-success-container': 'success-container',
-        'success-on-success-container': 'on-success-container',
-        'warning-warning': 'warning',
-        'warning-on-warning': 'on-warning',
-        'warning-warning-container': 'warning-container',
-        'warning-on-warning-container': 'on-warning-container',
-        'info-info': 'info',
-        'info-on-info': 'on-info',
-        'info-info-container': 'info-container',
-        'info-on-info-container': 'on-info-container',
-        'social-emotional-social-emotional': 'social-emotional',
-        'social-emotional-on-social-emotional': 'on-social-emotional',
-        'social-emotional-social-emotional-container': 'social-emotional-container',
-        'social-emotional-on-social-emotional-container': 'on-social-emotional-container',
-        'mastering-content-mastering-content': 'mastering-content',
-        'mastering-content-on-mastering-content': 'on-mastering-content',
-        'mastering-content-mastering-content-container': 'mastering-content-container',
-        'mastering-content-on-mastering-content-container': 'on-mastering-content-container',
-        'advocacy-advocacy': 'advocacy',
-        'advocacy-on-advocacy': 'on-advocacy',
-        'advocacy-advocacy-container': 'advocacy-container',
-        'advocacy-on-advocacy-container': 'on-advocacy-container',
-        'relationship-relationship': 'relationship',
-        'relationship-on-relationship': 'on-relationship',
-        'relationship-relationship-container': 'relationship-container',
-        'relationship-on-relationship-container': 'on-relationship-container',
-        'technology-tools-technology-tools': 'technology-tools',
-        'technology-tools-on-technology-tools': 'on-technology-tools',
-        'technology-tools-technology-tools-container': 'technology-tools-container',
-        'technology-tools-on-technology-tools-container': 'on-technology-tools-container',
     };
+
+    // Check direct mapping first
+    if (mappings[normalized]) {
+        return mappings[normalized];
+    }
 
     // Handle state layers
     if (normalized.includes('state-layers')) {
@@ -95,61 +98,7 @@ function toM3ColorName(name) {
             .replace('tertiary-state-layers-tertiary-16', 'tertiary-state-16')
             .replace('tertiary-state-layers-tertiary-container-08', 'tertiary-container-state-08')
             .replace('tertiary-state-layers-tertiary-container-12', 'tertiary-container-state-12')
-            .replace('tertiary-state-layers-tertiary-container-16', 'tertiary-container-state-16')
-            .replace('danger-state-layers-danger-08', 'danger-state-08')
-            .replace('danger-state-layers-danger-12', 'danger-state-12')
-            .replace('danger-state-layers-danger-16', 'danger-state-16')
-            .replace('danger-state-layers-danger-container-08', 'danger-container-state-08')
-            .replace('danger-state-layers-danger-container-12', 'danger-container-state-12')
-            .replace('danger-state-layers-danger-container-16', 'danger-container-state-16')
-            .replace('success-state-layers-success-08', 'success-state-08')
-            .replace('success-state-layers-success-12', 'success-state-12')
-            .replace('success-state-layers-success-16', 'success-state-16')
-            .replace('success-state-layers-success-container-08', 'success-container-state-08')
-            .replace('success-state-layers-success-container-12', 'success-container-state-12')
-            .replace('success-state-layers-success-container-16', 'success-container-state-16')
-            .replace('info-state-layers-info-08', 'info-state-08')
-            .replace('info-state-layers-info-12', 'info-state-12')
-            .replace('info-state-layers-info-16', 'info-state-16')
-            .replace('info-state-layers-info-container-08', 'info-container-state-08')
-            .replace('info-state-layers-info-container-12', 'info-container-state-12')
-            .replace('info-state-layers-info-container-16', 'info-container-state-16')
-            .replace('warning-state-layers-warning-08', 'warning-state-08')
-            .replace('warning-state-layers-warning-12', 'warning-state-12')
-            .replace('warning-state-layers-warning-16', 'warning-state-16')
-            .replace('warning-state-layers-warning-container-08', 'warning-container-state-08')
-            .replace('warning-state-layers-warning-container-12', 'warning-container-state-12')
-            .replace('warning-state-layers-warning-container-16', 'warning-container-state-16')
-            .replace('social-emotional-state-layers-social-emotional-08', 'social-emotional-state-08')
-            .replace('social-emotional-state-layers-social-emotional-12', 'social-emotional-state-12')
-            .replace('social-emotional-state-layers-social-emotional-16', 'social-emotional-state-16')
-            .replace('social-emotional-state-layers-social-emotional-container-08', 'social-emotional-container-state-08')
-            .replace('social-emotional-state-layers-social-emotional-container-12', 'social-emotional-container-state-12')
-            .replace('social-emotional-state-layers-social-emotional-container-16', 'social-emotional-container-state-16')
-            .replace('mastering-content-state-layers-mastering-content-08', 'mastering-content-state-08')
-            .replace('mastering-content-state-layers-mastering-content-12', 'mastering-content-state-12')
-            .replace('mastering-content-state-layers-mastering-content-16', 'mastering-content-state-16')
-            .replace('mastering-content-state-layers-mastering-content-container-08', 'mastering-content-container-state-08')
-            .replace('mastering-content-state-layers-mastering-content-container-12', 'mastering-content-container-state-12')
-            .replace('mastering-content-state-layers-mastering-content-container-16', 'mastering-content-container-state-16')
-            .replace('advocacy-state-layers-advocacy-08', 'advocacy-state-08')
-            .replace('advocacy-state-layers-advocacy-12', 'advocacy-state-12')
-            .replace('advocacy-state-layers-advocacy-16', 'advocacy-state-16')
-            .replace('advocacy-state-layers-advocacy-container-08', 'advocacy-container-state-08')
-            .replace('advocacy-state-layers-advocacy-container-12', 'advocacy-container-state-12')
-            .replace('advocacy-state-layers-advocacy-container-16', 'advocacy-container-state-16')
-            .replace('relationship-state-layers-relationship-08', 'relationship-state-08')
-            .replace('relationship-state-layers-relationship-12', 'relationship-state-12')
-            .replace('relationship-state-layers-relationship-16', 'relationship-state-16')
-            .replace('relationship-state-layers-relationship-container-08', 'relationship-container-state-08')
-            .replace('relationship-state-layers-relationship-container-12', 'relationship-container-state-12')
-            .replace('relationship-state-layers-relationship-container-16', 'relationship-container-state-16')
-            .replace('technology-tools-state-layers-technology-tools-08', 'technology-tools-state-08')
-            .replace('technology-tools-state-layers-technology-tools-12', 'technology-tools-state-12')
-            .replace('technology-tools-state-layers-technology-tools-16', 'technology-tools-state-16')
-            .replace('technology-tools-state-layers-technology-tools-container-08', 'technology-tools-container-state-08')
-            .replace('technology-tools-state-layers-technology-tools-container-12', 'technology-tools-container-state-12')
-            .replace('technology-tools-state-layers-technology-tools-container-16', 'technology-tools-container-state-16');
+            .replace('tertiary-state-layers-tertiary-container-16', 'tertiary-container-state-16');
     }
 
     return mappings[normalized] || normalized;
@@ -194,6 +143,9 @@ function generateColorsSCSS() {
             } else {
                 return; // Skip if we can't resolve
             }
+        } else if (typeof val === 'string') {
+            // Check if it's a hex string
+            colorValue = val;
         } else if (val.r !== undefined) {
             colorValue = rgbToHex(val.r, val.g, val.b, val.a);
         } else {
@@ -263,6 +215,8 @@ function generateColorsSCSS() {
             } else {
                 return;
             }
+        } else if (typeof val === 'string') {
+            colorValue = val;
         } else if (val.r !== undefined) {
             colorValue = rgbToHex(val.r, val.g, val.b, val.a);
         } else {
