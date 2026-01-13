@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import Alert from '../../../../../packages/plus-ds/src/components/Alert/Alert';
 import Form from 'react-bootstrap/Form';
+import Switch from '../../../../../packages/plus-ds/src/forms/Switch';
+import Checkbox from '../../../../../packages/plus-ds/src/forms/Checkbox';
+import Select from '../../../../../packages/plus-ds/src/forms/Select';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form (Toggle Organism)',
@@ -35,55 +38,82 @@ const CallOffFormOrganism = ({
     const isChecked = isInteractive ? checked : initialChecked;
 
     return (
-        <div style={{ maxWidth: '600px', fontFamily: '"Merriweather Sans", sans-serif' }}>
-            <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: 'var(--size-element-pad-x-lg)', gap: 'var(--size-element-gap-sm)' }}>
-                <div>
-                    <strong className="d-block" style={{ fontSize: '14px', fontWeight: 600 }}>Call off entire recurring session</strong>
-                    <span className="text-muted" style={{ fontSize: '12px' }}>This will call you off from all future sessions in this recurring session</span>
+        <div style={{ maxWidth: '531px', fontFamily: '"Merriweather Sans", sans-serif' }}>
+            <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>
+                <div className="d-flex flex-column" style={{ gap: '2px', flex: 1, minWidth: 0 }}>
+                    <strong className="d-block body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Call off entire recurring session</strong>
+                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>This will call you off from all future sessions in this recurring session</span>
                 </div>
-                <Form.Check
-                    type="switch"
+                <Switch
                     id={`call-off-switch-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
                     checked={isToggled}
                     onChange={handleToggle}
-                    readOnly={!isInteractive}
+                    size="small"
+                    style={{ width: 'auto' }}
                 />
             </div>
 
             {isToggled && (
-                <div style={{ marginBottom: 'var(--size-element-pad-x-lg)' }}>
-                    <Alert style="warning" dismissable={false} className="mb-0">
-                        <Form.Check
-                            type="checkbox"
-                            id={`supervisor-check-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
-                            checked={isChecked}
-                            onChange={handleCheck}
-                            readOnly={!isInteractive}
-                            label={
-                                <div>
-                                    <span style={{ fontSize: '12px', fontWeight: 600 }}>I have already spoken with my supervisor about dropping this recurring session</span>
-                                    <span className="text-danger ml-1">*</span>
-                                    <div className="text-danger mt-1" style={{ fontSize: '12px' }}>
-                                        Please contact your supervisor via email/Slack before proceeding.
-                                    </div>
-                                </div>
-                            }
-                        />
+                <div style={{
+                    marginBottom: 'var(--size-section-gap-sm)',
+                    '--size-card-gap-sm': 'var(--size-element-gap-xs)'      // Override for Figma compliance
+                }}>
+                    <Alert
+                        style="warning"
+                        dismissable={false}
+                        className="mb-0"
+                    >
+                        {/* Figma Node 221:171732: Alert content has specific padding and gap */}
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 'var(--size-element-gap-xs)',
+                        }}>
+                            <Checkbox
+                                id={`supervisor-check-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
+                                checked={isChecked}
+                                onChange={handleCheck}
+                                size="small"
+                                style={{ '--size-element-gap-xs': 'var(--size-element-gap-sm)' }}
+                                label={
+                                    <span className="body2-txt">I have already spoken with my supervisor about dropping this recurring session <span className="text-danger">*</span></span>
+                                }
+                            />
+                            <div className="text-danger body2-txt" style={{
+                                paddingLeft: '24px', // Approx alignment without nested checkbox padding
+                                lineHeight: '1.571'
+                            }}>
+                                Please contact your supervisor via email/Slack before proceeding.
+                            </div>
+                        </div>
                     </Alert>
                 </div>
             )}
 
             {isToggled && isChecked && (
-                <div style={{ marginBottom: 'var(--size-element-pad-x-lg)' }}>
+                <div style={{ marginBottom: 'var(--size-element-gap-lg)' }}>
                     <Form.Group controlId={`supervisor-select-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}>
-                        <Form.Label style={{ fontSize: '12px', fontWeight: 600 }}>
-                            Which supervisor did you speak with? <span className="text-danger">*</span>
-                        </Form.Label>
-                        <Form.Select aria-label="Select supervisor" style={{ fontSize: '14px' }}>
-                            <option>Select a supervisor</option>
-                            <option value="1">Supervisor A</option>
-                            <option value="2">Supervisor B</option>
-                        </Form.Select>
+                        {/* Figma Node 221:171733: Gap between label and input is element-gap-xs (4px) */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
+                            <Form.Label style={{
+                                fontSize: '12px',
+                                fontWeight: 400, // Regular
+                                fontFamily: '"Merriweather Sans", sans-serif',
+                                marginBottom: 0
+                            }}>
+                                Which supervisor did you speak with? <span className="text-danger">*</span>
+                            </Form.Label>
+                            <Select
+                                id={`supervisor-select-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
+                                options={[
+                                    { value: '1', label: 'Supervisor A' },
+                                    { value: '2', label: 'Supervisor B' }
+                                ]}
+                                placeholder="Select a supervisor"
+                                disabled={!isInteractive}
+                                required
+                            />
+                        </div>
                     </Form.Group>
                 </div>
             )}
