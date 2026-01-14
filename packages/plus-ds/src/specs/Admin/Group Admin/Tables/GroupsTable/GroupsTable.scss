@@ -70,7 +70,8 @@
             &.plus-badge--info {
                 background-color: var(--color-info-state-08);
                 padding: 0 var(--size-element-pad-x-sm);
-                border-radius: var(--size-element-radius-pill);
+                border-radius: var(--size-element-radius-full);
+                min-width: unset;
             }
         }
     }

@@ -8,116 +8,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '../../../../Universal/Pages';
+import { OverviewCard } from '../../../../Universal/Cards';
 import NavTabs from '../../../../../components/NavTabs/NavTabs';
 import Button from '../../../../../components/Button/Button';
 import GroupTrainingProgressTable from '../../Tables/GroupTrainingProgressTable/GroupTrainingProgressTable';
 import '../../Tables/GroupTrainingProgressTable/GroupTrainingProgressTable.scss';
 import './GroupTrainingProgressPage.scss';
-
-/**
- * Overview Card Component
- */
-const OverviewCard = ({ title, value, description, variant = 'default' }) => {
-    const isStudentNeed = variant === 'student-need';
-    
-    return (
-        <div className={`overview-card ${isStudentNeed ? 'overview-card--student-need' : ''}`}>
-            <div className="overview-card__header">
-                <h5 
-                    className="h5" 
-                    style={{ 
-                        color: isStudentNeed 
-                            ? 'var(--color-mastering-content-text)' 
-                            : 'var(--color-on-surface-variant)',
-                        whiteSpace: 'nowrap'
-                    }}
-                >
-                    {title}
-                </h5>
-                <i 
-                    className="fas fa-circle-info" 
-                    style={{ 
-                        fontSize: '20px', 
-                        color: isStudentNeed 
-                            ? 'var(--color-mastering-content-text)' 
-                            : 'var(--color-on-surface-variant)' 
-                    }} 
-                />
-            </div>
-            <div className="overview-card__body">
-                <div className="overview-card__text">
-                    <div 
-                        className="body2-txt" 
-                        style={{ 
-                            fontWeight: 'var(--font-weight-bold)', 
-                            color: isStudentNeed 
-                                ? 'var(--color-mastering-content-text)' 
-                                : 'var(--color-on-surface-variant)' 
-                        }}
-                    >
-                        {value}
-                    </div>
-                    <p 
-                        className="body3-txt" 
-                        style={{ 
-                            fontWeight: 300, 
-                            color: isStudentNeed 
-                                ? 'var(--color-mastering-content-text)' 
-                                : 'var(--color-on-surface-variant)',
-                            margin: 0 
-                        }}
-                    >
-                        {description}
-                    </p>
-                </div>
-                {isStudentNeed ? (
-                    <SmartBars />
-                ) : (
-                    <div className="overview-card__progress">
-                        <span className="h4" style={{ color: 'var(--color-on-surface-variant)' }}>
-                            {value}
-                        </span>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-/**
- * SMART Bars Visualization Component
- */
-const SmartBars = () => {
-    const bars = [
-        { letter: 'S', height: 60, color: 'var(--color-social-emotional-container)', textColor: 'var(--color-social-emotional-text)' },
-        { letter: 'M', height: 70, color: 'var(--color-mastering-content)', textColor: 'var(--color-mastering-content-text)' },
-        { letter: 'A', height: 60, color: 'var(--color-advocacy-container)', textColor: 'var(--color-advocacy-text)' },
-        { letter: 'R', height: 60, color: 'var(--color-relationship-container)', textColor: 'var(--color-relationship-text)' },
-        { letter: 'T', height: 60, color: 'var(--color-technology-tools-container)', textColor: 'var(--color-technology-tools-text)' },
-    ];
-
-    return (
-        <div className="smart-bars">
-            {bars.map((bar) => (
-                <div key={bar.letter} className="smart-bars__item">
-                    <div className="smart-bars__bar-wrapper">
-                        <div className="smart-bars__bar-bg" />
-                        <div 
-                            className="smart-bars__bar" 
-                            style={{ height: `${bar.height}px`, backgroundColor: bar.color }} 
-                        />
-                    </div>
-                    <span 
-                        className="body3-txt" 
-                        style={{ fontWeight: 300, color: bar.textColor, textTransform: 'uppercase' }}
-                    >
-                        {bar.letter}
-                    </span>
-                </div>
-            ))}
-        </div>
-    );
-};
 
 const GroupTrainingProgressPage = ({
     trainingData = [],
@@ -231,25 +127,39 @@ const GroupTrainingProgressPage = ({
                     {/* Overview Cards */}
                     <div className="group-training-progress-page__cards">
                         <OverviewCard
-                            title="Student Need"
-                            value="Mastering Content"
+                            type="mastering-content"
+                            subtitle="Mastering Content"
                             description="3/3 students need mastering content support"
-                            variant="student-need"
+                            smartData={{
+                                socio: 0.75,
+                                mastering: 0.875,
+                                advocacy: 0.75,
+                                relationships: 0.75,
+                                technology: 0.75
+                            }}
                         />
                         <OverviewCard
+                            type="avg-completion"
                             title="Completion Rate"
-                            value="20%"
+                            subtitle="20%"
                             description="of total lessons have been completed by <first name>."
+                            chartValue={20}
+                            chartColor="#FFD23F"
                         />
                         <OverviewCard
-                            title="Avg Accuracy Rate"
-                            value="20%"
+                            type="avg-accuracy"
+                            subtitle="20%"
                             description="is the average accuracy on the completed training lessons."
+                            chartValue={20}
+                            chartColor="#FFD23F"
                         />
                         <OverviewCard
-                            title="Avg Time Spent"
-                            value="30 / 90 min"
-                            description="is the average time <placeholder> spent on training. Edit Goal"
+                            type="time-spent"
+                            subtitle="30 / 90 min"
+                            description="is the average time <placeholder> spent on training. "
+                            chartValue={33}
+                            editLink={true}
+                            chartColor="#FFD23F"
                         />
                     </div>
 

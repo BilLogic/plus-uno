@@ -26,19 +26,19 @@ const SMART_COLORS = {
 const SMARTBar = ({ letter, value = 0, category, isHighlighted = false }) => {
     const colors = SMART_COLORS[category] || SMART_COLORS.socio;
     const barHeight = Math.max(1, value * 80); // Scale value (0-1) to 80px max height
-    
+
     return (
         <div className="plus-overview-card__smart-bar">
             <div className="plus-overview-card__smart-bar-track">
-                <div 
+                <div
                     className="plus-overview-card__smart-bar-fill"
-                    style={{ 
+                    style={{
                         height: `${barHeight}px`,
                         backgroundColor: isHighlighted ? colors.fill : colors.bg
                     }}
                 />
             </div>
-            <span 
+            <span
                 className="plus-overview-card__smart-bar-label"
                 style={{ color: colors.text }}
             >
@@ -126,7 +126,7 @@ const OverviewCard = ({
 
     // Donut chart segments for metric cards
     const getDonutSegments = (val) => [
-        { value: val, color: 'var(--color-primary, #006b5e)', label: 'Value' },
+        { value: val, color: props.chartColor || 'var(--color-primary, #006b5e)', label: 'Value' },
         { value: 100 - val, color: 'var(--color-surface-variant, #dde3ea)', label: 'Remaining' }
     ];
 
@@ -175,7 +175,7 @@ const OverviewCard = ({
     // Title based on type
     const getTitle = () => {
         if (title) return title;
-        
+
         const titleMap = {
             'relationships': 'Student Need',
             'socio-emotional': 'Student Need',
@@ -227,8 +227,8 @@ const OverviewCard = ({
                 {/* Visualization */}
                 <div className="plus-overview-card__visualization">
                     {isSmartCard && (
-                        <SMARTVisualization 
-                            data={smartData} 
+                        <SMARTVisualization
+                            data={smartData}
                             highlightedCategory={smartTypeKey}
                         />
                     )}
@@ -284,6 +284,8 @@ OverviewCard.propTypes = {
     chartValue: PropTypes.number,
     /** Donut chart center label */
     chartLabel: PropTypes.string,
+    /** Custom color for the donut chart value segment */
+    chartColor: PropTypes.string,
     /** Show edit link (for time-spent type) */
     editLink: PropTypes.bool,
     /** Additional CSS classes */

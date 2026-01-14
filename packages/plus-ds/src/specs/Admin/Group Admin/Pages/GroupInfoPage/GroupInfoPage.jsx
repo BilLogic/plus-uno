@@ -32,15 +32,15 @@ const GroupInfoPage = ({
 
     const defaultGroups = [
         { id: 1, name: 'Math Masters', size: 4 },
-        { id: 2, name: 'Math Masters', size: 4 },
-        { id: 3, name: 'Math Masters', size: 4 },
-        { id: 4, name: 'Math Masters', size: 4 },
-        { id: 5, name: 'Math Masters', size: 4 },
-        { id: 6, name: 'Math Masters', size: 4 },
-        { id: 7, name: 'Math Masters', size: 4 },
-        { id: 8, name: 'Math Masters', size: 4 },
-        { id: 9, name: 'Math Masters', size: 4 },
-        { id: 10, name: 'Math Masters', size: 4 },
+        { id: 2, name: 'Science Explorers', size: 6 },
+        { id: 3, name: 'Reading Champions', size: 5 },
+        { id: 4, name: 'Writing Warriors', size: 3 },
+        { id: 5, name: 'History Buffs', size: 7 },
+        { id: 6, name: 'Art Appreciation', size: 4 },
+        { id: 7, name: 'Music Makers', size: 5 },
+        { id: 8, name: 'Coding Club', size: 8 },
+        { id: 9, name: 'Language Learners', size: 6 },
+        { id: 10, name: 'Study Group Alpha', size: 4 },
     ];
 
     const displayGroups = groups.length > 0 ? groups : defaultGroups;
