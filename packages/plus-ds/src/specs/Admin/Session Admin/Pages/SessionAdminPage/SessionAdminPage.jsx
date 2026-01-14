@@ -11,6 +11,7 @@ import { PageLayout } from '../../../../Universal/Pages';
 import Button from '../../../../../components/Button/Button';
 import NavTabs from '../../../../../components/NavTabs/NavTabs';
 import Pagination from '../../../../../components/Pagination/Pagination';
+import AdminDateRangeFilter from '../../../../Admin/Elements/AdminDateRangeFilter/AdminDateRangeFilter';
 import SessionsTable from '../../Tables/SessionsTable/SessionsTable';
 import SessionOverviewSection from '../../Sections/SessionOverviewSection/SessionOverviewSection';
 import SessionModal from '../../Modals/SessionModal/SessionModal';
@@ -153,43 +154,17 @@ const SessionAdminPage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Session Overview
                         </h2>
-                        <div className="session-admin-page__filters">
-                            <Button
-                                text={selectedSchool}
-                                style="secondary"
-                                fill="outlined"
-                                size="small"
-                                trailingVisual="caret-down"
-                                onClick={onSchoolFilterChange}
-                            />
-                            <Button
-                                text={selectedTutor}
-                                style="secondary"
-                                fill="outlined"
-                                size="small"
-                                trailingVisual="caret-down"
-                                onClick={onTutorFilterChange}
-                            />
-                            <div className="session-admin-page__date-filter">
-                                <Button
-                                    text={dateFrom}
-                                    style="secondary"
-                                    fill="outlined"
-                                    size="small"
-                                    trailingVisual="caret-down"
-                                    onClick={() => onDateFilterChange && onDateFilterChange('from')}
-                                />
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>to</span>
-                                <Button
-                                    text={dateTo}
-                                    style="secondary"
-                                    fill="outlined"
-                                    size="small"
-                                    trailingVisual="caret-down"
-                                    onClick={() => onDateFilterChange && onDateFilterChange('to')}
-                                />
-                            </div>
-                        </div>
+                        <AdminDateRangeFilter
+                            selectedSchool={selectedSchool}
+                            selectedTutor={selectedTutor}
+                            dateFrom={dateFrom}
+                            dateTo={dateTo}
+                            onSchoolChange={onSchoolFilterChange}
+                            onTutorChange={onTutorFilterChange}
+                            onDateFromChange={() => onDateFilterChange && onDateFilterChange('from')}
+                            onDateToChange={() => onDateFilterChange && onDateFilterChange('to')}
+                        />
+
                     </div>
 
                     {/* Charts Section */}
