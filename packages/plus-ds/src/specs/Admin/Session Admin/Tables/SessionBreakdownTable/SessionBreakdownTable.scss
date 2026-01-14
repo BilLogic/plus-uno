@@ -19,7 +19,7 @@
             th {
                 padding: var(--table-cell-y, 8px) var(--table-cell-x, 10px);
                 border: none;
-                border-bottom: 1px solid var(--color-outline-variant);
+                // border-bottom: 1px solid var(--color-outline-variant);
                 font-weight: var(--font-weight-normal);
                 vertical-align: middle;
             }
@@ -37,7 +37,7 @@
             td {
                 padding: var(--table-cell-y, 12px) var(--table-cell-x, 10px);
                 border: none;
-                border-bottom: 1px solid var(--color-outline-variant);
+                // border-bottom: 1px solid var(--color-outline-variant);
                 vertical-align: middle;
                 font-weight: var(--font-weight-light);
                 color: var(--color-on-surface);
