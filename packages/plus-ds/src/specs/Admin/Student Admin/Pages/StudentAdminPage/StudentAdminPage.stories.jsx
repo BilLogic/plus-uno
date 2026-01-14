@@ -8,6 +8,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import StudentAdminPage from './StudentAdminPage';
 import './StudentAdminPage.scss';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+
 
 // Generate sample data
 const generateStudentData = (rowCount) => {
@@ -36,6 +38,14 @@ export default {
     title: 'Specs/Admin/Student Admin/Pages/StudentAdminPage',
     component: StudentAdminPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+
     parameters: {
         layout: 'fullscreen',
         docs: {
@@ -82,6 +92,15 @@ Node ID: 1006-258597
             description: 'Modal variant (Info or Sessions tab)',
             table: { category: 'Modal' },
         },
+        breakpoint: {
+            control: 'select',
+            options: ['md', 'lg', 'xl', 'xxl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
+        },
+    },
+    args: {
+        breakpoint: 'xl',
     },
 };
 
@@ -162,7 +181,7 @@ export const Interactive = {
         const [currentPage, setCurrentPage] = useState(1);
         const [modalOpen, setModalOpen] = useState(args.modalOpen);
         const [modalVariant, setModalVariant] = useState(args.modalVariant);
-        
+
         const tableData = useMemo(() => {
             return generateStudentData(args.rowCount);
         }, [args.rowCount]);

@@ -8,6 +8,8 @@
 import React, { useState, useMemo } from 'react';
 import GroupTrainingProgressPage from './GroupTrainingProgressPage';
 import './GroupTrainingProgressPage.scss';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+
 
 // Sample data pool for generating rows
 const competencyTypes = ['socio-emotional', 'mastering-content', 'advocacy', 'relationships', 'technology-tools'];
@@ -20,7 +22,7 @@ const generateTableData = (rowCount) => {
         const accuracy = `${Math.floor(Math.random() * 40) + 50}%`;
         const rating = `${(Math.random() * 1.5 + 3.5).toFixed(1)}/5`;
         const timeSpent = `${Math.floor(Math.random() * 300) + 200} mins`;
-        
+
         data.push({
             id: i + 1,
             competencyArea,
@@ -90,6 +92,14 @@ export default {
     title: 'Specs/Admin/Group Admin/Pages/GroupTrainingProgressPage',
     component: GroupTrainingProgressPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+
     parameters: {
         layout: 'fullscreen',
         docs: {
@@ -121,6 +131,15 @@ Node ID: 531-62962
             description: 'Number of table rows to display',
             table: { category: 'Data' },
         },
+        breakpoint: {
+            control: 'select',
+            options: ['md', 'lg', 'xl', 'xxl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
+        },
+    },
+    args: {
+        breakpoint: 'xl',
     },
 };
 
@@ -136,9 +155,9 @@ export const Docs = {
                 <section>
                     <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
                     <p className="body2-txt">
-                        Full page layout for the Group Training Progress section of Group Admin. 
-                        Uses the PageLayout shell with TopBar and Sidebar. Contains tab navigation, 
-                        title section with group filter, overview cards showing key metrics, and a 
+                        Full page layout for the Group Training Progress section of Group Admin.
+                        Uses the PageLayout shell with TopBar and Sidebar. Contains tab navigation,
+                        title section with group filter, overview cards showing key metrics, and a
                         hierarchical training progress table organized by SMART competency areas.
                         Default displays 9 table rows.
                     </p>
@@ -196,7 +215,7 @@ export const Overview = {
 export const Interactive = {
     render: (args) => {
         const [selectedGroup, setSelectedGroup] = useState(args.selectedGroup);
-        
+
         const tableData = useMemo(() => {
             return generateTableData(args.rowCount);
         }, [args.rowCount]);

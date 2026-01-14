@@ -7,8 +7,9 @@
 
 import React, { useState } from 'react';
 import LessonsDetailPage from './LessonsDetailPage';
-import ResponsiveFrame from '../ResponsiveFrame';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './LessonsDetailPage.scss';
+
 import '../../Elements/Rating/Rating.scss';
 import '../../Elements/RatingSingle/RatingSingle.scss';
 
@@ -16,6 +17,13 @@ export default {
     title: 'Specs/Training/Lessons/Pages/LessonsDetailPage',
     component: LessonsDetailPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
     parameters: {
         docs: {
             description: {
@@ -45,7 +53,16 @@ export default {
         estimatedTime: {
             control: { type: 'text' },
             description: 'Estimated time to complete (P1 only)'
-        }
+        },
+        breakpoint: {
+            control: { type: 'select' },
+            options: ['md', 'lg', 'xl', 'xxl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
+        },
+    },
+    args: {
+        breakpoint: 'xl',
     }
 };
 
@@ -55,15 +72,13 @@ export default {
 export const P1 = {
     name: 'P1',
     render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <LessonsDetailPage
-                variant="P1"
-                lessonTitle={args.lessonTitle}
-                estimatedTime={args.estimatedTime}
-                onBack={() => console.log('Back clicked')}
-                onRatingChange={(rating) => console.log('Rating changed:', rating)}
-            />
-        </ResponsiveFrame>
+        <LessonsDetailPage
+            variant="P1"
+            lessonTitle={args.lessonTitle}
+            estimatedTime={args.estimatedTime}
+            onBack={() => console.log('Back clicked')}
+            onRatingChange={(rating) => console.log('Rating changed:', rating)}
+        />
     ),
     args: {
         breakpoint: 'xl',
@@ -78,15 +93,13 @@ export const P1 = {
 export const P2 = {
     name: 'P2',
     render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <LessonsDetailPage
-                variant="P2"
-                lessonTitle={args.lessonTitle}
-                onBack={() => console.log('Back clicked')}
-                onPrevious={() => console.log('Previous clicked')}
-                onNext={() => console.log('Next clicked')}
-            />
-        </ResponsiveFrame>
+        <LessonsDetailPage
+            variant="P2"
+            lessonTitle={args.lessonTitle}
+            onBack={() => console.log('Back clicked')}
+            onPrevious={() => console.log('Previous clicked')}
+            onNext={() => console.log('Next clicked')}
+        />
     ),
     args: {
         breakpoint: 'xl',
@@ -100,15 +113,13 @@ export const P2 = {
 export const P3 = {
     name: 'P3',
     render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <LessonsDetailPage
-                variant="P3"
-                lessonTitle={args.lessonTitle}
-                onBack={() => console.log('Back clicked')}
-                onPrevious={() => console.log('Previous clicked')}
-                onNext={() => console.log('Next clicked')}
-            />
-        </ResponsiveFrame>
+        <LessonsDetailPage
+            variant="P3"
+            lessonTitle={args.lessonTitle}
+            onBack={() => console.log('Back clicked')}
+            onPrevious={() => console.log('Previous clicked')}
+            onNext={() => console.log('Next clicked')}
+        />
     ),
     args: {
         breakpoint: 'xl',
@@ -122,15 +133,13 @@ export const P3 = {
 export const P4 = {
     name: 'P4',
     render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <LessonsDetailPage
-                variant="P4"
-                lessonTitle={args.lessonTitle}
-                onBack={() => console.log('Back clicked')}
-                onPrevious={() => console.log('Previous clicked')}
-                onNext={() => console.log('Next clicked')}
-            />
-        </ResponsiveFrame>
+        <LessonsDetailPage
+            variant="P4"
+            lessonTitle={args.lessonTitle}
+            onBack={() => console.log('Back clicked')}
+            onPrevious={() => console.log('Previous clicked')}
+            onNext={() => console.log('Next clicked')}
+        />
     ),
     args: {
         breakpoint: 'xl',
@@ -144,15 +153,13 @@ export const P4 = {
 export const P5 = {
     name: 'P5',
     render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <LessonsDetailPage
-                variant="P5"
-                lessonTitle={args.lessonTitle}
-                onBack={() => console.log('Back clicked')}
-                onPrevious={() => console.log('Previous clicked')}
-                onNext={() => console.log('Next clicked')}
-            />
-        </ResponsiveFrame>
+        <LessonsDetailPage
+            variant="P5"
+            lessonTitle={args.lessonTitle}
+            onBack={() => console.log('Back clicked')}
+            onPrevious={() => console.log('Previous clicked')}
+            onNext={() => console.log('Next clicked')}
+        />
     ),
     args: {
         breakpoint: 'xl',
@@ -169,9 +176,9 @@ export const Interactive = {
         const [variant, setVariant] = useState(args.variant || 'P1');
         return (
             <div>
-                <div style={{ 
-                    padding: '16px', 
-                    backgroundColor: 'var(--color-surface-container)', 
+                <div style={{
+                    padding: '16px',
+                    backgroundColor: 'var(--color-surface-container)',
                     marginBottom: '16px',
                     display: 'flex',
                     alignItems: 'center',
@@ -181,9 +188,9 @@ export const Interactive = {
                     <select
                         value={variant}
                         onChange={(e) => setVariant(e.target.value)}
-                        style={{ 
-                            padding: '8px 12px', 
-                            borderRadius: '4px', 
+                        style={{
+                            padding: '8px 12px',
+                            borderRadius: '4px',
                             border: '1px solid var(--color-outline-variant)',
                             fontSize: '14px'
                         }}
@@ -195,17 +202,15 @@ export const Interactive = {
                         <option value="P5">P5 - Congratulations</option>
                     </select>
                 </div>
-                <ResponsiveFrame breakpoint={args.breakpoint}>
-                    <LessonsDetailPage
-                        variant={variant}
-                        lessonTitle={args.lessonTitle}
-                        estimatedTime={args.estimatedTime}
-                        onBack={() => console.log('Back clicked')}
-                        onPrevious={() => console.log('Previous clicked')}
-                        onNext={() => console.log('Next clicked')}
-                        onRatingChange={(rating) => console.log('Rating changed:', rating)}
-                    />
-                </ResponsiveFrame>
+                <LessonsDetailPage
+                    variant={variant}
+                    lessonTitle={args.lessonTitle}
+                    estimatedTime={args.estimatedTime}
+                    onBack={() => console.log('Back clicked')}
+                    onPrevious={() => console.log('Previous clicked')}
+                    onNext={() => console.log('Next clicked')}
+                    onRatingChange={(rating) => console.log('Rating changed:', rating)}
+                />
             </div>
         );
     },

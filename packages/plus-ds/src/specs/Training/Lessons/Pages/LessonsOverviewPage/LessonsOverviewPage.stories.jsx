@@ -7,13 +7,22 @@
 
 import React, { useState } from 'react';
 import LessonsOverviewPage from './LessonsOverviewPage';
-import ResponsiveFrame from '../ResponsiveFrame';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './LessonsOverviewPage.scss';
+
 
 export default {
     title: 'Specs/Training/Lessons/Pages/LessonsOverviewPage',
     component: LessonsOverviewPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+
     parameters: {
         docs: {
             description: {
@@ -22,7 +31,11 @@ export default {
         },
         layout: 'fullscreen',
     },
+    args: {
+        breakpoint: 'xl',
+    },
     argTypes: {
+
         breakpoint: {
             control: { type: 'select' },
             options: ['md', 'lg', 'xl', 'xxl'],
@@ -98,11 +111,10 @@ export const Docs = {
  * Static rendering matching Figma design exactly
  */
 export const Overview = {
-    render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <LessonsOverviewPage />
-        </ResponsiveFrame>
+    render: () => (
+        <LessonsOverviewPage />
     ),
+
     parameters: {
         layout: 'fullscreen',
     },
@@ -123,44 +135,44 @@ export const Interactive = {
         const [currentView, setCurrentView] = useState(args.currentView || 'list');
 
         return (
-            <ResponsiveFrame breakpoint={args.breakpoint}>
-                <LessonsOverviewPage
-                    statusFilter={statusFilter}
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    currentView={currentView}
-                    onStatusChange={(value) => {
-                        setStatusFilter(value);
-                        args.onStatusChange && args.onStatusChange(value);
-                    }}
-                    onSortByChange={(value) => {
-                        setSortBy(value);
-                        args.onSortByChange && args.onSortByChange(value);
-                    }}
-                    onOrderChange={(value) => {
-                        setSortOrder(value);
-                        args.onOrderChange && args.onOrderChange(value);
-                    }}
-                    onViewToggle={(view) => {
-                        setCurrentView(view);
-                        args.onViewToggle && args.onViewToggle(view);
-                    }}
-                    onExpandAll={() => {
-                        console.log('Expand All clicked');
-                        args.onExpandAll && args.onExpandAll();
-                    }}
-                    onLessonContinue={(lesson) => {
-                        console.log('Continue lesson:', lesson);
-                        args.onLessonContinue && args.onLessonContinue(lesson);
-                    }}
-                    onLessonClick={(lesson) => {
-                        console.log('Lesson clicked:', lesson);
-                        args.onLessonClick && args.onLessonClick(lesson);
-                    }}
-                />
-            </ResponsiveFrame>
+            <LessonsOverviewPage
+
+                statusFilter={statusFilter}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                currentView={currentView}
+                onStatusChange={(value) => {
+                    setStatusFilter(value);
+                    args.onStatusChange && args.onStatusChange(value);
+                }}
+                onSortByChange={(value) => {
+                    setSortBy(value);
+                    args.onSortByChange && args.onSortByChange(value);
+                }}
+                onOrderChange={(value) => {
+                    setSortOrder(value);
+                    args.onOrderChange && args.onOrderChange(value);
+                }}
+                onViewToggle={(view) => {
+                    setCurrentView(view);
+                    args.onViewToggle && args.onViewToggle(view);
+                }}
+                onExpandAll={() => {
+                    console.log('Expand All clicked');
+                    args.onExpandAll && args.onExpandAll();
+                }}
+                onLessonContinue={(lesson) => {
+                    console.log('Continue lesson:', lesson);
+                    args.onLessonContinue && args.onLessonContinue(lesson);
+                }}
+                onLessonClick={(lesson) => {
+                    console.log('Lesson clicked:', lesson);
+                    args.onLessonClick && args.onLessonClick(lesson);
+                }}
+            />
         );
     },
+
     args: {
         breakpoint: 'lg',
         statusFilter: 'all',

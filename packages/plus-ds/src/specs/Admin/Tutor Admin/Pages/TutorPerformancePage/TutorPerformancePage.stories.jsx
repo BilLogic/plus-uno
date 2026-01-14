@@ -8,6 +8,8 @@
 import React, { useState, useEffect } from 'react';
 import TutorPerformancePage from './TutorPerformancePage';
 import './TutorPerformancePage.scss';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+
 
 const defaultTutors = [
     { id: 1, tutorName: 'Amelia Blue', signedUp: 'Yes', attendance: 92, sessions: 25, students: 18, badge: null },
@@ -25,6 +27,14 @@ export default {
     title: 'Specs/Admin/Tutor Admin/Pages/TutorPerformancePage',
     component: TutorPerformancePage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+
     parameters: {
         layout: 'fullscreen',
         docs: {
@@ -84,6 +94,15 @@ Node ID: 258-262669
             description: 'Number of table rows to display',
             table: { category: 'Data' },
         },
+        breakpoint: {
+            control: 'select',
+            options: ['md', 'lg', 'xl', 'xxl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
+        },
+    },
+    args: {
+        breakpoint: 'xl',
     },
 };
 
@@ -99,7 +118,7 @@ export const Docs = {
                     <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
                     <p className="body2-txt">
                         Full page layout for the Tutor Performance section. Uses the PageLayout shell with
-                        TopBar and Sidebar. Contains tab navigation, action buttons, an overview section with 
+                        TopBar and Sidebar. Contains tab navigation, action buttons, an overview section with
                         filters and donut charts, and a performance details table with pagination. Default displays 9 rows.
                     </p>
                 </section>

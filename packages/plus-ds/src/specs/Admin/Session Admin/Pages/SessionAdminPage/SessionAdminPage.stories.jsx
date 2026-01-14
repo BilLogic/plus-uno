@@ -8,6 +8,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import SessionAdminPage from './SessionAdminPage';
 import './SessionAdminPage.scss';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+
 
 // Generate sample data
 const generateSessionData = (rowCount) => {
@@ -51,6 +53,14 @@ export default {
     title: 'Specs/Admin/Session Admin/Pages/SessionAdminPage',
     component: SessionAdminPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+
     parameters: {
         layout: 'fullscreen',
         docs: {
@@ -103,6 +113,15 @@ Node ID: 987-128734
             description: 'Whether the session modal is open',
             table: { category: 'Modal' },
         },
+        breakpoint: {
+            control: 'select',
+            options: ['md', 'lg', 'xl', 'xxl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
+        },
+    },
+    args: {
+        breakpoint: 'xl',
     },
 };
 
@@ -174,7 +193,7 @@ export const Interactive = {
         const [currentPage, setCurrentPage] = useState(1);
         const [modalOpen, setModalOpen] = useState(args.modalOpen);
         const [activeTab, setActiveTab] = useState(args.activeTab);
-        
+
         const tableData = useMemo(() => {
             return generateSessionData(args.rowCount);
         }, [args.rowCount]);

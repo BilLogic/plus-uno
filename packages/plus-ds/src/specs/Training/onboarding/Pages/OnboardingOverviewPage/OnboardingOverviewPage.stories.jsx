@@ -7,13 +7,20 @@
 
 import React, { useState } from 'react';
 import OnboardingOverviewPage from './OnboardingOverviewPage';
-import ResponsiveFrame from '../ResponsiveFrame';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './OnboardingOverviewPage.scss';
 
 export default {
     title: 'Specs/Training/Onboarding/Pages/OnboardingOverviewPage',
     component: OnboardingOverviewPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
     parameters: {
         docs: {
             description: {
@@ -26,7 +33,7 @@ export default {
         breakpoint: {
             control: { type: 'select' },
             options: ['md', 'lg', 'xl', 'xxl'],
-            description: 'Responsive breakpoint (md: 768px, lg: 992px, xl: 1200px, xxl: 1400px)',
+            description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
         sortBy: {
@@ -47,11 +54,13 @@ export default {
             table: { category: 'State' },
         },
     },
+    args: {
+        breakpoint: 'xl',
+    },
 };
 
 /**
  * Docs
- * Documentation for OnboardingOverviewPage component
  */
 export const Docs = {
     render: () => (
@@ -90,25 +99,15 @@ export const Docs = {
 
 /**
  * Overview
- * Static rendering matching Figma design exactly
  */
 export const Overview = {
-    render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <OnboardingOverviewPage />
-        </ResponsiveFrame>
+    render: () => (
+        <OnboardingOverviewPage />
     ),
-    parameters: {
-        layout: 'fullscreen',
-    },
-    args: {
-        breakpoint: 'lg',
-    },
 };
 
 /**
  * Interactive
- * Interactive playground with Storybook controls
  */
 export const Interactive = {
     render: (args) => {
@@ -120,7 +119,6 @@ export const Interactive = {
             if (newSort.sortOrder) setSortOrder(newSort.sortOrder);
         };
 
-        // Sample modules data
         const featuredModules = args.showEmptyState ? [] : [
             { id: 1, title: 'Welcome to PLUS', duration: '9 mins', variant: 'thumbnail', badgeType: 'other', stage: 'completed' },
             { id: 2, title: 'Your Role at PLUS', duration: '12 mins', variant: 'thumbnail', badgeType: 'video', stage: 'in progress' },
@@ -137,21 +135,18 @@ export const Interactive = {
         ];
 
         return (
-            <ResponsiveFrame breakpoint={args.breakpoint}>
-                <OnboardingOverviewPage
-                    featuredModules={featuredModules}
-                    allModules={allModules}
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                    onModuleClick={(module) => console.log('Module clicked:', module)}
-                    onCtaClick={(module) => console.log('CTA clicked:', module)}
-                />
-            </ResponsiveFrame>
+            <OnboardingOverviewPage
+                featuredModules={featuredModules}
+                allModules={allModules}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={handleSortChange}
+                onModuleClick={(module) => console.log('Module clicked:', module)}
+                onCtaClick={(module) => console.log('CTA clicked:', module)}
+            />
         );
     },
     args: {
-        breakpoint: 'lg',
         sortBy: 'Name',
         sortOrder: 'A-Z',
         showEmptyState: false,

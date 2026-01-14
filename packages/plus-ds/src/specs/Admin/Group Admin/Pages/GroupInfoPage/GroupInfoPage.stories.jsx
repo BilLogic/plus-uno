@@ -8,11 +8,21 @@
 import React, { useState } from 'react';
 import GroupInfoPage from './GroupInfoPage';
 import './GroupInfoPage.scss';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+
 
 export default {
     title: 'Specs/Admin/Group Admin/Pages/GroupInfoPage',
     component: GroupInfoPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+
     parameters: {
         layout: 'fullscreen',
         docs: {
@@ -47,6 +57,15 @@ Node ID: 258-263800
             description: 'Total number of entries',
             table: { category: 'Pagination' },
         },
+        breakpoint: {
+            control: 'select',
+            options: ['md', 'lg', 'xl', 'xxl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
+        },
+    },
+    args: {
+        breakpoint: 'xl',
     },
 };
 
@@ -62,9 +81,9 @@ export const Docs = {
                 <section>
                     <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
                     <p className="body2-txt">
-                        Full page layout for the Group Info section of Group Admin. Uses the PageLayout 
-                        shell with TopBar and Sidebar. Contains tab navigation for switching between 
-                        Group Info and Training Progress views, a title section with Add Group button, 
+                        Full page layout for the Group Info section of Group Admin. Uses the PageLayout
+                        shell with TopBar and Sidebar. Contains tab navigation for switching between
+                        Group Info and Training Progress views, a title section with Add Group button,
                         the groups table, and pagination footer.
                     </p>
                 </section>

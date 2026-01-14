@@ -7,13 +7,20 @@
 
 import React, { useState, useEffect } from 'react';
 import OnboardingInnerPage from './OnboardingInnerPage';
-import ResponsiveFrame from '../ResponsiveFrame';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './OnboardingInnerPage.scss';
 
 export default {
     title: 'Specs/Training/Onboarding/Pages/OnboardingInnerPage',
     component: OnboardingInnerPage,
     tags: ['autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
     parameters: {
         docs: {
             description: {
@@ -26,7 +33,7 @@ export default {
         breakpoint: {
             control: { type: 'select' },
             options: ['md', 'lg', 'xl', 'xxl'],
-            description: 'Responsive breakpoint (md: 768px, lg: 992px, xl: 1200px, xxl: 1400px)',
+            description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
         moduleTitle: {
@@ -61,11 +68,13 @@ export default {
             table: { category: 'State' },
         },
     },
+    args: {
+        breakpoint: 'xl',
+    },
 };
 
 /**
  * Docs
- * Documentation for OnboardingInnerPage component
  */
 export const Docs = {
     render: () => (
@@ -106,91 +115,68 @@ export const Docs = {
 
 /**
  * Overview
- * Static rendering matching Figma design exactly
  */
 export const Overview = {
-    render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <OnboardingInnerPage
-                moduleTitle="PLUS APP Usage"
-                moduleDescription="Learn how to use the PLUS tutoring application effectively."
-                moduleDuration="Estimated Time: 15 minutes"
-                badgeType="image"
-                showAlert={true}
-                showCompletionModal={false}
-            />
-        </ResponsiveFrame>
+    render: () => (
+        <OnboardingInnerPage
+            moduleTitle="PLUS APP Usage"
+            moduleDescription="Learn how to use the PLUS tutoring application effectively."
+            moduleDuration="Estimated Time: 15 minutes"
+            badgeType="image"
+            showAlert={true}
+            showCompletionModal={false}
+        />
     ),
-    parameters: {
-        layout: 'fullscreen',
-    },
-    args: {
-        breakpoint: 'lg',
-    },
 };
 
 /**
  * WithCompletionModal
- * Shows the page with completion modal overlay
  */
 export const WithCompletionModal = {
-    render: (args) => (
-        <ResponsiveFrame breakpoint={args.breakpoint}>
-            <OnboardingInnerPage
-                moduleTitle="PLUS APP Usage"
-                moduleDescription="Learn how to use the PLUS tutoring application effectively."
-                moduleDuration="Estimated Time: 15 minutes"
-                badgeType="image"
-                showAlert={false}
-                showCompletionModal={true}
-            />
-        </ResponsiveFrame>
+    render: () => (
+        <OnboardingInnerPage
+            moduleTitle="PLUS APP Usage"
+            moduleDescription="Learn how to use the PLUS tutoring application effectively."
+            moduleDuration="Estimated Time: 15 minutes"
+            badgeType="image"
+            showAlert={false}
+            showCompletionModal={true}
+        />
     ),
-    parameters: {
-        layout: 'fullscreen',
-    },
-    args: {
-        breakpoint: 'lg',
-    },
 };
 
 /**
  * Interactive
- * Interactive playground with Storybook controls
  */
 export const Interactive = {
     render: (args) => {
         const [showModal, setShowModal] = useState(args.showCompletionModal);
 
-        // Sync with args
         useEffect(() => {
             setShowModal(args.showCompletionModal);
         }, [args.showCompletionModal]);
 
         return (
-            <ResponsiveFrame breakpoint={args.breakpoint}>
-                <OnboardingInnerPage
-                    moduleTitle={args.moduleTitle}
-                    moduleDescription={args.moduleDescription}
-                    moduleDuration={args.moduleDuration}
-                    badgeType={args.badgeType}
-                    showAlert={args.showAlert}
-                    showCompletionModal={showModal}
-                    reflectionQuestion="What's one specific action you plan to take in your next session based on what you learned in this module?"
-                    onModuleComplete={(data) => {
-                        console.log('Module completed:', data);
-                        setShowModal(true);
-                    }}
-                    onBackToOverview={() => {
-                        console.log('Back to overview');
-                        setShowModal(false);
-                    }}
-                />
-            </ResponsiveFrame>
+            <OnboardingInnerPage
+                moduleTitle={args.moduleTitle}
+                moduleDescription={args.moduleDescription}
+                moduleDuration={args.moduleDuration}
+                badgeType={args.badgeType}
+                showAlert={args.showAlert}
+                showCompletionModal={showModal}
+                reflectionQuestion="What's one specific action you plan to take in your next session based on what you learned in this module?"
+                onModuleComplete={(data) => {
+                    console.log('Module completed:', data);
+                    setShowModal(true);
+                }}
+                onBackToOverview={() => {
+                    console.log('Back to overview');
+                    setShowModal(false);
+                }}
+            />
         );
     },
     args: {
-        breakpoint: 'lg',
         moduleTitle: 'Welcome to PLUS',
         moduleDescription: 'This module introduces you to the PLUS tutoring platform and its core features.',
         moduleDuration: 'Estimated Time: 9 minutes',
