@@ -25,6 +25,8 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: var(--size-modal-gap-lg, 24px);
+        padding-bottom: var(--size-element-pad-y-lg, 8px);
+        border-bottom: 1px solid var(--color-outline-variant);
     }
 
     &__title {
@@ -45,11 +47,15 @@
         padding: 0;
         border: none;
         background: transparent;
-        color: var(--color-on-surface);
-        font-size: 24px;
+        color: var(--color-on-surface-variant);
+        font-size: 20px;
         cursor: pointer;
         border-radius: var(--size-element-radius-sm, 4px);
         transition: background-color 0.15s ease;
+
+        i {
+            font-size: 20px;
+        }
 
         &:hover {
             background-color: rgba(25, 28, 30, 0.08);
