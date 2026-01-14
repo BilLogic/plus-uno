@@ -218,8 +218,9 @@ $btn-themes: (
             }
         }
 
-        // 4. GHOST
-        &.plus-btn--ghost {
+        // 4. GHOST / TEXT
+        &.plus-btn--ghost,
+        &.plus-btn--text {
             background-color: transparent;
             border-color: transparent;
             color: var($col-text);

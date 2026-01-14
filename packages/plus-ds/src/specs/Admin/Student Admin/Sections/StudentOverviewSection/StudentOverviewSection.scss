@@ -58,15 +58,14 @@ $color-other: #807878;
 .stacked-bar-chart {
     display: flex;
     flex-direction: column;
-    gap: var(--space-300, 16px);
+    gap: 16px; // Direct flat gaps between Header, Graph, Legend
     background-color: var(--color-surface-container-lowest, white);
     border-radius: 8px;
     padding: var(--space-500, 24px);
-    flex: 0 0 auto;
-    min-width: 320px;
     width: 445px;
-    max-width: 445px;
-    height: 376px;
+    height: auto;
+    min-height: 376px;
+    box-sizing: border-box;
 
     // Header
     &__header {
@@ -106,40 +105,39 @@ $color-other: #807878;
         }
     }
 
-    // Graphs container
-    &__graphs {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-300, 16px);
-        flex: 1;
-        align-items: center;
-        justify-content: center;
-    }
-
-    &__graph {
+    // Graph area (replaces Graphs container)
+    &__graph-area {
         display: flex;
         gap: 10px;
-        flex: 1;
         width: 100%;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
+        min-height: 231px; // Match plot + labels + tiny buffer
+        flex: 1;
     }
 
-    // Y-axis
+    // Y-axis labels
     &__y-axis {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 207px;
+        height: 207px; // Standard height for axis alignment
         text-align: right;
-        min-width: 33px;
+        min-width: 45px;
+        padding-right: 12px;
+        flex-shrink: 0;
 
         span {
             font-family: 'Merriweather Sans', sans-serif;
             font-size: 12px;
             font-weight: 300;
-            line-height: 1.667;
-            color: var(--color-on-background, #191c1e);
+            line-height: 1;
+            color: var(--color-on-surface, #191c1e);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 0; // Collapsed height, text will overflow centered around the point
+            overflow: visible;
         }
     }
 
@@ -147,42 +145,45 @@ $color-other: #807878;
     &__main {
         flex: 1;
         position: relative;
-        height: 207px;
+        height: 231px;
     }
 
-    // Grid lines
-    &__grid {
+    // Axis lines
+    &__axes {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        height: 207px; // Constant for bar registration
         pointer-events: none;
+        z-index: 10;
     }
 
-    &__grid-line {
-        width: 100%;
-        height: 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    &__axis-y {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 1px;
+        background-color: var(--color-on-surface, #191c1e);
+    }
 
-        &:last-child {
-            border-bottom-width: 2px;
-            border-bottom-color: rgba(0, 0, 0, 0.12);
-        }
+    &__axis-x {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background-color: var(--color-on-surface, #191c1e);
     }
 
     // Columns container
     &__cols {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
-        height: 198px;
-        padding-top: 7px;
-        padding-left: 14px;
-        padding-right: 14px;
+        align-items: flex-start;
+        height: 100%;
+        padding: 0 14px;
     }
 
     // Single column (bar + date)
@@ -194,24 +195,46 @@ $color-other: #807878;
         height: 100%;
     }
 
-    // Bar container
+    // Bar cell (holds the bar container, fixed height)
+    &__bar-cell {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        width: 100%;
+        height: 207px; // MUST match axis height
+        flex-shrink: 0;
+    }
+
+    // Bar container (dynamic height from JSX)
     &__bar-container {
         display: flex;
         flex-direction: column;
         width: 100%;
-        min-height: 0;
-        margin-top: auto;
+        min-height: 2px;
+        gap: 0 !important;
     }
 
-    // Individual bar segment
-    &__bar {
+    // Individual bar segment - High specificity to override pill defaults
+    .stacked-bar-chart__bar {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
-        border-radius: 4px;
-        min-height: 4px;
+        border-radius: 0 !important;
+        min-height: 2px;
         position: relative;
+        margin: 0 !important;
+        padding: 0;
+
+        &:first-child {
+            border-top-left-radius: 4px !important;
+            border-top-right-radius: 4px !important;
+        }
+
+        &:last-child {
+            border-bottom-left-radius: 4px !important;
+            border-bottom-right-radius: 4px !important;
+        }
     }
 
     &__bar-value {
@@ -229,8 +252,10 @@ $color-other: #807878;
         font-weight: 300;
         line-height: 1.667;
         color: var(--color-on-background, #191c1e);
-        margin-top: 8px;
+        margin-top: 8px; // Reduced to match Figma visual gap better
         white-space: nowrap;
+        text-align: center;
+        width: 100%;
     }
 
     // Legend
@@ -239,6 +264,8 @@ $color-other: #807878;
         flex-wrap: wrap;
         gap: var(--space-500, 24px);
         align-items: center;
+        margin-top: auto; // Push to bottom if space available
+        width: 100%;
     }
 
     &__legend-item {

@@ -16,11 +16,14 @@
     border-spacing: 0;
 
     // Header styles
-    .students-table__header {
+    thead .students-table__header {
+        height: 32px;
+
         .students-table__header-cell {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: 6px var(--size-table-cell-x) !important;
             border: none;
             background: transparent;
+            vertical-align: middle;
 
             .students-table__header-content {
                 display: flex;
@@ -31,8 +34,10 @@
     }
 
     // Row styles
-    .students-table__row {
+    tbody .students-table__row {
+        height: 44px;
         border-radius: var(--size-table-radius-md);
+        border: none;
         transition: background-color 0.2s ease;
 
         &.students-table__row--hover:hover {
@@ -40,7 +45,7 @@
         }
 
         .students-table__cell {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: 8px var(--size-table-cell-x) !important;
             border: none;
             vertical-align: middle;
         }
@@ -70,11 +75,20 @@
     // Status cell
     .students-table__cell--status {
         .students-table__status-badge {
-            &.plus-badge--info {
-                background-color: var(--color-info-state-08);
-                color: var(--color-info-text);
-                padding: 0 var(--size-element-pad-x-sm);
-                border-radius: var(--size-element-radius-pill);
+            &.plus-badge {
+                height: 24px;
+                padding: 0 var(--size-element-pad-x-sm, 8px);
+                border-radius: var(--size-element-radius-full, 999px);
+                font-weight: 400;
+                line-height: 1;
+                display: inline-flex;
+                align-items: center;
+                border: none;
+
+                &.plus-badge--info {
+                    background-color: var(--color-info-state-08, rgba(14, 129, 117, 0.08));
+                    color: var(--color-info-text, #0E8175);
+                }
             }
         }
     }

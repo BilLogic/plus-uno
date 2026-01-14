@@ -39,16 +39,23 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         padding: 0;
         border: none;
         background: transparent;
         color: var(--color-on-surface-variant);
         cursor: pointer;
         font-size: 24px;
+        border-radius: var(--size-element-radius-sm, 4px);
+        transition: background-color 0.15s ease;
+
+        i {
+            font-size: 24px;
+        }
 
         &:hover {
+            background-color: var(--color-on-surface-state-08);
             color: var(--color-on-surface);
         }
     }

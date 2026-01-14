@@ -162,7 +162,7 @@ Button.propTypes = {
         'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info', 'default',
         'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'
     ]),
-    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
+    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost', 'text']),
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     block: PropTypes.bool,
     className: PropTypes.string,

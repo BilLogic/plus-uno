@@ -110,7 +110,7 @@ export const Overview = {
         return (
             <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
                 <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Student Modal</h6>
-                
+
                 <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                     <Button
                         text={showModal ? "Hide Modal" : "Show Modal"}
@@ -152,7 +152,10 @@ export const Overview = {
                         { id: 5, date: 'Tuesday (01/25/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
                     ]}
                     onHide={() => setShowModal(false)}
-                    onSave={(data) => console.log('Save clicked:', data)}
+                    onSave={(data) => {
+                        console.log('Save clicked:', data);
+                        setShowModal(false);
+                    }}
                     onDelete={(student) => console.log('Delete clicked:', student)}
                 />
             </div>
@@ -199,6 +202,7 @@ export const Interactive = {
                     onHide={() => setShowModal(false)}
                     onSave={(data) => {
                         console.log('Save clicked:', data);
+                        setShowModal(false);
                     }}
                     onDelete={(student) => {
                         console.log('Delete clicked:', student);
@@ -240,6 +244,7 @@ export const InfoVariant = {
                         email: 'name@example.com',
                     }}
                     onHide={() => setShowModal(false)}
+                    onSave={() => setShowModal(false)}
                 />
             </div>
         );
@@ -278,6 +283,7 @@ export const SessionsVariant = {
                         { id: 5, date: 'Tuesday (01/25/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
                     ]}
                     onHide={() => setShowModal(false)}
+                    onSave={() => setShowModal(false)}
                 />
             </div>
         );

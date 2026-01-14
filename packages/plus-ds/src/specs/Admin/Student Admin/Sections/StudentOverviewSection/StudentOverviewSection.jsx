@@ -21,8 +21,8 @@ const StackedBarChart = ({ title, tooltip, data, legend, chartType = 'needs', cl
             {/* Header */}
             <div className="stacked-bar-chart__header">
                 <h4 className="h4 stacked-bar-chart__title">{title}</h4>
-                <button 
-                    className="stacked-bar-chart__info-btn" 
+                <button
+                    className="stacked-bar-chart__info-btn"
                     aria-label="Info"
                     title={tooltip}
                 >
@@ -30,44 +30,42 @@ const StackedBarChart = ({ title, tooltip, data, legend, chartType = 'needs', cl
                 </button>
             </div>
 
-            {/* Chart Content */}
-            <div className="stacked-bar-chart__graphs">
-                <div className="stacked-bar-chart__graph">
-                    {/* Y-axis */}
-                    <div className="stacked-bar-chart__y-axis">
-                        <span className="body3-txt">100%</span>
-                        <span className="body3-txt">75%</span>
-                        <span className="body3-txt">50%</span>
-                        <span className="body3-txt">25%</span>
-                        <span className="body3-txt">0%</span>
+            {/* Chart Content - Flat structure matching Figma */}
+            <div className="stacked-bar-chart__graph-area">
+                {/* Y-axis */}
+                <div className="stacked-bar-chart__y-axis">
+                    <span className="body3-txt">100%</span>
+                    <span className="body3-txt">75%</span>
+                    <span className="body3-txt">50%</span>
+                    <span className="body3-txt">25%</span>
+                    <span className="body3-txt">0%</span>
+                </div>
+
+                {/* Main chart area */}
+                <div className="stacked-bar-chart__main">
+                    {/* Axis lines */}
+                    <div className="stacked-bar-chart__axes">
+                        <div className="stacked-bar-chart__axis-y" />
+                        <div className="stacked-bar-chart__axis-x" />
                     </div>
 
-                    {/* Main chart area */}
-                    <div className="stacked-bar-chart__main">
-                        {/* Grid lines */}
-                        <div className="stacked-bar-chart__grid">
-                            <div className="stacked-bar-chart__grid-line" />
-                            <div className="stacked-bar-chart__grid-line" />
-                            <div className="stacked-bar-chart__grid-line" />
-                            <div className="stacked-bar-chart__grid-line" />
-                            <div className="stacked-bar-chart__grid-line" />
-                        </div>
+                    {/* Bars */}
+                    <div className="stacked-bar-chart__cols">
+                        {data.map((item, index) => {
+                            const total = item.values.reduce((a, b) => a + b, 0);
+                            const heightPercent = total > 0 ? (total / maxTotal) * 100 : 0;
 
-                        {/* Bars */}
-                        <div className="stacked-bar-chart__cols">
-                            {data.map((item, index) => {
-                                const total = item.values.reduce((a, b) => a + b, 0);
-                                const heightPercent = (total / maxTotal) * 100;
-                                
-                                return (
-                                    <div key={index} className="stacked-bar-chart__col">
-                                        {/* Bar container */}
-                                        <div 
+                            return (
+                                <div key={index} className="stacked-bar-chart__col">
+                                    {/* Bar Cell - fixed height to align with y-axis */}
+                                    <div className="stacked-bar-chart__bar-cell">
+                                        {/* Bar container - dynamic height based on data */}
+                                        <div
                                             className="stacked-bar-chart__bar-container"
                                             style={{ height: `${heightPercent}%` }}
                                         >
                                             {item.values.map((value, segIndex) => {
-                                                const percentage = (value / total) * 100;
+                                                const percentage = total > 0 ? (value / total) * 100 : 0;
                                                 return (
                                                     <div
                                                         key={segIndex}
@@ -83,26 +81,26 @@ const StackedBarChart = ({ title, tooltip, data, legend, chartType = 'needs', cl
                                                 );
                                             })}
                                         </div>
-                                        {/* X-axis label */}
-                                        <span className="stacked-bar-chart__date body3-txt">
-                                            {item.label}
-                                        </span>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                    {/* X-axis label */}
+                                    <span className="stacked-bar-chart__date body3-txt">
+                                        {item.label}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
+            </div>
 
-                {/* Legend */}
-                <div className="stacked-bar-chart__legend">
-                    {legend.map((item, index) => (
-                        <div key={index} className="stacked-bar-chart__legend-item">
-                            <span className={`stacked-bar-chart__legend-color stacked-bar-chart__legend-color--${index}`} />
-                            <span className="body3-txt">{item}</span>
-                        </div>
-                    ))}
-                </div>
+            {/* Legend - Direct sibling to Header and Graph Area */}
+            <div className="stacked-bar-chart__legend">
+                {legend.map((item, index) => (
+                    <div key={index} className="stacked-bar-chart__legend-item">
+                        <span className={`stacked-bar-chart__legend-color stacked-bar-chart__legend-color--${index}`} />
+                        <span className="body3-txt">{item}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );

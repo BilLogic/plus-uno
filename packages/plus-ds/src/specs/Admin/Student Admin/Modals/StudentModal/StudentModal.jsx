@@ -280,11 +280,10 @@ const StudentModal = ({
                     />
                     <Button
                         text="Save"
-                        style="secondary"
+                        style="primary"
                         fill="filled"
                         size="medium"
                         onClick={handleSave}
-                        disabled={activeTab !== 'info'}
                     />
                 </div>
             </div>
