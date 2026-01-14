@@ -11,7 +11,7 @@
     align-items: flex-start;
     overflow-x: auto;
     overflow-y: visible;
-    padding-bottom: var(--size-section-pad-y-sm, 8px);
+    padding-bottom: 0;
 
     // Scrollbar styling
     &::-webkit-scrollbar {
@@ -39,10 +39,11 @@
     gap: var(--space-300, 16px);
     background-color: var(--color-surface-container-lowest, white);
     border-radius: 8px;
-    padding: var(--space-400, 20px);
-    flex: 0 0 auto;
-    min-width: 180px;
-    width: 200px;
+    padding: var(--space-500, 24px);
+    flex: 1 0 0;
+    min-width: 275px;
+    max-width: 444px;
+    height: 376px;
 
     &__header {
         display: flex;

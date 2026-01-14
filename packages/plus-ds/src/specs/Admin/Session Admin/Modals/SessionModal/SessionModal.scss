@@ -48,13 +48,13 @@
         border: none;
         background: transparent;
         color: var(--color-on-surface-variant);
-        font-size: 20px;
+        font-size: 24px;
         cursor: pointer;
         border-radius: var(--size-element-radius-sm, 4px);
         transition: background-color 0.15s ease;
 
         i {
-            font-size: 20px;
+            font-size: 24px;
         }
 
         &:hover {
