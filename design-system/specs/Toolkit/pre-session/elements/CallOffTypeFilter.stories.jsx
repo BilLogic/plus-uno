@@ -11,14 +11,13 @@ export default {
 };
 
 const filterOptions = [
-    { text: 'All', value: 'all' },
-    { text: 'Sick', value: 'sick' },
-    { text: 'Personal', value: 'personal' },
-    { text: 'Family Emergency', value: 'family_emergency' },
-    { text: 'Other', value: 'other' },
+    { text: 'All Types', value: 'all_types' },
+    { text: 'One-Time', value: 'one_time' },
+    { text: 'Recurring', value: 'recurring' },
+    { text: 'Custom', value: 'custom' },
 ];
 
-const FilterWrapper = ({ label = "Call-Off Type", initialSelection = "All", interactive = true, isOpen }) => {
+const FilterWrapper = ({ label = "Call-Off Type", initialSelection = "All Types", interactive = true, isOpen }) => {
     const [selected, setSelected] = useState(initialSelection);
 
     // Map options to Dropdown items format
@@ -51,20 +50,20 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 'var(--size-section-gap-lg, 32px)', alignItems: 'flex-start' }}>
         <section>
             <h6 className="h6 mb-3">Default State (Closed)</h6>
-            <FilterWrapper initialSelection="All" interactive={false} />
+            <FilterWrapper initialSelection="All Types" interactive={false} />
         </section>
 
         <section>
             <h6 className="h6 mb-3">Open State</h6>
             {/* Force open state using the new isOpen prop */}
             <div style={{ height: '240px' }}> {/* Reserve space for dropdown menu */}
-                <FilterWrapper initialSelection="All" interactive={false} isOpen={true} />
+                <FilterWrapper initialSelection="All Types" interactive={false} isOpen={true} />
             </div>
         </section>
 
         <section>
             <h6 className="h6 mb-3">Selected State (Closed)</h6>
-            <FilterWrapper initialSelection="Sick" interactive={false} />
+            <FilterWrapper initialSelection="One-Time" interactive={false} />
         </section>
     </div>
 );

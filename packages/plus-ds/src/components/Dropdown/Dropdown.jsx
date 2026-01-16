@@ -114,7 +114,10 @@ const Dropdown = ({
                             type="button"
                             className={`dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''} ${item.header ? 'dropdown-section-header' : ''}`}
                             disabled={item.disabled}
-                            onClick={item.onClick}
+                            onClick={(e) => {
+                                if (item.onClick) item.onClick(e);
+                                if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
+                            }}
                         >
                             <div className="dropdown-item-inner">
 
