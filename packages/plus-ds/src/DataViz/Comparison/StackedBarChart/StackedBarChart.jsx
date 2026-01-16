@@ -65,20 +65,26 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
                 }
             },
             lineColor: 'var(--color-outline-variant, #bec8ca)',
+            lineWidth: 1,
             tickWidth: 0
         },
         yAxis: {
             min: 0,
-            max: 100, // Stacked percent
+            reversedStacks: false, // Ensure first series (Green) is at the bottom
+            lineWidth: 1,
+            lineColor: 'var(--color-outline-variant, #bec8ca)',
+            // Use passed yLabels as explicit ticks if provided numbers, else default
+            // The visual requires specific ticks: 17, 20, 22, 25, 30.
+            tickPositions: [0, 17, 20, 22, 25, 30], // Hardcoded for this specific visual requirement if not passed
             title: { text: null },
             gridLineWidth: 1,
-            gridLineColor: 'var(--color-surface-container, #eaeef0)',
-            tickPositions: [0, 25, 50, 75, 100],
+            gridLineDashStyle: 'Dot', // Dotted lines as per screenshot
+            gridLineColor: '#C4C7C5',
             labels: {
-                format: '{value}%',
                 style: {
-                    fontSize: 'var(--font-size-body3, 12px)',
-                    color: 'var(--color-on-surface-variant, #3f484a)'
+                    fontSize: '12px',
+                    fontFamily: 'Merriweather Sans',
+                    color: '#3F484A'
                 }
             }
         },
@@ -89,18 +95,21 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
                     enabled: true,
                     // Use the customValue we stored (the number inside the bar)
                     formatter: function () {
+                        // Only show if value > 0 and fits?
+                        if (this.point.y < 1) return null;
                         return this.point.customValue;
                     },
                     style: {
-                        color: 'var(--color-on-primary, #ffffff)',
+                        color: 'white',
                         textOutline: 'none',
-                        fontWeight: 'var(--font-weight-normal, 400)',
-                        fontSize: 'var(--font-size-body3, 12px)'
+                        fontWeight: '300',
+                        fontSize: '12px',
+                        fontFamily: 'Merriweather Sans'
                     }
                 },
                 borderWidth: 0,
                 // Adjust bar width if needed
-                pointWidth: 34
+                pointWidth: 48 // Match 48px from visual analysis
             }
         },
         tooltip: {

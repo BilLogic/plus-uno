@@ -7,46 +7,58 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import DonutChart from '@/DataViz/PartToWhole/DonutChart/DonutChart'; // Assumed path based on imports
+import DonutChart from '@/DataViz/PartToWhole/DonutChart/DonutChart';
+import StackedBarChart from '@/DataViz/Comparison/StackedBarChart/StackedBarChart';
 import './TutorChartsElement.scss';
 
 // --- INTERNAL CHART COMPONENTS ---
 
-const PieVariant = ({ data, legend, className }) => {
-    const percentage = data?.percentage || 0;
-    const label = data?.label || '';
+const PieVariant = ({ data, legend, className, centerText, centerSubtext }) => {
+    // Check if data is array (multi-segment) or percentage object (legacy/single)
+    const isMultiSegment = Array.isArray(data);
 
-    // Legend colors
-    const colorABC = legend[0]?.color || '#61b5cf';
-    const colorXYZ = legend[1]?.color || '#85ecd5';
+    let segments = [];
+    let valueText = "";
+    let labelText = "";
+
+    if (isMultiSegment) {
+        segments = data.map(item => ({
+            value: item.value,
+            color: item.color,
+            label: item.label
+        }));
+        // Use provided center text or default to total
+        valueText = centerText || data.reduce((sum, item) => sum + item.value, 0).toString();
+        labelText = centerSubtext || "Total";
+    } else {
+        // Legacy single percentage mode
+        const percentage = data?.percentage || 0;
+        const colorABC = legend?.[0]?.color || '#61b5cf';
+        const colorXYZ = legend?.[1]?.color || '#85ecd5';
+
+        segments = [
+            { value: percentage, color: colorABC },
+            { value: 100 - percentage, color: colorXYZ }
+        ];
+        valueText = `${percentage}%`;
+        labelText = data?.label || '';
+    }
 
     return (
         <div className={`tutor-charts-element tutor-charts-element--pie ${className}`}>
             <div className="tutor-charts-element__chart-area">
                 <DonutChart
                     size={227}
-                    value={`${percentage}%`}
-                    label={label}
-                    segments={[
-                        { value: percentage, color: colorABC },
-                        { value: 100 - percentage, color: colorXYZ } // Or gray if 'remaining'? Figma shows full circle usually mostly blue?
-                        // Actually Figma screenshot shows a blue ring segment and a cyan ring segment?
-                        // Wait, DonutChart usually shows parts of a whole.
-                        // If ABC is 85% and XYZ is 15%, then it sums to 100.
-                        // Screenshot shows "00%" and "ABC". 
-                        // It looks like a progress ring + text.
-                        // I'll assume segment 0 is the 'value' and 'segment 1' is remainder/background or second value.
-                        // If it's 2 values (ABC vs XYZ), then:
-                        // { value: percentage, color: colorABC },
-                        // { value: 100-percentage, color: colorXYZ }
-                    ]}
+                    value={valueText}
+                    label={labelText}
+                    segments={segments}
                     thickness={30} // Thick ring
                     centerTextSize="h1"
                 />
             </div>
             {/* Legend */}
             <div className="tutor-charts-element__legend">
-                {legend.map((item, index) => (
+                {legend && legend.map((item, index) => (
                     <div key={index} className="tutor-charts-element__legend-item">
                         <span
                             className="tutor-charts-element__legend-color"
@@ -60,77 +72,45 @@ const PieVariant = ({ data, legend, className }) => {
     );
 };
 
-const BarVariant = ({ data, legend, className }) => {
-    // Determine max value for Y scaling
-    // Each bar is sum of values?
-    // Stacking: values[0] is bottom, values[1] is top.
-    const maxTotal = Math.max(...data.map(d => d.values.reduce((a, b) => a + b, 0)), 1);
+const BarVariant = ({ data, legend, className, hideLegend }) => {
+    // Transform data for StackedBarChart
+    // StackedBarChart expects:
+    // data: [ { segments: [ { value, color, height, textColor } ] } ]
+    // dates: ['Week 1', 'Week 2'...]
+
+    // Input data: [ { label: 'Week 1', values: [17, 3, 2...] } ]
+    // where values correspond to legend colors.
+
+    const dates = data.map(d => d.label);
+    const convertedData = data.map(item => ({
+        segments: item.values.map((val, idx) => ({
+            value: val, // The number to show in the bar
+            color: legend[idx]?.color || '#ccc',
+            height: val.toString(), // Used as the Y value by the component
+            textColor: '#ffffff'
+        }))
+    }));
 
     return (
         <div className={`tutor-charts-element tutor-charts-element--bar ${className}`}>
-            <div className="tutor-charts-element__chart-container">
-                {/* Y Axis */}
-                <div className="tutor-charts-element__y-axis">
-                    <span>100%</span>
-                    <span>75%</span>
-                    <span>50%</span>
-                    <span>25%</span>
-                    <span>0%</span>
+            {/* Use Design System Component */}
+            <StackedBarChart
+                data={convertedData}
+                dates={dates}
+                height={232}
+            />
+
+            {/* Internal legend if needed (hidden by default in current page usage) */}
+            {!hideLegend && legend && legend.length > 0 && (
+                <div className="tutor-charts-element__legend">
+                    {legend.map((item, index) => (
+                        <div key={index} className="tutor-charts-element__legend-item">
+                            <span className="tutor-charts-element__legend-color" style={{ backgroundColor: item.color }} />
+                            <span className="tutor-charts-element__legend-label">{item.label}</span>
+                        </div>
+                    ))}
                 </div>
-
-                {/* Plot Area */}
-                <div className="tutor-charts-element__plot">
-                    {data.map((item, i) => {
-                        const total = item.values.reduce((a, b) => a + b, 0);
-                        // Scale height relative to assumed '100% reference' or maxTotal?
-                        // Figma axis says 100%. Usually this means the chart scales so the max is 100% or relative to a fixed max like 25 entries? 
-                        // Screenshot values: 12+6 = 18. max axis 100%. 
-                        // If these are raw counts, maybe Y axis isn't %, or it's % of capacity?
-                        // Screenshot Y axis LABELS are %. But values are integers (6, 12, 16, 8...).
-                        // I'll assume max height represents 100% of some capacity, OR the axis labels are just static and the bars visualize relative distribution?
-                        // Let's assume maxTotal maps to 100% height for now to fill the space.
-                        // Or maybe fixed max = 25?
-                        // I'll use maxTotal for scaling.
-
-                        const heightPct = (total / maxTotal) * 100; // Total bar height %
-
-                        return (
-                            <div key={i} className="tutor-charts-element__bar-group" style={{ height: '100%' }}>
-                                <div className="tutor-charts-element__bar" style={{ height: `${heightPct}%` }}>
-                                    {item.values.map((val, segIdx) => (
-                                        <div
-                                            key={segIdx}
-                                            className="tutor-charts-element__bar-segment"
-                                            title={`${legend[segIdx]?.label || ''}: ${val}`}
-                                            style={{
-                                                height: `${(val / total) * 100}%`, // % of the BAR height
-                                                backgroundColor: legend[segIdx]?.color,
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            {val > 0 && val}
-                                        </div>
-                                    ))}
-                                </div>
-                                <span className="tutor-charts-element__x-label">{item.label}</span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Legend */}
-            <div className="tutor-charts-element__legend">
-                {legend.map((item, index) => (
-                    <div key={index} className="tutor-charts-element__legend-item">
-                        <span
-                            className="tutor-charts-element__legend-color"
-                            style={{ backgroundColor: item.color }}
-                        />
-                        <span className="tutor-charts-element__legend-label">{item.label}</span>
-                    </div>
-                ))}
-            </div>
+            )}
         </div>
     );
 };
@@ -247,6 +227,9 @@ const TutorChartsElement = ({
     donutSubtitle,
     stackedBarData,
     lineChartData,
+    centerText,
+    centerSubtext,
+    hideLegend,
     className = '',
     ...props
 }) => {
@@ -292,9 +275,9 @@ const TutorChartsElement = ({
     // Render Variant
     switch (variant) {
         case 'Pie':
-            return <PieVariant data={chartData} legend={chartLegend} className={className} />;
+            return <PieVariant data={chartData} legend={chartLegend} centerText={centerText} centerSubtext={centerSubtext} className={className} />;
         case 'Bar':
-            return <BarVariant data={chartData} legend={chartLegend} className={className} />;
+            return <BarVariant data={chartData} legend={chartLegend} className={className} hideLegend={hideLegend} />;
         case 'Line':
             return <LineVariant data={chartData} legend={chartLegend} className={className} />;
         default:

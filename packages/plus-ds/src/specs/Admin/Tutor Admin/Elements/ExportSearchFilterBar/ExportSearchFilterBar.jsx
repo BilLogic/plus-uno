@@ -24,21 +24,24 @@ const ExportSearchFilterBar = ({
     onSearch,
     onFilterChange,
     onSort,
+    hideExport = false,
     className = '',
     ...props
 }) => {
     return (
         <div className={`export-search-filter-bar ${className}`} {...props}>
             {/* Export CSV Button */}
-            <Button
-                text={exportLabel}
-                style="primary"
-                fill="filled"
-                size="medium"
-                leadingVisual="download"
-                onClick={onExport}
-                className="export-search-filter-bar__export-btn"
-            />
+            {!hideExport && (
+                <Button
+                    text={exportLabel}
+                    style="primary"
+                    fill="filled"
+                    size="medium"
+                    leadingVisual="download"
+                    onClick={onExport}
+                    className="export-search-filter-bar__export-btn"
+                />
+            )}
 
             {/* Search Input */}
             <div className="export-search-filter-bar__search">
@@ -100,9 +103,12 @@ ExportSearchFilterBar.propTypes = {
     /** Callback when search value changes */
     onSearch: PropTypes.func,
     /** Callback when filter changes */
+    /** Callback when filter changes */
     onFilterChange: PropTypes.func,
     /** Callback when sortable filter is clicked */
     onSort: PropTypes.func,
+    /** Whether to hide the export button */
+    hideExport: PropTypes.bool,
     /** Additional CSS classes */
     className: PropTypes.string,
 };

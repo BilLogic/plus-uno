@@ -102,97 +102,105 @@
 
     // --- BAR CHART ---
     &--bar {
-        align-items: stretch; // Full width
-        padding: 16px 24px; // Adjust padding
+        padding: 0; // Padding handled by parent card or container
 
         .tutor-charts-element__chart-container {
-            flex: 1;
+            width: 100%;
+            height: 232px; // Fixed height from spec
             display: flex;
             position: relative;
-            margin-bottom: 8px; // Space for X axis
         }
 
-        // Y-Axis
         .tutor-charts-element__y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 24px; // Space for X labels
+            width: 24px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding-right: 8px;
-            width: 40px;
-            height: 100%;
-            padding-bottom: 20px; // Offset for X axis labels overlap??
 
             span {
+                position: absolute;
+                right: 8px; // Right align text to grid
+                transform: translateY(-50%); // Center exactly on line
                 font-family: 'Merriweather Sans', sans-serif;
                 font-weight: 300;
                 font-size: 12px;
-                line-height: 1.667;
-                color: var(--color-on-surface, #191c1e);
+                color: var(--color-on-surface-variant, #3f484a);
+                line-height: normal;
             }
         }
 
-        // Plot Area
         .tutor-charts-element__plot {
+            margin-left: 24px; // Space for Y axis
             flex: 1;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between; // Even spacing
+            height: 100%;
             position: relative;
-            border-left: 1px solid #000; // Y axis line
-            border-bottom: 1px solid #000; // X axis line
-            padding: 0 16px; // Padding inside axes
+            // No border for whole plot, just grid lines
         }
 
-        // Bars
-        .tutor-charts-element__bar-group {
+        .tutor-charts-element__grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 24px; // Above X labels
+
+            .grid-line {
+                position: absolute;
+                left: 0;
+                right: 0;
+                height: 1px;
+                border-top: 1px dashed #C4C7C5; // Dotted line color
+                // No transformation needed if top % is correct
+            }
+        }
+
+        .tutor-charts-element__bars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 24px; // Align bottom with grid bottom (approx)
+            display: flex;
+            justify-content: space-around; // Spaced evenly
+            align-items: flex-end; // Bottom align bars
+            padding: 0 16px; // Side padding inside plot
+        }
+
+        .bar-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
-            width: 40px; // Fixed width bars? Or flex?
-            height: 100%;
+            height: 100%; // Fill to top
             justify-content: flex-end;
+            position: relative;
         }
 
-        .tutor-charts-element__bar {
-            width: 100%;
+        .bar-stack {
             display: flex;
-            flex-direction: column-reverse; // Stack from bottom
-            // Height is set via inline style
+            flex-direction: column-reverse; // Stack from bottom up
+            overflow: hidden; // Clip corners if rounded?
+            // border-radius: 4px; // Optional if design has rounded bars
         }
 
-        .tutor-charts-element__bar-segment {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white; // Assuming white text for values inside bars
-            font-family: 'Merriweather Sans', sans-serif;
-            font-weight: 300;
-            font-size: 12px;
-            transition: filter 0.2s ease;
+        .bar-segment {
+            transition: opacity 0.2s;
 
             &:hover {
-                filter: brightness(1.1); // Brighten on hover
-                z-index: 1;
-            }
-
-            &--abc {
-                background-color: #61b5cf;
-            }
-
-            &--xyz {
-                background-color: #85ecd5;
+                opacity: 0.8;
             }
         }
 
-        .tutor-charts-element__x-label {
+        .x-label {
             position: absolute;
             bottom: -24px;
             font-family: 'Merriweather Sans', sans-serif;
             font-weight: 300;
             font-size: 12px;
             color: var(--color-on-surface, #191c1e);
+            white-space: nowrap;
         }
     }
 

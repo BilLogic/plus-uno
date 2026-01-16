@@ -27,7 +27,7 @@ const TutorToolUsageSection = ({
     ...props
 }) => {
     // Default data for Recording Upload (Daily) - Bar Chart
-    const defaultRecordingData = recordingUploadData || [
+    const defaultRecordingData = (recordingUploadData && recordingUploadData.length > 0) ? recordingUploadData : [
         { label: '10/11', values: [12, 6] },
         { label: '10/12', values: [16, 8] },
         { label: '10/13', values: [12, 5] },
@@ -37,7 +37,7 @@ const TutorToolUsageSection = ({
     ];
 
     // Default data for Reflection Completion (Weekly) - Line Chart
-    const defaultReflectionData = reflectionCompletionData || [
+    const defaultReflectionData = (reflectionCompletionData && reflectionCompletionData.length > 0) ? reflectionCompletionData : [
         { label: '06/03/24', values: [5, 0] },
         { label: '06/10/24', values: [60, 20] },
         { label: '06/17/24', values: [55, 75] },
@@ -45,7 +45,7 @@ const TutorToolUsageSection = ({
     ];
 
     // Default data for Attendance Tracking (Weekly) - Line Chart
-    const defaultAttendanceData = attendanceTrackingData || [
+    const defaultAttendanceData = (attendanceTrackingData && attendanceTrackingData.length > 0) ? attendanceTrackingData : [
         { label: '06/03/24', values: [10, 5] },
         { label: '06/10/24', values: [55, 25] },
         { label: '06/17/24', values: [60, 70] },
@@ -53,7 +53,7 @@ const TutorToolUsageSection = ({
     ];
 
     // Default data for Check-in Completion (Weekly) - Line Chart
-    const defaultCheckInData = checkInCompletionData || [
+    const defaultCheckInData = (checkInCompletionData && checkInCompletionData.length > 0) ? checkInCompletionData : [
         { label: '06/03/24', values: [15, 10] },
         { label: '06/10/24', values: [50, 30] },
         { label: '06/17/24', values: [55, 65] },

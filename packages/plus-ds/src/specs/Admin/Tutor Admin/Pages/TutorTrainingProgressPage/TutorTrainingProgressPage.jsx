@@ -60,10 +60,89 @@ const TutorTrainingProgressPage = ({
             completion: '8/18',
             accuracy: '30%',
             badgeClaimed: 'Yes',
-            timeSpent: 328,
-            action: 'View'
+            timeSpent: 328
         },
-        // ... (truncated for brevity, assume user wants existing data kept or I can just use existing variable if I don't touch it)
+        {
+            id: 2,
+            tutorName: 'Albert Flores',
+            email: 'albert@gmail.com',
+            completion: '18/18',
+            accuracy: '95%',
+            badgeClaimed: 'Yes',
+            timeSpent: 520
+        },
+        {
+            id: 3,
+            tutorName: 'Brooklyn Simmons',
+            email: 'brooklyn@gmail.com',
+            completion: '5/18',
+            accuracy: '60%',
+            badgeClaimed: 'No',
+            timeSpent: 120
+        },
+        {
+            id: 4,
+            tutorName: 'Cody Fisher',
+            email: 'cody@gmail.com',
+            completion: '12/18',
+            accuracy: '80%',
+            badgeClaimed: 'No',
+            timeSpent: 340
+        },
+        {
+            id: 5,
+            tutorName: 'Darlene Robertson',
+            email: 'darlene@gmail.com',
+            completion: '18/18',
+            accuracy: '100%',
+            badgeClaimed: 'Yes',
+            timeSpent: 600
+        },
+        {
+            id: 6,
+            tutorName: 'Esther Howard',
+            email: 'esther@gmail.com',
+            completion: '2/18',
+            accuracy: '10%',
+            badgeClaimed: 'No',
+            timeSpent: 45
+        },
+        {
+            id: 7,
+            tutorName: 'Guy Hawkins',
+            email: 'guy@gmail.com',
+            completion: '15/18',
+            accuracy: '88%',
+            badgeClaimed: 'No',
+            timeSpent: 410
+        },
+        {
+            id: 8,
+            tutorName: 'Jacob Jones',
+            email: 'jacob@gmail.com',
+            completion: '10/18',
+            accuracy: '75%',
+            badgeClaimed: 'No',
+            timeSpent: 280
+        },
+        {
+            id: 9,
+            tutorName: 'Jane Cooper',
+            email: 'jane@gmail.com',
+            completion: '18/18',
+            accuracy: '92%',
+            badgeClaimed: 'Yes',
+            timeSpent: 550
+        },
+        {
+            id: 10,
+            tutorName: 'Jenny Wilson',
+            email: 'jenny@gmail.com',
+            completion: '6/18',
+            accuracy: '50%',
+            badgeClaimed: 'No',
+            timeSpent: 180
+        }
     ];
 
     const displayTutors = tutors.length > 0 ? tutors : defaultTutors; // I should make sure defaultTutors is available or not mess it up. Wait, replacing lines means I need to provide content.
@@ -89,6 +168,9 @@ const TutorTrainingProgressPage = ({
             onViewModeChange(mode);
         }
     };
+
+    const entriesStart = (currentPage - 1) * 10 + 1;
+    const entriesEnd = Math.min(currentPage * 10, totalEntries);
 
     const topBarConfig = {
         breadcrumbs: [
@@ -160,7 +242,7 @@ const TutorTrainingProgressPage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Training Progress Overview
                         </h2>
-                        <ButtonGroup size="small" style="tertiary" fill="tonal">
+                        <ButtonGroup size="small" style="primary" fill="tonal" className="tutor-training-progress-page__toggle">
                             <Button
                                 text="By Tutor"
                                 active={currentViewMode === 'By Tutor'}
@@ -229,21 +311,18 @@ const TutorTrainingProgressPage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Training Progress Details
                         </h2>
-                        <Button
-                            text="Export CSV"
-                            style="primary"
-                            fill="filled"
-                            size="medium"
-                            leadingVisual="download"
-                            onClick={onExportCSV}
-                        />
                     </div>
 
                     {/* Search Bar */}
                     <ExportSearchFilterBar
                         searchPlaceholder="Search"
                         onSearch={onSearchChange}
-                        filters={[]}
+                        onExport={onExportCSV}
+                        filters={[
+                            { key: 'group', label: 'All Groups' },
+                            { key: 'date', label: 'All Dates' },
+                            { key: 'status', label: 'All Status' }
+                        ]}
                     />
 
                     {/* Tutors Training Progress Table */}

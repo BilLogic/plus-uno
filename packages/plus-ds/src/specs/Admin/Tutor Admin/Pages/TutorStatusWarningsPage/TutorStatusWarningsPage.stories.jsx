@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import { linkTo } from '@storybook/addon-links';
 import TutorStatusWarningsPage from './TutorStatusWarningsPage';
 import ResponsiveFrame from '../../../../Universal/ResponsiveFrame';
 
@@ -61,7 +62,7 @@ Full page layout for Tutor Status and Warnings section.
     ],
 };
 
-export const Overview = {
+export const Docs = {
     render: () => (
         <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
             <h2 className="h2" style={{ marginBottom: '24px' }}>TutorStatusWarningsPage</h2>
@@ -73,6 +74,41 @@ export const Overview = {
                 Figma Node: 258-263229
             </p>
         </div>
+    ),
+};
+
+export const Overview = {
+    render: () => (
+        <TutorStatusWarningsPage
+            breakpoint="xxl"
+            activeTab="statusWarnings"
+            currentPage={1}
+            totalPages={20}
+            totalEntries={200}
+            selectedSchool="All Schools"
+            selectedTutor="All Tutors"
+            dateFrom="01/10/25"
+            dateTo="02/10/25"
+            onPageChange={(page) => console.log('Page changed to:', page)}
+            onRowClick={(tutor) => console.log('Row clicked:', tutor)}
+            onSchoolFilterChange={(school) => console.log('School filter:', school)}
+            onTutorFilterChange={(tutor) => console.log('Tutor filter:', tutor)}
+            onDateFilterChange={(type) => console.log('Date filter changed:', type)}
+
+            onTabChange={(key) => {
+                const linkMap = {
+                    performance: ['Specs/Admin/Tutor Admin/Pages/TutorPerformancePage', 'Overview'],
+                    statusWarnings: ['Specs/Admin/Tutor Admin/Pages/TutorStatusWarningsPage', 'Overview'],
+                    toolUsage: ['Specs/Admin/Tutor Admin/Pages/TutorToolUsagePage', 'Overview'],
+                    trainingProgress: ['Specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage', 'Overview'],
+                };
+                if (linkMap[key]) linkTo(linkMap[key][0], linkMap[key][1])();
+            }}
+            onModalChange={(open, tab) => console.log('Modal changed:', open, tab)}
+            onAddTutor={() => console.log('Add Tutor clicked')}
+            onEmailTutors={() => console.log('Email Tutors clicked')}
+            onExportData={() => console.log('Export Data clicked')}
+        />
     ),
 };
 
@@ -110,10 +146,4 @@ export const Interactive = {
     },
 };
 
-export const WithModal = {
-    args: {
-        ...Interactive.args,
-        modalOpen: true,
-        modalTab: 'info',
-    },
-};
+

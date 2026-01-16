@@ -14,7 +14,7 @@ import Pagination from '../../../../../components/Pagination/Pagination';
 import AdminDateRangeFilter from '../../Elements/AdminDateRangeFilter/AdminDateRangeFilter';
 import TutorDataCard from '../../Cards/TutorDataCard/TutorDataCard';
 import TutorChartsElement from '../../Elements/TutorChartsElement/TutorChartsElement';
-import TutorsStatusTable from '../../Tables/TutorsStatusTable/TutorsStatusTable';
+import TutorsStatusAndWarningsTable from '../../Tables/TutorsStatusAndWarningsTable/TutorsStatusAndWarningsTable';
 
 import './TutorStatusWarningsPage.scss';
 
@@ -65,12 +65,12 @@ const TutorStatusWarningsPage = ({
         { id: 10, tutorName: 'Floyd Miles', status: 'Check-In Needed', totalWarnings: 16, micOff: 4, camOff: 4, absence: 4, lateCall: 4 },
     ];
 
-    // Default status trend data (Weekly)
+    // Default status trend data (Weekly) - Segment values matching Figma visual
     const defaultStatusTrendData = statusTrendData.length > 0 ? statusTrendData : [
-        { label: 'Week 1', values: [17, 20, 22, 25, 28, 30] },
-        { label: 'Week 2', values: [20, 22, 23, 25, 26, 28] },
-        { label: 'Week 3', values: [22, 25, 26, 27, 28, 30] },
-        { label: 'Week 4', values: [25, 26, 27, 28, 29, 30] },
+        { label: 'Week 1', values: [17, 3, 2, 3, 2, 3] },
+        { label: 'Week 2', values: [22, 2, 2, 2, 1, 1] },
+        { label: 'Week 3', values: [24, 2, 1, 1, 1, 1] },
+        { label: 'Week 4', values: [20, 3, 3, 2, 1, 1] },
     ];
 
     const displayTutors = tutors.length > 0 ? tutors : defaultTutors;
@@ -82,12 +82,12 @@ const TutorStatusWarningsPage = ({
 
     // Prepare pie chart data
     const pieChartData = [
-        { label: 'On Track', value: statusDistribution.onTrack, color: '#85ecd5' },
-        { label: 'Check-In Needed', value: statusDistribution.checkInNeeded, color: '#61b5cf' },
-        { label: 'On Watch', value: statusDistribution.onWatch, color: '#445c6a' },
-        { label: 'On TIP', value: statusDistribution.onTIP, color: '#f5d061' },
-        { label: 'Recommended for Termination', value: statusDistribution.recommendedForTermination, color: '#f7b8a7' },
-        { label: 'Inactive', value: statusDistribution.inactive, color: '#3b525f' },
+        { label: 'On Track', value: statusDistribution.onTrack, color: '#A1EB83' },
+        { label: 'Check-In Needed', value: statusDistribution.checkInNeeded, color: '#85ECD5' },
+        { label: 'On Watch', value: statusDistribution.onWatch, color: '#5E849B' },
+        { label: 'On TIP', value: statusDistribution.onTIP, color: '#FFE17A' },
+        { label: 'Recommended for Termination', value: statusDistribution.recommendedForTermination, color: '#FFDAD6' },
+        { label: 'Inactive', value: statusDistribution.inactive, color: '#807878' },
     ];
 
     const handleRowClick = (tutor) => {
@@ -187,43 +187,69 @@ const TutorStatusWarningsPage = ({
                         />
                     </div>
 
-                    {/* Status Charts */}
-                    <div className="tutor-status-warnings-page__charts">
-                        {/* Status Distribution (Latest) - Pie Chart */}
-                        <TutorDataCard
-                            title="Status Distribution (Latest)"
-                            tooltip="Current distribution of tutor statuses"
-                        >
-                            <TutorChartsElement
-                                variant="Pie"
-                                data={pieChartData}
-                                centerText={totalTutors.toString()}
-                                centerSubtext="Total Tutors"
-                                legend={pieChartData.map(item => ({
-                                    label: `${item.label} (${Math.round((item.value / totalTutors) * 100)}%)`,
-                                    color: item.color
-                                }))}
-                            />
-                        </TutorDataCard>
+                    {/* Status Charts - Unified Card */}
+                    <div className="tutor-status-overview-card">
+                        <div className="tutor-status-overview-card__row">
+                            {/* Status Distribution (Latest) */}
+                            <div className="tutor-status-overview-card__section">
+                                <div className="tutor-status-overview-card__header">
+                                    <h4 className="title-h4">Status Distribution (Latest)</h4>
+                                    <i className="fas fa-circle-question help-icon" title="Current distribution of tutor statuses" />
+                                </div>
+                                <div className="tutor-status-overview-card__content">
+                                    <TutorChartsElement
+                                        variant="Pie"
+                                        data={pieChartData}
+                                        centerText="300"
+                                        centerSubtext="Total Tutors"
+                                        legend={[]} // Hide internal legend
+                                        className="tutor-status-overview-card__chart"
+                                    />
+                                </div>
+                            </div>
 
-                        {/* Status Trend (Weekly) - Stacked Bar Chart */}
-                        <TutorDataCard
-                            title="Status Trend (Weekly)"
-                            tooltip="Weekly trend of tutor statuses"
-                        >
-                            <TutorChartsElement
-                                variant="StackedBar"
-                                data={defaultStatusTrendData}
-                                legend={[
-                                    { label: 'On Track', color: '#85ecd5' },
-                                    { label: 'Check-In Needed', color: '#61b5cf' },
-                                    { label: 'On Watch', color: '#445c6a' },
-                                    { label: 'On TIP', color: '#f5d061' },
-                                    { label: 'Recommended for Termination', color: '#f7b8a7' },
-                                    { label: 'Inactive', color: '#3b525f' },
-                                ]}
-                            />
-                        </TutorDataCard>
+                            {/* Status Trend (Weekly) */}
+                            <div className="tutor-status-overview-card__section">
+                                <div className="tutor-status-overview-card__header">
+                                    <h4 className="title-h4">Status Trend (Weekly)</h4>
+                                    <i className="fas fa-circle-question help-icon" title="Weekly trend of tutor statuses" />
+                                </div>
+                                <div className="tutor-status-overview-card__content">
+                                    <TutorChartsElement
+                                        variant="Bar"
+                                        data={defaultStatusTrendData}
+                                        // Legend ordered by Stack Order (Bottom to Top)
+                                        legend={[
+                                            { label: 'On Track', color: '#A1EB83' }, // Green
+                                            { label: 'On Watch', color: '#5E849B' }, // Blue
+                                            { label: 'Check-In Needed', color: '#85ECD5' }, // Cyan
+                                            { label: 'Recommended for Termination', color: '#FFDAD6' }, // Pink
+                                            { label: 'On TIP', color: '#FFE17A' }, // Yellow
+                                            { label: 'Inactive', color: '#807878' }, // Grey
+                                        ]}
+                                        hideLegend={true} // Hide internal visual legend, but keep data for colors
+                                        className="tutor-status-overview-card__chart"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Shared Legend */}
+                        <div className="tutor-status-overview-card__legend">
+                            {[
+                                { label: 'On Track', color: '#A1EB83' },
+                                { label: 'Check-In Needed', color: '#85ECD5' },
+                                { label: 'On Watch', color: '#5E849B' },
+                                { label: 'On TIP', color: '#FFE17A' },
+                                { label: 'Recommended for Termination', color: '#FFDAD6' },
+                                { label: 'Inactive', color: '#807878' }
+                            ].map((item, index) => (
+                                <div key={index} className="legend-item">
+                                    <span className="legend-color" style={{ backgroundColor: item.color }} />
+                                    <span className="legend-label">{item.label}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -244,7 +270,7 @@ const TutorStatusWarningsPage = ({
                     </div>
 
                     {/* Tutors Status Table */}
-                    <TutorsStatusTable
+                    <TutorsStatusAndWarningsTable
                         tutors={displayTutors}
                         onRowClick={handleRowClick}
                     />

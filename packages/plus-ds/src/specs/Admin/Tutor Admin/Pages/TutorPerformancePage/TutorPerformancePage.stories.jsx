@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { linkTo } from '@storybook/addon-links';
 import TutorPerformancePage from './TutorPerformancePage';
 import './TutorPerformancePage.scss';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
@@ -159,7 +160,16 @@ export const Overview = {
             onSchoolFilterChange={() => console.log('School filter clicked')}
             onTutorFilterChange={() => console.log('Tutor filter clicked')}
             onDateFilterChange={(type) => console.log('Date filter clicked:', type)}
-            onTabChange={(tab) => console.log('Tab changed:', tab)}
+
+            onTabChange={(key) => {
+                const linkMap = {
+                    performance: ['Specs/Admin/Tutor Admin/Pages/TutorPerformancePage', 'Overview'],
+                    statusWarnings: ['Specs/Admin/Tutor Admin/Pages/TutorStatusWarningsPage', 'Overview'],
+                    toolUsage: ['Specs/Admin/Tutor Admin/Pages/TutorToolUsagePage', 'Overview'],
+                    trainingProgress: ['Specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage', 'Overview'],
+                };
+                if (linkMap[key]) linkTo(linkMap[key][0], linkMap[key][1])();
+            }}
             onAddTutor={() => console.log('Add Tutor clicked')}
             onEmailTutors={() => console.log('Email Tutors clicked')}
             onExportData={() => console.log('Export Data clicked')}

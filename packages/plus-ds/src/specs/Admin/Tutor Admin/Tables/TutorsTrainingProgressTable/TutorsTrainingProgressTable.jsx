@@ -10,6 +10,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Badge from '../../../../../components/Badge/Badge';
+import UserAvatar from '../../../../../components/UserAvatar/UserAvatar';
 import './TutorsTrainingProgressTable.scss';
 
 const ProgressIndicator = ({ value }) => {
@@ -69,17 +70,7 @@ const ProgressIndicator = ({ value }) => {
     );
 };
 
-const CustomAvatarCell = ({ name, email }) => (
-    <div className="tutors-training-progress-table__custom-avatar">
-        <div className="tutors-training-progress-table__avatar-circle">
-            <i className="fas fa-chalkboard-teacher" />
-        </div>
-        <div className="tutors-training-progress-table__avatar-info">
-            <span className="body2-txt" style={{ fontWeight: 600 }}>{name}</span>
-            <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', fontSize: '12px' }}>{email}</span>
-        </div>
-    </div>
-);
+
 
 const TutorsTrainingProgressTable = ({
     tutors = [],
@@ -162,7 +153,17 @@ const TutorsTrainingProgressTable = ({
                     {displayTutors.map((tutor) => (
                         <tr key={tutor.id}>
                             <td>
-                                <CustomAvatarCell name={tutor.tutorName} email={tutor.email} />
+                                <div className="flex items-center gap-3">
+                                    <UserAvatar
+                                        name={tutor.tutorName}
+                                        size="medium"
+                                        className="tutors-training-progress-table__avatar"
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="body2-txt font-semibold">{tutor.tutorName}</span>
+                                        <span className="body3-txt text-secondary">{tutor.email}</span>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <ProgressIndicator value={typeof tutor.completion === 'object' ? `${tutor.completion.value}/${tutor.completion.total}` : tutor.completion} />

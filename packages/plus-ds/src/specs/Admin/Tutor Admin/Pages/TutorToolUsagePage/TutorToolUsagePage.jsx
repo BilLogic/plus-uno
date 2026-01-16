@@ -184,32 +184,10 @@ const TutorToolUsagePage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Tool Usage Details
                         </h2>
-                        <div className="tutor-tool-usage-page__details-actions">
-                            <Button
-                                text="Add Tutor"
-                                style="primary"
-                                fill="filled"
-                                size="medium"
-                                leadingVisual="user-plus"
-                                onClick={onAddTutor}
-                            />
-                            <Button
-                                text="Export CSV"
-                                style="primary"
-                                fill="filled"
-                                size="medium"
-                                leadingVisual="download"
-                                onClick={onExportCSV}
-                            />
-                        </div>
+
                     </div>
 
-                    {/* Search Bar */}
-                    <ExportSearchFilterBar
-                        searchPlaceholder="Search"
-                        onSearch={onSearchChange}
-                        filters={[]}
-                    />
+
 
                     {/* Tutors Tool Usage Table */}
                     <TutorsToolUsageTable

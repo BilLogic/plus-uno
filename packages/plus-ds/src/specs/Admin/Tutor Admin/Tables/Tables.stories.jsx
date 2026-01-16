@@ -6,7 +6,7 @@
 
 import React from 'react';
 import TutorsPerformanceTable from './TutorsPerformanceTable/TutorsPerformanceTable';
-import TutorsStatusTable from './TutorsStatusTable/TutorsStatusTable';
+import TutorsStatusAndWarningsTable from './TutorsStatusAndWarningsTable/TutorsStatusAndWarningsTable';
 import TutorsToolUsageTable from './TutorsToolUsageTable/TutorsToolUsageTable';
 import TutorsTrainingProgressTable from './TutorsTrainingProgressTable/TutorsTrainingProgressTable';
 import TutorSessionsTable from './TutorSessionsTable/TutorSessionsTable';
@@ -47,11 +47,11 @@ export const AllTables = {
             </section>
 
             <section>
-                <h4 className="h4" style={{ marginBottom: '16px' }}>2. Status Table (Null State)</h4>
+                <h4 className="h4" style={{ marginBottom: '16px' }}>2. Status Table</h4>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Figma: 258-262388
+                    Figma: 258-262435
                 </p>
-                <TutorsStatusTable tutors={statusTutors} />
+                <TutorsStatusAndWarningsTable />
             </section>
 
             <section>

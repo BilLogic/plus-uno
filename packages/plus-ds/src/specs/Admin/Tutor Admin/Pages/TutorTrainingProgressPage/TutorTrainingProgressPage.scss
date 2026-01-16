@@ -31,6 +31,12 @@
     align-items: center;
 }
 
+.tutor-training-progress-page__title-toggle {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .tutor-training-progress-page__overview-cards {
     display: flex;
     gap: var(--spacing-large-space-300, 16px);
@@ -67,4 +73,27 @@
     justify-content: space-between;
     align-items: center;
     margin-top: var(--spacing-medium-space-200, 12px);
+}
+
+/* Custom Toggle Styles to match StudentModal tabs */
+.tutor-training-progress-page__toggle {
+    button.plus-btn {
+        background-color: var(--color-secondary-state-08);
+        color: var(--color-secondary-text);
+        border: none;
+
+        &:hover {
+            background-color: var(--color-secondary-state-12);
+        }
+
+        &.active,
+        &[aria-pressed="true"] {
+            background-color: var(--color-primary-state-08) !important;
+            color: var(--color-primary-text) !important;
+
+            &:hover {
+                background-color: var(--color-primary-state-12) !important;
+            }
+        }
+    }
 }
