@@ -10,13 +10,19 @@ const config = {
     '../packages/plus-ds/src/forms/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/patterns/**/*.mdx',
     '../packages/plus-ds/src/DataViz/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Admin/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Home/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Login/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Profile/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Training/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Universal/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
+    // Include Toolkit stories from design-system directory
+    '../design-system/**/*.stories.@(js|jsx|ts|tsx)',
     // Exclude non-existent component directories
     '!../packages/plus-ds/src/specs/**/SessionDataCardsSection/**/*.stories.@(js|jsx|ts|tsx)',
-    '!../packages/plus-ds/src/specs/**/SessionAdminSection/**/*.stories.@(js|jsx|ts|tsx)',
-    // Ensure Lessons stories are included explicitly
-    '../packages/plus-ds/src/specs/Training/Lessons/**/*.stories.@(js|jsx|ts|tsx)',
+    // Explicitly exclude legacy Toolkit specs
+    '!../packages/plus-ds/src/specs/Toolkit/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     '@storybook/addon-essentials',
@@ -47,7 +53,7 @@ const config = {
     const rootDistPath = path.resolve(__dirname, '../dist');
     const distPath = path.resolve(__dirname, '../packages/plus-ds/dist');
     const assetsPath = path.resolve(__dirname, '../packages/plus-ds/src/assets');
-    
+
     // Include root dist directory for CSS files
     if (fs.existsSync(rootDistPath)) {
       staticDirs.push({ from: rootDistPath, to: '/dist' });
@@ -59,7 +65,7 @@ const config = {
     if (fs.existsSync(assetsPath)) {
       staticDirs.push({ from: assetsPath, to: '/assets' });
     }
-    
+
     return staticDirs;
   })(),
   viteFinal: async (config) => {

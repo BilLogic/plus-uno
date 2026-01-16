@@ -11,13 +11,27 @@ const Dropdown = ({
     fill = "filled", // NEW: filled, tonal, outline, ghost
     split = false,
     direction = "dropdown",
-    className = ""
+    className = "",
+    isOpen: controlledIsOpen // Optional controlled state
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalIsOpen, setInternalIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    const toggleDropdown = () => setIsOpen(!isOpen);
-    const closeDropdown = () => setIsOpen(false);
+    // Determine if controlled or uncontrolled
+    const isControlled = controlledIsOpen !== undefined;
+    const show = isControlled ? controlledIsOpen : internalIsOpen;
+
+    const toggleDropdown = () => {
+        if (!isControlled) {
+            setInternalIsOpen(!internalIsOpen);
+        }
+    };
+
+    const closeDropdown = () => {
+        if (!isControlled) {
+            setInternalIsOpen(false);
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -28,7 +42,7 @@ const Dropdown = ({
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [dropdownRef]);
 
     const wrapperClasses = [
         'pdropdown',
@@ -38,19 +52,19 @@ const Dropdown = ({
         style !== 'default' ? `pdropdown-${style}` : 'pdropdown-default',
         fill !== 'filled' ? `pdropdown-${fill}` : '', // NEW: fill variant class
         split ? 'pdropdown-split-dropdown' : '',
-        isOpen ? 'show' : '',
+        show ? 'show' : '',
         className
     ].filter(Boolean).join(' ');
 
     const menuClasses = [
         'dropdown-menu',
-        isOpen ? 'show' : ''
+        show ? 'show' : ''
     ].filter(Boolean).join(' ');
 
     const renderToggle = () => {
         const toggleClasses = [
             split ? 'pdropdown-split-toggle-btn' : 'pdropdown-default-toggle',
-            'dropdown-toggle',
+            'dropdown-toggle', // Note: Ensure CSS suppresses the default Bootstrap caret if standard bootstrap is loaded
             direction === 'dropup' ? 'pdropdown-caret-up' : '',
             direction === 'dropleft' ? 'pdropdown-caret-left' : '',
             direction === 'dropright' ? 'pdropdown-caret-right' : ''
@@ -62,7 +76,7 @@ const Dropdown = ({
                 className={toggleClasses}
                 onClick={toggleDropdown}
                 aria-haspopup="true"
-                aria-expanded={isOpen}
+                aria-expanded={show}
             >
                 {!split && <span>{buttonText}</span>}
             </button>
@@ -156,7 +170,8 @@ Dropdown.propTypes = {
     fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
     split: PropTypes.bool,
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
-    className: PropTypes.string
+    className: PropTypes.string,
+    isOpen: PropTypes.bool
 };
 
 export default Dropdown;

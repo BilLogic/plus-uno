@@ -42,15 +42,24 @@ $dropdown-themes: (
         border: var(--size-element-stroke-sm) solid transparent;
         border-radius: var(--size-element-radius-md);
         cursor: pointer;
-        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        transition: background-color 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease;
 
         // Caret icon - inherits color from parent to match text
         &::after {
+            // Reset Bootstrap caret borders to prevent "double icon" effect (triangle + font icon)
+            border: none !important;
+
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             content: '\f0d7'; // fa-caret-down
             font-size: var(--font-size-fa-body2-solid);
             color: inherit;
+            // Ensure display is correct for font icon
+            display: inline-block;
+            margin-left: 0; // Reset bootstrap margin
+            vertical-align: middle;
         }
     }
 
@@ -108,13 +117,35 @@ $dropdown-themes: (
         cursor: pointer;
         transition: background-color 0.15s ease;
 
+        // Interaction States
         &:hover {
-            background-color: var(--color-neutral-state-08);
+            background-color: var(--color-neutral-state-08, rgba(0, 0, 0, 0.08));
+            color: var(--color-on-surface);
         }
 
-        &:focus {
-            outline: none;
-            background-color: var(--color-neutral-state-12);
+        &:focus-visible {
+            outline: 2px solid var(--color-focus-ring);
+            outline-offset: -2px;
+            background-color: var(--color-neutral-state-08, rgba(0, 0, 0, 0.08));
+        }
+
+        // Pressed State
+        &:active {
+            background-color: var(--color-neutral-state-12, rgba(0, 0, 0, 0.12));
+        }
+
+        // Selected State (JSX uses 'selected' class)
+        &.selected,
+        &.active {
+            background-color: var(--color-secondary-state-08); // Using secondary for selection typically, or sticking to neutral if preferred. User wants "design system" which usually implies 'selected' state.
+            color: var(--color-on-surface);
+            font-weight: var(--font-weight-semibold-1);
+
+            // Ensure icon inside is visible
+            .selected-icon {
+                opacity: 1 !important;
+                color: var(--color-secondary);
+            }
         }
 
         &.active {
