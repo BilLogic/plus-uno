@@ -11,11 +11,11 @@ import { PageLayout } from '../../../../Universal/Pages';
 import Button from '../../../../../components/Button/Button';
 import NavTabs from '../../../../../components/NavTabs/NavTabs';
 import Pagination from '../../../../../components/Pagination/Pagination';
-import AdminDateRangeFilter from '../../../Elements/AdminDateRangeFilter/AdminDateRangeFilter';
+import AdminDateRangeFilter from '../../Elements/AdminDateRangeFilter/AdminDateRangeFilter';
 import TutorPerformanceSection from '../../Sections/TutorPerformanceSection/TutorPerformanceSection';
 import TutorsPerformanceTable from '../../Tables/TutorsPerformanceTable/TutorsPerformanceTable';
 import TutorModal from '../../Modals/TutorModal/TutorModal';
-import '../../../Elements/AdminDateRangeFilter/AdminDateRangeFilter.scss';
+import '../../Elements/AdminDateRangeFilter/AdminDateRangeFilter.scss';
 import '../../Sections/TutorPerformanceSection/TutorPerformanceSection.scss';
 import '../../Tables/TutorsPerformanceTable/TutorsPerformanceTable.scss';
 import '../../Modals/TutorModal/TutorModal.scss';
@@ -25,6 +25,7 @@ const TutorPerformancePage = ({
     tutors = [],
     attendancePercentage = 95,
     signUpRatePercentage = 85,
+    loading = false,
     currentPage = 1,
     totalPages = 20,
     totalEntries = 200,
@@ -35,6 +36,7 @@ const TutorPerformancePage = ({
     activeTab = 'performance',
     modalOpen = false,
     modalTab = 'info',
+    modalMode = 'edit',
     onPageChange,
     onRowClick,
     onSchoolFilterChange,
@@ -159,14 +161,14 @@ const TutorPerformancePage = ({
                     <Button
                         text="Email Tutors"
                         style="primary"
-                        fill="outlined"
+                        fill="outline"
                         size="medium"
                         onClick={onEmailTutors}
                     />
                     <Button
                         text="Export Reflection Data"
                         style="primary"
-                        fill="outlined"
+                        fill="outline"
                         size="medium"
                         onClick={onExportData}
                     />
@@ -194,6 +196,7 @@ const TutorPerformancePage = ({
                     <TutorPerformanceSection
                         attendancePercentage={attendancePercentage}
                         signUpRatePercentage={signUpRatePercentage}
+                        loading={loading}
                     />
                 </div>
 
@@ -237,6 +240,7 @@ const TutorPerformancePage = ({
                 {/* Tutor Modal */}
                 <TutorModal
                     show={showModal}
+                    mode={modalMode}
                     tutor={selectedTutorData || { name: 'Amelia Blue' }}
                     initialTab={currentModalTab}
                     onHide={handleModalHide}
@@ -263,7 +267,10 @@ TutorPerformancePage.propTypes = {
     /** Attendance percentage */
     attendancePercentage: PropTypes.number,
     /** Sign-up rate percentage */
+    /** Sign-up rate percentage */
     signUpRatePercentage: PropTypes.number,
+    /** Loading state for charts */
+    loading: PropTypes.bool,
     /** Current page number for pagination */
     currentPage: PropTypes.number,
     /** Total number of pages */
@@ -284,6 +291,8 @@ TutorPerformancePage.propTypes = {
     modalOpen: PropTypes.bool,
     /** Modal tab ('info' or 'sessions') */
     modalTab: PropTypes.oneOf(['info', 'sessions']),
+    /** Modal mode ('edit' or 'add') */
+    modalMode: PropTypes.oneOf(['edit', 'add']),
     /** Callback when page changes */
     onPageChange: PropTypes.func,
     /** Callback when row is clicked */

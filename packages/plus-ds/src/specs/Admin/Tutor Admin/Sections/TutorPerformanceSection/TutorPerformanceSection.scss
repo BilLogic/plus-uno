@@ -8,5 +8,7 @@
     gap: var(--space-300, 16px);
     width: 100%;
     align-items: flex-start;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    background: transparent;
 }

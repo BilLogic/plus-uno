@@ -1,52 +1,82 @@
 /**
- * Tutor Admin - Tables Overview
+ * Tables Overview
  * 
- * Overview of all table components in the Tutor Admin section.
+ * Displays all Tutor Admin tables in one view for comparison and overview.
  */
 
+import React from 'react';
+import TutorsPerformanceTable from './TutorsPerformanceTable/TutorsPerformanceTable';
+import TutorsStatusTable from './TutorsStatusTable/TutorsStatusTable';
+import TutorsToolUsageTable from './TutorsToolUsageTable/TutorsToolUsageTable';
+import TutorsTrainingProgressTable from './TutorsTrainingProgressTable/TutorsTrainingProgressTable';
+import TutorSessionsTable from './TutorSessionsTable/TutorSessionsTable';
+
+const defaultTutors = [
+    { id: 1, tutorName: 'Amelia Blue', signedUp: 'Yes', attendance: 92, sessions: 25, students: 18, badge: null },
+    { id: 2, tutorName: 'Ava Silver', signedUp: 'Yes', attendance: 22, sessions: 34, students: 12, badge: null },
+    { id: 3, tutorName: 'Elijah Orange', signedUp: 'Yes', attendance: 68, sessions: 22, students: 7, badge: 'Lead' },
+    { id: 4, tutorName: 'Ethan Black', signedUp: 'Yes', attendance: 49, sessions: 65, students: 5, badge: null },
+];
+
+const statusTutors = [
+    { id: 1, tutorName: 'Floyd Miles', signedUp: 'No', attendance: null, sessions: null, students: null, badge: null },
+    { id: 2, tutorName: 'Floyd Miles', signedUp: 'No', attendance: null, sessions: null, students: null, badge: null },
+    { id: 3, tutorName: 'Floyd Miles', signedUp: 'No', attendance: null, sessions: null, students: null, badge: null },
+];
+
 export default {
-    title: 'Specs/Admin/Tutor Admin/Tables',
+    title: 'Specs/Admin/Tutor Admin/Tables/Overview',
     parameters: {
         docs: {
             description: {
-                component: `Table components for the Tutor Admin section.
-
-## Components
-
-### TutorsPerformanceTable
-Main table showing tutor performance data (Figma Node: 258-262435)
-- Tutor Name, Signed-Up, % Attendance, Sessions, Students columns
-- Color-coded attendance badges (≥80% green, 50-79% yellow, <50% red)
-- Lead tutor badges
-- Sortable columns
-- Add Tutor button
-
-## Additional Tables (To Be Implemented)
-- TutorsStatusWarningsTable
-- TutorsToolUsageTable
-- TutorsTrainingProgressTable
-- TutorSessionsTable
-`,
-            },
-        },
-    },
+                component: `Overview of the 5 key tables in Tutor Admin.`
+            }
+        }
+    }
 };
 
-export const Overview = {
+export const AllTables = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>Tutor Admin Tables</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>TutorsPerformanceTable</h4>
-                    <p className="body2-txt" style={{ marginBottom: '8px' }}>
-                        Main table for displaying tutor performance metrics with color-coded badges.
-                    </p>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Figma Node: 258-262435
-                    </p>
-                </section>
-            </div>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', display: 'flex', flexDirection: 'column', gap: '48px' }}>
+            <section>
+                <h4 className="h4" style={{ marginBottom: '16px' }}>1. Performance Table</h4>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Figma: 258-262435
+                </p>
+                <TutorsPerformanceTable tutors={defaultTutors} />
+            </section>
+
+            <section>
+                <h4 className="h4" style={{ marginBottom: '16px' }}>2. Status Table (Null State)</h4>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Figma: 258-262388
+                </p>
+                <TutorsStatusTable tutors={statusTutors} />
+            </section>
+
+            <section>
+                <h4 className="h4" style={{ marginBottom: '16px' }}>3. Tool Usage Table</h4>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Figma: 1013-81092
+                </p>
+                <TutorsToolUsageTable />
+            </section>
+
+            <section>
+                <h4 className="h4" style={{ marginBottom: '16px' }}>4. Training Progress Table</h4>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Figma: 448-93944
+                </p>
+                <TutorsTrainingProgressTable />
+            </section>
+
+            <section>
+                <h4 className="h4" style={{ marginBottom: '16px' }}>5. Sessions Table</h4>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Figma: 1013-81141
+                </p>
+                <TutorSessionsTable />
+            </section>
         </div>
-    ),
+    )
 };

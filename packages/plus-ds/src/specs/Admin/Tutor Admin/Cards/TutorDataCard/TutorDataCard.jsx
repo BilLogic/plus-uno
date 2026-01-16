@@ -1,12 +1,6 @@
-/**
- * TutorDataCard Component
- *
- * Data card with donut chart for displaying tutor metrics.
- * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262197
- */
-
 import React from 'react';
 import PropTypes from 'prop-types';
+import TutorChartsElement from '../../Elements/TutorChartsElement/TutorChartsElement';
 import './TutorDataCard.scss';
 
 const TutorDataCard = ({
@@ -17,18 +11,13 @@ const TutorDataCard = ({
     legend = [],
     loading = false,
     className = '',
+    children,
     ...props
 }) => {
     const safePercentage = Number.isFinite(percentage) ? Math.max(0, Math.min(100, percentage)) : 0;
 
-    // Calculate stroke dash for donut
-    const radius = 70;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDasharray = circumference;
-    const strokeDashoffset = circumference * (1 - safePercentage / 100);
-
     return (
-        <div className={`tutor-data-card ${loading ? 'tutor-data-card--loading' : ''} ${className}`} {...props}>
+        <div className={`tutor-data-card ${className}`} {...props}>
             {/* Header */}
             <div className="tutor-data-card__header">
                 <h4 className="h4 tutor-data-card__title">{title}</h4>
@@ -52,55 +41,18 @@ const TutorDataCard = ({
                             <i className="fas fa-spinner fa-spin" />
                         </div>
                     </div>
+                ) : children ? (
+                    children
                 ) : (
-                    <>
-                        {/* Donut Chart */}
-                        <div className="tutor-data-card__chart">
-                            <svg viewBox="0 0 180 180" className="tutor-data-card__svg" aria-hidden="true">
-                                {/* Background circle */}
-                                <circle
-                                    cx="90"
-                                    cy="90"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="var(--color-surface-container-highest, #e2e2e5)"
-                                    strokeWidth="16"
-                                />
-                                {/* Progress circle */}
-                                <circle
-                                    cx="90"
-                                    cy="90"
-                                    r={radius}
-                                    fill="none"
-                                    stroke="var(--color-primary-container, #61b5cf)"
-                                    strokeWidth="16"
-                                    strokeDasharray={strokeDasharray}
-                                    strokeDashoffset={strokeDashoffset}
-                                    strokeLinecap="round"
-                                    transform="rotate(-90 90 90)"
-                                />
-                            </svg>
-                            <div className="tutor-data-card__center">
-                                <span className="tutor-data-card__percentage">{safePercentage}%</span>
-                                <span className="tutor-data-card__subtitle body1-txt">{subtitle}</span>
-                            </div>
-                        </div>
-
-                        {/* Legend */}
-                        {legend.length > 0 && (
-                            <div className="tutor-data-card__legend" aria-label="Legend">
-                                {legend.map((item, index) => (
-                                    <div key={index} className="tutor-data-card__legend-item">
-                                        <span
-                                            className="tutor-data-card__legend-color"
-                                            style={{ backgroundColor: item.color }}
-                                        />
-                                        <span className="body3-txt">{item.label}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </>
+                    <TutorChartsElement
+                        variant="Pie"
+                        data={{ percentage: safePercentage, label: subtitle }}
+                        legend={legend.length > 0 ? legend : [
+                            { color: 'var(--color-primary-container, #61b5cf)', label: subtitle },
+                            { color: 'var(--color-surface-container-highest, #e2e2e5)', label: 'Remaining' }
+                        ]}
+                        className="tutor-data-card__chart-wrapper"
+                    />
                 )}
             </div>
         </div>
@@ -127,6 +79,8 @@ TutorDataCard.propTypes = {
     loading: PropTypes.bool,
     /** Additional CSS classes */
     className: PropTypes.string,
+    /** Child content (replaces default chart) */
+    children: PropTypes.node,
 };
 
 export default TutorDataCard;

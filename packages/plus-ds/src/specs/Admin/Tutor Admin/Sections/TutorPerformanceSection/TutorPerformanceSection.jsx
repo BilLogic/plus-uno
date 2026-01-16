@@ -10,6 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TutorDataCard from '../../Cards/TutorDataCard/TutorDataCard';
+import TutorChartsElement from '../../Elements/TutorChartsElement/TutorChartsElement';
 import '../../Cards/TutorDataCard/TutorDataCard.scss';
 import './TutorPerformanceSection.scss';
 
@@ -25,25 +26,33 @@ const TutorPerformanceSection = ({
             <TutorDataCard
                 title="Attendance"
                 tooltip="Percentage of tutors who attended their assigned sessions"
-                percentage={attendancePercentage}
-                subtitle="Attended"
-                legend={[
-                    { color: '#61b5cf', label: 'Attended' },
-                    { color: '#85ecd5', label: 'Missed' },
-                ]}
                 loading={loading}
-            />
+            >
+                <TutorChartsElement
+                    variant="Pie"
+                    donutPercentage={attendancePercentage}
+                    donutSubtitle="Attended"
+                    legend={[
+                        { color: '#61b5cf', label: 'Attended' },
+                        { color: '#85ecd5', label: 'Missed' },
+                    ]}
+                />
+            </TutorDataCard>
             <TutorDataCard
                 title="Sign-Up Rate"
                 tooltip="Percentage of tutors who signed up vs those who did not"
-                percentage={signUpRatePercentage}
-                subtitle="Signed Up"
-                legend={[
-                    { color: '#61b5cf', label: 'Signed Up' },
-                    { color: '#3f484a', label: 'Not Signed Up' },
-                ]}
                 loading={loading}
-            />
+            >
+                <TutorChartsElement
+                    variant="Pie"
+                    donutPercentage={signUpRatePercentage}
+                    donutSubtitle="Signed Up"
+                    legend={[
+                        { color: '#61b5cf', label: 'Signed Up' },
+                        { color: '#3f484a', label: 'Not Signed Up' },
+                    ]}
+                />
+            </TutorDataCard>
         </div>
     );
 };

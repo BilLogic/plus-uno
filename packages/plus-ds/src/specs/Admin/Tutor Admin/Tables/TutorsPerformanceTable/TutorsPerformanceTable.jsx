@@ -33,7 +33,6 @@ const TutorsPerformanceTable = ({
     sortDirection = 'asc',
     onSort,
     onRowClick,
-    onAddTutor,
     className = '',
     ...props
 }) => {
@@ -71,7 +70,7 @@ const TutorsPerformanceTable = ({
         if (!sortable) return null;
         const isActive = sortColumn === columnKey;
         return (
-            <i 
+            <i
                 className={`fas fa-arrow-up tutors-performance-table__sort-icon ${isActive ? 'tutors-performance-table__sort-icon--active' : ''}`}
             />
         );
@@ -83,7 +82,7 @@ const TutorsPerformanceTable = ({
                 <thead>
                     <tr>
                         {columns.map((col) => (
-                            <th 
+                            <th
                                 key={col.key}
                                 onClick={() => col.sortable && handleSort(col.key)}
                                 className={`tutors-performance-table__th ${col.sortable ? 'tutors-performance-table__th--sortable' : ''} ${sortColumn === col.key ? 'tutors-performance-table__th--active' : ''}`}
@@ -98,7 +97,7 @@ const TutorsPerformanceTable = ({
                 </thead>
                 <tbody>
                     {displayTutors.map((tutor) => (
-                        <tr 
+                        <tr
                             key={tutor.id}
                             onClick={() => onRowClick && onRowClick(tutor)}
                             className={onRowClick ? 'tutors-performance-table__row--clickable' : ''}
@@ -114,8 +113,8 @@ const TutorsPerformanceTable = ({
                                 </div>
                             </td>
                             <td>
-                                <Badge 
-                                    style={tutor.signedUp === 'Yes' ? 'info' : 'secondary'} 
+                                <Badge
+                                    style={tutor.signedUp === 'Yes' ? 'info' : 'secondary'}
                                     size="b3"
                                 >
                                     {tutor.signedUp}
@@ -131,27 +130,25 @@ const TutorsPerformanceTable = ({
                                 )}
                             </td>
                             <td>
-                                <span className="body3-txt">{tutor.sessions !== null ? tutor.sessions : 'Null'}</span>
+                                {tutor.sessions !== null ? (
+                                    <Badge style="secondary" size="b3">{tutor.sessions}</Badge>
+                                ) : (
+                                    <Badge style="secondary" size="b3">Null</Badge>
+                                )}
                             </td>
                             <td>
-                                <span className="body3-txt">{tutor.students}</span>
+                                {tutor.students !== null ? (
+                                    <Badge style="secondary" size="b3">{tutor.students}</Badge>
+                                ) : (
+                                    <Badge style="secondary" size="b3">Null</Badge>
+                                )}
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </Table>
 
-            {onAddTutor && (
-                <div className="tutors-performance-table__footer">
-                    <button
-                        className="tutors-performance-table__add-tutor"
-                        onClick={onAddTutor}
-                    >
-                        <i className="fas fa-user-plus" />
-                        <span className="body2-txt">Add Tutor</span>
-                    </button>
-                </div>
-            )}
+
         </div>
     );
 };
@@ -177,8 +174,7 @@ TutorsPerformanceTable.propTypes = {
     onSort: PropTypes.func,
     /** Callback when row is clicked */
     onRowClick: PropTypes.func,
-    /** Callback when Add Tutor is clicked */
-    onAddTutor: PropTypes.func,
+
     /** Additional CSS classes */
     className: PropTypes.string,
 };

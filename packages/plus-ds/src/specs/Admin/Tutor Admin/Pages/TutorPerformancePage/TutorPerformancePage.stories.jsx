@@ -86,8 +86,19 @@ Node ID: 258-262669
         modalTab: {
             control: 'radio',
             options: ['info', 'sessions'],
-            description: 'Modal tab variant',
+            description: 'Switch between the modal variant',
             table: { category: 'Modal' },
+        },
+        modalMode: {
+            control: 'radio',
+            options: ['edit', 'add'],
+            description: 'Modal mode - edit existing tutor or add new tutor',
+            table: { category: 'Modal' },
+        },
+        loading: {
+            control: 'boolean',
+            description: 'Show loading state for graphs',
+            table: { category: 'State' },
         },
         rowCount: {
             control: { type: 'number', min: 1, max: 20 },
@@ -165,6 +176,7 @@ export const Interactive = {
         const [modalOpen, setModalOpen] = useState(args.modalOpen);
         const [modalTab, setModalTab] = useState(args.modalTab);
         const [activeTab, setActiveTab] = useState(args.activeTab);
+        const [loading, setLoading] = useState(args.loading);
 
         useEffect(() => {
             setModalOpen(args.modalOpen);
@@ -178,15 +190,21 @@ export const Interactive = {
             setActiveTab(args.activeTab);
         }, [args.activeTab]);
 
+        useEffect(() => {
+            setLoading(args.loading);
+        }, [args.loading]);
+
         return (
             <TutorPerformancePage
                 tutors={defaultTutors.slice(0, args.rowCount)}
+                loading={loading}
                 selectedSchool={args.selectedSchool}
                 selectedTutor={args.selectedTutor}
                 currentPage={currentPage}
                 activeTab={activeTab}
                 modalOpen={modalOpen}
                 modalTab={modalTab}
+                modalMode={args.modalMode}
                 onPageChange={setCurrentPage}
                 onRowClick={(tutor) => {
                     console.log('Tutor clicked:', tutor);
@@ -215,7 +233,9 @@ export const Interactive = {
         selectedTutor: 'All Tutors',
         activeTab: 'performance',
         modalOpen: false,
-        modalTab: 'info',
+        modalTab: "sessions",
+        modalMode: 'edit',
+        loading: false,
         rowCount: 9,
     },
 };
@@ -224,20 +244,34 @@ export const Interactive = {
  * WithModalOpen
  */
 export const WithModalOpen = {
-    render: () => {
-        const [modalOpen, setModalOpen] = useState(true);
-        const [modalTab, setModalTab] = useState('info');
+    render: (args) => {
+        const [modalOpen, setModalOpen] = useState(args.modalOpen);
+        const [modalTab, setModalTab] = useState(args.modalTab);
+
+        useEffect(() => {
+            setModalOpen(args.modalOpen);
+        }, [args.modalOpen]);
+
+        useEffect(() => {
+            setModalTab(args.modalTab);
+        }, [args.modalTab]);
 
         return (
             <TutorPerformancePage
                 tutors={defaultTutors}
                 modalOpen={modalOpen}
                 modalTab={modalTab}
+                modalMode={args.modalMode}
                 onModalChange={(open, tab) => {
                     setModalOpen(open);
                     setModalTab(tab);
                 }}
             />
         );
+    },
+    args: {
+        modalOpen: true,
+        modalTab: 'info',
+        modalMode: 'edit',
     },
 };

@@ -6,13 +6,13 @@
 .card-title-header {
     display: flex;
     align-items: center;
-    gap: var(--space-100, 8px);
+    gap: var(--element-gap-lg, 12px);
 
     &__title {
         font-family: 'Lato', sans-serif;
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 600;
-        line-height: 1.333;
+        line-height: 1.4;
         color: var(--color-on-surface, #191c1e);
         margin: 0;
     }

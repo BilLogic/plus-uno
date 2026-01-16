@@ -38,7 +38,6 @@ Node ID: 258-262435
 - Color-coded attendance badges (≥80% green, 50-79% yellow, <50% red)
 - Signed-Up status badges
 - Lead tutor badge
-- Add Tutor button
 - Default 9 rows
 `,
             },
@@ -96,7 +95,6 @@ export const Overview = {
                 tutors={defaultTutors}
                 onRowClick={(tutor) => console.log('Tutor clicked:', tutor)}
                 onSort={(column) => console.log('Sort by:', column)}
-                onAddTutor={() => console.log('Add Tutor clicked')}
             />
         </div>
     ),
@@ -120,7 +118,6 @@ export const Interactive = {
                     sortColumn={sortColumn}
                     onRowClick={(tutor) => console.log('Tutor clicked:', tutor)}
                     onSort={(column) => setSortColumn(column)}
-                    onAddTutor={() => console.log('Add Tutor clicked')}
                 />
             </div>
         );

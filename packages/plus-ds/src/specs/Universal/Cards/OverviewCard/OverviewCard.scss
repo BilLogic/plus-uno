@@ -10,7 +10,7 @@
 .plus-overview-card {
     // Base dimensions from Figma
     width: var(--columns-col-5, 275px);
-    height: 180px;
+    min-height: 180px;
     padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
     border-radius: var(--size-card-radius-md, 16px);
 
@@ -21,7 +21,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--size-card-gap-md, 16px);
-    overflow: hidden;
     box-sizing: border-box;
 
     // =============================================
@@ -55,7 +54,8 @@
         color: var(--color-on-surface-variant, #3f484a);
         flex-shrink: 0;
 
-        i, svg {
+        i,
+        svg {
             font-size: inherit;
             color: inherit;
         }
@@ -169,7 +169,7 @@
 
     &--relationships {
         background: linear-gradient(90deg, rgba(199, 11, 119, 0.08) 0%, rgba(199, 11, 119, 0.08) 100%),
-                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
+            linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
         .plus-overview-card__subtitle,
@@ -184,7 +184,7 @@
 
     &--socio-emotional {
         background: linear-gradient(90deg, rgba(125, 87, 0, 0.08) 0%, rgba(125, 87, 0, 0.08) 100%),
-                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
+            linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
         .plus-overview-card__subtitle,
@@ -199,7 +199,7 @@
 
     &--mastering-content {
         background: linear-gradient(90deg, rgba(127, 63, 177, 0.08) 0%, rgba(127, 63, 177, 0.08) 100%),
-                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
+            linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
         .plus-overview-card__subtitle,
@@ -214,7 +214,7 @@
 
     &--advocacy {
         background: linear-gradient(90deg, rgba(22, 119, 69, 0.08) 0%, rgba(22, 119, 69, 0.08) 100%),
-                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
+            linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
         .plus-overview-card__subtitle,
@@ -229,7 +229,7 @@
 
     &--technology-tools {
         background: linear-gradient(90deg, rgba(0, 92, 189, 0.08) 0%, rgba(0, 92, 189, 0.08) 100%),
-                    linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
+            linear-gradient(90deg, #f9f9fc 0%, #f9f9fc 100%);
 
         .plus-overview-card__title,
         .plus-overview-card__subtitle,
@@ -259,7 +259,7 @@
     &--progress {
         background-color: var(--color-surface-bright, #f9f9fc);
         box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
-                    0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+            0px 1px 3px 1px rgba(0, 0, 0, 0.15);
 
         .plus-overview-card__header {
             flex-shrink: 0;

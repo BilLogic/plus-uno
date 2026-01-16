@@ -1,200 +1,108 @@
 /**
- * TutorModal - Tutor Admin Modal
- * 
- * Modal for viewing and editing tutor information.
- * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262330
+ * TutorModal Stories
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TutorModal from './TutorModal';
-import Button from '../../../../../components/Button/Button';
-import './TutorModal.scss';
 
-const defaultTutor = {
+// Mock Data
+const mockTutor = {
+    id: 1,
     name: 'Amelia Blue',
     preferredName: 'Amy',
-    email: 'name@example.com',
-    schools: ['Option #1', 'Option #2', 'Option #3'],
-    students: ['Option #1', 'Option #2', 'Option #3'],
+    email: 'amelia@example.com',
+    schools: ['School A', 'School B'],
+    students: ['Student 1', 'Student 2'],
+    isLead: true,
 };
+
+const mockSessions = [
+    { id: 1, day: 'Monday (01/31/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
+    { id: 2, day: 'Friday (01/28/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
+    { id: 3, day: 'Thursday (01/27/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
+    { id: 4, day: 'Wednesday (01/26/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
+    { id: 5, day: 'Tuesday (01/25/25)', shift: '0:00 PM - 0:00 PM', school: 'School' },
+];
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Modals/TutorModal',
     component: TutorModal,
-    tags: ['autodocs'],
     parameters: {
         docs: {
             description: {
-                component: `Modal component for viewing and editing tutor information with tabs.
-
-## Figma Reference
-Node ID: 258-262330
-
-## Features
-- Two tabs: Tutor Info and Sessions
-- Tutor Info tab: form fields for name, email, schools, students
-- Sessions tab: table with pagination
-- Show Future Sessions toggle
-- View Training Progress link
-- Delete/Cancel/Save actions
-`,
-            },
-        },
+                component: `Modal for editing existing tutors or adding new ones. Supports tabs and different form layouts.`
+            }
+        }
     },
     argTypes: {
-        show: {
-            control: 'boolean',
-            description: 'Whether the modal is visible',
-            table: { category: 'State' },
+        mode: {
+            control: { type: 'select' },
+            options: ['edit', 'add'],
         },
-        initialTab: {
-            control: 'radio',
-            options: ['info', 'sessions'],
-            description: 'Initial active tab',
-            table: { category: 'Variant' },
-        },
-    },
+    }
 };
 
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorModal</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Modal component for viewing and editing tutor information. Features two tabs for
-                        Tutor Info and Sessions.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Tabs</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Tutor Info</strong>: Edit tutor details, schools, and students</li>
-                        <li><strong>Sessions</strong>: View tutor's assigned sessions</li>
-                    </ul>
-                </section>
-            </div>
-        </div>
-    ),
-};
-
-/**
- * Overview
- */
-export const Overview = {
-    render: () => {
-        const [showModal, setShowModal] = useState(true);
-
-        return (
-            <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Tutor Modal</h6>
-                <Button
-                    text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
-                    onClick={() => setShowModal(!showModal)}
-                />
-                <TutorModal
-                    show={showModal}
-                    tutor={defaultTutor}
-                    onHide={() => setShowModal(false)}
-                    onSave={() => console.log('Save clicked')}
-                    onDelete={() => console.log('Delete clicked')}
-                />
-            </div>
-        );
-    },
-};
-
-/**
- * Interactive
- */
-export const Interactive = {
+export const EditTutor = {
     render: (args) => {
-        const [showModal, setShowModal] = useState(args.show);
-        const [activeTab, setActiveTab] = useState(args.initialTab);
-
-        useEffect(() => {
-            setShowModal(args.show);
-        }, [args.show]);
-
-        useEffect(() => {
-            setActiveTab(args.initialTab);
-        }, [args.initialTab]);
-
+        const [show, setShow] = useState(true);
         return (
-            <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>
-                    Tutor Modal - Interactive
-                </h6>
-                <Button
-                    text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
-                    onClick={() => setShowModal(!showModal)}
-                />
+            <>
+                <button onClick={() => setShow(true)}>Open Edit Modal</button>
                 <TutorModal
-                    show={showModal}
-                    tutor={defaultTutor}
-                    initialTab={activeTab}
-                    onHide={() => setShowModal(false)}
-                    onSave={() => console.log('Save clicked')}
-                    onDelete={() => console.log('Delete clicked')}
-                    onTabChange={(tab) => {
-                        setActiveTab(tab);
-                        console.log('Tab changed:', tab);
-                    }}
+                    {...args}
+                    show={show}
+                    onHide={() => setShow(false)}
+                    tutor={mockTutor}
+                    sessions={mockSessions}
                 />
-            </div>
+            </>
         );
     },
     args: {
-        show: true,
+        mode: 'edit',
         initialTab: 'info',
-    },
+    }
 };
 
-/**
- * InfoTab - Shows modal with Info tab active
- */
-export const InfoTab = {
-    render: () => {
-        const [showModal, setShowModal] = useState(true);
-
+export const EditTutorSessions = {
+    render: (args) => {
+        const [show, setShow] = useState(true);
         return (
-            <TutorModal
-                show={showModal}
-                tutor={defaultTutor}
-                initialTab="info"
-                onHide={() => setShowModal(false)}
-                onSave={() => console.log('Save clicked')}
-                onDelete={() => console.log('Delete clicked')}
-            />
+            <>
+                <button onClick={() => setShow(true)}>Open Sessions Modal</button>
+                <TutorModal
+                    {...args}
+                    show={show}
+                    onHide={() => setShow(false)}
+                    tutor={mockTutor}
+                    sessions={mockSessions}
+                />
+            </>
         );
     },
+    args: {
+        mode: 'edit',
+        initialTab: 'sessions',
+    }
 };
 
-/**
- * SessionsTab - Shows modal with Sessions tab active
- */
-export const SessionsTab = {
-    render: () => {
-        const [showModal, setShowModal] = useState(true);
-
+export const AddNewTutor = {
+    render: (args) => {
+        const [show, setShow] = useState(true);
         return (
-            <TutorModal
-                show={showModal}
-                tutor={defaultTutor}
-                initialTab="sessions"
-                onHide={() => setShowModal(false)}
-                onSave={() => console.log('Save clicked')}
-                onDelete={() => console.log('Delete clicked')}
-            />
+            <>
+                <button onClick={() => setShow(true)}>Open Add Modal</button>
+                <TutorModal
+                    {...args}
+                    show={show}
+                    onHide={() => setShow(false)}
+                    tutor={{}} // Empty for add
+                />
+            </>
         );
     },
+    args: {
+        mode: 'add',
+        initialTab: 'individual',
+    }
 };

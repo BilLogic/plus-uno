@@ -19,8 +19,13 @@ Section displaying two donut charts for tutor performance (Figma Node: 258-26220
 - Sign-Up Rate chart
 - Responsive layout
 
-## Additional Sections (To Be Implemented)
-- TutorToolUsageSection (Figma Node: 1009-130962)
+### TutorToolUsageSection
+Section displaying tool usage metrics with multiple charts (Figma Node: 1009-130962)
+- Recording Upload (Daily) - Bar Chart
+- Reflection Completion (Weekly) - Line Chart
+- Attendance Tracking (Weekly) - Line Chart
+- Check-in Completion (Weekly) - Line Chart
+- Horizontal scroll layout
 `,
             },
         },
@@ -39,6 +44,16 @@ export const Overview = {
                     </p>
                     <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                         Figma Node: 258-262208
+                    </p>
+                </section>
+
+                <section>
+                    <h4 className="h4" style={{ marginBottom: '12px' }}>TutorToolUsageSection</h4>
+                    <p className="body2-txt" style={{ marginBottom: '8px' }}>
+                        Section displaying tool usage metrics with bar and line charts in a horizontal scroll layout.
+                    </p>
+                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                        Figma Node: 1009-130962
                     </p>
                 </section>
             </div>

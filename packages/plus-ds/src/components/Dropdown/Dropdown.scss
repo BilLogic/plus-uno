@@ -226,6 +226,39 @@ $dropdown-themes: (
         top: 0;
         left: 100%;
     }
+
+    // --- SIZE VARIANTS ---
+    &.small {
+
+        .pdropdown-toggle,
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            font-size: var(--font-size-body3);
+            line-height: var(--font-line-height-body3);
+
+            &::after {
+                font-size: var(--font-size-fa-body3-solid);
+            }
+        }
+    }
+
+    &.large {
+
+        .pdropdown-toggle,
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+            font-size: var(--font-size-h6);
+            line-height: var(--font-line-height-h6);
+
+            &::after {
+                font-size: var(--font-size-fa-h6-solid);
+            }
+        }
+    }
 }
 
 // =============================================================================

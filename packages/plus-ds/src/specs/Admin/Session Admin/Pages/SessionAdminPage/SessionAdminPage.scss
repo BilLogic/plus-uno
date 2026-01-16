@@ -38,8 +38,20 @@
     gap: var(--size-section-gap-md, 16px);
 }
 
-// Details Section
+.session-admin-page__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--size-element-gap-md, 12px);
+}
 
+.session-admin-page__date-filter {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px);
+}
+
+// Details Section
 .session-admin-page__details-section {
     display: flex;
     flex-direction: column;

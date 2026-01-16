@@ -13,11 +13,31 @@ import './OverviewCard.scss';
 
 // SMART category colors
 const SMART_COLORS = {
-    socio: { bg: '#ffdea0', text: '#674a00', fill: '#8c6600' },
-    mastering: { bg: '#f2daff', text: '#673a8b', fill: '#8659a9' },
-    advocacy: { bg: '#b3f1bf', text: '#00572a', fill: '#167745' },
-    relationships: { bg: '#ffd9e4', text: '#940055', fill: '#c70b77' },
-    technology: { bg: '#d7e2ff', text: '#0b469d', fill: '#005cbd' }
+    socio: {
+        bg: 'var(--color-social-emotional-container, #ffdea0)',
+        text: 'var(--color-social-emotional-text, #674a00)',
+        fill: 'var(--color-social-emotional, #8c6600)'
+    },
+    mastering: {
+        bg: 'var(--color-mastering-content-container, #f2daff)',
+        text: 'var(--color-mastering-content-text, #673a8b)',
+        fill: 'var(--color-mastering-content, #8659a9)'
+    },
+    advocacy: {
+        bg: 'var(--color-advocacy-container, #b3f1bf)',
+        text: 'var(--color-advocacy-text, #00572a)',
+        fill: 'var(--color-advocacy, #167745)'
+    },
+    relationships: {
+        bg: 'var(--color-relationship-container, #ffd9e4)',
+        text: 'var(--color-relationship-text, #940055)',
+        fill: 'var(--color-relationship, #c70b77)'
+    },
+    technology: {
+        bg: 'var(--color-technology-tools-container, #d7e2ff)',
+        text: 'var(--color-technology-tools-text, #0b469d)',
+        fill: 'var(--color-technology-tools, #005cbd)'
+    }
 };
 
 /**
@@ -100,6 +120,7 @@ const OverviewCard = ({
     smartData = {},
     chartValue = 20,
     chartLabel,
+    chartColor,
     editLink,
     className = '',
     style,
@@ -126,7 +147,7 @@ const OverviewCard = ({
 
     // Donut chart segments for metric cards
     const getDonutSegments = (val) => [
-        { value: val, color: props.chartColor || 'var(--color-primary, #006b5e)', label: 'Value' },
+        { value: val, color: chartColor || 'var(--color-primary, #006b5e)', label: 'Value' },
         { value: 100 - val, color: 'var(--color-surface-variant, #dde3ea)', label: 'Remaining' }
     ];
 

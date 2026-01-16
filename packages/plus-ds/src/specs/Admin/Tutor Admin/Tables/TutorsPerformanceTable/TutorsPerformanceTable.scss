@@ -99,28 +99,5 @@
         cursor: pointer;
     }
 
-    &__footer {
-        margin-top: var(--size-section-gap-md, 16px);
-    }
 
-    &__add-tutor {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: transparent;
-        border: 1.5px solid var(--color-primary, #0472a8);
-        border-radius: var(--element-radius-sm, 4px);
-        color: var(--color-primary, #0472a8);
-        cursor: pointer;
-        transition: all 0.15s ease;
-
-        &:hover {
-            background-color: rgba(4, 114, 168, 0.08);
-        }
-
-        i {
-            font-size: 14px;
-        }
-    }
 }

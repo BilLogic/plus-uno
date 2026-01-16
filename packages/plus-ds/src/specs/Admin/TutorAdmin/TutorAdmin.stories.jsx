@@ -9,13 +9,10 @@ import { TutorAdminSpec } from './TutorAdminSpec';
 
 export default {
     title: 'Specs/Admin/Tutor Admin',
+    component: TutorAdminSpec,
     tags: ['autodocs'],
     parameters: {
-        docs: {
-            description: {
-                component: 'Admin components for managing tutors.',
-            },
-        },
+        layout: 'fullscreen',
     },
 };
 

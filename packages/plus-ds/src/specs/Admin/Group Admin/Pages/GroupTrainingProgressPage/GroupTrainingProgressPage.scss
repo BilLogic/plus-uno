@@ -35,9 +35,13 @@
         display: flex;
         gap: var(--size-section-gap-sm);
         align-items: stretch;
-        width: 100%;
+        width: calc(100% + 24px);
+        margin-left: -12px;
+        margin-right: -12px;
+        padding: 12px;
         overflow-x: auto;
-        overflow-y: hidden;
+        overflow-y: visible;
+        box-sizing: border-box;
     }
 
     &__table-container {

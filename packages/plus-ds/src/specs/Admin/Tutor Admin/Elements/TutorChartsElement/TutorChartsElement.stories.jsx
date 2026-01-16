@@ -1,29 +1,13 @@
 /**
- * TutorChartsElement - Tutor Admin Element
+ * TutorChartsElement Stories
  * 
- * Element displaying three chart types: Donut, Stacked Bar, and Line.
+ * Element displaying three chart types: Pie, Bar, and Line.
  * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262214
  */
 
 import React from 'react';
 import TutorChartsElement from './TutorChartsElement';
 import './TutorChartsElement.scss';
-
-const defaultStackedBarData = [
-    { label: '10/11', values: [12, 6] },
-    { label: '10/12', values: [16, 8] },
-    { label: '10/13', values: [12, 5] },
-    { label: '10/17', values: [12, 1] },
-    { label: '10/18', values: [20, 2] },
-];
-
-const defaultLineChartData = [
-    { label: '06/03/24', values: [5, 0] },
-    { label: '06/10/24', values: [60, 20] },
-    { label: '06/17/24', values: [55, 75] },
-    { label: '06/24/24', values: [65, 30] },
-    { label: '07/01/24', values: [20, 40] },
-];
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements/TutorChartsElement',
@@ -32,102 +16,128 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Element displaying three chart types: Donut, Stacked Bar, and Line charts.
-
-## Figma Reference
-Node ID: 258-262214
-
-## Charts
-1. **Donut Chart** - Shows percentage with center text and legend
-2. **Stacked Bar Chart** - Shows data breakdown over dates with values in segments
-3. **Line Chart** - Shows trend lines over time with percentage Y-axis
-
-## Features
-- Consistent color schemes (ABC/XYZ)
-- Responsive layout
-- Configurable data and legends
-`,
-            },
-        },
+                component: `TutorChartsElement renders one of three chart variants: **Pie**, **Bar**, or **Line**.
+                Each variant is designed to visualize specific tutor performance metrics (Attendance, Sign-up rates, etc.).
+                
+                ## Variants
+                - **Pie**: Donut chart with center text.
+                - **Bar**: Stacked bar chart showing comparison over time.
+                - **Line**: Multi-line chart showing trends.
+                
+                ## Formatting
+                - Matches specific Figma styling (Node 258:262214).
+                - Fixed width container (508px) by default, but can be overridden.
+                `
+            }
+        }
     },
     argTypes: {
-        donutPercentage: {
-            control: { type: 'range', min: 0, max: 100 },
-            description: 'Donut chart percentage',
-            table: { category: 'Donut Chart' },
+        variant: {
+            control: { type: 'select' },
+            options: ['Pie', 'Bar', 'Line'],
+            description: 'The type of chart to display'
         },
-        donutSubtitle: {
-            control: 'text',
-            description: 'Donut chart subtitle',
-            table: { category: 'Donut Chart' },
-        },
-    },
+        data: { control: 'object', description: 'Chart data object/array' },
+        legend: { control: 'object', description: 'Custom Legend items' },
+        // Wrappers for interactive control
+        donutPercentage: { control: { type: 'range', min: 0, max: 100 }, if: { arg: 'variant', eq: 'Pie' } },
+        donutSubtitle: { control: 'text', if: { arg: 'variant', eq: 'Pie' } }
+    }
 };
 
 /**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorChartsElement</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Element component displaying three chart types: Donut, Stacked Bar, and Line charts.
-                        Used for data visualization in Tutor Admin sections.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Chart Types</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Donut Chart</strong>: Percentage display with center text</li>
-                        <li><strong>Stacked Bar Chart</strong>: Data breakdown with segment values</li>
-                        <li><strong>Line Chart</strong>: Trend visualization over time</li>
-                    </ul>
-                </section>
-            </div>
-        </div>
-    ),
-};
-
-/**
- * Overview
+ * Overview - Shows all variants side-by-side
  */
 export const Overview = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Tutor Charts Element</h6>
-            <TutorChartsElement
-                donutPercentage={0}
-                donutSubtitle="ABC"
-                stackedBarData={defaultStackedBarData}
-                lineChartData={defaultLineChartData}
-            />
+        <div style={{ padding: '24px', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div>
+                <h6 style={{ marginBottom: '16px' }}>Pie Variant</h6>
+                <TutorChartsElement variant="Pie" donutPercentage={45} donutSubtitle="ABC" />
+            </div>
+            <div>
+                <h6 style={{ marginBottom: '16px' }}>Bar Variant</h6>
+                <TutorChartsElement variant="Bar" />
+            </div>
+            <div>
+                <h6 style={{ marginBottom: '16px' }}>Line Variant</h6>
+                <TutorChartsElement variant="Line" />
+            </div>
         </div>
-    ),
+    )
 };
 
 /**
- * Interactive
+ * Pie Variant (Interactive)
  */
-export const Interactive = {
-    render: (args) => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>
-                Tutor Charts Element - Interactive
-            </h6>
-            <TutorChartsElement
-                donutPercentage={args.donutPercentage}
-                donutSubtitle={args.donutSubtitle}
-                stackedBarData={defaultStackedBarData}
-                lineChartData={defaultLineChartData}
-            />
-        </div>
-    ),
+export const Pie = {
     args: {
+        variant: 'Pie',
         donutPercentage: 0,
         donutSubtitle: 'ABC',
+        legend: [
+            { label: 'ABC', color: '#61b5cf' },
+            { label: 'XYZ', color: '#85ecd5' }
+        ]
     },
+    render: (args) => (
+        <div style={{ padding: '24px', backgroundColor: '#f5f5f5' }}>
+            <TutorChartsElement
+                variant="Pie"
+                donutPercentage={args.donutPercentage}
+                donutSubtitle={args.donutSubtitle}
+                legend={args.legend}
+            />
+        </div>
+    )
+};
+
+/**
+ * Bar Variant
+ */
+export const Bar = {
+    args: {
+        variant: 'Bar',
+        data: [
+            { label: '10/11', values: [12, 6] },
+            { label: '10/12', values: [16, 8] },
+            { label: '10/13', values: [12, 5] },
+            { label: '10/17', values: [12, 1] },
+            { label: '10/18', values: [20, 2] },
+        ],
+        legend: [
+            { label: 'ABC', color: '#61b5cf' },
+            { label: 'XYZ', color: '#85ecd5' }
+        ]
+    },
+    render: (args) => (
+        <div style={{ padding: '24px', backgroundColor: '#f5f5f5' }}>
+            <TutorChartsElement {...args} />
+        </div>
+    )
+};
+
+/**
+ * Line Variant
+ */
+export const Line = {
+    args: {
+        variant: 'Line',
+        data: [
+            { label: '06/03/24', values: [5, 0] },
+            { label: '06/10/24', values: [60, 20] },
+            { label: '06/17/24', values: [55, 75] },
+            { label: '06/24/24', values: [65, 30] },
+            { label: '07/01/24', values: [20, 40] },
+        ],
+        legend: [
+            { label: 'ABC', color: '#004b6b' },
+            { label: 'XYZ', color: '#85ecd5' }
+        ]
+    },
+    render: (args) => (
+        <div style={{ padding: '24px', backgroundColor: '#f5f5f5' }}>
+            <TutorChartsElement {...args} />
+        </div>
+    )
 };

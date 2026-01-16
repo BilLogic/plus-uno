@@ -5,3 +5,4 @@
  */
 
 export { default as TutorPerformanceSection } from './TutorPerformanceSection/TutorPerformanceSection';
+export { default as TutorToolUsageSection } from './TutorToolUsageSection/TutorToolUsageSection';

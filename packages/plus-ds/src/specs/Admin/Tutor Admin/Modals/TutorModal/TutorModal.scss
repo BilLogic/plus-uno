@@ -5,7 +5,7 @@
 
 .tutor-modal {
     .modal-dialog {
-        max-width: 600px;
+        max-width: 672px; // Updated to match Figma (col-12)
     }
 
     .modal-content {
@@ -25,6 +25,8 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: var(--size-modal-gap-md, 16px);
+        padding-bottom: var(--size-modal-gap-md, 12px); // Add space inside border
+        border-bottom: 1px solid var(--color-outline-variant, #e2e2e5); // Add requested underline
     }
 
     &__title {
@@ -46,10 +48,14 @@
         border: none;
         background: transparent;
         color: var(--color-on-surface);
-        font-size: 24px;
+        font-size: 20px; // Adjusted icon size
         cursor: pointer;
         border-radius: var(--size-element-radius-sm, 4px);
         transition: background-color 0.15s ease;
+
+        i {
+            font-size: 20px; // Explicit icon size
+        }
 
         &:hover {
             background-color: rgba(25, 28, 30, 0.08);
@@ -58,43 +64,47 @@
 
     &__tabs {
         display: flex;
-        align-items: center;
-        gap: var(--size-element-gap-md, 16px);
-        padding-bottom: var(--size-modal-gap-sm, 12px);
-        border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+        width: 100%;
+        border-radius: var(--size-element-radius-lg, 8px);
+        overflow: hidden;
         margin-bottom: var(--size-modal-gap-md, 16px);
+        border: none; // Remove bottom border
+        padding: 0; // Remove padding
     }
 
     &__tab {
+        flex: 1;
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 0;
+        justify-content: center;
+        gap: var(--size-element-gap-md, 10px);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
         border: none;
-        background: transparent;
-        color: var(--color-on-surface-variant, #5a5a5a);
+        background-color: var(--color-secondary-state-08);
+        color: var(--color-secondary-text);
         font-size: 14px;
         font-weight: 400;
         cursor: pointer;
-        transition: color 0.15s ease;
-        position: relative;
+        transition: background-color 0.2s ease;
 
-        &:hover {
-            color: var(--color-on-surface, #191c1e);
+        &:first-child {
+            border-radius: var(--size-element-radius-md, 4px) 0 0 var(--size-element-radius-md, 4px);
+        }
+
+        &:last-child {
+            // If there's a link after, we might need adjustment, but assuming tabs are main
+            // If link exists, it might break flex=1.
+            // TutorModal Edit mode has a Link.
+            border-radius: 0 var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0;
         }
 
         &--active {
-            color: var(--color-primary, #0472a8);
-            font-weight: 500;
+            background-color: var(--color-primary-state-08);
+            color: var(--color-primary-text);
+            font-weight: 600;
 
             &::after {
-                content: '';
-                position: absolute;
-                bottom: -13px;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background-color: var(--color-primary, #0472a8);
+                display: none; // Remove underline
             }
         }
     }
@@ -125,16 +135,27 @@
         display: flex;
         flex-direction: column;
         gap: var(--size-modal-gap-md, 16px);
-        min-height: 300px;
-        max-height: 400px;
+        max-height: 500px; // Increased height for Add form
         overflow-y: auto;
     }
 
     &__info-tab,
-    &__sessions-tab {
+    &__sessions-tab,
+    &__add-tab,
+    &__multiple-tab {
         display: flex;
         flex-direction: column;
         gap: var(--size-modal-gap-md, 16px);
+    }
+
+    &__row {
+        display: flex;
+        gap: 16px;
+        width: 100%;
+    }
+
+    &__half-width {
+        flex: 1;
     }
 
     &__form-group {
@@ -145,10 +166,18 @@
             font-weight: 400;
             color: var(--color-on-surface, #191c1e);
             margin-bottom: 6px;
+
+            &.required::after {
+                content: '*';
+                color: #B3261E;
+                margin-left: 2px;
+            }
         }
 
-        input, select {
-            font-size: 12px;
+        input,
+        select {
+            font-size: 14px; // Use standard size
+            padding: 8px 12px;
         }
     }
 
@@ -158,9 +187,22 @@
         gap: 8px;
     }
 
+    &__tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background-color: var(--color-surface-container-high, #e7eef2); // Gray background as per screenshot
+        border-radius: 4px;
+        width: 100%;
+        min-height: 48px; // Match input height
+    }
+
     &__student-count {
         color: var(--color-on-surface-variant, #5a5a5a);
         margin-top: 4px;
+        font-size: 12px;
     }
 
     &__lead-toggle {
@@ -192,7 +234,7 @@
 
         tbody td {
             padding: var(--table-cell-y, 12px) var(--table-cell-x, 10px);
-            border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+            border: none !important; // No border lines as requested
             font-size: 12px;
         }
     }

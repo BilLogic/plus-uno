@@ -64,8 +64,7 @@ const ExportSearchFilterBar = ({
                         style="secondary"
                         fill="text"
                         size="medium"
-                        leadingVisual={filter.sortable ? 'caret-down' : undefined}
-                        trailingVisual={filter.sortable ? 'caret-down' : 'caret-down'}
+                        trailingVisual="caret-down"
                         onClick={() => {
                             if (filter.sortable && onSort) {
                                 onSort(filter.key);

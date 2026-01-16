@@ -1,195 +1,35 @@
 /**
  * TutorChartsElement Styles
- * Figma Node: 258-262214
+ * Matches Figma: node-id=258-262214
  */
 
 .tutor-charts-element {
     display: flex;
     flex-direction: column;
-    gap: var(--size-section-gap-xl, 40px);
-    width: 100%;
+    align-items: center;
+    justify-content: center;
+    width: 508px;
+    height: 266px;
+    background-color: white; // Assuming white background based on screenshot context
+    padding: 16px;
+    box-sizing: border-box;
+    position: relative;
 
-    &__chart-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: var(--size-section-gap-md, 16px);
-    }
+    gap: var(--element-gap-md, 16px); // Figma gap
 
-    // Donut Chart
-    &__donut {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-200, 16px);
-    }
-
-    &__donut-chart {
-        position: relative;
-        width: 221px;
-        height: 221px;
-    }
-
-    &__svg {
-        width: 100%;
-        height: 100%;
-    }
-
-    &__donut-center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    &__donut-percentage {
-        font-family: 'Lato', sans-serif;
-        font-size: 40px;
-        font-weight: 700;
-        line-height: 1.6;
-        color: var(--color-on-surface, #191c1e);
-    }
-
-    &__donut-subtitle {
-        font-size: 16px;
-        font-weight: 300;
-        color: var(--color-on-surface, #191c1e);
-        line-height: 1.5;
-        margin-top: 0;
-    }
-
-    // Stacked Bar Chart
-    &__stacked-bar,
-    &__line {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-200, 16px);
-    }
-
-    &__chart-content {
-        display: flex;
-        gap: var(--space-100, 8px);
-        height: 300px;
-    }
-
-    &__y-axis {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: flex-end;
-        min-width: 40px;
-        padding-right: var(--space-100, 8px);
-    }
-
-    &__main {
-        flex: 1;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-    }
-
-    &__grid {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    &__grid-line {
-        height: 1px;
-        background-color: var(--color-outline-variant, #e2e2e5);
-    }
-
-    &__bars {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-around;
-        height: 100%;
-        padding: 0 var(--space-050, 4px);
-    }
-
-    &__bar-col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-050, 4px);
-        flex: 1;
-        max-width: 80px;
-    }
-
-    &__bar-container {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        min-height: 20px;
-    }
-
-    &__bar-segment {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        transition: height 0.3s ease;
-
-        &--0 {
-            background-color: #61b5cf;
-        }
-
-        &--1 {
-            background-color: #85ecd5;
-        }
-    }
-
-    &__bar-value {
-        color: var(--color-on-surface, #191c1e);
-        font-weight: var(--font-weight-normal, 400);
-        font-size: 12px;
-    }
-
-    // Line Chart
-    &__line-svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-
-    &__x-axis {
-        display: flex;
-        justify-content: space-around;
-        margin-top: auto;
-        padding-top: var(--space-100, 8px);
-    }
-
-    &__date {
-        font-size: 12px;
-        color: var(--color-on-surface, #191c1e);
-        white-space: nowrap;
-    }
-
-    // Legend (shared)
+    // --- SHARED: LEGEND ---
     &__legend {
         display: flex;
-        gap: var(--space-500, 24px);
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
+        gap: 24px; // var(--space-500) Gap between legend items
+        justify-content: center; // Center alignment for ABC XYZ
+        width: 100%;
+        // removed margin-top: auto and padding-top to rely on parent gap
     }
 
     &__legend-item {
         display: flex;
         align-items: center;
-        gap: var(--space-050, 4px);
+        gap: 4px; // var(--space-050)
     }
 
     &__legend-color {
@@ -197,5 +37,237 @@
         height: 25px;
         border-radius: 5px;
         flex-shrink: 0;
+
+        &--abc {
+            background-color: #61b5cf; // Blue
+        }
+
+        &--xyz {
+            background-color: #85ecd5; // Cyan
+        }
+
+        &--line-abc {
+            background-color: #00507a; // Approximate dark blue from interaction or keep #61b5cf if consistent? 
+            // Screenshot showed dark blue line, but legend box might be same? 
+            // Let's use #00507a for line, and maybe the legend box matches line color.
+            background-color: #004b6b; // Darker blue for Line chart ABC
+        }
+    }
+
+    &__legend-label {
+        font-family: 'Merriweather Sans', sans-serif;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 12px;
+        line-height: 20px;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    // --- PIE CHART ---
+    &--pie {
+
+        // Layout for Pie
+        .tutor-charts-element__chart-area {
+            position: relative;
+            width: 221px;
+            height: 221px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tutor-charts-element__center-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            h1 {
+                font-family: 'Lato', sans-serif;
+                font-weight: 700;
+                font-size: 40px;
+                line-height: 1.6;
+                margin: 0;
+            }
+
+            p {
+                font-family: 'Merriweather Sans', sans-serif;
+                font-weight: 300;
+                font-size: 16px;
+                line-height: 1.5;
+                margin: 0;
+            }
+        }
+    }
+
+    // --- BAR CHART ---
+    &--bar {
+        align-items: stretch; // Full width
+        padding: 16px 24px; // Adjust padding
+
+        .tutor-charts-element__chart-container {
+            flex: 1;
+            display: flex;
+            position: relative;
+            margin-bottom: 8px; // Space for X axis
+        }
+
+        // Y-Axis
+        .tutor-charts-element__y-axis {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-right: 8px;
+            width: 40px;
+            height: 100%;
+            padding-bottom: 20px; // Offset for X axis labels overlap??
+
+            span {
+                font-family: 'Merriweather Sans', sans-serif;
+                font-weight: 300;
+                font-size: 12px;
+                line-height: 1.667;
+                color: var(--color-on-surface, #191c1e);
+            }
+        }
+
+        // Plot Area
+        .tutor-charts-element__plot {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between; // Even spacing
+            position: relative;
+            border-left: 1px solid #000; // Y axis line
+            border-bottom: 1px solid #000; // X axis line
+            padding: 0 16px; // Padding inside axes
+        }
+
+        // Bars
+        .tutor-charts-element__bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 40px; // Fixed width bars? Or flex?
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .tutor-charts-element__bar {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse; // Stack from bottom
+            // Height is set via inline style
+        }
+
+        .tutor-charts-element__bar-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white; // Assuming white text for values inside bars
+            font-family: 'Merriweather Sans', sans-serif;
+            font-weight: 300;
+            font-size: 12px;
+            transition: filter 0.2s ease;
+
+            &:hover {
+                filter: brightness(1.1); // Brighten on hover
+                z-index: 1;
+            }
+
+            &--abc {
+                background-color: #61b5cf;
+            }
+
+            &--xyz {
+                background-color: #85ecd5;
+            }
+        }
+
+        .tutor-charts-element__x-label {
+            position: absolute;
+            bottom: -24px;
+            font-family: 'Merriweather Sans', sans-serif;
+            font-weight: 300;
+            font-size: 12px;
+            color: var(--color-on-surface, #191c1e);
+        }
+    }
+
+    // --- LINE CHART ---
+    &--line {
+        align-items: stretch;
+        padding: 16px 24px;
+
+        .tutor-charts-element__chart-container {
+            flex: 1;
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .tutor-charts-element__y-axis {
+            // Shared with Bar
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-right: 8px;
+            width: 40px;
+            padding-bottom: 20px;
+
+            span {
+                font-family: 'Merriweather Sans', sans-serif;
+                font-weight: 300;
+                font-size: 12px;
+                line-height: 1.667;
+            }
+        }
+
+        .tutor-charts-element__plot {
+            flex: 1;
+            position: relative;
+            border-left: 1px solid #000;
+            border-bottom: 1px solid #000;
+            height: 100%;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .tutor-charts-element__point {
+            opacity: 0; // Hidden by default
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+            transform-box: fill-box;
+            transform-origin: center;
+
+            &:hover {
+                opacity: 1;
+                transform: scale(1.5); // Make slightly larger on hover
+            }
+        }
+
+        .tutor-charts-element__x-axis-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            padding-left: 40px; // Align with plot
+            margin-left: 8px; // Gap
+        }
+
+        .tutor-charts-element__x-label {
+            font-family: 'Merriweather Sans', sans-serif;
+            font-weight: 300;
+            font-size: 12px;
+            color: var(--color-on-surface, #191c1e);
+            transform: translateX(-50%); // Center align
+            position: absolute;
+            bottom: -24px;
+        }
     }
 }

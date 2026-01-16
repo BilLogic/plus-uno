@@ -109,7 +109,20 @@ export const Interactive = {
                     onSearch={(value) => console.log('Search:', value)}
                     onFilterChange={(key) => {
                         console.log('Filter changed:', key);
-                        setSelectedFilters({ ...selectedFilters, [key]: 'Selected' });
+                        // Cycle through some example options for better demo
+                        const options = {
+                            lessons: ['Math 101', 'Science Lab', 'History 101', 'All Lessons'],
+                            startDate: ['Last 7 Days', 'Last 30 Days', 'This Month', 'All Start Date'],
+                            name: ['A-Z', 'Z-A', 'Name']
+                        };
+
+                        const currentVal = selectedFilters[key] || '';
+                        const nextIndex = (options[key].indexOf(currentVal) + 1) % options[key].length;
+                        const nextVal = options[key][nextIndex] !== defaultFilters.find(f => f.key === key).label
+                            ? options[key][nextIndex]
+                            : undefined; // Reset to default label if it matches
+
+                        setSelectedFilters({ ...selectedFilters, [key]: nextVal });
                     }}
                     onSort={(key) => console.log('Sort:', key)}
                 />

@@ -131,11 +131,11 @@ const GroupTrainingProgressPage = ({
                             subtitle="Mastering Content"
                             description="3/3 students need mastering content support"
                             smartData={{
-                                socio: 0.75,
-                                mastering: 0.875,
-                                advocacy: 0.75,
-                                relationships: 0.75,
-                                technology: 0.75
+                                socio: 0.45,
+                                mastering: 0.85,
+                                advocacy: 0.55,
+                                relationships: 0.80,
+                                technology: 0.65
                             }}
                         />
                         <OverviewCard
