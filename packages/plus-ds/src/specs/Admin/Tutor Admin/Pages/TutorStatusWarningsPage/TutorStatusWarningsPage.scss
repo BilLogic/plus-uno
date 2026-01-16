@@ -1,0 +1,58 @@
+/**
+ * TutorStatusWarningsPage Styles
+ */
+
+.tutor-status-warnings-page__content {
+    padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-status-warnings-page__tabs {
+    margin-bottom: var(--spacing-medium-space-200, 12px);
+}
+
+.tutor-status-warnings-page__actions {
+    display: flex;
+    gap: var(--spacing-medium-space-200, 12px);
+    margin-bottom: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-status-warnings-page__overview-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-status-warnings-page__overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-status-warnings-page__charts {
+    display: flex;
+    gap: var(--spacing-large-space-300, 16px);
+    overflow-x: auto;
+}
+
+.tutor-status-warnings-page__details-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+    margin-top: var(--spacing-large-space-400, 24px);
+}
+
+.tutor-status-warnings-page__details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-status-warnings-page__pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-medium-space-200, 12px);
+}
