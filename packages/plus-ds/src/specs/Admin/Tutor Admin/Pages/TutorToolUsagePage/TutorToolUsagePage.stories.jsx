@@ -140,7 +140,16 @@ export const Interactive = {
         onSchoolFilterChange: (school) => console.log('School filter:', school),
         onTutorFilterChange: (tutor) => console.log('Tutor filter:', tutor),
         onDateFilterChange: (type) => console.log('Date filter changed:', type),
-        onTabChange: (tab) => console.log('Tab changed to:', tab),
+        onTabChange: (key) => {
+            console.log('Tab changed to:', key);
+            const linkMap = {
+                performance: ['Specs/Admin/Tutor Admin/Pages/TutorPerformancePage', 'Interactive'],
+                statusWarnings: ['Specs/Admin/Tutor Admin/Pages/TutorStatusWarningsPage', 'Interactive'],
+                toolUsage: ['Specs/Admin/Tutor Admin/Pages/TutorToolUsagePage', 'Interactive'],
+                trainingProgress: ['Specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage', 'Interactive'],
+            };
+            if (linkMap[key]) linkTo(linkMap[key][0], linkMap[key][1])();
+        },
         onModalChange: (open, tab) => console.log('Modal changed:', open, tab),
         onAddTutor: () => console.log('Add Tutor clicked'),
         onEmailTutors: () => console.log('Email Tutors clicked'),

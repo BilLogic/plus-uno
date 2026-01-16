@@ -226,6 +226,13 @@ export const Interactive = {
                 onTabChange={(tab) => {
                     setActiveTab(tab);
                     console.log('Tab changed:', tab);
+                    const linkMap = {
+                        performance: ['Specs/Admin/Tutor Admin/Pages/TutorPerformancePage', 'Interactive'],
+                        statusWarnings: ['Specs/Admin/Tutor Admin/Pages/TutorStatusWarningsPage', 'Interactive'],
+                        toolUsage: ['Specs/Admin/Tutor Admin/Pages/TutorToolUsagePage', 'Interactive'],
+                        trainingProgress: ['Specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage', 'Interactive'],
+                    };
+                    if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
                 }}
                 onModalChange={(open, tab) => {
                     setModalOpen(open);

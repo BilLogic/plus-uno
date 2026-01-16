@@ -106,6 +106,7 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
 
         i {
             color: var(--color-on-surface-variant, #40484c);
@@ -130,8 +131,10 @@
     &__progress-cell {
         display: flex;
         align-items: center;
+        justify-content: center;
         width: 48px;
         height: 40px;
+        margin: 0 auto;
     }
 
     &__action-btn {

@@ -161,7 +161,16 @@ export const Interactive = {
         onboardingCompletion: 20,
         onPageChange: (page) => console.log('Page changed to:', page),
         onRowClick: (tutor) => console.log('Row clicked:', tutor),
-        onTabChange: (tab) => console.log('Tab changed to:', tab),
+        onTabChange: (key) => {
+            console.log('Tab changed to:', key);
+            const linkMap = {
+                performance: ['Specs/Admin/Tutor Admin/Pages/TutorPerformancePage', 'Interactive'],
+                statusWarnings: ['Specs/Admin/Tutor Admin/Pages/TutorStatusWarningsPage', 'Interactive'],
+                toolUsage: ['Specs/Admin/Tutor Admin/Pages/TutorToolUsagePage', 'Interactive'],
+                trainingProgress: ['Specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage', 'Interactive'],
+            };
+            if (linkMap[key]) linkTo(linkMap[key][0], linkMap[key][1])();
+        },
         onModalChange: (open, tab) => console.log('Modal changed:', open, tab),
         onViewModeChange: (mode) => console.log('View mode changed to:', mode),
         onEmailTutors: () => console.log('Email Tutors clicked'),

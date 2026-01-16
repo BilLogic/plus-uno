@@ -8,9 +8,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table } from 'react-bootstrap';
+import Table from '../../../../../components/Table/Table';
 import Badge from '../../../../../components/Badge/Badge';
-import UserAvatar from '../../../../../components/UserAvatar/UserAvatar';
+
 import './TutorsTrainingProgressTable.scss';
 
 const ProgressIndicator = ({ value }) => {
@@ -31,9 +31,9 @@ const ProgressIndicator = ({ value }) => {
     return (
         <div className="tutors-training-progress-table__progress-cell">
             <div style={{ width: 48, height: 40, position: 'relative' }}>
-                {/* Background Track (White) */}
+                {/* Background Track (Surface Variant) */}
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="40" viewBox="0 0 48 40" fill="none" style={{ position: 'absolute', top: 0, left: 0 }}>
-                    <path d="M8.72662 39.2763C7.78931 40.2136 6.25886 40.2205 5.41982 39.1942C2.93875 36.1595 1.23059 32.5528 0.461153 28.6843C-0.464892 24.0284 0.0103881 19.2024 1.82689 14.8167C3.64339 10.4309 6.71953 6.68237 10.6663 4.04502C14.6131 1.40768 19.2532 -5.66086e-08 24 0C28.7468 5.66086e-08 33.3869 1.40768 37.3337 4.04503C41.2805 6.68237 44.3566 10.4309 46.1731 14.8167C47.9896 19.2024 48.4649 24.0284 47.5388 28.6843C46.7694 32.5528 45.0613 36.1595 42.5802 39.1942C41.7411 40.2205 40.2107 40.2136 39.2734 39.2763C38.3362 38.339 38.35 36.8274 39.1631 35.7806C40.9865 33.433 42.2469 30.6847 42.8311 27.7478C43.5719 24.0231 43.1917 20.1623 41.7385 16.6537C40.2853 13.1451 37.8244 10.1462 34.667 8.03637C31.5095 5.92649 27.7974 4.80035 24 4.80035C20.2026 4.80035 16.4905 5.92649 13.3331 8.03637C10.1756 10.1462 7.71472 13.1451 6.26151 16.6537C4.80831 20.1623 4.42809 24.0231 5.16892 27.7478C5.75307 30.6847 7.01351 33.433 8.83691 35.7806C9.64996 36.8274 9.66383 38.339 8.72662 39.2763Z" fill="white" />
+                    <path d="M8.72662 39.2763C7.78931 40.2136 6.25886 40.2205 5.41982 39.1942C2.93875 36.1595 1.23059 32.5528 0.461153 28.6843C-0.464892 24.0284 0.0103881 19.2024 1.82689 14.8167C3.64339 10.4309 6.71953 6.68237 10.6663 4.04502C14.6131 1.40768 19.2532 -5.66086e-08 24 0C28.7468 5.66086e-08 33.3869 1.40768 37.3337 4.04503C41.2805 6.68237 44.3566 10.4309 46.1731 14.8167C47.9896 19.2024 48.4649 24.0284 47.5388 28.6843C46.7694 32.5528 45.0613 36.1595 42.5802 39.1942C41.7411 40.2205 40.2107 40.2136 39.2734 39.2763C38.3362 38.339 38.35 36.8274 39.1631 35.7806C40.9865 33.433 42.2469 30.6847 42.8311 27.7478C43.5719 24.0231 43.1917 20.1623 41.7385 16.6537C40.2853 13.1451 37.8244 10.1462 34.667 8.03637C31.5095 5.92649 27.7974 4.80035 24 4.80035C20.2026 4.80035 16.4905 5.92649 13.3331 8.03637C10.1756 10.1462 7.71472 13.1451 6.26151 16.6537C4.80831 20.1623 4.42809 24.0231 5.16892 27.7478C5.75307 30.6847 7.01351 33.433 8.83691 35.7806C9.64996 36.8274 9.66383 38.339 8.72662 39.2763Z" fill="var(--color-surface-variant, #DEE3E5)" />
                 </svg>
 
                 {/* Foreground Fill (Yellow) - Masked */}
@@ -82,15 +82,6 @@ const TutorsTrainingProgressTable = ({
     className = '',
     ...props
 }) => {
-    const columns = [
-        { key: 'tutorName', label: 'Tutor Name', sortable: true },
-        { key: 'completion', label: 'Completion', sortable: true },
-        { key: 'accuracy', label: 'Accuracy', sortable: true },
-        { key: 'badgeClaimed', label: 'Badge Claimed', sortable: true },
-        { key: 'timeSpent', label: 'Time Spent (mins)', sortable: true },
-        { key: 'action', label: 'Action', sortable: false },
-    ];
-
     const defaultTutors = [
         {
             id: 1,
@@ -120,77 +111,98 @@ const TutorsTrainingProgressTable = ({
         }
     };
 
-    const renderSortIcon = (columnKey) => {
-        if (!sortable) return null;
-        const isActive = sortColumn === columnKey;
-        return (
-            <i
-                className={`fas fa-arrow-up tutors-training-progress-table__sort-icon ${isActive ? 'tutors-training-progress-table__sort-icon--active' : ''}`}
-            />
-        );
-    };
+    const renderHeader = (label, key) => (
+        <div
+            className="flex items-center gap-2"
+            style={{ cursor: sortable ? 'pointer' : 'default' }}
+            onClick={() => handleSort(key)}
+        >
+            <span className="body3-txt">{label}</span>
+            {sortable && (
+                <i className={`fas fa-arrow-up tutors-training-progress-table__sort-icon ${sortColumn === key ? 'tutors-training-progress-table__sort-icon--active' : ''}`} />
+            )}
+        </div>
+    );
+
+    const headers = [
+        { text: renderHeader('Tutor Name', 'tutorName'), width: '25%', align: 'left' },
+        { text: renderHeader('Completion', 'completion'), width: '15%', align: 'center' },
+        { text: renderHeader('Accuracy', 'accuracy'), width: '15%', align: 'center' },
+        { text: renderHeader('Badge Claimed', 'badgeClaimed'), width: '15%', align: 'center' },
+        { text: renderHeader('Time Spent (mins)', 'timeSpent'), width: '15%', align: 'left' },
+        { text: <span className="body3-txt">Action</span>, width: '15%', align: 'left' },
+    ];
+
+    const rows = displayTutors.map((tutor) => [
+        {
+            content: (
+                <div className="tutors-training-progress-table__custom-avatar">
+                    <div className="tutors-training-progress-table__avatar-circle">
+                        <i className="fas fa-chalkboard-user" />
+                    </div>
+                    <div className="tutors-training-progress-table__avatar-info">
+                        <span className="body2-txt font-semibold" style={{ color: 'var(--color-on-surface)' }}>{tutor.tutorName}</span>
+                        <span className="tutors-training-progress-table__email">{tutor.email}</span>
+                    </div>
+                </div>
+            )
+        },
+        {
+            content: <ProgressIndicator value={typeof tutor.completion === 'object' ? `${tutor.completion.value}/${tutor.completion.total}` : tutor.completion} />,
+            align: 'center'
+        },
+        {
+            content: <ProgressIndicator value={typeof tutor.accuracy === 'object' ? `${tutor.accuracy}%` : tutor.accuracy} />,
+            align: 'center'
+        },
+        {
+            content: (() => {
+                let badgeStyle = 'secondary';
+                let badgeText = tutor.badgeClaimed;
+                let icon = '';
+
+                if (tutor.badgeClaimed === 'Yes') {
+                    badgeStyle = 'success';
+                    icon = '✓ ';
+                } else if (tutor.badgeClaimed === 'No') {
+                    badgeStyle = 'danger';
+                    icon = '! ';
+                } else if (tutor.badgeClaimed === 'N/A') {
+                    badgeStyle = 'secondary';
+                    icon = '✕ ';
+                }
+
+                return (
+                    <Badge style={badgeStyle} size="b3">
+                        {icon}{badgeText}
+                    </Badge>
+                );
+            })(),
+            align: 'center'
+        },
+        {
+            content: <span className="body3-txt">{tutor.timeSpent}</span>
+        },
+        {
+            content: (
+                <button
+                    className="tutors-training-progress-table__action-btn"
+                    onClick={() => onViewProgress && onViewProgress(tutor)}
+                >
+                    View Progress
+                </button>
+            )
+        }
+    ]);
 
     return (
         <div className={`tutors-training-progress-table ${className}`} {...props}>
-            <Table hover className="tutors-training-progress-table__table">
-                <thead>
-                    <tr>
-                        {columns.map((col) => (
-                            <th
-                                key={col.key}
-                                onClick={() => col.sortable && handleSort(col.key)}
-                                className={`tutors-training-progress-table__th ${col.sortable ? 'tutors-training-progress-table__th--sortable' : ''} ${sortColumn === col.key ? 'tutors-training-progress-table__th--active' : ''}`}
-                            >
-                                <div className="tutors-training-progress-table__th-content">
-                                    <span className="body3-txt">{col.label}</span>
-                                    {col.sortable && renderSortIcon(col.key)}
-                                </div>
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {displayTutors.map((tutor) => (
-                        <tr key={tutor.id}>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <UserAvatar
-                                        name={tutor.tutorName}
-                                        size="medium"
-                                        className="tutors-training-progress-table__avatar"
-                                    />
-                                    <div className="flex flex-col">
-                                        <span className="body2-txt font-semibold">{tutor.tutorName}</span>
-                                        <span className="body3-txt text-secondary">{tutor.email}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <ProgressIndicator value={typeof tutor.completion === 'object' ? `${tutor.completion.value}/${tutor.completion.total}` : tutor.completion} />
-                            </td>
-                            <td>
-                                <ProgressIndicator value={typeof tutor.accuracy === 'object' ? `${tutor.accuracy}%` : tutor.accuracy} />
-                            </td>
-                            <td>
-                                <Badge style="secondary" size="b3">
-                                    {tutor.badgeClaimed === 'N/A' ? '✕ N/A' : tutor.badgeClaimed}
-                                </Badge>
-                            </td>
-                            <td>
-                                <span className="body3-txt">{tutor.timeSpent}</span>
-                            </td>
-                            <td>
-                                <button
-                                    className="tutors-training-progress-table__action-btn"
-                                    onClick={() => onViewProgress && onViewProgress(tutor)}
-                                >
-                                    View Progress
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
+            <Table
+                headers={headers}
+                rows={rows}
+                hover
+                className="tutors-training-progress-table__table"
+            />
         </div>
     );
 };
