@@ -185,19 +185,19 @@ $btn-themes: (
             }
         }
 
-        // 2. TONAL (Material Design 3: uses container color, not state layer)
+        // 2. TONAL (Modified: uses state-08 layer per Figma spec, with text-safe color)
         &.plus-btn--tonal {
-            background-color: var($col-container);
-            color: var($col-on-container);
+            background-color: var($col-state);
+            color: var($col-text);
 
             &:hover,
             &.active,
             &:active {
-                background-color: color-mix(in srgb, var($col-container), black 12%);
+                background-color: color-mix(in srgb, var($col-state), black 8%);
             }
 
             &.plus-btn--loading::after {
-                color: var($col-on-container);
+                color: var($col-text);
             }
         }
 

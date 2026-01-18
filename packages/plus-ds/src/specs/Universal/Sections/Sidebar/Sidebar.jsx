@@ -12,6 +12,7 @@ import Logo from '../../../../assets/Logo/Logo';
 
 const Sidebar = ({
     user = 'tutor',
+    activeTab = 'home',
     onHomeClick,
     onTabClick,
     visible = true,
@@ -85,7 +86,7 @@ const Sidebar = ({
             <SidebarTab
                 text="Home"
                 icon="house"
-                state="selected"
+                state={activeTab === 'home' ? 'selected' : 'enabled'}
                 onClick={onHomeClick}
             />
 
@@ -111,7 +112,7 @@ const Sidebar = ({
                             key={item.id}
                             text={item.text}
                             icon={item.icon}
-                            state="enabled"
+                            state={activeTab === item.id ? 'selected' : 'enabled'}
                             onClick={() => handleTabClick(item.id)}
                         />
                     ))}
@@ -123,6 +124,7 @@ const Sidebar = ({
 
 Sidebar.propTypes = {
     user: PropTypes.oneOf(['tutor', 'supervisor']),
+    activeTab: PropTypes.string,
     onHomeClick: PropTypes.func,
     onTabClick: PropTypes.func,
     visible: PropTypes.bool,

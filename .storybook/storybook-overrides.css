@@ -57,3 +57,8 @@ a.sbdocs-a {
 .sbdocs a:hover {
     color: var(--color-primary, #0472a8) !important;
 }
+
+/* Hide scrollbar while maintaining scroll functionality */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
