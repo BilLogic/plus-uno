@@ -1,5 +1,9 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
@@ -25,7 +29,6 @@ const config = {
     '!../packages/plus-ds/src/specs/Toolkit/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
-    '@storybook/addon-essentials',
     '@storybook/addon-links',
   ],
   framework: {
@@ -149,4 +152,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config;
