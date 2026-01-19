@@ -290,7 +290,7 @@ export const CornerRadiusApplication = () => (
                 { token: '--size-element-radius-sm', value: '4px', description: 'element-pad-sm', extra: 'Small buttons' },
                 { token: '--size-element-radius-md', value: '4px', description: 'element-pad-md', extra: 'Standard buttons' },
                 { token: '--size-element-radius-lg', value: '4px', description: 'element-pad-lg', extra: 'Large buttons' },
-                { token: '--size-element-radius-pill', value: '999px', description: 'Any padding', extra: 'Badges, chips' },
+                { token: '--size-element-radius-full', value: '999px', description: 'Pill shape', extra: 'Badges, chips' },
             ]}
         />
 

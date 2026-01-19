@@ -111,6 +111,7 @@ Visual separator.
 ### Radius
 | Token | Value | Usage |
 | :--- | :--- | :--- |
-| `var(--size-element-radius-sm)` | 4px | Small elements |
+| `var(--size-element-radius-sm)` | 2px | Small elements |
 | `var(--size-element-radius-md)` | 4px | Default elements |
-| `var(--size-element-radius-pill)` | 999px | Badges, Chips, Switches |
+| `var(--size-element-radius-lg)` | 8px | Large elements |
+| `var(--size-element-radius-full)` | 999px | Badges, Chips, Switches (pill shape) |

@@ -22,7 +22,9 @@
     padding-right: var(--size-element-pad-x-lg);
 
     // Shape
-    border-radius: var(--size-element-radius-full); // 999px pill
+    // Figma spec: Badges use pill shape - Border/Radius/radius-1000 (999px)
+    // Using semantic token --size-element-radius-full which maps to --size-border-radius-radius-1000
+    border-radius: var(--size-element-radius-full);
 
     // Default Font (overridden by size classes)
     text-align: center;
@@ -189,7 +191,8 @@
         background-color: var(--color-surface-container-highest); // Contrast bg
         color: var(--color-on-surface);
 
-        border-radius: 999px; // Pill
+        // Counter always uses pill shape (full radius)
+        border-radius: var(--size-element-radius-full);
         padding: 0 0.4em; // Minimal padding
         min-width: 1.5em;
         height: 1.5em;
