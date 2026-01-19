@@ -44,7 +44,7 @@ export const TimeframeFilter = ({ initialSelection = 'This week', interactive = 
                 items={dropdownItems}
                 style="secondary"
                 fill="outline"
-                size="default"
+                size="small"
                 isOpen={isOpen}
             />
             {isCustom && (
@@ -54,7 +54,7 @@ export const TimeframeFilter = ({ initialSelection = 'This week', interactive = 
                         items={[]}
                         style="primary"
                         fill="outline"
-                        size="default"
+                        size="small"
                     />
                     <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>to</span>
                     <Dropdown
@@ -62,7 +62,7 @@ export const TimeframeFilter = ({ initialSelection = 'This week', interactive = 
                         items={[]}
                         style="primary"
                         fill="outline"
-                        size="default"
+                        size="small"
                     />
                 </>
             )}

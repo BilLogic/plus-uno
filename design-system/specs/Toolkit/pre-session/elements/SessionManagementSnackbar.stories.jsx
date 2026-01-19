@@ -27,13 +27,13 @@ export default {
 const Template = (args) => <SessionManagementSnackbar {...args} />;
 
 export const AllVariations = () => (
-    <div className="d-flex flex-column" style={{ padding: '60px', gap: '60px', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <div className="d-flex flex-column" style={{ padding: 'var(--size-section-gap-lg)', gap: 'var(--size-section-gap-lg)', backgroundColor: 'var(--color-surface-variant)', minHeight: '100vh' }}>
         <div>
             <h5 className="text-muted mb-2">Session Management Snackbar</h5>
             <p className="text-muted small mb-0">All supported variations. Fixed width: 300px.</p>
         </div>
 
-        <div className="d-flex flex-wrap align-items-start" style={{ gap: '60px' }}>
+        <div className="d-flex flex-wrap align-items-start" style={{ gap: 'var(--size-section-gap-lg)' }}>
             <div className="d-flex flex-column gap-3">
                 <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Session Created</h6>
                 <SessionManagementSnackbar type="session created" timestamp="1 mins ago" />

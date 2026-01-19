@@ -45,7 +45,7 @@ export const SiteFilter = ({
             items={dropdownItems}
             style="secondary"
             fill="outline"
-            size="default"
+            size="small"
             isOpen={isOpen}
         />
     );

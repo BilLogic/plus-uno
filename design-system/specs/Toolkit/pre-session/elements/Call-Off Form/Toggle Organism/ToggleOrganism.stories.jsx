@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Alert from '../../../../../packages/plus-ds/src/components/Alert/Alert';
+import Alert from '../../../../../../../packages/plus-ds/src/components/Alert/Alert';
 import Form from 'react-bootstrap/Form';
-import Switch from '../../../../../packages/plus-ds/src/forms/Switch';
-import Checkbox from '../../../../../packages/plus-ds/src/forms/Checkbox';
-import Select from '../../../../../packages/plus-ds/src/forms/Select';
+import Switch from '../../../../../../../packages/plus-ds/src/forms/Switch';
+import Checkbox from '../../../../../../../packages/plus-ds/src/forms/Checkbox';
+import Select from '../../../../../../../packages/plus-ds/src/forms/Select';
 
 export default {
-    title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form (Toggle Organism)',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Toggle Organism',
     component: Form,
     parameters: {
         layout: 'padded',
