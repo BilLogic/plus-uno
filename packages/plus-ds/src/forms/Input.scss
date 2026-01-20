@@ -14,7 +14,8 @@
 .plus-input-label {
     margin-bottom: 0;
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
+    // Figma spec: Body/B3/Semibold (12px, weight 400)
+    font-weight: var(--font-weight-semibold-1);
     font-size: var(--font-size-body3);
     line-height: var(--font-line-height-body3);
     
@@ -35,7 +36,7 @@
     width: 100%;
     border: 0.8px solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-sm, 2px);
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--color-surface);
     color: var(--color-on-surface);
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);

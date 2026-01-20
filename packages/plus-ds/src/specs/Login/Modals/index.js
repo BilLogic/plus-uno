@@ -4,5 +4,5 @@
  */
 
 // Notifications Modal
-// export * from './NotificationsModal/index.js';
+export { default as LoginNotificationsModal } from './LoginNotificationsModal/LoginNotificationsModal.jsx';
 
