@@ -1,0 +1,145 @@
+/**
+ * GroupTrainingProgressTable Styles
+ * Figma Node: 1107-269190
+ */
+
+.training-progress-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.training-progress-table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    // Header styles
+    .training-progress-table__header {
+        .training-progress-table__header-cell {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            border: none;
+            background: transparent;
+            height: 64px;
+            vertical-align: middle;
+
+            .training-progress-table__header-content {
+                display: flex;
+                gap: var(--size-table-cell-gap);
+                align-items: center;
+            }
+        }
+    }
+
+    // Row styles
+    .training-progress-table__row {
+        border-radius: var(--size-table-radius-md);
+        transition: background-color 0.2s ease;
+        height: 70px;
+
+        &.training-progress-table__row--hover:hover {
+            background-color: var(--color-on-surface-state-08);
+        }
+
+        .training-progress-table__cell {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            border: none;
+            vertical-align: middle;
+        }
+    }
+
+    // Level-specific row styles
+    .training-progress-table__row--level-1 {
+        .training-progress-table__cell--competency {
+            padding-left: var(--size-table-cell-x);
+        }
+    }
+
+    .training-progress-table__row--level-2 {
+        .training-progress-table__cell--competency {
+            padding-left: 24px;
+        }
+    }
+
+    .training-progress-table__row--level-3 {
+        .training-progress-table__cell--competency {
+            padding-left: 60px;
+        }
+
+        .training-progress-table__lesson-name--level-3 {
+            font-weight: 300;
+            color: var(--color-on-surface-variant);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    // Expand button
+    .training-progress-table__expand-btn {
+        display: flex;
+        gap: var(--size-element-gap-md);
+        align-items: center;
+        padding: var(--size-table-cell-y) var(--size-table-cell-x);
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: var(--size-element-radius-sm);
+
+        &:hover {
+            background-color: var(--color-on-surface-state-08);
+        }
+
+        &.training-progress-table__expand-btn--level-2 {
+            padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+            flex: 1;
+        }
+    }
+
+    // Progress indicator cells
+    .training-progress-table__cell--progress {
+        .progress-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            width: 48px;
+            height: 40px;
+            padding: 0 var(--size-element-pad-x-md);
+
+            svg {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            .progress-indicator__value {
+                position: absolute;
+                top: calc(50% + 2.5px);
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                width: 48px;
+                color: var(--color-on-surface-variant);
+                z-index: 1;
+            }
+        }
+    }
+
+    // Time cell
+    .training-progress-table__cell--time {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    // Action cell
+    .training-progress-table__cell--action {
+        .plus-btn {
+            border-radius: var(--size-element-radius-sm);
+        }
+    }
+}

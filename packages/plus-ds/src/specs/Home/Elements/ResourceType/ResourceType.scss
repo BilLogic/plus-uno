@@ -1,0 +1,29 @@
+/**
+ * ResourceType Component Styles
+ * Icon component for displaying resource types
+ */
+
+.plus-resource-type {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    &-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+
+        i {
+            font-size: 12px;
+            line-height: 1.833;
+            color: var(--color-primary);
+            text-align: center;
+            white-space: nowrap;
+        }
+    }
+}
+

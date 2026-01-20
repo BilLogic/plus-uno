@@ -1,0 +1,103 @@
+/**
+ * TutorsPerformanceTable Styles
+ * Figma Node: 258-262435
+ */
+
+.tutors-performance-table {
+    width: 100%;
+
+    &__table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        thead {
+            tr {
+                background-color: transparent;
+            }
+
+            th {
+                padding: var(--table-cell-y, 8px) var(--table-cell-x, 10px);
+                border: none;
+                font-weight: var(--font-weight-normal);
+                vertical-align: middle;
+            }
+        }
+
+        tbody {
+            tr {
+                border-radius: var(--table-row-radius, 8px);
+                transition: background-color 0.15s ease;
+
+                &:hover {
+                    background-color: rgba(25, 28, 30, 0.08);
+                }
+            }
+
+            td {
+                padding: var(--table-cell-y, 8px) var(--table-cell-x, 10px);
+                border: none;
+                vertical-align: middle;
+                font-weight: var(--font-weight-light);
+                color: var(--color-on-surface);
+            }
+        }
+    }
+
+    &__tutor-cell {
+        display: flex;
+        align-items: center;
+        gap: var(--space-100, 8px);
+    }
+
+    &__th {
+        cursor: default;
+
+        &--sortable {
+            cursor: pointer;
+
+            &:hover {
+                .tutors-performance-table__sort-icon {
+                    color: var(--color-secondary);
+                }
+            }
+        }
+
+        &--active {
+            .tutors-performance-table__th-content span {
+                color: var(--color-secondary-text, #3b525f);
+            }
+
+            .tutors-performance-table__sort-icon {
+                color: var(--color-secondary) !important;
+            }
+        }
+    }
+
+    &__th-content {
+        display: flex;
+        align-items: center;
+        gap: var(--table-cell-gap, 10px);
+
+        span {
+            color: var(--color-on-surface);
+            white-space: nowrap;
+        }
+    }
+
+    &__sort-icon {
+        font-size: 10px;
+        color: var(--color-outline-variant);
+        transition: color 0.15s ease;
+
+        &--active {
+            color: var(--color-secondary);
+        }
+    }
+
+    &__row--clickable {
+        cursor: pointer;
+    }
+
+
+}

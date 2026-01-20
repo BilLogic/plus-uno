@@ -1,0 +1,64 @@
+/*
+ * Storybook Typography Overrides
+ * Ensures Storybook documentation uses the design system fonts.
+ */
+
+/* Use design system fonts throughout Storybook */
+body,
+.sb-main-padded,
+.docs-story,
+.sbdocs,
+.sbdocs-wrapper {
+    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
+    color: var(--color-on-surface, #191c1e) !important;
+}
+
+/* Headers in Storybook docs */
+.sbdocs h1,
+.sbdocs h2,
+.sbdocs h3,
+.sbdocs h4,
+.sbdocs h5,
+.sbdocs h6,
+.sbdocs-title,
+.sbdocs-h1,
+.sbdocs-h2,
+.sbdocs-h3,
+.sbdocs-h4,
+.sbdocs-h5 {
+    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-weight: var(--font-weight-headline, 700) !important;
+    color: var(--color-on-surface, #191c1e) !important;
+}
+
+/* Body text in docs */
+.sbdocs p,
+.sbdocs li,
+.sbdocs td,
+.sbdocs th {
+    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
+    font-size: var(--font-size-body2, 14px) !important;
+    line-height: var(--font-line-height-body2, 157.1%) !important;
+    font-weight: var(--font-weight-normal, 300) !important;
+}
+
+/* Code blocks */
+.sbdocs code,
+.sbdocs pre {
+    font-family: var(--font-family-code, 'Source Code Pro', monospace) !important;
+}
+
+/* Links - using primary-text for accessibility */
+.sbdocs a,
+a.sbdocs-a {
+    color: var(--color-primary-text, #00547e) !important;
+}
+
+.sbdocs a:hover {
+    color: var(--color-primary, #0472a8) !important;
+}
+
+/* Hide scrollbar while maintaining scroll functionality */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}

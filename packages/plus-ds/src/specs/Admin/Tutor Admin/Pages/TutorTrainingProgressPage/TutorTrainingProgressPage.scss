@@ -1,0 +1,99 @@
+/**
+ * TutorTrainingProgressPage Styles
+ */
+
+.tutor-training-progress-page__content {
+    padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-training-progress-page__tabs {
+    margin-bottom: var(--spacing-medium-space-200, 12px);
+}
+
+.tutor-training-progress-page__actions {
+    display: flex;
+    gap: var(--spacing-medium-space-200, 12px);
+    margin-bottom: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-training-progress-page__overview-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-training-progress-page__overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-training-progress-page__title-toggle {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tutor-training-progress-page__overview-cards {
+    display: flex;
+    gap: var(--spacing-large-space-300, 16px);
+    align-items: stretch;
+    width: calc(100% + 24px);
+    margin-left: -12px;
+    margin-right: -12px;
+    padding: 12px;
+    overflow-x: auto;
+    overflow-y: visible;
+    box-sizing: border-box;
+
+    /* Ensure cards don't shrink */
+    >* {
+        flex-shrink: 0;
+    }
+}
+
+.tutor-training-progress-page__details-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+    margin-top: var(--spacing-large-space-400, 24px);
+}
+
+.tutor-training-progress-page__details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-training-progress-page__pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-medium-space-200, 12px);
+}
+
+/* Custom Toggle Styles to match StudentModal tabs */
+.tutor-training-progress-page__toggle {
+    button.plus-btn {
+        background-color: var(--color-secondary-state-08);
+        color: var(--color-secondary-text);
+        border: none;
+
+        &:hover {
+            background-color: var(--color-secondary-state-12);
+        }
+
+        &.active,
+        &[aria-pressed="true"] {
+            background-color: var(--color-primary-state-08) !important;
+            color: var(--color-primary-text) !important;
+
+            &:hover {
+                background-color: var(--color-primary-state-12) !important;
+            }
+        }
+    }
+}

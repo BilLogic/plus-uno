@@ -1,0 +1,151 @@
+.plus-metrics-card {
+    width: 266.667px;
+    height: 405px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    // Card should clip at edges, but allow content to extend slightly
+    &.card {
+        overflow: hidden;
+    }
+    
+    .plus-card-content {
+        overflow: visible;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 !important; // Remove any default padding from Card.Body
+    }
+    
+    .plus-card-description {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .plus-card-body {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 !important; // Remove any default padding
+        margin: 0 !important;
+    }
+}
+
+.plus-metrics-card-page {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    overflow: visible;
+}
+
+.plus-metrics-card-progress {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-spacing-large-space-600);
+    position: relative;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-metrics-card-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.plus-metrics-card-progress-value {
+    font-family: var(--font-family-title);
+    font-weight: var(--font-weight-title);
+    font-size: var(--font-size-h4);
+    line-height: var(--font-line-height-h4);
+    color: var(--color-on-surface-variant);
+    margin: 0;
+}
+
+.plus-metrics-card-progress-chart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.plus-metrics-card-progress-circle {
+    width: 100%;
+    height: 100%;
+}
+
+.plus-metrics-card-progress-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.plus-metrics-card-metrics {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-spacing-medium-space-300);
+    width: 100%;
+}
+
+.plus-metrics-card-item {
+    flex: 1;
+    background-color: var(--color-surface-container);
+    border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
+    border-radius: var(--size-border-radius-radius-100);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-spacing-medium-space-300) var(--size-spacing-medium-space-200);
+    min-height: 0;
+}
+
+.plus-metrics-card-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.plus-metrics-card-item-value {
+    font-family: var(--font-family-title);
+    font-weight: var(--font-weight-title);
+    font-size: var(--font-size-h4);
+    line-height: var(--font-line-height-h4);
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+.plus-metrics-card-item-label {
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+

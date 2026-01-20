@@ -1,0 +1,2611 @@
+{
+  "modes": {
+    "Default": "Default"
+  },
+  "variables": [
+    {
+      "id": "Size=06 - Container (Fluid)",
+      "name": "Breakpoint / Size=06 - Container (Fluid)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=06 - Container (Fluid) (Grid 0)",
+      "name": "Breakpoint / Size=06 - Container (Fluid)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=05 - Mobile (Extra small)",
+      "name": "Breakpoint / Size=05 - Mobile (Extra small)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=05 - Mobile (Extra small) (Grid 0)",
+      "name": "Breakpoint / Size=05 - Mobile (Extra small)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=04 - Tablet (Small)",
+      "name": "Breakpoint / Size=04 - Tablet (Small)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=04 - Tablet (Small) (Grid 0)",
+      "name": "Breakpoint / Size=04 - Tablet (Small)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=03 - Tablet (Medium)",
+      "name": "Breakpoint / Size=03 - Tablet (Medium)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=03 - Tablet (Medium) (Grid 0)",
+      "name": "Breakpoint / Size=03 - Tablet (Medium)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=02 - Desktop (Large)",
+      "name": "Breakpoint / Size=02 - Desktop (Large)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=02 - Desktop (Large) (Grid 0)",
+      "name": "Breakpoint / Size=02 - Desktop (Large)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=01 - Desktop HD (Extra large)",
+      "name": "Breakpoint / Size=01 - Desktop HD (Extra large)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Size=01 - Desktop HD (Extra large) (Grid 0)",
+      "name": "Breakpoint / Size=01 - Desktop HD (Extra large)",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint (Grid 0)",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Grid",
+      "name": "Breakpoint / Grid",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Filled buttons",
+      "name": "Filled buttons",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "_Button",
+      "name": "Filled buttons / _Button",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint (Grid 0)",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Max containter with",
+      "name": "Breakpoint / Max containter with",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Grid",
+      "name": "Breakpoint / Grid",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint (Grid 0)",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Max containter with",
+      "name": "Breakpoint / Max containter with",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Grid",
+      "name": "Breakpoint / Grid",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav",
+      "name": "Breakpoint / Side Nav",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav",
+      "name": "Breakpoint / Side Nav",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Breakpoint (Grid 0)",
+      "name": "Breakpoint",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav",
+      "name": "Breakpoint / Side Nav",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav",
+      "name": "Breakpoint / Side Nav",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav",
+      "name": "Breakpoint / Side Nav",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Adjustable Margin",
+      "name": "Breakpoint / Adjustable Margin",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav",
+      "name": "Breakpoint / Side Nav",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Grid",
+      "name": "Breakpoint / Grid",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Gutter",
+      "name": "Breakpoint / Gutter",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Adjustable Margin",
+      "name": "Breakpoint / Adjustable Margin",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Side Nav - Fixed Width",
+      "name": "Breakpoint / Side Nav - Fixed Width",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Filled buttons",
+      "name": "Filled buttons",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "_Button",
+      "name": "Filled buttons / _Button",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×3-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×3-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×3-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×3 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×3 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×3 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×2-2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×2-2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×2-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×2-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/horizontal×1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×10 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×9 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×8 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×7 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×6 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×5 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×4 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×3-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×3-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×3-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×3 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×3 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×3 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×2-2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×2-2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×2-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×2-1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×2 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/vertical×1 / layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "layout-blocks/base",
+      "name": "layout-blocks/base",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "swap-label",
+      "name": "layout-blocks/base / swap-label",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Header",
+      "name": "Layout / Header",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Artboard",
+      "name": "Layout / Artboard",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Artboard (Grid 0)",
+      "name": "Layout / Artboard",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "OUTDATED",
+      "name": "OUTDATED",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "OUTDATED (Grid 0)",
+      "name": "OUTDATED",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "OUTDATED (Grid 1)",
+      "name": "OUTDATED",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "ArtBoardHeader",
+      "name": "OUTDATED / ArtBoardHeader",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "ArtBoardFooter",
+      "name": "OUTDATED / ArtBoardFooter",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Overview",
+      "name": "Overview",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Overview (Grid 0)",
+      "name": "Overview",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Overview (Grid 1)",
+      "name": "Overview",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "ArtBoardHeader",
+      "name": "Overview / ArtBoardHeader",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "ArtBoardFooter",
+      "name": "Overview / ArtBoardFooter",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "component",
+      "name": "component",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Card",
+      "name": "component / Card",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Modal",
+      "name": "component / Modal",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "table test",
+      "name": "table test",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "page",
+      "name": "page",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Homepage",
+      "name": "page / Homepage",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Homepage",
+      "name": "page / Homepage",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Static Badge/h1/default",
+      "name": "page / Static Badge/h1/default",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Static Badge/h1/default",
+      "name": "page / Static Badge/h1/default",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Examples",
+      "name": "Examples",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Frame 1010106142",
+      "name": "Examples / Frame 1010106142",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Edit tutor info",
+      "name": "Edit tutor info",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Modal",
+      "name": "Modal",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Form Content",
+      "name": "Main Form / Form Content",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Form Section Header",
+      "name": "Main Form / Form Section Header",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Form Content",
+      "name": "Main Form / Form Content",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Header",
+      "name": "Spacing Token Guidelines / Header",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Content",
+      "name": "Spacing Token Guidelines / Content",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Content",
+      "name": "Pointer / Content",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Content",
+      "name": "Pointer / Content",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Using sm for padding and md for vertical/horizontal spacing in the same component is valid. It is rare/not ideal to mix different semantic sizes for the same token type (e.g., pad-x-sm + pad-y-md).",
+      "name": "Using sm for padding and md for vertical/horizontal spacing in the same component is valid. It is rare/not ideal to mix different semantic sizes for the same token type (e.g., pad-x-sm + pad-y-md).",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Ellipse",
+      "name": "Form <-> Specific Use Cases Gap XS Token: This token is reserved for tight spacing where elements are closely related. Its primary use is for the space between a form label and its input field (e.g., a text field or dropdown menu). / Ellipse",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    },
+    {
+      "id": "Core Spacing Principles for Elements The primary spacing tokens are tied to the typographic hierarchy. Use the following as your default guide: Headline Text: Use element-gap-lg and element-x/y-lg Title Text: Use element-gap-md and element-x/y-md Body Text: Use element-gap-smand element-x/y-sm However, mixing tokens is still allowed (see mixing Tokens) if absolutely necessary",
+      "name": "Core Spacing Principles for Elements The primary spacing tokens are tied to the typographic hierarchy. Use the following as your default guide: Headline Text: Use element-gap-lg and element-x/y-lg Title Text: Use element-gap-md and element-x/y-md Body Text: Use element-gap-smand element-x/y-sm However, mixing tokens is still allowed (see mixing Tokens) if absolutely necessary",
+      "valuesByMode": {
+        "Default": 0
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+/**
+ * GroupInfoPage Styles
+ * Figma Node: 258-263800
+ */
+
+.group-info-page {
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-section-gap-md);
+        width: 100%;
+    }
+
+    &__tabs {
+        flex-shrink: 0;
+    }
+
+    &__title-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--size-section-gap-md);
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    &__pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--size-section-gap-md);
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+}

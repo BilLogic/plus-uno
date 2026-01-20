@@ -1,0 +1,161 @@
+/**
+ * OnboardingModuleCard Component Styles
+ * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=74-122003
+ */
+
+.onboarding-module-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-card-radius-sm, 12px);
+    width: 275.33px;
+    overflow: hidden;
+
+    &--thumbnail {
+        height: 348px;
+    }
+
+    &--description {
+        height: auto;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        width: 275.33px;
+        overflow: hidden;
+        border-radius: inherit;
+    }
+
+    .onboarding-module-card--thumbnail &__inner {
+        height: 348px;
+    }
+
+    .onboarding-module-card--description &__inner {
+        height: auto;
+    }
+
+    // Header area
+    &__header {
+        display: flex;
+        gap: var(--size-card-gap-sm, 8px);
+        height: 200px;
+        align-items: center;
+        justify-content: center;
+        padding: var(--size-card-pad-y-sm, 12px) var(--size-card-pad-x-sm, 12px);
+        width: 100%;
+        flex-shrink: 0;
+        position: relative;
+
+        &--thumbnail {
+            // Default styling for thumbnail variant
+        }
+
+        &--description {
+            background-color: var(--color-info-container);
+            min-height: 200px;
+            flex: 1;
+        }
+    }
+
+    &__thumbnail {
+        position: absolute;
+        inset: 0;
+        opacity: 0.38;
+    }
+
+    &__thumbnail-bg {
+        position: absolute;
+        inset: 0;
+        background-color: var(--color-tertiary-state-08, rgba(0, 128, 128, 0.08));
+    }
+
+    &__thumbnail-img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: 50% 50%;
+    }
+
+    &__description-text {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2, 14px);
+        font-weight: var(--font-weight-normal, 400);
+        line-height: 1.571;
+        color: var(--color-on-surface-variant);
+        text-align: center;
+        flex: 1;
+        margin: 0;
+    }
+
+    // Content area
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-card-gap-sm, 8px);
+        padding: var(--size-card-pad-y-sm, 12px) var(--size-card-pad-x-sm, 12px);
+        width: 100%;
+    }
+
+    .onboarding-module-card--thumbnail &__content {
+        height: 148px;
+    }
+
+    .onboarding-module-card--description &__content {
+        height: auto;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-pad-x-sm, 8px);
+        padding: 0 var(--size-element-pad-y-sm, 4px);
+        width: 100%;
+    }
+
+    &__tags {
+        display: flex;
+        align-items: center;
+        padding: var(--size-element-pad-y-sm, 4px) 0;
+        width: 100%;
+    }
+
+    &__duration {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3, 12px);
+        font-weight: var(--font-weight-normal, 400);
+        line-height: 1.667;
+        color: var(--color-on-surface-variant);
+        white-space: nowrap;
+    }
+
+    &__title-wrapper {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    &__title {
+        font-family: var(--font-family-header);
+        font-size: var(--font-size-h5, 20px);
+        font-weight: var(--font-weight-semibold-2, 600);
+        line-height: 1.4;
+        color: var(--color-on-surface);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    // Footer with badge and status
+    &__footer {
+        border-top: 1px solid var(--color-outline-variant);
+        display: flex;
+        gap: var(--size-element-gap-sm, 8px);
+        align-items: center;
+        padding: var(--size-element-gap-sm, 8px) 0;
+        width: 100%;
+    }
+}

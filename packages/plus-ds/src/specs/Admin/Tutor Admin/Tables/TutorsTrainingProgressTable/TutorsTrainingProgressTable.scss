@@ -1,0 +1,155 @@
+/**
+ * TutorsTrainingProgressTable Styles
+ * Figma Node: 448-93944
+ */
+
+.tutors-training-progress-table {
+    width: 100%;
+
+    &__table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        thead {
+            tr {
+                background-color: transparent;
+            }
+
+            th {
+                padding: var(--table-cell-y, 8px) var(--table-cell-x, 10px);
+                border: none;
+                font-weight: var(--font-weight-normal);
+                vertical-align: middle;
+            }
+        }
+
+        tbody {
+            tr {
+                border-radius: var(--table-row-radius, 8px);
+                transition: background-color 0.15s ease;
+
+                // Alternate row color if needed, or hover
+                &:hover {
+                    background-color: rgba(25, 28, 30, 0.08);
+                }
+            }
+
+            td {
+                padding: var(--table-cell-y, 8px) var(--table-cell-x, 10px);
+                border: none;
+                vertical-align: middle;
+                font-weight: var(--font-weight-light);
+                color: var(--color-on-surface);
+            }
+        }
+    }
+
+    &__th {
+        cursor: default;
+
+        &--sortable {
+            cursor: pointer;
+
+            &:hover {
+                .tutors-training-progress-table__sort-icon {
+                    color: var(--color-secondary);
+                }
+            }
+        }
+
+        &--active {
+            .tutors-training-progress-table__th-content span {
+                color: var(--color-secondary-text, #3b525f);
+            }
+
+            .tutors-training-progress-table__sort-icon {
+                color: var(--color-secondary) !important;
+            }
+        }
+    }
+
+    &__th-content {
+        display: flex;
+        align-items: center;
+        gap: var(--table-cell-gap, 10px);
+
+        span {
+            color: var(--color-on-surface);
+            white-space: nowrap;
+        }
+    }
+
+    &__sort-icon {
+        font-size: 10px;
+        color: var(--color-outline-variant);
+        transition: color 0.15s ease;
+
+        &--active {
+            color: var(--color-secondary);
+        }
+    }
+
+    // Avatar Cell Styles
+    &__custom-avatar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-200, 12px);
+    }
+
+    &__avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--color-surface, #ffffff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+
+        i {
+            color: var(--color-on-surface-variant, #40484c);
+            font-size: 16px;
+        }
+    }
+
+    &__avatar-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 1.4;
+    }
+
+    &__email {
+        color: var(--color-on-surface-variant, #40484c);
+        font-size: 12px;
+        font-weight: 300;
+    }
+
+    // Progress Cell Styles
+    &__progress-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 40px;
+        margin: 0 auto;
+    }
+
+    &__action-btn {
+        background: none;
+        border: none;
+        color: var(--color-primary, #0472a8);
+        font-family: 'Merriweather Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

@@ -1,0 +1,68 @@
+/**
+ * Layout Tokens
+ * Breakpoints, containers, and column widths
+ */
+
+:root {
+    /* Breakpoints */
+    /* Breakpoints */
+    --breakpoint-md-min: 768px;
+    --breakpoint-md-max: 1023.98px;
+    /* Up to Desktop Large start */
+    --breakpoint-lg-min: 1024px;
+    /* Size=02 Desktop (Large) */
+    --breakpoint-lg-max: 1439.98px;
+    --breakpoint-xl-min: 1440px;
+    /* Size=01 Desktop HD (Extra large) */
+    --breakpoint-xl-max: 1919.98px;
+    --breakpoint-xxl-min: 1920px;
+    /* Assuming next generic step or keep open */
+
+    /* Containers */
+    /* Note: Container and column width tokens are available but may require responsive handling */
+
+    /* Sidebar fixed width (visible at Large+) */
+    --layout-sidebar-width: 164px;
+
+    /* 
+     * Flexible 12-Column Grid Tokens
+     * Uses calc() to be responsive to the parent container width.
+     * Gap: 8px per Figma (element/gap-sm)
+     * Formula: (N * SingleColWidth) + ((N-1) * Gap)
+     */
+    --layout-grid-gap: var(--size-element-gap-sm);
+    /* 8px */
+
+    /* Base 1-column Width: (100% - 11 gaps) / 12 columns */
+    --layout-col-1-width: calc((100% - (11 * var(--layout-grid-gap))) / 12);
+
+    /* Column Widths
+     * Reference values at breakpoint minimums:
+     *                    Medium(768)  Large(1024)  X-Large(1440)
+     * Content Width:       672px        748px        1164px
+     */
+    --col-1: var(--layout-col-1-width);
+    /* 48.67px | 55.00px | 89.67px */
+    --col-2: calc((2 * var(--layout-col-1-width)) + (1 * var(--layout-grid-gap)));
+    /* 105.33  | 118.00  | 187.33  */
+    --col-3: calc((3 * var(--layout-col-1-width)) + (2 * var(--layout-grid-gap)));
+    /* 162.00  | 181.00  | 285.00  */
+    --col-4: calc((4 * var(--layout-col-1-width)) + (3 * var(--layout-grid-gap)));
+    /* 218.67  | 244.00  | 382.67  */
+    --col-5: calc((5 * var(--layout-col-1-width)) + (4 * var(--layout-grid-gap)));
+    /* 275.33  | 307.00  | 480.33  */
+    --col-6: calc((6 * var(--layout-col-1-width)) + (5 * var(--layout-grid-gap)));
+    /* 332.00  | 370.00  | 578.00  */
+    --col-7: calc((7 * var(--layout-col-1-width)) + (6 * var(--layout-grid-gap)));
+    /* 388.67  | 433.00  | 675.67  */
+    --col-8: calc((8 * var(--layout-col-1-width)) + (7 * var(--layout-grid-gap)));
+    /* 445.33  | 496.00  | 773.33  */
+    --col-9: calc((9 * var(--layout-col-1-width)) + (8 * var(--layout-grid-gap)));
+    /* 502.00  | 559.00  | 871.00  */
+    --col-10: calc((10 * var(--layout-col-1-width)) + (9 * var(--layout-grid-gap)));
+    /* 558.67 | 622.00  | 968.67  */
+    --col-11: calc((11 * var(--layout-col-1-width)) + (10 * var(--layout-grid-gap)));
+    /* 615.33 | 685.00  | 1066.33 */
+    --col-12: calc((12 * var(--layout-col-1-width)) + (11 * var(--layout-grid-gap)));
+    /* 672.00 | 748.00  | 1164.00 */
+}

@@ -1,25 +1,41 @@
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    '../new-ds/assets/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/components/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/forms/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/patterns/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/patterns/**/*.mdx',
-    '../new-ds/specs/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    '../new-ds/styles/**/*.mdx',
+    '../packages/plus-ds/src/assets/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/forms/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/forms/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/styles/patterns/**/*.mdx',
+    '../packages/plus-ds/src/DataViz/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Admin/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Home/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Login/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Profile/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Training/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Universal/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
+    // Include Toolkit stories from design-system directory
+    '../design-system/**/*.stories.@(js|jsx|ts|tsx)',
+    // Exclude non-existent component directories
+    '!../packages/plus-ds/src/specs/**/SessionDataCardsSection/**/*.stories.@(js|jsx|ts|tsx)',
+    // Explicitly exclude legacy Toolkit specs
+    '!../packages/plus-ds/src/specs/Toolkit/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     '@storybook/addon-links',
-    '@storybook/addon-docs',
-    '@storybook/addon-vitest'
   ],
   framework: {
     name: '@storybook/react-vite',
-    options: {},
+    options: {
+      strictMode: true,
+    },
   },
   typescript: {
     check: false,
@@ -31,15 +47,34 @@ const config = {
   docs: {
     autodocs: true,
   },
-  staticDirs: [
-    { from: path.resolve(__dirname, '../dist'), to: '/dist' },
-    { from: path.resolve(__dirname, '../legacy-ds/assets'), to: '/assets' },
-  ],
+  server: {
+    host: '127.0.0.1',
+    port: 6006,
+  },
+  staticDirs: (() => {
+    const staticDirs = [];
+    const rootDistPath = path.resolve(__dirname, '../dist');
+    const distPath = path.resolve(__dirname, '../packages/plus-ds/dist');
+    const assetsPath = path.resolve(__dirname, '../packages/plus-ds/src/assets');
+
+    // Include root dist directory for CSS files
+    if (fs.existsSync(rootDistPath)) {
+      staticDirs.push({ from: rootDistPath, to: '/dist' });
+    }
+    // Only include directories that exist
+    if (fs.existsSync(distPath) && fs.readdirSync(distPath).length > 0) {
+      staticDirs.push({ from: distPath, to: '/packages-dist' });
+    }
+    if (fs.existsSync(assetsPath)) {
+      staticDirs.push({ from: assetsPath, to: '/assets' });
+    }
+
+    return staticDirs;
+  })(),
   viteFinal: async (config) => {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
-    const srcPath = path.resolve(rootDir, 'new-ds');
-    const designSystemPath = path.resolve(rootDir, 'legacy-ds');
+    const srcPath = path.resolve(rootDir, 'packages/plus-ds/src');
 
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
@@ -47,16 +82,10 @@ const config = {
     config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};
 
-    // Add alias for design-system components FIRST (more specific aliases should come first)
-    // Map @/js/components to design-system/components
-    config.resolve.alias['@/js/components'] = path.resolve(designSystemPath, 'components');
-
-    // Add alias for src directory - use absolute path (for backward compatibility)
+    // Map @ to src
     config.resolve.alias['@'] = srcPath;
-    config.resolve.alias['@design-system'] = designSystemPath;
 
     // Ensure Vite can resolve relative paths from project root
-    // This helps with dynamic imports in story files
     if (!config.resolve.modules) {
       config.resolve.modules = ['node_modules', rootDir];
     } else {
@@ -78,85 +107,49 @@ const config = {
     config.optimizeDeps.esbuildOptions.loader['.js'] = 'jsx';
 
     // Ensure proper ES module handling
-    config.optimizeDeps = config.optimizeDeps || {};
     config.optimizeDeps.include = config.optimizeDeps.include || [];
+    config.optimizeDeps.include.push('react', 'react-dom', 'prop-types');
 
-    // Ensure CSS is processed and available
+    // Deduplicate React to avoid invalid hook call errors
+    config.resolve.dedupe = config.resolve.dedupe || [];
+    config.resolve.dedupe.push('react', 'react-dom');
+
+    // Config css
     config.css = config.css || {};
-    config.css.postcss = config.css.postcss || {};
-    
-    // Configure SCSS preprocessor options (matching vite.config.js)
-    // Merge with existing options if they exist
     config.css.preprocessorOptions = config.css.preprocessorOptions || {};
-    const existingLoadPaths = config.css.preprocessorOptions.scss?.loadPaths || [];
     config.css.preprocessorOptions.scss = {
-      api: 'modern-compiler',
-      loadPaths: [
-        ...new Set([ // Use Set to avoid duplicates
-          ...existingLoadPaths,
-          path.resolve(rootDir, 'develop/tokens'),
-          path.resolve(rootDir, 'legacy-ds/components'),
-          path.resolve(rootDir, 'new-ds/forms'),
-          path.resolve(rootDir, 'new-ds/components')
-        ])
+      includePaths: [
+        path.resolve(srcPath, 'components'),
+        path.resolve(rootDir, 'develop/tokens'),
+        path.resolve(rootDir, 'legacy-ds/components')
       ],
+      api: 'modern-compiler',
       silenceDeprecations: ['legacy-js-api']
     };
 
-    // Improve module resolution for better compatibility
-    config.build = config.build || {};
-    config.build.commonjsOptions = {
-      include: [/node_modules/],
-      transformMixedEsModules: true,
-    };
-
-    // Improve error handling for module resolution
-    config.resolve.dedupe = config.resolve.dedupe || [];
-    config.resolve.dedupe.push('@storybook/react-vite');
-
-    // Better handling of dynamic imports
-    config.optimizeDeps = config.optimizeDeps || {};
-
-    // Ensure story files are properly handled as modules
-    config.optimizeDeps.include = config.optimizeDeps.include || [];
-    config.optimizeDeps.include.push(
-      'legacy-ds/components/index.js',
-      'legacy-ds/components/**/*.js'
-    );
-
-    // Configure static asset serving
-    // Disable default publicDir to use staticDirs instead
+    // Use staticDirs instead
     config.publicDir = false;
 
-    // Ensure static assets are properly served
+    // Allow serving from root and package src
+    // Note: server config is set at top level, don't override here
     config.server = config.server || {};
     config.server.fs = config.server.fs || {};
-    // Allow Vite to access the entire project root and design-system directory
     config.server.fs.allow = [
       ...(config.server.fs.allow || []),
-      rootDir, // Allow access to entire project root
-      path.resolve(rootDir, 'legacy-ds'),
-      path.resolve(rootDir, 'legacy-ds/assets'),
-      path.resolve(rootDir, 'legacy-ds/components'),
-      path.resolve(rootDir, 'legacy-ds/specs'),
-      path.resolve(rootDir, 'legacy-ds/styles'),
+      rootDir,
+      srcPath
     ];
 
-    // Enable HMR and file watching
-    config.server.watch = {
-      ...config.server.watch,
-      usePolling: false,
-      interval: 100,
-    };
+    // Improve HMR stability
+    config.server.hmr = config.server.hmr || {};
+    config.server.hmr.overlay = true;
 
-    // Ensure HMR is enabled
-    config.server.hmr = {
-      ...config.server.hmr,
-      overlay: true,
-    };
+    // Ensure proper CSS module handling
+    config.css.modules = config.css.modules || {};
+    config.css.modules.localsConvention = 'camelCase';
 
     return config;
   },
 };
 
-module.exports = config;
+export default config;

@@ -1,0 +1,14 @@
+/**
+ * SidebarTab Styles
+ */
+
+.plus-sidebar-tab {
+    &:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--color-on-surface-state-08) !important;
+    }
+
+    &:focus-visible:not(.plus-sidebar-tab--disabled) {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+}

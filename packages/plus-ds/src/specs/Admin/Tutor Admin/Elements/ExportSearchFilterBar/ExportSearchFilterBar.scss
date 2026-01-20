@@ -1,0 +1,91 @@
+/**
+ * ExportSearchFilterBar Styles
+ * Figma Node: 433-370346
+ */
+
+.export-search-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--element-gap-lg, 12px);
+    width: 100%;
+
+    &__export-btn {
+        flex-shrink: 0;
+        height: 34px;
+        border-radius: var(--element-radius-sm, 2px);
+    }
+
+    &__search {
+        flex: 1;
+        min-width: 200px;
+        max-width: 400px;
+        height: 34px;
+
+        .input-group {
+            height: 100%;
+        }
+
+        .input-group-text {
+            background-color: var(--color-surface, #f9f9fc);
+            border: 0.6px solid var(--color-outline-variant, #bec8ca);
+            border-right: none;
+            border-radius: var(--element-radius-sm, 2px) 0 0 var(--element-radius-sm, 2px);
+            padding: 6px 10px;
+            color: var(--color-on-surface-variant, #3f484a);
+        }
+    }
+
+    &__search-icon {
+        i {
+            font-size: 12px;
+        }
+    }
+
+    &__search-input {
+        border: 0.8px solid var(--color-outline-variant, #bec8ca);
+        border-left: none;
+        border-radius: 0 var(--element-radius-sm, 2px) var(--element-radius-sm, 2px) 0;
+        height: 34px;
+        font-family: 'Merriweather Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 300;
+        background-color: var(--color-surface, #f9f9fc);
+
+        &:focus {
+            border-color: var(--color-outline-variant, #bec8ca);
+            box-shadow: none;
+            background-color: var(--color-surface, #f9f9fc);
+        }
+
+        &::placeholder {
+            color: var(--color-on-surface-variant, #3f484a);
+        }
+    }
+
+    &__filters {
+        display: flex;
+        align-items: center;
+        gap: var(--element-gap-lg, 12px);
+        margin-left: auto;
+    }
+
+    &__filter {
+        white-space: nowrap;
+        height: 34px;
+        border-radius: var(--element-radius-sm, 2px);
+
+        // Override Button default active/focus styles to prevent "Selected" look
+        &:active,
+        &:focus,
+        &.active,
+        &:focus-visible {
+            background-color: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            color: var(--color-on-surface-variant, #3f484a) !important;
+        }
+
+        // Ensure text color matches expected secondary text color
+        color: var(--color-on-surface-variant, #3f484a);
+    }
+}

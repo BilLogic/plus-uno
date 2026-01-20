@@ -1,8 +1,0 @@
-export { default as DonutChart } from './DonutChart';
-export { default as SmartBarChart } from './SmartBarChart';
-export { default as StackedBarChart } from './StackedBarChart';
-export { default as LineChart } from './LineChart';
-export { default as AreaChart } from './AreaChart';
-export { default as ComboChart } from './ComboChart';
-export { default as ScatterChart } from './ScatterChart';
-export { default as BarChart } from './BarChart';

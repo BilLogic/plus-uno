@@ -1,0 +1,73 @@
+/**
+ * TutorPerformancePage Styles
+ * Figma Node: 258-262669
+ */
+
+.tutor-performance-page__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 24px);
+    width: 100%;
+}
+
+// Tabs Section
+.tutor-performance-page__tabs {
+    margin-bottom: var(--size-section-gap-lg, 24px);
+    width: 100%;
+}
+
+.tutor-performance-page__nav-tabs {
+    border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+}
+
+// Action Buttons
+.tutor-performance-page__actions {
+    display: flex;
+    gap: var(--size-element-gap-md, 12px);
+    margin-bottom: var(--size-section-gap-lg, 24px);
+}
+
+// Overview Section
+.tutor-performance-page__overview-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md, 16px);
+    width: 100%;
+    padding-bottom: var(--size-section-pad-y-lg, 24px);
+    margin-bottom: var(--size-section-gap-xl, 40px);
+}
+
+.tutor-performance-page__overview-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-section-gap-md, 16px);
+}
+
+// Details Section
+.tutor-performance-page__details-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md, 16px);
+    padding-top: var(--size-section-pad-y-md, 16px);
+}
+
+.tutor-performance-page__details-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-section-gap-md, 16px);
+}
+
+// Pagination Footer
+.tutor-performance-page__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-section-gap-md, 16px);
+    padding-top: var(--size-section-pad-y-sm, 8px);
+}

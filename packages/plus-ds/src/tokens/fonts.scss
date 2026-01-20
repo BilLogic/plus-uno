@@ -1,0 +1,482 @@
+:root {
+
+    /* common font sizes */
+    --font-size-125: 1.25rem;
+
+    /* common line heights */
+    --font-line-height-140: 140%;
+    --font-line-height-150: 150%;
+    --font-line-height-160: 160%;
+
+    /* common font families*/
+    --font-family-header: "Lato";
+    --font-family-body: "Merriweather Sans", "Open Sans", "sans-serif";
+
+    /*font weights*/
+    --font-weight-normal: 300;
+    --font-weight-semibold-1: 400;
+    --font-weight-semibold-2: 600;
+    --font-weight-bold: 700;
+
+    /*Display*/
+    /*Shared*/
+    --font-weight-display: var(--font-weight-semibold-1);
+
+    /*Display 1 - Figma: 80px, Lato, 400, lineHeight 140% */
+    --font-family-display1: var(--font-family-header);
+    --font-size-display1: 5rem;
+    /* 80px */
+    --font-line-height-display1: 140%;
+    /* 140% = 112px / 80px */
+    --font-letter-spacing-display1: 0;
+
+    /*Display 2 - Figma: 72px, Lato, 400, lineHeight 138.9% */
+    --font-family-display2: var(--font-family-header);
+    --font-size-display2: 4.5rem;
+    /* 72px */
+    --font-line-height-display2: 138.9%;
+    --font-letter-spacing-display2: 0;
+
+    /*Display 3 - Figma: 64px, Lato, 400, lineHeight 150% */
+    --font-family-display3: var(--font-family-header);
+    --font-size-display3: 4rem;
+    /* 64px */
+    --font-line-height-display3: var(--font-line-height-150);
+    --font-letter-spacing-display3: 0;
+
+    /*Display 4 - Figma: 56px, Open Sans, 400, lineHeight 150%, letterSpacing 1px */
+    --font-family-display4: "Open Sans";
+    --font-size-display4: 3.5rem;
+    /* 56px */
+    --font-line-height-display4: var(--font-line-height-150);
+    --font-letter-spacing-display4: 0.0625rem;
+    /* 1px */
+
+    /*Headline*/
+    /*Shared*/
+    /* Note: Figma uses SF Pro Display for h1/h2, but codebase uses Lato for consistency */
+    --font-family-headline: var(--font-family-header);
+    /* Note: Figma specifies Semibold (600) for h1/h2, but codebase uses Bold (700) for headlines */
+    --font-weight-headline: var(--font-weight-bold);
+
+    /*h1 - Figma: Headline/H1 - 40px, Lato Bold (700), lineHeight 160% */
+    --font-size-h1: 2.5rem;
+    /* 40px */
+    --font-line-height-h1: 160%;
+    /* 160% = 64px / 40px */
+
+    /*h2 - Figma: Headline/H2 - 32px, Lato Bold (700), lineHeight 150% */
+    --font-size-h2: 2rem;
+    /* 32px */
+    --font-line-height-h2: 1.5;
+    /* 150% = 48px / 32px */
+
+    /*h3 - Figma: Headline/H3 - 28px, Lato Bold (700), lineHeight 142.9% */
+    --font-size-h3: 1.75rem;
+    /* 28px */
+    --font-line-height-h3: 142.9%;
+    /* 142.9% = 40px / 28px */
+
+    /*Title*/
+    /*Shared*/
+    --font-family-title: var(--font-family-header);
+    --font-weight-title: var(--font-weight-semibold-2);
+
+    /*h4 - Figma: Title/H4 - 24px, Lato, lineHeight 133.3% */
+    --font-size-h4: 1.5rem;
+    /* 24px */
+    --font-line-height-h4: 133.3%;
+    /* 133.3% = 32px / 24px */
+
+    /*h5 - Figma: Title/H5 - 20px, Lato, lineHeight 140% */
+    --font-size-h5: var(--font-size-125);
+    /* 1.25rem = 20px */
+    --font-line-height-h5: var(--font-line-height-140);
+    /* 140% = 28px / 20px */
+
+    /*h6 - Figma: Title/H6 - 16px, Lato, lineHeight 150% */
+    --font-size-h6: 1rem;
+    /* 16px */
+    --font-line-height-h6: var(--font-line-height-150);
+    /* 150% = 24px / 16px */
+
+    /*Body - Default variant is Regular (weight 300), SemiBold (weight 400) and Bold (weight 700) available */
+    /*b1 - Figma: Body/B1/Regular - Merriweather Sans, 16px, weight 300, lineHeight 150% */
+    --font-size-body1: 1rem;
+    /* 16px */
+    --font-line-height-body1: var(--font-line-height-150);
+    /* 150% = 24px / 16px */
+    --font-weight-body1-regular: var(--font-weight-normal);
+    --font-weight-body1-semibold: var(--font-weight-semibold-1);
+    --font-weight-body1-bold: var(--font-weight-bold);
+
+    /*b2 - Figma: Body/B2/Regular - Merriweather Sans, 14px, weight 300, lineHeight 157.1% */
+    --font-size-body2: 0.875rem;
+    /* 14px */
+    --font-line-height-body2: 157.1%;
+    /* 157.1% = 22px / 14px */
+    --font-weight-body2-regular: var(--font-weight-normal);
+    --font-weight-body2-semibold: var(--font-weight-semibold-1);
+    --font-weight-body2-bold: var(--font-weight-bold);
+
+    /*b3 - Figma: Body/B3/Regular - Merriweather Sans, 12px, weight 300, lineHeight 166.7% */
+    --font-size-body3: 0.75rem;
+    /* 12px */
+    --font-line-height-body3: 166.7%;
+    /* 166.7% = 20px / 12px */
+    --font-weight-body3-regular: var(--font-weight-normal);
+    --font-weight-body3-semibold: var(--font-weight-semibold-1);
+    --font-weight-body3-bold: var(--font-weight-bold);
+
+    /*lead - Figma: Body/Special/Lead - 20px, Merriweather Sans Light (300), lineHeight 160% */
+    --font-size-lead: var(--font-size-125);
+    /* 20px */
+    --font-line-height-lead: var(--font-line-height-160);
+    /* 160% = 32px / 20px */
+    --font-weight-lead: var(--font-weight-normal);
+    /* 300 */
+
+    /*block quote - Figma: Body/Special/Blockquotes - 20px, Merriweather Sans Regular (400), lineHeight 160% */
+    --font-size-blockquote: var(--font-size-125);
+    /* 20px */
+    --font-line-height-blockquote: var(--font-line-height-160);
+    /* 160% = 32px / 20px */
+    --font-weight-blockquote: var(--font-weight-semibold-1);
+    /* 400 */
+
+    /*code - Figma: Body/Special/Code - 14px, Source Code Pro Light (300), lineHeight 142.9% */
+    --font-size-code: var(--font-size-body2);
+    /* 14px */
+    --font-line-height-code: 142.9%;
+    /* 142.9% = 20px / 14px */
+    --font-weight-code: var(--font-weight-normal);
+    /* 300 */
+    --font-family-code: "Source Code Pro", sans-serif;
+
+    /*Fontawesome (icons)*/
+    /* Font Awesome Solid */
+
+    /* Huge - For large status icons in modals (128px) */
+    --font-size-fa-huge-solid: 8rem;
+    /* 128px */
+    --font-line-height-fa-huge-solid: 100%;
+
+    /*h1 - Figma: Fontawesome/Solid/H1 - 36px, lineHeight 177.8% */
+    --font-size-fa-h1-solid: 2.25rem;
+    /* 36px */
+    --font-line-height-fa-h1-solid: 177.8%;
+
+    /*h2 - Figma: Fontawesome/Solid/H2 - 28px, lineHeight 171.4% */
+    --font-size-fa-h2-solid: var(--font-size-h3);
+    /* 28px */
+    --font-line-height-fa-h2-solid: 171.4%;
+
+    /*h3 - Figma: Fontawesome/Solid/H3 - 24px, lineHeight 166.7% */
+    --font-size-fa-h3-solid: var(--font-size-h4);
+    /* 24px */
+    --font-line-height-fa-h3-solid: 166.7%;
+
+    /*h4 - Figma: Fontawesome/Solid/H4 - 20px, lineHeight 160% */
+    --font-size-fa-h4-solid: var(--font-size-h5);
+    /* 20px */
+    --font-line-height-fa-h4-solid: var(--font-line-height-160);
+
+    /*h5 - Figma: Fontawesome/Solid/H5 - 16px, lineHeight 175% */
+    --font-size-fa-h5-solid: var(--font-size-h6);
+    /* 16px */
+    --font-line-height-fa-h5-solid: 175%;
+
+    /*h6 - Figma: Fontawesome/Solid/H6 - 14px, lineHeight 171.4% */
+    --font-size-fa-h6-solid: var(--font-size-body2);
+    /* 14px */
+    --font-line-height-fa-h6-solid: 171.4%;
+
+    /*b1 - Figma: Fontawesome/Solid/B1 - 14px, lineHeight 171.4% */
+    --font-size-fa-body1-solid: var(--font-size-body2);
+    /* 14px */
+    --font-line-height-fa-body1-solid: 171.4%;
+
+    /*b2 - Figma: Fontawesome/Solid/B2 - 12px, lineHeight 183.3% */
+    --font-size-fa-body2-solid: var(--font-size-body3);
+    /* 12px */
+    --font-line-height-fa-body2-solid: 183.3%;
+
+    /*b3 - Figma: Fontawesome/Solid/B3 - 10px, lineHeight 200% */
+    --font-size-fa-body3-solid: 0.625rem;
+    /* 10px */
+    --font-line-height-fa-body3-solid: 200%;
+
+    /* Font Awesome Regular */
+    /*h1 - Figma: Fontawesome/Regular/H1 - 36px, lineHeight 177.8% */
+    --font-size-fa-h1-regular: 2.25rem;
+    /* 36px */
+    --font-line-height-fa-h1-regular: 177.8%;
+
+    /*h2 - Figma: Fontawesome/Regular/H2 - 28px, lineHeight 171.4% */
+    --font-size-fa-h2-regular: var(--font-size-h3);
+    /* 28px */
+    --font-line-height-fa-h2-regular: 171.4%;
+
+    /*h3 - Figma: Fontawesome/Regular/H3 - 24px, lineHeight 166.7% */
+    --font-size-fa-h3-regular: var(--font-size-h4);
+    /* 24px */
+    --font-line-height-fa-h3-regular: 166.7%;
+
+    /*h4 - Figma: Fontawesome/Regular/H4 - 20px, lineHeight 160% */
+    --font-size-fa-h4-regular: var(--font-size-h5);
+    /* 20px */
+    --font-line-height-fa-h4-regular: var(--font-line-height-160);
+
+    /*h5 - Figma: Fontawesome/Regular/H5 - 16px, lineHeight 175% */
+    --font-size-fa-h5-regular: var(--font-size-h6);
+    /* 16px */
+    --font-line-height-fa-h5-regular: 175%;
+
+    /*h6 - Figma: Fontawesome/Regular/H6 - 14px, lineHeight 171.4% */
+    --font-size-fa-h6-regular: var(--font-size-body2);
+    /* 14px */
+    --font-line-height-fa-h6-regular: 171.4%;
+
+    /*b1 - Figma: Fontawesome/Regular/B1 - 14px, lineHeight 171.4% */
+    --font-size-fa-body1-regular: var(--font-size-body2);
+    /* 14px */
+    --font-line-height-fa-body1-regular: 171.4%;
+
+    /*b2 - Figma: Fontawesome/Regular/B2 - 12px, lineHeight 183.3% */
+    --font-size-fa-body2-regular: var(--font-size-body3);
+    /* 12px */
+    --font-line-height-fa-body2-regular: 183.3%;
+
+    /*b3 - Figma: Fontawesome/Regular/B3 - 10px, lineHeight 200% */
+    --font-size-fa-body3-regular: 0.625rem;
+    /* 10px */
+    --font-line-height-fa-body3-regular: 200%;
+
+    /* Legacy aliases for backward compatibility */
+    --font-size-fa-h1: var(--font-size-fa-h1-solid);
+    --font-line-height-fa-h1: var(--font-line-height-fa-h1-solid);
+    --font-size-fa-h2: var(--font-size-fa-h2-solid);
+    --font-line-height-fa-h2: var(--font-line-height-fa-h2-solid);
+    --font-size-fa-h3: var(--font-size-fa-h3-solid);
+    --font-line-height-fa-h3: var(--font-line-height-fa-h3-solid);
+    --font-size-fa-h4: var(--font-size-fa-h4-solid);
+    --font-line-height-fa-h4: var(--font-line-height-fa-h4-solid);
+    --font-size-fa-h5: var(--font-size-fa-h5-solid);
+    --font-line-height-fa-h5: var(--font-line-height-fa-h5-solid);
+    --font-size-fa-h6: var(--font-size-fa-h6-solid);
+    --font-line-height-fa-h6: var(--font-line-height-fa-h6-solid);
+    --font-size-fa-body1: var(--font-size-fa-body1-solid);
+    --font-line-height-fa-body1: var(--font-line-height-fa-body1-solid);
+    --font-size-fa-body2: var(--font-size-fa-body2-solid);
+    --font-line-height-fa-body2: var(--font-line-height-fa-body2-solid);
+    --font-size-fa-body3: var(--font-size-fa-body3-solid);
+    --font-line-height-fa-body3: var(--font-line-height-fa-body3-solid);
+}
+
+// Mixin for FontAwesome icon sizing
+@mixin fa-icon-size($size-token, $line-height-token) {
+
+    .far,
+    .fas,
+    .fa-solid,
+    .fa-regular {
+        font-size: $size-token;
+        line-height: $line-height-token;
+    }
+}
+
+%default-font-color {
+    color: var(--color-neutral-on-surface);
+}
+
+/** set default text styles **/
+body,
+.body2-txt {
+    @extend %default-font-color;
+    @extend %font-body;
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    // Use B2 token values as default
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    /* next rule prevents "rubberband" nudging of topbar in OSX/Chrome browser */
+    overscroll-behavior: none;
+
+    @include fa-icon-size(var(--font-size-fa-body2), var(--font-line-height-fa-body2));
+}
+
+/* rules for display text*/
+%font-display {
+    font-weight: var(--font-weight-display);
+}
+
+%font-family-header {
+    font-family: var(--font-family-header);
+}
+
+.display1-txt {
+    @extend %font-display;
+    @extend %font-family-header;
+    font-size: var(--font-size-display1);
+    line-height: var(--font-line-height-display1);
+    letter-spacing: var(--font-letter-spacing-display1);
+    padding-top: var(--size-spacing-between-components-5);
+    padding-bottom: var(--size-spacing-within-component-4-5);
+}
+
+.display2-txt {
+    @extend %font-display;
+    @extend %font-family-header;
+    font-size: var(--font-size-display2);
+    line-height: var(--font-line-height-display2);
+    letter-spacing: var(--font-letter-spacing-display2);
+    padding-top: var(--size-spacing-between-components-4);
+    padding-bottom: var(--size-spacing-within-component-4);
+
+}
+
+.display3-txt {
+    @extend %font-display;
+    @extend %font-family-header;
+    font-size: var(--font-size-display3);
+    line-height: var(--font-line-height-display3);
+    letter-spacing: var(--font-letter-spacing-display3);
+    padding-top: var(--size-spacing-within-component-4-5);
+    padding-bottom: var(--size-spacing-within-component-3);
+}
+
+.display4-txt {
+    @extend %font-display;
+    font-family: var(--font-family-display4);
+    font-size: var(--font-size-display4);
+    line-height: var(--font-line-height-display4);
+    letter-spacing: var(--font-letter-spacing-display4);
+    padding-top: var(--size-spacing-within-component-4-5);
+    padding-bottom: var(--size-spacing-within-component-3);
+}
+
+/* rules for headlines (h1,h2,h3) */
+%font-headline {
+    @extend %default-font-color;
+    @extend %font-family-header;
+    font-weight: var(--font-weight-headline);
+    margin: 0;
+}
+
+h1,
+.h1 {
+    @extend %font-headline;
+    font-size: var(--font-size-h1);
+    line-height: var(--font-line-height-h1);
+
+
+    @include fa-icon-size(var(--font-size-fa-h1), var(--font-line-height-fa-h1));
+}
+
+h2,
+.h2 {
+    @extend %font-headline;
+    font-size: var(--font-size-h2);
+    line-height: var(--font-line-height-h2);
+
+
+    @include fa-icon-size(var(--font-size-fa-h2), var(--font-line-height-fa-h2));
+}
+
+h3,
+.h3 {
+    @extend %font-headline;
+    font-size: var(--font-size-h3);
+    line-height: var(--font-line-height-h3);
+
+
+    @include fa-icon-size(var(--font-size-fa-h1), var(--font-line-height-fa-h1));
+}
+
+/* rules for titles (h4,h5,h6) */
+%font-title {
+    @extend %default-font-color;
+    @extend %font-family-header;
+    font-weight: var(--font-weight-title);
+    margin: 0;
+}
+
+h4,
+.h4 {
+    @extend %font-title;
+    font-size: var(--font-size-h4);
+    line-height: var(--font-line-height-h4);
+
+
+    @include fa-icon-size(var(--font-size-fa-h4), var(--font-line-height-fa-h4));
+}
+
+h5,
+.h5 {
+    @extend %font-title;
+    font-size: var(--font-size-h5);
+    line-height: var(--font-line-height-h5);
+
+
+    @include fa-icon-size(var(--font-size-fa-h5), var(--font-line-height-fa-h5));
+}
+
+h6,
+.h6 {
+    @extend %font-title;
+    font-size: var(--font-size-h6);
+    line-height: var(--font-line-height-h6);
+
+
+    @include fa-icon-size(var(--font-size-fa-h6), var(--font-line-height-fa-h6));
+}
+
+/* rules for body txt */
+%font-body {
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+}
+
+.body1-txt {
+    @extend %font-body;
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+
+    @include fa-icon-size(var(--font-size-fa-body1), var(--font-line-height-fa-body1));
+}
+
+
+
+.body3-txt {
+    @extend %font-body;
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+
+    @include fa-icon-size(var(--font-size-fa-body3), var(--font-line-height-fa-body3));
+}
+
+.body1-txt.font-weight-semibold,
+.body2-txt.font-weight-semibold,
+.body3-txt.font-weight-semibold {
+    font-weight: var(--font-weight-semibold-1) !important;
+}
+
+.body1-txt.font-weight-bold,
+.body2-txt.font-weight-bold,
+.body3-txt.font-weight-bold {
+    font-weight: var(--font-weight-bold) !important;
+}
+
+/* rules for special text (lead/blockquote) */
+.body-lead-txt {
+    @extend %font-body;
+    font-size: var(--font-size-lead);
+    line-height: var(--font-line-height-lead);
+}
+
+.body-blockquote-txt {
+    @extend %font-body;
+    font-size: var(--font-size-blockquote);
+    font-weight: var(--font-weight-blockquote);
+    line-height: var(--font-line-height-blockquote);
+}

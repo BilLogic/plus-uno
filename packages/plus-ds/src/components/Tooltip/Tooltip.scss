@@ -1,0 +1,80 @@
+/*
+ * Tooltip Component Styles
+ * Per Figma specs - extends React Bootstrap Tooltip
+ * Uses design system tokens - no hardcoded values
+ */
+
+// Override Bootstrap tooltip styles
+.tooltip {
+
+    &.plus-tooltip-default,
+    &.plus-tooltip-small,
+    &.plus-tooltip-large {
+        .tooltip-inner {
+            background-color: var(--color-on-surface);
+            color: var(--color-surface);
+            font-family: var(--font-family-body);
+            font-weight: var(--font-weight-normal);
+            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+            border-radius: var(--size-element-radius-sm);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            max-width: 200px;
+            text-align: center;
+        }
+
+        // Arrow styling
+        .tooltip-arrow::before {
+            border-top-color: var(--color-on-surface);
+            border-bottom-color: var(--color-on-surface);
+            border-left-color: var(--color-on-surface);
+            border-right-color: var(--color-on-surface);
+        }
+    }
+
+    // --- SIZE: SMALL ---
+    &.plus-tooltip-small {
+        .tooltip-inner {
+            font-size: var(--font-size-body4);
+            line-height: var(--font-line-height-body4);
+            padding: var(--size-element-pad-y-xs) var(--size-element-pad-x-sm);
+            max-width: 150px;
+        }
+    }
+
+    // --- SIZE: DEFAULT (MEDIUM) ---
+    &.plus-tooltip-default {
+        .tooltip-inner {
+            font-size: var(--font-size-body3);
+            line-height: var(--font-line-height-body3);
+        }
+    }
+
+    // --- SIZE: LARGE ---
+    &.plus-tooltip-large {
+        .tooltip-inner {
+            font-size: var(--font-size-body2);
+            line-height: var(--font-line-height-body2);
+            padding: var(--size-element-pad-y-md) var(--size-element-pad-x-lg);
+            max-width: 280px;
+        }
+    }
+
+    // --- PLACEMENT ARROW FIXES ---
+    &.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: var(--color-on-surface);
+    }
+
+    &.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: var(--color-on-surface);
+    }
+
+    &.bs-tooltip-start .tooltip-arrow::before,
+    &.bs-tooltip-left .tooltip-arrow::before {
+        border-left-color: var(--color-on-surface);
+    }
+
+    &.bs-tooltip-end .tooltip-arrow::before,
+    &.bs-tooltip-right .tooltip-arrow::before {
+        border-right-color: var(--color-on-surface);
+    }
+}

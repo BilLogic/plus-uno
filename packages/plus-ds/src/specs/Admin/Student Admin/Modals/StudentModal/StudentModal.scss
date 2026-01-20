@@ -1,0 +1,253 @@
+/**
+ * StudentModal Styles
+ * Figma Node: 317-126488
+ */
+
+.student-modal {
+    .modal-dialog {
+        max-width: 502px;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: var(--size-modal-radius-md, 8px);
+        background-color: var(--color-surface-container);
+        overflow: hidden;
+    }
+}
+
+.student-modal__container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-modal-gap-md, 12px);
+    padding: var(--size-modal-pad-y-md, 12px) var(--size-modal-pad-x-md, 16px);
+}
+
+.student-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px);
+    border-bottom: 1px solid var(--color-outline-variant);
+
+    .student-modal__title {
+        margin: 0;
+        color: var(--color-on-surface);
+    }
+
+    .student-modal__close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: var(--color-on-surface-variant);
+        cursor: pointer;
+        font-size: 24px;
+        border-radius: var(--size-element-radius-sm, 4px);
+        transition: background-color 0.15s ease;
+
+        i {
+            font-size: 24px;
+        }
+
+        &:hover {
+            background-color: var(--color-on-surface-state-08);
+            color: var(--color-on-surface);
+        }
+    }
+}
+
+.student-modal__tabs {
+    display: flex;
+    width: 100%;
+    border-radius: var(--size-element-radius-lg, 8px);
+    overflow: hidden;
+
+    .student-modal__tab {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--size-element-gap-md, 10px);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        border: none;
+        background-color: var(--color-secondary-state-08);
+        color: var(--color-secondary-text);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:first-child {
+            border-radius: var(--size-element-radius-md, 4px) 0 0 var(--size-element-radius-md, 4px);
+        }
+
+        &:last-child {
+            border-radius: 0 var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0;
+        }
+
+        &--active {
+            background-color: var(--color-primary-state-08);
+            color: var(--color-primary-text);
+        }
+
+        .student-modal__tab-badge {
+            background-color: var(--color-on-surface-state-08);
+            padding: 0 var(--size-element-pad-x-sm, 8px);
+            border-radius: var(--size-element-radius-pill);
+        }
+    }
+}
+
+.student-modal__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-modal-gap-md, 12px);
+}
+
+// Info Tab Styles
+.student-modal__info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .student-modal__form-row {
+        display: flex;
+        gap: 12px;
+
+        .student-modal__form-field {
+            flex: 1;
+        }
+    }
+
+    .student-modal__form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        &--full {
+            width: 100%;
+        }
+    }
+
+    .student-modal__label {
+        color: var(--color-on-surface-variant);
+        font-weight: var(--font-weight-semibold-1);
+    }
+
+    .student-modal__input {
+        background-color: var(--color-surface);
+        border: 0.8px solid var(--color-outline-variant);
+        border-radius: var(--size-element-radius-sm, 2px);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-normal);
+        color: var(--color-on-surface-variant);
+
+        &:focus {
+            border-color: var(--color-primary);
+            box-shadow: none;
+        }
+    }
+
+    .student-modal__select-wrapper {
+        position: relative;
+
+        .student-modal__input {
+            padding-right: 36px;
+        }
+
+        .student-modal__select-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-on-surface-variant);
+            font-size: 12px;
+            pointer-events: none;
+        }
+    }
+
+    .student-modal__caption {
+        color: var(--color-on-surface);
+        font-weight: var(--font-weight-normal);
+    }
+}
+
+// Sessions Tab Styles
+.student-modal__sessions-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-modal-gap-md, 12px);
+
+    .student-modal__sessions-toggle {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--size-modal-gap-md, 12px);
+
+        .student-modal__switch {
+            // Switch component handles its own styling
+            // Just ensure proper spacing
+            margin: 0;
+        }
+    }
+
+    .student-modal__sessions-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        thead {
+            th {
+                padding: var(--size-table-cell-y) var(--size-table-cell-x);
+                border: none;
+                background: transparent;
+            }
+        }
+
+        tbody {
+            tr {
+                border-radius: var(--size-table-radius-md);
+
+                &:hover {
+                    background-color: var(--color-on-surface-state-08);
+                }
+            }
+
+            td {
+                padding: var(--size-table-cell-y) var(--size-table-cell-x);
+                border: none;
+                vertical-align: middle;
+            }
+        }
+
+        .student-modal__th-content {
+            display: flex;
+            align-items: center;
+            gap: var(--size-table-cell-gap);
+        }
+    }
+
+    .student-modal__sessions-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--size-section-pad-y-sm, 8px) var(--size-section-pad-x-md, 16px);
+    }
+}
+
+.student-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--size-element-gap-lg, 12px);
+    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px);
+    border-top: 1px solid var(--color-outline-variant);
+
+    // Position delete button on the left
+    .plus-btn:first-child {
+        margin-right: auto;
+    }
+}

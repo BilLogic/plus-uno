@@ -1,4 +1,5 @@
 @use "_fonts";
+@use "../Checkbox/Checkbox" as *;
 
 /** dropdowns **/
 
@@ -21,12 +22,12 @@
 
 .dropdown-item:focus,
 .dropdown-item:hover {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 .dropdown-item.disabled,
 .dropdown-item:disabled {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 .pdropdown .dropdown-menu,
@@ -41,7 +42,7 @@
     padding: 0px;
     width: 100%;
     min-width: fit-content;
-    
+
     /* Bootstrap uses display: none to hide, and display: block to show */
     /* Allow Bootstrap to control visibility, but don't force hide if inline styles are set */
     /* Inline styles from Storybook should take precedence for static display */
@@ -49,7 +50,7 @@
         /* Only hide if there's no inline display style (allows Storybook static display) */
         display: none;
     }
-    
+
     &.show {
         display: block !important;
     }
@@ -91,7 +92,8 @@
 }
 
 .dropdown-submenu .dropdown-menu {
-    top: -1px !important; /*compensate for border*/
+    top: -1px !important;
+    /*compensate for border*/
     left: calc(100% + 1px) !important;
     margin-top: 0px;
 }
@@ -105,7 +107,7 @@
 .pdropdown .dropdown-menu .dropdown-item[disabled="true"] {
     cursor: default;
     pointer-events: none;
-    
+
     .pdropdown-item-text {
         opacity: 0.38;
     }
@@ -131,7 +133,7 @@
         font-size: var(--font-size-fa-body2);
         line-height: var(--font-line-height-fa-body2);
     }
-    
+
     /* Figma: Leading icon - Font Awesome B2 (12px), color on-surface-variant */
     i.fas:not(.selected-icon):not(.fa-caret-right) {
         color: var(--color-on-surface-variant);
@@ -139,7 +141,7 @@
         line-height: var(--font-line-height-fa-body2);
         flex-shrink: 0;
     }
-    
+
     /* Figma: Dropright arrow - Font Awesome B2 (12px), color on-surface-variant */
     i.fa-caret-right {
         color: var(--color-on-surface-variant);
@@ -170,7 +172,7 @@
 .pdropdown {
     /* Bootstrap 4 requires position: relative for dropdown positioning */
     position: relative;
-    
+
     &.pdropdown-split-dropdown {
         /* Container should use flex to align buttons */
         display: flex;
@@ -179,12 +181,14 @@
         gap: 0;
         /* Remove any default margins that might create separation */
         margin: 0;
-        
+
         .pdropdown-split-text-btn {
+
             /* Text button should not have caret icon */
             &::after {
                 display: none;
             }
+
             /* Text button is clickable for its own action, not for dropdown toggle */
             pointer-events: auto;
             /* Ensure same height as toggle button */
@@ -203,7 +207,7 @@
             /* Ensure background matches toggle button for seamless connection */
             background: var(--color-surface);
         }
-        
+
         /* Default order: text on left, toggle on right (for dropdown, dropup, dropright) */
         .pdropdown-split-text-btn {
             /* Remove right border completely - toggle button will provide the border */
@@ -216,6 +220,7 @@
             /* Ensure background matches toggle button for seamless connection */
             background: var(--color-surface);
         }
+
         .pdropdown-split-toggle-btn {
             /* Remove left border completely - text button's border continues through */
             border-left: none !important;
@@ -240,6 +245,7 @@
             outline: none;
             /* Ensure toggle button covers any potential gap */
             overflow: visible;
+
             /* Use a pseudo-element to visually connect the buttons if needed */
             &::before {
                 content: '';
@@ -252,7 +258,7 @@
                 z-index: -1;
             }
         }
-        
+
         /* Reversed order for dropleft: toggle on left, text on right */
         &.dropleft {
             .pdropdown-split-toggle-btn {
@@ -269,6 +275,7 @@
                 position: relative;
                 z-index: 2;
             }
+
             .pdropdown-split-text-btn {
                 border-right: none !important;
                 border-left: none !important;
@@ -282,7 +289,7 @@
                 background: var(--color-surface);
             }
         }
-        
+
         .pdropdown-split-toggle-btn {
             /* Toggle button should only show caret icon (no text) */
             display: flex;
@@ -299,6 +306,7 @@
             max-width: fit-content;
             /* Ensure no background artifacts */
             background: var(--color-surface);
+
             /* Ensure caret icon is visible and centered - content will be set by direction classes */
             /* Figma: Split dropdown toggle caret - Font Awesome B3 (10px) */
             &::after {
@@ -327,11 +335,11 @@
     /* all toggles */
     .pdropdown-toggle {
         /* Figma: Dropdown toggle - radius-sm (4px) */
-        border-radius: var(--size-element-radius-sm); 
+        border-radius: var(--size-element-radius-sm);
     }
-    
+
     /* default toggle */
-    .pdropdown-default-toggle {        
+    .pdropdown-default-toggle {
         /* Figma: Dropdown toggle - radius-sm (4px) */
         border-radius: var(--size-element-radius-sm);
         width: 100%;
@@ -352,20 +360,21 @@
     .pdropdown-default-toggle i {
         color: var(--color-on-surface-variant);
     }
-    
+
     /* Color style variants for dropdown toggles */
     &.pdropdown-primary {
+
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             /* Figma: Primary style - border and text use primary color */
             border-color: var(--color-primary);
             color: var(--color-primary-text);
-            
+
             &::after {
                 color: var(--color-primary-text);
             }
-            
+
             /* Open state - when dropdown is open, use primary state layer */
             &[aria-expanded="true"] {
                 background-color: var(--color-primary-state-08);
@@ -373,78 +382,83 @@
                 color: var(--color-primary-text);
             }
         }
-        
+
         /* Figma: Split dropdown toggle button open state - 16% opacity state layer */
         .pdropdown-split-toggle-btn[aria-expanded="true"] {
             background-color: var(--color-primary-state-16);
             border-color: var(--color-primary);
             color: var(--color-primary-text);
-            
+
             &::after {
                 color: var(--color-primary-text);
             }
         }
     }
-    
+
     &.pdropdown-secondary {
+
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             border-color: var(--color-secondary);
             color: var(--color-secondary-text);
-            
+
             &::after {
                 color: var(--color-secondary-text);
             }
         }
     }
-    
+
     &.pdropdown-success {
+
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             border-color: var(--color-success);
             color: var(--color-success-text);
-            
+
             &::after {
                 color: var(--color-success-text);
             }
         }
     }
-    
+
     &.pdropdown-danger {
+
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             border-color: var(--color-danger);
             color: var(--color-danger-text);
-            
+
             &::after {
                 color: var(--color-danger-text);
             }
         }
     }
-    
+
     &.pdropdown-warning {
+
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             border-color: var(--color-warning);
             color: var(--color-warning-text);
-            
+
             &::after {
                 color: var(--color-warning-text);
             }
         }
     }
-    
+
     &.pdropdown-info {
+
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             border-color: var(--color-info);
             color: var(--color-info-text);
-            
+
             &::after {
                 color: var(--color-info-text);
             }
@@ -456,7 +470,7 @@
 .pdropdown.small .pdropdown-default-toggle {
     /* Figma: Small dropdown - pad-y-sm (4px), pad-x-sm (8px) */
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
-    
+
     /* Small size icon - 10px (fa-body3) */
     &::after {
         font-size: var(--font-size-fa-body3);
@@ -467,7 +481,7 @@
 .pdropdown.large .pdropdown-default-toggle {
     /* Figma: Large dropdown - pad-y-lg (8px), pad-x-lg (16px) */
     padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
-    
+
     /* Large size icon - 14px (fa-body1) */
     &::after {
         font-size: var(--font-size-fa-body1);
@@ -510,7 +524,7 @@
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
 
     /* Ensure text content is properly aligned */
-    > span {
+    >span {
         display: inline;
         /* Ensure text doesn't constrain icon */
         flex-shrink: 1;
@@ -531,7 +545,8 @@
     }
 
     &::after {
-        content: "\f0d7" !important; /* caret-down - Font Awesome icon (default direction, always points down) */
+        content: "\f0d7" !important;
+        /* caret-down - Font Awesome icon (default direction, always points down) */
         font-family: "Font Awesome 6 Free";
         font-weight: 900;
         /* Icon color should match button text color */
@@ -560,12 +575,13 @@
         background: none;
         box-shadow: none;
     }
-    
+
     /* Caret direction should not change when opened - it always matches the dropdown direction */
 
     /* Direction-specific caret icons - using different Font Awesome icons (not rotated) */
     &.pdropdown-caret-up::after {
-        content: "\f0d8" !important; /* caret-up - different icon, not rotated */
+        content: "\f0d8" !important;
+        /* caret-up - different icon, not rotated */
         /* Use same size, line-height and alignment as default */
         font-size: var(--font-size-fa-body2);
         line-height: var(--font-line-height-fa-body2);
@@ -582,44 +598,52 @@
         background: none !important;
         box-shadow: none !important;
     }
-    
+
     /* Split dropdown toggle button - use smaller caret size (10px) for all directions */
     &.pdropdown-split-toggle-btn {
+
         /* Figma: Split dropdown default direction (dropdown) - always caret-down, regardless of open/closed */
         /* For split dropdowns, caret direction matches dropdown direction and doesn't change when open */
         &:not(.pdropdown-caret-up):not(.pdropdown-caret-left):not(.pdropdown-caret-right)::after {
-            content: "\f0d7" !important; /* caret-down - default direction for split dropdowns */
+            content: "\f0d7" !important;
+            /* caret-down - default direction for split dropdowns */
             font-size: var(--font-size-fa-body3);
             line-height: var(--font-line-height-fa-body3);
         }
+
         &.pdropdown-caret-up::after {
-            content: "\f0d8" !important; /* caret-up */
+            content: "\f0d8" !important;
+            /* caret-up */
             font-size: var(--font-size-fa-body3);
             line-height: var(--font-line-height-fa-body3);
         }
+
         &.pdropdown-caret-left::after {
-            content: "\f0d9" !important; /* caret-left */
+            content: "\f0d9" !important;
+            /* caret-left */
             font-size: var(--font-size-fa-body3);
             line-height: var(--font-line-height-fa-body3);
         }
+
         &.pdropdown-caret-right::after {
-            content: "\f0da" !important; /* caret-right */
+            content: "\f0da" !important;
+            /* caret-right */
             font-size: var(--font-size-fa-body3);
             line-height: var(--font-line-height-fa-body3);
         }
     }
-    
+
     /* Ensure no ::before pseudo-element creates duplicate icons */
     &::before {
         display: none !important;
         content: none !important;
     }
-    
+
     /* Hide any actual icon elements that might be added (should only use ::after) */
-    > i.fa-caret-down,
-    > i.fa-caret-up,
-    > i.fa-caret-left,
-    > i.fa-caret-right,
+    >i.fa-caret-down,
+    >i.fa-caret-up,
+    >i.fa-caret-left,
+    >i.fa-caret-right,
     i.fas.fa-caret-down,
     i.fas.fa-caret-up,
     i.fas.fa-caret-left,
@@ -628,7 +652,8 @@
     }
 
     &.pdropdown-caret-left::after {
-        content: "\f0d9" !important; /* caret-left - different icon, not rotated */
+        content: "\f0d9" !important;
+        /* caret-left - different icon, not rotated */
         /* Use same size, line-height and alignment as default */
         font-size: var(--font-size-fa-body2);
         line-height: var(--font-line-height-fa-body2);
@@ -647,7 +672,8 @@
     }
 
     &.pdropdown-caret-right::after {
-        content: "\f0da" !important; /* caret-right - different icon, not rotated */
+        content: "\f0da" !important;
+        /* caret-right - different icon, not rotated */
         /* Use same size, line-height and alignment as default */
         font-size: var(--font-size-fa-body2);
         line-height: var(--font-line-height-fa-body2);
@@ -699,16 +725,18 @@
     .multiselect-option.dropdown-item,
     .multiselect-all.dropdown-item {
 
+
         /* body2-txt */
         @extend .body2-txt;
-        
-        min-width: 218.67px; /* Based on Figma col-4 specification - matches production var(--size-columns-min-4) */
+
+        min-width: 218.67px;
+        /* Based on Figma col-4 specification - matches production var(--size-columns-min-4) */
 
         /* Figma: Dropdown toggle default - pad-y-md (6px), pad-x-md (10px) */
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
         color: var(--color-on-surface);
         background-color: inherit;
-    
+
         &.active {
             background-color: var(--color-surface-container-highest) !important;
         }
@@ -717,7 +745,7 @@
             background-color: inherit !important;
         }
     }
-    
+
     //search bar and add option btn don't scroll with rest of menu
     .multiselect-filter,
     .multiselect-option.add-option-btn {
@@ -728,7 +756,7 @@
 
     //search bar
     .multiselect-filter {
-        
+
         top: 0px;
 
         i,
@@ -739,6 +767,7 @@
             line-height: var(--font-line-height-fa-body2);
             margin-left: 0;
         }
+
         i.multiselect-clear-filter {
             //nudge to align with caret icon in toggle
             margin-right: -1px;
@@ -759,10 +788,10 @@
             background-repeat: no-repeat;
             background-size: var(--font-size-fa-body2);
         }
-        
+
         input.multiselect-search.form-control {
             @extend .body2-txt;
-            
+
             color: var(--color-on-surface);
             padding: 0 var(--size-element-pad-x-md);
             margin: 0;
@@ -793,12 +822,12 @@
             padding-left: calc(var(--font-size-body3) + var(--size-element-pad-x-md));
             display: flex;
             align-items: center;
-            
+
             input[type="checkbox"] {
                 @extend .plus-checkbox !optional;
                 padding: 0;
                 margin-top: 0;
-                
+
                 // negative margin equal to width of checkbox + gap b/w checkbox and label 
                 margin-left: calc(0px - var(--font-size-body3) - var(--size-element-pad-x-md));
             }
@@ -814,6 +843,7 @@
     .form-check-input {
         display: none;
     }
+
     .form-check-label {
         margin-left: -1.5em;
     }

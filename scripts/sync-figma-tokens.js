@@ -10,12 +10,13 @@
  *   FIGMA_ACCESS_TOKEN - Figma API access token
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import dotenv from 'dotenv';
 
 // Load environment variables
-require('dotenv').config();
+dotenv.config();
 
 const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
 const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN;

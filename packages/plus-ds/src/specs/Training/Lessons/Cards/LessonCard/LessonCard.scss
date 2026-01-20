@@ -1,0 +1,204 @@
+/**
+ * LessonCard Styles
+ * Matches Figma design exactly - node 63-177597
+ */
+
+.lesson-card {
+    // Outer container - Figma: max-w-[444px] min-w-[218.67px] w-[332px]
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-card-radius-sm, 12px);
+    max-width: 444px;
+    min-width: 218.67px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+
+    &--hover {
+        border-color: var(--color-outline-variant);
+        max-width: 400px;
+        min-width: 296px;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        overflow: hidden;
+        border-radius: inherit;
+    }
+
+    // Thumbnail - Figma: h-[184px]
+    &__thumbnail {
+        background-color: var(--color-tertiary-state-08);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-card-gap-sm, 8px);
+        min-height: 184px;
+        height: auto;
+        align-items: center;
+        justify-content: center;
+        padding: var(--size-card-pad-x-sm, 16px);
+        width: 100%;
+        opacity: 0.38;
+        transition: all 0.2s ease;
+
+        &--hover {
+            background-color: var(--color-tertiary-state-16);
+            opacity: 1;
+            padding: var(--size-card-pad-x-sm, 16px) var(--size-card-pad-y-sm, 16px);
+        }
+
+        &-bg {
+            position: absolute;
+            inset: 0;
+            background-color: inherit;
+        }
+
+        &-text {
+            font-family: var(--font-family-body);
+            font-size: var(--font-size-body2, 14px);
+            font-weight: var(--font-weight-normal, 400);
+            line-height: 1.571;
+            color: var(--color-on-tertiary-container);
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    // Content area - Figma: h-[161px]
+    &__content {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-card-gap-sm, 8px);
+        min-height: 161px;
+        height: auto;
+        align-items: flex-start;
+        padding: var(--size-card-pad-y-sm, 16px) var(--size-card-pad-x-sm, 16px);
+        width: 100%;
+    }
+
+    // Info container
+    &__info {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-sm, 8px);
+        align-items: flex-start;
+        padding: 0 var(--size-element-pad-y-sm, 4px);
+        width: 100%;
+    }
+
+    // Tags row
+    &__tags {
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+        gap: 0;
+        align-items: center;
+        padding: 0 var(--size-element-gap-xs, 4px);
+        width: 100%;
+    }
+
+    &__tags-separator {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3, 12px);
+        font-weight: var(--font-weight-normal, 400);
+        line-height: 1.667;
+        color: var(--color-on-surface-variant);
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin: 0 4px;
+    }
+
+    &__duration {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3, 12px);
+        font-weight: var(--font-weight-normal, 400);
+        line-height: 1.667;
+        color: var(--color-on-surface-variant);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    // Title
+    &__title {
+        font-family: var(--font-family-header);
+        min-height: 28px;
+        height: auto;
+        line-height: 1.4;
+        font-style: normal;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        position: relative;
+        flex-shrink: 0;
+        font-size: var(--font-size-h5, 20px);
+        font-weight: var(--font-weight-semibold, 600);
+        color: var(--color-on-surface);
+        white-space: nowrap;
+        width: 100%;
+        margin: 0;
+    }
+
+    // Divider
+    &__divider {
+        height: var(--size-element-stroke-sm, 1px);
+        position: relative;
+        flex-shrink: 0;
+        width: 100%;
+        opacity: 0.38;
+        background-color: var(--color-surface-container-highest);
+    }
+
+    // Actions container
+    &__actions {
+        box-sizing: border-box;
+        display: flex;
+        gap: var(--size-element-gap-sm, 8px);
+        flex-grow: 1;
+        align-items: center;
+        padding: 0 var(--size-element-pad-y-sm, 4px);
+        width: 100%;
+    }
+
+    // Indicators container
+    &__indicators {
+        display: flex;
+        flex-grow: 1;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--size-element-gap-sm, 8px);
+    }
+
+    // Status button
+    &__status-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: var(--size-element-radius-md, 8px);
+        flex-shrink: 0;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        min-width: 36px;
+        height: 36px;
+    }
+
+    &__status-icon {
+        font-size: var(--font-size-fa-body1-solid, 16px);
+        line-height: 1.75;
+        text-align: center;
+        white-space: nowrap;
+    }
+}

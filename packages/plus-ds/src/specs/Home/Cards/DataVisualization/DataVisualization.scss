@@ -1,0 +1,78 @@
+.plus-data-viz-card {
+    width: 100%;
+    max-width: 858px;
+}
+
+.plus-data-viz-tabs {
+    width: 100%;
+}
+
+.plus-data-viz-tab-content {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-lg);
+    
+    i {
+        color: var(--color-on-surface-variant);
+        font-size: 14px;
+    }
+}
+
+.plus-data-viz-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-spacing-large-space-600);
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.plus-data-viz-overview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-spacing-large-space-600); /* 32px gap between chart and legend */
+    align-items: center;
+    width: 100%;
+}
+
+.plus-data-viz-radar-container {
+    width: 100%;
+    height: 290px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plus-data-viz-progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    width: 100%;
+}
+
+.plus-data-viz-chart-container {
+    width: 100%;
+    height: 290px;
+}
+
+.plus-data-viz-legend {
+    display: flex;
+    gap: var(--size-spacing-medium-space-500);
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.plus-data-viz-legend-item {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+    align-items: center;
+}
+
+.plus-data-viz-legend-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
