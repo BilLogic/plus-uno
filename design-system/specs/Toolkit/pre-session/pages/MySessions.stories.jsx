@@ -6,11 +6,60 @@ import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
 import { NavHorizontal } from '../tables/NavHorizontal.stories';
 import { TimeframeFilter } from '../elements/TimeframeFilter.stories';
 import { SiteFilter } from '../elements/SiteFilter.stories';
+// Import Session Details modals from Toolkit specs
+import * as SessionDetailsModals from '../modals/Session Details (All User)/SessionDetails.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Pages/My Sessions',
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component: `
+# My Sessions Page
+
+The My Sessions page is the primary dashboard for tutors to view and manage their session schedule.
+
+## Page Structure
+
+The page uses the **PageLayout** component which provides:
+- **Top Bar**: Breadcrumbs and user profile
+- **Sidebar**: Navigation for tutor role
+- **Main Content**: Session data and controls
+
+## Components Used
+
+| Component | Source | Purpose |
+|-----------|--------|---------|
+| PageLayout | Universal/Pages | Page structure with sidebar |
+| StatCard | OverviewCard.stories | Dashboard statistics |
+| NavHorizontal | NavHorizontal.stories | Tab navigation |
+| TableRow/TableHeaderRow | MySessions.stories (tables) | Session data display |
+| TimeframeFilter | TimeframeFilter.stories | Date range filtering |
+| SiteFilter | SiteFilter.stories | School filtering |
+| Button | plus-ds/components | Actions |
+
+## Design System Tokens
+
+### Section Spacing
+- \`--size-section-gap-lg\`: Between major sections
+- \`--size-section-gap-sm\`: Within table section
+
+### Card Spacing
+- \`--size-card-gap-md\`: Between stat cards
+
+### Element Spacing
+- \`--size-element-gap-sm\`: Between filter dropdowns
+
+## Interactive Features
+
+The Interactive story includes:
+- **Dismissable alert** - Info update notifications
+- **Tab switching** - Navigate between session views
+- **Breakpoint toggle** - Preview at MD (768px), LG (992px), XL (1200px), XXL (1400px)
+                `,
+            },
+        },
     },
 };
 
@@ -212,10 +261,20 @@ export const Overview = () => (
  * - Dismissable alert
  * - Tab switching
  * - Dynamic session data per tab
+ * - Breakpoint toggle to preview at different screen sizes
  */
 export const Interactive = () => {
     const [showAlert, setShowAlert] = useState(true);
     const [selectedTab, setSelectedTab] = useState('my-sessions');
+    const [breakpoint, setBreakpoint] = useState('xxl');
+
+    // Breakpoint widths from design system
+    const breakpointWidths = {
+        'md': 768,
+        'lg': 992,
+        'xl': 1200,
+        'xxl': 1400,
+    };
 
     // Different session data per tab
     const sessionsByTab = {
@@ -262,30 +321,270 @@ export const Interactive = () => {
     ];
 
     return (
-        <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
-            <PageLayout
-                topBarConfig={{
-                    breadcrumbs: [
-                        { text: 'Home', href: '#' },
-                        { text: 'Sessions' }
-                    ],
-                    user: { name: 'John Doe' }
-                }}
-                sidebarConfig={{
-                    user: 'tutor',
-                    activeTab: 'sessions'
-                }}
-                id="my-sessions-page-interactive"
-            >
-                <MainContent
-                    showAlert={showAlert}
-                    onAlertClose={() => setShowAlert(false)}
-                    tabs={tabs}
-                    selectedTab={selectedTab}
-                    onTabChange={setSelectedTab}
-                    sessions={sessionsByTab[selectedTab] || []}
-                />
-            </PageLayout>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
+            {/* Breakpoint Toggle Controls */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--size-element-gap-md)',
+                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
+                backgroundColor: 'var(--color-surface-container-low)',
+                borderRadius: 'var(--size-card-radius-sm)',
+                flexWrap: 'wrap'
+            }}>
+                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                    Breakpoint:
+                </span>
+                {Object.entries(breakpointWidths).map(([bp, width]) => (
+                    <Button
+                        key={bp}
+                        text={`${bp.toUpperCase()} (${width}px)`}
+                        size="small"
+                        style="primary"
+                        fill={breakpoint === bp ? 'filled' : 'outline'}
+                        onClick={() => setBreakpoint(bp)}
+                    />
+                ))}
+                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
+                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
+                </span>
+            </div>
+
+            {/* Page Preview Container */}
+            <div style={{
+                width: `${breakpointWidths[breakpoint]}px`,
+                margin: '0 auto',
+                border: '2px dashed var(--color-outline-variant)',
+                borderRadius: 'var(--size-card-radius-sm)',
+                overflow: 'hidden',
+                transition: 'width 0.3s ease'
+            }}>
+                <PageLayout
+                    topBarConfig={{
+                        breadcrumbs: [
+                            { text: 'Home', href: '#' },
+                            { text: 'Sessions' }
+                        ],
+                        user: { name: 'John Doe' }
+                    }}
+                    sidebarConfig={{
+                        user: 'tutor',
+                        activeTab: 'sessions'
+                    }}
+                    id="my-sessions-page-interactive"
+                >
+                    <MainContent
+                        showAlert={showAlert}
+                        onAlertClose={() => setShowAlert(false)}
+                        tabs={tabs}
+                        selectedTab={selectedTab}
+                        onTabChange={setSelectedTab}
+                        sessions={sessionsByTab[selectedTab] || []}
+                    />
+                </PageLayout>
+            </div>
+        </div>
+    );
+};
+
+/**
+ * My Sessions Page - With Modals
+ * Shows the My Sessions page with a scrim overlay and Session Details modal
+ * Features:
+ * - Toggle between different modal states (organized by tab and stage)
+ * - Scrim overlay to simulate modal context
+ * - Breakpoint toggle for responsive preview
+ */
+export const WithModals = () => {
+    const [showAlert, setShowAlert] = useState(true);
+    const [selectedTab, setSelectedTab] = useState('my-sessions');
+    const [breakpoint, setBreakpoint] = useState('xl');
+    const [modalState, setModalState] = useState('session-info-post-signup');
+
+    // Breakpoint widths from design system
+    const breakpointWidths = {
+        'md': 768,
+        'lg': 992,
+        'xl': 1200,
+        'xxl': 1400,
+    };
+
+    // Modal states organized by category
+    const modalStates = {
+        'Session Info Tab': [
+            { id: 'session-info-post-signup', label: 'Post Sign-Up' },
+            { id: 'recurring-pre-signup', label: 'Recurring Pre Sign-Up' },
+            { id: 'onetime-pre-fillin', label: 'One-Time Pre Fill-In' },
+        ],
+        'Attendees Tab': [
+            { id: 'attendees-post-signup', label: 'Post Sign-Up / Fill-In' },
+        ],
+        'Fill-In Flow': [
+            { id: 'fillin-review', label: 'Review Choices' },
+        ],
+        'Call-Off Confirmations': [
+            { id: 'calloff-confirmation', label: 'Request Submitted' },
+            { id: 'auto-excuse', label: 'Auto-Excuse (Excused)' },
+            { id: 'auto-approve', label: 'Auto-Approve (Approved)' },
+        ],
+        'Actions': [
+            { id: 'unregister', label: 'Unregister Confirmation' },
+        ],
+    };
+
+    // Session data
+    const sessions = [
+        { date: 'Tue, Sep 9', timeRange: '12:30 PM - 1:30 PM', school: 'Hogwarts', teacher: 'Mr. Snape', status: 'Scheduled' },
+        { date: 'Tue, Sep 9', timeRange: '12:30 PM - 1:30 PM', school: 'Hogwarts', teacher: 'Mr. Snape', status: 'Cancelled' },
+    ];
+
+    const tabs = [
+        { id: 'my-sessions', label: 'My sessions', count: 3 },
+        { id: 'all-sessions', label: 'All sessions', count: 3 },
+        { id: 'sign-ups', label: 'Sign-ups', count: 3 },
+        { id: 'fill-ins', label: 'Fill-ins', count: 3 },
+        { id: 'call-offs', label: 'Call-offs', count: 3 },
+        { id: 'reflections', label: 'Reflections', count: 20 },
+    ];
+
+    // Render the appropriate modal based on state - uses imported SessionDetails modals
+    const renderModal = () => {
+        // Map modal state IDs to actual exported story components
+        const modalComponents = {
+            'session-info-post-signup': SessionDetailsModals.SessionInfo_PostSignUp,
+            'recurring-pre-signup': SessionDetailsModals.RecurringSession_PreSignUp,
+            'onetime-pre-fillin': SessionDetailsModals.OneTimeSession_PreFillIn,
+            'attendees-post-signup': SessionDetailsModals.SessionAttendees_PostSignUp_FillIn,
+            'fillin-review': SessionDetailsModals.FillIn_ReviewChoices,
+            'calloff-confirmation': SessionDetailsModals.CallOff_Confirmation_PostSignUp,
+            'auto-excuse': SessionDetailsModals.AutoExcuse_Confirmation_PostSignUp,
+            'auto-approve': SessionDetailsModals.AutoApprove_Confirmation_PostSignUp,
+            'unregister': SessionDetailsModals.Unregister_PostSignUp,
+        };
+
+        const ModalComponent = modalComponents[modalState];
+
+        if (!ModalComponent) {
+            return (
+                <div style={{
+                    backgroundColor: 'var(--color-surface-container-high)',
+                    borderRadius: 'var(--size-modal-radius-lg)',
+                    padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
+                    width: '672px'
+                }}>
+                    <p className="body2-txt">Modal not found: {modalState}</p>
+                </div>
+            );
+        }
+
+        return <ModalComponent />;
+    };
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
+            {/* Controls */}
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-md)',
+                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
+                backgroundColor: 'var(--color-surface-container-low)',
+                borderRadius: 'var(--size-card-radius-sm)',
+            }}>
+                {/* Breakpoint Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
+                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '80px' }}>
+                        Breakpoint:
+                    </span>
+                    {Object.entries(breakpointWidths).map(([bp, width]) => (
+                        <Button
+                            key={bp}
+                            text={`${bp.toUpperCase()} (${width}px)`}
+                            size="small"
+                            style="primary"
+                            fill={breakpoint === bp ? 'filled' : 'outline'}
+                            onClick={() => setBreakpoint(bp)}
+                        />
+                    ))}
+                </div>
+
+                {/* Modal State Toggle */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                        Modal State:
+                    </span>
+                    {Object.entries(modalStates).map(([category, states]) => (
+                        <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
+                            <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', minWidth: '140px', fontSize: '0.75rem' }}>
+                                {category}:
+                            </span>
+                            {states.map(state => (
+                                <Button
+                                    key={state.id}
+                                    text={state.label}
+                                    size="small"
+                                    style="primary"
+                                    fill={modalState === state.id ? 'filled' : 'ghost'}
+                                    onClick={() => setModalState(state.id)}
+                                />
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Page Preview with Modal */}
+            <div style={{
+                position: 'relative',
+                width: `${breakpointWidths[breakpoint]}px`,
+                margin: '0 auto',
+                border: '2px dashed var(--color-outline-variant)',
+                borderRadius: 'var(--size-card-radius-sm)',
+                overflow: 'hidden',
+                transition: 'width 0.3s ease'
+            }}>
+                {/* Background Page */}
+                <PageLayout
+                    topBarConfig={{
+                        breadcrumbs: [
+                            { text: 'Home', href: '#' },
+                            { text: 'Sessions' }
+                        ],
+                        user: { name: 'John Doe' }
+                    }}
+                    sidebarConfig={{
+                        user: 'tutor',
+                        activeTab: 'sessions'
+                    }}
+                    id="my-sessions-page-with-modals"
+                >
+                    <MainContent
+                        showAlert={showAlert}
+                        onAlertClose={() => setShowAlert(false)}
+                        tabs={tabs}
+                        selectedTab={selectedTab}
+                        onTabChange={setSelectedTab}
+                        sessions={sessions}
+                    />
+                </PageLayout>
+
+                {/* Scrim Overlay */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 'var(--size-section-pad-x-lg)',
+                    zIndex: 1000
+                }}>
+                    {renderModal()}
+                </div>
+            </div>
         </div>
     );
 };

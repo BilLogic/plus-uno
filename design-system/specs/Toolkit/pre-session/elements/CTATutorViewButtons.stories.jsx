@@ -9,6 +9,85 @@ export default {
     },
 };
 
+// ========================================
+// Reusable CTA Button Components (Tutor View)
+// Import these in modals and other components
+// ========================================
+
+// Sign Up / Fill In Buttons
+export const SignUpButton = ({ disabled = false, ...props }) => (
+    <Button text="Sign up" leadingVisual="user" style="primary" disabled={disabled} {...props} />
+);
+
+export const FillInButton = (props) => (
+    <Button text="Fill in for this session" leadingVisual="user" style="primary" {...props} />
+);
+
+export const SignUpRecurringButton = (props) => (
+    <Button text="Sign up for recurring session" leadingVisual="user" style="primary" {...props} />
+);
+
+// Session List Buttons
+export const SeeSessionsFillInButton = (props) => (
+    <Button text="See sessions open to fill-in" style="primary" fill="outline" {...props} />
+);
+
+export const SeeSessionsSignUpButton = (props) => (
+    <Button text="See sessions open for sign-up" style="primary" fill="outline" {...props} />
+);
+
+// Navigation / Action Buttons
+export const CloseButton = (props) => (
+    <Button text="Close" style="primary" fill="outline" {...props} />
+);
+
+export const RequestCallOffButton = (props) => (
+    <Button text="Request Call-off" style="danger" fill="outline" {...props} />
+);
+
+export const CancelButton = (props) => (
+    <Button text="Cancel" style="primary" fill="outline" {...props} />
+);
+
+export const BackButton = (props) => (
+    <Button text="Back" style="primary" fill="outline" {...props} />
+);
+
+// Session Action Buttons
+export const JoinSessionButton = ({ block = false, ...props }) => (
+    <Button text="Join session" leadingVisual="video" style="primary" block={block} {...props} />
+);
+
+export const SessionCancelledButton = (props) => (
+    <Button text="Session cancelled" leadingVisual="user" style="primary" disabled {...props} />
+);
+
+// Request Buttons
+export const SubmitRequestButton = ({ disabled = false, ...props }) => (
+    <Button text="Submit Request" style="warning" disabled={disabled} {...props} />
+);
+
+export const ViewPendingRequestButton = (props) => (
+    <Button text="View Pending Request" style="primary" {...props} />
+);
+
+// Schedule & Withdrawal Buttons
+export const ViewUpdatedScheduleButton = (props) => (
+    <Button text="View Updated Schedule" style="primary" {...props} />
+);
+
+export const WithdrawRequestButton = (props) => (
+    <Button text="Withdraw Request" style="danger" fill="outline" {...props} />
+);
+
+export const ConfirmWithdrawalButton = (props) => (
+    <Button text="Confirm Withdrawal" style="danger" fill="outline" {...props} />
+);
+
+// ========================================
+// Story Component
+// ========================================
+
 export const CtaTutorViewButtons = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-lg)' }}>
         <p className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>
