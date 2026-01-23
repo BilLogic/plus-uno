@@ -23,6 +23,8 @@ const config = {
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
     // Include Toolkit stories from design-system directory
     '../design-system/**/*.stories.@(js|jsx|ts|tsx)',
+    // Include MDX docs from design-system directory
+    '../design-system/**/*.mdx',
     // Exclude non-existent component directories
     '!../packages/plus-ds/src/specs/**/SessionDataCardsSection/**/*.stories.@(js|jsx|ts|tsx)',
     // Explicitly exclude legacy Toolkit specs

@@ -11,9 +11,16 @@ export default {
 /**
  * Confirmation Alert Card (Checkbox for recurring call-off)
  * Warning bordered card with small checkbox
+ * Reusable component that accepts custom label text
  * Figma node: 221:172584
  */
-const ConfirmationAlert = () => (
+export const ConfirmationAlert = ({
+    checked,
+    onChange,
+    label = "I have already spoken with my supervisor about dropping this recurring session",
+    helperText = "Please contact your supervisor via email/Slack before proceeding.",
+    showHelper = true
+}) => (
     <div
         style={{
             backgroundColor: 'var(--color-warning-state-16)',
@@ -27,21 +34,29 @@ const ConfirmationAlert = () => (
         }}
     >
         <div className="d-flex align-items-start" style={{ gap: 'var(--size-element-gap-sm)' }}>
-            <Checkbox size="small" required style={{ flexShrink: 0, width: 'auto', margin: 0, padding: 0 }} />
+            <Checkbox
+                size="small"
+                required
+                checked={checked}
+                onChange={onChange}
+                style={{ flexShrink: 0, width: 'auto', margin: 0, padding: 0 }}
+            />
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                I have already spoken with my supervisor about dropping this recurring session
+                {label}
                 <span style={{ color: 'var(--color-danger)' }}> *</span>
             </span>
         </div>
-        <span
-            className="body2-txt"
-            style={{
-                color: 'var(--color-danger-text)',
-                marginLeft: 'var(--size-card-pad-x-md)'
-            }}
-        >
-            Please contact your supervisor via email/Slack before proceeding.
-        </span>
+        {showHelper && (
+            <span
+                className="body2-txt"
+                style={{
+                    color: 'var(--color-danger-text)',
+                    marginLeft: 'var(--size-card-pad-x-md)'
+                }}
+            >
+                {helperText}
+            </span>
+        )}
     </div>
 );
 

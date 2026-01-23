@@ -4,11 +4,27 @@ import ButtonGroup from '../../../../../../packages/plus-ds/src/components/Butto
 import Button from '../../../../../../packages/plus-ds/src/components/Button';
 import Badge from '../../../../../../packages/plus-ds/src/components/Badge';
 import Alert from '../../../../../../packages/plus-ds/src/components/Alert';
+import Checkbox from '../../../../../../packages/plus-ds/src/forms/Checkbox';
 
 // Import the reusable SessionInfoCard component
 import { SessionInfoCard } from '../../cards/SessionInfoCard.stories';
 // Import the reused AttendanceRosterRow component
 import { AttendanceRosterRow } from '../../elements/PopupModalAttendanceRoster.stories';
+// Import the reusable ConfirmationAlert component
+import { ConfirmationAlert } from '../../cards/CallOffAlerts.stories';
+// Import CTA button components from Tutor View
+import {
+    RequestCallOffButton,
+    JoinSessionButton,
+    BackButton,
+    SubmitRequestButton,
+    SeeSessionsFillInButton,
+    SeeSessionsSignUpButton,
+    ViewUpdatedScheduleButton,
+    SignUpRecurringButton,
+    FillInButton,
+    CloseButton
+} from '../../elements/CTATutorViewButtons.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Session Details (All User)',
@@ -123,20 +139,10 @@ export const SessionInfo_PostSignUp = () => (
                     />
                 </div>
 
-                {/* Footer Buttons */}
+                {/* Footer Buttons - using CTA Tutor View components */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <Button
-                        text="Request Call-off"
-                        style="danger"
-                        fill="outline"
-                    />
-                    <Button
-                        text="Join session"
-                        leadingVisual="video"
-                        style="primary"
-                        fill="filled"
-                        block
-                    />
+                    <RequestCallOffButton />
+                    <JoinSessionButton block />
                 </div>
             </div>
         }
@@ -291,19 +297,9 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
 
                 {/* Footer Buttons */}
                 <div className="d-flex justify-content-between align-items-center" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <Button
-                        text="Request Call-off"
-                        style="danger"
-                        fill="outline"
-                    />
+                    <RequestCallOffButton />
                     <div style={{ flex: 1 }}>
-                        <Button
-                            text="Join session"
-                            leadingVisual="video"
-                            style="primary"
-                            fill="filled"
-                            block
-                        />
+                        <JoinSessionButton block />
                     </div>
                 </div>
             </div>
@@ -414,20 +410,12 @@ export const RecurringSession_PreSignUp = () => (
                     />
                 </div>
 
-                {/* Footer Buttons */}
+                {/* Footer Buttons - using CTA Tutor View components */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <Button
-                        text="Close"
-                        style="primary"
-                        fill="outline"
-                    />
-                    <Button
-                        text="Sign up for recurring session"
-                        leadingVisual="user-plus"
-                        style="primary"
-                        fill="filled"
-                        block
-                    />
+                    <CloseButton />
+                    <div style={{ flex: 1 }}>
+                        <SignUpRecurringButton block />
+                    </div>
                 </div>
             </div>
         }
@@ -539,20 +527,12 @@ export const OneTimeSession_PreFillIn = () => (
                     />
                 </div>
 
-                {/* Footer Buttons */}
+                {/* Footer Buttons - using CTA Tutor View components */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <Button
-                        text="Close"
-                        style="primary"
-                        fill="outline"
-                    />
-                    <Button
-                        text="Fill in for this session"
-                        leadingVisual="user-plus"
-                        style="primary"
-                        fill="filled"
-                        block
-                    />
+                    <CloseButton />
+                    <div style={{ flex: 1 }}>
+                        <FillInButton block />
+                    </div>
                 </div>
             </div>
         }
@@ -756,19 +736,322 @@ export const FillIn_ReviewChoices = () => {
                         </div>
                     </div>
 
-                    {/* Footer Buttons */}
+                    {/* Footer Buttons - using CTA Tutor View components */}
                     <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                        <Button
-                            text="Back"
-                            style="primary"
-                            fill="outline"
+                        <BackButton />
+                        <div style={{ flex: 1 }}>
+                            <Button
+                                text="Confirm & complete fill-in"
+                                style="primary"
+                                fill="filled"
+                                block
+                            />
+                        </div>
+                    </div>
+                </div>
+            }
+        />
+    );
+};
+
+/**
+ * Call-Off Confirmation - Post Sign-Up
+ * Shows confirmation that call-off request has been submitted
+ * Features:
+ * - Clock icon in circular warning-colored background
+ * - "Request submitted" heading (H5)
+ * - Description about supervisor review (B2)
+ * - Two action buttons
+ */
+export const CallOff_Confirmation_PostSignUp = () => (
+    <Modal
+        width={672}
+        showBottomButtons={false}
+        onClose={() => { }}
+        body={
+            <div className="d-flex flex-column" style={{
+                gap: 'var(--size-modal-gap-lg)',
+                backgroundColor: 'var(--color-surface-container-high)',
+                padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
+                borderRadius: 'var(--size-modal-radius-lg)'
+            }}>
+
+                {/* Header */}
+                <div className="d-flex justify-content-between align-items-center">
+                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <i
+                        className="fa-solid fa-xmark"
+                        style={{
+                            fontSize: 'var(--font-size-fa-h4-solid)',
+                            color: 'var(--color-on-surface-variant)',
+                            cursor: 'pointer'
+                        }}
+                    />
+                </div>
+
+                {/* Confirmation Content - Centered */}
+                <div className="d-flex flex-column align-items-center text-center" style={{
+                    gap: 'var(--size-modal-gap-md)'
+                }}>
+                    {/* Clock Icon in Circle - Using FA Huge size */}
+                    <div style={{
+                        width: 'var(--font-size-fa-huge-solid, 8rem)',
+                        height: 'var(--font-size-fa-huge-solid, 8rem)',
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--color-warning)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <i
+                            className="fa-regular fa-clock"
+                            style={{
+                                fontSize: 'calc(var(--font-size-fa-huge-solid, 8rem) * 0.5)',
+                                lineHeight: 1,
+                                color: 'var(--color-on-warning)'
+                            }}
                         />
-                        <Button
-                            text="Confirm & complete fill-in"
-                            style="primary"
-                            fill="filled"
-                            block
+                    </div>
+
+                    {/* Request Submitted Heading - H5 to match other modals */}
+                    <h5 className="h5 m-0">Request submitted</h5>
+
+                    {/* Description Text - B2 */}
+                    <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                        Your request is under supervisor review. You'll be notified once processed. Until then, the absence may count against you.
+                    </p>
+                </div>
+
+                {/* Footer Buttons - using CTA Tutor View components */}
+                <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
+                    <div style={{ flex: 1 }}>
+                        <SeeSessionsFillInButton block />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <ViewUpdatedScheduleButton block />
+                    </div>
+                </div>
+
+            </div>
+        }
+    />
+);
+
+/**
+ * Auto-Excuse Confirmation - Post Sign-Up
+ * Shows confirmation that call-off request has been auto-excused
+ * Features:
+ * - Checkmark icon in circular success-colored background
+ * - "Call-off excused" heading (H5)
+ * - Description about session removal (B2)
+ * - Two action buttons
+ */
+export const AutoExcuse_Confirmation_PostSignUp = () => (
+    <Modal
+        width={672}
+        showBottomButtons={false}
+        onClose={() => { }}
+        body={
+            <div className="d-flex flex-column" style={{
+                gap: 'var(--size-modal-gap-lg)',
+                backgroundColor: 'var(--color-surface-container-high)',
+                padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
+                borderRadius: 'var(--size-modal-radius-lg)'
+            }}>
+
+                {/* Header */}
+                <div className="d-flex justify-content-between align-items-center">
+                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <i
+                        className="fa-solid fa-xmark"
+                        style={{
+                            fontSize: 'var(--font-size-fa-h4-solid)',
+                            color: 'var(--color-on-surface-variant)',
+                            cursor: 'pointer'
+                        }}
+                    />
+                </div>
+
+                {/* Success Confirmation Content - Centered */}
+                <div className="d-flex flex-column align-items-center text-center" style={{
+                    gap: 'var(--size-modal-gap-md)'
+                }}>
+                    {/* Checkmark Icon in Circle - Using FA Huge size */}
+                    <div style={{
+                        width: 'var(--font-size-fa-huge-solid, 8rem)',
+                        height: 'var(--font-size-fa-huge-solid, 8rem)',
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--color-success)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <i
+                            className="fa-solid fa-check"
+                            style={{
+                                fontSize: 'calc(var(--font-size-fa-huge-solid, 8rem) * 0.5)',
+                                lineHeight: 1,
+                                color: 'var(--color-on-success)'
+                            }}
                         />
+                    </div>
+
+                    {/* Call-off Excused Heading - H5 to match other modals */}
+                    <h5 className="h5 m-0">Call-off excused</h5>
+
+                    {/* Description Text - B2 */}
+                    <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                        Your request has been excused. This session have been removed from your schedule and you are no longer expected to attend.
+                    </p>
+                </div>
+
+                {/* Footer Buttons - using CTA Tutor View components */}
+                <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
+                    <div style={{ flex: 1 }}>
+                        <SeeSessionsFillInButton block />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <ViewUpdatedScheduleButton block />
+                    </div>
+                </div>
+            </div>
+        }
+    />
+);
+
+/**
+ * Auto-Approve Confirmation - Post Sign-Up
+ * Shows confirmation that call-off request has been auto-approved
+ * Features:
+ * - Checkmark icon in circular success-colored background
+ * - "Call-off approved" heading (H5)
+ * - Description about session removal (B2)
+ * - Two action buttons
+ */
+export const AutoApprove_Confirmation_PostSignUp = () => (
+    <Modal
+        width={672}
+        showBottomButtons={false}
+        onClose={() => { }}
+        body={
+            <div className="d-flex flex-column" style={{
+                gap: 'var(--size-modal-gap-lg)',
+                backgroundColor: 'var(--color-surface-container-high)',
+                padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
+                borderRadius: 'var(--size-modal-radius-lg)'
+            }}>
+
+                {/* Header */}
+                <div className="d-flex justify-content-between align-items-center">
+                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <i
+                        className="fa-solid fa-xmark"
+                        style={{
+                            fontSize: 'var(--font-size-fa-h4-solid)',
+                            color: 'var(--color-on-surface-variant)',
+                            cursor: 'pointer'
+                        }}
+                    />
+                </div>
+
+                {/* Success Confirmation Content - Centered */}
+                <div className="d-flex flex-column align-items-center text-center" style={{
+                    gap: 'var(--size-modal-gap-md)'
+                }}>
+                    {/* Checkmark Icon in Circle - Using FA Huge size */}
+                    <div style={{
+                        width: 'var(--font-size-fa-huge-solid, 8rem)',
+                        height: 'var(--font-size-fa-huge-solid, 8rem)',
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--color-success)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <i
+                            className="fa-solid fa-check"
+                            style={{
+                                fontSize: 'calc(var(--font-size-fa-huge-solid, 8rem) * 0.5)',
+                                lineHeight: 1,
+                                color: 'var(--color-on-success)'
+                            }}
+                        />
+                    </div>
+
+                    {/* Call-off Approved Heading - H5 to match other modals */}
+                    <h5 className="h5 m-0">Call-off approved</h5>
+
+                    {/* Description Text - B2 */}
+                    <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                        Your request has been approved. The related sessions have been removed from your schedule and you are no longer expected to attend.
+                    </p>
+                </div>
+
+                {/* Footer Buttons - using CTA Tutor View components */}
+                <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
+                    <div style={{ flex: 1 }}>
+                        <SeeSessionsSignUpButton block />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <ViewUpdatedScheduleButton block />
+                    </div>
+                </div>
+            </div>
+        }
+    />
+);
+
+/**
+ * Unregister - Post Sign-Up
+ * Shows confirmation dialog to unregister from recurring sessions
+ * Features:
+ * - Warning Alert with checkbox confirmation
+ * - "I understand..." checkbox text with required asterisk
+ * - Back and Submit Request buttons (Submit disabled until checkbox is checked)
+ */
+export const Unregister_PostSignUp = () => {
+    const [isChecked, setIsChecked] = React.useState(false);
+
+    return (
+        <Modal
+            width={672}
+            showBottomButtons={false}
+            onClose={() => { }}
+            body={
+                <div className="d-flex flex-column" style={{
+                    gap: 'var(--size-modal-gap-lg)',
+                    backgroundColor: 'var(--color-surface-container-high)',
+                    padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
+                    borderRadius: 'var(--size-modal-radius-lg)'
+                }}>
+
+                    {/* Header */}
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h4 className="h4 m-0">Unregister from recurring sessions</h4>
+                        <i
+                            className="fa-solid fa-xmark"
+                            style={{
+                                fontSize: 'var(--font-size-fa-h4-solid)',
+                                color: 'var(--color-on-surface-variant)',
+                                cursor: 'pointer'
+                            }}
+                        />
+                    </div>
+
+                    {/* Warning Confirmation - reuses CallOffAlerts component */}
+                    <ConfirmationAlert
+                        checked={isChecked}
+                        onChange={(e) => setIsChecked(e.target.checked)}
+                        label="I understand that upon submitting this request, I will be removed from all upcoming sessions in this recurring series."
+                        showHelper={false}
+                    />
+
+                    {/* Footer Buttons - using CTA Tutor View components */}
+                    <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
+                        <BackButton />
+                        <div style={{ flex: 1 }}>
+                            <SubmitRequestButton disabled={!isChecked} block />
+                        </div>
                     </div>
                 </div>
             }
