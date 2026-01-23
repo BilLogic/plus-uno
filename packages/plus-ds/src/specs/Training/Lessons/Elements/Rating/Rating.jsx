@@ -2,7 +2,7 @@
  * Rating Component
  * 
  * Rating component with 5 rating singles (1-5).
- * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177637
+ * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177636
  */
 
 import React from 'react';

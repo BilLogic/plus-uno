@@ -133,7 +133,7 @@ Node ID: 531-62962
         },
         breakpoint: {
             control: 'select',
-            options: ['md', 'lg', 'xl', 'xxl'],
+            options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },

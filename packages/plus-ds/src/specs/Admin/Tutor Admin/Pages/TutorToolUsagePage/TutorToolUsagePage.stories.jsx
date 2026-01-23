@@ -38,7 +38,7 @@ Full page layout for Tutor Tool Usage section.
     argTypes: {
         breakpoint: {
             control: { type: 'select' },
-            options: ['md', 'lg', 'xl', 'xxl'],
+            options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
@@ -58,7 +58,7 @@ Full page layout for Tutor Tool Usage section.
     },
     decorators: [
         (Story, context) => {
-            const breakpoint = context.args.breakpoint || 'xxl';
+            const breakpoint = context.args.breakpoint || 'xl';
             return (
                 <ResponsiveFrame breakpoint={breakpoint}>
                     <Story />
@@ -86,7 +86,7 @@ export const Docs = {
 export const Overview = {
     render: () => (
         <TutorToolUsagePage
-            breakpoint="xxl"
+            breakpoint="xl"
             activeTab="toolUsage"
             currentPage={1}
             totalPages={20}
@@ -123,7 +123,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        breakpoint: 'xxl',
+        breakpoint: 'xl',
         activeTab: 'toolUsage',
         currentPage: 1,
         totalPages: 20,

@@ -47,10 +47,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: var(--font-size-fa-body2-solid); // 12px
-        height: var(--font-size-fa-body2-solid); // 12px
-        border-radius: var(--size-element-radius-pill);
-        border: 1px solid var(--color-primary);
+        width: var(--size-spacing-medium-space-200); // 12px
+        height: var(--size-spacing-medium-space-200); // 12px
+        border-radius: var(--size-element-radius-full); // 999px (circular)
+        border: var(--size-element-stroke-sm) solid var(--color-primary); // 1px
         box-sizing: border-box;
         background-color: var(--color-on-primary); // white
         padding: 0;
@@ -58,14 +58,14 @@
 
         &--checked {
             background-color: var(--color-surface);
-            padding: 2px;
+            padding: var(--size-spacing-small-space-025); // 2px
         }
     }
 
     &__radio-inner {
-        width: calc(var(--font-size-fa-body2-solid) - 4px); // 8px (12px - 2px padding * 2)
-        height: calc(var(--font-size-fa-body2-solid) - 4px); // 8px
-        border-radius: var(--size-element-radius-pill);
+        width: var(--size-spacing-small-space-100); // 8px
+        height: var(--size-spacing-small-space-100); // 8px
+        border-radius: var(--size-element-radius-full); // 999px (circular)
         background-color: var(--color-primary);
         flex-shrink: 0;
     }

@@ -1,8 +1,0 @@
-.lessons-table-section {
-    padding: var(--size-section-pad-md, 24px);
-    background-color: var(--color-surface);
-    
-    &__header { margin-bottom: var(--size-card-gap-md, 16px); }
-    &__title { margin: 0; }
-    &__content { background-color: var(--color-surface); border-radius: var(--size-card-radius-sm, 8px); }
-}

@@ -12,9 +12,8 @@ const ResponsiveFrame = ({ breakpoint, children }) => {
     // Map breakpoints to fixed widths
     const widthMap = {
         md: 768,
-        lg: 992,
-        xl: 1200,
-        xxl: 1400,
+        lg: 1024,
+        xl: 1440,
     };
 
     const width = widthMap[breakpoint] || '100%';

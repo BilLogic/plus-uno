@@ -30,13 +30,32 @@ export default {
 };
 
 /**
- * Default
- * Default status select
+ * Overview
+ * Shows all possible states selected
  */
-export const Default = {
+export const Overview = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
-            <TrainingLessonStatusSelect />
+        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div>
+                <h4 style={{ marginBottom: '16px' }}>Status: All</h4>
+                <TrainingLessonStatusSelect selectedStatus="All" />
+            </div>
+            <div>
+                <h4 style={{ marginBottom: '16px' }}>Status: Assigned</h4>
+                <TrainingLessonStatusSelect selectedStatus="Assigned" />
+            </div>
+            <div>
+                <h4 style={{ marginBottom: '16px' }}>Status: In Progress</h4>
+                <TrainingLessonStatusSelect selectedStatus="In Progress" />
+            </div>
+            <div>
+                <h4 style={{ marginBottom: '16px' }}>Status: Completed</h4>
+                <TrainingLessonStatusSelect selectedStatus="Completed" />
+            </div>
+            <div>
+                <h4 style={{ marginBottom: '16px' }}>Status: Not Started</h4>
+                <TrainingLessonStatusSelect selectedStatus="Not Started" />
+            </div>
         </div>
     )
 };
@@ -50,7 +69,7 @@ export const Interactive = {
         const [selectedStatus, setSelectedStatus] = useState(args.selectedStatus || 'All');
 
         return (
-            <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
+            <div style={{ padding: '32px' }}>
                 <p className="body2-txt" style={{ marginBottom: '16px' }}>
                     Selected: {selectedStatus}
                 </p>

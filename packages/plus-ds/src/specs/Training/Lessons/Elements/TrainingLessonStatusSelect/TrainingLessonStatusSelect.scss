@@ -40,6 +40,11 @@
             outline: 2px solid var(--color-primary);
             outline-offset: 2px;
         }
+
+        // Hide Bootstrap's default dropdown caret
+        &::after {
+            display: none !important;
+        }
     }
 
     &__button-text {
@@ -60,8 +65,7 @@
     }
 
     &__menu {
-        min-width: 218.67px;
-        max-width: 332px;
+        width: 332px;
         background-color: var(--color-surface-container-high);
         border-radius: var(--size-element-radius-sm);
         box-shadow: var(--elevation-light-2);

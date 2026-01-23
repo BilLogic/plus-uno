@@ -30,39 +30,39 @@ const LessonsOverviewPage = ({
 }) => {
     // Default sample lessons
     const defaultLessons = [
-        { 
-            id: 1, 
-            title: 'Giving Effective Praise', 
-            competencyArea: 'socio-emotional', 
-            status: 'not-started', 
-            duration: '12mins', 
+        {
+            id: 1,
+            title: 'Giving Effective Praise',
+            competencyArea: 'socio-emotional',
+            status: 'not-started',
+            duration: '12mins',
             showAiIndicator: true,
             description: 'Learn how to give effective praise to increase student motivation.'
         },
-        { 
-            id: 2, 
-            title: 'Building Rapport', 
-            competencyArea: 'relationships', 
-            status: 'in-progress', 
-            duration: '15mins', 
+        {
+            id: 2,
+            title: 'Building Rapport',
+            competencyArea: 'relationships',
+            status: 'in-progress',
+            duration: '15mins',
             showAiIndicator: false,
             description: 'Strategies for building strong relationships with students.'
         },
-        { 
-            id: 3, 
-            title: 'Goal Setting', 
-            competencyArea: 'advocacy', 
-            status: 'completed', 
-            duration: '10mins', 
+        {
+            id: 3,
+            title: 'Goal Setting',
+            competencyArea: 'advocacy',
+            status: 'completed',
+            duration: '10mins',
             showAiIndicator: true,
             description: 'Help students set and achieve meaningful goals.'
         },
-        { 
-            id: 4, 
-            title: 'Active Listening', 
-            competencyArea: 'socio-emotional', 
-            status: 'not-started', 
-            duration: '18mins', 
+        {
+            id: 4,
+            title: 'Active Listening',
+            competencyArea: 'socio-emotional',
+            status: 'not-started',
+            duration: '18mins',
             showAiIndicator: false,
             description: 'Master the art of active listening in tutoring sessions.'
         },

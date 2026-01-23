@@ -97,15 +97,15 @@ export const Docs = {
  */
 export const Overview = {
     render: () => (
-        <div style={{ 
-            padding: 'var(--size-section-pad-y-lg, 32px)', 
-            backgroundColor: 'var(--color-surface)',
+        <div style={{
+            padding: 'var(--size-section-pad-y-lg, 32px)',
+            backgroundColor: 'transparent',
             display: 'flex',
             flexDirection: 'column',
             gap: '24px',
             alignItems: 'flex-start'
         }}>
-            <LessonCard 
+            <LessonCard
                 lessonTitle="Introduction to Social-Emotional Learning"
                 lessonDescription="Learn the fundamentals of SEL"
                 competencyArea="socio-emotional"
@@ -114,7 +114,7 @@ export const Overview = {
                 showAiIndicator={true}
                 onContinue={() => console.log('Continue clicked')}
             />
-            <LessonCard 
+            <LessonCard
                 lessonTitle="Building Strong Relationships"
                 lessonDescription="Explore relationship-building strategies"
                 competencyArea="relationships"
@@ -134,9 +134,9 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => (
-        <div style={{ 
-            padding: 'var(--size-section-pad-y-lg, 32px)', 
-            backgroundColor: 'var(--color-surface)'
+        <div style={{
+            padding: 'var(--size-section-pad-y-lg, 32px)',
+            backgroundColor: 'transparent'
         }}>
             <LessonCard
                 lessonTitle={args.lessonTitle}

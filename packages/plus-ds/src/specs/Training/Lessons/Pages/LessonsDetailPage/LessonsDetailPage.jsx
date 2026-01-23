@@ -14,7 +14,7 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../../../components/Button';
+import Button from '../../../../../components/Button/Button';
 import Rating from '../../Elements/Rating/Rating';
 import './LessonsDetailPage.scss';
 

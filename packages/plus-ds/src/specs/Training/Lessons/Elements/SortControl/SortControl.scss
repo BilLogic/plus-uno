@@ -36,6 +36,11 @@
             outline: 2px solid var(--color-primary);
             outline-offset: 2px;
         }
+
+        // Hide Bootstrap's default dropdown caret
+        &::after {
+            display: none !important;
+        }
     }
 
     &__button-text {

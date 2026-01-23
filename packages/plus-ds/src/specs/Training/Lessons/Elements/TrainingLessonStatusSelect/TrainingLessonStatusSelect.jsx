@@ -87,7 +87,7 @@ const TrainingLessonStatusSelect = ({
                     <span className="training-lesson-status-select__button-text">{selectedStatus}</span>
                     <Badge
                         style={getBadgeStyle(currentConfig.colorStyle)}
-                        size="small"
+                        size="b3"
                         className="training-lesson-status-select__counter"
                     >
                         {currentConfig.count}
@@ -111,7 +111,7 @@ const TrainingLessonStatusSelect = ({
                                 </span>
                                 <Badge
                                     style={getBadgeStyle(config.colorStyle)}
-                                    size="small"
+                                    size="b3"
                                     className="training-lesson-status-select__item-counter"
                                 >
                                     {config.count}

@@ -38,8 +38,8 @@ export default {
 
         breakpoint: {
             control: { type: 'select' },
-            options: ['md', 'lg', 'xl', 'xxl'],
-            description: 'Responsive breakpoint (md: 768px, lg: 992px, xl: 1200px, xxl: 1400px)',
+            options: ['md', 'lg', 'xl'],
+            description: 'Responsive breakpoint (md: 768px, lg: 1024px, xl: 1440px)',
             table: { category: 'Responsive' },
         },
         statusFilter: {

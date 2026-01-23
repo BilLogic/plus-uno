@@ -2,232 +2,20 @@
  * LessonsTable Component
  * 
  * Data table for displaying lessons with expandable rows.
- * Matches Figma design exactly: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-178095
+ * Matches Figma design: node-id=63-178095
  */
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Table } from 'react-bootstrap';
 import Button from '@/components/Button';
 import Badge from '@/components/Badge';
 import Progress from '@/components/Progress';
 import { StaticBadgeSmart } from '@/components/StaticBadgeSmart';
 import AiIndicator from '../../Elements/AiIndicator/AiIndicator';
+// Status config inline for now
 import './LessonsTable.scss';
 
-// Status icon mapping
-const statusIconMap = {
-    'not-started': { icon: 'square-plus', size: 'small' },
-    'in-progress': { icon: 'spinner', size: 'large' },
-    'started': { icon: 'spinner', size: 'large' },
-    'complete': { icon: 'circle-check', size: 'large' },
-    'completed': { icon: 'circle-check', size: 'large' },
-    'assigned': { icon: 'square-plus', size: 'small' }
-};
-
-// Status badge style mapping
-const statusBadgeMap = {
-    'completed': 'success',
-    'complete': 'success',
-    'in-progress': 'warning',
-    'not-started': 'secondary',
-    'assigned': 'info'
-};
-
-// Status label mapping
-const statusLabelMap = {
-    'completed': 'Completed',
-    'complete': 'Completed',
-    'in-progress': 'In Progress',
-    'not-started': 'Not Started',
-    'assigned': 'Assigned'
-};
-
-/**
- * Table Header Row
- */
-const LessonsTableHeader = ({ showProgress = false }) => (
-    <div className="lessons-table__header">
-        <div className="lessons-table__cell lessons-table__cell--header lessons-table__cell--lesson">
-            <span className="lessons-table__header-text">Lesson</span>
-        </div>
-        <div className="lessons-table__cell lessons-table__cell--header lessons-table__cell--competency">
-            <span className="lessons-table__header-text">Competency</span>
-        </div>
-        <div className="lessons-table__cell lessons-table__cell--header lessons-table__cell--status lessons-table__cell--center">
-            <span className="lessons-table__header-text">Status</span>
-        </div>
-        <div className="lessons-table__cell lessons-table__cell--header lessons-table__cell--duration">
-            <span className="lessons-table__header-text">Duration</span>
-        </div>
-        {showProgress && (
-            <div className="lessons-table__cell lessons-table__cell--header lessons-table__cell--progress">
-                <span className="lessons-table__header-text">Progress</span>
-            </div>
-        )}
-        <div className="lessons-table__cell lessons-table__cell--header lessons-table__cell--actions">
-            <span className="lessons-table__header-text">Action</span>
-        </div>
-    </div>
-);
-
-LessonsTableHeader.propTypes = {
-    showProgress: PropTypes.bool
-};
-
-/**
- * Table Item Row
- */
-const LessonsTableItem = ({
-    lesson,
-    expanded,
-    onToggle,
-    onContinue,
-    onActionClick,
-    state = 'default',
-    showProgress = false,
-    usePills = false
-}) => {
-    const statusConfig = statusIconMap[lesson.status] || statusIconMap['not-started'];
-    const statusBadgeStyle = statusBadgeMap[lesson.status] || 'secondary';
-    const statusLabel = statusLabelMap[lesson.status] || lesson.status;
-    const isCompleted = lesson.status === 'completed' || lesson.status === 'complete';
-    
-    const rowClasses = [
-        'lessons-table__row',
-        `lessons-table__row--${state}`,
-        expanded ? 'lessons-table__row--expanded' : ''
-    ].filter(Boolean).join(' ');
-
-    const handleActionClick = (e) => {
-        e.preventDefault();
-        if (onActionClick) {
-            onActionClick(lesson);
-        } else if (onContinue) {
-            onContinue(lesson);
-        }
-    };
-
-    return (
-        <div className={rowClasses}>
-            {/* Main Row */}
-            <div className={`lessons-table__row-main ${showProgress ? 'lessons-table__row-main--with-progress' : ''}`}>
-                {/* Column 1-3: Toggle + Title + AI Indicator */}
-                <div className="lessons-table__cell lessons-table__cell--lesson">
-                    {lesson.description ? (
-                        <button 
-                            type="button" 
-                            className="lessons-table__toggle"
-                            onClick={onToggle}
-                            aria-expanded={expanded}
-                            aria-label={expanded ? 'Collapse row' : 'Expand row'}
-                        >
-                            <i className={`fas fa-chevron-${expanded ? 'down' : 'right'}`} />
-                        </button>
-                    ) : null}
-                    <p className="lessons-table__title">{lesson.title}</p>
-                    {lesson.showAiIndicator && (
-                        <AiIndicator />
-                    )}
-                </div>
-                
-                {/* Column 4-5: Competency Area Badge */}
-                <div className="lessons-table__cell lessons-table__cell--competency">
-                    {lesson.competencyArea ? (
-                        <StaticBadgeSmart type={lesson.competencyArea} size="b3" />
-                    ) : (
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                            {lesson.competency || 'N/A'}
-                        </span>
-                    )}
-                </div>
-                
-                {/* Column 6: Status */}
-                <div className="lessons-table__cell lessons-table__cell--status">
-                    {usePills ? (
-                        <Badge 
-                            text={statusLabel} 
-                            style={statusBadgeStyle} 
-                            size="b3" 
-                        />
-                    ) : (
-                        <div className="lessons-table__status-container">
-                            <button type="button" className="lessons-table__status-button">
-                                <span className="lessons-table__status-icon-wrapper">
-                                    <i className={`fas fa-${statusConfig.icon} lessons-table__status-icon lessons-table__status-icon--${statusConfig.size}`} />
-                                </span>
-                            </button>
-                        </div>
-                    )}
-                </div>
-                
-                {/* Column 7-8: Duration */}
-                <div className="lessons-table__cell lessons-table__cell--duration">
-                    <p className="lessons-table__duration">{lesson.duration}</p>
-                </div>
-                
-                {/* Column: Progress (if enabled) */}
-                {showProgress && (
-                    <div className="lessons-table__cell lessons-table__cell--progress">
-                        <div style={{ width: '100px' }}>
-                            <Progress 
-                                value={lesson.progress || 0} 
-                                size="small" 
-                                style="primary" 
-                            />
-                        </div>
-                    </div>
-                )}
-                
-                {/* Column: Action */}
-                <div className="lessons-table__cell lessons-table__cell--actions">
-                    {usePills ? (
-                        <a 
-                            href="#" 
-                            className="body2-txt" 
-                            style={{ 
-                                color: 'var(--color-primary)',
-                                textDecoration: 'none'
-                            }}
-                            onClick={handleActionClick}
-                        >
-                            {isCompleted ? 'Review' : 'Start'}
-                        </a>
-                    ) : (
-                        <Button 
-                            text="Continue" 
-                            style="primary" 
-                            fill="filled" 
-                            size="small"
-                            onClick={() => onContinue && onContinue(lesson)}
-                        />
-                    )}
-                </div>
-            </div>
-            
-            {/* Expanded Description Row */}
-            {expanded && lesson.description && (
-                <div className="lessons-table__row-expanded">
-                    <p className="lessons-table__description">{lesson.description}</p>
-                </div>
-            )}
-        </div>
-    );
-};
-
-LessonsTableItem.propTypes = {
-    lesson: PropTypes.object.isRequired,
-    expanded: PropTypes.bool,
-    onToggle: PropTypes.func,
-    onContinue: PropTypes.func,
-    onActionClick: PropTypes.func,
-    state: PropTypes.oneOf(['default', 'hover', 'pressed', 'focus', 'disable']),
-    showProgress: PropTypes.bool,
-    usePills: PropTypes.bool
-};
-
-/**
- * Main LessonsTable Component
- */
 const LessonsTable = ({
     lessons = [],
     onLessonContinue,
@@ -236,11 +24,20 @@ const LessonsTable = ({
     className = '',
     style,
     showProgress = false,
-    usePills = false
+    usePills = false,
+    sortable = true,
+    headless = false
 }) => {
-    const [expandedRows, setExpandedRows] = useState(new Set());
+    const [expandedRows, setExpandedRows] = useState(() => {
+        const initial = new Set();
+        lessons.forEach((l, i) => {
+            if (l.expanded) initial.add(l.id || i);
+        });
+        return initial;
+    });
 
-    const toggleRow = (lessonId) => {
+    const toggleRow = (lessonId, e) => {
+        e?.stopPropagation();
         setExpandedRows(prev => {
             const next = new Set(prev);
             if (next.has(lessonId)) {
@@ -252,64 +49,217 @@ const LessonsTable = ({
         });
     };
 
-    const tableClasses = [
-        'lessons-table',
-        showProgress ? 'lessons-table--with-progress' : '',
-        className
-    ].filter(Boolean).join(' ');
+    const headers = [
+        { key: 'lesson', text: 'Lesson', width: '35%' },
+        { key: 'competency', text: 'Competency Area', width: '20%' },
+        { key: 'status', text: 'Status', width: '15%', align: 'center' },
+        { key: 'duration', text: 'Duration', width: '15%' },
+        ...(showProgress ? [{ key: 'progress', text: 'Progress', width: '15%' }] : []),
+        { key: 'action', text: 'Actions', width: '15%' }
+    ];
+
+    const getStatusContent = (lesson) => {
+        const { status } = lesson;
+
+        if (usePills) {
+            let badgeStyle = 'secondary';
+            if (['completed', 'complete'].includes(status)) badgeStyle = 'success';
+            else if (status === 'in-progress') badgeStyle = 'warning';
+            else if (status === 'assigned') badgeStyle = 'info';
+
+            const label = status === 'in-progress' ? 'In Progress' :
+                status === 'not-started' ? 'Not Started' :
+                    status.charAt(0).toUpperCase() + status.slice(1);
+
+            return <Badge text={label} style={badgeStyle} size="b3" />;
+        }
+
+        // Button-based status icon (Ghost Button as per Figma)
+        let style = 'default';
+        let iconNode = <i className="fa-solid fa-square-plus" />;
+        const label = status === 'in-progress' ? 'In Progress' :
+            status === 'not-started' ? 'Not Started' :
+                status.charAt(0).toUpperCase() + status.slice(1);
+
+        if (['completed', 'complete'].includes(status)) {
+            style = 'success';
+            iconNode = <i className="fa-solid fa-circle-check" />;
+        } else if (['in-progress', 'started'].includes(status)) {
+            style = 'warning';
+            // Use FA spinner with spin class instead of button loading state
+            iconNode = <i className="fa-solid fa-spinner fa-spin" />;
+        }
+
+        return (
+            <Button
+                style={style}
+                fill="ghost"
+                size="medium" // Matches 36px layout
+                leadingVisual={iconNode}
+                disabled // Non-interactive status indicator
+                aria-label={label}
+                title={label}
+                className="lessons-table__status-button"
+            />
+        );
+    };
 
     return (
-        <div className={tableClasses} style={style}>
-            <LessonsTableHeader showProgress={showProgress} />
-            {lessons.map((lesson, index) => (
-                <LessonsTableItem
-                    key={lesson.id || index}
-                    lesson={lesson}
-                    expanded={expandedRows.has(lesson.id || index)}
-                    onToggle={() => toggleRow(lesson.id || index)}
-                    onContinue={onLessonContinue}
-                    onActionClick={onLessonAction}
-                    showProgress={showProgress}
-                    usePills={usePills}
-                />
-            ))}
-        </div>
+        <div className={`lessons-table-wrapper ${className}`} style={style}>
+            <Table className="lessons-table">
+                <colgroup>
+                    {headers.map((header) => (
+                        <col key={header.key} style={{ width: header.width }} />
+                    ))}
+                </colgroup>
+                {!headless && (
+                    <thead>
+                        <tr className="lessons-table__header">
+                            {headers.map((header) => (
+                                <th
+                                    key={header.key}
+                                    className={`lessons-table__header-cell ${header.align ? `lessons-table__header-cell--${header.align}` : ''}`}
+                                    style={{ width: header.width }}
+                                >
+                                    <div className="lessons-table__header-content">
+                                        <span className="body3-txt" style={{ color: 'var(--color-on-surface)' }}>
+                                            {header.text}
+                                        </span>
+                                    </div>
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                )}
+                {lessons.map((lesson, index) => {
+                    const lessonId = lesson.id || index;
+                    const isExpanded = expandedRows.has(lessonId);
+                    const isCompleted = ['completed', 'complete'].includes(lesson.status);
+                    const groupStateClass = lesson.state ? `lessons-table__group--${lesson.state}` : '';
+
+                    return (
+                        <tbody
+                            key={lessonId}
+                            className={`lessons-table__group ${groupStateClass}`}
+                        >
+                            <tr
+                                className={`lessons-table__row ${isExpanded ? 'lessons-table__row--expanded' : ''}`}
+                                onClick={() => !['disabled', 'disable'].includes(lesson.state) && onLessonClick && onLessonClick(lesson)}
+                            >
+                                {/* Lesson Column */}
+                                <td className="lessons-table__cell lessons-table__cell--lesson">
+                                    <div className="lessons-table__lesson-wrapper">
+                                        {lesson.description && (
+                                            <button
+                                                type="button"
+                                                className="lessons-table__toggle"
+                                                onClick={(e) => toggleRow(lessonId, e)}
+                                            >
+                                                <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`} />
+                                            </button>
+                                        )}
+                                        <span className="body3-txt font-weight-semibold lesson-title">
+                                            {lesson.title}
+                                        </span>
+                                        {lesson.showAiIndicator && <AiIndicator />}
+                                    </div>
+                                </td>
+
+                                {/* Competency Column */}
+                                <td className="lessons-table__cell">
+                                    {lesson.competencyArea ? (
+                                        <StaticBadgeSmart type={lesson.competencyArea} size="b3" />
+                                    ) : (
+                                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                            {lesson.competency || 'N/A'}
+                                        </span>
+                                    )}
+                                </td>
+
+                                {/* Status Column */}
+                                <td className="lessons-table__cell lessons-table__cell--center">
+                                    {getStatusContent(lesson)}
+                                </td>
+
+                                {/* Duration Column */}
+                                <td className="lessons-table__cell">
+                                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                        {lesson.duration}
+                                    </span>
+                                </td>
+
+                                {/* Progress Column (Optional) */}
+                                {showProgress && (
+                                    <td className="lessons-table__cell">
+                                        <div style={{ width: '100px' }}>
+                                            <Progress value={lesson.progress || 0} size="small" />
+                                        </div>
+                                    </td>
+                                )}
+
+                                {/* Action Column */}
+                                <td className="lessons-table__cell">
+                                    {usePills ? (
+                                        <button
+                                            className="lessons-table__action-link"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onLessonAction?.(lesson);
+                                            }}
+                                        >
+                                            {isCompleted ? 'Review' : 'Start'}
+                                        </button>
+                                    ) : (
+                                        <Button
+                                            text={
+                                                ['completed', 'complete'].includes(lesson.status) ? 'Review' :
+                                                    ['in-progress', 'started'].includes(lesson.status) ? 'Continue' :
+                                                        'Start'
+                                            }
+                                            style="primary"
+                                            fill="filled"
+                                            size="small"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onLessonContinue?.(lesson);
+                                            }}
+                                        />
+                                    )}
+                                </td>
+                            </tr>
+
+                            {/* Expanded Row */}
+                            {
+                                isExpanded && lesson.description && (
+                                    <tr className="lessons-table__row-expanded-content">
+                                        <td colSpan={headers.length} className="lessons-table__cell--expanded">
+                                            <div className="lessons-table__description">
+                                                <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                                    {lesson.description}
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                        </tbody>
+                    );
+                })}
+            </Table>
+        </div >
     );
 };
 
 LessonsTable.propTypes = {
-    /** Array of lesson objects */
-    lessons: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        title: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        competencyArea: PropTypes.oneOf([
-            'socio-emotional',
-            'mastering-content',
-            'advocacy',
-            'relationships',
-            'technology-tools'
-        ]),
-        competency: PropTypes.string,
-        status: PropTypes.oneOf(['not-started', 'in-progress', 'started', 'complete', 'completed', 'assigned']),
-        duration: PropTypes.string,
-        progress: PropTypes.number,
-        showAiIndicator: PropTypes.bool
-    })),
-    /** Callback when Continue button is clicked */
+    lessons: PropTypes.arrayOf(PropTypes.object),
     onLessonContinue: PropTypes.func,
-    /** Callback when action link is clicked (for overview page mode) */
     onLessonAction: PropTypes.func,
-    /** Callback when lesson row is clicked */
     onLessonClick: PropTypes.func,
-    /** Show progress column */
-    showProgress: PropTypes.bool,
-    /** Use status pills instead of icons */
-    usePills: PropTypes.bool,
-    /** Additional CSS class */
     className: PropTypes.string,
-    /** Inline styles */
-    style: PropTypes.object
+    style: PropTypes.object,
+    showProgress: PropTypes.bool,
+    usePills: PropTypes.bool,
+    sortable: PropTypes.bool
 };
 
 export default LessonsTable;

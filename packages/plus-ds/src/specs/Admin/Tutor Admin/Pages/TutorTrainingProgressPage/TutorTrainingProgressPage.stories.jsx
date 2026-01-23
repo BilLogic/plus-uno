@@ -40,7 +40,7 @@ Full page layout for Tutor Training Progress section.
     argTypes: {
         breakpoint: {
             control: { type: 'select' },
-            options: ['md', 'lg', 'xl', 'xxl'],
+            options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
@@ -77,7 +77,7 @@ Full page layout for Tutor Training Progress section.
     },
     decorators: [
         (Story, context) => {
-            const breakpoint = context.args.breakpoint || 'xxl';
+            const breakpoint = context.args.breakpoint || 'xl';
             return (
                 <ResponsiveFrame breakpoint={breakpoint}>
                     <Story />
@@ -105,7 +105,7 @@ export const Docs = {
 export const Overview = {
     render: () => (
         <TutorTrainingProgressPage
-            breakpoint="xxl"
+            breakpoint="xl"
             activeTab="trainingProgress"
             viewMode="By Tutor"
             currentPage={1}
@@ -143,7 +143,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        breakpoint: 'xxl',
+        breakpoint: 'xl',
         activeTab: 'trainingProgress',
         viewMode: 'By Tutor',
         currentPage: 1,

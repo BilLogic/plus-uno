@@ -1,5 +1,5 @@
 /**
- * AiIndicator Component
+ * AIIndicator Component
  * 
  * AI indicator icon button with sparkle SVG.
  * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177685
@@ -7,11 +7,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import './AiIndicator.scss';
+import './AIIndicator.scss';
 
-const AiIndicator = ({ onClick, className = '', style }) => {
+const AIIndicator = ({ onClick, className = '', style }) => {
     return (
-        <div 
+        <div
             className={`ai-indicator ${className}`}
             style={style}
             data-node-id="63:177685"
@@ -43,7 +43,7 @@ const AiIndicator = ({ onClick, className = '', style }) => {
     );
 };
 
-AiIndicator.propTypes = {
+AIIndicator.propTypes = {
     /** Click handler for the AI indicator button */
     onClick: PropTypes.func,
     /** Additional CSS classes */
@@ -52,4 +52,4 @@ AiIndicator.propTypes = {
     style: PropTypes.object
 };
 
-export default AiIndicator;
+export default AIIndicator;

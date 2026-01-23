@@ -2,7 +2,7 @@
  * RatingSingle Stories
  * 
  * Single rating button component stories
- * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177643
+ * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177673
  */
 
 import React from 'react';
@@ -16,7 +16,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Single rating button with rest and selected states. Used within Rating component.',
+                component: 'Single rating button with rest and selected states. Shows ONE number with ONE radio button. Used as a building block within the Rating component.',
             },
         },
     },
@@ -34,54 +34,43 @@ export default {
 };
 
 /**
- * Rest State
- * Default unselected state
+ * Overview
+ * Shows both variants: rest (empty circle) and selected (filled circle)
  */
-export const Rest = {
+export const Overview = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)', display: 'flex', gap: '16px' }}>
-            {[1, 2, 3, 4, 5].map(val => (
-                <RatingSingle key={val} value={val} status="rest" />
-            ))}
-        </div>
-    )
-};
-
-/**
- * Selected State
- * Selected state
- */
-export const Selected = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)', display: 'flex', gap: '16px' }}>
-            {[1, 2, 3, 4, 5].map(val => (
-                <RatingSingle key={val} value={val} status={val === 3 ? 'selected' : 'rest'} />
-            ))}
+        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px', alignItems: 'center' }}>
+            <div>
+                <h4 style={{ marginBottom: '16px', textAlign: 'center' }}>Rest State</h4>
+                <RatingSingle value={1} status="rest" />
+            </div>
+            <div>
+                <h4 style={{ marginBottom: '16px', textAlign: 'center' }}>Selected State</h4>
+                <RatingSingle value={1} status="selected" />
+            </div>
         </div>
     )
 };
 
 /**
  * Interactive
- * Interactive rating single with click handler
+ * Interactive single rating button - click to toggle between rest and selected
  */
 export const Interactive = {
     render: (args) => {
-        const [selected, setSelected] = React.useState(args.value || 1);
+        const [isSelected, setIsSelected] = React.useState(false);
         return (
-            <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)', display: 'flex', gap: '16px' }}>
-                {[1, 2, 3, 4, 5].map(val => (
-                    <RatingSingle
-                        key={val}
-                        value={val}
-                        status={selected === val ? 'selected' : 'rest'}
-                        onClick={() => setSelected(val)}
-                    />
-                ))}
+            <div style={{ padding: '32px', display: 'flex', justifyContent: 'center' }}>
+                <RatingSingle
+                    value={1}
+                    status={isSelected ? 'selected' : 'rest'}
+                    onClick={() => setIsSelected(!isSelected)}
+                />
             </div>
         );
     },
     args: {
-        value: 1
+        value: 1,
+        status: 'rest'
     }
 };

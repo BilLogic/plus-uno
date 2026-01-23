@@ -1,17 +1,17 @@
 /**
- * AiIndicator Stories
+ * AIIndicator Stories
  * 
  * AI indicator icon button component stories
  * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177685
  */
 
 import React from 'react';
-import AiIndicator from './AiIndicator';
-import './AiIndicator.scss';
+import AIIndicator from './AIIndicator';
+import './AIIndicator.scss';
 
 export default {
-    title: 'Specs/Training/Lessons/Elements/AiIndicator',
-    component: AiIndicator,
+    title: 'Specs/Training/Lessons/Elements/AIIndicator',
+    component: AIIndicator,
     tags: ['autodocs'],
     parameters: {
         docs: {
@@ -29,7 +29,7 @@ export default {
 export const Default = {
     render: () => (
         <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
-            <AiIndicator onClick={() => console.log('AI Indicator clicked')} />
+            <AIIndicator onClick={() => console.log('AI Indicator clicked')} />
         </div>
     )
 };
@@ -41,8 +41,8 @@ export const Default = {
 export const Interactive = {
     render: () => (
         <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
-            <AiIndicator 
-                onClick={() => alert('AI Indicator clicked!')} 
+            <AIIndicator
+                onClick={() => alert('AI Indicator clicked!')}
             />
         </div>
     )
@@ -54,7 +54,7 @@ export const Interactive = {
  */
 export const InContext = {
     render: () => (
-        <div style={{ 
+        <div style={{
             padding: 'var(--size-section-pad-y-lg, 32px)',
             backgroundColor: 'var(--color-surface)'
         }}>
@@ -67,7 +67,7 @@ export const InContext = {
                 borderRadius: '8px'
             }}>
                 <span className="body2-txt">Lesson Title</span>
-                <AiIndicator />
+                <AIIndicator />
             </div>
         </div>
     )
