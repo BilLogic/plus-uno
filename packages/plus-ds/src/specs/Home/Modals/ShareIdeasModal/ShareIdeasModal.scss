@@ -1,0 +1,264 @@
+.plus-share-ideas-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    padding: var(--size-section-pad-y-sm, 20px);
+    overflow-y: auto;
+}
+
+.plus-share-ideas-modal-overlay-inline {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    background-color: transparent;
+}
+
+.plus-share-ideas-modal {
+    position: relative;
+    z-index: 1051;
+    max-width: 100%;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    
+    // Ensure the modal itself respects max height
+    .plus-modal {
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+}
+
+.plus-share-ideas-modal-inline {
+    position: relative;
+    z-index: 1;
+    max-width: 672px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    
+    .plus-modal {
+        max-height: none;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+    }
+}
+
+.plus-share-ideas-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-modal-gap-md);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-share-ideas-modal-description {
+    color: var(--color-on-surface-variant, #3f484a);
+    margin: 0;
+}
+
+.plus-share-ideas-modal-type-selection {
+    display: flex;
+    gap: var(--size-element-gap-md);
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.plus-share-ideas-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-modal-gap-md);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-share-ideas-modal-urgency-product-row {
+    display: flex;
+    gap: var(--size-modal-gap-md);
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.plus-share-ideas-modal-urgency {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-share-ideas-modal-label {
+    display: flex;
+    gap: var(--size-spacing-small-space-050);
+    color: var(--color-on-surface, #191c1e);
+    margin: 0;
+}
+
+.plus-share-ideas-modal-required {
+    color: var(--color-danger, #ba1a1a);
+}
+
+.plus-share-ideas-modal-form-row {
+    display: flex;
+    gap: var(--size-modal-gap-sm);
+    align-items: flex-start;
+    width: 100%;
+}
+
+.plus-share-ideas-modal-product-area {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    flex: 0 0 auto;
+    min-width: 218.67px;
+    max-width: 293.33px;
+    box-sizing: border-box;
+    
+    .plus-select-wrapper {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+.plus-share-ideas-modal-textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    
+    textarea {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+.plus-share-ideas-modal-add-images {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.plus-share-ideas-modal-add-images-btn {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+}
+
+.plus-share-ideas-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-modal-gap-md);
+    padding-top: var(--size-element-gap-xs);
+}
+
+.plus-share-ideas-modal-footer-text {
+    flex: 1;
+    color: var(--color-on-surface-variant, #3f484a);
+    margin: 0;
+}
+
+.plus-share-ideas-modal-link {
+    color: var(--color-primary-text, #005a50);
+    text-decoration: underline;
+    cursor: pointer;
+    
+    &:hover {
+        color: var(--color-primary, #0472a8);
+    }
+}
+
+// Override Modal styles for this specific use case
+.plus-share-ideas-modal {
+    .plus-modal {
+        // Override title to use h4 (24px) instead of h5
+        .plus-modal-header {
+            .plus-modal-title {
+                font-size: var(--font-size-h4, 24px);
+                line-height: var(--font-line-height-h4, 1.333);
+                font-weight: var(--font-weight-semibold-2, 600);
+            }
+        }
+        
+        // Ensure proper spacing and scrolling
+        .plus-modal-body {
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: calc(100vh - 200px); // Account for header and footer
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            box-sizing: border-box;
+            
+            .plus-modal-content {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+        }
+    }
+}
+
+// Urgency buttons styling - icon only buttons in a connected group
+.plus-share-ideas-modal-urgency-buttons {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    max-width: 100%;
+    
+    .plus-share-ideas-modal-urgency-btn {
+        flex: 1;
+        min-width: 36px;
+        max-width: 100%;
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        
+        // Hide text, show only icon
+        .plus-btn-text {
+            display: none;
+        }
+        
+        // First button - rounded left
+        &:first-child {
+            border-top-left-radius: var(--size-element-radius-md, 4px);
+            border-bottom-left-radius: var(--size-element-radius-md, 4px);
+            border-top-right-radius: var(--size-border-radius-radius-2, 4px);
+            border-bottom-right-radius: var(--size-border-radius-radius-2, 4px);
+            border-right: none;
+        }
+        
+        // Middle buttons - no rounded corners, no left border
+        &:not(:first-child):not(:last-child) {
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+        }
+        
+        // Last button - rounded right
+        &:last-child {
+            border-top-left-radius: var(--size-border-radius-radius-2, 4px);
+            border-bottom-left-radius: var(--size-border-radius-radius-2, 4px);
+            border-top-right-radius: var(--size-element-radius-md, 4px);
+            border-bottom-right-radius: var(--size-element-radius-md, 4px);
+            border-left: none;
+        }
+    }
+}

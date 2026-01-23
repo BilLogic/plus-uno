@@ -15,9 +15,8 @@
     width: fit-content;
 
     // Spacing - Figma spec: horizontal padding only, NO vertical padding (py-0)
-    // FIX: Using semantic token for vertical padding to prevent squashed look
-    padding-top: var(--size-element-pad-y-sm);
-    padding-bottom: var(--size-element-pad-y-sm);
+    padding-top: 0;
+    padding-bottom: 0;
     padding-left: var(--size-element-pad-x-lg);
     padding-right: var(--size-element-pad-x-lg);
 
@@ -34,16 +33,23 @@
 
     // --- SIZES ---
     // Override padding based on size class
+    // Match both size classes (b2) and typography classes (body2-txt) for compatibility
     &.h4,
     &.h5,
-    &.h6 {
+    &.h6,
+    &.h4-txt,
+    &.h5-txt,
+    &.h6-txt {
         padding-left: var(--size-element-pad-x-md);
         padding-right: var(--size-element-pad-x-md);
     }
 
     &.b1,
     &.b2,
-    &.b3 {
+    &.b3,
+    &.body1-txt,
+    &.body2-txt,
+    &.body3-txt {
         padding-left: var(--size-element-pad-x-sm);
         padding-right: var(--size-element-pad-x-sm);
         // Font weight now handled via typography class in JSX (font-weight-semibold)

@@ -1,1 +1,3 @@
-export { default as HomePage } from './HomePage/HomePage';
+export { default as TutorHomePageSkillsOverview } from './TutorHomePageSkillsOverview';
+export { default as TutorHomePageSkillsProgress } from './TutorHomePageSkillsProgress';
+export { default as TutorHomePageSkillsOverviewDifferentLayout } from './TutorHomePageSkillsOverviewDifferentLayout';

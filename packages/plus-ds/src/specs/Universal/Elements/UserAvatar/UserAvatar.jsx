@@ -93,8 +93,32 @@ const UserAvatar = ({
                 </p>
             </div>
 
-            {/* Counter Badge */}
-            {counter && (
+            {/* Counter Badge or Role Badge */}
+            {type === 'lead tutor' ? (
+                <div
+                    className="plus-user-avatar__role-badge"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '0 var(--size-element-pad-x-sm)',
+                        borderRadius: '999px',
+                        backgroundColor: 'var(--color-success-state-08, rgba(62, 105, 26, 0.08))',
+                        flexShrink: 0
+                    }}
+                >
+                    <span
+                        className="body3-txt"
+                        style={{
+                            color: 'var(--color-success-text, #4d8d4d)',
+                            fontWeight: 400,
+                            textAlign: 'center'
+                        }}
+                    >
+                        Lead
+                    </span>
+                </div>
+            ) : counter ? (
                 <div
                     className="plus-user-avatar__counter"
                     style={{
@@ -119,7 +143,7 @@ const UserAvatar = ({
                         {counterValue}
                     </span>
                 </div>
-            )}
+            ) : null}
         </div>
     );
 };

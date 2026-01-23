@@ -65,6 +65,7 @@ const TopBar = ({
                         name={user.name || 'User'}
                         counter={user.counter}
                         counterValue={user.counterValue}
+                        type={user.type}
                     />
                 )}
             </div>
@@ -86,7 +87,8 @@ TopBar.propTypes = {
     user: PropTypes.shape({
         name: PropTypes.string,
         counter: PropTypes.bool,
-        counterValue: PropTypes.number
+        counterValue: PropTypes.number,
+        type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin'])
     }),
     className: PropTypes.string,
     style: PropTypes.object

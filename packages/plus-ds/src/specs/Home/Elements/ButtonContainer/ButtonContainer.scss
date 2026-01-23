@@ -86,12 +86,6 @@
         }
     }
 
-    &--disabled {
-        .plus-button-container-select-inner {
-            opacity: 0.38;
-        }
-    }
-
     &-message {
         display: flex;
         gap: var(--size-element-pad-y-sm);
@@ -146,6 +140,9 @@
     // Disabled state
     &--disabled {
         .plus-button-container-button {
+            border-color: var(--color-outline) !important;
+            color: var(--color-on-surface) !important;
+            background-color: transparent !important;
             opacity: 0.38;
         }
     }

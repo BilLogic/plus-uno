@@ -10,6 +10,7 @@
  * - DataVisualization: Chart/progress visualization cards
  * - RecommendedLessons: Recommended lessons list
  * - TrainingProgressCard: Training progress summary
+ * - BadgeCard: Badge display cards with claim/view actions
  */
 
 import React from 'react';
@@ -49,7 +50,8 @@ export const Overview = () => (
                 { name: 'ResourceCard', desc: 'Resource display with type icons' },
                 { name: 'DataVisualization', desc: 'Skills progress and overview charts' },
                 { name: 'RecommendedLessons', desc: 'Recommended lessons list with responsive layout' },
-                { name: 'TrainingProgressCard', desc: 'Training progress summary (default/small sizes)' }
+                { name: 'TrainingProgressCard', desc: 'Training progress summary (default/small sizes)' },
+                { name: 'BadgeCard', desc: 'Badge display cards with claim/view actions for certified tutor badges' }
             ].map(item => (
                 <div key={item.name} style={{
                     padding: '16px',

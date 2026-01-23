@@ -18,7 +18,7 @@ const RecommendedLessons = ({
     title,
     duration,
     status = 'in-progress', // 'in-progress', 'completed', 'not-started'
-    aiRecommended = false,
+    aiRecommended = true,
     onReviewClick,
     className = '',
     style
@@ -40,40 +40,49 @@ const RecommendedLessons = ({
         );
     };
 
+    // Normalize breakpoint for class name (handle "XXL & above" -> "xxl-above")
+    // Remove special characters and normalize spacing
+    const breakpointClass = breakpoint === 'XXL & above' 
+        ? 'xxl-above' 
+        : breakpoint.replace(/[&\s]+/g, '-').toLowerCase();
+    
     const cardClasses = [
         'plus-recommended-lessons',
-        `plus-recommended-lessons-${breakpoint.replace(/\s+/g, '-').toLowerCase()}`,
+        `plus-recommended-lessons-${breakpointClass}`,
         className
     ].filter(Boolean).join(' ');
 
-    const maxWidth = breakpoint === 'XXL & above' ? '756px' : '444px';
-    const minWidth = breakpoint === 'XXL & above' ? '368px' : '218.67px';
+    // Width based on breakpoint - fixed widths per Figma spec
+    // < XXL: 275.33px (fixed width to match Figma)
+    // XXL & above: 368px (fixed width per Figma spec)
+    const width = breakpoint === 'XXL & above' 
+        ? '368px' 
+        : '275.33px';
 
     return (
         <Card
             id={id}
             className={cardClasses}
             style={{
-                maxWidth,
-                minWidth,
-                ...style
+                width: width,
+                maxWidth: width, // Ensure it doesn't exceed the set width
+                flexShrink: 0, // Prevent shrinking in flex containers (carousel)
+                ...style // Allow style prop to override if needed
             }}
-            paddingSize="none"
-            gapSize="none"
+            paddingSize={null}
+            gapSize={null}
             radiusSize="sm"
             borderSize="sm"
             showBorder={true}
         >
-            {/* Image thumbnail */}
-            {image && (
-                <div className="plus-recommended-lessons-image">
-                    {typeof image === 'string' ? (
-                        <img src={image} alt={title} />
-                    ) : (
-                        image
-                    )}
-                </div>
-            )}
+            {/* Image thumbnail (placeholder if no image provided) */}
+            <div className="plus-recommended-lessons-image">
+                {image
+                    ? (typeof image === 'string'
+                        ? <img src={image} alt={title} />
+                        : image)
+                    : <div className="plus-recommended-lessons-image-placeholder" aria-hidden="true" />}
+            </div>
 
             {/* Content */}
             <div className="plus-recommended-lessons-content">
@@ -94,7 +103,11 @@ const RecommendedLessons = ({
                 </div>
 
                 {/* Divider */}
-                <Divider size="1px" style="light" opacity10={true} />
+                <Divider
+                    size="1px"
+                    style="light"
+                    className="plus-recommended-lessons-divider"
+                />
 
                 {/* Bottom section with button and status indicators */}
                 <div className="plus-recommended-lessons-bottom">

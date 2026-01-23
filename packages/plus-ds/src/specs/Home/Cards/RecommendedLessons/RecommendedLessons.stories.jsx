@@ -8,10 +8,10 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' }}>
         <div>
             <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)', fontSize: 'var(--font-size-h6)' }}>
-                Below XXL
+                Below XXL (275.33px)
             </h3>
             <RecommendedLessons
                 breakpoint="< XXL"
@@ -24,7 +24,7 @@ export const Overview = () => (
         </div>
         <div>
             <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)', fontSize: 'var(--font-size-h6)' }}>
-                XXL & Above
+                XXL & Above (368px)
             </h3>
             <RecommendedLessons
                 breakpoint="XXL & above"

@@ -15,3 +15,6 @@ export * from './CardBadges/index.js';
 // Button Container
 export * from './ButtonContainer/index.js';
 
+// Certified Tutor Badge
+export * from './CertifiedTutorBadge/index.js';
+

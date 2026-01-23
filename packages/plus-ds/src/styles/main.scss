@@ -30,6 +30,7 @@
 // Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
 .plus-card {
     margin: 0; // Remove any default margin from React Bootstrap Card
+    background-color: var(--color-surface-container-lowest); // Card background color token
 }
 
 .plus-card .plus-card-content {

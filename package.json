@@ -28,6 +28,7 @@
   "author": "PLUS Design Team",
   "license": "ISC",
   "devDependencies": {
+    "@storybook/addon-docs": "^10.2.0",
     "@storybook/addon-links": "^10.1.10",
     "@storybook/html": "^10.1.10",
     "@storybook/html-vite": "^10.1.10",
