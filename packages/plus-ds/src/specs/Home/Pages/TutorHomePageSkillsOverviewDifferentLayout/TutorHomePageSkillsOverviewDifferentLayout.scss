@@ -66,10 +66,10 @@
         height: 100%;
         grid-column: 2;
         padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
-        background-color: var(--color-surface-container-lowest); // White background for the component
+        background-color: var(--color-surface-container-low); // Gray background for the component
         border-radius: var(--size-card-radius-md, 16px);
-        border: var(--size-card-border-sm) solid var(--color-outline-variant);
-        box-shadow: var(--elevation-light-2);
+        border: none; // No border
+        box-shadow: none; // No shadow
         box-sizing: border-box;
         
         // Ensure MetricsCard container fills available space
@@ -85,7 +85,7 @@
         .plus-metrics-stacked-card {
             background-color: var(--color-surface-container-lowest) !important;
             border: var(--size-card-border-sm) solid var(--color-outline-variant) !important;
-            box-shadow: var(--elevation-light-2) !important;
+            box-shadow: none !important; // Remove shadows
             border-radius: var(--size-card-radius-md, 16px) !important;
             width: 100%;
         }
