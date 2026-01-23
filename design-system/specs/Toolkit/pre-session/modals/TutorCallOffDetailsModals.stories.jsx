@@ -3,6 +3,14 @@ import Modal from '../../../../../packages/plus-ds/src/components/Modal';
 import ButtonGroup from '../../../../../packages/plus-ds/src/components/ButtonGroup';
 import Button from '../../../../../packages/plus-ds/src/components/Button';
 
+import {
+    CloseButton,
+    WithdrawRequestButton,
+    CancelButton,
+    ConfirmWithdrawalButton,
+    ViewUpdatedScheduleButton
+} from '../elements/CTATutorViewButtons.stories';
+
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Tutor Call-Off Details',
     component: Modal,
@@ -92,18 +100,8 @@ export const PreReview_TutorRequest = () => (
 
                 {/* Step 4: Footer Buttons */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <Button
-                        text="Close"
-                        style="primary"
-                        fill="outline"
-                        block
-                    />
-                    <Button
-                        text="Withdraw Request"
-                        style="danger"
-                        fill="outline"
-                        block
-                    />
+                    <CloseButton block className="flex-grow-1" />
+                    <WithdrawRequestButton block className="flex-grow-1" />
                 </div>
             </div>
         }
@@ -175,18 +173,8 @@ export const PreReview_WithdrawRequest = () => (
 
                 {/* Footer Buttons */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <Button
-                        text="Cancel"
-                        style="primary"
-                        fill="outline"
-                        block
-                    />
-                    <Button
-                        text="Confirm Withdrawal"
-                        style="danger"
-                        fill="outline"
-                        block
-                    />
+                    <CancelButton block className="flex-grow-1" />
+                    <ConfirmWithdrawalButton block className="flex-grow-1" />
                 </div>
             </div>
         }
@@ -247,12 +235,7 @@ export const PreReview_RequestWithdrawn = () => (
 
                 {/* Footer Button */}
                 <div className="d-flex">
-                    <Button
-                        text="View Updated Schedule"
-                        style="primary"
-                        fill="filled"
-                        block
-                    />
+                    <ViewUpdatedScheduleButton block fill="filled" />
                 </div>
             </div>
         }
@@ -333,12 +316,7 @@ export const PostReview_SupervisorReview = () => (
 
                 {/* Footer Button */}
                 <div className="d-flex">
-                    <Button
-                        text="Close"
-                        style="primary"
-                        fill="outline"
-                        block
-                    />
+                    <CloseButton block />
                 </div>
             </div>
         }
@@ -426,12 +404,7 @@ export const PostReview_TutorRequest = () => (
 
                 {/* Footer Button - Only Close, no Withdraw Request */}
                 <div className="d-flex">
-                    <Button
-                        text="Close"
-                        style="primary"
-                        fill="outline"
-                        block
-                    />
+                    <CloseButton block />
                 </div>
             </div>
         }
