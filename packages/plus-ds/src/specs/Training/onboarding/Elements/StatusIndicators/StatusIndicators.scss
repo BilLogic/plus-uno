@@ -21,7 +21,7 @@
     &--small {
         min-width: 28px;
         padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
-        
+
         i {
             font-size: 12px;
         }
@@ -30,7 +30,7 @@
     &--medium {
         min-width: 36px;
         padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
-        
+
         i {
             font-size: 14px;
         }
@@ -39,7 +39,7 @@
     &--large {
         min-width: 44px;
         padding: var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-lg, 16px);
-        
+
         i {
             font-size: 18px;
         }
@@ -48,19 +48,30 @@
     // Stage variants
     &--not-started {
         i {
-            color: var(--color-on-surface-variant, #6B6B6B);
+            color: var(--color-danger, #d32f2f);
         }
     }
 
     &--in-progress {
         i {
-            color: var(--color-info, #0288D1);
+            color: var(--color-warning, #ed6c02);
+            animation: spin 3s linear infinite; // Slow spin for in-progress
         }
     }
 
     &--completed {
         i {
-            color: var(--color-success, #2E7D32);
+            color: var(--color-success, #2e7d32);
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
         }
     }
 }

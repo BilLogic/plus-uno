@@ -124,6 +124,7 @@ const TutorPerformancePage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'tutors',
     };
 
     return (
@@ -232,7 +233,7 @@ const TutorPerformancePage = ({
                             totalPages={totalPages}
                             onPageChange={onPageChange}
                             type="icon"
-                            size="default"
+                            size="small"
                         />
                     </div>
                 </div>

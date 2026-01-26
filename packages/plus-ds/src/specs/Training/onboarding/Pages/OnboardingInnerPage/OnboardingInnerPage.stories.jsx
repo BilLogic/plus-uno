@@ -68,9 +68,7 @@ export default {
             table: { category: 'State' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
 };
 
 /**
@@ -117,7 +115,10 @@ export const Docs = {
  * Overview
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <OnboardingInnerPage
             moduleTitle="PLUS APP Usage"
             moduleDescription="Learn how to use the PLUS tutoring application effectively."
@@ -133,7 +134,10 @@ export const Overview = {
  * WithCompletionModal
  */
 export const WithCompletionModal = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <OnboardingInnerPage
             moduleTitle="PLUS APP Usage"
             moduleDescription="Learn how to use the PLUS tutoring application effectively."
@@ -177,6 +181,7 @@ export const Interactive = {
         );
     },
     args: {
+        breakpoint: 'xl',
         moduleTitle: 'Welcome to PLUS',
         moduleDescription: 'This module introduces you to the PLUS tutoring platform and its core features.',
         moduleDuration: 'Estimated Time: 9 minutes',

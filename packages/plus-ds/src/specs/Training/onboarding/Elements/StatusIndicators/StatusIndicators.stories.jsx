@@ -45,7 +45,7 @@ export const Docs = {
         <div style={{ padding: 'var(--size-section-pad-y-lg, 24px)' }}>
             <h3 className="h3" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>StatusIndicators</h3>
             <p className="body1-txt" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
-                Status indicator icons showing different stages of completion. 
+                Status indicator icons showing different stages of completion.
                 Uses FontAwesome icons with PLUS DS color tokens.
             </p>
             <h4 className="h4" style={{ marginBottom: 'var(--size-element-gap-md, 8px)' }}>Variants</h4>
@@ -64,7 +64,7 @@ export const Docs = {
  */
 export const Overview = {
     render: () => (
-        <div style={{ 
+        <div style={{
             padding: 'var(--size-section-pad-y-lg, 24px)',
             backgroundColor: 'var(--color-surface)',
             display: 'flex',
@@ -73,9 +73,9 @@ export const Overview = {
         }}>
             <section>
                 <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>All Stages</h6>
-                <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'row', 
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
                     gap: 'var(--size-section-gap-lg, 32px)',
                     alignItems: 'center'
                 }}>
@@ -96,9 +96,9 @@ export const Overview = {
 
             <section>
                 <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Sizes</h6>
-                <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'row', 
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
                     gap: 'var(--size-section-gap-lg, 32px)',
                     alignItems: 'center'
                 }}>
@@ -130,9 +130,9 @@ export const Interactive = {
         size: 'medium'
     },
     render: (args) => (
-        <div style={{ 
-            padding: 'var(--size-section-pad-y-lg, 24px)', 
-            backgroundColor: 'var(--color-surface)' 
+        <div style={{
+            padding: 'var(--size-section-pad-y-lg, 24px)',
+            backgroundColor: 'var(--color-surface)'
         }}>
             <StatusIndicators {...args} />
         </div>

@@ -22,6 +22,17 @@ const defaultTutors = [
     { id: 7, tutorName: 'Hannah Brown', signedUp: 'Yes', attendance: 94, sessions: 54, students: 7, badge: null },
     { id: 8, tutorName: 'Henry Gold', signedUp: 'Yes', attendance: 92, sessions: 33, students: 10, badge: null },
     { id: 9, tutorName: 'Liam Brown', signedUp: 'Yes', attendance: 50, sessions: 3, students: 8, badge: null },
+    { id: 10, tutorName: 'Lucas Grey', signedUp: 'Yes', attendance: 88, sessions: 29, students: 15, badge: null },
+    { id: 11, tutorName: 'Mia White', signedUp: 'Yes', attendance: 95, sessions: 42, students: 20, badge: 'Lead' },
+    { id: 12, tutorName: 'Noah Green', signedUp: 'Yes', attendance: 75, sessions: 18, students: 9, badge: null },
+    { id: 13, tutorName: 'Olivia Red', signedUp: 'Yes', attendance: 82, sessions: 24, students: 11, badge: null },
+    { id: 14, tutorName: 'Parker Purple', signedUp: 'Yes', attendance: 60, sessions: 12, students: 6, badge: null },
+    { id: 15, tutorName: 'Quinn Yellow', signedUp: 'No', attendance: null, sessions: null, students: 14, badge: null },
+    { id: 16, tutorName: 'Ryan Cyan', signedUp: 'Yes', attendance: 98, sessions: 58, students: 22, badge: 'Lead' },
+    { id: 17, tutorName: 'Sophia Magenta', signedUp: 'Yes', attendance: 85, sessions: 27, students: 13, badge: null },
+    { id: 18, tutorName: 'Tyler Teal', signedUp: 'Yes', attendance: 91, sessions: 31, students: 17, badge: null },
+    { id: 19, tutorName: 'Uma Violet', signedUp: 'Yes', attendance: 78, sessions: 20, students: 10, badge: null },
+    { id: 20, tutorName: 'Victor Indigo', signedUp: 'Yes', attendance: 89, sessions: 28, students: 16, badge: null },
 ];
 
 export default {
@@ -102,20 +113,18 @@ Node ID: 258-262669
             table: { category: 'State' },
         },
         rowCount: {
-            control: { type: 'number', min: 1, max: 20 },
+            control: { type: 'number', min: 1, max: 50 },
             description: 'Number of table rows to display',
             table: { category: 'Data' },
         },
         breakpoint: {
-            control: 'select',
+            control: { type: 'select' },
             options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
 };
 
 /**
@@ -152,7 +161,10 @@ export const Docs = {
  * Overview
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <TutorPerformancePage
             tutors={defaultTutors}
             onPageChange={(page) => console.log('Page changed:', page)}
@@ -246,6 +258,7 @@ export const Interactive = {
         );
     },
     args: {
+        breakpoint: 'xl',
         selectedSchool: 'All Schools',
         selectedTutor: 'All Tutors',
         activeTab: 'performance',
@@ -253,7 +266,7 @@ export const Interactive = {
         modalTab: "sessions",
         modalMode: 'edit',
         loading: false,
-        rowCount: 9,
+        rowCount: 20,
     },
 };
 
@@ -287,6 +300,7 @@ export const WithModalOpen = {
         );
     },
     args: {
+        breakpoint: 'xl',
         modalOpen: true,
         modalTab: 'info',
         modalMode: 'edit',

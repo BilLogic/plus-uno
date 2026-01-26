@@ -69,6 +69,7 @@ Full page layout for Tutor Tool Usage section.
 };
 
 export const Docs = {
+    args: {},
     render: () => (
         <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
             <h2 className="h2" style={{ marginBottom: '24px' }}>TutorToolUsagePage</h2>
@@ -80,16 +81,18 @@ export const Docs = {
                 Figma Node: 258-263367
             </p>
         </div>
-    ),
+    )
 };
 
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <TutorToolUsagePage
-            breakpoint="xl"
             activeTab="toolUsage"
             currentPage={1}
-            totalPages={20}
+            totalPages={10}
             totalEntries={200}
             selectedSchool="All Schools"
             selectedTutor="All Tutors"
@@ -126,7 +129,7 @@ export const Interactive = {
         breakpoint: 'xl',
         activeTab: 'toolUsage',
         currentPage: 1,
-        totalPages: 20,
+        totalPages: 10,
         totalEntries: 200,
         selectedSchool: 'All Schools',
         selectedTutor: 'All Tutors',

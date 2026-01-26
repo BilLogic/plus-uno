@@ -53,5 +53,5 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: var(--spacing-medium-space-200, 12px);
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
 }

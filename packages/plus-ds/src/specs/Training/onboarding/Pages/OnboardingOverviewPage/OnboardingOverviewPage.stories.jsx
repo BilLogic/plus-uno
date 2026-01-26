@@ -54,9 +54,7 @@ export default {
             table: { category: 'State' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
 };
 
 /**
@@ -101,7 +99,10 @@ export const Docs = {
  * Overview
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <OnboardingOverviewPage />
     ),
 };
@@ -147,6 +148,7 @@ export const Interactive = {
         );
     },
     args: {
+        breakpoint: 'xl',
         sortBy: 'Name',
         sortOrder: 'A-Z',
         showEmptyState: false,

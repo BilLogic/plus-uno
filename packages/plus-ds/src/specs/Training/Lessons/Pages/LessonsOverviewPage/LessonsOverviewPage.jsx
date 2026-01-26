@@ -16,10 +16,17 @@ import './LessonsOverviewPage.scss';
 
 const LessonsOverviewPage = ({
     lessons = [],
-    statusFilter = 'all',
+    statusFilter = 'All',
     sortBy = 'Name',
     sortOrder = 'A-Z',
     currentView = 'list',
+    statusCounts = {
+        all: 20,
+        assigned: 0,
+        inProgress: 0,
+        completed: 5,
+        notStarted: 15
+    },
     onStatusChange,
     onSortByChange,
     onOrderChange,
@@ -28,43 +35,70 @@ const LessonsOverviewPage = ({
     onLessonContinue,
     onLessonClick,
 }) => {
-    // Default sample lessons
+    // Default sample lessons matching Figma design
     const defaultLessons = [
         {
             id: 1,
-            title: 'Giving Effective Praise',
+            title: 'Lesson Title',
             competencyArea: 'socio-emotional',
-            status: 'not-started',
+            status: 'in-progress',
             duration: '12mins',
-            showAiIndicator: true,
-            description: 'Learn how to give effective praise to increase student motivation.'
+            showAiIndicator: false,
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
         },
         {
             id: 2,
-            title: 'Building Rapport',
-            competencyArea: 'relationships',
+            title: 'Lesson Title',
+            competencyArea: 'socio-emotional',
             status: 'in-progress',
-            duration: '15mins',
+            duration: '12mins',
             showAiIndicator: false,
-            description: 'Strategies for building strong relationships with students.'
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
         },
         {
             id: 3,
-            title: 'Goal Setting',
-            competencyArea: 'advocacy',
-            status: 'completed',
-            duration: '10mins',
+            title: 'Lesson Title',
+            competencyArea: 'socio-emotional',
+            status: 'in-progress',
+            duration: '12mins',
             showAiIndicator: true,
-            description: 'Help students set and achieve meaningful goals.'
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
         },
         {
             id: 4,
-            title: 'Active Listening',
+            title: 'Lesson Title',
             competencyArea: 'socio-emotional',
-            status: 'not-started',
-            duration: '18mins',
+            status: 'in-progress',
+            duration: '12mins',
             showAiIndicator: false,
-            description: 'Master the art of active listening in tutoring sessions.'
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+        },
+        {
+            id: 5,
+            title: 'Lesson Title',
+            competencyArea: 'socio-emotional',
+            status: 'in-progress',
+            duration: '12mins',
+            showAiIndicator: false,
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+        },
+        {
+            id: 6,
+            title: 'Lesson Title',
+            competencyArea: 'socio-emotional',
+            status: 'in-progress',
+            duration: '12mins',
+            showAiIndicator: true,
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+        },
+        {
+            id: 7,
+            title: 'Lesson Title',
+            competencyArea: 'socio-emotional',
+            status: 'in-progress',
+            duration: '12mins',
+            showAiIndicator: false,
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
         },
     ];
 
@@ -78,12 +112,14 @@ const LessonsOverviewPage = ({
         user: {
             name: 'John Doe',
             counter: true,
-            counterValue: 2
+            counterValue: 2,
+            type: 'lead tutor'
         }
     };
 
     const sidebarConfig = {
         user: 'tutor',
+        activeTab: 'lessons',
     };
 
     return (
@@ -98,7 +134,8 @@ const LessonsOverviewPage = ({
                     {/* Filter Left - Status Select */}
                     <div className="lessons-overview-page__filter-left">
                         <TrainingLessonStatusSelect
-                            selectedStatus={statusFilter === 'all' ? 'All' : statusFilter}
+                            selectedStatus={statusFilter}
+                            counts={statusCounts}
                             onStatusChange={onStatusChange}
                         />
                     </div>
@@ -152,8 +189,13 @@ const LessonsOverviewPage = ({
                         lessons={displayLessons}
                         onLessonContinue={onLessonContinue}
                         onLessonClick={onLessonClick}
-                        usePills={true}
+                        usePills={false}
                     />
+                </div>
+
+                {/* Footnote */}
+                <div className="lessons-overview-page__footnote">
+                    <p className="body3-txt">v5.2.0 | Copyright © Carnegie Mellon University 2024 | Terms of Use</p>
                 </div>
             </div>
         </PageLayout>
@@ -172,7 +214,15 @@ LessonsOverviewPage.propTypes = {
         showAiIndicator: PropTypes.bool,
     })),
     /** Status filter value */
-    statusFilter: PropTypes.string,
+    statusFilter: PropTypes.oneOf(['All', 'Assigned', 'In Progress', 'Completed', 'Not Started']),
+    /** Status counts object */
+    statusCounts: PropTypes.shape({
+        all: PropTypes.number,
+        assigned: PropTypes.number,
+        inProgress: PropTypes.number,
+        completed: PropTypes.number,
+        notStarted: PropTypes.number
+    }),
     /** Sort by value */
     sortBy: PropTypes.string,
     /** Sort order */

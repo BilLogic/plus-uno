@@ -5,13 +5,9 @@ import HighchartsReact from 'highcharts-react-official';
 
 /**
  * DonutChart Component
- * Displays a donut chart using Highcharts.
+ * Displays a donut chart using Highcharts with centered text overlay.
  */
 import chartTheme from '../../chartTheme';
-
-// Apply global theme options once or merge them locally.
-// Merging locally is safer for component isolation.
-// import Highcharts and HighchartsReact are already there.
 
 const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 'h1' }) => {
     // Transform segments into Highcharts series data
@@ -20,6 +16,37 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
         color: segment.color,
         name: segment.label || 'Segment'
     }));
+
+    // Get font size value for the center text using Figma semantic tokens
+    const getFontSize = () => {
+        const sizeMap = {
+            'h1': 'var(--font-size-title-l, 48px)',      // Title/L
+            'h2': 'var(--font-size-title-m1, 36px)',     // Title/M1
+            'h3': 'var(--font-size-title-m2, 32px)',     // Title/M2
+            'h4': 'var(--font-size-title-m4, 24px)',     // Title/M4 (Metric Cards)
+            'h5': 'var(--font-size-title-s, 20px)',      // Title/S
+            'body3': 'var(--font-size-body3, 12px)'      // Body3
+        };
+        return sizeMap[centerTextSize] || sizeMap['h4'];
+    };
+
+    const getFontWeight = () => {
+        // Title tokens use bold weight, body uses normal
+        return centerTextSize === 'body3' ? 'var(--font-weight-normal, 400)' : 'var(--font-weight-bold, 700)';
+    };
+
+    const getLineHeight = () => {
+        // Semantic line heights from Figma
+        const lineHeightMap = {
+            'h1': 'var(--font-line-height-title, 1.2)',
+            'h2': 'var(--font-line-height-title, 1.2)',
+            'h3': 'var(--font-line-height-title, 1.2)',
+            'h4': 'var(--font-line-height-title, 1.2)',
+            'h5': 'var(--font-line-height-title, 1.2)',
+            'body3': 'var(--font-line-height-body3, 1.667)'
+        };
+        return lineHeightMap[centerTextSize] || lineHeightMap['h4'];
+    };
 
     const options = {
         ...chartTheme, // Apply theme defaults
@@ -32,18 +59,7 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
             margin: [0, 0, 0, 0]
         },
         title: {
-            text: `<div style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                    <span style="font-family: ${centerTextSize === 'body3' ? 'var(--font-family-body, "Merriweather Sans", sans-serif)' : 'var(--font-family-header, "Lato", sans-serif)'}; font-weight: ${centerTextSize === 'body3' ? 'var(--font-weight-normal, 300)' : 'bold'}; font-size: ${centerTextSize === 'h1' ? 'var(--font-size-h1)' : centerTextSize === 'h2' ? 'var(--font-size-h2)' : centerTextSize === 'body3' ? '12px' : 'var(--font-size-h2)'}; line-height: ${centerTextSize === 'body3' ? '1.4' : '1'}; color: ${centerTextSize === 'body3' ? 'var(--color-on-surface-variant, #3f484a)' : 'var(--color-on-surface, #191c1e)'}; letter-spacing: 0;">${value || ''}</span>
-                    ${label ? `<span style="font-family: var(--font-family-body); font-size: var(--font-size-body3); color: var(--color-on-surface-variant, #666); margin-top: 4px;">${label}</span>` : ''}
-                   </div>`,
-            align: 'center',
-            verticalAlign: 'middle',
-            y: 2.5, // Optical adjustment - matches Figma's top-[calc(50%+2.5px)]
-            useHTML: true,
-            style: {
-                fontFamily: 'inherit',
-                color: 'inherit'
-            }
+            text: null
         },
         plotOptions: {
             pie: {
@@ -83,6 +99,36 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>
             <HighchartsReact highcharts={Highcharts} options={options} />
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center',
+                pointerEvents: 'none',
+                width: '100%'
+            }}>
+                <div style={{
+                    fontFamily: centerTextSize === 'body3' ? 'var(--font-family-body, "Merriweather Sans", sans-serif)' : 'var(--font-family-header, "Lato", sans-serif)',
+                    fontWeight: getFontWeight(),
+                    fontSize: getFontSize(),
+                    lineHeight: getLineHeight(),
+                    color: centerTextSize === 'body3' ? 'var(--color-on-surface-variant, #3f484a)' : 'var(--color-on-surface, #191c1e)'
+                }}>
+                    {value || ''}
+                </div>
+                {label && (
+                    <div style={{
+                        fontFamily: 'var(--font-family-body, "Merriweather Sans", sans-serif)',
+                        fontSize: 'var(--font-size-body3, 12px)',
+                        lineHeight: '1.667',
+                        color: 'var(--color-on-surface-variant, #3f484a)',
+                        marginTop: '4px'
+                    }}>
+                        {label}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

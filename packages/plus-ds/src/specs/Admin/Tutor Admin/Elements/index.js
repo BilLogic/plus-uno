@@ -11,7 +11,8 @@ export { default as CardTitleHeader } from './CardTitleHeader/CardTitleHeader';
 export { default as ExportSearchFilterBar } from './ExportSearchFilterBar/ExportSearchFilterBar';
 export { default as TutorChartsElement } from './TutorChartsElement/TutorChartsElement';
 export { default as AdminDateRangeFilter } from './AdminDateRangeFilter/AdminDateRangeFilter';
-export { default as TutorViewSelector } from './TutorViewSelector/TutorViewSelector';
+export { default as BadgeClaimedPill } from './BadgeClaimedPill/BadgeClaimedPill';
+export { default as ProgressRing } from './ProgressRing/ProgressRing';
 
 // AdminDateRangeFilter is shared - import from Admin/Elements
 // Note: This is Element #4 but is NOT duplicated here - it's shared across all Admin sections

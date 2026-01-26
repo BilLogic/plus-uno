@@ -83,6 +83,7 @@ const GroupTrainingProgressPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'groups',
     };
 
     return (

@@ -78,6 +78,7 @@ const OnboardingOverviewPage = ({
 
     const sidebarConfig = {
         user: 'tutor',
+        activeTab: 'onboarding',
     };
 
     return (
@@ -117,7 +118,7 @@ const OnboardingOverviewPage = ({
 
                     {/* Carousel Container */}
                     <div className="onboarding-overview-page__carousel-container">
-                        <div 
+                        <div
                             ref={carouselRef}
                             className="onboarding-overview-page__carousel"
                             onScroll={updateScrollButtons}

@@ -13,7 +13,7 @@ import Badge from '@/components/Badge';
 import Progress from '@/components/Progress';
 import { StaticBadgeSmart } from '@/components/StaticBadgeSmart';
 import AiIndicator from '../../Elements/AiIndicator/AiIndicator';
-// Status config inline for now
+import StatusIndicators from '../../../onboarding/Elements/StatusIndicators/StatusIndicators';
 import './LessonsTable.scss';
 
 const LessonsTable = ({
@@ -74,33 +74,18 @@ const LessonsTable = ({
             return <Badge text={label} style={badgeStyle} size="b3" />;
         }
 
-        // Button-based status icon (Ghost Button as per Figma)
-        let style = 'default';
-        let iconNode = <i className="fa-solid fa-square-plus" />;
-        const label = status === 'in-progress' ? 'In Progress' :
-            status === 'not-started' ? 'Not Started' :
-                status.charAt(0).toUpperCase() + status.slice(1);
-
+        // Map lesson status to StatusIndicators stage
+        let stage = 'not started';
         if (['completed', 'complete'].includes(status)) {
-            style = 'success';
-            iconNode = <i className="fa-solid fa-circle-check" />;
+            stage = 'completed';
         } else if (['in-progress', 'started'].includes(status)) {
-            style = 'warning';
-            // Use FA spinner with spin class instead of button loading state
-            iconNode = <i className="fa-solid fa-spinner fa-spin" />;
+            stage = 'in progress';
         }
 
         return (
-            <Button
-                style={style}
-                fill="ghost"
-                size="medium" // Matches 36px layout
-                leadingVisual={iconNode}
-                disabled // Non-interactive status indicator
-                aria-label={label}
-                title={label}
-                className="lessons-table__status-button"
-            />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <StatusIndicators stage={stage} size="medium" />
+            </div>
         );
     };
 

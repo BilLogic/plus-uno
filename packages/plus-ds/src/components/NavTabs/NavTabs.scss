@@ -17,6 +17,9 @@
     // Bottom border line across all tabs
     border-bottom: 1px solid var(--color-outline-variant);
 
+    // Constrain width to content so border doesn't exceed tabs
+    width: fit-content;
+
     // NAV ITEM container
     .nav-item,
     .plus-nav-item {
@@ -88,7 +91,7 @@
         }
     }
 
-    // DROPDOWN styling
+    // DROPDOWN styling (Keep mostly same but ensure no conflict)
     .plus-nav-dropdown,
     .dropdown {
         margin-bottom: -1px;

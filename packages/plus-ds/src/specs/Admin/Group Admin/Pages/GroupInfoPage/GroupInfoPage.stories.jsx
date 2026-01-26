@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react';
 import GroupInfoPage from './GroupInfoPage';
+import { linkTo } from '@storybook/addon-links';
 import './GroupInfoPage.scss';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 
@@ -58,15 +59,13 @@ Node ID: 258-263800
             table: { category: 'Pagination' },
         },
         breakpoint: {
-            control: 'select',
+            control: { type: 'select' },
             options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
 };
 
 /**
@@ -117,7 +116,10 @@ export const Docs = {
  * Shows full page with default data matching Figma design
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <GroupInfoPage
             groups={[
                 { id: 1, name: 'Math Masters', size: 4 },
@@ -130,12 +132,29 @@ export const Overview = {
                 { id: 8, name: 'Math Masters', size: 4 },
                 { id: 9, name: 'Math Masters', size: 4 },
                 { id: 10, name: 'Math Masters', size: 4 },
+                { id: 11, name: 'Math Masters', size: 4 },
+                { id: 12, name: 'Math Masters', size: 4 },
+                { id: 13, name: 'Math Masters', size: 4 },
+                { id: 14, name: 'Math Masters', size: 4 },
+                { id: 15, name: 'Math Masters', size: 4 },
+                { id: 16, name: 'Math Masters', size: 4 },
+                { id: 17, name: 'Math Masters', size: 4 },
+                { id: 18, name: 'Math Masters', size: 4 },
+                { id: 19, name: 'Math Masters', size: 4 },
+                { id: 20, name: 'Math Masters', size: 4 },
             ]}
             currentPage={1}
-            totalPages={20}
+            totalPages={10}
             totalEntries={200}
             onPageChange={(page) => console.log('Page changed:', page)}
-            onTabChange={(tab) => console.log('Tab changed:', tab)}
+            onTabChange={(tab) => {
+                console.log('Tab changed:', tab);
+                const linkMap = {
+                    'group-info': ['Specs/Admin/Group Admin/Pages/GroupInfoPage', 'Overview'],
+                    'training-progress': ['Specs/Admin/Group Admin/Pages/GroupTrainingProgressPage', 'Overview']
+                };
+                if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
+            }}
             onAddGroup={() => console.log('Add Group clicked')}
             onEditGroup={(group) => console.log('Edit clicked:', group)}
             onViewProgress={(group) => console.log('View Progress clicked:', group)}
@@ -164,6 +183,16 @@ export const Interactive = {
                     { id: 8, name: 'Language Learners', size: 6 },
                     { id: 9, name: 'Study Group Alpha', size: 4 },
                     { id: 10, name: 'Debate Team', size: 5 },
+                    { id: 11, name: 'Math Whizzes', size: 6 },
+                    { id: 12, name: 'Geography Geeks', size: 5 },
+                    { id: 13, name: 'Chess Club', size: 4 },
+                    { id: 14, name: 'Robotics Team', size: 8 },
+                    { id: 15, name: 'Drama Club', size: 10 },
+                    { id: 16, name: 'Book Club', size: 5 },
+                    { id: 17, name: 'Environment Club', size: 7 },
+                    { id: 18, name: 'Photography', size: 4 },
+                    { id: 19, name: 'Student Council', size: 12 },
+                    { id: 20, name: 'Yearbook Committee', size: 6 },
                 ]}
                 currentPage={currentPage}
                 totalPages={args.totalPages}
@@ -172,7 +201,14 @@ export const Interactive = {
                     setCurrentPage(page);
                     console.log('Page changed:', page);
                 }}
-                onTabChange={(tab) => console.log('Tab changed:', tab)}
+                onTabChange={(tab) => {
+                    console.log('Tab changed:', tab);
+                    const linkMap = {
+                        'group-info': ['Specs/Admin/Group Admin/Pages/GroupInfoPage', 'Interactive'],
+                        'training-progress': ['Specs/Admin/Group Admin/Pages/GroupTrainingProgressPage', 'Interactive']
+                    };
+                    if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
+                }}
                 onAddGroup={() => console.log('Add Group clicked')}
                 onEditGroup={(group) => console.log('Edit clicked:', group)}
                 onViewProgress={(group) => console.log('View Progress clicked:', group)}
@@ -180,8 +216,9 @@ export const Interactive = {
         );
     },
     args: {
+        breakpoint: 'xl',
         currentPage: 1,
-        totalPages: 20,
+        totalPages: 10,
         totalEntries: 200,
     },
 };

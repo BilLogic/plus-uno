@@ -34,12 +34,6 @@ Full page layout for Tutor Status and Warnings section.
         },
     },
     argTypes: {
-        breakpoint: {
-            control: { type: 'select' },
-            options: ['md', 'lg', 'xl'],
-            description: 'Responsive breakpoint',
-            table: { category: 'Responsive' },
-        },
         activeTab: {
             control: { type: 'select' },
             options: ['performance', 'statusWarnings', 'toolUsage', 'trainingProgress'],
@@ -48,6 +42,12 @@ Full page layout for Tutor Status and Warnings section.
         currentPage: {
             control: { type: 'number', min: 1, max: 20 },
             description: 'Current page number',
+        },
+        breakpoint: {
+            control: { type: 'select' },
+            options: ['md', 'lg', 'xl'],
+            description: 'Responsive breakpoint',
+            table: { category: 'Responsive' },
         },
     },
     decorators: [
@@ -78,12 +78,14 @@ export const Docs = {
 };
 
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <TutorStatusWarningsPage
-            breakpoint="xl"
             activeTab="statusWarnings"
             currentPage={1}
-            totalPages={20}
+            totalPages={10}
             totalEntries={200}
             selectedSchool="All Schools"
             selectedTutor="All Tutors"
@@ -117,7 +119,7 @@ export const Interactive = {
         breakpoint: 'xl',
         activeTab: 'statusWarnings',
         currentPage: 1,
-        totalPages: 20,
+        totalPages: 10,
         totalEntries: 200,
         selectedSchool: 'All Schools',
         selectedTutor: 'All Tutors',

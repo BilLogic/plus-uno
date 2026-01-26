@@ -7,6 +7,7 @@
 
 import React, { useState, useMemo } from 'react';
 import GroupTrainingProgressPage from './GroupTrainingProgressPage';
+import { linkTo } from '@storybook/addon-links';
 import './GroupTrainingProgressPage.scss';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 
@@ -127,20 +128,18 @@ Node ID: 531-62962
             table: { category: 'Filters' },
         },
         rowCount: {
-            control: { type: 'number', min: 1, max: 20 },
+            control: { type: 'number', min: 1, max: 50 },
             description: 'Number of table rows to display',
             table: { category: 'Data' },
         },
         breakpoint: {
-            control: 'select',
+            control: { type: 'select' },
             options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
 };
 
 /**
@@ -197,11 +196,21 @@ export const Docs = {
  * Shows full page with 9 rows matching Figma design
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <GroupTrainingProgressPage
-            trainingData={defaultNineRows}
+            trainingData={generateTableData(20)}
             selectedGroup="All Groups"
-            onTabChange={(tab) => console.log('Tab changed:', tab)}
+            onTabChange={(tab) => {
+                console.log('Tab changed:', tab);
+                const linkMap = {
+                    'group-info': ['Specs/Admin/Group Admin/Pages/GroupInfoPage', 'Overview'],
+                    'training-progress': ['Specs/Admin/Group Admin/Pages/GroupTrainingProgressPage', 'Overview']
+                };
+                if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
+            }}
             onGroupFilterChange={() => console.log('Group filter clicked')}
             onAssignClick={(item) => console.log('Assign clicked:', item)}
         />
@@ -224,7 +233,14 @@ export const Interactive = {
             <GroupTrainingProgressPage
                 trainingData={tableData}
                 selectedGroup={selectedGroup}
-                onTabChange={(tab) => console.log('Tab changed:', tab)}
+                onTabChange={(tab) => {
+                    console.log('Tab changed:', tab);
+                    const linkMap = {
+                        'group-info': ['Specs/Admin/Group Admin/Pages/GroupInfoPage', 'Interactive'],
+                        'training-progress': ['Specs/Admin/Group Admin/Pages/GroupTrainingProgressPage', 'Interactive']
+                    };
+                    if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
+                }}
                 onGroupFilterChange={() => {
                     const groups = ['All Groups', 'Math Masters', 'Science Explorers'];
                     const currentIndex = groups.indexOf(selectedGroup);
@@ -236,7 +252,8 @@ export const Interactive = {
         );
     },
     args: {
+        breakpoint: 'xl',
         selectedGroup: 'All Groups',
-        rowCount: 9,
+        rowCount: 20,
     },
 };

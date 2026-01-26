@@ -119,6 +119,7 @@ const TutorStatusWarningsPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'tutors',
     };
 
     return (
@@ -285,7 +286,7 @@ const TutorStatusWarningsPage = ({
                             totalPages={totalPages}
                             onPageChange={onPageChange}
                             type="icon"
-                            size="default"
+                            size="small"
                         />
                     </div>
                 </div>

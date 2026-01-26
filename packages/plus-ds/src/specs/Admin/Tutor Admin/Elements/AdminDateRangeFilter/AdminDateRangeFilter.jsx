@@ -57,14 +57,16 @@ const AdminDateRangeFilter = ({
                     size="small"
                     className="admin-date-range-filter__dropdown"
                 />
-                <Dropdown
-                    buttonText={selectedTutor}
-                    items={tutorOptions}
-                    style="secondary"
-                    fill="ghost"
-                    size="small"
-                    className="admin-date-range-filter__dropdown"
-                />
+                {selectedTutor && (
+                    <Dropdown
+                        buttonText={selectedTutor}
+                        items={tutorOptions}
+                        style="secondary"
+                        fill="ghost"
+                        size="small"
+                        className="admin-date-range-filter__dropdown"
+                    />
+                )}
             </div>
 
             {/* Date Range */}

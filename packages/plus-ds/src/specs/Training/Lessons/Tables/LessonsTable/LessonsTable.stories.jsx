@@ -120,6 +120,12 @@ export const Interactive = {
             control: 'boolean',
             description: 'Force all rows to be expanded initially',
             table: { category: 'State' }
+        },
+        status: {
+            control: 'select',
+            options: ['not-started', 'in-progress', 'completed'],
+            description: 'Status of the lesson',
+            table: { category: 'Content' }
         }
     },
     render: (args) => {
@@ -127,6 +133,7 @@ export const Interactive = {
             ...l,
             state: args.rowState || undefined,
             expanded: args.forceExpanded !== undefined ? args.forceExpanded : l.expanded,
+            status: args.status || l.status,
             showAiIndicator: true
         }));
 
@@ -158,6 +165,7 @@ export const Interactive = {
     args: {
         rowState: '',
         forceExpanded: false,
+        status: 'in-progress',
         lessons: [
             {
                 id: 1,

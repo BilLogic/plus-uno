@@ -14,6 +14,7 @@ import Pagination from '../../../../../components/Pagination/Pagination';
 import SessionsTable from '../../Tables/SessionsTable/SessionsTable';
 import SessionOverviewSection from '../../Sections/SessionOverviewSection/SessionOverviewSection';
 import SessionModal from '../../Modals/SessionModal/SessionModal';
+import { AdminDateRangeFilter } from '../../../Tutor Admin/Elements';
 import '../../Tables/SessionsTable/SessionsTable.scss';
 import '../../Sections/SessionOverviewSection/SessionOverviewSection.scss';
 import '../../Modals/SessionModal/SessionModal.scss';
@@ -108,6 +109,7 @@ const SessionAdminPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'admin-sessions',
     };
 
     const handleTabSelect = (selectedKey) => {
@@ -154,41 +156,16 @@ const SessionAdminPage = ({
                             Session Overview
                         </h2>
                         <div className="session-admin-page__filters">
-                            <Button
-                                text={selectedSchool}
-                                style="secondary"
-                                fill="outlined"
-                                size="small"
-                                trailingVisual="caret-down"
-                                onClick={onSchoolFilterChange}
+                            <AdminDateRangeFilter
+                                selectedSchool={selectedSchool}
+                                selectedTutor={selectedTutor}
+                                dateFrom={dateFrom}
+                                dateTo={dateTo}
+                                onSchoolChange={onSchoolFilterChange}
+                                onTutorChange={onTutorFilterChange}
+                                onDateFromChange={(date) => onDateFilterChange && onDateFilterChange('from', date)}
+                                onDateToChange={(date) => onDateFilterChange && onDateFilterChange('to', date)}
                             />
-                            <Button
-                                text={selectedTutor}
-                                style="secondary"
-                                fill="outlined"
-                                size="small"
-                                trailingVisual="caret-down"
-                                onClick={onTutorFilterChange}
-                            />
-                            <div className="session-admin-page__date-filter">
-                                <Button
-                                    text={dateFrom}
-                                    style="secondary"
-                                    fill="outlined"
-                                    size="small"
-                                    trailingVisual="caret-down"
-                                    onClick={() => onDateFilterChange && onDateFilterChange('from')}
-                                />
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>to</span>
-                                <Button
-                                    text={dateTo}
-                                    style="secondary"
-                                    fill="outlined"
-                                    size="small"
-                                    trailingVisual="caret-down"
-                                    onClick={() => onDateFilterChange && onDateFilterChange('to')}
-                                />
-                            </div>
                         </div>
                     </div>
 
@@ -226,7 +203,7 @@ const SessionAdminPage = ({
                             totalPages={totalPages}
                             onPageChange={onPageChange}
                             type="icon"
-                            size="default"
+                            size="small"
                         />
                     </div>
                 </div>

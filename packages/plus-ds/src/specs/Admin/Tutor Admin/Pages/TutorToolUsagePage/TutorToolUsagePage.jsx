@@ -102,6 +102,7 @@ const TutorToolUsagePage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'tutors',
     };
 
     return (
@@ -205,7 +206,7 @@ const TutorToolUsagePage = ({
                             totalPages={totalPages}
                             onPageChange={onPageChange}
                             type="icon"
-                            size="default"
+                            size="small"
                         />
                     </div>
                 </div>

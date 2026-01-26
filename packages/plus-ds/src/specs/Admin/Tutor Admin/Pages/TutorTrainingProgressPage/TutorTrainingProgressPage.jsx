@@ -104,7 +104,7 @@ const TutorTrainingProgressPage = ({
             email: 'esther@gmail.com',
             completion: '2/18',
             accuracy: '10%',
-            badgeClaimed: 'No',
+            badgeClaimed: 'N/A',
             timeSpent: 45
         },
         {
@@ -186,6 +186,7 @@ const TutorTrainingProgressPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'tutors',
     };
 
     return (
@@ -341,7 +342,7 @@ const TutorTrainingProgressPage = ({
                             totalPages={totalPages}
                             onPageChange={onPageChange}
                             type="icon"
-                            size="default"
+                            size="small"
                         />
                     </div>
                 </div>

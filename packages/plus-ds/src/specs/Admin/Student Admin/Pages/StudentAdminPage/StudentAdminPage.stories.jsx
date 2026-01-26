@@ -77,7 +77,7 @@ Node ID: 1006-258597
             table: { category: 'Filters' },
         },
         rowCount: {
-            control: { type: 'number', min: 1, max: 20 },
+            control: { type: 'number', min: 1, max: 50 },
             description: 'Number of table rows to display',
             table: { category: 'Data' },
         },
@@ -93,15 +93,13 @@ Node ID: 1006-258597
             table: { category: 'Modal' },
         },
         breakpoint: {
-            control: 'select',
+            control: { type: 'select' },
             options: ['md', 'lg', 'xl'],
             description: 'Responsive breakpoint',
             table: { category: 'Responsive' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
 };
 
 /**
@@ -159,7 +157,10 @@ export const Docs = {
  * Shows full page with 9 rows matching Figma design
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <StudentAdminPage
             students={defaultNineRows}
             onPageChange={(page) => console.log('Page changed:', page)}
@@ -219,8 +220,9 @@ export const Interactive = {
         );
     },
     args: {
+        breakpoint: 'xl',
         selectedSchool: 'All Schools',
-        rowCount: 9,
+        rowCount: 20,
         modalOpen: false,
         modalVariant: 'info',
     },
@@ -231,7 +233,10 @@ export const Interactive = {
  * Shows page with modal open (Info variant)
  */
 export const WithModalInfoVariant = {
-    render: () => {
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => {
         const [modalOpen, setModalOpen] = useState(true);
 
         return (
@@ -251,7 +256,10 @@ export const WithModalInfoVariant = {
  * Shows page with modal open (Sessions variant)
  */
 export const WithModalSessionsVariant = {
-    render: () => {
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => {
         const [modalOpen, setModalOpen] = useState(true);
 
         return (

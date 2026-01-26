@@ -73,5 +73,5 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--size-section-gap-md, 16px);
-    padding-top: var(--size-section-pad-y-sm, 8px);
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
 }

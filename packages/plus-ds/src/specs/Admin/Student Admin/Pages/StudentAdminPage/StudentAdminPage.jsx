@@ -13,6 +13,7 @@ import Pagination from '../../../../../components/Pagination/Pagination';
 import StudentsTable from '../../Tables/StudentsTable/StudentsTable';
 import StudentOverviewSection from '../../Sections/StudentOverviewSection/StudentOverviewSection';
 import StudentModal from '../../Modals/StudentModal/StudentModal';
+import { AdminDateRangeFilter } from '../../../Tutor Admin/Elements';
 import '../../Tables/StudentsTable/StudentsTable.scss';
 import '../../Sections/StudentOverviewSection/StudentOverviewSection.scss';
 import '../../Modals/StudentModal/StudentModal.scss';
@@ -109,6 +110,7 @@ const StudentAdminPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'students',
     };
 
     return (
@@ -126,33 +128,15 @@ const StudentAdminPage = ({
                             Student Overview
                         </h2>
                         <div className="student-admin-page__filters">
-                            <Button
-                                text={selectedSchool}
-                                style="secondary"
-                                fill="outlined"
-                                size="small"
-                                trailingVisual="caret-down"
-                                onClick={onSchoolFilterChange}
+                            <AdminDateRangeFilter
+                                selectedSchool={selectedSchool}
+                                selectedTutor={null}
+                                dateFrom={dateFrom}
+                                dateTo={dateTo}
+                                onSchoolChange={onSchoolFilterChange}
+                                onDateFromChange={(date) => onDateFilterChange && onDateFilterChange('from', date)}
+                                onDateToChange={(date) => onDateFilterChange && onDateFilterChange('to', date)}
                             />
-                            <div className="student-admin-page__date-filter">
-                                <Button
-                                    text={dateFrom}
-                                    style="secondary"
-                                    fill="outlined"
-                                    size="small"
-                                    trailingVisual="caret-down"
-                                    onClick={() => onDateFilterChange && onDateFilterChange('from')}
-                                />
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>to</span>
-                                <Button
-                                    text={dateTo}
-                                    style="secondary"
-                                    fill="outlined"
-                                    size="small"
-                                    trailingVisual="caret-down"
-                                    onClick={() => onDateFilterChange && onDateFilterChange('to')}
-                                />
-                            </div>
                         </div>
                     </div>
 
@@ -197,7 +181,7 @@ const StudentAdminPage = ({
                             totalPages={totalPages}
                             onPageChange={onPageChange}
                             type="icon"
-                            size="default"
+                            size="small"
                         />
                     </div>
                 </div>

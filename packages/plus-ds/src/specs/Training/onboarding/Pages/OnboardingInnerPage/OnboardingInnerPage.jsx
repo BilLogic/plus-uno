@@ -66,6 +66,7 @@ const OnboardingInnerPage = ({
 
     const sidebarConfig = {
         user: 'tutor',
+        activeTab: 'onboarding',
     };
 
     return (
@@ -89,7 +90,7 @@ const OnboardingInnerPage = ({
                             }
                         }}
                     />
-                    
+
                     {/* Illustration placeholder */}
                     <div className="onboarding-inner-page__illustration">
                         <div className="onboarding-inner-page__illustration-placeholder" />

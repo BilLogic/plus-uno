@@ -61,9 +61,7 @@ export default {
             table: { category: 'Responsive' },
         },
     },
-    args: {
-        breakpoint: 'xl',
-    }
+    args: {},
 };
 
 /**
@@ -174,6 +172,23 @@ export const Interactive = {
     name: 'Interactive',
     render: (args) => {
         const [variant, setVariant] = useState(args.variant || 'P1');
+
+        const variants = ['P1', 'P2', 'P3', 'P4', 'P5'];
+
+        const handleNext = () => {
+            const currentIndex = variants.indexOf(variant);
+            if (currentIndex < variants.length - 1) {
+                setVariant(variants[currentIndex + 1]);
+            }
+        };
+
+        const handlePrevious = () => {
+            const currentIndex = variants.indexOf(variant);
+            if (currentIndex > 0) {
+                setVariant(variants[currentIndex - 1]);
+            }
+        };
+
         return (
             <div>
                 <div style={{
@@ -207,8 +222,8 @@ export const Interactive = {
                     lessonTitle={args.lessonTitle}
                     estimatedTime={args.estimatedTime}
                     onBack={() => console.log('Back clicked')}
-                    onPrevious={() => console.log('Previous clicked')}
-                    onNext={() => console.log('Next clicked')}
+                    onPrevious={handlePrevious}
+                    onNext={handleNext}
                     onRatingChange={(rating) => console.log('Rating changed:', rating)}
                 />
             </div>

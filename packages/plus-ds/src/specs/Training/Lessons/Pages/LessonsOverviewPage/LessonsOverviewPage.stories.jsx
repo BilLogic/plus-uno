@@ -11,6 +11,36 @@ import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './LessonsOverviewPage.scss';
 
 
+const sampleLessons = [
+    {
+        id: 1,
+        title: 'Giving Effective Praise',
+        competencyArea: 'socio-emotional',
+        status: 'in-progress',
+        duration: '12mins',
+        showAiIndicator: false,
+        description: 'Learn how to give effective praise to increase student motivation.'
+    },
+    {
+        id: 2,
+        title: 'Building Relationships',
+        competencyArea: 'socio-emotional',
+        status: 'in-progress',
+        duration: '12mins',
+        showAiIndicator: false,
+        description: 'Strategies for building strong relationships with students.'
+    },
+    {
+        id: 3,
+        title: 'Active Listening',
+        competencyArea: 'socio-emotional',
+        status: 'in-progress',
+        duration: '12mins',
+        showAiIndicator: true,
+        description: 'Techniques for active listening in the classroom.'
+    }
+];
+
 export default {
     title: 'Specs/Training/Lessons/Pages/LessonsOverviewPage',
     component: LessonsOverviewPage,
@@ -31,11 +61,8 @@ export default {
         },
         layout: 'fullscreen',
     },
-    args: {
-        breakpoint: 'xl',
-    },
+    args: {},
     argTypes: {
-
         breakpoint: {
             control: { type: 'select' },
             options: ['md', 'lg', 'xl'],
@@ -44,7 +71,7 @@ export default {
         },
         statusFilter: {
             control: { type: 'select' },
-            options: ['all', 'not-started', 'in-progress', 'completed'],
+            options: ['All', 'Assigned', 'In Progress', 'Completed', 'Not Started'],
             description: 'Status filter value',
             table: { category: 'Filters' },
         },
@@ -65,6 +92,12 @@ export default {
             options: ['list', 'grid'],
             description: 'Current view mode',
             table: { category: 'Display' },
+        },
+        status: {
+            control: { type: 'select' },
+            options: ['not-started', 'in-progress', 'completed'],
+            description: 'Override status for all lessons',
+            table: { category: 'Content' },
         },
     },
 };
@@ -111,15 +144,15 @@ export const Docs = {
  * Static rendering matching Figma design exactly
  */
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: 'xl'
+    },
+    render: (args) => (
         <LessonsOverviewPage />
     ),
 
     parameters: {
         layout: 'fullscreen',
-    },
-    args: {
-        breakpoint: 'lg',
     },
 };
 
@@ -129,15 +162,16 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => {
-        const [statusFilter, setStatusFilter] = useState(args.statusFilter || 'all');
+        const [statusFilter, setStatusFilter] = useState(args.statusFilter || 'All');
         const [sortBy, setSortBy] = useState(args.sortBy || 'Name');
         const [sortOrder, setSortOrder] = useState(args.sortOrder || 'A-Z');
         const [currentView, setCurrentView] = useState(args.currentView || 'list');
 
         return (
             <LessonsOverviewPage
-
+                lessons={sampleLessons.map(l => ({ ...l, status: args.status || l.status }))}
                 statusFilter={statusFilter}
+                statusCounts={args.statusCounts}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
                 currentView={currentView}
@@ -174,8 +208,16 @@ export const Interactive = {
     },
 
     args: {
-        breakpoint: 'lg',
-        statusFilter: 'all',
+        breakpoint: 'xl',
+        statusFilter: 'All',
+        status: 'in-progress',
+        statusCounts: {
+            all: 20,
+            assigned: 0,
+            inProgress: 0,
+            completed: 5,
+            notStarted: 15
+        },
         sortBy: 'Name',
         sortOrder: 'A-Z',
         currentView: 'list',

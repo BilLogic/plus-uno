@@ -103,13 +103,15 @@ export const Docs = {
 };
 
 export const Overview = {
-    render: () => (
+    args: {
+        breakpoint: "xl"
+    },
+    render: (args) => (
         <TutorTrainingProgressPage
-            breakpoint="xl"
             activeTab="trainingProgress"
             viewMode="By Tutor"
             currentPage={1}
-            totalPages={20}
+            totalPages={10}
             totalEntries={200}
             modalOpen={false}
             searchQuery=""
@@ -138,7 +140,7 @@ export const Overview = {
             onExportCSV={() => console.log('Export CSV clicked')}
             onSearchChange={(query) => console.log('Search query:', query)}
         />
-    ),
+    )
 };
 
 export const Interactive = {
@@ -147,7 +149,7 @@ export const Interactive = {
         activeTab: 'trainingProgress',
         viewMode: 'By Tutor',
         currentPage: 1,
-        totalPages: 20,
+        totalPages: 10,
         totalEntries: 200,
         modalOpen: false,
         modalTab: 'info',

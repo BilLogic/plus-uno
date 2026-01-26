@@ -14,9 +14,13 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { PageLayout } from '../../../../Universal/Pages';
 import Button from '../../../../../components/Button/Button';
 import Rating from '../../Elements/Rating/Rating';
 import './LessonsDetailPage.scss';
+
+const imgMain = "http://localhost:3845/assets/735e5e5eb60dd6430d7cbe12333e91485b70612b.png";
+const imgScenario = "http://localhost:3845/assets/5818981c2f06827056286762399990264177b960.png"; // Assuming scenario image from context if available, otherwise reuse or keep placeholder
 
 /**
  * Progress Bar Component - Shows lesson progress with 9 segments
@@ -53,16 +57,19 @@ LessonProgressBar.propTypes = {
 /**
  * Alert for Supervisors Component
  */
-const AlertForSupervisors = () => (
+const AlertForSupervisors = ({ onClose }) => (
     <div className="supervisor-alert">
         <div className="supervisor-alert__icon">
             <i className="fas fa-info-circle" />
         </div>
         <div className="supervisor-alert__content">
             <p className="body2-txt">
-                <strong>Note for Supervisors:</strong> This lesson includes AI-generated content to enhance the learning experience.
+                Please complete all questions on this page to proceed.
             </p>
         </div>
+        <button className="supervisor-alert__close" onClick={onClose} aria-label="Close alert">
+            <i className="fas fa-times" />
+        </button>
     </div>
 );
 
@@ -114,11 +121,13 @@ const P1Content = ({ lessonTitle, estimatedTime, onRatingChange }) => {
 
             {/* Content Section */}
             <div className="lesson-content__body">
-                {/* Placeholder image */}
+                {/* Image */}
                 <div className="lesson-content__image">
-                    <div className="lesson-content__image-placeholder">
-                        <i className="fas fa-image" />
-                    </div>
+                    <img
+                        src={imgMain}
+                        alt="Lesson Intro"
+                        style={{ maxWidth: '100%', height: 'auto', maxHeight: '300px' }}
+                    />
                 </div>
 
                 {/* Text content */}
@@ -242,8 +251,8 @@ const P2Content = ({ onPrevious, onNext }) => (
 
         {/* Actions */}
         <div className="lesson-content__actions">
-            <Button text="Previous" style="primary" fill="outline" size="large" onClick={onPrevious} />
-            <Button text="Next" style="primary" fill="filled" size="large" onClick={onNext} />
+            <Button text="Previous" style="primary" fill="outline" size="medium" onClick={onPrevious} />
+            <Button text="Next" style="primary" fill="filled" size="medium" onClick={onNext} />
         </div>
     </div>
 );
@@ -336,11 +345,13 @@ const P4Content = ({ onPrevious, onNext }) => {
                 You are tutoring a student named Carla, who came to you for help with solving a story problem from her algebra homework. As her tutor, you are providing feedback and asking Carla prompting questions to help her solve the word problem. You are trying to encourage her to continue trying to solve the problem.
             </p>
 
-            {/* Image placeholder */}
+            {/* Scenario Image */}
             <div className="lesson-content__image">
-                <div className="lesson-content__image-placeholder lesson-content__image-placeholder--large">
-                    <i className="fas fa-user-graduate" />
-                </div>
+                <img
+                    src={imgScenario}
+                    alt="Student Scenario"
+                    style={{ maxWidth: '100%', height: 'auto', maxHeight: '300px' }}
+                />
             </div>
 
             {/* Question 7: Textarea */}
@@ -488,54 +499,52 @@ const LessonsDetailPage = ({
         return lessonTitle;
     };
 
+    const topBarConfig = {
+        breadcrumbs: [
+            { text: 'Home', href: '#' },
+            { text: 'Lessons', href: '#' },
+            { text: getBreadcrumbText() }
+        ],
+        user: {
+            name: 'John Doe',
+            counter: true,
+            counterValue: 2,
+            type: 'lead tutor'
+        }
+    };
+
+    const sidebarConfig = {
+        user: 'tutor',
+        activeTab: 'lessons',
+    };
+
     return (
-        <div className={`lessons-detail-page ${className}`} style={style}>
-            {/* Top Bar */}
-            <div className="lessons-detail-page__topbar">
-                <div className="lessons-detail-page__sidebar-control">
-                    <Button
-                        text=""
-                        style="primary"
-                        fill="tonal"
-                        size="medium"
-                        leadingVisual="angles-left"
-                        onClick={onBack}
-                    />
+        <PageLayout
+            topBarConfig={topBarConfig}
+            sidebarConfig={sidebarConfig}
+            id="lessons-detail-page"
+            style={{
+                '--size-surface-pad-x': '24px',
+                '--size-surface-pad-y': '24px'
+            }}
+        >
+            <div className={`lessons-detail-page__content-container ${className}`} style={style}>
+                {/* Content Wrapper */}
+                <div className="lessons-detail-page__content-wrapper">
+                    {/* Progress Bar */}
+                    <LessonProgressBar variant={variant} />
+
+                    {/* Alert - Hidden by default to match clean design, can be enabled if needed */}
+                    {/* <AlertForSupervisors /> */}
+
+                    {/* Variant Content */}
+                    {renderVariantContent()}
                 </div>
-                <div className="lessons-detail-page__breadcrumb">
-                    <span className="body1-txt" style={{ color: 'var(--color-primary-text)' }}>Home</span>
-                    <span className="body1-txt" style={{ color: 'var(--color-on-surface-variant)' }}>/</span>
-                    <span className="body1-txt" style={{ color: 'var(--color-primary-text)' }}>Lessons</span>
-                    <span className="body1-txt" style={{ color: 'var(--color-on-surface-variant)' }}>/</span>
-                    <span className="body1-txt" style={{ color: 'var(--color-on-surface-variant)' }}>{getBreadcrumbText()}</span>
-                </div>
-                <div className="lessons-detail-page__user-avatar">
-                    <div className="lessons-detail-page__user-initial">J</div>
-                    <span className="body2-txt">John Doe</span>
-                    <span className="lessons-detail-page__notification">2</span>
-                </div>
+
+                {/* Footer */}
+                <LessonFooter />
             </div>
-
-            {/* Main Content Container */}
-            <div className="lessons-detail-page__main">
-                <div className="lessons-detail-page__content-container">
-                    {/* Content Wrapper */}
-                    <div className="lessons-detail-page__content-wrapper">
-                        {/* Progress Bar */}
-                        <LessonProgressBar variant={variant} />
-
-                        {/* Alert */}
-                        <AlertForSupervisors />
-
-                        {/* Variant Content */}
-                        {renderVariantContent()}
-                    </div>
-
-                    {/* Footer */}
-                    <LessonFooter />
-                </div>
-            </div>
-        </div>
+        </PageLayout>
     );
 };
 

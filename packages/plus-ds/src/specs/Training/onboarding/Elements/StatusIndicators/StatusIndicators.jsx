@@ -34,7 +34,7 @@ const StatusIndicators = ({
     const config = stageConfig[stage] || stageConfig['not started'];
 
     return (
-        <div 
+        <div
             className={`status-indicators status-indicators--${size} ${config.colorClass} ${className}`}
             role="status"
             aria-label={`Status: ${stage}`}
@@ -46,6 +46,7 @@ const StatusIndicators = ({
 };
 
 StatusIndicators.propTypes = {
+    /** Status stage: "not started", "in progress", "completed" */
     /** Status stage: "not started", "in progress", "completed" */
     stage: PropTypes.oneOf(['not started', 'in progress', 'completed']),
     /** Size variant */

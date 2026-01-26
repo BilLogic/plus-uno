@@ -9,13 +9,13 @@ import CardTitleHeader from './CardTitleHeader/CardTitleHeader';
 import ExportSearchFilterBar from './ExportSearchFilterBar/ExportSearchFilterBar';
 import TutorChartsElement from './TutorChartsElement/TutorChartsElement';
 import AdminDateRangeFilter from './AdminDateRangeFilter/AdminDateRangeFilter';
-import TutorViewSelector from './TutorViewSelector/TutorViewSelector';
+
 
 import './CardTitleHeader/CardTitleHeader.scss';
 import './ExportSearchFilterBar/ExportSearchFilterBar.scss';
 import './TutorChartsElement/TutorChartsElement.scss';
 import './AdminDateRangeFilter/AdminDateRangeFilter.scss';
-import './TutorViewSelector/TutorViewSelector.scss';
+
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements',
@@ -29,7 +29,7 @@ export default {
 - **ExportSearchFilterBar**: Combined search and filter bar with export functionality
 - **TutorChartsElement**: Chart visualization component (Pie, Bar, Line variants)
 - **AdminDateRangeFilter**: Date range filter with school and tutor dropdowns
-- **TutorViewSelector**: View mode selector (Table/Card toggle)
+
 `,
             },
         },
@@ -64,22 +64,7 @@ export const Overview = {
                 </div>
             </section>
 
-            {/* Tutor View Selector */}
-            <section style={{ marginBottom: '48px' }}>
-                <h3 className="h3" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
-                    Tutor View Selector
-                </h3>
-                <div style={{
-                    backgroundColor: 'var(--color-surface-container-lowest, white)',
-                    padding: '24px',
-                    borderRadius: '12px'
-                }}>
-                    <TutorViewSelector
-                        selectedView="table"
-                        onViewChange={(view) => console.log('View changed:', view)}
-                    />
-                </div>
-            </section>
+
 
             {/* Admin Date Range Filter */}
             <section style={{ marginBottom: '48px' }}>

@@ -68,6 +68,7 @@ const GroupInfoPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
+        activeTab: 'groups',
     };
 
     return (
@@ -124,7 +125,7 @@ const GroupInfoPage = ({
                         totalPages={totalPages}
                         onPageChange={onPageChange}
                         type="icon"
-                        size="default"
+                        size="small"
                     />
                 </div>
             </div>
