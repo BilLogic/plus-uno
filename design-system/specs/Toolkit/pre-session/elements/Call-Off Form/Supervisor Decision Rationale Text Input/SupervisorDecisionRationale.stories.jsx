@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TextareaVer2 from '../../../../../../../packages/plus-ds/src/forms/TextareaVer2';
 
 export default {
-    title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Text Input Additional Details',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Supervisor Decision Rationale Text Input',
     component: TextareaVer2,
     tags: ['autodocs'],
     parameters: {
@@ -12,7 +12,7 @@ export default {
 
 /**
  * Overview - All States
- * Shows all visual states of the Additional Details text input
+ * Shows all visual states of the Supervisor Decision Rationale text input
  * 
  * Uses design system TextareaVer2 component with:
  * - variant="long" for boxed style
@@ -31,8 +31,8 @@ export const Overview = () => (
             <h6 className="h6 mb-3">Unfilled State (Placeholder)</h6>
             <div style={{ maxWidth: '592px' }}>
                 <TextareaVer2
-                    label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
-                    placeholder="Provide additional context..."
+                    label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
+                    placeholder="Please provide a reason for this decision..."
                     rows={2}
                     variant="long"
                 />
@@ -43,7 +43,7 @@ export const Overview = () => (
             <h6 className="h6 mb-3">Filled State</h6>
             <div style={{ maxWidth: '592px' }}>
                 <TextareaVer2
-                    label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
+                    label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     defaultValue="Bla bla bla bla"
                     rows={2}
                     variant="long"
@@ -58,27 +58,27 @@ export const Overview = () => (
  * Allows user to interact with the text input
  */
 export const Interactive = () => {
-    const [details, setDetails] = useState('');
+    const [rationale, setRationale] = useState('');
 
     return (
         <div>
             <h6 className="h6 mb-3">Interactive Demo</h6>
             <p className="body2-txt mb-4">
-                Provide additional context for the call-off request.
+                Provide a rationale for the supervisor's decision on the call-off request.
             </p>
             <div style={{ maxWidth: '592px' }}>
                 <TextareaVer2
-                    label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
-                    placeholder="Provide additional context..."
-                    value={details}
-                    onChange={(e) => setDetails(e.target.value)}
+                    label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
+                    placeholder="Please provide a reason for this decision..."
+                    value={rationale}
+                    onChange={(e) => setRationale(e.target.value)}
                     rows={2}
                     variant="long"
                 />
             </div>
-            {details && (
+            {rationale && (
                 <p className="body3-txt mt-3" style={{ color: 'var(--color-secondary-text)' }}>
-                    Character count: {details.length}
+                    Character count: {rationale.length}
                 </p>
             )}
         </div>

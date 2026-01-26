@@ -8,6 +8,8 @@
 @use "sass:map";
 @use "sass:list";
 
+@use "sass:string";
+
 // --- COLOR THEMES (mirrors Button.scss) ---
 $dropdown-themes: (
     'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text'),
@@ -311,12 +313,12 @@ $dropdown-themes: (
 // THEME VARIANTS - Regular Dropdowns (COMPOUND SELECTORS)
 // =============================================================================
 @each $theme, $config in $dropdown-themes {
-    $col-main: unquote(list.nth($config, 1));
-    $col-on-main: unquote(list.nth($config, 2));
-    $col-state: unquote(list.nth($config, 3));
-    $col-text: unquote(list.nth($config, 4));
+    $col-main: string.unquote(list.nth($config, 1));
+    $col-on-main: string.unquote(list.nth($config, 2));
+    $col-state: string.unquote(list.nth($config, 3));
+    $col-text: string.unquote(list.nth($config, 4));
 
-    // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-primary
+    // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-#{$theme}
     .pdropdown.pdropdown-#{$theme} {
 
         // FILLED (default)
@@ -324,6 +326,7 @@ $dropdown-themes: (
         .pdropdown-default-toggle {
             background-color: var($col-main);
             color: var($col-on-main);
+
 
             // CRITICAL: Explicitly set caret color for filled variants
             &::after {

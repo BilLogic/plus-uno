@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Select from '../../../../../../../packages/plus-ds/src/forms/Select';
 
 export default {
-    title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Reason Dropdown',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Supervisor Selection Dropdown',
     component: Select,
     tags: ['autodocs'],
     parameters: {
@@ -10,20 +10,18 @@ export default {
     },
 };
 
-// Call-off reason options
-const reasonOptions = [
-    { value: 'illness', label: 'Illness/Health issue' },
-    { value: 'family', label: 'Family emergency' },
-    { value: 'work', label: 'Work/Job conflict' },
-    { value: 'transportation', label: 'Transportation issue' },
-    { value: 'academic', label: 'Academic commitment' },
-    { value: 'mistake', label: 'Signed up by mistake' },
-    { value: 'other', label: 'Other' },
+// Supervisor options
+const supervisorOptions = [
+    { value: 'supervisor-a', label: 'Supervisor A' },
+    { value: 'supervisor-b', label: 'Supervisor B' },
+    { value: 'supervisor-c', label: 'Supervisor C' },
+    { value: 'supervisor-d', label: 'Supervisor D' },
+    { value: 'supervisor-e', label: 'Supervisor E' },
 ];
 
 /**
  * Overview - All States
- * Shows all visual states of the Call-Off Reason Select
+ * Shows all visual states of the Supervisor Selection Dropdown
  * 
  * Uses design system Select component with:
  * - mode="single" for single selection
@@ -50,13 +48,13 @@ export const Overview = () => (
             >
                 <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
                     <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
-                        Reason for call-Off
+                        Which supervisor did you speak with?
                     </span>
                     <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
                 </div>
                 <Select
-                    options={reasonOptions}
-                    placeholder="Select a reason"
+                    options={supervisorOptions}
+                    placeholder="Select a supervisor"
                     mode="single"
                     required
                 />
@@ -75,15 +73,15 @@ export const Overview = () => (
             >
                 <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
                     <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
-                        Reason for call-Off
+                        Which supervisor did you speak with?
                     </span>
                     <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
                 </div>
                 <Select
-                    options={reasonOptions}
-                    placeholder="Select a reason"
+                    options={supervisorOptions}
+                    placeholder="Select a supervisor"
                     mode="single"
-                    defaultValue="other"
+                    defaultValue="supervisor-a"
                     required
                 />
             </div>
@@ -96,13 +94,13 @@ export const Overview = () => (
  * Allows user to interact with the select
  */
 export const Interactive = () => {
-    const [selectedReason, setSelectedReason] = useState('');
+    const [selectedSupervisor, setSelectedSupervisor] = useState('');
 
     return (
         <div>
             <h6 className="h6 mb-3">Interactive Demo</h6>
             <p className="body2-txt mb-4">
-                Select a reason for the call-off from the dropdown.
+                Select the supervisor you spoke with from the dropdown.
             </p>
             <div
                 style={{
@@ -114,22 +112,22 @@ export const Interactive = () => {
             >
                 <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
                     <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
-                        Reason for call-Off
+                        Which supervisor did you speak with?
                     </span>
                     <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
                 </div>
                 <Select
-                    options={reasonOptions}
-                    placeholder="Select a reason"
+                    options={supervisorOptions}
+                    placeholder="Select a supervisor"
                     mode="single"
-                    value={selectedReason}
-                    onChange={(val) => setSelectedReason(val)}
+                    value={selectedSupervisor}
+                    onChange={(val) => setSelectedSupervisor(val)}
                     required
                 />
             </div>
-            {selectedReason && (
+            {selectedSupervisor && (
                 <p className="body2-txt mt-4" style={{ color: 'var(--color-secondary-text)' }}>
-                    Selected: {reasonOptions.find(o => o.value === selectedReason)?.label}
+                    Selected: {supervisorOptions.find(o => o.value === selectedSupervisor)?.label}
                 </p>
             )}
         </div>

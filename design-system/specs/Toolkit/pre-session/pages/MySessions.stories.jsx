@@ -8,6 +8,10 @@ import { TimeframeFilter } from '../elements/TimeframeFilter.stories';
 import { SiteFilter } from '../elements/SiteFilter.stories';
 // Import Session Details modals from Toolkit specs
 import * as SessionDetailsModals from '../modals/Session Details (All User)/SessionDetails.stories';
+// Import Sign-Ups modals from Toolkit specs
+import * as SignUpsModals from '../modals/Sign-Ups/SignUps.stories';
+// Import Call-Offs modals from Toolkit specs
+import * as CallOffsModals from '../modals/Call-Offs/CallOffs.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Pages/My Sessions',
@@ -452,13 +456,13 @@ export const WithModals = () => {
         // Map modal state IDs to actual exported story components
         const modalComponents = {
             'session-info-post-signup': SessionDetailsModals.SessionInfo_PostSignUp,
-            'recurring-pre-signup': SessionDetailsModals.RecurringSession_PreSignUp,
+            'recurring-pre-signup': SignUpsModals.RecurringSession_PreSignUp,
             'onetime-pre-fillin': SessionDetailsModals.OneTimeSession_PreFillIn,
             'attendees-post-signup': SessionDetailsModals.SessionAttendees_PostSignUp_FillIn,
             'fillin-review': SessionDetailsModals.FillIn_ReviewChoices,
-            'calloff-confirmation': SessionDetailsModals.CallOff_Confirmation_PostSignUp,
-            'auto-excuse': SessionDetailsModals.AutoExcuse_Confirmation_PostSignUp,
-            'auto-approve': SessionDetailsModals.AutoApprove_Confirmation_PostSignUp,
+            'calloff-confirmation': CallOffsModals.CallOff_Confirmation_PostSignUp,
+            'auto-excuse': CallOffsModals.AutoExcuse_Confirmation_PostSignUp,
+            'auto-approve': CallOffsModals.AutoApprove_Confirmation_PostSignUp,
             'unregister': SessionDetailsModals.Unregister_PostSignUp,
         };
 
