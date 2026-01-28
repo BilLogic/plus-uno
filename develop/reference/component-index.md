@@ -1,7 +1,7 @@
 # Master Component Index
 
 **Context**: The complete list of all available components and specifications.
-**Source of Truth**: `design-system/components/` and `design-system/specs/`.
+**Source of Truth**: `packages/plus-ds/src/components/` and `packages/plus-ds/src/specs/`.
 
 ## 1. Components
 

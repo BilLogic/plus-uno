@@ -44,8 +44,8 @@ export default defineConfig({
         api: 'modern-compiler',
         loadPaths: [
           path.resolve(dirname, 'develop/tokens'),
-          path.resolve(dirname, 'legacy-ds/components'),
-          path.resolve(dirname, 'new-ds/forms')
+          path.resolve(dirname, 'packages/plus-ds/src/styles'),
+          path.resolve(dirname, 'packages/plus-ds/src/forms')
         ],
         silenceDeprecations: ['legacy-js-api']
       }

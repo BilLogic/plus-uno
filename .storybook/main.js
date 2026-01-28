@@ -21,10 +21,7 @@ const config = {
     '../packages/plus-ds/src/specs/Training/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/specs/Universal/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    // Include Toolkit stories from design-system directory
-    '../design-system/**/*.stories.@(js|jsx|ts|tsx)',
-    // Include MDX docs from design-system directory
-    '../design-system/**/*.mdx',
+    // Legacy design-system removed - all specs now in packages/plus-ds/src/specs/
     // Exclude non-existent component directories
     '!../packages/plus-ds/src/specs/**/SessionDataCardsSection/**/*.stories.@(js|jsx|ts|tsx)',
     // Explicitly exclude legacy Toolkit specs
@@ -123,7 +120,7 @@ const config = {
       includePaths: [
         path.resolve(srcPath, 'components'),
         path.resolve(rootDir, 'develop/tokens'),
-        path.resolve(rootDir, 'legacy-ds/components')
+        path.resolve(srcPath, 'styles')
       ],
       api: 'modern-compiler',
       silenceDeprecations: ['legacy-js-api']

@@ -5,8 +5,8 @@
  * Watches for SCSS file changes and automatically rebuilds CSS
  */
 
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import path from 'path';
 
 console.log('🚀 Starting automatic CSS rebuild...');
 console.log('📁 Watching SCSS files for changes...');
