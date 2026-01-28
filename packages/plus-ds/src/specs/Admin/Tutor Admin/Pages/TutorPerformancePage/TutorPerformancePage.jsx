@@ -27,7 +27,7 @@ const TutorPerformancePage = ({
     signUpRatePercentage = 85,
     loading = false,
     currentPage = 1,
-    totalPages = 20,
+    totalPages = 10,
     totalEntries = 200,
     selectedSchool = 'All Schools',
     selectedTutor = 'All Tutors',
@@ -82,8 +82,8 @@ const TutorPerformancePage = ({
     ];
 
     const displayTutors = tutors.length > 0 ? tutors : defaultTutors;
-    const entriesStart = (currentPage - 1) * 10 + 1;
-    const entriesEnd = Math.min(currentPage * 10, totalEntries);
+    const entriesStart = (currentPage - 1) * 20 + 1;
+    const entriesEnd = Math.min(currentPage * 20, totalEntries);
 
     const handleRowClick = (tutor) => {
         setSelectedTutorData(tutor);
