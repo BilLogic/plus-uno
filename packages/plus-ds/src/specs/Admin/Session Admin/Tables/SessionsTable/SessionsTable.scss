@@ -10,15 +10,18 @@
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
+        /* Match TutorStatusWarnings/TutorTrainingProgress: table chrome is transparent */
+        background-color: transparent;
 
         thead {
             tr {
-                background-color: transparent;
+                background-color: transparent !important;
             }
 
             th {
                 padding: var(--table-cell-y, 8px) var(--table-cell-x, 10px);
                 border: none;
+                background-color: transparent !important;
                 font-weight: var(--font-weight-normal);
                 vertical-align: middle;
             }
@@ -28,6 +31,8 @@
             tr {
                 border-radius: var(--table-row-radius, 8px);
                 transition: background-color 0.15s ease;
+                /* Override Bootstrap table striping – rows should be transparent by default */
+                background-color: transparent !important;
 
                 &:hover {
                     background-color: rgba(25, 28, 30, 0.08);
@@ -40,6 +45,7 @@
                 vertical-align: middle;
                 font-weight: var(--font-weight-light);
                 color: var(--color-on-surface);
+                background-color: transparent;
             }
         }
     }

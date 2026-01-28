@@ -14,13 +14,17 @@
     min-width: 800px;
     border-collapse: separate;
     border-spacing: 0;
+    /* Ensure table chrome is transparent like other admin tables */
+    background-color: transparent;
 
     // Header styles
-    .training-progress-table__header {
+    thead .training-progress-table__header {
+        background-color: transparent !important;
+
         .training-progress-table__header-cell {
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
             border: none;
-            background: transparent;
+            background-color: transparent !important;
             height: 64px;
             vertical-align: middle;
 
@@ -37,6 +41,8 @@
         border-radius: var(--size-table-radius-md);
         transition: background-color 0.2s ease;
         height: 70px;
+        /* Override Bootstrap table striping – rows should be transparent by default */
+        background-color: transparent !important;
 
         &.training-progress-table__row--hover:hover {
             background-color: var(--color-on-surface-state-08);
@@ -46,6 +52,7 @@
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
             border: none;
             vertical-align: middle;
+            background-color: transparent;
         }
     }
 

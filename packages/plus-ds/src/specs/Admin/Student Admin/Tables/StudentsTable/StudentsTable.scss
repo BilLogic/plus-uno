@@ -14,15 +14,18 @@
     min-width: 800px;
     border-collapse: separate;
     border-spacing: 0;
+    /* Ensure table chrome is transparent like other admin tables */
+    background-color: transparent;
 
     // Header styles
     thead .students-table__header {
         height: 32px;
+        background-color: transparent !important;
 
         .students-table__header-cell {
             padding: 6px var(--size-table-cell-x) !important;
             border: none;
-            background: transparent;
+            background-color: transparent !important;
             vertical-align: middle;
 
             .students-table__header-content {
@@ -39,6 +42,8 @@
         border-radius: var(--size-table-radius-md);
         border: none;
         transition: background-color 0.2s ease;
+        /* Override Bootstrap table striping – rows should be transparent by default */
+        background-color: transparent !important;
 
         &.students-table__row--hover:hover {
             background-color: var(--color-on-surface-state-08);
@@ -48,6 +53,7 @@
             padding: 8px var(--size-table-cell-x) !important;
             border: none;
             vertical-align: middle;
+            background-color: transparent;
         }
     }
 

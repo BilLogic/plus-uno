@@ -19,13 +19,12 @@ const config = {
     '../packages/plus-ds/src/specs/Login/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/specs/Profile/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/specs/Training/**/*.stories.@(js|jsx|ts|tsx)',
+    '../packages/plus-ds/src/specs/Toolkit/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/specs/Universal/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
     // Legacy design-system removed - all specs now in packages/plus-ds/src/specs/
     // Exclude non-existent component directories
     '!../packages/plus-ds/src/specs/**/SessionDataCardsSection/**/*.stories.@(js|jsx|ts|tsx)',
-    // Explicitly exclude legacy Toolkit specs
-    '!../packages/plus-ds/src/specs/Toolkit/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
     '@storybook/addon-links',

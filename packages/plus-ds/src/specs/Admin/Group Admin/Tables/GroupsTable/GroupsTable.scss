@@ -14,13 +14,17 @@
     min-width: 600px;
     border-collapse: separate;
     border-spacing: 0;
+    /* Ensure table chrome is transparent like other admin tables */
+    background-color: transparent;
 
     // Header styles
-    .groups-table__header {
+    thead .groups-table__header {
+        background-color: transparent !important;
+
         .groups-table__header-cell {
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
             border: none;
-            background: transparent;
+            background-color: transparent !important;
 
             .groups-table__header-content {
                 display: flex;
@@ -34,6 +38,8 @@
     .groups-table__row {
         border-radius: var(--size-table-radius-md);
         transition: background-color 0.2s ease;
+        /* Override Bootstrap table striping – rows should be transparent by default */
+        background-color: transparent !important;
 
         &.groups-table__row--hover:hover {
             background-color: var(--color-on-surface-state-08);
@@ -43,6 +49,7 @@
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
             border: none;
             vertical-align: middle;
+            background-color: transparent;
         }
     }
 
