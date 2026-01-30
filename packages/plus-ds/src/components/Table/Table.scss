@@ -1,0 +1,94 @@
+/**
+ * PLUS Table base styles.
+ * Used by the Table component (components/Table/Table.jsx).
+ */
+
+.plus-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.plus-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: transparent;
+
+    thead {
+        tr {
+            background-color: transparent;
+        }
+
+        th {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            border: none;
+            border-bottom: 1px solid var(--color-outline-variant);
+            background-color: transparent;
+            font-weight: var(--font-weight-semibold-2, 600);
+            font-size: var(--font-size-body3, 12px);
+            line-height: var(--font-line-height-body3, 1.5);
+            color: var(--color-on-surface);
+            text-align: left;
+            vertical-align: middle;
+        }
+    }
+
+    tbody {
+        tr {
+            background-color: transparent;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: rgba(25, 28, 30, 0.04);
+            }
+        }
+
+        td {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            border: none;
+            border-bottom: 1px solid var(--color-outline-variant);
+            vertical-align: middle;
+            font-weight: var(--font-weight-normal, 400);
+            font-size: var(--font-size-body2, 14px);
+            line-height: var(--font-line-height-body2, 1.5);
+            color: var(--color-on-surface);
+            background-color: transparent;
+        }
+    }
+}
+
+.plus-table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(0, 0, 0, 0.02);
+
+    &:hover {
+        background-color: rgba(25, 28, 30, 0.06);
+    }
+}
+
+.plus-table-hover tbody tr:hover {
+    background-color: rgba(25, 28, 30, 0.06);
+}
+
+.plus-table-bordered {
+    border: 1px solid var(--color-outline-variant);
+
+    th,
+    td {
+        border: 1px solid var(--color-outline-variant);
+    }
+}
+
+.plus-table-density-sm th,
+.plus-table-density-sm td {
+    padding: var(--size-spacing-small-space-050) var(--size-spacing-small-space-100);
+}
+
+.plus-table-density-md th,
+.plus-table-density-md td {
+    padding: var(--size-table-cell-y) var(--size-table-cell-x);
+}
+
+.plus-table-density-lg th,
+.plus-table-density-lg td {
+    padding: var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-250);
+}

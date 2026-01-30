@@ -9,11 +9,15 @@
 *   **PLUS - Universal**: Team Universal's design system.
 *   **PLUS - Toolkit**: Toolkit components.
 
-### Using Figma MCP
-When Figma files are available, use the Figma MCP tools to:
-1.  **Get Design Context**: Extract component designs and specifications.
-2.  **Get Screenshots**: Capture component examples to verify implementation.
-3.  **Get Metadata**: Understand component structure.
+### Using Figma MCP (required when user provides a Figma link)
+
+**When the user provides a Figma link**, always start by using Figma MCP—do not build or prototype from the link without fetching design data first:
+
+1.  **Get design context**: Extract component designs and specifications for the selected node/frame.
+2.  **Get screenshot**: Capture the design so layout and visuals can be matched.
+3.  **Get metadata** (as needed): Understand component structure and file organization.
+
+If Figma MCP is unavailable, say so and ask for a screenshot or export.
 
 ## 2. Extraction Process
 

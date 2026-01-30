@@ -17,15 +17,17 @@
 
 // Components (using load path - load-path is design-system/components, so imports should be relative to that)
 // Use @import to ensure global scope availability for @extend (e.g. Dropdown extends Checkbox)
+// Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
+// Prototypes and any app that imports main.scss get styles only for uncommented components.
 @import "../components/Button/Button";
 @import "../components/Breadcrumb/Breadcrumb";
 @import "../components/Badge/Badge";
 
-// @import "../components/Divider/Divider";
+@import "../components/Divider/Divider";
 
 @import "../components/ButtonGroup/ButtonGroup";
-// @import "../components/Checkbox/Checkbox";
-// @import "../components/Dropdown/Dropdown";
+// @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
+@import "../components/Dropdown/Dropdown";
 // Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
 // Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
 .plus-card {
@@ -80,28 +82,34 @@
 .plus-card-border-lg {
     border-width: var(--size-card-border-lg);
 }
-// @import "../components/Modal/Modal";
-// @import "../components/Navigation/Navigation";
-// @import "../components/Navbar/Navbar";
-// @import "../components/Form/Form";
-// @import "../components/DatePicker/DatePicker";
-// @import "../components/Radio/Radio";
-// @import "../components/Switch/Switch";
-// @import "../components/InputGroup/InputGroup";
-// @import "../components/ListGroup/ListGroup";
+@import "../components/Modal/Modal";
+// @import "../components/Navigation/Navigation"; // no Navigation component in components/
+@import "../components/Navbar/Navbar";
+// @import "../components/Form/Form"; // forms live under src/forms/
+// @import "../components/DatePicker/DatePicker"; // no DatePicker in components/
+// @import "../components/Radio/Radio"; // no Radio in components/
+// @import "../components/Switch/Switch"; // no Switch in components/
+// @import "../components/InputGroup/InputGroup"; // no InputGroup in components/
+@import "../components/ListGroup/ListGroup";
 @import "../components/Carousel/Carousel";
-// @import "../components/Collapse/Collapse";
-// @import "../components/Jumbotron/Jumbotron";
-// @import "../components/MediaObject/MediaObject";
-// @import "../components/Progress/Progress";
-// @import "../components/Spinner/Spinner";
-// @import "../components/LoadingGif/LoadingGif";
-// @import "../components/Popover/Popover";
-// @import "../components/Pagination/Pagination";
-// @import "../components/Tooltip/Tooltip";
-// @import "../components/Toast/Toast";
-// @import "../components/Scrollspy/Scrollspy";
-// @import "../components/RichTextEditor/RichTextEditor";
+@import "../components/Collapse/Collapse";
+@import "../components/Jumbotron/Jumbotron";
+@import "../components/MediaObject/MediaObject";
+@import "../components/Progress/Progress";
+@import "../components/Spinner/Spinner";
+@import "../components/LoadingGif/LoadingGif";
+@import "../components/Popover/Popover";
+@import "../components/Pagination/Pagination";
+@import "../components/Tooltip/Tooltip";
+@import "../components/Toast/Toast";
+@import "../components/Scrollspy/Scrollspy";
+// @import "../components/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
+@import "../components/Table/Table";
+@import "../components/NavTabs/NavTabs";
+@import "../components/NavPills/NavPills";
+@import "../components/Alert/Alert";
+@import "../components/Accordion/Accordion";
+@import "../components/UserAvatar/UserAvatar";
 @import "../assets/Logo/Logo";
 
 // Base Styles

@@ -1,5 +1,8 @@
 import React from 'react';
 import './storybook-overrides.css';
+// Load design system styles so stories that import components directly (e.g. @/components/Modal)
+// still get .plus-modal, tokens, and other global styles from main.scss
+import '../packages/plus-ds/src/styles/main.scss';
 
 /**
  * Storybook preview configuration for PLUS Design System

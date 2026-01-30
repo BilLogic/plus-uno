@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import SessionsPage from './SessionsPage';
-import '@/styles/main.scss'; // Import global styles
+import TutorPerformancePage from './TutorPerformancePage';
+import '@/styles/main.scss';
 
-// Create a root element if it doesn't exist
 let rootElement = document.getElementById('root');
 if (!rootElement) {
     rootElement = document.createElement('div');
@@ -13,7 +12,6 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-        <SessionsPage />
+        <TutorPerformancePage />
     </React.StrictMode>
 );
-
