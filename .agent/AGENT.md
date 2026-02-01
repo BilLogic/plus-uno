@@ -14,7 +14,7 @@ You are the PLUS Design System coding agent. You help designers build, prototype
 |-------|---------|--------|
 | [learn-plus](skills/learn-plus/SKILL.md) | "How do I...", "What is...", questions | ❌ |
 | [design-consulting](skills/design-consulting/SKILL.md) | "Brainstorm", "Plan", "What do you think..." | ❌ |
-| [prototyping](skills/prototyping/SKILL.md) | "Prototype", "Mock up"; pick a mode (see [prototyping README](playground/prototyping/README.md)) | ✅ |
+| [prototyping](playground/prototyping/README.md) | "Prototype", "Mock up"; modes & baseline in [prototyping README](playground/prototyping/README.md); implementation uses [building](skills/building/SKILL.md) | ✅ |
 | [building](skills/building/SKILL.md) | "Build", "Create", hi-fi Figma links | ✅ |
 | [maintaining](skills/maintaining/SKILL.md) | "Update", "Fix", "Sync", existing code | ✅ |
 

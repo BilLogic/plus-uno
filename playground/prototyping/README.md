@@ -25,32 +25,53 @@ Pick the mode that matches what you have and what you want.
 
 | Mode | When to use | What to say or provide | Where the prototype will live |
 |------|-------------|------------------------|------------------------------|
-| **Sketch to hi-fi** | You have a sketch, wireframe, or screenshot and want to see it as a real screen. | Paste the image or say: "I have a sketch of [thing]" and describe it. | `playground/prototyping/{your-name}/{project-name}/` |
-| **0–1 from description** | You're imagining a feature from scratch with no visual yet. | Say: "Imagine we had…" or "What if we…" and describe the feature. | Same |
-| **Figma to build** | You have a hi-fi Figma design and want it built. | Paste the Figma link and say "Build this" (or "Build this as a prototype in the playground"). | Package/app, or playground if you say "just a prototype" |
-| **Flow/journey** | You want to click through a sequence of screens (e.g. login → dashboard → settings) without giving full designs. | Say: "I want to click through [screen A] → [screen B] → [screen C]" and any details. | Same |
+| **0→hi-fi** | You want **one hi-fi screen**. Input can be a sketch, wireframe, or screenshot (and optional words), or words only. Single view, no navigation or flow. When you use words only, the AI may ask follow-up questions to pin down components and layout. | Paste an image and/or say "I have a sketch of [thing]…", or say "Imagine we had…" / "What if we…" and describe the screen. | `playground/prototyping/{your-name}/{project-name}/` |
+| **Flow/journey** | You want to **click through multiple screens** (e.g. login → dashboard → settings). Input can be words only, or you can give a Figma link (lo-fi or hi-fi) as a starting point. | Say: "I want to click through [screen A] → [screen B] → [screen C]" and any details; optionally add a Figma link to start from. | Same |
 | **Remix** | You have an existing prototype or Figma and want to change something. | Say: "Take [this prototype/Figma] and change [X] to [Y]." | Same folder or a new one |
+
+### How the agent can help (per mode)
+
+The agent may ask clarifying questions so the prototype matches what you want. You can also volunteer these details up front.
+
+**0→hi-fi**
+
+- **Which PLUS context does this screen belong to?** (e.g. Admin dashboard, Login, Profile) — so the agent picks the right specs/templates and components.
+- **Is this matching an existing page or spec?** — If yes, the agent will reuse the same components as the real page (filters, table, top bar), not generic elements.
+- **Do you have a Figma link or screenshot?** — Even rough reference reduces guesswork and keeps tokens/layout aligned.
+- **Words-only:** What’s the primary action? What content blocks (table + filters, cards grid, form)? Any specific PLUS components (Modal, Alert, DateRangeFilter)?
+- Before building, the agent can confirm: design tokens only, PLUS components from the repo, and output path `playground/prototyping/{name}/{project}/`.
+
+**Flow/journey**
+
+- **What’s the exact sequence?** (e.g. Login → Dashboard → Settings) — so no step is missing or wrong.
+- **Should navigation be real (routing) or placeholder (e.g. buttons that just switch view)?** — sets expectations and implementation.
+- **Do you have a Figma link for the flow (even lo-fi)?** — gives structure and content per screen.
+- **Same user state across screens (e.g. “logged in”) or should we simulate state changes?** — affects whether the agent adds simple state or routing.
+- The agent can list the screens it will implement and confirm order, and remind that each screen still follows the shared bar (tokens, hi-fi, PLUS components, same components as real page when replicating).
+
+**Remix**
+
+- **Point to the prototype folder or Figma** — so the agent knows exactly what to remix (path or link).
+- **What exactly should change?** (e.g. copy, layout, component, token) — one clear sentence avoids scope creep.
+- **Same folder or a new one?** (e.g. `project-v2`) — avoids overwriting when you want to compare.
+- Before changing, the agent can restate: “I’ll take [X] and change [Y] to [Z]. Output in [folder]. Correct?” After the change, it can note what was remixed so you can verify.
 
 ### Quick reference: "If you want X, say Y"
 
-- **"I have a sketch"** → Sketch to hi-fi. Paste the image and/or describe it.
-- **"Imagine we had a dashboard that…"** → 0–1 from description. Describe the feature in words.
-- **"Build this [Figma link]"** → Figma to build. Add the link and say if you want it in the playground or production-style.
-- **"I want to click through login, then dashboard, then settings"** → Flow/journey. List the screens and any key elements.
+- **"I have a sketch"** or **"Imagine we had a dashboard that…"** → 0→hi-fi. One screen from an image and/or words, or words only (AI may ask follow-ups to narrow components/layout).
+- **"I want to click through login, then dashboard, then settings"** → Flow/journey. List the screens (and optionally a Figma link to start from).
 - **"Take this prototype and change the button to…"** → Remix. Point to the prototype and describe the change.
 
 ### Where output lives
 
-- **Exploratory / flow / remix:**  
-  `playground/prototyping/{your-name}/{project-name}/`  
-  Example: `playground/prototyping/jordan/login-flow/`
+All prototypes (0→hi-fi, flow/journey, remix) live under:
 
-- **"Build from Figma" (production-style):**  
-  In the package or consumer app. If you say "just a prototype" or "in the playground," it goes under `playground/prototyping/` as above.
+`playground/prototyping/{your-name}/{project-name}/`  
+Example: `playground/prototyping/jordan/login-flow/`
 
 ### How to use (in Cursor)
 
-Describe what you want **in Cursor chat** using the modes above. For example: "I want to create a prototype. Sketch to hi-fi — I have a sketch of a login form with…" or "Imagine we had a dashboard that shows…". You can also start your message with **Prototyping mode: sketch-to-hifi.** (or another mode id) so the AI uses that mode's rules. The AI will follow the baseline (tokens, hi-fi, PLUS components) and put output in the right place.
+Describe what you want **in Cursor chat** using the modes above. For example: "I want to create a prototype. 0→hi-fi — I have a sketch of a login form with…" or "Imagine we had a dashboard that shows…" (0→hi-fi) or "I want to click through login, then dashboard, then settings" (flow/journey). You can also start your message with **Prototyping mode: 0-to-hifi** (or **flow-journey**, **remix**) so the AI uses that mode's rules. The AI will follow the baseline (tokens, hi-fi, PLUS components) and put output in the right place.
 
 ---
 
@@ -140,7 +161,7 @@ By default, prototyping directories are ignored by git (see `.gitignore`). If yo
 
 ## See Also
 
-- **Prototyping skill**: `.agent/skills/prototyping/SKILL.md` — Agent protocol and baseline
+- **Building skill**: `.agent/skills/building/SKILL.md` — Agent protocol for implementation (prototyping uses this + modes above)
 - **Templates**: `../templates/` — Curated templates based on specs documentation
 - **Design System**: `../../packages/plus-ds/` — Component library and tokens
 - **Documentation**: `../../develop/` — Technical documentation

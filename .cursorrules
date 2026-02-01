@@ -23,7 +23,7 @@ This project uses a skills-based agent framework.
 |-------|----------|-------------|
 | learn-plus | `.agent/skills/learn-plus/SKILL.md` | Questions, onboarding |
 | design-consulting | `.agent/skills/design-consulting/SKILL.md` | Planning, brainstorming |
-| prototyping | `.agent/skills/prototyping/SKILL.md` | Prototypes (see `playground/prototyping/README.md` for modes) |
+| prototyping | `playground/prototyping/README.md` | Prototypes — modes & baseline; implementation uses building skill |
 | building | `.agent/skills/building/SKILL.md` | New patterns from Figma |
 | maintaining | `.agent/skills/maintaining/SKILL.md` | Update existing code |
 
@@ -47,4 +47,4 @@ This project uses a skills-based agent framework.
 
 ## Prototyping
 
-For prototype requests, use the [prototyping skill](.agent/skills/prototyping/SKILL.md) and follow the mode that matches the user's input. Designer guide: `playground/prototyping/README.md`.
+For prototype requests, use the modes and baseline in `playground/prototyping/README.md` and implement using the [building](.agent/skills/building/SKILL.md) skill.

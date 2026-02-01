@@ -26,13 +26,14 @@ For updating **existing** code, use [maintaining](../maintaining/SKILL.md) inste
 
 ## Protocol
 
-1. **When user provides a Figma link**: Run Figma MCP first—**get design context** (e.g. `get_code`) and **get screenshot** (e.g. `get_image`); use **get metadata** (e.g. `get_file_content`) as needed. Do not skip this step.
-2. Map to PLUS terminology and context level
-3. **Load context** as needed: `develop/foundations/colors.md`, `typography.md`, `layout.md`
-4. Propose component composition
-5. **WAIT for confirmation before coding**
-6. Implement with React + React-Bootstrap (PLUS components where they exist)
-7. Verify in Storybook
+1. When the build is for a prototype (output in playground/prototyping/), load playground/prototyping/README.md first and follow its modes, baseline, and “How the agent can help (per mode)” before proposing the plan.
+2. **When user provides a Figma link**: Run Figma MCP first—**get design context** (e.g. `get_code`) and **get screenshot** (e.g. `get_image`); use **get metadata** (e.g. `get_file_content`) as needed. Do not skip this step.
+3. Map to PLUS terminology and context level
+4. **Load context** as needed: `develop/foundations/colors.md`, `typography.md`, `layout.md`
+5. Propose component composition
+6. **WAIT for confirmation before coding**
+7. Implement with React + React-Bootstrap (PLUS components where they exist)
+8. Verify in Storybook
 
 ## Confirmation Template
 
