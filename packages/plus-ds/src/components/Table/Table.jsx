@@ -55,7 +55,12 @@ const Table = ({
                 {rows && rows.length > 0 && (
                     <tbody>
                         {rows.map((row, rowIndex) => (
-                            <tr key={rowIndex}>
+                            <tr
+                                key={rowIndex}
+                                onClick={() => onRowClick && onRowClick(rowIndex)}
+                                style={onRowClick ? { cursor: 'pointer' } : undefined}
+                                role={onRowClick ? 'button' : undefined}
+                            >
                                 {row.map((cell, cellIndex) => {
                                     const isObject = typeof cell === 'object' && cell !== null && !React.isValidElement(cell) && cell.content !== undefined;
                                     const content = isObject ? cell.content : cell;

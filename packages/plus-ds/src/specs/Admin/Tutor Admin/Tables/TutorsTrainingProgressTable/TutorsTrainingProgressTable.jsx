@@ -24,6 +24,7 @@ const TutorsTrainingProgressTable = ({
     sortColumn = 'tutorName',
     sortDirection = 'asc',
     onSort,
+    onRowClick,
     onViewProgress,
     className = '',
     ...props
@@ -111,8 +112,12 @@ const TutorsTrainingProgressTable = ({
         {
             content: (
                 <button
+                    type="button"
                     className="tutors-training-progress-table__action-btn"
-                    onClick={() => onViewProgress && onViewProgress(tutor)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewProgress && onViewProgress(tutor);
+                    }}
                 >
                     View Progress
                 </button>
@@ -120,12 +125,19 @@ const TutorsTrainingProgressTable = ({
         }
     ]);
 
+    const handleRowClick = (rowIndex) => {
+        if (onRowClick && displayTutors[rowIndex]) {
+            onRowClick(displayTutors[rowIndex]);
+        }
+    };
+
     return (
         <div className={`tutors-training-progress-table ${className}`} {...props}>
             <Table
                 headers={headers}
                 rows={rows}
                 hover
+                onRowClick={onRowClick ? handleRowClick : undefined}
                 className="tutors-training-progress-table__table"
             />
         </div>
@@ -138,6 +150,7 @@ TutorsTrainingProgressTable.propTypes = {
     sortColumn: PropTypes.string,
     sortDirection: PropTypes.string,
     onSort: PropTypes.func,
+    onRowClick: PropTypes.func,
     onViewProgress: PropTypes.func,
     className: PropTypes.string
 };

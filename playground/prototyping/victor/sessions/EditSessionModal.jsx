@@ -371,4 +371,3 @@ const EditSessionModal = ({ session, onClose }) => {
 };
 
 export default EditSessionModal;
-

@@ -4,10 +4,12 @@ import PageLayout from '@/components/PageLayout/PageLayout';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import EditSessionModal from './EditSessionModal';
+import AttendanceModal from './AttendanceModal';
 
 const SessionsPage = () => {
     const [selectedSession, setSelectedSession] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
 
     // Mock session data
     const yourSessions = [
@@ -103,11 +105,24 @@ const SessionsPage = () => {
                         <h2 className="h4" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
                             My Sessions
                         </h2>
-                        <Card
-                            title="All My Sessions"
-                            body="View and manage all your tutoring sessions in one place. This section provides an overview of your session history, upcoming sessions, and session statistics."
-                            paddingSize="lg"
-                        />
+                        <Row>
+                            <Col md={6} className="mb-3">
+                                <Card
+                                    title="Attendance"
+                                    body="View all sessions you've been assigned to and your attendance status for each."
+                                    paddingSize="lg"
+                                    onClick={() => setIsAttendanceModalOpen(true)}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                            </Col>
+                            <Col md={6} className="mb-3">
+                                <Card
+                                    title="All My Sessions"
+                                    body="View and manage all your tutoring sessions in one place. This section provides an overview of your session history, upcoming sessions, and session statistics."
+                                    paddingSize="lg"
+                                />
+                            </Col>
+                        </Row>
                     </div>
                 </Container>
             </PageLayout>
@@ -119,9 +134,13 @@ const SessionsPage = () => {
                     onClose={handleCloseModal}
                 />
             )}
+
+            {/* Attendance Modal */}
+            {isAttendanceModalOpen && (
+                <AttendanceModal onClose={() => setIsAttendanceModalOpen(false)} />
+            )}
         </>
     );
 };
 
 export default SessionsPage;
-

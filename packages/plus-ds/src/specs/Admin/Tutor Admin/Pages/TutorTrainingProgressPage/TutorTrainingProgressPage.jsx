@@ -320,9 +320,9 @@ const TutorTrainingProgressPage = ({
                         onSearch={onSearchChange}
                         onExport={onExportCSV}
                         filters={[
-                            { key: 'group', label: 'All Groups' },
-                            { key: 'date', label: 'All Dates' },
-                            { key: 'status', label: 'All Status' }
+                            { key: 'lessons', label: 'All Lessons' },
+                            { key: 'startDate', label: 'All Start Date' },
+                            { key: 'name', label: 'Name' }
                         ]}
                     />
 
