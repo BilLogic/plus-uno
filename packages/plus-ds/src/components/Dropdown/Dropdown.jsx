@@ -12,7 +12,8 @@ const Dropdown = ({
     split = false,
     direction = "dropdown",
     className = "",
-    isOpen: controlledIsOpen // Optional controlled state
+    isOpen: controlledIsOpen, // Optional controlled state
+    toggle // Optional custom toggle component
 }) => {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -104,7 +105,13 @@ const Dropdown = ({
                     </>
                 )
             ) : (
-                renderToggle()
+                toggle ? (
+                    <div onClick={toggleDropdown} className="d-inline-block" style={{ cursor: 'pointer' }}>
+                        {toggle}
+                    </div>
+                ) : (
+                    renderToggle()
+                )
             )}
 
             <div className={menuClasses}>
@@ -174,7 +181,8 @@ Dropdown.propTypes = {
     split: PropTypes.bool,
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
     className: PropTypes.string,
-    isOpen: PropTypes.bool
+    isOpen: PropTypes.bool,
+    toggle: PropTypes.node
 };
 
 export default Dropdown;
