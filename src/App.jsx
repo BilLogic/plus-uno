@@ -3,7 +3,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import HomeRedesignApp from '../playground/prototyping/bill/home-redesign/src/App';
 import { ErrorBoundary } from '../playground/prototyping/bill/research-assistant-chat/src/ErrorBoundary';
-import InSessionPage from '../playground/prototyping/sessions/InSessionPage';
+import InSessionPage from '../playground/prototyping/bill/sessions/InSessionPage';
 
 /** Lazy-loaded admin app so the shell loads first and /admin doesn't block or hang. */
 const ResearchAdminApp = lazy(() =>
