@@ -6,6 +6,12 @@
  */
 
 const chartTheme = {
+    // Highcharts Accessibility
+    // We disable this by default to avoid console warnings in Storybook.
+    // (We can enable + configure this later when we add a11y requirements.)
+    accessibility: {
+        enabled: false
+    },
     // Categorical Palette (Data Series)
     // Order: Primary, Secondary, Tertiary, Tech Tools, Advocacy, Social-Emotional, Mastering Content, Relationship
     colors: [

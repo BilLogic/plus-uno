@@ -131,6 +131,34 @@ const Sidebar = ({
         if (onTabClick) {
             onTabClick(tabName);
         }
+
+        // Optional Storybook navigation wiring for specs
+        // When rendered inside Storybook, clicking Admin items should jump to the matching Admin spec.
+        try {
+            if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+                const parentLocation = window.parent.location;
+                // Heuristic: only run inside Storybook iframe (hash-based story routing)
+                if (parentLocation && /(?:localhost:6006|storybook)/i.test(parentLocation.href || '')) {
+                    const storyIdMap = {
+                        // Admin → Tutors (Tutor Performance page, Interactive story)
+                        tutors: 'specs-admin-tutor-admin-pages-tutorperformancepage--interactive',
+                        // Admin → Sessions
+                        'admin-sessions': 'specs-admin-session-admin-pages-sessionadminpage--interactive',
+                        // Admin → Students
+                        students: 'specs-admin-student-admin-pages-studentadminpage--interactive',
+                        // Admin → Groups
+                        groups: 'specs-admin-group-admin-pages-groupinfopage--interactive',
+                    };
+
+                    const storyId = storyIdMap[tabName];
+                    if (storyId) {
+                        parentLocation.hash = `/story/${storyId}`;
+                    }
+                }
+            }
+        } catch {
+            // Fail silently if Storybook navigation is not available or cross-origin
+        }
     };
 
     const categories = [

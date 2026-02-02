@@ -8,23 +8,16 @@ const __dirname = path.dirname(__filename);
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    '../packages/plus-ds/src/assets/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/components/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/forms/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/forms/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/styles/patterns/**/*.mdx',
-    '../packages/plus-ds/src/DataViz/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Admin/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Home/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Login/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Profile/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Training/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Toolkit/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/specs/Universal/**/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/plus-ds/src/styles/**/*.stories.@(js|jsx|ts|tsx)',
-    // Legacy design-system removed - all specs now in packages/plus-ds/src/specs/
-    // Exclude non-existent component directories
-    '!../packages/plus-ds/src/specs/**/SessionDataCardsSection/**/*.stories.@(js|jsx|ts|tsx)',
+    // Prefer brace expansion here (more consistently supported across globbers than extglob @())
+    '../packages/plus-ds/src/**/*.stories.{js,jsx,ts,tsx}',
+    '../packages/plus-ds/src/**/*.mdx',
+
+    // Source of truth in this repo (legacy but still actively used)
+    '../design-system/specs/**/*.stories.{js,jsx,ts,tsx}',
+    '../design-system/specs/**/*.mdx',
+
+    // Playground prototypes
+    '../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}',
   ],
   addons: [
     '@storybook/addon-links',
@@ -122,7 +115,8 @@ const config = {
         path.resolve(srcPath, 'styles')
       ],
       api: 'modern-compiler',
-      silenceDeprecations: ['legacy-js-api']
+      // Keep Storybook terminal output readable (these are Sass 3.0 deprecations in legacy SCSS)
+      silenceDeprecations: ['legacy-js-api', 'import', 'global-builtin']
     };
 
     // Use staticDirs instead
@@ -137,6 +131,8 @@ const config = {
       rootDir,
       srcPath
     ];
+    // Allow 127.0.0.1 hostname for Vite
+    config.server.allowedHosts = ['127.0.0.1', 'localhost'];
 
     // Improve HMR stability
     config.server.hmr = config.server.hmr || {};

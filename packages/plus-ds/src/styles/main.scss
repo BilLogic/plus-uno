@@ -226,6 +226,51 @@ body {
     border-radius: 2px;
 }
 
+// Table Overrides - Match Admin/Training Figma Specs
+// Remove Bootstrap's default table chrome (background colors and row divider lines)
+// This ensures all tables match PLUS design system patterns by default
+.table {
+    // Remove default table background
+    --bs-table-bg: transparent;
+    --bs-table-border-color: transparent;
+    border-color: transparent;
+
+    // Target th & td - remove borders and backgrounds
+    > :not(caption) > * > * {
+        background-color: transparent !important;
+        border-bottom-width: 0 !important;
+        border-top-width: 0 !important;
+    }
+
+    // Remove header background
+    > thead {
+        background-color: transparent !important;
+
+        > tr {
+            background-color: transparent !important;
+
+            > th {
+                background-color: transparent !important;
+                border-bottom-width: 0 !important;
+            }
+        }
+    }
+
+    // Remove row backgrounds and borders
+    > tbody {
+        > tr {
+            background-color: transparent !important;
+            border-bottom-width: 0 !important;
+
+            > td {
+                background-color: transparent !important;
+                border-bottom-width: 0 !important;
+                border-top-width: 0 !important;
+            }
+        }
+    }
+}
+
 // Image Placeholder Utility
 .image-placeholder {
     background-color: var(--color-surface-container-low, #f3f3f6);

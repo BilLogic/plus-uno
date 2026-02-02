@@ -10,6 +10,7 @@ import Highcharts from 'highcharts';
 
 // Import all modules using ES imports
 import HighchartsMore from 'highcharts/highcharts-more';
+import Accessibility from 'highcharts/modules/accessibility';
 import SolidGauge from 'highcharts/modules/solid-gauge';
 import Heatmap from 'highcharts/modules/heatmap';
 import Histogram from 'highcharts/modules/histogram-bellcurve';
@@ -72,6 +73,9 @@ export function initHighchartsModules() {
 
         // highcharts-more - Required for: bubble, waterfall, boxplot, gauge, lollipop, polar/radar
         initModule(HighchartsMore, 'highcharts-more');
+
+        // accessibility - Enables Highcharts a11y features and removes the warning in console
+        initModule(Accessibility, 'accessibility');
 
         // solid-gauge - Required for: gauge charts (depends on highcharts-more)
         initModule(SolidGauge, 'solid-gauge');
@@ -145,7 +149,6 @@ export function initHighchartsModules() {
         initModule(Variwide, 'variwide');
 
         modulesInitialized = true;
-        console.log('Highcharts modules initialized successfully');
     } catch (error) {
         console.error('Error initializing Highcharts modules:', error);
     }

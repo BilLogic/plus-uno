@@ -60,6 +60,34 @@
 </style>
 
 <script>
+  // --- Console noise filter (manager UI only) --------------------------------
+  // The Storybook manager runtime currently logs a deprecation about `Button active`
+  // as a console *error*. It's non-actionable for us (Storybook internal), so we
+  // suppress only that exact message substring to keep DevTools usable.
+  (function patchManagerConsoleOnce() {
+    if (globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__) return;
+    globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__ = true;
+
+    const SUPPRESSED = 'The `active` prop on `Button` is deprecated and will be removed in Storybook 11.';
+
+    const originalWarn = console.warn.bind(console);
+    const originalError = console.error.bind(console);
+
+    function shouldSuppress(args) {
+      return args.some((a) => typeof a === 'string' && a.includes(SUPPRESSED));
+    }
+
+    console.warn = (...args) => {
+      if (shouldSuppress(args)) return;
+      originalWarn(...args);
+    };
+
+    console.error = (...args) => {
+      if (shouldSuppress(args)) return;
+      originalError(...args);
+    };
+  })();
+
   // Hide icons for group nodes only, keep icons for leaf nodes
   function hideGroupNodeIcons() {
     const sidebar = document.querySelector('.sidebar-container');
@@ -179,11 +207,21 @@
       setTimeout(hideGroupNodeIcons, 50);
     }
   });
-  
-  docObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+
+  // manager-head.html runs in <head>. In some loads, `document.body` isn't ready yet.
+  // Guard to avoid: "Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'."
+  function startDocObserverWhenReady() {
+    if (!document.body) return false;
+    docObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    return true;
+  }
+
+  if (!startDocObserverWhenReady()) {
+    document.addEventListener('DOMContentLoaded', startDocObserverWhenReady, { once: true });
+  }
 </script>
 
 

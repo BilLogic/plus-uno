@@ -8,7 +8,7 @@ import chartTheme from '../../chartTheme';
  * StackedBarChart Component
  * Displays a stacked bar chart using Highcharts.
  */
-const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
+const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
     // data: Array of { segments: [{ value, color, height (%), textColor }] }
     // dates: Array of strings (x-axis categories)
 
@@ -48,6 +48,27 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
         });
     }
 
+    // Calculate max value from all segments if not provided
+    let calculatedMax = yAxisMax;
+    if (!calculatedMax) {
+        // Calculate total height for each bar (sum of all segments)
+        const barTotals = data.map(bar => {
+            return bar.segments.reduce((sum, seg) => sum + parseFloat(seg.height), 0);
+        });
+        const maxValue = Math.max(...barTotals, 0);
+        // Round up to nearest 10 for clean axis
+        calculatedMax = Math.ceil(maxValue / 10) * 10;
+        // Ensure minimum of 10 for visibility
+        if (calculatedMax < 10) calculatedMax = 10;
+    }
+
+    // Generate tick positions dynamically
+    const tickCount = 6; // 0 + 5 intermediate ticks
+    const tickStep = calculatedMax / (tickCount - 1);
+    const tickPositions = Array.from({ length: tickCount }, (_, i) => 
+        Math.round(i * tickStep)
+    );
+
     const options = {
         ...chartTheme,
         chart: {
@@ -70,12 +91,11 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207 }) => {
         },
         yAxis: {
             min: 0,
+            max: calculatedMax, // Set max dynamically based on data
             reversedStacks: false, // Ensure first series (Green) is at the bottom
             lineWidth: 1,
             lineColor: 'var(--color-outline-variant, #bec8ca)',
-            // Use passed yLabels as explicit ticks if provided numbers, else default
-            // The visual requires specific ticks: 17, 20, 22, 25, 30.
-            tickPositions: [0, 17, 20, 22, 25, 30], // Hardcoded for this specific visual requirement if not passed
+            tickPositions: tickPositions, // Dynamic ticks based on calculated max
             title: { text: null },
             gridLineWidth: 1,
             gridLineDashStyle: 'Dot', // Dotted lines as per screenshot
@@ -138,7 +158,8 @@ StackedBarChart.propTypes = {
     })).isRequired,
     dates: PropTypes.arrayOf(PropTypes.string).isRequired,
     yLabels: PropTypes.arrayOf(PropTypes.string), // ignored in favor of axis logic mostly
-    height: PropTypes.number
+    height: PropTypes.number,
+    yAxisMax: PropTypes.number // Optional override for y-axis max (auto-calculated if not provided)
 };
 
 export default StackedBarChart;
