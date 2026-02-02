@@ -8,9 +8,9 @@
 .plus-logo {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     box-sizing: border-box;
-    overflow: hidden;
+    /* overflow: hidden; - Removed to prevent clipping of text/effects and aid debugging */
     flex-shrink: 0;
     gap: 0;
     /* Default: no gap (for icon-only logos) */
@@ -60,6 +60,8 @@
     align-items: center;
     flex-shrink: 0;
     height: 100%;
+    width: auto;
+    max-width: none;
 }
 
 .plus-logo__text svg {
@@ -69,13 +71,23 @@
     object-fit: contain;
 }
 
-/* Size Variants - Based on Figma specifications */
+/* Size Variants - Refactored to match Figma Container Model (Padding included) */
+
+/* XS: 40px Icon + 10px Padding = 60px Total Height (Est) */
+/* Re-evaluating based on codebase: Previous XS was 40px total. 
+   If we follow the M pattern (Icon Only also has padding), the "Icon" size must be distinct.
+   However, without explicit Figma checks for XS, I will follow the pattern:
+   Layout: Padding + Content.
+   XS Padding: space-150 (10px). 
+   XS Icon: 40px (existing). 
+   New Total: 60px.
+*/
 .plus-logo--xs {
-    /* Figma: XS size - 40px container */
-    width: 40px;
-    height: 40px;
-    padding: 0;
+    width: auto;
+    height: auto;
+    padding: var(--size-spacing-small-space-150);
     border-radius: 4px;
+    gap: var(--size-spacing-small-space-150);
 }
 
 .plus-logo--xs .plus-logo__container {
@@ -88,12 +100,17 @@
     height: 40px;
 }
 
+.plus-logo--xs .plus-logo__text svg {
+    height: 40px;
+}
+
+/* S: 64px Icon + 16px Padding = 96px Total Height */
 .plus-logo--s {
-    /* Figma: S size - 64px container */
-    width: 64px;
-    height: 64px;
-    padding: 0;
+    width: auto;
+    height: auto;
+    padding: var(--size-spacing-medium-space-300);
     border-radius: 1.778px;
+    gap: var(--size-spacing-medium-space-300);
 }
 
 .plus-logo--s .plus-logo__container {
@@ -106,12 +123,17 @@
     height: 64px;
 }
 
+.plus-logo--s .plus-logo__text svg {
+    height: 64px;
+}
+
+/* M: 92px Icon + 20px Padding = 132px Total Height */
 .plus-logo--m {
-    /* Figma: M size - 92px container */
-    width: 92px;
-    height: 92px;
-    padding: 0;
+    width: auto;
+    height: auto;
+    padding: var(--size-spacing-medium-space-400);
     border-radius: 2.556px;
+    gap: var(--size-spacing-medium-space-400);
 }
 
 .plus-logo--m .plus-logo__container {
@@ -124,12 +146,17 @@
     height: 92px;
 }
 
+.plus-logo--m .plus-logo__text svg {
+    height: 92px;
+}
+
+/* L: 144px Icon + 24px Padding = 192px Total Height */
 .plus-logo--l {
-    /* Figma: L size - 144px container */
-    width: 144px;
-    height: 144px;
-    padding: 0;
+    width: auto;
+    height: auto;
+    padding: var(--size-spacing-medium-space-500);
     border-radius: 4px;
+    gap: var(--size-spacing-medium-space-500);
 }
 
 .plus-logo--l .plus-logo__container {
@@ -142,12 +169,17 @@
     height: 144px;
 }
 
+.plus-logo--l .plus-logo__text svg {
+    height: 144px;
+}
+
+/* XL: 160px Icon + 32px Padding = 224px Total Height */
 .plus-logo--xl {
-    /* Figma: XL size - 160px container */
-    width: 160px;
-    height: 160px;
-    padding: 0;
+    width: auto;
+    height: auto;
+    padding: var(--size-spacing-large-space-600);
     border-radius: 4px;
+    gap: var(--size-spacing-large-space-600);
 }
 
 .plus-logo--xl .plus-logo__container {
@@ -160,83 +192,46 @@
     height: 160px;
 }
 
-/* Text Variants - When text is included, adjust container width and apply Figma spacing tokens */
-/* XS: spacing/small/space-150 (10px) */
+.plus-logo--xl .plus-logo__text svg {
+    height: 160px;
+}
+
+/* With Text Modifiers:
+   Explicitly set height/width to auto to ensure specificity overrides any legacy/default sizing.
+   The padding is handled by the base class, but we need to ensure the container grows.
+*/
+
+/* XS */
 .plus-logo--xs.plus-logo--with-text {
     width: auto;
-    height: 40px;
-    gap: var(--size-spacing-small-space-150);
-    padding: var(--size-spacing-small-space-150);
+    height: auto;
 }
 
-.plus-logo--xs.plus-logo--with-text .plus-logo__container {
-    height: 40px;
-}
-
-.plus-logo--xs.plus-logo--with-text .plus-logo__text svg {
-    height: 40px;
-}
-
-/* S: spacing/medium/space-300 (16px) */
+/* S */
 .plus-logo--s.plus-logo--with-text {
     width: auto;
-    height: 64px;
-    gap: var(--size-spacing-medium-space-300);
-    padding: var(--size-spacing-medium-space-300);
+    height: auto;
 }
 
-.plus-logo--s.plus-logo--with-text .plus-logo__container {
-    height: 64px;
-}
-
-.plus-logo--s.plus-logo--with-text .plus-logo__text svg {
-    height: 64px;
-}
-
-/* M: spacing/medium/space-400 (20px) */
+/* M */
 .plus-logo--m.plus-logo--with-text {
     width: auto;
-    height: 92px;
-    gap: var(--size-spacing-medium-space-400);
-    padding: var(--size-spacing-medium-space-400);
+    height: auto;
+    /* Ensure content+padding dictates height (92 + 20 + 20 = 132) */
 }
 
-.plus-logo--m.plus-logo--with-text .plus-logo__container {
-    height: 92px;
-}
-
-.plus-logo--m.plus-logo--with-text .plus-logo__text svg {
-    height: 92px;
-}
-
-/* L: spacing/medium/space-500 (24px) */
+/* L */
 .plus-logo--l.plus-logo--with-text {
     width: auto;
-    height: 144px;
-    gap: var(--size-spacing-medium-space-500);
-    padding: var(--size-spacing-medium-space-500);
+    height: auto;
 }
 
-.plus-logo--l.plus-logo--with-text .plus-logo__container {
-    height: 144px;
-}
-
-.plus-logo--l.plus-logo--with-text .plus-logo__text svg {
-    height: 144px;
-}
-
-/* XL: spacing/large/space-600 (32px) */
+/* XL */
 .plus-logo--xl.plus-logo--with-text {
     width: auto;
-    height: 160px;
-    gap: var(--size-spacing-large-space-600);
-    padding: var(--size-spacing-large-space-600);
+    height: auto;
 }
 
-.plus-logo--xl.plus-logo--with-text .plus-logo__container {
-    height: 160px;
-}
-
-.plus-logo--xl.plus-logo--with-text .plus-logo__text svg {
-    height: 160px;
+.plus-logo--with-text {
+    /* Base modifier fallback */
 }
