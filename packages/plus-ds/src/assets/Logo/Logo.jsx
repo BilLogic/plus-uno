@@ -8,10 +8,8 @@ import './Logo.scss';
  * PLUS brand logo component with multiple styles, sizes, and optional text wordmark.
  * Matches Figma design system specifications.
  * 
- * @param {string} style - Visual style: 'colored', 'filled', or 'outlined'
- * @param {string} size - Size variant: 'XS', 'S', 'M', 'L', 'XL'
- * @param {boolean} text - Whether to show the text wordmark alongside the icon
- */
+ * @param { string } style - Visual style: 'colored', 'filled', or 'outlined'
+            */
 const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...props }) => {
     // Normalize size to lowercase for CSS classes
     const sizeClass = size.toLowerCase();
@@ -126,7 +124,7 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
         const fillColor = style === 'colored' ? '#3F484A' : 'currentColor';
 
         return (
-            <svg viewBox="0 0 247 92" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 'auto', height: '100%' }}>
+            <svg viewBox="0 0 247 92" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M23.2777 7.11776C33.6111 7.11776 41.1513 9.17587 45.8981 13.2921C50.6449 17.4083 53.0183 23.1745 53.0183 30.5908C53.0183 33.9619 52.4706 37.1732 51.3752 40.2249C50.3163 43.2411 48.5636 45.9202 46.1172 48.2621C43.6707 50.5686 40.4392 52.3961 36.4227 53.7445C32.4427 55.0929 27.5315 55.7671 21.6893 55.7671H13.145V84.9355H0V7.11776H23.2777ZM22.4013 17.7099H13.145V45.1218H20.32C24.4461 45.1218 27.9514 44.6605 30.8361 43.7379C33.7207 42.7798 35.9115 41.2717 37.4086 39.2136C38.9056 37.1555 39.6542 34.4409 39.6542 31.0699C39.6542 26.5633 38.2484 23.21 35.4368 21.01C32.6618 18.8099 28.3166 17.7099 22.4013 17.7099Z" fill={fillColor} />
                 <path d="M64.5246 84.9355V7.11776H77.6696V74.0772H111.682V84.9355H64.5246Z" fill={fillColor} />
                 <path d="M183.93 7.11776V57.4704C183.93 62.8995 182.743 67.7609 180.37 72.0546C178.033 76.3482 174.491 79.7547 169.744 82.2741C164.997 84.758 159.027 86 151.834 86C141.573 86 133.759 83.3919 128.392 78.1756C123.061 72.9239 120.395 65.9512 120.395 57.2575V7.11776H133.54V56.1397C133.54 62.6334 135.11 67.4238 138.251 70.511C141.391 73.5981 146.083 75.1417 152.327 75.1417C156.635 75.1417 160.141 74.4143 162.843 72.9594C165.581 71.4691 167.59 69.3045 168.868 66.4657C170.182 63.5915 170.839 60.1317 170.839 56.0865V7.11776H183.93Z" fill={fillColor} />
