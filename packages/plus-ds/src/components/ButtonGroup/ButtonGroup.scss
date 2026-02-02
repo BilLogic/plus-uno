@@ -120,4 +120,15 @@
 
         // Large uses same radius as medium per Figma
     }
+
+    &--block {
+        display: flex;
+        width: 100%;
+
+        >.plus-btn,
+        >.btn {
+            flex: 1;
+            width: 100%;
+        }
+    }
 }

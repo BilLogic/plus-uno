@@ -19,6 +19,7 @@ const ButtonGroup = ({
     style = 'primary',
     fill = 'tonal', // Tonal is default per Figma spec
     vertical = false,
+    block = false,
 
     // Development
     className = '',
@@ -33,6 +34,7 @@ const ButtonGroup = ({
     const groupClasses = [
         'plus-button-group',
         vertical ? 'plus-button-group--vertical' : '',
+        block ? 'plus-button-group--block' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -117,6 +119,8 @@ ButtonGroup.propTypes = {
     fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
     /** Stack buttons vertically */
     vertical: PropTypes.bool,
+    /** Whether the group takes full width */
+    block: PropTypes.bool,
 
     // Development
     /** Additional CSS classes */

@@ -14,7 +14,7 @@
 
 :root {
     /* Copying some core tokens just in case, though they should be available if we import the DS css */
-    --color-surface: #ffffff;
+    --color-surface: #f9f9fc;
     --color-on-surface: #1f1f1f;
     --font-family-body: 'Open Sans', sans-serif;
 }

@@ -10,16 +10,122 @@ import PropTypes from 'prop-types';
 import { SidebarTab } from '../../Elements';
 import Logo from '../../../../assets/Logo/Logo';
 
+/** Skeleton placeholder heights to match logo and nav items. */
+const SKELETON_LOGO_HEIGHT = 36;
+const SKELETON_NAV_ITEM_HEIGHT = 36;
+const SKELETON_SECTION_TITLE_HEIGHT = 16;
+
 const Sidebar = ({
     user = 'tutor',
     activeTab = 'home',
     onHomeClick,
     onTabClick,
     visible = true,
+    loading = false,
     className = '',
     style,
 }) => {
     if (!visible) return null;
+
+    if (loading) {
+        return (
+            <div
+                className={`plus-sidebar plus-sidebar--loading ${className}`}
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--size-surface-gap-sm)',
+                    width: 184,
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-sm)',
+                    ...style,
+                }}
+            >
+                <div
+                    className="plus-skeleton-block"
+                    style={{
+                        height: SKELETON_LOGO_HEIGHT,
+                        width: '100%',
+                        flexShrink: 0,
+                    }}
+                />
+                <div
+                    className="plus-skeleton-block"
+                    style={{
+                        height: SKELETON_NAV_ITEM_HEIGHT,
+                        width: '100%',
+                        flexShrink: 0,
+                    }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                    <div
+                        className="plus-skeleton-block"
+                        style={{
+                            height: SKELETON_SECTION_TITLE_HEIGHT,
+                            width: '60%',
+                            flexShrink: 0,
+                        }}
+                    />
+                    {[1, 2].map((i) => (
+                        <div
+                            key={i}
+                            className="plus-skeleton-block"
+                            style={{
+                                height: SKELETON_NAV_ITEM_HEIGHT,
+                                width: '100%',
+                                flexShrink: 0,
+                            }}
+                        />
+                    ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                    <div
+                        className="plus-skeleton-block"
+                        style={{
+                            height: SKELETON_SECTION_TITLE_HEIGHT,
+                            width: '50%',
+                            flexShrink: 0,
+                        }}
+                    />
+                    {[1, 2].map((i) => (
+                        <div
+                            key={i}
+                            className="plus-skeleton-block"
+                            style={{
+                                height: SKELETON_NAV_ITEM_HEIGHT,
+                                width: '100%',
+                                flexShrink: 0,
+                            }}
+                        />
+                    ))}
+                </div>
+                {user === 'supervisor' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                        <div
+                            className="plus-skeleton-block"
+                            style={{
+                                height: SKELETON_SECTION_TITLE_HEIGHT,
+                                width: '40%',
+                                flexShrink: 0,
+                            }}
+                        />
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div
+                                key={i}
+                                className="plus-skeleton-block"
+                                style={{
+                                    height: SKELETON_NAV_ITEM_HEIGHT,
+                                    width: '100%',
+                                    flexShrink: 0,
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     const handleTabClick = (tabName) => {
         if (onTabClick) {
@@ -128,6 +234,8 @@ Sidebar.propTypes = {
     onHomeClick: PropTypes.func,
     onTabClick: PropTypes.func,
     visible: PropTypes.bool,
+    /** When true, show skeleton/shimmer placeholder instead of nav (uses .plus-skeleton-block). */
+    loading: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
 };

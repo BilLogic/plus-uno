@@ -12,6 +12,10 @@ import { UserAvatar } from '../../Elements';
 import Button from '../../../../components/Button';
 import './TopBar.scss';
 
+/** Collapsed left section width (toggle button only); matches PageLayout motion. */
+const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
+const TOPBAR_LEFT_EXPANDED_WIDTH = 184;
+
 const TopBar = ({
     mode = 'expanded',
     onToggle,
@@ -27,9 +31,8 @@ const TopBar = ({
         }
     };
 
-    // Calculate sidebar width based on mode or prop
-    // This maintains the layout alignment with the sidebar below
-    const sidebarWidth = mode === 'expanded' ? 'var(--layout-sidebar-width, 164px)' : 'auto';
+    // Numeric width so CSS can transition; aligns with sidebar (184px when expanded).
+    const leftSectionWidth = mode === 'expanded' ? TOPBAR_LEFT_EXPANDED_WIDTH : TOPBAR_LEFT_COLLAPSED_WIDTH;
 
     return (
         <div
@@ -40,7 +43,7 @@ const TopBar = ({
             {/* Left: Sidebar Control */}
             <div
                 className="topbar-left-section"
-                style={{ width: sidebarWidth }}
+                style={{ width: leftSectionWidth }}
             >
                 <Button
                     className="topbar-toggle-btn"

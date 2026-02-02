@@ -4,6 +4,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import Card from '@/components/Card';
 import NavTabs from '@/components/NavTabs';
+import Button from '@/components/Button/Button';
 import chartTheme from '@/DataViz/chartTheme';
 import { RadarChart } from '@/DataViz';
 import './DataVisualization.scss';
@@ -19,7 +20,16 @@ const DataVisualizationSkillsProgress = ({
     skillsProgressData,
     defaultActiveTab = 'skills-progress',
     className = '',
-    style
+    style,
+    variant = 'tabs',
+    title,
+    hideRadarYAxisLabels = false,
+    radarCategoryLabelBody3Regular = false,
+    radarChartSpacing,
+    radarHeight,
+    radarCategoryIcons,
+    /** When true, render content without the Card wrapper (content only, for use inside a parent card container) */
+    unwrapCard = false
 }) => {
     const [activeTab, setActiveTab] = useState(defaultActiveTab);
 
@@ -88,41 +98,83 @@ const DataVisualizationSkillsProgress = ({
         }]
     };
 
-    return (
-        <Card
-            id={id}
-            className={`plus-data-viz-card ${className}`}
-            style={style}
-            paddingSize="md"
-            gapSize="lg"
-            radiusSize="sm"
-            borderSize="sm"
-            showBorder={true}
-        >
-            <NavTabs
-                activeKey={activeTab}
-                onSelect={(key) => setActiveTab(key)}
-                className="plus-data-viz-tabs"
-            >
-                <NavTabs.Item 
-                    eventKey="skills-overview"
-                    active={activeTab === 'skills-overview'}
-                >
-                    <div className="plus-data-viz-tab-content">
-                        <span>Skills Overview</span>
-                        <i className="fas fa-circle-info" aria-hidden="true"></i>
+    const innerContent = (
+        <>
+            {variant === 'buttonGroup' ? (
+                <div className="plus-data-viz-header-with-title">
+                    {title && <h4 className="h4 plus-data-viz-header-title">{title}</h4>}
+                    <div className="plus-data-viz-nav-buttons">
+                        <Button
+                            style="primary"
+                            fill="outline"
+                            size="small"
+                            leadingVisual="chart-pie"
+                            onClick={() => setActiveTab('skills-overview')}
+                            active={activeTab === 'skills-overview'}
+                            title="Skills Overview"
+                            aria-label="Skills Overview"
+                        />
+                        <Button
+                            style="primary"
+                            fill="outline"
+                            size="small"
+                            leadingVisual="chart-line"
+                            onClick={() => setActiveTab('skills-progress')}
+                            active={activeTab === 'skills-progress'}
+                            title="Skills Progress"
+                            aria-label="Skills Progress"
+                        />
                     </div>
-                </NavTabs.Item>
-                <NavTabs.Item 
-                    eventKey="skills-progress"
-                    active={activeTab === 'skills-progress'}
+                </div>
+            ) : variant === 'toggle' ? (
+                <div className="plus-data-viz-toggle" role="group" aria-label="Skills view">
+                    <button
+                        type="button"
+                        className={`plus-data-viz-toggle-option ${activeTab === 'skills-overview' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('skills-overview')}
+                        aria-pressed={activeTab === 'skills-overview'}
+                        aria-label="Skills Overview"
+                        title="Skills Overview"
+                    >
+                        <i className="fa-solid fa-chart-pie" aria-hidden="true"></i>
+                    </button>
+                    <button
+                        type="button"
+                        className={`plus-data-viz-toggle-option ${activeTab === 'skills-progress' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('skills-progress')}
+                        aria-pressed={activeTab === 'skills-progress'}
+                        aria-label="Skills Progress"
+                        title="Skills Progress"
+                    >
+                        <i className="fa-solid fa-chart-line" aria-hidden="true"></i>
+                    </button>
+                </div>
+            ) : (
+                <NavTabs
+                    activeKey={activeTab}
+                    onSelect={(key) => setActiveTab(key)}
+                    className="plus-data-viz-tabs"
                 >
-                    <div className="plus-data-viz-tab-content">
-                        <span>Skills Progress</span>
-                        <i className="fas fa-circle-info" aria-hidden="true"></i>
-                    </div>
-                </NavTabs.Item>
-            </NavTabs>
+                    <NavTabs.Item 
+                        eventKey="skills-overview"
+                        active={activeTab === 'skills-overview'}
+                    >
+                        <div className="plus-data-viz-tab-content">
+                            <span>Skills Overview</span>
+                            <i className="fas fa-circle-info" aria-hidden="true"></i>
+                        </div>
+                    </NavTabs.Item>
+                    <NavTabs.Item 
+                        eventKey="skills-progress"
+                        active={activeTab === 'skills-progress'}
+                    >
+                        <div className="plus-data-viz-tab-content">
+                            <span>Skills Progress</span>
+                            <i className="fas fa-circle-info" aria-hidden="true"></i>
+                        </div>
+                    </NavTabs.Item>
+                </NavTabs>
+            )}
 
             <div className="plus-data-viz-content">
                 {activeTab === 'skills-overview' ? (
@@ -162,11 +214,14 @@ const DataVisualizationSkillsProgress = ({
                                         <RadarChart
                                             categories={categories}
                                             series={radarSeries}
-                                            height={290}
+                                            height={radarHeight !== undefined ? radarHeight : 290}
                                             yAxisMax={100}
                                             filled={true}
                                             showLegend={false}
-                                            chartSpacing={[0, 0, 0, 0]}
+                                            chartSpacing={radarChartSpacing !== undefined ? radarChartSpacing : [0, 0, 0, 0]}
+                                            showYAxisLabels={!hideRadarYAxisLabels}
+                                            categoryLabelBody3Regular={radarCategoryLabelBody3Regular}
+                                            categoryIcons={radarCategoryIcons}
                                         />
                                     </div>
                                     <div className="plus-data-viz-legend">
@@ -200,6 +255,37 @@ const DataVisualizationSkillsProgress = ({
                     </div>
                 )}
             </div>
+        </>
+    );
+
+    if (unwrapCard) {
+        return (
+            <div
+                id={id}
+                className={`plus-card-content card-body ${className}`}
+                style={style}
+            >
+                <div className="plus-card-description">
+                    <div className="plus-card-body body1-txt card-text">
+                        {innerContent}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <Card
+            id={id}
+            className={`plus-data-viz-card ${className}`}
+            style={style}
+            paddingSize="md"
+            gapSize="lg"
+            radiusSize="sm"
+            borderSize="sm"
+            showBorder={true}
+        >
+            {innerContent}
         </Card>
     );
 };
@@ -217,7 +303,18 @@ DataVisualizationSkillsProgress.propTypes = {
     }),
     defaultActiveTab: PropTypes.oneOf(['skills-overview', 'skills-progress']),
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    variant: PropTypes.oneOf(['tabs', 'toggle', 'buttonGroup']),
+    title: PropTypes.string,
+    hideRadarYAxisLabels: PropTypes.bool,
+    radarCategoryLabelBody3Regular: PropTypes.bool,
+    radarChartSpacing: PropTypes.arrayOf(PropTypes.number),
+    /** Radar chart height in pixels or '100%' to fill container (responsive) */
+    radarHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['100%'])]),
+    /** Font Awesome icon classes for radar axes (e.g. ['fa-calculator', 'fa-comments']) */
+    radarCategoryIcons: PropTypes.arrayOf(PropTypes.string),
+    /** When true, render content without the Card wrapper (content only, for use inside a parent card container) */
+    unwrapCard: PropTypes.bool
 };
 
 export default DataVisualizationSkillsProgress;

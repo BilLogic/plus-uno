@@ -119,6 +119,9 @@ playground/
             └── README.md
 ```
 
+**Home Redesign** (Figma APPLICATION-PROTOTYPES node 158-21725) is grouped under:
+`playground/prototyping/bill/home-redesign/` — see that folder’s README for Figma MCP usage, tokens, and DataViz.
+
 ## Best Practices
 
 1. **Organize by feature**: Create subdirectories for different prototypes

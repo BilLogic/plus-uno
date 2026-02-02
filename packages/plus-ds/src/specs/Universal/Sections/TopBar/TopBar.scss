@@ -3,6 +3,7 @@
     align-items: center;
     gap: 16px;
     width: 100%;
+    height: fit-content;
 
     // Figma strict token usage for TopBar container if needed, 
     // though usually handled by parent. 
@@ -52,10 +53,10 @@
 }
 
 .topbar-left-section {
-    // Width logic moved here or kept inline for dynamic prop support
-    // Keeping minimal here to allow JS dynamic width
     display: flex;
     align-items: center;
+    /* Same 280ms / easing as PageLayout sidebar so left section animates in sync */
+    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .topbar-center-section {

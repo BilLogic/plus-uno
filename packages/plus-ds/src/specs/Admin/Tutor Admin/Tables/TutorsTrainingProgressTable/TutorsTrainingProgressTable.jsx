@@ -60,8 +60,12 @@ const TutorsTrainingProgressTable = ({
 
     const renderHeader = (label, key) => (
         <div
-            className="flex items-center gap-2"
-            style={{ cursor: sortable ? 'pointer' : 'default' }}
+            className="flex items-center gap-2 tutors-training-progress-table__header-cell"
+            style={{
+                cursor: sortable ? 'pointer' : 'default',
+                justifyContent: 'space-between',
+                width: '100%',
+            }}
             onClick={() => handleSort(key)}
         >
             <span className="body3-txt">{label}</span>

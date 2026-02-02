@@ -197,44 +197,44 @@ const TutorTrainingProgressPage = ({
             className={className}
         >
             <div className="tutor-training-progress-page__content">
-                {/* Tab Navigation */}
-                <div className="tutor-training-progress-page__tabs">
-                    <NavTabs
-                        activeKey={currentTab}
-                        onSelect={handleTabSelect}
-                        className="tutor-training-progress-page__nav-tabs"
-                    >
-                        <NavTabs.Item eventKey="performance" active={currentTab === 'performance'}>
-                            Tutor Performance
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="statusWarnings" active={currentTab === 'statusWarnings'}>
-                            Status And Warnings
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="toolUsage" active={currentTab === 'toolUsage'}>
-                            Tool Usage
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="trainingProgress" active={currentTab === 'trainingProgress'}>
-                            Training Progress
-                        </NavTabs.Item>
-                    </NavTabs>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="tutor-training-progress-page__actions">
-                    <Button
-                        text="Email Tutors"
-                        style="primary"
-                        fill="outline"
-                        size="medium"
-                        onClick={onEmailTutors}
-                    />
-                    <Button
-                        text="Export Reflection Data"
-                        style="primary"
-                        fill="outline"
-                        size="medium"
-                        onClick={onExportData}
-                    />
+                {/* Tab Navigation & Actions on same row */}
+                <div className="tutor-training-progress-page__tabs-row">
+                    <div className="tutor-training-progress-page__tabs">
+                        <NavTabs
+                            activeKey={currentTab}
+                            onSelect={handleTabSelect}
+                            className="tutor-training-progress-page__nav-tabs"
+                        >
+                            <NavTabs.Item eventKey="performance" active={currentTab === 'performance'}>
+                                Tutor Performance
+                            </NavTabs.Item>
+                            <NavTabs.Item eventKey="statusWarnings" active={currentTab === 'statusWarnings'}>
+                                Status And Warnings
+                            </NavTabs.Item>
+                            <NavTabs.Item eventKey="toolUsage" active={currentTab === 'toolUsage'}>
+                                Tool Usage
+                            </NavTabs.Item>
+                            <NavTabs.Item eventKey="trainingProgress" active={currentTab === 'trainingProgress'}>
+                                Training Progress
+                            </NavTabs.Item>
+                        </NavTabs>
+                    </div>
+                    <div className="tutor-training-progress-page__actions">
+                        <Button
+                            text="Email Tutors"
+                            style="primary"
+                            fill="outline"
+                            size="medium"
+                            onClick={onEmailTutors}
+                        />
+                        <Button
+                            text="Export Reflection Data"
+                            style="primary"
+                            fill="outline"
+                            size="medium"
+                            onClick={onExportData}
+                        />
+                    </div>
                 </div>
 
                 {/* Training Progress Overview Section */}
@@ -243,7 +243,7 @@ const TutorTrainingProgressPage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Training Progress Overview
                         </h2>
-                        <ButtonGroup size="small" style="primary" fill="tonal" className="tutor-training-progress-page__toggle">
+                        <ButtonGroup size="medium" style="primary" fill="tonal" className="tutor-training-progress-page__toggle">
                             <Button
                                 text="By Tutor"
                                 active={currentViewMode === 'By Tutor'}

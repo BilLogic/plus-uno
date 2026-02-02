@@ -93,7 +93,7 @@ const HomepageJumbotron = ({
             <div className="plus-homepage-jumbotron-content">
                 {currentTab === 'sign-up' && (
                     <>
-                        <h2 className="plus-homepage-jumbotron-title h4">
+                        <h2 className="plus-homepage-jumbotron-title h2">
                             Sign up for your next session, {tutorName}!
                         </h2>
                         <p className="plus-homepage-jumbotron-description body1-txt">
@@ -104,7 +104,7 @@ const HomepageJumbotron = ({
                                 text="Sign up now"
                                 style="primary"
                                 fill="filled"
-                                size="medium"
+                                size="small"
                                 leadingVisual="paper-plane"
                                 onClick={onSignUp}
                             />
@@ -112,7 +112,7 @@ const HomepageJumbotron = ({
                                 text="View schedule"
                                 style="secondary"
                                 fill="tonal"
-                                size="medium"
+                                size="small"
                                 onClick={onViewSchedule}
                             />
                         </div>
@@ -121,7 +121,7 @@ const HomepageJumbotron = ({
 
                 {currentTab === 'session' && (
                     <>
-                        <h2 className="plus-homepage-jumbotron-title h4">
+                        <h2 className="plus-homepage-jumbotron-title h2">
                             Get ready to shine, {tutorName}.
                         </h2>
                         <p className="plus-homepage-jumbotron-description body1-txt">
@@ -141,7 +141,7 @@ const HomepageJumbotron = ({
 
                 {currentTab === 'reflection' && (
                     <>
-                        <h2 className="plus-homepage-jumbotron-title h4">
+                        <h2 className="plus-homepage-jumbotron-title h2">
                             How did your session go, {tutorName}?
                         </h2>
                         <p className="plus-homepage-jumbotron-description body1-txt">
@@ -152,7 +152,7 @@ const HomepageJumbotron = ({
                                 text="Submit Your Reflection"
                                 style="primary"
                                 fill="filled"
-                                size="medium"
+                                size="small"
                                 leadingVisual="paper-plane"
                                 onClick={onSubmitReflection}
                             />

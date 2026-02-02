@@ -26,8 +26,8 @@ const GaugeChart = ({
         },
         title: { text: null },
         pane: {
-            center: ['50%', '85%'],
-            size: '140%',
+            center: ['50%', '78%'],
+            size: '120%',
             startAngle: -90,
             endAngle: 90,
             background: {

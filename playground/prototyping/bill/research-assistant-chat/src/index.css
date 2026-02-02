@@ -1,0 +1,166 @@
+/**
+ * Research Assistant Chat – base styles.
+ * PLUS tokens are loaded via plus-tokens.scss.
+ * Chat uses light theme vars; container/layout come from component library.
+ */
+:root {
+  --chat-bg: #f9fafb;
+  --chat-bg-deep: #f3f4f6;
+  --chat-surface: #e5e7eb;
+  --chat-on-surface: #111827;
+  --chat-on-surface-muted: #6b7280;
+  --chat-outline: #d1d5db;
+  /* Demo frame: 1280×800 – same as home-redesign and sessions */
+  --demo-frame-width: 1280px;
+  --demo-frame-height: 800px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/** Same as home-redesign: body not filled with surface color; gray background, flex center. */
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface, #191c1e);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-outline-variant, #e0e0e0);
+}
+
+/** Frame 1280×800 – same as home-redesign and sessions; 8px radius. */
+#root {
+  width: 1280px;
+  height: 800px;
+  min-width: 1280px;
+  min-height: 800px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: var(--color-surface-container);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#root>* {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+/** Page fills root frame; no horizontal scroll. */
+#tutor-training-progress-page {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/** Overview section: fit-content height, full width. */
+#tutor-training-progress-page .tutor-training-progress-page__overview-section {
+  height: fit-content;
+  width: 100%;
+}
+
+/** Overview cards: height 181px, full width; no horizontal scroll. */
+#tutor-training-progress-page .tutor-training-progress-page__overview-cards {
+  height: 181px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/** UserAvatar: same as home-redesign (surface-container-lowest for demo). */
+#tutor-training-progress-page .plus-user-avatar {
+  background-color: var(--color-surface-container-lowest) !important;
+}
+
+/** Overview card titles: b1 bold. */
+#tutor-training-progress-page .plus-overview-card__title {
+  font-size: var(--font-size-body1, 1rem);
+  font-weight: var(--font-weight-body1-bold, 700);
+  line-height: var(--font-line-height-body1, 1.5);
+}
+
+#tutor-training-progress-page .tutor-training-progress-page__overview-cards .plus-overview-card {
+  min-height: unset;
+  height: 179px;
+}
+
+#tutor-training-progress-page .tutor-training-progress-page__overview-cards .plus-overview-card__body {
+  flex: 0 1 auto;
+}
+
+/** Hide scrollbars on main content area; scrolling still enabled. */
+#tutor-training-progress-page .plus-page-main,
+#tutor-training-progress-page .plus-page-content-wrapper {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#tutor-training-progress-page .plus-page-main::-webkit-scrollbar,
+#tutor-training-progress-page .plus-page-content-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/** Phase 2: typing cursor blink. */
+@keyframes cursor-blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/** Chart/heatmap skeleton shimmer (sweep left). */
+@keyframes chart-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/** Fix search input height and alignment. */
+.export-search-filter-bar__search .input-group {
+  display: flex !important;
+  align-items: stretch !important;
+  height: 100% !important;
+}
+
+.export-search-filter-bar__search-icon {
+  display: flex !important;
+  align-items: center !important;
+  height: auto !important;
+  border: 1px solid var(--color-outline-variant, #bec8ca) !important;
+  border-right: none !important;
+  border-radius: 2px 0 0 2px !important;
+}
+
+.export-search-filter-bar__search-input {
+  display: block !important;
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 100% !important;
+  border: 1px solid var(--color-outline-variant, #bec8ca) !important;
+  border-left: none !important;
+  border-radius: 0 2px 2px 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}

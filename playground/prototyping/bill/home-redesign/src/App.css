@@ -1,0 +1,749 @@
+/* Home Redesign – same PageLayout setup as tutor-training-progress-page.
+ * PageLayout (and its Sidebar) come from specs/Universal/Pages – do not overwrite.
+ * No styles for plus-page-* or plus-sidebar; only .home-redesign-* content.
+ */
+
+/* Page frame: fill root (root is 1280×800 in index.css) */
+#home-redesign-page {
+    --home-redesign-section-pad-y: 16px;
+    --home-redesign-section-pad-x: 20px;
+}
+
+/* TopBar: breadcrumb and user from config; UserAvatar background for demo. */
+#home-redesign-page .plus-user-avatar {
+    background-color: var(--color-surface-container-lowest) !important;
+}
+
+/* Sidebar: no overrides – match reference tutor-training-progress-page exactly. */
+
+#home-redesign-page .plus-page-main,
+#home-redesign-page .plus-page-content-wrapper {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#home-redesign-page .plus-page-main::-webkit-scrollbar,
+#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+/* Skeleton loading: one shimmer, layout fidelity, content hints (plan) */
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.home-redesign-skeleton-block {
+    display: block;
+    background: linear-gradient(90deg,
+            var(--color-outline-variant, #e0e0e0) 0%,
+            var(--color-surface-container-highest, #e8e8e8) 50%,
+            var(--color-outline-variant, #e0e0e0) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 2s ease-in-out infinite;
+    border-radius: var(--size-surface-radius, 8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-redesign-skeleton-block {
+        animation: none;
+        background: var(--color-outline-variant, #e0e0e0);
+    }
+}
+
+/* Skeleton root: brief fade-out when exiting */
+.home-redesign-skeleton-root.is-exiting .home-redesign-jumbotron-section,
+.home-redesign-skeleton-root.is-exiting .home-redesign-three-cards,
+.home-redesign-skeleton-root.is-exiting .home-redesign-trainings-section {
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+/* Jumbotron skeleton: tabs row, divider, title, 2 lines, 2 buttons */
+.home-redesign-skeleton-jumbotron {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 0;
+    padding-bottom: 16px;
+    min-height: 0;
+}
+
+.home-redesign-skeleton-tabs-row {
+    display: flex;
+    gap: 8px;
+}
+
+.home-redesign-skeleton-pill {
+    width: 88px;
+    height: 36px;
+    border-radius: 6px;
+}
+
+.home-redesign-skeleton-divider {
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-outline-variant, #e0e0e0);
+    margin: 0;
+}
+
+.home-redesign-skeleton-title {
+    height: 28px;
+    width: 50%;
+    max-width: 320px;
+}
+
+.home-redesign-skeleton-line {
+    height: 14px;
+    width: 100%;
+}
+
+.home-redesign-skeleton-line-short {
+    width: 70%;
+}
+
+.home-redesign-skeleton-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.home-redesign-skeleton-btn {
+    width: 120px;
+    height: 36px;
+}
+
+.home-redesign-skeleton-btn-sm {
+    width: 100px;
+}
+
+/* Card skeleton: header + content block, same padding as real cards */
+.home-redesign-skeleton-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
+    height: 100%;
+    min-height: 0;
+}
+
+.home-redesign-skeleton-card-title {
+    height: 18px;
+    width: 40%;
+    max-width: 160px;
+}
+
+.home-redesign-skeleton-card-content {
+    flex: 1;
+    min-height: 120px;
+}
+
+/* Trainings skeleton: header + carousel row (section provides padding) */
+.home-redesign-skeleton-trainings {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.home-redesign-skeleton-trainings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.home-redesign-skeleton-trainings-title {
+    height: 22px;
+    width: 180px;
+}
+
+.home-redesign-skeleton-trainings-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.home-redesign-skeleton-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+}
+
+.home-redesign-skeleton-carousel {
+    display: flex;
+    gap: var(--size-card-gap-md, 16px);
+}
+
+.home-redesign-skeleton-carousel-card {
+    flex-shrink: 0;
+    width: 200px;
+    height: 140px;
+    border-radius: 12px;
+}
+
+/* Entry loading: progressive reveal top-to-bottom (longer for demo video, obvious rollout) */
+@keyframes revealIn {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.home-redesign-reveal-root .home-redesign-jumbotron-section,
+.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-tutoring,
+.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-weekly,
+.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-momentum,
+.home-redesign-reveal-root .home-redesign-trainings-section {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section,
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring,
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly,
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum,
+.home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section {
+    animation-delay: 0ms;
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring {
+    animation-delay: 280ms;
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly {
+    animation-delay: 560ms;
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum {
+    animation-delay: 840ms;
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
+    animation-delay: 1120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-redesign-reveal-root .home-redesign-jumbotron-section,
+    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-tutoring,
+    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-weekly,
+    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-momentum,
+    .home-redesign-reveal-root .home-redesign-trainings-section,
+    .home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section,
+    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring,
+    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly,
+    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum,
+    .home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Shell loading: TopBar + Sidebar use same reveal as content (opacity + translateY, 1.3s, 280ms stagger). */
+/* TopBar: per-section reveal (left, center, right) – same motion as content. */
+#home-redesign-page .shell-reveal .plus-topbar .topbar-left-section,
+#home-redesign-page .shell-reveal .plus-topbar .topbar-center-section,
+#home-redesign-page .shell-reveal .plus-topbar .topbar-right-section {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+#home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-left-section {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 0ms;
+}
+
+#home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-center-section {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 280ms;
+}
+
+#home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-right-section {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 560ms;
+}
+
+/* Sidebar: per-item reveal (logo, Home, section titles, tabs) – same motion as content. */
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar>.plus-sidebar-tab,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 0ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 280ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 560ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 840ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1120ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1400ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1680ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1960ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    #home-redesign-page .shell-reveal .plus-topbar .topbar-left-section,
+    #home-redesign-page .shell-reveal .plus-topbar .topbar-center-section,
+    #home-redesign-page .shell-reveal .plus-topbar .topbar-right-section,
+    #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-left-section,
+    #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-center-section,
+    #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-right-section,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar>.plus-sidebar-tab,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Same content wrapper pattern as .tutor-training-progress-page__content */
+.home-redesign-content {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-sizing: border-box;
+}
+
+/* Tighter spacing between top (jumbotron) and three-cards section */
+.home-redesign-content>.home-redesign-jumbotron-section+.home-redesign-three-cards {
+    margin-top: 0;
+}
+
+.home-redesign-jumbotron-section {
+    width: 100%;
+    height: fit-content;
+}
+
+#home-redesign-page .plus-homepage-jumbotron {
+    padding-top: 0;
+}
+
+/* Three-cards row: reference height ~520px so content fits and labels don’t clip */
+/* Three-cards row: 368px per card (match training carousel card), horizontal scroll, scrollbar hidden */
+.home-redesign-three-cards {
+    display: grid;
+    grid-template-columns: 361px 361px 361px;
+    gap: 24px;
+    align-items: stretch;
+    width: 100%;
+    height: 360px;
+    min-height: 360px;
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.home-redesign-three-cards::-webkit-scrollbar {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .home-redesign-three-cards {
+        grid-template-columns: 361px 361px;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-redesign-three-cards {
+        grid-template-columns: 361px;
+    }
+}
+
+/* Single card per section: fill grid cell, min width so no cutoff when sidebar visible */
+.home-redesign-card-tutoring,
+.home-redesign-card-weekly,
+.home-redesign-card-momentum {
+    width: 361px;
+    min-width: 361px;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--size-surface-radius, 16px);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.home-redesign-section-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md, 16px);
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Weekly load: breakdown fills rest of space and is spaced out */
+.home-redesign-weekly-load-inner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.home-redesign-weekly-load-inner .home-redesign-breakdown {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--size-element-gap-md, 16px);
+    min-height: 0;
+}
+
+.home-redesign-weekly-load-inner .home-redesign-breakdown-row {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+}
+
+.home-redesign-card-title {
+    margin: 0 0 var(--size-element-gap-md, 16px);
+}
+
+/* Header must not shrink so nav buttons never overlap content below */
+.home-redesign-card-header-with-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--size-element-gap-xs, 4px);
+    flex-shrink: 0;
+}
+
+.home-redesign-card-header-with-nav .home-redesign-card-title {
+    margin: 0;
+}
+
+.home-redesign-nav-buttons {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+}
+
+/* Weekly Tutoring Load – match Figma 158-21725: scale, layout, typography */
+.home-redesign-weekly-load-inner .home-redesign-card-title {
+    font-family: var(--font-family-header);
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--font-line-height-h4);
+    color: var(--color-on-surface);
+}
+
+.home-redesign-weekly-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-md, 16px);
+    margin-bottom: var(--size-element-gap-sm, 8px);
+}
+
+.home-redesign-weekly-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* 16.8 hrs – H1 level, Lato bold; keep on one line */
+.home-redesign-weekly-value {
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-h1);
+    line-height: var(--font-line-height-h1);
+    color: var(--color-on-surface);
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+/* of 20.0 hrs – smaller, regular, body style */
+.home-redesign-weekly-of {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-body2-regular);
+    line-height: var(--font-line-height-body2);
+    color: var(--color-on-surface-variant);
+}
+
+.home-redesign-donut-wrap {
+    flex-shrink: 0;
+}
+
+/* Bar items: label + hours on first line, full-width bar on second line; fills rest of card, spaced out */
+.home-redesign-breakdown {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.home-redesign-breakdown-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+/* First row: label (left), hours (right) */
+.home-redesign-breakdown-label-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+.home-redesign-breakdown-label {
+    flex-shrink: 0;
+    min-width: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-body2-regular);
+    line-height: var(--font-line-height-body2);
+    color: var(--color-on-surface);
+}
+
+.home-redesign-breakdown-hrs {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-body2-regular);
+    line-height: var(--font-line-height-body2);
+    color: var(--color-on-surface);
+}
+
+/* Progress bar: design system Progress (size small) – leaner height override */
+.home-redesign-breakdown-progress-wrap {
+    width: 100%;
+}
+
+/* Second row: full-width gray track, colored bar on top (legacy) */
+.home-redesign-breakdown-bar-wrap {
+    width: 100%;
+    height: 8px;
+    background-color: var(--color-outline-variant, #e0e0e0);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.home-redesign-breakdown-bar {
+    height: 100%;
+    border-radius: 4px;
+    min-width: 2px;
+    transition: width 0.2s ease;
+}
+
+/* Student Momentum – fills section height; 4 equal rows; charts resize to fill cells */
+.home-redesign-student-momentum-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.home-redesign-student-momentum-inner .home-redesign-momentum-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    gap: var(--size-element-gap-md, 16px) var(--size-section-gap-md, 24px);
+    align-items: stretch;
+    overflow: hidden;
+}
+
+.home-redesign-momentum-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, auto);
+    gap: var(--size-element-gap-lg, 24px) var(--size-section-gap-md, 24px);
+}
+
+.home-redesign-momentum-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    min-height: 0;
+}
+
+.home-redesign-student-momentum-inner .home-redesign-momentum-cell {
+    flex: 1;
+    min-height: 0;
+}
+
+.home-redesign-momentum-name {
+    font-weight: 500;
+    color: var(--color-on-surface);
+    flex-shrink: 0;
+}
+
+/* Chart wrap fills remaining cell height; ResizeObserver passes height to BarChart */
+.home-redesign-momentum-chart-wrap {
+    width: 100%;
+    flex: 1;
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-redesign-momentum-chart-wrap>div {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.home-redesign-momentum-chart-wrap .highcharts-container {
+    width: 100% !important;
+}
+
+.home-redesign-mini-chart-bar {
+    flex: 1;
+    min-width: 6px;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.2s ease;
+}
+
+/* Personalized Trainings – same padding as three cards */
+.home-redesign-trainings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md);
+    width: 100%;
+    padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--size-surface-radius, 16px);
+    box-sizing: border-box;
+}
+
+.home-redesign-trainings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.home-redesign-trainings-header .h4 {
+    margin: 0;
+}
+
+.home-redesign-trainings-controls {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+}
+
+.home-redesign-trainings-carousel {
+    display: flex;
+    gap: var(--size-card-gap-md, 16px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.home-redesign-trainings-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.home-redesign-trainings-carousel>* {
+    flex-shrink: 0;
+}
+
+/* Spotlight Effect - Localized Approach */
+.is-dimmed {
+    opacity: 0.15 !important;
+    filter: grayscale(100%) blur(4px) !important;
+    pointer-events: none !important;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.home-redesign-trainings-section.spotlight-active {
+    opacity: 1 !important;
+    filter: none !important;
+    pointer-events: auto !important;
+    transform: scale(1.03);
+    z-index: 50;
+    position: relative;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+    background-color: var(--color-surface-container-lowest);
+    border-radius: 16px;
+    padding: 12px;
+    margin: -12px;
+    /* Offset padding to keep layout stable */
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}

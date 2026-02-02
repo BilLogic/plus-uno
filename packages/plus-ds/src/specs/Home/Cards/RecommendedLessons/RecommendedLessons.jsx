@@ -19,6 +19,7 @@ const RecommendedLessons = ({
     duration,
     status = 'in-progress', // 'in-progress', 'completed', 'not-started'
     aiRecommended = true,
+    actionLabel = 'Review',
     onReviewClick,
     className = '',
     style
@@ -32,7 +33,7 @@ const RecommendedLessons = ({
 
     const renderAIIndicator = () => {
         if (!aiRecommended) return null;
-        
+
         return (
             <div className="plus-recommended-lessons-ai-indicator">
                 <i className="fas fa-star" aria-hidden="true"></i>
@@ -42,10 +43,10 @@ const RecommendedLessons = ({
 
     // Normalize breakpoint for class name (handle "XXL & above" -> "xxl-above")
     // Remove special characters and normalize spacing
-    const breakpointClass = breakpoint === 'XXL & above' 
-        ? 'xxl-above' 
+    const breakpointClass = breakpoint === 'XXL & above'
+        ? 'xxl-above'
         : breakpoint.replace(/[&\s]+/g, '-').toLowerCase();
-    
+
     const cardClasses = [
         'plus-recommended-lessons',
         `plus-recommended-lessons-${breakpointClass}`,
@@ -55,8 +56,8 @@ const RecommendedLessons = ({
     // Width based on breakpoint - fixed widths per Figma spec
     // < XXL: 275.33px (fixed width to match Figma)
     // XXL & above: 368px (fixed width per Figma spec)
-    const width = breakpoint === 'XXL & above' 
-        ? '368px' 
+    const width = breakpoint === 'XXL & above'
+        ? '368px'
         : '275.33px';
 
     return (
@@ -112,7 +113,7 @@ const RecommendedLessons = ({
                 {/* Bottom section with button and status indicators */}
                 <div className="plus-recommended-lessons-bottom">
                     <Button
-                        text="Review"
+                        text={actionLabel}
                         style="primary"
                         fill="filled"
                         size="small"
@@ -141,6 +142,7 @@ RecommendedLessons.propTypes = {
     duration: PropTypes.string,
     status: PropTypes.oneOf(['in-progress', 'completed', 'not-started']),
     aiRecommended: PropTypes.bool,
+    actionLabel: PropTypes.string,
     onReviewClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object

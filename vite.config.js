@@ -25,14 +25,17 @@ try {
 export default defineConfig({
   plugins: [react()],
   resolve: {
+    dedupe: ['react', 'react-dom', 'framer-motion'],
     alias: {
       '@': path.resolve(__dirname, './packages/plus-ds/src'),
+      '@plus-ds': path.resolve(__dirname, './packages/plus-ds/src'),
       '~': path.resolve(__dirname, './node_modules')
     }
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    strictPort: false
   },
   build: {
     outDir: 'dist',

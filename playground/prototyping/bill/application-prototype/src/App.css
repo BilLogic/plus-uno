@@ -1,0 +1,207 @@
+/* Application Prototype – layout and card styling (Figma 158-21725) */
+
+.app-prototype-page .plus-page-main-container > div:last-child {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-prototype-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-lg, 32px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.app-prototype-jumbotron-section {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--size-section-gap-md, 24px);
+    align-items: stretch;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .app-prototype-jumbotron-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Three cards in a row */
+.app-prototype-three-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--size-section-gap-md, 24px);
+    align-items: stretch;
+    width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .app-prototype-three-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-prototype-three-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+.app-prototype-card-tutoring,
+.app-prototype-card-weekly,
+.app-prototype-card-momentum {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--size-surface-radius, 16px);
+    box-sizing: border-box;
+}
+
+.app-prototype-card-tutoring .plus-data-viz-card {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.app-prototype-card-title {
+    margin: 0 0 var(--size-element-gap-md, 16px);
+}
+
+.app-prototype-card-header-with-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--size-element-gap-sm, 8px);
+}
+
+.app-prototype-card-header-with-nav .app-prototype-card-title {
+    margin: 0;
+}
+
+.app-prototype-nav-buttons {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+}
+
+/* Weekly Tutoring Load card */
+.app-prototype-weekly-load-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-lg);
+}
+
+.app-prototype-donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.app-prototype-donut-sub {
+    margin: 0;
+    color: var(--color-on-surface-variant);
+}
+
+.app-prototype-breakdown {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.app-prototype-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Student Momentum card */
+.app-prototype-momentum-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.app-prototype-momentum-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-prototype-momentum-name {
+    flex-shrink: 0;
+    min-width: 72px;
+}
+
+.app-prototype-momentum-bar-wrap {
+    flex: 1;
+    height: 12px;
+    background-color: var(--color-outline-variant);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.app-prototype-momentum-bar {
+    height: 100%;
+    border-radius: 6px;
+    min-width: 4px;
+    transition: width 0.2s ease;
+}
+
+/* Personalized Trainings section */
+.app-prototype-trainings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md);
+    width: 100%;
+    padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
+    background-color: var(--color-surface-container-low);
+    border-radius: var(--size-surface-radius, 16px);
+    box-sizing: border-box;
+}
+
+.app-prototype-trainings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.app-prototype-trainings-header .h4 {
+    margin: 0;
+}
+
+.app-prototype-trainings-controls {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+}
+
+.app-prototype-trainings-carousel {
+    display: flex;
+    gap: var(--size-card-gap-md, 16px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.app-prototype-trainings-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.app-prototype-trainings-carousel > * {
+    flex-shrink: 0;
+}

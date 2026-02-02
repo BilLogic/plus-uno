@@ -88,6 +88,11 @@
     --size-surface-radius: var(--size-border-radius-radius-400);
     --size-surface-border: var(--size-border-stroke-stroke-200);
 
+    /* Surface Container (Figma: Surface Container/pad-x-sm, pad-y-sm, gap-sm) */
+    --size-surface-container-pad-x: var(--size-spacing-medium-space-300);
+    --size-surface-container-pad-y: var(--size-spacing-medium-space-200);
+    --size-surface-container-gap-md: var(--size-spacing-medium-space-300);
+
     /* Table Tokens */
     --size-table-cell-x: var(--size-spacing-small-space-150);
     --size-table-cell-y: var(--size-spacing-small-space-100);

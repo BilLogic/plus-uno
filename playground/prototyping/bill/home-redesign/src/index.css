@@ -1,0 +1,60 @@
+/**
+ * Home Redesign – base styles (same structure as reference tutor-training-progress-page).
+ * PLUS tokens via plus-tokens.scss; layout from component library.
+ */
+:root {
+  --chat-bg: #f9fafb;
+  --chat-bg-deep: #f3f4f6;
+  --chat-surface: #e5e7eb;
+  --chat-on-surface: #111827;
+  --chat-on-surface-muted: #6b7280;
+  --chat-outline: #d1d5db;
+  /* Demo frame: 1280×800 */
+  --demo-frame-width: 1280px;
+  --demo-frame-height: 800px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface, #191c1e);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-outline-variant, #e0e0e0);
+  overflow: auto;
+}
+
+/* Frame 1280×800: fixed size; border-radius matches inner plus-page-layout (8px). */
+#root {
+  width: 1280px;
+  height: 800px;
+  min-width: 1280px;
+  min-height: 800px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: var(--color-surface-container);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+/** Hide scrollbars on main content area; scrolling still enabled (same as reference). */
+#home-redesign-page .plus-page-main,
+#home-redesign-page .plus-page-content-wrapper {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#home-redesign-page .plus-page-main::-webkit-scrollbar,
+#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+  display: none;
+}

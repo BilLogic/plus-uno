@@ -7,49 +7,83 @@ import chartTheme from '../../chartTheme';
 /**
  * BarChart Component
  * Basic Column or Bar chart for categorical comparison.
+ * Supports compact/spark mode (showLegend, yAxisMax, xAxisMax, hideXAxisLabels).
  */
 const BarChart = ({
     categories,
     series,
     horizontal = false,
     yAxisLabel,
-    height = 300
+    height = 300,
+    showLegend = true,
+    yAxisMax,
+    xAxisMax,
+    hideXAxisLabels = false,
+    hideYAxisLabels = false,
+    chartSpacing,
+    yAxisTickPositions,
+    columnPointPadding = 0.2,
+    fillOpacity
 }) => {
     const seriesWithTheme = series.map((s, i) => ({
         ...s,
         color: s.color || chartTheme.colors[i % chartTheme.colors.length]
     }));
 
+    // Column: xAxis = categories, yAxis = values. Bar (horizontal): xAxis = values, yAxis = categories.
+    const xAxisConfig = horizontal
+        ? {
+            ...chartTheme.xAxis,
+            min: 0,
+            ...(xAxisMax !== undefined && { max: xAxisMax }),
+            categories: undefined,
+            labels: { ...chartTheme.xAxis.labels, enabled: !hideXAxisLabels }
+        }
+        : {
+            ...chartTheme.xAxis,
+            categories: categories,
+            labels: { ...chartTheme.xAxis.labels, enabled: !hideXAxisLabels }
+        };
+
+    const yAxisConfig = horizontal
+        ? {
+            ...chartTheme.yAxis,
+            categories: categories,
+            reversed: false,
+            labels: { ...chartTheme.yAxis.labels, enabled: !hideYAxisLabels }
+        }
+        : {
+            ...chartTheme.yAxis,
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel },
+            ...(yAxisMax !== undefined && { max: yAxisMax }),
+            ...(yAxisTickPositions && { tickPositions: yAxisTickPositions }),
+            labels: { ...chartTheme.yAxis.labels, enabled: !hideYAxisLabels }
+        };
+
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: horizontal ? 'bar' : 'column',
-            height: height
+            height: height,
+            ...(chartSpacing !== undefined && { spacing: chartSpacing })
         },
         title: { text: null },
-        xAxis: {
-            ...chartTheme.xAxis,
-            categories: categories
-        },
-        yAxis: {
-            ...chartTheme.yAxis,
-            title: {
-                ...chartTheme.yAxis.title,
-                text: yAxisLabel
-            }
-        },
+        xAxis: xAxisConfig,
+        yAxis: yAxisConfig,
         plotOptions: {
             column: {
-                pointPadding: 0.2,
-                borderWidth: 0
+                pointPadding: columnPointPadding,
+                borderWidth: 0,
+                ...(fillOpacity !== undefined && { fillOpacity })
             },
             bar: {
                 pointPadding: 0.1,
-                borderWidth: 0
+                borderWidth: 0,
+                ...(fillOpacity !== undefined && { fillOpacity })
             }
         },
-        legend: { enabled: true },
+        legend: { enabled: showLegend },
         tooltip: {
             ...chartTheme.tooltip,
             shared: true
@@ -72,7 +106,16 @@ BarChart.propTypes = {
     })).isRequired,
     horizontal: PropTypes.bool,
     yAxisLabel: PropTypes.string,
-    height: PropTypes.number
+    height: PropTypes.number,
+    showLegend: PropTypes.bool,
+    yAxisMax: PropTypes.number,
+    xAxisMax: PropTypes.number,
+    hideXAxisLabels: PropTypes.bool,
+    hideYAxisLabels: PropTypes.bool,
+    chartSpacing: PropTypes.arrayOf(PropTypes.number),
+    yAxisTickPositions: PropTypes.arrayOf(PropTypes.number),
+    columnPointPadding: PropTypes.number,
+    fillOpacity: PropTypes.number
 };
 
 export default BarChart;

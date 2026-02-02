@@ -10,6 +10,75 @@
     margin: 0 auto;
 }
 
+/* ButtonGroup variant: title and button group on one line (no wrap) */
+.plus-data-viz-header-with-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-md, 16px);
+    width: 100%;
+    margin-bottom: var(--size-spacing-large-space-700, 40px);
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.plus-data-viz-header-title {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Nav buttons: same pattern as Student Momentum (arrow left/right) – two small outline buttons with gap */
+.plus-data-viz-nav-buttons {
+    display: flex;
+    gap: var(--size-element-gap-xs);
+    flex-shrink: 0;
+}
+
+/* Icon-only nav buttons: hide text, show only leading visual */
+.plus-data-viz-nav-buttons .plus-btn-text {
+    display: none;
+}
+
+/* Toggle variant: two icon options (Skills Overview = pie/radar, Skills Progress = line) */
+.plus-data-viz-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 2px;
+    border-radius: var(--size-element-radius-full, 999px);
+    background-color: var(--color-outline-variant, #e0e0e0);
+    margin-bottom: var(--size-spacing-large-space-700, 40px);
+}
+
+.plus-data-viz-toggle-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: var(--size-element-radius-full, 999px);
+    background: transparent;
+    color: var(--color-on-surface-variant, #3f484a);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    i {
+        font-size: 14px;
+    }
+
+    &:hover {
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &.active {
+        background-color: var(--color-surface-container-lowest, #fff);
+        color: var(--color-secondary-text, #445c6a);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+}
+
 .plus-data-viz-tabs {
     width: 100%;
     margin-bottom: var(--size-spacing-large-space-700) !important; // Spacing between tabs and content (40px - increased for proper visual separation)

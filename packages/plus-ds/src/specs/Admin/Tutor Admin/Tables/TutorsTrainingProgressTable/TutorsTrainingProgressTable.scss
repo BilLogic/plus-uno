@@ -24,6 +24,20 @@
             }
         }
 
+        /* Column header: text and icon on two sides (space-between) */
+        .tutors-training-progress-table__header-cell {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: var(--table-cell-gap, 10px);
+
+            span.body3-txt {
+                width: 100%;
+                height: fit-content;
+            }
+        }
+
         tbody {
             tr {
                 border-radius: var(--table-row-radius, 8px);

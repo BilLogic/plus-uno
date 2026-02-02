@@ -15,9 +15,11 @@
     "build-storybook": "storybook build --config-dir .storybook -o storybook-static",
     "sync:tokens": "node scripts/sync-figma-tokens.js",
     "generate:tokens": "node scripts/generate-all-tokens.js",
+    "start": "vite",
     "dev:react": "vite",
     "build:react": "vite build",
-    "preview:react": "vite preview"
+    "preview:react": "vite preview",
+    "dev:home-redesign": "vite --config playground/prototyping/bill/home-redesign/vite.config.js"
   },
   "keywords": [
     "plus",
@@ -44,14 +46,17 @@
     "vitest": "^4.0.15"
   },
   "dependencies": {
+    "@assistant-ui/react": "^0.12.3",
     "@popperjs/core": "^2.11.8",
     "@vitejs/plugin-react": "^5.1.1",
     "bootstrap": "^5.3.3",
+    "framer-motion": "^12.29.2",
     "highcharts": "^12.4.0",
     "highcharts-react-official": "^3.2.3",
     "react": "^19.2.1",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.1",
+    "react-router-dom": "^7.13.0",
     "typescript": "^5.9.3"
   }
 }

@@ -28,10 +28,10 @@ const UserAvatar = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-md)',
-                width: '168px',
+                width: 'fit-content',
                 padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
                 borderRadius: 'var(--size-element-radius-md)',
-                backgroundColor: isHover ? 'rgba(25, 28, 30, 0.08)' : 'transparent',
+                backgroundColor: isHover ? 'rgba(25, 28, 30, 0.08)' : 'var(--color-surface-container-lowest)',
                 cursor: onClick ? 'pointer' : 'default'
             }}
             onClick={onClick}
@@ -45,7 +45,8 @@ const UserAvatar = ({
                     alignItems: 'center',
                     gap: '6px',
                     flex: '1 1 0',
-                    minWidth: 0
+                    minWidth: 0,
+                    width: 'fit-content'
                 }}
             >
                 {/* Initial Badge */}
@@ -75,18 +76,16 @@ const UserAvatar = ({
                     </span>
                 </div>
 
-                {/* Name Text */}
+                {/* Name Text - hug content, no clipping */}
                 <p
                     className="body2-txt plus-user-avatar__name"
                     style={{
                         margin: 0,
                         color: 'var(--color-on-surface)',
                         fontWeight: 300,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        flex: '1 1 0',
-                        minWidth: 0
+                        flex: '0 1 auto',
+                        minWidth: 0,
+                        width: 'fit-content'
                     }}
                 >
                     {name}

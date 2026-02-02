@@ -7,6 +7,8 @@ const Sidebar = ({
     user = 'tutor',
     onHomeClick,
     onTabClick,
+    /** When set, the tab with this id is shown as selected (anchored). e.g. 'sessions' for Sessions page */
+    activeTabId,
     visible = true,
     className = '',
     style,
@@ -78,7 +80,7 @@ const Sidebar = ({
             <SidebarTab
                 text="Home"
                 icon="house"
-                state="selected"
+                state={activeTabId === 'home' || !activeTabId ? 'selected' : 'enabled'}
                 onClick={onHomeClick}
             />
 
@@ -104,7 +106,7 @@ const Sidebar = ({
                             key={item.id}
                             text={item.text}
                             icon={item.icon}
-                            state="enabled"
+                            state={activeTabId === item.id ? 'selected' : 'enabled'}
                             onClick={() => handleTabClick(item.id)}
                         />
                     ))}
@@ -118,6 +120,8 @@ Sidebar.propTypes = {
     user: PropTypes.oneOf(['tutor', 'supervisor']),
     onHomeClick: PropTypes.func,
     onTabClick: PropTypes.func,
+    /** Id of the tab to show as selected (e.g. 'sessions', 'home') */
+    activeTabId: PropTypes.string,
     visible: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,

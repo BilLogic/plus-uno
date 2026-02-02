@@ -10,8 +10,9 @@
 .plus-overview-card {
     // Base dimensions from Figma
     width: var(--columns-col-5, 275px);
-    min-height: 180px;
+    min-height: 220px;
     padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
+    padding-bottom: var(--size-card-pad-y-lg, 24px);
     border-radius: var(--size-card-radius-md, 16px);
 
     // Default background
@@ -22,6 +23,7 @@
     flex-direction: column;
     gap: var(--size-card-gap-md, 16px);
     box-sizing: border-box;
+    overflow: visible;
 
     // =============================================
     // HEADER
@@ -69,6 +71,7 @@
         gap: var(--size-card-gap-md, 16px);
         flex: 1;
         min-height: 0;
+        overflow: visible;
     }
 
     &__text {
@@ -76,7 +79,7 @@
         flex-direction: column;
         flex: 1;
         min-width: 0;
-        overflow: hidden;
+        overflow: visible;
     }
 
     &__subtitle {
@@ -111,13 +114,16 @@
         display: flex;
         align-items: flex-end;
         flex-shrink: 0;
+        overflow: visible;
+        padding-bottom: 2px;
     }
 
-    // SMART Vertical Bars
+    // SMART Vertical Bars (ensure labels have room and are not clipped)
     &__smart-viz {
         display: flex;
         gap: var(--size-element-gap-xs, 4px);
         align-items: flex-end;
+        overflow: visible;
     }
 
     &__smart-bar {
@@ -125,6 +131,7 @@
         flex-direction: column;
         align-items: center;
         gap: var(--size-element-gap-xs, 4px);
+        overflow: visible;
     }
 
     &__smart-bar-track {
@@ -151,6 +158,8 @@
         font-size: 12px;
         line-height: 1.667;
         text-transform: uppercase;
+        flex-shrink: 0;
+        overflow: visible;
     }
 
     // Donut Chart
@@ -292,7 +301,7 @@
         .plus-overview-card__description {
             font-size: 12px;
             line-height: 1.5;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .plus-overview-card__visualization {

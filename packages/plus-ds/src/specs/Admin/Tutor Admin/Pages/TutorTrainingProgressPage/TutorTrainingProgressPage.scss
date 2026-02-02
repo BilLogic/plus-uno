@@ -9,26 +9,39 @@
     gap: var(--spacing-large-space-300, 16px);
 }
 
+.tutor-training-progress-page__tabs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-medium-space-200, 12px);
+    margin-bottom: var(--spacing-large-space-300, 16px);
+}
+
 .tutor-training-progress-page__tabs {
-    margin-bottom: var(--spacing-medium-space-200, 12px);
+    /* no margin: row provides spacing */
 }
 
 .tutor-training-progress-page__actions {
     display: flex;
     gap: var(--spacing-medium-space-200, 12px);
-    margin-bottom: var(--spacing-large-space-300, 16px);
 }
 
 .tutor-training-progress-page__overview-section {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-large-space-300, 16px);
+    width: 100%;
+    height: fit-content;
+    overflow: visible;
 }
 
 .tutor-training-progress-page__overview-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    height: fit-content;
 }
 
 .tutor-training-progress-page__title-toggle {
@@ -40,18 +53,29 @@
 .tutor-training-progress-page__overview-cards {
     display: flex;
     gap: var(--spacing-large-space-300, 16px);
-    align-items: stretch;
-    width: calc(100% + 24px);
-    margin-left: -12px;
-    margin-right: -12px;
-    padding: 12px;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 100%;
+    height: fit-content;
+    min-height: 180px;
+    padding: 0;
     overflow-x: auto;
     overflow-y: visible;
-    box-sizing: border-box;
+    box-sizing: content-box;
 
-    /* Ensure cards don't shrink */
-    >* {
+    /* Cards hug content vertically; no fixed height */
+    > * {
         flex-shrink: 0;
+    }
+
+    .plus-overview-card {
+        min-height: unset;
+        height: fit-content;
+        align-self: flex-start;
+
+        .plus-overview-card__body {
+            flex: 0 1 auto;
+        }
     }
 }
 
@@ -75,8 +99,17 @@
     padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
 }
 
-/* Custom Toggle Styles to match StudentModal tabs */
+/* Custom Toggle Styles to match StudentModal tabs – fit-content so group does not stretch */
 .tutor-training-progress-page__toggle {
+    width: fit-content;
+
+    > .plus-btn,
+    > .btn {
+        flex: 0 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+
     button.plus-btn {
         background-color: var(--color-secondary-state-08);
         color: var(--color-secondary-text);
