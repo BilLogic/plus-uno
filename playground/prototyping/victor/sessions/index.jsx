@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import InSessionPage from './InSessionPage';
-import './index.css'; // Import local styles
+import SessionsPage from './SessionsPage';
 import '@/styles/main.scss'; // Import global styles
 
 // Create a root element if it doesn't exist
@@ -14,6 +13,6 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-        <InSessionPage />
+        <SessionsPage />
     </React.StrictMode>
 );
