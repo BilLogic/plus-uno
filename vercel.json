@@ -1,0 +1,15 @@
+{
+    "framework": "vite",
+    "buildCommand": "npm run build:vercel",
+    "outputDirectory": "dist",
+    "rewrites": [
+        {
+            "source": "/storybook/(.*)",
+            "destination": "/storybook/$1"
+        },
+        {
+            "source": "/((?!storybook).*)",
+            "destination": "/index.html"
+        }
+    ]
+}
