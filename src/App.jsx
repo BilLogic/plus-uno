@@ -52,6 +52,9 @@ function IndexPage() {
         <Link to="/sessions" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
           In-session (Your Students) prototype
         </Link>
+        <a href="/storybook/index.html" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+          Storybook Documentation
+        </a>
       </nav>
     </div>
   );
