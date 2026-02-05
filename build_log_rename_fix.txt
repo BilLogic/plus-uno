@@ -1,0 +1,1580 @@
+
+> plus-vibe-coding-starting-kit@1.0.0 build:vercel
+> npm run build && STORYBOOK_DISABLE_TELEMETRY=1 npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/
+
+
+> plus-vibe-coding-starting-kit@1.0.0 build
+> npm run build:react
+
+
+> plus-vibe-coding-starting-kit@1.0.0 build:react
+> vite build
+
+vite v6.4.1 building for production...
+transforming...
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+19 │ @import "skeleton";
+   │         ^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 19:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+25 │ @import "../components/Button/Button";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 25:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+26 │ @import "../components/Breadcrumb/Breadcrumb";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 26:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+27 │ @import "../components/Badge/Badge";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 27:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+29 │ @import "../components/Divider/Divider";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 29:9  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:22  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:57  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+109 │         border-radius: var(unquote(list.nth($config, 3)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 109:28  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+110 │         gap: var(unquote(list.nth($config, 4)));
+    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 110:18  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+113 │             font-size: var(unquote(list.nth($config, 5)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 113:28  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+WARNING: 30 repetitive deprecation warnings omitted.
+Run in verbose mode to see all warnings.
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:22  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:57  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+109 │         border-radius: var(unquote(list.nth($config, 3)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 109:28  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+110 │         gap: var(unquote(list.nth($config, 4)));
+    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 110:18  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+113 │             font-size: var(unquote(list.nth($config, 5)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 113:28  root stylesheet
+
+WARNING: 6 repetitive deprecation warnings omitted.
+Run in verbose mode to see all warnings.
+
+✓ 1005 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                             0.84 kB │ gzip:   0.46 kB
+dist/assets/unclaimed-v1-full-TnQdwpsN.png                  6.63 kB
+dist/assets/claimed-v2-thumbnail-yz1FJvWX.png               7.49 kB
+dist/assets/claimed-v1-thumbnail-DRuPFWnM.png               7.78 kB
+dist/assets/claimed-v2-modal-BjD6BgTu.png                  12.82 kB
+dist/assets/claimed-v1-modal-Co1Gy29e.png                  13.58 kB
+dist/assets/claimed-v2-full-9JfqMIxC.png                   60.84 kB
+dist/assets/claimed-v1-full-g_hoJMxp.png                   65.11 kB
+dist/assets/supporting-growth-mindset-TKUNmfJH.png      2,533.66 kB
+dist/assets/reacting-to-errors-BfrVWRZG.png             2,916.32 kB
+dist/assets/giving-effective-praise-C4ZHOXSl.png        2,961.31 kB
+dist/assets/prompting-students-to-explain-Ca3H2-_o.png  3,006.92 kB
+dist/assets/App-Cc5ffhc8.css                               32.28 kB │ gzip:   4.83 kB
+dist/assets/index-Dg5JxYOq.css                            486.79 kB │ gzip:  59.29 kB
+dist/assets/App-B2VQYquL.js                               358.91 kB │ gzip: 130.19 kB │ map:   921.15 kB
+dist/assets/index-yM2m5_I6.js                           1,361.91 kB │ gzip: 451.47 kB │ map: 4,607.57 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 5.73s
+
+> plus-vibe-coding-starting-kit@1.0.0 build-storybook
+> storybook build --config-dir .storybook -o storybook-static
+
+
+┌  Building storybook v10.2.1
+│
+◇  Cleaning outputDir: storybook-static
+│
+◇  Loading presets
+│
+◇  Building manager..
+│
+●  Building preview..
+│
+▲  No story files found for the specified pattern:
+│  design-system/specs/**/*.mdx
+│
+▲  No story files found for the specified pattern:
+│  packages/plus-ds/src/**/*.mdx
+│
+●  Copying static files: dist at storybook-static/dist
+│
+●  Copying static files: packages/plus-ds/src/assets at
+│  storybook-static/assets
+│  Vite vite v6.4.1 building for production...
+│  Vite transforming...
+│  Vite ✓ 1268 modules transformed.
+│  Vite rendering chunks...
+│  Vite computing gzip size...
+│  Vite storybook-static/assets/unclaimed-v1-full-TnQdwpsN.png
+│  6.63 kB
+│  Vite storybook-static/assets/claimed-v2-thumbnail-yz1FJvWX.png
+│  7.49 kB
+│  Vite storybook-static/assets/claimed-v1-thumbnail-DRuPFWnM.png
+│  7.78 kB
+│  Vite storybook-static/assets/clever-image-BjHDPHBc.png
+│  10.21 kB
+│  Vite storybook-static/assets/claimed-v2-modal-BjD6BgTu.png
+│  12.82 kB
+│  Vite storybook-static/assets/claimed-v1-modal-Co1Gy29e.png
+│  13.58 kB
+│  Vite storybook-static/iframe.html
+│  20.69 kB │ gzip:   5.96 kB
+│  Vite storybook-static/assets/claimed-v2-full-9JfqMIxC.png
+│  60.84 kB
+│  Vite storybook-static/assets/claimed-v1-full-g_hoJMxp.png
+│  65.11 kB
+│  Vite storybook-static/assets/CtaButtons-CYHRhvce.css
+│  0.05 kB │ gzip:   0.07 kB
+│  Vite storybook-static/assets/Rating-WQGlBhFZ.css
+│  0.12 kB │ gzip:   0.12 kB
+│  Vite storybook-static/assets/TutorPerformanceSection-BOdBUqPI.css
+│  0.16 kB │ gzip:   0.15 kB
+│  Vite storybook-static/assets/SidebarTab-CcDpM53z.css
+│  0.28 kB │ gzip:   0.17 kB
+│  Vite storybook-static/assets/AdminDateRangeFilter-CINI6LAH.css
+│  0.34 kB │ gzip:   0.18 kB
+│  Vite storybook-static/assets/ResourceType-9oO9I9Uu.css
+│  0.35 kB │ gzip:   0.20 kB
+│  Vite storybook-static/assets/CertifiedTutorBadge-BphEOxPl.css
+│  0.50 kB │ gzip:   0.22 kB
+│  Vite storybook-static/assets/GroupInfoPage-DSXBbS3S.css
+│  0.51 kB │ gzip:   0.21 kB
+│  Vite storybook-static/assets/StrategyBadge-JvOrWdpf.css
+│  0.52 kB │ gzip:   0.29 kB
+│  Vite storybook-static/assets/CardTitleHeader-BAYAPaRl.css
+│  0.55 kB │ gzip:   0.31 kB
+│  Vite storybook-static/assets/Divider-Cq6gyH7p.css
+│  0.67 kB │ gzip:   0.22 kB
+│  Vite storybook-static/assets/TutorToolUsageSection-BPjg2aWF.css
+│  0.69 kB │ gzip:   0.30 kB
+│  Vite storybook-static/assets/Breadcrumb-D5NbnRco.css
+│  0.73 kB │ gzip:   0.27 kB
+│  Vite storybook-static/assets/MultipleChoice-OJB5m7cz.css
+│  0.74 kB │ gzip:   0.34 kB
+│  Vite storybook-static/assets/GroupTrainingProgressPage-BEp_JGdi.css
+│  0.80 kB │ gzip:   0.33 kB
+│  Vite storybook-static/assets/AiIndicator-BnPtYbO5.css
+│  0.85 kB │ gzip:   0.37 kB
+│  Vite storybook-static/assets/TopBar-DnewS8ku.css
+│  0.98 kB │ gzip:   0.37 kB
+│  Vite storybook-static/assets/DeleteTutorModal-BImqnbaZ.css
+│  1.03 kB │ gzip:   0.45 kB
+│  Vite storybook-static/assets/ContentBlurb-CkWYBEuz.css
+│  1.06 kB │ gzip:   0.37 kB
+│  Vite storybook-static/assets/StatusIndicators-DuhF2yDV.css
+│  1.10 kB │ gzip:   0.40 kB
+│  Vite storybook-static/assets/SortingDropdown-D-FdwZr3.css
+│  1.13 kB │ gzip:   0.50 kB
+│  Vite storybook-static/assets/TutorToolUsagePage-BA4BcEBd.css
+│  1.14 kB │ gzip:   0.30 kB
+│  Vite storybook-static/assets/StudentAdminPage-CmKiL_TH.css
+│  1.15 kB │ gzip:   0.30 kB
+│  Vite storybook-static/assets/SessionModal-BitTgqjw.css
+│  1.16 kB │ gzip:   0.49 kB
+│  Vite storybook-static/assets/BadgeClaimedPill-C2Cs3e3s.css
+│  1.16 kB │ gzip:   0.48 kB
+│  Vite storybook-static/assets/LessonOverviewSection-CWuIkwXN.css
+│  1.19 kB │ gzip:   0.42 kB
+│  Vite storybook-static/assets/AlertForSupervisors-CCbZjHzd.css
+│  1.28 kB │ gzip:   0.47 kB
+│  Vite storybook-static/assets/CardBadges-5tz4znU2.css
+│  1.29 kB │ gzip:   0.41 kB
+│  Vite storybook-static/assets/SessionAdminPage-BHFdfJES.css
+│  1.31 kB │ gzip:   0.37 kB
+│  Vite storybook-static/assets/TutorPerformancePage-CkBBhl2F.css
+│  1.39 kB │ gzip:   0.36 kB
+│  Vite storybook-static/assets/ResourceCard-DEAD9WSx.css
+│  1.40 kB │ gzip:   0.50 kB
+│  Vite storybook-static/assets/Modals-DCE53edf.css
+│  1.40 kB │ gzip:   0.46 kB
+│  Vite storybook-static/assets/RatingSingle-CGr5wmp5.css
+│  1.43 kB │ gzip:   0.52 kB
+│  Vite storybook-static/assets/OnboardingAlertCard-DRk5vnl_.css
+│  1.50 kB │ gzip:   0.55 kB
+│  Vite storybook-static/assets/TutorDataCard-BqiOYKlw.css
+│  1.52 kB │ gzip:   0.59 kB
+│  Vite storybook-static/assets/SessionBreakdownTable-BacRZTca.css
+│  1.54 kB │ gzip:   0.46 kB
+│  Vite storybook-static/assets/Alert-Dv5SwH4z.css
+│  1.57 kB │ gzip:   0.48 kB
+│  Vite storybook-static/assets/GroupModal-GIV_XLr6.css
+│  1.58 kB │ gzip:   0.58 kB
+│  Vite storybook-static/assets/SessionsTable-BNUXO27E.css
+│  1.62 kB │ gzip:   0.50 kB
+│  Vite storybook-static/assets/Rating-Js4QQrZ4.css
+│  1.63 kB │ gzip:   0.55 kB
+│  Vite storybook-static/assets/Tooltip-DSO0QnSE.css
+│  1.75 kB │ gzip:   0.41 kB
+│  Vite storybook-static/assets/DropdownListOptions-C7M5rggi.css
+│  1.76 kB │ gzip:   0.64 kB
+│  Vite storybook-static/assets/GroupsTable-BZ59WmNl.css
+│  1.83 kB │ gzip:   0.49 kB
+│  Vite storybook-static/assets/Toast-BuK750Lw.css
+│  1.89 kB │ gzip:   0.65 kB
+│  Vite storybook-static/assets/TutorsToolUsageTable-BgoypNLW.css
+│  1.90 kB │ gzip:   0.52 kB
+│  Vite storybook-static/assets/TutorsPerformanceTable-DQUl6X_B.css
+│  1.92 kB │ gzip:   0.52 kB
+│  Vite storybook-static/assets/TutorSessionsTable-Bc_IiSxO.css
+│  1.92 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/StudentsTable-CB5eox5f.css
+│  1.96 kB │ gzip:   0.61 kB
+│  Vite storybook-static/assets/StrategyContentPromptModal-BSM05EOF.css
+│  2.05 kB │ gzip:   0.50 kB
+│  Vite storybook-static/assets/MediaObject-B1_oLh0g.css
+│  2.12 kB │ gzip:   0.56 kB
+│  Vite storybook-static/assets/TextareaVer2-BhHvV-Hp.css
+│  2.13 kB │ gzip:   0.57 kB
+│  Vite storybook-static/assets/LessonWelcomeSection-BoQxoq-v.css
+│  2.14 kB │ gzip:   0.67 kB
+│  Vite storybook-static/assets/FileUpload-DskmoY2d.css
+│  2.19 kB │ gzip:   0.61 kB
+│  Vite storybook-static/assets/LessonsOverviewPage-CLdD_utS.css
+│  2.20 kB │ gzip:   0.54 kB
+│  Vite storybook-static/assets/ModuleCompletionModal-BvMM-_EA.css
+│  2.20 kB │ gzip:   0.62 kB
+│  Vite storybook-static/assets/ExportSearchFilterBar-CI74wCBz.css
+│  2.27 kB │ gzip:   0.59 kB
+│  Vite storybook-static/assets/LessonListSection-DicCYrUn.css
+│  2.32 kB │ gzip:   0.70 kB
+│  Vite storybook-static/assets/Collapse-BcL3kB66.css
+│  2.40 kB │ gzip:   0.67 kB
+│  Vite storybook-static/assets/Jumbotron-BcLGnz0l.css
+│  2.40 kB │ gzip:   0.48 kB
+│  Vite storybook-static/assets/Logo-e4QOMw6y.css
+│  2.41 kB │ gzip:   0.50 kB
+│  Vite storybook-static/assets/Spinner-C17AMiiF.css
+│  2.45 kB │ gzip:   0.61 kB
+│  Vite storybook-static/assets/SortControl-ChPu6aGi.css
+│  2.46 kB │ gzip:   0.68 kB
+│  Vite storybook-static/assets/TrainingProgressCard-DFSzqBAi.css
+│  2.47 kB │ gzip:   0.63 kB
+│  Vite storybook-static/assets/TutorsStatusAndWarningsTable-C6wu4mFq.css
+│  2.48 kB │ gzip:   0.69 kB
+│  Vite storybook-static/assets/SessionOverviewSection-DeuUwLw8.css
+│  2.58 kB │ gzip:   0.84 kB
+│  Vite storybook-static/assets/TutorPerformancePage-C_OHntbk.css
+│  2.67 kB │ gzip:   0.64 kB
+│  Vite storybook-static/assets/HomepageJumbotron-CKERGbc0.css
+│  2.69 kB │ gzip:   0.70 kB
+│  Vite storybook-static/assets/TutorTrainingProgressPage-BPsjVHaw.css
+│  2.77 kB │ gzip:   0.66 kB
+│  Vite storybook-static/assets/ButtonContainer-mVW9zFMr.css
+│  2.78 kB │ gzip:   0.66 kB
+│  Vite storybook-static/assets/Scrollspy-DhZtSGOX.css
+│  2.85 kB │ gzip:   0.60 kB
+│  Vite storybook-static/assets/TutorStatusWarningsPage-BZzQNX-1.css
+│  2.90 kB │ gzip:   0.76 kB
+│  Vite storybook-static/assets/OnboardingModuleCard-D1pu95ym.css
+│  2.98 kB │ gzip:   0.76 kB
+│  Vite storybook-static/assets/BadgeCard-BcgLh9AV.css
+│  3.00 kB │ gzip:   0.78 kB
+│  Vite storybook-static/assets/Range-CzW6vQWb.css
+│  3.00 kB │ gzip:   0.61 kB
+│  Vite storybook-static/assets/Radio-Dhq5w-xR.css
+│  3.07 kB │ gzip:   0.68 kB
+│  Vite storybook-static/assets/OnboardingModulesTable-DA-U_7Xq.css
+│  3.07 kB │ gzip:   0.85 kB
+│  Vite storybook-static/assets/Progress-DfzoJmtT.css
+│  3.14 kB │ gzip:   0.63 kB
+│  Vite storybook-static/assets/ProductAreaDropdown-BAkXuM8o.css
+│  3.14 kB │ gzip:   0.74 kB
+│  Vite storybook-static/assets/RecommendedLessons-B5Nb5Cfu.css
+│  3.17 kB │ gzip:   0.77 kB
+│  Vite storybook-static/assets/LoginPortal-CBJkmIyV.css
+│  3.21 kB │ gzip:   0.82 kB
+│  Vite storybook-static/assets/GroupPerformanceV2Page-B5_vdbnG.css
+│  3.27 kB │ gzip:   0.80 kB
+│  Vite storybook-static/assets/ButtonGroup-B3Q9m8PN.css
+│  3.34 kB │ gzip:   0.45 kB
+│  Vite storybook-static/assets/TrainingLessonStatusSelect-CSkSPWLu.css
+│  3.38 kB │ gzip:   0.77 kB
+│  Vite storybook-static/assets/GroupTrainingProgressTable-Cq18cziN.css
+│  3.39 kB │ gzip:   0.77 kB
+│  Vite storybook-static/assets/DatePicker-Bh8KAs8l.css
+│  3.44 kB │ gzip:   0.89 kB
+│  Vite storybook-static/assets/Select-C4WomBsI.css
+│  3.46 kB │ gzip:   1.01 kB
+│  Vite storybook-static/assets/Cascader-B_-vz6yT.css
+│  3.55 kB │ gzip:   0.92 kB
+│  Vite storybook-static/assets/TutorsTrainingProgressTable-DBaH-m-d.css
+│  3.79 kB │ gzip:   0.98 kB
+│  Vite storybook-static/assets/UserFeedbackModal-Dn4d2w0g.css
+│  3.85 kB │ gzip:   0.92 kB
+│  Vite storybook-static/assets/Checkbox-DePlXBfr.css
+│  3.89 kB │ gzip:   0.88 kB
+│  Vite storybook-static/assets/Popover-CBYkulbA.css
+│  3.93 kB │ gzip:   0.85 kB
+│  Vite storybook-static/assets/NavTabs-WhmptWWk.css
+│  3.94 kB │ gzip:   0.80 kB
+│  Vite storybook-static/assets/MetricsCard-QTxCeWOr.css
+│  3.99 kB │ gzip:   0.88 kB
+│  Vite storybook-static/assets/BottomDiv-7o35ndKN.css
+│  3.99 kB │ gzip:   0.85 kB
+│  Vite storybook-static/assets/StudentsOverviewSection-CDj8UZgD.css
+│  4.17 kB │ gzip:   0.85 kB
+│  Vite storybook-static/assets/RadioButtonGroup-DmrigIJJ.css
+│  4.20 kB │ gzip:   0.85 kB
+│  Vite storybook-static/assets/LessonsTable-DFwuaH9D.css
+│  4.34 kB │ gzip:   0.87 kB
+│  Vite storybook-static/assets/NavPills-Bfq_sLJc.css
+│  4.48 kB │ gzip:   0.78 kB
+│  Vite storybook-static/assets/TutorModal-DytzUFhl.css
+│  4.54 kB │ gzip:   1.17 kB
+│  Vite storybook-static/assets/TutorChartsElement-WleP7Slg.css
+│  4.55 kB │ gzip:   1.07 kB
+│  Vite storybook-static/assets/TutorRiskInterventionsPage-Rj72Uwgb.css
+│  4.86 kB │ gzip:   1.01 kB
+│  Vite
+│  storybook-static/assets/DataVisualizationSkillsProgress-BcMp19-9.css
+│  4.96 kB │ gzip:   1.15 kB
+│  Vite storybook-static/assets/Switch-B-GN2HrV.css
+│  5.21 kB │ gzip:   0.94 kB
+│  Vite storybook-static/assets/StudentModal-DL5BCPHr.css
+│  5.62 kB │ gzip:   1.10 kB
+│  Vite storybook-static/assets/Input-DjHA8Qac.css
+│  6.00 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/Pagination-Cal4i1Me.css
+│  6.29 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/Badge-DHaCKLAr.css
+│  7.14 kB │ gzip:   1.14 kB
+│  Vite storybook-static/assets/StudentOverviewSection-slEu2VFP.css
+│  7.25 kB │ gzip:   1.31 kB
+│  Vite storybook-static/assets/Carousel-CzyNz-z0.css
+│  7.29 kB │ gzip:   1.19 kB
+│  Vite storybook-static/assets/Pages-C--axKPe.css
+│  7.67 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/Accordion-BXNq_Vc8.css
+│  7.86 kB │ gzip:   1.17 kB
+│  Vite storybook-static/assets/ChoiceGrid-Ci_GQFMx.css
+│  7.94 kB │ gzip:   1.29 kB
+│  Vite storybook-static/assets/NumberInput-Bs-buUTH.css
+│  8.40 kB │ gzip:   1.28 kB
+│  Vite storybook-static/assets/LessonsDetailPage-BygBMdd-.css
+│  8.76 kB │ gzip:   1.66 kB
+│  Vite storybook-static/assets/ListGroup-CbsrhR8Q.css
+│  8.94 kB │ gzip:   1.25 kB
+│  Vite storybook-static/assets/OnboardingInnerPage-DerDAPbK.css
+│  9.02 kB │ gzip:   1.50 kB
+│  Vite storybook-static/assets/OverviewCard-RdCuMByr.css
+│  9.67 kB │ gzip:   1.52 kB
+│  Vite storybook-static/assets/OnboardingOverviewPage-DLvgrI-V.css
+│  10.84 kB │ gzip:   1.99 kB
+│  Vite storybook-static/assets/DateAndTimePicker-2AYQyf0W.css
+│  11.01 kB │ gzip:   1.85 kB
+│  Vite storybook-static/assets/Modals-n8Q3qL6V.css
+│  14.38 kB │ gzip:   1.47 kB
+│  Vite storybook-static/assets/Toast-C3H4tUsz.css
+│  15.38 kB │ gzip:   1.34 kB
+│  Vite storybook-static/assets/InputGroup-CiFuWqvb.css
+│  15.99 kB │ gzip:   1.98 kB
+│  Vite storybook-static/assets/Button-D_zpR9bk.css
+│  16.43 kB │ gzip:   1.87 kB
+│  Vite storybook-static/assets/SessionAvailabilitySnackbar-BkTqCDOv.css
+│  26.19 kB │ gzip:   4.17 kB
+│  Vite storybook-static/assets/SessionManagementSnackbar-CV2vixlf.css
+│  26.49 kB │ gzip:   4.23 kB
+│  Vite storybook-static/assets/Dropdown-B-EXIxRq.css
+│  69.00 kB │ gzip:   4.42 kB
+│  Vite storybook-static/assets/iframe-CbNQ-i0u.css
+│  445.84 kB │ gzip:  53.05 kB
+│  Vite storybook-static/assets/index-CpzHrvhz.js
+│  0.08 kB │ gzip:   0.09 kB
+│  Vite storybook-static/assets/InputGroupContext-DH2BAwnb.js
+│  0.12 kB │ gzip:   0.13 kB
+│  Vite storybook-static/assets/usePrevious-D1m4BsrX.js
+│  0.14 kB │ gzip:   0.14 kB
+│  Vite storybook-static/assets/warning-9CD1iRqm.js
+│  0.15 kB │ gzip:   0.14 kB
+│  Vite storybook-static/assets/objectWithoutPropertiesLoose-Dsqj8S3w.js
+│  0.16 kB │ gzip:   0.15 kB
+│  Vite storybook-static/assets/useWillUnmount-DoKKdzaC.js
+│  0.18 kB │ gzip:   0.15 kB
+│  Vite storybook-static/assets/divWithClassName-fbp6ip80.js
+│  0.20 kB │ gzip:   0.18 kB
+│  Vite storybook-static/assets/useMergedRefs-DO8hO0W3.js
+│  0.23 kB │ gzip:   0.19 kB
+│  Vite storybook-static/assets/useEventCallback-DOA6qPTh.js
+│  0.24 kB │ gzip:   0.18 kB
+│  Vite storybook-static/assets/DataKey-COGXBUcQ.js
+│  0.24 kB │ gzip:   0.18 kB
+│  Vite storybook-static/assets/useEventCallback-R1-heTot.js
+│  0.25 kB │ gzip:   0.18 kB
+│  Vite storybook-static/assets/NavContext-CyuTrgGF.js
+│  0.25 kB │ gzip:   0.21 kB
+│  Vite storybook-static/assets/constants-BqY2NnwZ.js
+│  0.27 kB │ gzip:   0.19 kB
+│  Vite storybook-static/assets/utils-BxHnp-T5.js
+│  0.31 kB │ gzip:   0.24 kB
+│  Vite storybook-static/assets/ElementChildren-DVQs0KnW.js
+│  0.32 kB │ gzip:   0.21 kB
+│  Vite storybook-static/assets/CloseButton-KRJ5MBQc.js
+│  0.45 kB │ gzip:   0.31 kB
+│  Vite storybook-static/assets/useWindow-Cyiw_4T8.js
+│  0.46 kB │ gzip:   0.29 kB
+│  Vite storybook-static/assets/Button-WBgP8kLJ.js
+│  0.50 kB │ gzip:   0.34 kB
+│  Vite storybook-static/assets/useTimeout-CdPpyJXk.js
+│  0.59 kB │ gzip:   0.34 kB
+│  Vite storybook-static/assets/Table-BsogKpGl.js
+│  0.61 kB │ gzip:   0.39 kB
+│  Vite storybook-static/assets/Anchor-iVAsA0KG.js
+│  0.66 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Fade-Bw8yEfqd.js
+│  0.66 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Pages.stories-cILqfJBY.js
+│  0.70 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Pages.stories-Dlj7hGWL.js
+│  0.70 kB │ gzip:   0.42 kB
+│  Vite storybook-static/assets/Col-B3ZerKCi.js
+│  0.71 kB │ gzip:   0.45 kB
+│  Vite storybook-static/assets/Tables.stories-BlT9iPxu.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Tables.stories-fkvonKzO.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Cards.stories-CFdqTvmH.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Cards.stories-Us5OErCG.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Tables.stories-DwDWBPkZ.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Modals.stories-RnJdANXJ.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Tables.stories-BcHb3vPW.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Modals.stories-CrB4bccQ.js
+│  0.72 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Sections.stories-BW-y2oDU.js
+│  0.73 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Sections.stories-CUlex71o.js
+│  0.73 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/AttendanceListItems-SGdGgy1e.js
+│  0.73 kB │ gzip:   0.40 kB
+│  Vite storybook-static/assets/AttendanceListItems-RbQA2HD5.js
+│  0.73 kB │ gzip:   0.40 kB
+│  Vite storybook-static/assets/Elements.stories-BlmZr801.js
+│  0.73 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Sections.stories-B7bq3JoX.js
+│  0.73 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Elements.stories-DFMIxDy7.js
+│  0.73 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/Sections.stories-MphQvMwX.js
+│  0.73 kB │ gzip:   0.43 kB
+│  Vite storybook-static/assets/AttendanceBadge-BdBqurR5.js
+│  0.75 kB │ gzip:   0.45 kB
+│  Vite storybook-static/assets/AttendanceBadge-DiWSP_rJ.js
+│  0.75 kB │ gzip:   0.45 kB
+│  Vite storybook-static/assets/Tables.stories-9FIY9FUO.js
+│  0.77 kB │ gzip:   0.44 kB
+│  Vite storybook-static/assets/Modals.stories-CapPcgAy.js
+│  0.77 kB │ gzip:   0.44 kB
+│  Vite storybook-static/assets/InputGroup-BE9z_jkt.js
+│  0.82 kB │ gzip:   0.48 kB
+│  Vite storybook-static/assets/Breadcrumb-BNMJflkv.js
+│  0.86 kB │ gzip:   0.46 kB
+│  Vite storybook-static/assets/TutorBadges-gdloH8-W.js
+│  0.89 kB │ gzip:   0.36 kB
+│  Vite storybook-static/assets/index-BWjwErea.js
+│  0.93 kB │ gzip:   0.56 kB
+│  Vite storybook-static/assets/useMergedRefs-DTRrzFWN.js
+│  0.98 kB │ gzip:   0.50 kB
+│  Vite storybook-static/assets/ButtonContainer.stories-I8g8cvmW.js
+│  1.02 kB │ gzip:   0.57 kB
+│  Vite storybook-static/assets/Button-vQIEDjFt.js
+│  1.04 kB │ gzip:   0.59 kB
+│  Vite storybook-static/assets/CardTitleHeader-D9dboQT5.js
+│  1.08 kB │ gzip:   0.51 kB
+│  Vite storybook-static/assets/hook-BHGi_V6n.js
+│  1.20 kB │ gzip:   0.70 kB
+│  Vite storybook-static/assets/Rating-DIgRECmB.js
+│  1.24 kB │ gzip:   0.65 kB
+│  Vite storybook-static/assets/ThemeProvider-BVsXIuYB.js
+│  1.25 kB │ gzip:   0.69 kB
+│  Vite storybook-static/assets/preload-helper-Dp1pzeXC.js
+│  1.27 kB │ gzip:   0.73 kB
+│  Vite storybook-static/assets/SpecOverview-JtWB3VN8.js
+│  1.29 kB │ gzip:   0.59 kB
+│  Vite storybook-static/assets/AttendanceDropdown-zsy8IasR.js
+│  1.30 kB │ gzip:   0.66 kB
+│  Vite storybook-static/assets/AttendanceDropdown-BfAjEdq9.js
+│  1.30 kB │ gzip:   0.66 kB
+│  Vite storybook-static/assets/CtaButtons-ZS5dR4QU.js
+│  1.38 kB │ gzip:   0.61 kB
+│  Vite storybook-static/assets/RatingSingle-rBeu4-ND.js
+│  1.42 kB │ gzip:   0.67 kB
+│  Vite storybook-static/assets/StatusIndicators-o9lrtSC0.js
+│  1.47 kB │ gzip:   0.61 kB
+│  Vite storybook-static/assets/Cards.stories-Bb-JlBzW.js
+│  1.48 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Pages.stories-B9rBupCy.js
+│  1.48 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Breadcrumb-C8a6Sidi.js
+│  1.48 kB │ gzip:   0.71 kB
+│  Vite storybook-static/assets/Modals.stories-Dg02sSn5.js
+│  1.48 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Tables.stories-CRBp4XGc.js
+│  1.48 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Cards.stories-Dw3jBO70.js
+│  1.48 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Pages.stories-BtSnqF5t.js
+│  1.48 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Cards.stories-zbdPIffx.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Pages.stories-uFf1F4jk.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Modals.stories-BDMUn_XF.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Tables.stories-CrrsJ2cr.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Elements.stories-BSHK1eVc.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Sections.stories-IqaID_Sh.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Modals.stories-CWaNIEML.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Tables.stories-D9ZUtEPg.js
+│  1.49 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Elements.stories-CZa11M5g.js
+│  1.50 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Sections.stories-Cnf8Jjhx.js
+│  1.50 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/TutorBadges.stories-7YWw8qJe.js
+│  1.50 kB │ gzip:   0.63 kB
+│  Vite storybook-static/assets/Elements.stories-Uyr0pJOf.js
+│  1.51 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/Sections.stories-seSSSe6K.js
+│  1.51 kB │ gzip:   0.53 kB
+│  Vite storybook-static/assets/AttendanceDropdown.stories-Bdgmi7pD.js
+│  1.52 kB │ gzip:   0.81 kB
+│  Vite storybook-static/assets/AttendanceDropdown.stories-CTvFBWVu.js
+│  1.52 kB │ gzip:   0.81 kB
+│  Vite storybook-static/assets/clever-image-Cu7G64Y3.js
+│  1.54 kB │ gzip:   0.68 kB
+│  Vite storybook-static/assets/StrategyBadge-D0V-gmX3.js
+│  1.59 kB │ gzip:   0.69 kB
+│  Vite storybook-static/assets/TutorPerformanceSection-DfwCDPcB.js
+│  1.61 kB │ gzip:   0.69 kB
+│  Vite storybook-static/assets/Tooltip-CvKSrXTU.js
+│  1.64 kB │ gzip:   0.65 kB
+│  Vite storybook-static/assets/CallOffLateness.stories-Czmc0BpL.js
+│  1.67 kB │ gzip:   0.82 kB
+│  Vite storybook-static/assets/Section-BBV4A0M2.js
+│  1.69 kB │ gzip:   0.67 kB
+│  Vite storybook-static/assets/BadgeClaimedPill-DJW22ndJ.js
+│  1.69 kB │ gzip:   0.84 kB
+│  Vite storybook-static/assets/Divider-BN1Qh5zN.js
+│  1.71 kB │ gzip:   0.64 kB
+│  Vite storybook-static/assets/AttendanceListItems.stories-BfsYjIOB.js
+│  1.73 kB │ gzip:   0.73 kB
+│  Vite storybook-static/assets/AttendanceListItems.stories-BApq4xAI.js
+│  1.73 kB │ gzip:   0.73 kB
+│  Vite storybook-static/assets/NavDropdown-rCK6nQHv.js
+│  1.87 kB │ gzip:   0.93 kB
+│  Vite storybook-static/assets/Spinner-CpPvjcla.js
+│  1.89 kB │ gzip:   0.78 kB
+│  Vite storybook-static/assets/SessionAdmin.stories-Ctxjj-Hg.js
+│  1.93 kB │ gzip:   0.96 kB
+│  Vite storybook-static/assets/OnboardingAlertCard-CLghxfnw.js
+│  1.93 kB │ gzip:   0.72 kB
+│  Vite storybook-static/assets/Section.stories-Dplk9JMG.js
+│  1.94 kB │ gzip:   0.69 kB
+│  Vite storybook-static/assets/Profile.stories-BNYG-MlQ.js
+│  1.99 kB │ gzip:   0.96 kB
+│  Vite storybook-static/assets/MetricsCard.stories-yLXbuyI7.js
+│  2.00 kB │ gzip:   0.92 kB
+│  Vite storybook-static/assets/Toolkit.stories-prRinDme.js
+│  2.03 kB │ gzip:   0.98 kB
+│  Vite storybook-static/assets/Radio-CPVDuT2c.js
+│  2.06 kB │ gzip:   0.75 kB
+│  Vite storybook-static/assets/SessionAvailabilitySnackbar-maU2d_fb.js
+│  2.07 kB │ gzip:   0.72 kB
+│  Vite storybook-static/assets/Progress-CXDuQxN-.js
+│  2.09 kB │ gzip:   0.71 kB
+│  Vite storybook-static/assets/Switch-CzXT1032.js
+│  2.10 kB │ gzip:   0.76 kB
+│  Vite storybook-static/assets/TutorAdmin.stories-DFRW0bkZ.js
+│  2.10 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/GroupAdmin.stories-4nsuffe8.js
+│  2.14 kB │ gzip:   1.06 kB
+│  Vite storybook-static/assets/StudentAdmin.stories-B3dXOpkA.js
+│  2.14 kB │ gzip:   1.05 kB
+│  Vite storybook-static/assets/Progress.stories-Dvit88tR.js
+│  2.18 kB │ gzip:   0.91 kB
+│  Vite storybook-static/assets/StaticBadgeSmart-DCC0BaP5.js
+│  2.20 kB │ gzip:   0.89 kB
+│  Vite storybook-static/assets/SortingDropdown-pG1b_CGS.js
+│  2.23 kB │ gzip:   0.91 kB
+│  Vite storybook-static/assets/Modals.stories-BrNpj9hA.js
+│  2.25 kB │ gzip:   0.87 kB
+│  Vite storybook-static/assets/Textarea-DJhhQ_vM.js
+│  2.27 kB │ gzip:   0.75 kB
+│  Vite storybook-static/assets/Cards.stories-D_F5VVmx.js
+│  2.31 kB │ gzip:   0.90 kB
+│  Vite storybook-static/assets/TutorSessionsTable.stories-DYvgn93C.js
+│  2.32 kB │ gzip:   0.99 kB
+│  Vite storybook-static/assets/LearningSection.stories-dyoluhmz.js
+│  2.32 kB │ gzip:   1.19 kB
+│  Vite storybook-static/assets/Modals.stories-Bx4cpul3.js
+│  2.39 kB │ gzip:   0.92 kB
+│  Vite storybook-static/assets/Sections.stories-DuPN2xDg.js
+│  2.42 kB │ gzip:   0.91 kB
+│  Vite storybook-static/assets/SessionModal-CvgpvQ-0.js
+│  2.43 kB │ gzip:   0.92 kB
+│  Vite storybook-static/assets/TutorDataCard-C02mbHbv.js
+│  2.44 kB │ gzip:   0.95 kB
+│  Vite storybook-static/assets/CardBadges.stories-DtM-d03Z.js
+│  2.46 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/ModuleCompletionModal-DM0UTjdZ.js
+│  2.51 kB │ gzip:   0.87 kB
+│  Vite storybook-static/assets/Alert.Subcomponents.stories-D9XwQzfR.js
+│  2.51 kB │ gzip:   0.88 kB
+│  Vite storybook-static/assets/SkillsSection.stories-D39XnQqk.js
+│  2.52 kB │ gzip:   1.27 kB
+│  Vite storybook-static/assets/TutorsToolUsageTable.stories-D_BWLYy5.js
+│  2.53 kB │ gzip:   1.04 kB
+│  Vite storybook-static/assets/Pages.stories-99Usudl4.js
+│  2.54 kB │ gzip:   0.99 kB
+│  Vite storybook-static/assets/SessionManagementSnackbar-CZzpQGB4.js
+│  2.54 kB │ gzip:   0.83 kB
+│  Vite storybook-static/assets/ContentBlurb-xhvtTkyu.js
+│  2.57 kB │ gzip:   0.93 kB
+│  Vite storybook-static/assets/SidebarTab.stories-C5Ve8fw1.js
+│  2.57 kB │ gzip:   0.90 kB
+│  Vite storybook-static/assets/TopBar-BzkGtmEC.js
+│  2.58 kB │ gzip:   1.05 kB
+│  Vite storybook-static/assets/TextareaVer2-CG4nDmno.js
+│  2.59 kB │ gzip:   0.81 kB
+│  Vite
+│  storybook-static/assets/TutorsStatusAndWarningsTable.stories-DwfNR1RF.js
+│  2.59 kB │ gzip:   0.94 kB
+│  Vite storybook-static/assets/NavTabs-B8oHjEca.js
+│  2.64 kB │ gzip:   0.96 kB
+│  Vite storybook-static/assets/Cancel.stories-6ummMca8.js
+│  2.66 kB │ gzip:   1.01 kB
+│  Vite storybook-static/assets/Back.stories-DI9K5g00.js
+│  2.67 kB │ gzip:   1.01 kB
+│  Vite storybook-static/assets/ResponsiveFrame-hn-axHPE.js
+│  2.69 kB │ gzip:   1.27 kB
+│  Vite storybook-static/assets/DeleteTutorModal.stories-6hrPOB52.js
+│  2.71 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/Success.stories-BWvJAdFH.js
+│  2.77 kB │ gzip:   1.07 kB
+│  Vite storybook-static/assets/StackedBarChart-BirbrwmM.js
+│  2.79 kB │ gzip:   1.24 kB
+│  Vite storybook-static/assets/TutorSessionsTable-DRxR_Qlz.js
+│  2.80 kB │ gzip:   0.99 kB
+│  Vite storybook-static/assets/Checkbox-VEufEmiy.js
+│  2.81 kB │ gzip:   0.98 kB
+│  Vite
+│  storybook-static/assets/Breadcrumb.Subcomponents.stories-C-IR8Sg2.js
+│  2.82 kB │ gzip:   1.09 kB
+│  Vite storybook-static/assets/RecommendedLessons.stories-CDp5huJH.js
+│  2.84 kB │ gzip:   1.10 kB
+│  Vite storybook-static/assets/Cards.stories-Cmu23XpK.js
+│  2.86 kB │ gzip:   1.02 kB
+│  Vite
+│  storybook-static/assets/SupervisorSignUpMGMTButton.stories-BpR7-xGh.js
+│  2.86 kB │ gzip:   1.05 kB
+│  Vite storybook-static/assets/ConfirmFillIn.stories-B3MWeehj.js
+│  2.88 kB │ gzip:   1.06 kB
+│  Vite storybook-static/assets/EngagementListItems-BFXToSxd.js
+│  2.91 kB │ gzip:   1.01 kB
+│  Vite storybook-static/assets/Nav-BPPTFbjw.js
+│  2.92 kB │ gzip:   1.40 kB
+│  Vite storybook-static/assets/ViewDetails.stories-BQj0noES.js
+│  2.95 kB │ gzip:   1.13 kB
+│  Vite storybook-static/assets/NavPills-Dmp3y0i1.js
+│  2.96 kB │ gzip:   1.05 kB
+│  Vite storybook-static/assets/AiIndicator.stories-B_tvwYm-.js
+│  3.00 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/EngagementDropdown-BwzV48uu.js
+│  3.01 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/Cards.stories-CLLEjpHR.js
+│  3.04 kB │ gzip:   1.08 kB
+│  Vite storybook-static/assets/Pagination-BBI1mQev.js
+│  3.06 kB │ gzip:   1.18 kB
+│  Vite storybook-static/assets/hasClass-DMfmhVmR.js
+│  3.09 kB │ gzip:   1.39 kB
+│  Vite storybook-static/assets/SidebarTab-DhDubXOL.js
+│  3.10 kB │ gzip:   1.11 kB
+│  Vite storybook-static/assets/RatingSingle.stories-BEo9-2jq.js
+│  3.11 kB │ gzip:   1.16 kB
+│  Vite storybook-static/assets/DropdownListOptions-Dd6htBM-.js
+│  3.11 kB │ gzip:   0.94 kB
+│  Vite storybook-static/assets/BadgeClaimedPill.stories-C7c8iy9p.js
+│  3.11 kB │ gzip:   1.17 kB
+│  Vite storybook-static/assets/Modals.stories-CpM-gCUi.js
+│  3.15 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/Tooltip.stories-HVBh7rVb.js
+│  3.15 kB │ gzip:   1.21 kB
+│  Vite storybook-static/assets/ExportSearchFilterBar-paDFNe_h.js
+│  3.16 kB │ gzip:   1.14 kB
+│  Vite
+│  storybook-static/assets/EditingAttendanceRosterItems.stories-4duSk0az.js
+│  3.16 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/Table-lsYZ8ctV.js
+│  3.17 kB │ gzip:   1.10 kB
+│  Vite
+│  storybook-static/assets/TutorsTrainingProgressTable.stories-BqKejUOO.js
+│  3.19 kB │ gzip:   1.39 kB
+│  Vite storybook-static/assets/BadgeCard-LzoNuT_1.js
+│  3.20 kB │ gzip:   1.09 kB
+│  Vite storybook-static/assets/Elements.stories-B1arCWSY.js
+│  3.21 kB │ gzip:   1.07 kB
+│  Vite storybook-static/assets/LoginForm.stories-Db97Ce59.js
+│  3.23 kB │ gzip:   1.46 kB
+│  Vite storybook-static/assets/Rating-DZF_KToZ.js
+│  3.24 kB │ gzip:   1.18 kB
+│  Vite storybook-static/assets/Modal.stories-DPghl9WX.js
+│  3.28 kB │ gzip:   1.13 kB
+│  Vite storybook-static/assets/ArcDiagram.stories-DQ_FKDQG.js
+│  3.28 kB │ gzip:   1.61 kB
+│  Vite storybook-static/assets/SortControl.stories-DgUXgf7n.js
+│  3.34 kB │ gzip:   1.39 kB
+│  Vite storybook-static/assets/Tables.stories-DCFXWPv_.js
+│  3.36 kB │ gzip:   1.10 kB
+│  Vite storybook-static/assets/ButtonContainer-CDsLILV6.js
+│  3.36 kB │ gzip:   1.17 kB
+│  Vite storybook-static/assets/TutorsToolUsageTable-Dl1oRyZx.js
+│  3.39 kB │ gzip:   1.06 kB
+│  Vite storybook-static/assets/DonutChart-CM1Lx2gr.js
+│  3.42 kB │ gzip:   1.37 kB
+│  Vite storybook-static/assets/Badge.Subcomponents.stories-D5iaflfv.js
+│  3.45 kB │ gzip:   1.19 kB
+│  Vite storybook-static/assets/SortControl-Ctmmes-r.js
+│  3.45 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/OnboardingModuleCard-9mwTbtZP.js
+│  3.51 kB │ gzip:   1.06 kB
+│  Vite storybook-static/assets/Admin.stories-BdBJ3cgX.js
+│  3.51 kB │ gzip:   1.25 kB
+│  Vite storybook-static/assets/CallOffTypeFilter.stories-BMrmuUi_.js
+│  3.52 kB │ gzip:   1.28 kB
+│  Vite storybook-static/assets/ContinueToSignUp.stories-DesZ7aYk.js
+│  3.53 kB │ gzip:   1.13 kB
+│  Vite storybook-static/assets/Tables.stories-CJTZjq34.js
+│  3.54 kB │ gzip:   1.11 kB
+│  Vite storybook-static/assets/UserAvatar-BtasxkLr.js
+│  3.54 kB │ gzip:   1.11 kB
+│  Vite storybook-static/assets/Rating.stories-J5lt-pX7.js
+│  3.55 kB │ gzip:   1.27 kB
+│  Vite storybook-static/assets/ConfirmSignUp.stories-B7kuCyiA.js
+│  3.56 kB │ gzip:   1.15 kB
+│  Vite storybook-static/assets/OrganizationChart.stories-Bz64-rQa.js
+│  3.56 kB │ gzip:   1.65 kB
+│  Vite
+│  storybook-static/assets/CopyRecruitmentMessage.stories-oCKyUkoA.js
+│  3.57 kB │ gzip:   1.13 kB
+│  Vite storybook-static/assets/Sections.stories-D3ltw_PU.js
+│  3.57 kB │ gzip:   1.03 kB
+│  Vite storybook-static/assets/SidebarTab-CUQNYuaA.js
+│  3.57 kB │ gzip:   1.30 kB
+│  Vite storybook-static/assets/Tables.stories-BCsJrTW2.js
+│  3.61 kB │ gzip:   1.16 kB
+│  Vite storybook-static/assets/SessionActionsButton.stories-BRwvmNn8.js
+│  3.62 kB │ gzip:   1.01 kB
+│  Vite storybook-static/assets/Tables.stories-DOfh6-Ml.js
+│  3.65 kB │ gzip:   1.17 kB
+│  Vite storybook-static/assets/Badge-D1fh3gHT.js
+│  3.66 kB │ gzip:   1.27 kB
+│  Vite storybook-static/assets/VennDiagram.stories-DkeT_p-4.js
+│  3.69 kB │ gzip:   1.63 kB
+│  Vite storybook-static/assets/TutorToolUsageSection-ByJr1kfF.js
+│  3.70 kB │ gzip:   1.07 kB
+│  Vite storybook-static/assets/Cards.stories-C6MfSEWO.js
+│  3.73 kB │ gzip:   1.31 kB
+│  Vite storybook-static/assets/Sections.stories-BZTFAvxb.js
+│  3.74 kB │ gzip:   1.16 kB
+│  Vite storybook-static/assets/GroupInfoPage-D3-pkYcl.js
+│  3.77 kB │ gzip:   1.45 kB
+│  Vite storybook-static/assets/GroupsTable-DX6GC0Gf.js
+│  3.77 kB │ gzip:   1.39 kB
+│  Vite storybook-static/assets/TrainingLessonStatusSelect-CntFF_Ns.js
+│  3.80 kB │ gzip:   1.36 kB
+│  Vite storybook-static/assets/Alert-Dn1Vkml8.js
+│  3.81 kB │ gzip:   1.65 kB
+│  Vite storybook-static/assets/ParetoChart.stories-B2dB6GXQ.js
+│  3.82 kB │ gzip:   1.76 kB
+│  Vite storybook-static/assets/PyramidChart.stories-CGAt2kcv.js
+│  3.83 kB │ gzip:   1.79 kB
+│  Vite storybook-static/assets/SuperCompPill.stories-vsR5vyQu.js
+│  3.84 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/Elements.stories-CIbXLPOQ.js
+│  3.84 kB │ gzip:   1.25 kB
+│  Vite storybook-static/assets/Modals.stories-CZc5JnA0.js
+│  3.85 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/AreaRangeChart.stories-CTRbgv9Z.js
+│  3.87 kB │ gzip:   1.81 kB
+│  Vite storybook-static/assets/HomepageJumbotron.stories-Di31RC0G.js
+│  3.88 kB │ gzip:   1.44 kB
+│  Vite storybook-static/assets/Sidebar.stories-ZCnI95qI.js
+│  3.89 kB │ gzip:   1.32 kB
+│  Vite storybook-static/assets/index-xKFszKAM.js
+│  3.89 kB │ gzip:   1.52 kB
+│  Vite storybook-static/assets/Elements.stories-DKl_BYPA.js
+│  3.95 kB │ gzip:   1.29 kB
+│  Vite storybook-static/assets/Sections.stories-DiHb0Lil.js
+│  3.97 kB │ gzip:   1.30 kB
+│  Vite
+│  storybook-static/assets/SupervisorCalloffsButton.stories-Q7-mZ9Zp.js
+│  4.00 kB │ gzip:   1.10 kB
+│  Vite storybook-static/assets/TreegraphChart.stories-CU2_nyGQ.js
+│  4.01 kB │ gzip:   1.77 kB
+│  Vite storybook-static/assets/StreamgraphChart.stories-DqaFB1oX.js
+│  4.02 kB │ gzip:   1.85 kB
+│  Vite storybook-static/assets/RecommendedLessons-CVyOshjU.js
+│  4.09 kB │ gzip:   1.36 kB
+│  Vite storybook-static/assets/Breadcrumb.stories-CejjLT9H.js
+│  4.12 kB │ gzip:   1.41 kB
+│  Vite storybook-static/assets/ButtonGroup-CWfCHG_M.js
+│  4.14 kB │ gzip:   1.49 kB
+│  Vite storybook-static/assets/AttendanceBadge.stories-DDvC_vqz.js
+│  4.14 kB │ gzip:   1.08 kB
+│  Vite storybook-static/assets/AttendanceBadge.stories-Dpn3Snv_.js
+│  4.14 kB │ gzip:   1.08 kB
+│  Vite storybook-static/assets/ParliamentChart.stories-D5w1GI0A.js
+│  4.15 kB │ gzip:   1.95 kB
+│  Vite storybook-static/assets/Footer.stories-BgZbwdgJ.js
+│  4.19 kB │ gzip:   1.33 kB
+│  Vite storybook-static/assets/StrategyContentPromptModal-DZI7m18T.js
+│  4.19 kB │ gzip:   1.20 kB
+│  Vite storybook-static/assets/XRangeChart.stories-Baa2pZKI.js
+│  4.22 kB │ gzip:   1.88 kB
+│  Vite storybook-static/assets/ResourceType.stories-DcEz3z-q.js
+│  4.23 kB │ gzip:   1.16 kB
+│  Vite storybook-static/assets/BadgeCard.stories-CbgErv4J.js
+│  4.26 kB │ gzip:   1.44 kB
+│  Vite storybook-static/assets/TimelineChart.stories-qX99bWCa.js
+│  4.26 kB │ gzip:   1.85 kB
+│  Vite storybook-static/assets/SidebarTab.stories-1nKh4D_W.js
+│  4.27 kB │ gzip:   1.43 kB
+│  Vite storybook-static/assets/RadioButtonGroup-D4FC97-z.js
+│  4.29 kB │ gzip:   1.37 kB
+│  Vite storybook-static/assets/VariwidthChart.stories-DhV4dBJz.js
+│  4.36 kB │ gzip:   1.92 kB
+│  Vite storybook-static/assets/ColumnRangeChart.stories-jTN5_cY3.js
+│  4.41 kB │ gzip:   1.92 kB
+│  Vite storybook-static/assets/Input-DOI1KwuH.js
+│  4.45 kB │ gzip:   1.34 kB
+│  Vite storybook-static/assets/ComboChart.stories-BLm4WaIK.js
+│  4.45 kB │ gzip:   1.68 kB
+│  Vite storybook-static/assets/StudentsTable-DaqzTqg_.js
+│  4.45 kB │ gzip:   1.43 kB
+│  Vite storybook-static/assets/OnboardingModulesTable-C3WpzAmY.js
+│  4.46 kB │ gzip:   1.39 kB
+│  Vite storybook-static/assets/Pages.stories-CgK2GAWB.js
+│  4.49 kB │ gzip:   1.27 kB
+│  Vite storybook-static/assets/SessionBreakdownTable-_YO_LtNw.js
+│  4.50 kB │ gzip:   1.37 kB
+│  Vite storybook-static/assets/CardTitleHeader.stories-DU5mve1h.js
+│  4.52 kB │ gzip:   1.36 kB
+│  Vite storybook-static/assets/AiIndicator-qfqNO0Y_.js
+│  4.52 kB │ gzip:   2.03 kB
+│  Vite storybook-static/assets/Form-b-UpHbs5.js
+│  4.53 kB │ gzip:   1.69 kB
+│  Vite storybook-static/assets/Switch.stories-v6atZGXs.js
+│  4.56 kB │ gzip:   1.47 kB
+│  Vite storybook-static/assets/LessonOverviewSection.stories-xOELrThO.js
+│  4.57 kB │ gzip:   1.45 kB
+│  Vite storybook-static/assets/Button.Subcomponents.stories-B3fZl4T5.js
+│  4.59 kB │ gzip:   1.33 kB
+│  Vite storybook-static/assets/Cards.stories-zUFryQWK.js
+│  4.62 kB │ gzip:   1.25 kB
+│  Vite storybook-static/assets/Cards.stories-CfwelWA_.js
+│  4.62 kB │ gzip:   1.34 kB
+│  Vite storybook-static/assets/PackedBubbleChart.stories-B6hNOomd.js
+│  4.63 kB │ gzip:   2.00 kB
+│  Vite
+│  storybook-static/assets/SessionManagementSnackbar.stories-BlbVw_XI.js
+│  4.68 kB │ gzip:   1.20 kB
+│  Vite storybook-static/assets/DependencyWheel.stories-XXMSSk7C.js
+│  4.69 kB │ gzip:   2.08 kB
+│  Vite storybook-static/assets/ProductAreaDropdown.stories-BtdOTuHw.js
+│  4.72 kB │ gzip:   1.72 kB
+│  Vite storybook-static/assets/Modals.stories-CWE9iH2C.js
+│  4.78 kB │ gzip:   1.24 kB
+│  Vite storybook-static/assets/Cards.stories-Cs0ilpgB.js
+│  4.83 kB │ gzip:   1.23 kB
+│  Vite storybook-static/assets/TutorsPerformanceTable-BJNq22sf.js
+│  4.83 kB │ gzip:   1.56 kB
+│  Vite storybook-static/assets/CertifiedTutorBadge.stories-gDdbxPBU.js
+│  4.84 kB │ gzip:   1.60 kB
+│  Vite
+│  storybook-static/assets/SessionAvailabilitySnackbar.stories-AD6sKNDm.js
+│  4.85 kB │ gzip:   1.22 kB
+│  Vite storybook-static/assets/AdminDateRangeFilter-omhhzLBP.js
+│  4.85 kB │ gzip:   1.12 kB
+│  Vite
+│  storybook-static/assets/SessionManagementSnackbar.stories-B882PsEA.js
+│  4.86 kB │ gzip:   1.23 kB
+│  Vite storybook-static/assets/MetricsCard-B8Fa7FWA.js
+│  4.91 kB │ gzip:   1.39 kB
+│  Vite storybook-static/assets/TutorToolUsageSection.stories-UI6T4SNc.js
+│  4.93 kB │ gzip:   1.38 kB
+│  Vite storybook-static/assets/TutorModal.stories-BTBM_9uO.js
+│  4.95 kB │ gzip:   1.75 kB
+│  Vite storybook-static/assets/HomepageJumbotron-Dy-AP_qR.js
+│  4.96 kB │ gzip:   1.61 kB
+│  Vite storybook-static/assets/Button-BdscSedU.js
+│  4.96 kB │ gzip:   1.53 kB
+│  Vite storybook-static/assets/PageLayout-a03m4dEg.js
+│  4.96 kB │ gzip:   1.61 kB
+│  Vite
+│  storybook-static/assets/ConfirmSessionAttendanceAlert.stories-D1GO5a3T.js
+│  4.97 kB │ gzip:   1.34 kB
+│  Vite storybook-static/assets/AdditionalDetails.stories-DjstGoGm.js
+│  4.98 kB │ gzip:   1.47 kB
+│  Vite
+│  storybook-static/assets/CTASupervisorViewButtons.stories-C17cpJdB.js
+│  4.98 kB │ gzip:   1.41 kB
+│  Vite storybook-static/assets/Toast.stories-BDSN_yIt.js
+│  4.99 kB │ gzip:   1.87 kB
+│  Vite storybook-static/assets/WordCloud.stories-hSCtHidm.js
+│  5.03 kB │ gzip:   2.15 kB
+│  Vite storybook-static/assets/Sidebar-BolliqPP.js
+│  5.04 kB │ gzip:   1.57 kB
+│  Vite
+│  storybook-static/assets/SessionAvailabilitySnackbar.stories-C-73uImi.js
+│  5.05 kB │ gzip:   1.25 kB
+│  Vite
+│  storybook-static/assets/TrainingLessonStatusSelect.stories-Cg0SzvOt.js
+│  5.06 kB │ gzip:   1.60 kB
+│  Vite
+│  storybook-static/assets/SupervisorDecisionRationale.stories-kbcydbOE.js
+│  5.07 kB │ gzip:   1.49 kB
+│  Vite storybook-static/assets/RadarChart-BRfRhGoj.js
+│  5.08 kB │ gzip:   1.96 kB
+│  Vite storybook-static/assets/StudentOverviewSection-NupgZcjf.js
+│  5.11 kB │ gzip:   1.32 kB
+│  Vite storybook-static/assets/UserAvatar.stories-B5UuGdXA.js
+│  5.16 kB │ gzip:   1.45 kB
+│  Vite storybook-static/assets/PieChart.stories-D5frO0br.js
+│  5.16 kB │ gzip:   2.21 kB
+│  Vite storybook-static/assets/ResourceCard.stories-CRQrLUY2.js
+│  5.18 kB │ gzip:   1.85 kB
+│  Vite storybook-static/assets/BulletChart.stories-B53hF4b2.js
+│  5.18 kB │ gzip:   2.21 kB
+│  Vite
+│  storybook-static/assets/PopupModalAttendanceRoster.stories-gO6mEEBV.js
+│  5.20 kB │ gzip:   1.77 kB
+│  Vite storybook-static/assets/Tables.stories-CzKCAW2Q.js
+│  5.23 kB │ gzip:   1.36 kB
+│  Vite storybook-static/assets/Modal-CON5iXdE.js
+│  5.26 kB │ gzip:   1.44 kB
+│  Vite storybook-static/assets/LollipopChart.stories-BLY0ciq4.js
+│  5.29 kB │ gzip:   2.21 kB
+│  Vite storybook-static/assets/SiteFilter.stories-DayeSL96.js
+│  5.31 kB │ gzip:   1.67 kB
+│  Vite storybook-static/assets/Dropdown-LPxhtx-R.js
+│  5.37 kB │ gzip:   1.67 kB
+│  Vite storybook-static/assets/Pages.stories-sryqBBrp.js
+│  5.38 kB │ gzip:   1.32 kB
+│  Vite storybook-static/assets/Typography.stories-Lem5RfW9.js
+│  5.40 kB │ gzip:   1.69 kB
+│  Vite storybook-static/assets/Pages.stories-DrR9AVo-.js
+│  5.41 kB │ gzip:   1.37 kB
+│  Vite storybook-static/assets/Checkbox.stories-BMmcQEd6.js
+│  5.45 kB │ gzip:   1.62 kB
+│  Vite storybook-static/assets/CTAGoalRelatedButtons.stories-F6S-MFpp.js
+│  5.46 kB │ gzip:   1.13 kB
+│  Vite storybook-static/assets/LineChart.stories-1gv_NOKc.js
+│  5.47 kB │ gzip:   2.31 kB
+│  Vite storybook-static/assets/RadarChart.stories-DZb5lgYf.js
+│  5.49 kB │ gzip:   2.28 kB
+│  Vite storybook-static/assets/SessionsTable-CNJErEl-.js
+│  5.52 kB │ gzip:   1.60 kB
+│  Vite storybook-static/assets/LessonsTable-DvQadHBc.js
+│  5.52 kB │ gzip:   1.80 kB
+│  Vite storybook-static/assets/Radio.stories-DS0qRm2g.js
+│  5.59 kB │ gzip:   1.54 kB
+│  Vite storybook-static/assets/NumberInput-BKLlOyat.js
+│  5.59 kB │ gzip:   1.69 kB
+│  Vite storybook-static/assets/Tables.stories-BMoM_nuf.js
+│  5.63 kB │ gzip:   1.50 kB
+│  Vite storybook-static/assets/SmartBarChart.stories-CxRvS2Q3.js
+│  5.67 kB │ gzip:   1.90 kB
+│  Vite storybook-static/assets/BoxPlotChart.stories-CoVrN5pF.js
+│  5.68 kB │ gzip:   2.41 kB
+│  Vite storybook-static/assets/ScatterChart.stories-Di98qmXN.js
+│  5.70 kB │ gzip:   2.43 kB
+│  Vite storybook-static/assets/HistogramChart.stories-Dn6Hlsui.js
+│  5.77 kB │ gzip:   2.31 kB
+│  Vite storybook-static/assets/SankeyDiagram.stories-D0_h4akg.js
+│  5.78 kB │ gzip:   2.35 kB
+│  Vite storybook-static/assets/LessonListSection.stories-xkpoKYA4.js
+│  5.79 kB │ gzip:   1.82 kB
+│  Vite storybook-static/assets/NavTabs.stories-BMUbEYNU.js
+│  5.81 kB │ gzip:   1.74 kB
+│  Vite storybook-static/assets/CTASignUpRelated.stories-BMNpIsyl.js
+│  5.84 kB │ gzip:   1.31 kB
+│  Vite storybook-static/assets/Pages.stories-BlRvkDTA.js
+│  5.86 kB │ gzip:   1.45 kB
+│  Vite storybook-static/assets/AlertForSupervisors.stories-PC_ooPAf.js
+│  5.86 kB │ gzip:   1.73 kB
+│  Vite storybook-static/assets/Alert.stories-DUfVMley.js
+│  5.89 kB │ gzip:   1.97 kB
+│  Vite storybook-static/assets/TopBar.stories-Bp3OriZq.js
+│  5.89 kB │ gzip:   1.84 kB
+│  Vite storybook-static/assets/NetworkGraph.stories-DpgkzMsb.js
+│  5.91 kB │ gzip:   2.31 kB
+│  Vite storybook-static/assets/TutorChartsElement-DoSAlg85.js
+│  5.92 kB │ gzip:   1.89 kB
+│  Vite storybook-static/assets/WaterfallChart.stories-CSbOgSoQ.js
+│  5.96 kB │ gzip:   2.51 kB
+│  Vite storybook-static/assets/TextareaVer2.stories-Dxy7c2Ls.js
+│  6.01 kB │ gzip:   1.67 kB
+│  Vite storybook-static/assets/NavPills.stories-B4zft4VN.js
+│  6.02 kB │ gzip:   1.75 kB
+│  Vite storybook-static/assets/SunburstChart.stories-Bc9uOjvM.js
+│  6.05 kB │ gzip:   2.39 kB
+│  Vite storybook-static/assets/FunnelChart.stories--OYlT_O9.js
+│  6.07 kB │ gzip:   2.43 kB
+│  Vite storybook-static/assets/DonutChart.stories-C9CSduBC.js
+│  6.10 kB │ gzip:   2.08 kB
+│  Vite
+│  storybook-static/assets/TutorPerformanceSection.stories-BV3oa-rb.js
+│  6.15 kB │ gzip:   1.61 kB
+│  Vite storybook-static/assets/Rating.Subcomponents.stories-2pOJ6iA_.js
+│  6.20 kB │ gzip:   1.29 kB
+│  Vite storybook-static/assets/Universal.stories-DR0A1vKv.js
+│  6.21 kB │ gzip:   1.48 kB
+│  Vite storybook-static/assets/Card.stories-Bx8SpIHm.js
+│  6.23 kB │ gzip:   1.57 kB
+│  Vite storybook-static/assets/ListGroup.stories-Bb97zyqf.js
+│  6.38 kB │ gzip:   1.68 kB
+│  Vite
+│  storybook-static/assets/RadioButtonGroup.Subcomponents.stories-DLUmxBw7.js
+│  6.38 kB │ gzip:   1.29 kB
+│  Vite storybook-static/assets/SortingDropdown.stories-rJ7-tuD7.js
+│  6.38 kB │ gzip:   1.90 kB
+│  Vite storybook-static/assets/GaugeChart.stories-DrpAEh6K.js
+│  6.40 kB │ gzip:   2.55 kB
+│  Vite storybook-static/assets/DumbbellChart.stories-CTduiZN4.js
+│  6.44 kB │ gzip:   2.55 kB
+│  Vite storybook-static/assets/NavHorizontal.stories-CxPMmfiz.js
+│  6.48 kB │ gzip:   2.11 kB
+│  Vite storybook-static/assets/TreemapChart.stories-txZSj-XB.js
+│  6.48 kB │ gzip:   2.53 kB
+│  Vite storybook-static/assets/TransitionWrapper-D6H_Qjb1.js
+│  6.52 kB │ gzip:   2.56 kB
+│  Vite storybook-static/assets/AreaChart.stories-BoDVnyro.js
+│  6.57 kB │ gzip:   2.49 kB
+│  Vite storybook-static/assets/TimeframeFilter.stories-BNUo27vr.js
+│  6.67 kB │ gzip:   1.90 kB
+│  Vite storybook-static/assets/CompletionFilter.stories-BNxQpKaZ.js
+│  6.68 kB │ gzip:   1.80 kB
+│  Vite storybook-static/assets/SmartBadges.stories-mcZfIiUQ.js
+│  6.71 kB │ gzip:   1.68 kB
+│  Vite storybook-static/assets/Select-CjDrfQ-G.js
+│  6.72 kB │ gzip:   2.25 kB
+│  Vite storybook-static/assets/TutorChartsElement.stories-f4BPqpvY.js
+│  6.74 kB │ gzip:   1.88 kB
+│  Vite
+│  storybook-static/assets/InputGroup.Subcomponents.stories-C39A9WGX.js
+│  6.74 kB │ gzip:   1.49 kB
+│  Vite storybook-static/assets/StackedBarChart.stories-B9kFB0Ds.js
+│  6.74 kB │ gzip:   2.03 kB
+│  Vite storybook-static/assets/SessionStatusFilter.stories-D3QZDGx_.js
+│  6.76 kB │ gzip:   1.88 kB
+│  Vite storybook-static/assets/LessonWelcomeSection.stories-BWi3W1Vy.js
+│  6.78 kB │ gzip:   1.97 kB
+│  Vite storybook-static/assets/DropdownListOptions.stories-hkqAuphm.js
+│  6.78 kB │ gzip:   1.72 kB
+│  Vite
+│  storybook-static/assets/TutorsPerformanceTable.stories-BWQVJOar.js
+│  6.82 kB │ gzip:   2.07 kB
+│  Vite storybook-static/assets/ExportSearchFilterBar.stories-Bpb90IUh.js
+│  6.90 kB │ gzip:   2.24 kB
+│  Vite storybook-static/assets/OverlayTrigger-yCI6s3Dn.js
+│  6.92 kB │ gzip:   2.90 kB
+│  Vite storybook-static/assets/DataVisualization.stories-CrGuuwt_.js
+│  6.92 kB │ gzip:   2.47 kB
+│  Vite storybook-static/assets/TutorDataCard.stories-D6ilZtEf.js
+│  6.92 kB │ gzip:   1.97 kB
+│  Vite storybook-static/assets/Pages.stories-sm-aJiB-.js
+│  6.93 kB │ gzip:   1.49 kB
+│  Vite storybook-static/assets/Cards.stories-D0XHvytn.js
+│  6.96 kB │ gzip:   1.75 kB
+│  Vite storybook-static/assets/TutorsTrainingProgressTable-BBN080GZ.js
+│  6.98 kB │ gzip:   2.56 kB
+│  Vite storybook-static/assets/RadioButtonGroup.stories-dRrAM6eF.js
+│  7.05 kB │ gzip:   1.42 kB
+│  Vite storybook-static/assets/ToggleOrganism.stories-DTa3gQc5.js
+│  7.05 kB │ gzip:   2.33 kB
+│  Vite storybook-static/assets/Jumbotron.stories-CrsLSQ5H.js
+│  7.09 kB │ gzip:   2.02 kB
+│  Vite storybook-static/assets/Range.stories-BxWOW0dh.js
+│  7.17 kB │ gzip:   2.16 kB
+│  Vite storybook-static/assets/OverviewCard.stories-BH20RwCX.js
+│  7.27 kB │ gzip:   1.93 kB
+│  Vite storybook-static/assets/GroupTrainingProgressTable-DZFkys-S.js
+│  7.27 kB │ gzip:   2.28 kB
+│  Vite storybook-static/assets/BubbleChart.stories-Bpqj6xxe.js
+│  7.33 kB │ gzip:   2.81 kB
+│  Vite storybook-static/assets/StrategyBadge.stories-CJtFvtCv.js
+│  7.35 kB │ gzip:   1.86 kB
+│  Vite storybook-static/assets/Pages.stories-CbMWkXQn.js
+│  7.50 kB │ gzip:   2.34 kB
+│  Vite storybook-static/assets/PageLayout-VGWU_Exd.js
+│  7.52 kB │ gzip:   2.69 kB
+│  Vite storybook-static/assets/Modals.stories-CUF3tGKw.js
+│  7.55 kB │ gzip:   2.37 kB
+│  Vite storybook-static/assets/OverviewCard-nhOWQln4.js
+│  7.74 kB │ gzip:   2.31 kB
+│  Vite storybook-static/assets/SessionOverviewSection-BGkUwom_.js
+│  7.81 kB │ gzip:   3.02 kB
+│  Vite storybook-static/assets/HeatmapChart.stories-Y04viNg8.js
+│  7.87 kB │ gzip:   3.04 kB
+│  Vite storybook-static/assets/TrainingProgressPage.stories-ids4iPMz.js
+│  7.99 kB │ gzip:   2.96 kB
+│  Vite storybook-static/assets/Select.stories-GLnu8TaS.js
+│  8.20 kB │ gzip:   2.44 kB
+│  Vite storybook-static/assets/Reason.stories-DtlcfmMe.js
+│  8.35 kB │ gzip:   2.10 kB
+│  Vite storybook-static/assets/Scrollspy.stories-CqJOmWKE.js
+│  8.35 kB │ gzip:   2.60 kB
+│  Vite
+│  storybook-static/assets/SessionOverviewSection.stories-XeLMRGzC.js
+│  8.36 kB │ gzip:   1.96 kB
+│  Vite storybook-static/assets/Card-1VYq6WP5.js
+│  8.40 kB │ gzip:   2.64 kB
+│  Vite
+│  storybook-static/assets/SupervisorSelectionDropdown.stories-DCEh0fn0.js
+│  8.48 kB │ gzip:   2.03 kB
+│  Vite storybook-static/assets/SortingOptions.stories-mRksOLNa.js
+│  8.51 kB │ gzip:   2.08 kB
+│  Vite storybook-static/assets/SortingOptions.stories-B544plXd.js
+│  8.52 kB │ gzip:   2.09 kB
+│  Vite storybook-static/assets/CertifiedTutorBadge-Cr6g3lMK.js
+│  8.53 kB │ gzip:   5.30 kB
+│  Vite storybook-static/assets/Carousel-31c8To9Q.js
+│  8.54 kB │ gzip:   3.11 kB
+│  Vite storybook-static/assets/MediaObject.stories-5exzll88.js
+│  8.54 kB │ gzip:   2.27 kB
+│  Vite storybook-static/assets/Popover.stories-hci_ImbX.js
+│  8.56 kB │ gzip:   2.47 kB
+│  Vite storybook-static/assets/StudentModal-CUk0wISb.js
+│  8.56 kB │ gzip:   2.20 kB
+│  Vite storybook-static/assets/Button.stories-BvgHwY3l.js
+│  8.58 kB │ gzip:   2.28 kB
+│  Vite storybook-static/assets/Elevation.stories-FjB09A05.js
+│  8.58 kB │ gzip:   1.97 kB
+│  Vite storybook-static/assets/SessionInfoCard.stories-3V_tjizl.js
+│  8.62 kB │ gzip:   2.33 kB
+│  Vite storybook-static/assets/CtaButtons.stories-YVifguSC.js
+│  8.64 kB │ gzip:   1.84 kB
+│  Vite storybook-static/assets/ContentBlurb.stories-CWMHxcG9.js
+│  8.66 kB │ gzip:   2.25 kB
+│  Vite storybook-static/assets/CallOffAlerts.stories-C6RvpIuj.js
+│  8.67 kB │ gzip:   2.27 kB
+│  Vite storybook-static/assets/ModuleCompletionModal.stories-C4_21hJk.js
+│  8.69 kB │ gzip:   2.29 kB
+│  Vite storybook-static/assets/SessionBreakdownTable.stories-D57rRb8L.js
+│  8.79 kB │ gzip:   2.50 kB
+│  Vite storybook-static/assets/RichTextEditor.stories-hzGx7Nsm.js
+│  8.80 kB │ gzip:   2.78 kB
+│  Vite storybook-static/assets/TrainingProgressCard.stories-nEA_aibZ.js
+│  8.82 kB │ gzip:   2.45 kB
+│  Vite storybook-static/assets/Spinner.stories-DLJ1EcFm.js
+│  8.87 kB │ gzip:   1.84 kB
+│  Vite storybook-static/assets/GroupModal.stories-Dgj3Tjzk.js
+│  8.88 kB │ gzip:   3.29 kB
+│  Vite storybook-static/assets/StudentsTable.stories-Dc7LtvT2.js
+│  8.90 kB │ gzip:   2.53 kB
+│  Vite storybook-static/assets/Logo.stories-DCP9VEke.js
+│  8.90 kB │ gzip:   2.03 kB
+│  Vite storybook-static/assets/StatusIndicators.stories-cRyEO16g.js
+│  8.95 kB │ gzip:   1.79 kB
+│  Vite storybook-static/assets/InputGroup-t4c-3G_c.js
+│  8.99 kB │ gzip:   2.20 kB
+│  Vite storybook-static/assets/TutorsStatusAndWarningsTable-BjnIjYwp.js
+│  9.01 kB │ gzip:   2.24 kB
+│  Vite
+│  storybook-static/assets/StudentOverviewSection.stories-D5D183qu.js
+│  9.07 kB │ gzip:   1.93 kB
+│  Vite storybook-static/assets/CapacityFilter.stories-2EHKHoBG.js
+│  9.09 kB │ gzip:   2.01 kB
+│  Vite storybook-static/assets/LessonsTable.stories-B048puH1.js
+│  9.21 kB │ gzip:   2.60 kB
+│  Vite storybook-static/assets/SessionsTable.stories-DoTNxpmB.js
+│  9.22 kB │ gzip:   2.67 kB
+│  Vite storybook-static/assets/TutorModal-DHf8HESz.js
+│  9.35 kB │ gzip:   2.59 kB
+│  Vite storybook-static/assets/Spinner.Subcomponents.stories-DlC2KbtA.js
+│  9.36 kB │ gzip:   2.00 kB
+│  Vite storybook-static/assets/BarChart.stories-CuH7YP_B.js
+│  9.37 kB │ gzip:   3.16 kB
+│  Vite storybook-static/assets/OnboardingAlertCard.stories-BNlD-gKo.js
+│  9.37 kB │ gzip:   2.31 kB
+│  Vite storybook-static/assets/Elements.stories-DNuMPLOJ.js
+│  9.46 kB │ gzip:   2.26 kB
+│  Vite storybook-static/assets/TutorFilter.stories-D0IYN6PE.js
+│  9.48 kB │ gzip:   2.11 kB
+│  Vite storybook-static/assets/DaysFilter.stories-CVRXJpyd.js
+│  9.51 kB │ gzip:   2.11 kB
+│  Vite storybook-static/assets/TutorTrainingProgressPage-gQJFnR5n.js
+│  9.55 kB │ gzip:   2.78 kB
+│  Vite
+│  storybook-static/assets/OnboardingModulesTable.stories-MCYnM6AO.js
+│  9.58 kB │ gzip:   2.33 kB
+│  Vite
+│  storybook-static/assets/NavPills.Subcomponents.stories-D7Dz_JfY.js
+│  9.71 kB │ gzip:   2.38 kB
+│  Vite storybook-static/assets/SessionModal.stories-BrQ4pdhy.js
+│  9.72 kB │ gzip:   2.68 kB
+│  Vite storybook-static/assets/Toast.stories-DWm8anhC.js
+│  9.75 kB │ gzip:   3.17 kB
+│  Vite storybook-static/assets/GroupsTable.stories-CWnY2IuK.js
+│  9.78 kB │ gzip:   2.44 kB
+│  Vite storybook-static/assets/NavTabs.Subcomponents.stories-BTV5x_-n.js
+│  9.78 kB │ gzip:   2.41 kB
+│  Vite storybook-static/assets/AdminDateRangeFilter.stories-CdKhdpeC.js
+│  9.98 kB │ gzip:   2.45 kB
+│  Vite storybook-static/assets/Training.stories-BNpwloSu.js
+│  10.03 kB │ gzip:   2.15 kB
+│  Vite storybook-static/assets/PageLayout.stories-3eYNc4JK.js
+│  10.09 kB │ gzip:   3.29 kB
+│  Vite storybook-static/assets/Pagination.stories--hJx5yIs.js
+│  10.40 kB │ gzip:   1.78 kB
+│  Vite storybook-static/assets/NumberInput.stories-B2ia63Pv.js
+│  10.58 kB │ gzip:   2.30 kB
+│  Vite
+│  storybook-static/assets/TutorTrainingProgressPage.stories-BzH02WB3.js
+│  10.63 kB │ gzip:   3.27 kB
+│  Vite storybook-static/assets/OnboardingModuleCard.stories-BdsRTfCA.js
+│  10.73 kB │ gzip:   2.31 kB
+│  Vite storybook-static/assets/Dropdown-DcSt3GAg.js
+│  10.74 kB │ gzip:   4.44 kB
+│  Vite
+│  storybook-static/assets/StrategyContentPromptModal.stories-C0omuTV3.js
+│  10.76 kB │ gzip:   2.57 kB
+│  Vite storybook-static/assets/ListGroup-M9Smgsm3.js
+│  10.87 kB │ gzip:   2.73 kB
+│  Vite storybook-static/assets/UserFeedbackModal.stories-C-OXrZSq.js
+│  10.97 kB │ gzip:   3.40 kB
+│  Vite storybook-static/assets/Overview.stories-CFOlKbZc.js
+│  11.17 kB │ gzip:   2.37 kB
+│  Vite storybook-static/assets/SignUps.stories-BRjphVsz.js
+│  11.27 kB │ gzip:   3.39 kB
+│  Vite
+│  storybook-static/assets/DataVisualizationSkillsProgress-DAG2Hxif.js
+│  11.32 kB │ gzip:   3.00 kB
+│  Vite storybook-static/assets/Cascader.stories-DPpR5OzG.js
+│  11.54 kB │ gzip:   3.32 kB
+│  Vite storybook-static/assets/BottomDiv.stories-CFFWcJLi.js
+│  11.57 kB │ gzip:   2.87 kB
+│  Vite storybook-static/assets/Modal-ChlYfzME.js
+│  11.73 kB │ gzip:   4.41 kB
+│  Vite
+│  storybook-static/assets/GroupTrainingProgressTable.stories-D9wWIMig.js
+│  11.77 kB │ gzip:   2.94 kB
+│  Vite storybook-static/assets/Logo-CrtFyAG3.js
+│  11.87 kB │ gzip:   4.23 kB
+│  Vite
+│  storybook-static/assets/StudentsOverviewSection.stories-Bm9oQ4As.js
+│  11.91 kB │ gzip:   2.88 kB
+│  Vite storybook-static/assets/Divider.stories-C2SGUYUo.js
+│  12.13 kB │ gzip:   2.22 kB
+│  Vite storybook-static/assets/LoginPortal-CdNle4-O.js
+│  12.17 kB │ gzip:   2.20 kB
+│  Vite storybook-static/assets/Images.stories-D5-zXCzn.js
+│  12.44 kB │ gzip:   2.40 kB
+│  Vite storybook-static/assets/FileUpload.stories-vosJNH-O.js
+│  12.53 kB │ gzip:   2.93 kB
+│  Vite storybook-static/assets/Carousel.stories-6C4YaDRO.js
+│  12.61 kB │ gzip:   2.93 kB
+│  Vite
+│  storybook-static/assets/ListGroup.Subcomponents.stories-BmWZHT7o.js
+│  12.61 kB │ gzip:   3.01 kB
+│  Vite storybook-static/assets/Badge.stories-D-Iz-s92.js
+│  12.69 kB │ gzip:   2.83 kB
+│  Vite storybook-static/assets/AllSessions.stories-D5d9IFvD.js
+│  12.80 kB │ gzip:   3.64 kB
+│  Vite storybook-static/assets/Elements.stories-DWcuY8AN.js
+│  12.82 kB │ gzip:   2.42 kB
+│  Vite storybook-static/assets/SessionsPage.stories-HZagjW3o.js
+│  13.27 kB │ gzip:   4.14 kB
+│  Vite storybook-static/assets/Colors.stories-BlBmCs3U.js
+│  13.53 kB │ gzip:   2.37 kB
+│  Vite storybook-static/assets/EngagementDropdown.stories-CWHE-ov5.js
+│  13.88 kB │ gzip:   2.88 kB
+│  Vite
+│  storybook-static/assets/SessionAttendeeListItems.stories-BzHe9T_E.js
+│  13.98 kB │ gzip:   2.60 kB
+│  Vite storybook-static/assets/CallOffs.stories-D0fcEbFF.js
+│  14.59 kB │ gzip:   3.87 kB
+│  Vite
+│  storybook-static/assets/OnboardingOverviewPage.stories-cHW-heea.js
+│  14.85 kB │ gzip:   3.91 kB
+│  Vite storybook-static/assets/Rating.stories-CvAN0tQW.js
+│  14.87 kB │ gzip:   2.40 kB
+│  Vite storybook-static/assets/GroupInfoPage.stories-DCT7nnW7.js
+│  14.93 kB │ gzip:   3.66 kB
+│  Vite storybook-static/assets/Reflection.stories-HsNonj-G.js
+│  15.05 kB │ gzip:   4.04 kB
+│  Vite storybook-static/assets/Icons.stories-0j96DW-1.js
+│  15.14 kB │ gzip:   2.95 kB
+│  Vite storybook-static/assets/ChoiceGrid.stories-0HfyM-EE.js
+│  15.30 kB │ gzip:   3.69 kB
+│  Vite storybook-static/assets/TutorPerformancePage.stories-BpNyTpMa.js
+│  15.39 kB │ gzip:   4.59 kB
+│  Vite storybook-static/assets/Textarea.stories-CP1iztC_.js
+│  15.62 kB │ gzip:   2.67 kB
+│  Vite storybook-static/assets/OnboardingInnerPage.stories-CflZ0RdR.js
+│  15.67 kB │ gzip:   4.18 kB
+│  Vite storybook-static/assets/CTATutorViewButtons.stories-D3smo7A7.js
+│  15.78 kB │ gzip:   2.78 kB
+│  Vite storybook-static/assets/InputGroup.stories-D36CZvBI.js
+│  15.79 kB │ gzip:   2.53 kB
+│  Vite storybook-static/assets/DatePicker.stories-BbHt0ES_.js
+│  15.96 kB │ gzip:   4.49 kB
+│  Vite storybook-static/assets/MultipleChoice.stories-B5hIggdh.js
+│  16.45 kB │ gzip:   3.41 kB
+│  Vite storybook-static/assets/Dropdown.stories-DmwVN8S_.js
+│  16.48 kB │ gzip:   3.02 kB
+│  Vite storybook-static/assets/LessonsOverviewPage.stories-tlNSN72y.js
+│  16.50 kB │ gzip:   4.56 kB
+│  Vite storybook-static/assets/OverviewCard.stories-IEfVsJKH.js
+│  16.78 kB │ gzip:   3.58 kB
+│  Vite storybook-static/assets/CallOffs.stories-B3KCY2Q2.js
+│  16.94 kB │ gzip:   2.44 kB
+│  Vite storybook-static/assets/Collapse.stories-DyJxWRPu.js
+│  16.99 kB │ gzip:   3.94 kB
+│  Vite
+│  storybook-static/assets/GroupTrainingProgressPage.stories-CcaAFolO.js
+│  17.07 kB │ gzip:   4.75 kB
+│  Vite storybook-static/assets/MySessions.stories-DG-XDayc.js
+│  17.12 kB │ gzip:   3.31 kB
+│  Vite storybook-static/assets/SessionControls.stories-Xvzyyhlr.js
+│  17.15 kB │ gzip:   3.34 kB
+│  Vite storybook-static/assets/StudentModal.stories-CI3PAiCE.js
+│  17.44 kB │ gzip:   3.68 kB
+│  Vite storybook-static/assets/FillIn.stories-CN2btw1S.js
+│  18.08 kB │ gzip:   4.25 kB
+│  Vite storybook-static/assets/Accordion.stories-D_tAkSlU.js
+│  18.16 kB │ gzip:   5.14 kB
+│  Vite storybook-static/assets/StudentDashboard.stories-DCabuWn0.js
+│  18.34 kB │ gzip:   4.91 kB
+│  Vite storybook-static/assets/TutorToolUsagePage.stories-CYRESQkR.js
+│  18.57 kB │ gzip:   4.73 kB
+│  Vite storybook-static/assets/SupervisorControls.stories-DnusfpDZ.js
+│  18.67 kB │ gzip:   2.98 kB
+│  Vite storybook-static/assets/EngagementListItems.stories-CRg7cJVA.js
+│  19.03 kB │ gzip:   3.06 kB
+│  Vite storybook-static/assets/Modals.stories-C8WGX_3q.js
+│  19.41 kB │ gzip:   3.97 kB
+│  Vite storybook-static/assets/EngagementBadges.stories-DHArq1iw.js
+│  19.53 kB │ gzip:   3.56 kB
+│  Vite storybook-static/assets/SignUps.stories-B2yJY3mZ.js
+│  19.94 kB │ gzip:   3.60 kB
+│  Vite storybook-static/assets/CreateNewSession.stories-DUVeo8S3.js
+│  20.24 kB │ gzip:   5.01 kB
+│  Vite
+│  storybook-static/assets/TutorStatusWarningsPage.stories-4nTqO2OA.js
+│  20.31 kB │ gzip:   5.23 kB
+│  Vite storybook-static/assets/FillInSchedule.stories-CgZQfEws.js
+│  20.50 kB │ gzip:   4.01 kB
+│  Vite storybook-static/assets/DateAndTimePicker.stories-ClvcpTWU.js
+│  20.93 kB │ gzip:   5.55 kB
+│  Vite storybook-static/assets/StudentAdminPage.stories-BL7KNTb8.js
+│  21.77 kB │ gzip:   5.71 kB
+│  Vite storybook-static/assets/StudentList.stories-CrqRZgyz.js
+│  21.89 kB │ gzip:   4.49 kB
+│  Vite storybook-static/assets/ButtonGroup.stories-U-KweSL1.js
+│  22.38 kB │ gzip:   3.37 kB
+│  Vite
+│  storybook-static/assets/GroupPerformanceV2Page.stories-BxYEHwwv.js
+│  22.48 kB │ gzip:   5.84 kB
+│  Vite storybook-static/assets/Pages.stories-DB0OX9mu.js
+│  22.63 kB │ gzip:   4.44 kB
+│  Vite storybook-static/assets/SessionAdminPage.stories-B81vYLRS.js
+│  23.38 kB │ gzip:   5.84 kB
+│  Vite storybook-static/assets/ReflectionsTable.stories-r3fZGqrG.js
+│  24.14 kB │ gzip:   4.07 kB
+│  Vite storybook-static/assets/useIsomorphicEffect-C9-XOEnU.js
+│  24.84 kB │ gzip:   9.39 kB
+│  Vite storybook-static/assets/Input.stories-BlOiKvJh.js
+│  24.88 kB │ gzip:   3.66 kB
+│  Vite storybook-static/assets/LessonsDetailPage.stories-CN3GRTLf.js
+│  25.59 kB │ gzip:   6.47 kB
+│  Vite storybook-static/assets/TutorPerformancePage.stories-CpRoD5No.js
+│  26.26 kB │ gzip:   6.68 kB
+│  Vite
+│  storybook-static/assets/TutorCallOffDetailsModals.stories-CsYmJp3s.js
+│  27.30 kB │ gzip:   3.89 kB
+│  Vite storybook-static/assets/Elements.stories-BonkWGqQ.js
+│  28.52 kB │ gzip:   5.83 kB
+│  Vite storybook-static/vite-inject-mocker-entry.js
+│  28.53 kB │ gzip:   9.94 kB
+│  Vite storybook-static/assets/AllSessionsTable.stories-YeQ8rnYo.js
+│  30.96 kB │ gzip:   5.42 kB
+│  Vite storybook-static/assets/CallOffsTable.stories-BDBvG2bH.js
+│  31.59 kB │ gzip:   5.01 kB
+│  Vite storybook-static/assets/MySessions.stories-Dq80IguE.js
+│  32.43 kB │ gzip:   7.28 kB
+│  Vite storybook-static/assets/Layout.stories-BBi-c86l.js
+│  34.15 kB │ gzip:   5.24 kB
+│  Vite storybook-static/assets/SignInTable.stories-B4Et6ZuT.js
+│  37.07 kB │ gzip:   4.21 kB
+│  Vite storybook-static/assets/FillInTable.stories-Cgxt0Z5D.js
+│  37.14 kB │ gzip:   4.55 kB
+│  Vite storybook-static/assets/SessionDetails.stories-Dg8IxFxT.js
+│  39.59 kB │ gzip:   5.73 kB
+│  Vite
+│  storybook-static/assets/TutorRiskInterventionsPage.stories-4qpAiOqi.js
+│  41.28 kB │ gzip:   8.01 kB
+│  Vite storybook-static/assets/react-18-CgVN3iQc.js
+│  181.75 kB │ gzip:  57.21 kB
+│  Vite storybook-static/assets/chartTheme-e15FagJG.js
+│  293.65 kB │ gzip: 108.82 kB
+│  Vite storybook-static/assets/highchartsModules-DPXolljs.js
+│  503.83 kB │ gzip: 165.09 kB
+│  Vite storybook-static/assets/iframe-CsUTIYDT.js
+│  1,224.40 kB │ gzip: 343.04 kB
+│
+▲  Vite
+│  (!) Some chunks are larger than 500 kB after minification. Consider:
+│  - Using dynamic import() to code-split the application
+│  - Use build.rollupOptions.output.manualChunks to improve chunking:
+│  ]8;;https://rollupjs.org/configuration-options/#output-manualchunkshttps://rollupjs.org/configuration-options/#output-manualchunks]8;;
+│  - Adjust chunk size limit for this warning via
+│  build.chunkSizeWarningLimit.
+│  Vite ✓ built in 18.85s
+│
+◇  Output directory: /Users/billguo/Desktop/Vibe Coding/PLUS -
+│  ONE/plus-vibe-coding-starting-kit/storybook-static
+│
+└  Storybook build completed successfully
+
