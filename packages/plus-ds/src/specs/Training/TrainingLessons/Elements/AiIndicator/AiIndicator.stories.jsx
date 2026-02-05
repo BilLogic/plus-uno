@@ -6,8 +6,8 @@
  */
 
 import React from 'react';
-import AIIndicator from './AIIndicator';
-import './AIIndicator.scss';
+import AIIndicator from './AiIndicator';
+import './AiIndicator.scss';
 
 export default {
     title: 'Specs/Training/TrainingLessons/Elements/AIIndicator',

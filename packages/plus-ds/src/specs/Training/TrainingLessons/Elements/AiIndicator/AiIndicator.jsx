@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import './AIIndicator.scss';
+import './AiIndicator.scss';
 
 const AIIndicator = ({ onClick, className = '', style }) => {
     return (
