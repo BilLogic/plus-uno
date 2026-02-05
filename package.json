@@ -19,7 +19,7 @@
     "dev:react": "vite",
     "build:react": "vite build",
     "build": "npm run build:react",
-    "build:vercel": "npm run build && npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/",
+    "build:vercel": "npm run build && STORYBOOK_DISABLE_TELEMETRY=1 npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/",
     "preview:react": "vite preview",
     "dev:home-redesign": "vite --config playground/prototyping/bill/home-redesign/vite.config.js"
   },

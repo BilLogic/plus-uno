@@ -1,0 +1,266 @@
+
+> plus-vibe-coding-starting-kit@1.0.0 build:vercel
+> npm run build && STORYBOOK_DISABLE_TELEMETRY=1 npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/
+
+
+> plus-vibe-coding-starting-kit@1.0.0 build
+> npm run build:react
+
+
+> plus-vibe-coding-starting-kit@1.0.0 build:react
+> vite build
+
+vite v6.4.1 building for production...
+transforming...
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+19 │ @import "skeleton";
+   │         ^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 19:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+25 │ @import "../components/Button/Button";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 25:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+26 │ @import "../components/Breadcrumb/Breadcrumb";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 26:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+27 │ @import "../components/Badge/Badge";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 27:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+29 │ @import "../components/Divider/Divider";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    packages/plus-ds/src/styles/main.scss 29:9  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:22  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:57  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+109 │         border-radius: var(unquote(list.nth($config, 3)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 109:28  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+110 │         gap: var(unquote(list.nth($config, 4)));
+    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 110:18  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+113 │             font-size: var(unquote(list.nth($config, 5)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 113:28  @import
+    packages/plus-ds/src/styles/main.scss 25:9                 root stylesheet
+
+WARNING: 30 repetitive deprecation warnings omitted.
+Run in verbose mode to see all warnings.
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:22  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+108 │         padding: var(unquote(list.nth($config, 1))) var(unquote(list.nth($config, 2)));
+    │                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 108:57  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+109 │         border-radius: var(unquote(list.nth($config, 3)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 109:28  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+110 │         gap: var(unquote(list.nth($config, 4)));
+    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 110:18  root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+113 │             font-size: var(unquote(list.nth($config, 5)));
+    │                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    packages/plus-ds/src/components/Button/Button.scss 113:28  root stylesheet
+
+WARNING: 6 repetitive deprecation warnings omitted.
+Run in verbose mode to see all warnings.
+
+✓ 1005 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                             0.84 kB │ gzip:   0.46 kB
+dist/assets/unclaimed-v1-full-TnQdwpsN.png                  6.63 kB
+dist/assets/claimed-v2-thumbnail-yz1FJvWX.png               7.49 kB
+dist/assets/claimed-v1-thumbnail-DRuPFWnM.png               7.78 kB
+dist/assets/claimed-v2-modal-BjD6BgTu.png                  12.82 kB
+dist/assets/claimed-v1-modal-Co1Gy29e.png                  13.58 kB
+dist/assets/claimed-v2-full-9JfqMIxC.png                   60.84 kB
+dist/assets/claimed-v1-full-g_hoJMxp.png                   65.11 kB
+dist/assets/supporting-growth-mindset-TKUNmfJH.png      2,533.66 kB
+dist/assets/reacting-to-errors-BfrVWRZG.png             2,916.32 kB
+dist/assets/giving-effective-praise-C4ZHOXSl.png        2,961.31 kB
+dist/assets/prompting-students-to-explain-Ca3H2-_o.png  3,006.92 kB
+dist/assets/App-Cc5ffhc8.css                               32.28 kB │ gzip:   4.83 kB
+dist/assets/index-Dg5JxYOq.css                            486.79 kB │ gzip:  59.29 kB
+dist/assets/App-CuUY7bN3.js                               358.91 kB │ gzip: 130.18 kB │ map:   921.15 kB
+dist/assets/index-Ce-70BTv.js                           1,361.75 kB │ gzip: 451.43 kB │ map: 4,607.31 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.65s
+
+> plus-vibe-coding-starting-kit@1.0.0 build-storybook
+> storybook build --config-dir .storybook -o storybook-static
+
+
+┌  Building storybook v10.2.1
+│
+◇  Cleaning outputDir: storybook-static
+│
+◇  Loading presets
+│
+◇  Building manager..
+│
+●  Building preview..
+│
+●  Copying static files: dist at storybook-static/dist
+│
+●  Copying static files: packages/plus-ds/src/assets at
+│  storybook-static/assets
+│  Vite vite v6.4.1 building for production...
+│  Vite transforming...
+│  Vite ✓ 24 modules transformed.
+│
+■  Vite ✗ Build failed in 2.54s
+│
+■  Failed to build the preview
+│
+■  [vite]: Rollup failed to resolve import "@storybook/blocks" from
+│  "./packages/plus-ds/src/styles/patterns/Elements/Elements.mdx".
+│  This is most likely unintended because it can break your application
+│  at runtime.
+│  If you do want to externalize this module explicitly add it to
+│  `build.rollupOptions.external`
+│  at viteLog
+│  (file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46374:15)
+│  at
+│  file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46432:18
+│  at onwarn
+│  (file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/@vitejs/plugin-react/dist/index.js:76:7)
+│  at
+│  file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46430:7
+│  at onRollupLog
+│  (file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46422:5)
+│  at onLog
+│  (file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46072:7)
+│  at
+│  file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/rollup/dist/es/shared/node-entry.js:20955:32
+│  at Object.logger [as onLog]
+│  (file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/rollup/dist/es/shared/node-entry.js:22942:9)
+│  at ModuleLoader.handleInvalidResolvedId
+│  (file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/rollup/dist/es/shared/node-entry.js:21686:26)
+│  at
+│  file:///Users/billguo/Desktop/Vibe%20Coding/PLUS%20-%20ONE/plus-vibe-coding-starting-kit/node_modules/rollup/dist/es/shared/node-entry.js:21644:26
+│
+└  Storybook exited with an error
+

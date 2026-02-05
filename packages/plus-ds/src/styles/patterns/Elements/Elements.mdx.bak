@@ -29,8 +29,8 @@ Atomic building blocks used for general interactions.
 *   **Focus**: Add `on-surface` @ 12% opacity AND change border to `Inverse Primary`
 *   **Disabled**: Set total opacity to 38%
 
-## 6. Do's and Don'ts
-> [!WARNING]
+## 6. Guidelines
+> **WARNING**:
 > *   **NEVER** use hex codes for colors.
 > *   **NEVER** replace fills on hover; always use the additive overlay.
 

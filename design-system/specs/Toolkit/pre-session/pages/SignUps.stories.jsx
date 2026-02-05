@@ -4,10 +4,10 @@ import { PageLayout } from '../../../../../packages/plus-ds/src/specs/Universal/
 import { StatCard } from '../cards/OverviewCard.stories';
 import { SignInTableRow, SignInTableHeaderRow } from '../tables/SignInTable.stories';
 import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TutorFilter } from '../elements/Tutor Filter/TutorFilter.stories';
-import { SiteFilter } from '../elements/SiteFilter.stories';
-import { DaysFilter } from '../elements/Days Filter/DaysFilter.stories';
-import { CapacityFilter } from '../elements/Capacity Filter/CapacityFilter.stories';
+import { TutorFilter } from '../elements/Filters/Tutor Filter/TutorFilter.stories';
+import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import { DaysFilter } from '../elements/Filters/Days Filter/DaysFilter.stories';
+import { CapacityFilter } from '../elements/Filters/Capacity Filter/CapacityFilter.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Pages/Sign-Ups',
@@ -100,7 +100,7 @@ const MainContent = ({
                         timeRange={session.timeRange}
                         school={session.school}
                         tutorCount={session.tutorCount}
-                        onSignUp={() => {}}
+                        onSignUp={() => { }}
                     />
                 ))}
             </div>
@@ -159,10 +159,10 @@ export const Overview = () => (
             <MainContent
                 tabs={defaultTabs}
                 selectedTab="sign-ups"
-                onTabChange={() => {}}
+                onTabChange={() => { }}
                 sessions={defaultSessions}
                 filters={defaultFilters}
-                onFilterChange={() => {}}
+                onFilterChange={() => { }}
             />
         </PageLayout>
     </div>

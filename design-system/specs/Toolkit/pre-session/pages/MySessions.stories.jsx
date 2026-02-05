@@ -4,8 +4,8 @@ import { PageLayout } from '../../../../../packages/plus-ds/src/specs/Universal/
 import { StatCard } from '../cards/OverviewCard.stories';
 import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
 import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/SiteFilter.stories';
+import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
 // Import Session Details modals from Toolkit specs
 import * as SessionDetailsModals from '../modals/Session Details (All User)/SessionDetails.stories';
 // Import Sign-Ups modals from Toolkit specs

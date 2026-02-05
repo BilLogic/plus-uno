@@ -1,14 +1,14 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Styles/Patterns/Surfaces" />
+<Meta title="Styles/Patterns/SurfaceContainer" />
 
-# Surfaces
+# Surface Container
 
-The application shell and navigation layers.
+General wrapper for page content or large groups of sections.
 
 ## 1. Identity
-*   **Context**: Base Background
-*   **Required Token**: `surface`
+*   **Context**: General Wrapper
+*   **Required Token**: `surface-container`
 
 ## 2. Variations & Sizes
 *   *Pending population from specs/components*
@@ -20,11 +20,11 @@ The application shell and navigation layers.
 *   **Elevation**: 0
 
 ## 5. Interaction Rules
-*   Base surfaces are generally static.
+*   Containers are broadly static.
 
-## 6. Do's and Don'ts
-> [!WARNING]
-> *   **NEVER** use hex codes for the app background.
+## 6. Guidelines
+> **WARNING**:
+> *   **NEVER** use hex codes.
 
 ## 7. Visual Examples
 *(Placeholder for live rendered examples)*

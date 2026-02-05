@@ -23,9 +23,9 @@ Overlays and dialogs for focused tasks or feedback.
 ## 5. Interaction Rules
 *   Standard button/content interaction rules apply within the modal.
 
-## 6. Do's and Don'ts
-> [!WARNING]
-> *   **NEVER** utilize a modal without an appropriate scrim backdrop (unless it's a non-blocking toast).
+## 6. Guidelines
+> **WARNING**:
+> *   **NEVER** utilize a modal without an appropriate scrim backdrop (unless it is a non-blocking toast).
 
 ## 7. Visual Examples
 *(Placeholder for live rendered examples)*

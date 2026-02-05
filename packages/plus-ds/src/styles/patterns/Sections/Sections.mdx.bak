@@ -22,8 +22,8 @@ Large structural blocks for page layout.
 ## 5. Interaction Rules
 *   Generally non-interactive containers, but children follow standard rules.
 
-## 6. Do's and Don'ts
-> [!WARNING]
+## 6. Guidelines
+> **WARNING**:
 > *   **NEVER** apply elevation shadows to basic sections.
 
 ## 7. Visual Examples

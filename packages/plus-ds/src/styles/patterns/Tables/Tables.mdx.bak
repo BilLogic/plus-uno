@@ -25,8 +25,8 @@ Data presentation patterns.
     *   **Pressed**: Add `on-surface` @ 16% opacity
     *   **Focus**: Add `on-surface` @ 12% opacity
 
-## 6. Do's and Don'ts
-> [!WARNING]
+## 6. Guidelines
+> **WARNING**:
 > *   **NEVER** set a solid background color on the table itself; rely on the container or additive overlays for rows.
 > *   **NEVER** replace row fills on hover.
 
