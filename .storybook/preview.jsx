@@ -82,7 +82,7 @@ const preview = {
             'Profile',
             ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
             'Training',
-            ['Lessons', 'Onboarding'],
+            ['TrainingLessons', 'Onboarding'],
             'Toolkit',
             ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
             'Admin',

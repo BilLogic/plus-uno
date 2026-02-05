@@ -10,11 +10,11 @@ const config = {
   stories: [
     // Prefer brace expansion here (more consistently supported across globbers than extglob @())
     '../packages/plus-ds/src/**/*.stories.{js,jsx,ts,tsx}',
-    '../packages/plus-ds/src/**/*.mdx',
+    // '../packages/plus-ds/src/**/*.mdx',
 
     // Source of truth in this repo (legacy but still actively used)
     '../design-system/specs/**/*.stories.{js,jsx,ts,tsx}',
-    '../design-system/specs/**/*.mdx',
+    // '../design-system/specs/**/*.mdx',
 
     // Playground prototypes
     '../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}',
