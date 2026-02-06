@@ -7,8 +7,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { InputGroup, Form } from 'react-bootstrap';
 import Button from '../../../../../components/Button/Button';
+import InputGroup from '../../../../../forms/InputGroup/InputGroup';
 import './ExportSearchFilterBar.scss';
 
 const ExportSearchFilterBar = ({
@@ -36,7 +36,7 @@ const ExportSearchFilterBar = ({
                     text={exportLabel}
                     style="primary"
                     fill="filled"
-                    size="medium"
+                    size="small"
                     leadingVisual="download"
                     onClick={onExport}
                     className="export-search-filter-bar__export-btn"
@@ -45,17 +45,17 @@ const ExportSearchFilterBar = ({
 
             {/* Search Input */}
             <div className="export-search-filter-bar__search">
-                <InputGroup>
-                    <InputGroup.Text className="export-search-filter-bar__search-icon">
-                        <i className="fas fa-search" />
-                    </InputGroup.Text>
-                    <Form.Control
-                        type="text"
-                        placeholder={searchPlaceholder}
-                        onChange={(e) => onSearch && onSearch(e.target.value)}
-                        className="export-search-filter-bar__search-input"
-                    />
-                </InputGroup>
+                <InputGroup
+                    placeholder={searchPlaceholder}
+                    onChange={(e) => onSearch && onSearch(e.target.value)}
+                    leadingVisual={
+                        <InputGroup.Text style={{ backgroundColor: 'var(--color-surface, #f9f9fc)' }}>
+                            <i className="fas fa-search" style={{ fontSize: '10px', color: 'var(--color-on-surface-variant, #3f484a)' }} />
+                        </InputGroup.Text>
+                    }
+                    size="small"
+                    className="export-search-filter-bar__search-input-group"
+                />
             </div>
 
             {/* Filter Dropdowns */}
@@ -66,7 +66,7 @@ const ExportSearchFilterBar = ({
                         text={selectedFilters[filter.key] || filter.label}
                         style="secondary"
                         fill="text"
-                        size="medium"
+                        size="small"
                         trailingVisual="caret-down"
                         onClick={() => {
                             if (filter.sortable && onSort) {
