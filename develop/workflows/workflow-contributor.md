@@ -11,10 +11,10 @@
 
 | Target | Path | Action |
 | :--- | :--- | :--- |
-| **Component** | `design-system/components/{Name}/` | Update Logic/UI |
-| **Spec** | `design-system/specs/{Pillar}/` | Update Template |
-| **Token** | `design-system/styles/` | Update Foundation |
-| **Asset** | `design-system/assets/` | Update Resource |
+| **Component** | `packages/plus-ds/src/components/{Name}/` | Update Logic/UI |
+| **Spec** | `packages/plus-ds/src/specs/{Pillar}/` | Update Template |
+| **Token** | `packages/plus-ds/src/styles/` | Update Foundation |
+| **Asset** | `packages/plus-ds/src/assets/` | Update Resource |
 
 ### STEP 2: BRANCHING_STRATEGY
 **COMMAND**: `git checkout -b {type}/{name}`
@@ -27,7 +27,7 @@
 1.  **DESIGN**: **MUST** check [Figma Handoff Guide](../guides/figma-workflow.md).
 2.  **TOKENS**: **MUST** use Semantic Tokens. No hardcoded values.
 3.  **REUSE**: **MUST** extend existing components. No duplication.
-4.  **DOCS**: **MUST** update `develop/patterns/*.md` if API changes.
+4.  **DOCS**: **MUST** update `packages/plus-ds/guidelines/{components/design-tokens}/*.md` if API changes.
 
 ### STEP 4: VERIFICATION
 **PROCESS**:
@@ -37,6 +37,6 @@
 
 ## CHEATSHEET: FILE_STRUCTURE
 
-*   **Components**: `design-system/components/` (Flat Structure)
-*   **Specs**: `design-system/specs/` (Page Templates)
-*   **Styles**: `design-system/styles/` (Tokens)
+*   **Components**: `packages/plus-ds/src/components/` (Flat Structure)
+*   **Specs**: `packages/plus-ds/src/specs/` (Page Templates)
+*   **Styles**: `packages/plus-ds/src/styles/` (Tokens)

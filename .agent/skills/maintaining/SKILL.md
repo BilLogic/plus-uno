@@ -69,6 +69,6 @@ After making changes:
 
 ## References
 
-- [Context Levels](../foundations/context-levels.md)
-- [Terminology](../foundations/terminology.md)
-- [Tech Stack](../foundations/tech-stack.md)
+- [Context Levels](../../develop/foundations/context-levels.md)
+- [Terminology](../../develop/foundations/terminology.md)
+- [Tech Stack](../../develop/foundations/tech-stack.md)

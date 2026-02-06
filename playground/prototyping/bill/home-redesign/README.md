@@ -15,13 +15,13 @@ Use Figma MCP to keep the prototype aligned with the design:
 
 ## Token usage
 
-Styling uses **PLUS design tokens** from `develop/tokens/` and `packages/plus-ds/src/styles`:
+Styling uses **PLUS design tokens** from `packages/plus-ds/src/styles`:
 
 - **Colors**: `--color-primary`, `--color-surface-container-low`, `--color-on-surface`, `--color-outline-variant`, `--color-social-emotional`, `--color-mastering-content`, `--color-advocacy`, `--color-relationship`, etc.
 - **Typography**: `--font-family-header`, `--font-family-body`, `--font-size-title-m4`, `--font-size-body2`, `--font-line-height-title`.
 - **Spacing/layout**: `--size-section-gap-lg`, `--size-section-pad-y-lg`, `--size-surface-radius`, `--size-element-gap-*`.
 
-See `develop/foundations/tokens.md` and `develop/tokens/` for the full token set.
+See `packages/plus-ds/guidelines/design-tokens/` for the full token set.
 
 ## Data visualization framework
 

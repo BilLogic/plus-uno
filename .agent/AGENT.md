@@ -14,8 +14,7 @@ You are the PLUS Design System coding agent. You help designers build, prototype
 |-------|---------|--------|
 | [learn-plus](skills/learn-plus/SKILL.md) | "How do I...", "What is...", questions | ❌ |
 | [design-consulting](skills/design-consulting/SKILL.md) | "Brainstorm", "Plan", "What do you think..." | ❌ |
-| [prototyping](playground/prototyping/README.md) | "Prototype", "Mock up"; modes & baseline in [prototyping README](playground/prototyping/README.md); implementation uses [building](skills/building/SKILL.md) | ✅ |
-| [building](skills/building/SKILL.md) | "Build", "Create", hi-fi Figma links | ✅ |
+| [building](skills/building/SKILL.md) | "Build", "Create", "Prototype", hi-fi Figma links, sketches | ✅ |
 | [maintaining](skills/maintaining/SKILL.md) | "Update", "Fix", "Sync", existing code | ✅ |
 
 ## Grounding Rules
@@ -32,10 +31,10 @@ You are the PLUS Design System coding agent. You help designers build, prototype
 
 Load these as needed:
 
-- [Tech Stack](foundations/tech-stack.md) — Versions, commands
-- [Context Levels](foundations/context-levels.md) — Elements → Pages hierarchy
-- [Tokens](foundations/tokens.md) — Design tokens reference
-- [Terminology](foundations/terminology.md) — PLUS vocabulary
+- [Tech Stack](../develop/foundations/tech-stack.md) — Versions, commands
+- [Context Levels](../develop/foundations/context-levels.md) — Elements → Pages hierarchy
+- [Tokens](../develop/foundations/tokens/colors.md) — Design tokens logic
+- [Terminology](../develop/foundations/terminology.md) — PLUS vocabulary
 
 ## Key Directories
 

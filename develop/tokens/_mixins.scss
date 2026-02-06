@@ -1,8 +1,0 @@
-/**
- * This file is for defining mixins used across the app
- */
-
-@mixin grid-columns($nCols) {
-    display: grid;
-    grid-template-columns: repeat($nCols, 1fr);
-}

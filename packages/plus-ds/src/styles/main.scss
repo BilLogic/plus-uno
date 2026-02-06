@@ -8,12 +8,12 @@
 // Design Tokens
 // Use @use to include :root blocks and CSS rules (modern Sass syntax)
 // Import token files directly to ensure :root blocks are included
-@use "_colors" as *;
-@use "_primitives" as *;
-@use "_spacing_semantics" as *;
-@use "_layout" as *;
-@use "_fonts" as *;
-@use "_elevation" as *;
+@use "../tokens/colors" as *;
+@use "../tokens/primitives" as *;
+@use "../tokens/spacing_semantics" as *;
+@use "../tokens/layout" as *;
+@use "../tokens/fonts" as *;
+@use "../tokens/elevation" as *;
 
 // Shared skeleton/shimmer loading style (Sidebar, prototypes)
 @import "skeleton";
@@ -31,6 +31,7 @@
 @import "../components/ButtonGroup/ButtonGroup";
 // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
 @import "../components/Dropdown/Dropdown";
+
 // Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
 // Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
 .plus-card {
@@ -85,6 +86,7 @@
 .plus-card-border-lg {
     border-width: var(--size-card-border-lg);
 }
+
 @import "../components/Modal/Modal";
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
 @import "../components/Navbar/Navbar";
@@ -236,20 +238,20 @@ body {
     border-color: transparent;
 
     // Target th & td - remove borders and backgrounds
-    > :not(caption) > * > * {
+    > :not(caption)>*>* {
         background-color: transparent !important;
         border-bottom-width: 0 !important;
         border-top-width: 0 !important;
     }
 
     // Remove header background
-    > thead {
+    >thead {
         background-color: transparent !important;
 
-        > tr {
+        >tr {
             background-color: transparent !important;
 
-            > th {
+            >th {
                 background-color: transparent !important;
                 border-bottom-width: 0 !important;
             }
@@ -257,12 +259,12 @@ body {
     }
 
     // Remove row backgrounds and borders
-    > tbody {
-        > tr {
+    >tbody {
+        >tr {
             background-color: transparent !important;
             border-bottom-width: 0 !important;
 
-            > td {
+            >td {
                 background-color: transparent !important;
                 border-bottom-width: 0 !important;
                 border-top-width: 0 !important;

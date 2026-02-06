@@ -64,5 +64,5 @@ What problem does this solve?
 
 ## References
 
-- [Context Levels](../foundations/context-levels.md)
-- [Terminology](../foundations/terminology.md)
+- [Context Levels](../../develop/foundations/context-levels.md)
+- [Terminology](../../develop/foundations/terminology.md)

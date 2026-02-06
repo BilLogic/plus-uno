@@ -127,7 +127,9 @@ playground/
 1. **Organize by feature**: Create subdirectories for different prototypes
 2. **Document your work**: Include README.md files explaining your prototypes
 3. **Use templates**: Start from templates in `../templates/` when appropriate
-4. **Follow design system**: Always use PLUS design tokens and components
+4. **Follow design system**:
+   - **Styles**: `packages/plus-ds/guidelines/design-tokens/`
+   - **Components**: `packages/plus-ds/guidelines/overview-components.md`
 5. **Keep it clean**: Remove experimental code that didn't work out
 
 ## When to Use Prototyping vs Templates
@@ -168,4 +170,4 @@ By default, prototyping directories are ignored by git (see `.gitignore`). If yo
 - **Templates**: `../templates/` — Curated templates based on specs documentation
 - **Design System**: `../../packages/plus-ds/` — Component library and tokens
 - **Documentation**: `../../develop/` — Technical documentation
-- **Token Reference**: `../../develop/foundations/` — Colors, typography, layout
+- **Token Reference**: `../../packages/plus-ds/guidelines/design-tokens/` — Colors, typography, layout

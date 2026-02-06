@@ -9,7 +9,7 @@ This repository contains:
 - **Starter Template**: Ready-to-use template with base structure and minimal component set
 - **Cursor Rules**: Pre-configured rules for Cursor AI to generate PLUS-compliant code
 - **Reference Prototypes**: Example prototypes demonstrating design system usage
-- **Component Library**: Base components matching PLUS design patterns
+- **Component Library**: Base components from `packages/plus-ds` matching PLUS design patterns
 
 ## Quick Start
 
@@ -45,8 +45,8 @@ This repository contains:
 See **[`develop/PROJECT_STRUCTURE.md`](develop/PROJECT_STRUCTURE.md)** for complete structure documentation.
 
 **Quick Overview:**
-- **`design-system/`** - Design system source (components, assets, styles documentation)
-- **`develop/`** - Technical documentation and token SCSS source files
+- **`packages/plus-ds/`** - Design system source (components, assets, styles documentation)
+- **`develop/`** - Technical documentation and guide index
 - **`src/`** - Application source files
 - **`playground/`** - Prototyping workspace (templates and designer playgrounds)
 
@@ -77,8 +77,8 @@ See `playground/templates/README.md` and `playground/README.md` for detailed gui
 3. **Ask for prototypes** using PLUS design system
 4. **Always reference guideline files**:
    - `develop/standards.md` - Project rules and coding standards
-   - `design-system/styles/` - Token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
-   - `design-system/components/overview.md` - Component types and terminology
+    - `packages/plus-ds/guidelines/design-tokens/` - Token reference (colors.md, typography.md, etc.)
+    - `packages/plus-ds/guidelines/overview-components.md` - Component types and terminology
 5. **Use designated areas**: Always create prototypes in `playground/templates/` or `playground/{your-name}/` directories
 
 ### Example Prompts
@@ -90,7 +90,7 @@ See `playground/templates/README.md` and `playground/README.md` for detailed gui
 
 ### Design Tokens
 
-Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `design-system/styles/` for all available tokens (colors.md, layout.md, typography.md, icons.md, elevation.md).
+Always use semantic tokens (CSS variables) instead of hardcoded values. Reference `packages/plus-ds/guidelines/design-tokens/` for all available tokens.
 
 ```css
 /* ✅ Good - Using semantic tokens */
@@ -115,33 +115,35 @@ Always use semantic tokens (CSS variables) instead of hardcoded values. Referenc
 Use existing PLUS components when possible:
 
 ```javascript
-import { PlusInterface, PlusSmartComponents } from "./design-system/components/index.js";
-
-const button = PlusInterface.createButton({
-    btnText: "Click me",
-    btnStyle: "primary",
-    btnFill: "filled",
-    btnSize: "default"
-});
+import { Button } from '@tutors.plus/design-system';
+ 
+ const MyButton = () => (
+     <Button
+         text="Click me"
+         style="primary"
+         fill="filled"
+         size="default"
+     />
+ );
 ```
 
 Components are organized into two main categories:
 - **Components**: Reusable UI components (Input, Button, Card, Alert, Form, etc.)
 - **Specs**: Complex interface sections composed of multiple components (Login, Home, Profile, Training, Toolkit, Universal, Admin)
 
-See `design-system/components/overview.md` for component details and `develop/PROJECT_STRUCTURE.md` for complete project organization.
+See `packages/plus-ds/guidelines/overview-components.md` for component details and `develop/PROJECT_STRUCTURE.md` for complete project organization.
 
 ## Documentation
 
 ### Essential Guidelines (Always Reference)
 - **[Coding Standards](develop/standards.md)** - Project rules, coding standards, setup guides, best practices
-- **[Token Reference](design-system/styles/)** - Complete token reference (colors.md, layout.md, typography.md, icons.md, elevation.md)
-- **[Component Terminology](design-system/components/overview.md)** - UI component types and terminology
-- **[Import Paths](develop/imports.md)** - Component import path reference
-
-### Additional Documentation
-- **[Components](design-system/components/overview.md)** - Component library documentation
-- **[Styles Overview](design-system/styles/overview.md)** - Design token system overview
+- **[Token Reference](packages/plus-ds/guidelines/design-tokens/)** - Complete token reference
+- **[Component Terminology](packages/plus-ds/guidelines/overview-components.md)** - UI component types and terminology
+- **[Import Paths](develop/imports.md)** - Component import path reference (see `packages/plus-ds`)
+ 
+ ### Additional Documentation
+- **[Components](packages/plus-ds/guidelines/overview-components.md)** - Component library documentation
+- **[Styles Overview](packages/plus-ds/guidelines/design-tokens/)** - Design token system overview
 - **[Figma Integration](develop/FIGMA_DESIGN_SYSTEM.md)** - Figma integration guide
 - **[Project Structure](develop/PROJECT_STRUCTURE.md)** - Complete project structure guide
 
@@ -198,17 +200,16 @@ npm run watch:css
 
 ### Adding New Components
 
-1. Create component file in `design-system/components/{ComponentName}/index.js`
-2. Create component SCSS file in `design-system/components/{ComponentName}/{ComponentName}.scss`
-3. Create Storybook story file `{ComponentName}.stories.js` in the component folder
-4. Add component export to `design-system/components/index.js`
-5. Import component styles in `src/css/main.scss`
-6. Document in `design-system/components/overview.md`
+1. Create component file in `packages/plus-ds/src/components/{ComponentName}/index.tsx`
+2. Create component SCSS file in `packages/plus-ds/src/components/{ComponentName}/{ComponentName}.scss`
+3. Create Storybook story file `{ComponentName}.stories.tsx` in the component folder
+4. Add component export to `packages/plus-ds/src/components/index.ts`
+5. Document in `packages/plus-ds/guidelines/components/{ComponentName}.md`
 
 ### Updating Design Tokens
 
-1. Update token SCSS files in `develop/tokens/`
-2. Update token documentation in `design-system/styles/` (colors.md, layout.md, typography.md, icons.md, elevation.md)
+1. Update token SCSS files in `packages/plus-ds/src/styles/`
+2. Update token documentation in `packages/plus-ds/guidelines/design-tokens/`
 3. Rebuild CSS: `npm run build:css`
 
 ## Reference Prototypes

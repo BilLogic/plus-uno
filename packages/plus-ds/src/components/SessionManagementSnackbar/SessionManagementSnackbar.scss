@@ -1,7 +1,7 @@
-@use '../../styles/colors' as *;
-@use '../../styles/fonts' as *;
-@use '../../styles/spacing_semantics' as *;
-@use '../../styles/elevation' as *;
+@use '../../tokens/colors' as *;
+@use '../../tokens/fonts' as *;
+@use '../../tokens/spacing_semantics' as *;
+@use '../../tokens/elevation' as *;
 
 .plus-session-snackbar {
     display: flex;

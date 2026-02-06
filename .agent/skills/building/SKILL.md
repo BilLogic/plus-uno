@@ -1,90 +1,124 @@
 ---
 name: building
-description: Builds new PLUS components from hi-fi Figma designs. Use when the user provides a Figma link for a new design, asks to "build", "create", "implement" something new, or needs to translate a finalized Figma design into production code.
+description: Builds new PLUS components or prototypes from designs. Use when the user asks to "build", "create", "implement", "prototype", "mock up", or provides a Figma link/sketch. strictly adheres to the design system.
 ---
 
 # Building
 
-Create new production-ready components from Figma.
+Create production-ready components or high-fidelity prototypes.
 
 ## When to Use
 
-- User provides a Figma link for a **new** design
-- Creating a pattern that doesn't exist in the codebase
-- Translating finalized designs to production code
+- **Builds:** User provides a hi-fi Figma link for a new design.
+- **Prototypes:** User provides a sketch, screenshot, loose description, or asks to "prototype" something.
+- **New Patterns:** Creating a pattern that doesn't exist in the codebase.
 
-For updating **existing** code, use [maintaining](../maintaining/SKILL.md) instead.
+## Core Principle: No "Cheating"
 
-## Baseline (every build)
+**All** output, whether a "prototype" or a "production build," must be **high-fidelity** and **strictly adhere to the design system**.
 
-**No exceptions.** Every build must satisfy:
+1. **Design tokens only** — No hardcoded colors, spacing, or typography. Use `var(--color-*)`, `var(--size-*)`.
+2. **PLUS components** — Use components from `packages/plus-ds/src/components/` (and specs). Do **not** use raw React-Bootstrap or HTML when a PLUS equivalent exists.
+3. **Real Implementation** — No placeholders. If replicating a page, use the actual components that page uses (e.g., use `AdminDateRangeFilter` for admin filters, not a generic dropdown).
 
-1. **Design tokens only** — No hardcoded colors, spacing, or typography. Use `var(--color-*)`, `var(--size-*)`, etc. See `develop/foundations/colors.md`, `typography.md`, `layout.md`.
-2. **Hi-fi output** — Builds are production-ready: PLUS components, real styling. No low-fi or placeholder styling.
-3. **PLUS components where they exist** — Use components from `packages/plus-ds/src/components/` (and specs). Do **not** use raw React-Bootstrap or React components (e.g. `Modal`, `Button`, `Alert`) when a PLUS equivalent exists. Check `develop/reference/component-index.md` and `packages/plus-ds/src/components/index.js`.
-4. **When replicating a page: use the same components as the real page** — If you are replicating an existing page (from Figma, a spec, or the app), **always** check how that page implements each area (filters, table, top bar, forms, etc.) and which components or specs it uses; then **use those same components from the repo**. Do **not** substitute native HTML (e.g. `<select>`, `<input>`) or raw Bootstrap utility classes (e.g. `form-select`, `form-control`) as a shortcut. Look in `packages/plus-ds/src/specs/` for page-level specs that already implement the pattern (e.g. AdminDateRangeFilter for admin filters).
+## Workflows
 
-## Protocol
+**All builds** output to `playground/prototyping/{user}/{project}/` to create interactive prototypes for designer testing. Valid code is required, but the goal is interaction, not shipping library code.
 
-1. When the build is for a prototype (output in playground/prototyping/), load playground/prototyping/README.md first and follow its modes, baseline, and “How the agent can help (per mode)” before proposing the plan.
-2. **When user provides a Figma link**: Run Figma MCP first—**get design context** (e.g. `get_code`) and **get screenshot** (e.g. `get_image`); use **get metadata** (e.g. `get_file_content`) as needed. Do not skip this step.
-3. Map to PLUS terminology and context level
-4. **Load context** as needed: `develop/foundations/colors.md`, `typography.md`, `layout.md`
-5. Propose component composition
-6. **WAIT for confirmation before coding**
-7. Implement with React + React-Bootstrap (PLUS components where they exist)
-8. Verify in Storybook
+### 1. Build from Figma (Hi-Fi)
+**Input:** High-fidelity Figma design.
+**Output:** `playground/prototyping/{user}/{project}/`
+
+**Protocol:**
+1. Run Figma MCP (`get_code`, `get_image`).
+2. Map to PLUS context level/components.
+3. Implement with React + React-Bootstrap (PLUS components where they exist).
+4. Verify in Storybook/Local Dev.
+
+### 2. Build from Sketch/Idea (Lo-Fi)
+**Input:** Sketches, screenshots, wireframes, verbal descriptions.
+**Output:** `playground/prototyping/{user}/{project}/`
+
+**Modes:**
+
+| Mode | When to use | What to say/provide |
+|------|-------------|---------------------|
+| **0→hi-fi** | Single screen. | "I have a sketch..." or "Imagine a dashboard..." |
+| **Flow** | Multiple screens. | "Click through login -> dashboard" |
+| **Remix** | Modify existing. | "Take this prototype and change X" |
+
+**Protocol:**
+1. Identify Mode (0→hi-fi, Flow, Remix).
+2. Clarify requirements.
+3. Implement with React + React-Bootstrap (PLUS components where they exist).
+4. Output to `playground/prototyping/`.
+
+## Prototyping Mode Checks
+
+**0→hi-fi checks:**
+- Which PLUS context? (Admin, Login, etc.)
+- Matching an existing page/spec? (Reuse those specific components!)
+- Primary action/content blocks?
+
+**Flow checks:**
+- Exact sequence?
+- Real routing or placeholder nav?
+- User state simulation?
+
+**Remix checks:**
+- Target folder/URL?
+- Precise change?
+- New folder or overwrite?
+
+## Technical Guidelines (CRITICAL)
+
+### Card Styling
+When creating chart/data cards (especially in Admin contexts):
+- **Background:** `var(--color-surface-container-lowest, #ffffff)` (NOT `surface-container-low`)
+- **Radius:** `var(--card-radius-sm, 12px)`
+- **Padding:** `var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px)`
+- **Shadow:** `0px 1px 2px rgba(0, 0, 0, 0.05)`
+
+### Table Styling
+- **Background:** `transparent !important` (override Bootstrap).
+- **No Borders:** `border: none`.
+- **Headers:** `font-weight: 700`.
+- **Reference:** `packages/plus-ds/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss`
+
+### Breakpoint Testing
+For full page layouts, wrap stories in `ResponsiveFrame`:
+```jsx
+// .stories.jsx
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+// ... decorators: [(Story, c) => <ResponsiveFrame breakpoint={c.args.breakpoint}><Story/></ResponsiveFrame>]
+```
 
 ## Confirmation Template
 
-Before writing code, describe the plan:
+Before coding, confirm the plan:
 
 ```
-I'll create a **[Component Name]** at the **[Context Level]** level using:
+I will [build/prototype] a **[Component/Page]** using:
+
+Mode: [Production Build / 0→hi-fi / Flow / Remix]
+Input: [Figma Link / Sketch / Description]
+Output Location: [path]
 
 Components:
-- `[Component]` from `packages/plus-ds/src/components`
-
-Props:
-- `style="[value]"`
-- `size="[value]"`
+- `[Component]` from `packages/plus-ds/...`
 
 Tokens:
 - `--[token-name]`
 
-Location: `[file path]`
-
-Does this match your expectation?
+Strict Adherence Check:
+- [ ] Tokens Only
+- [ ] PLUS Components
+- [ ] No hardcoded styles
 ```
-
-## Figma MCP Tools
-
-| Tool | Purpose |
-|------|---------|
-| `get_image` | Capture visual design |
-| `get_code` | Extract generated code/specs |
-| `get_file_content` | Get Figma file metadata |
-
-## Coding guidelines
-
-- Use PLUS token CSS variables (no hardcoded colors, spacing, or typography).
-- **Use PLUS components from the repo** (e.g. Modal, Button, Alert from `packages/plus-ds/src/components/`). Do not use raw React-Bootstrap or React components when a PLUS version exists.
-- **When replicating a page:** Check how the real page (spec or Figma) implements each UI area and use the same components/specs from the repo (e.g. filters → AdminDateRangeFilter/Dropdown, not native `<select>`). Never drop in native form elements or Bootstrap utility classes as a shortcut.
-- Prefer existing components and specs over custom HTML.
-
-## Implementation Checklist
-
-- [ ] Use PLUS components where they exist (check `develop/reference/component-index.md`, `packages/plus-ds/src/components/index.js`)
-- [ ] Apply PLUS design tokens (no hardcoded values); see `develop/foundations/colors.md`, `typography.md`, `layout.md`
-- [ ] When replicating a page: use same components/specs as real page (`packages/plus-ds/src/specs/`)
-- [ ] Follow context level patterns
-- [ ] Create Storybook story if new component
-- [ ] Verify in Storybook before completing
 
 ## References
 
-- [Context Levels](../foundations/context-levels.md)
-- [Terminology](../foundations/terminology.md)
-- [Tech Stack](../foundations/tech-stack.md)
-- [Tokens](../foundations/tokens.md)
-- Component index: `develop/reference/component-index.md` — Master list of PLUS components and specs. Page-level specs: `packages/plus-ds/src/specs/`.
+- [Context Levels](../../develop/foundations/context-levels.md)
+- [Terminology](../../develop/foundations/terminology.md)
+- [Tech Stack](../../develop/foundations/tech-stack.md)
+- [Tokens](../../develop/foundations/tokens/colors.md) (and others in `develop/foundations/tokens/`)

@@ -17,24 +17,15 @@ Welcome to the developer documentation for the PLUS Design System. This director
 ### 1. Workflows (`workflows/`)
 Role-based guides that provide the "Protocol" (Step-by-step process) and "Lite Context" (Top 10 tokens/components) for your task. Start here.
 
-### 2. Patterns (`patterns/`)
-**Context-Based Packs** that group API signatures and Design Tokens by semantic layer. Load these when you need specific details.
+### 2. Patterns & Components
+ 
+ **MOVED**: See `packages/plus-ds/guidelines/` for all pattern and component documentation.
 
-*   [**Elements**](patterns/elements.md): Buttons, Inputs, Badges, Toggles.
-*   [**Cards**](patterns/cards.md): Card containers and tiles.
-*   [**Sections**](patterns/sections.md): Layout sections and groups.
-*   [**Modals**](patterns/modals.md): Dialogs, Tooltips, Alerts.
-*   [**Surfaces**](patterns/surfaces.md): Page layouts, Sidebars, Topbars.
-
-### 3. Foundations (`foundations/`)
-Global shared rules and tokens.
-
-*   [**Colors**](foundations/colors.md): Global color palette and roles.
-*   [**Typography**](foundations/typography.md): Font families, weights, and sizes.
-*   [**Icons**](foundations/icons.md): Font Awesome sizing tokens.
-*   [**Elevation**](foundations/elevation.md): Shadow tokens for depth.
-*   [**Layout**](foundations/layout.md): Spacing principles and radius rules.
-*   [**Project Map**](foundations/project-map.md): File structure and import paths.
+### 3. Foundations
+ 
+ **MOVED**: See `packages/plus-ds/guidelines/design-tokens/` for all foundation documentation.
+ 
+ *   [**Project Map**](foundations/project-map.md): File structure and import paths.
 
 ### 4. Guides (`guides/`)
 Deep-dive tutorials for specific complex topics.

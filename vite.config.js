@@ -46,7 +46,7 @@ export default defineConfig({
       scss: {
         api: 'modern-compiler',
         loadPaths: [
-          path.resolve(dirname, 'develop/tokens'),
+          path.resolve(dirname, 'packages/plus-ds/src/tokens'),
           path.resolve(dirname, 'packages/plus-ds/src/styles'),
           path.resolve(dirname, 'packages/plus-ds/src/forms')
         ],

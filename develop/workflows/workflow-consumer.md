@@ -24,7 +24,7 @@
 ### STEP 2.5: LOAD_CONTEXT (REQUIRED)
 **PROCESS**:
 1.  **READ** `develop/foundations/colors.md` (for color tokens).
-2.  **READ** `develop/foundations/typography.md` (for font tokens).
+2.  **TOKENS**: Use tokens from `packages/plus-ds/guidelines/design-tokens/` (e.g., `var(--size-pad-md)`).
 3.  **READ** `develop/foundations/layout.md` (for spacing/radius).
 **CRITICAL**: Do not proceed until you have loaded these tokens into context.
 
