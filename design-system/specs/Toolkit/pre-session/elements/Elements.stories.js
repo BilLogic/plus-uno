@@ -5,7 +5,7 @@
  */
 
 export default {
-  title: 'Specs/Toolkit/Pre-Session/Elements',
+  title: 'Specs/Toolkit/Pre-Session/Elements/Overview',
   tags: ['autodocs'],
   parameters: {
     docs: {

@@ -7,6 +7,12 @@ import { CallOffsTableRow, CallOffsTableHeaderRow } from '../tables/CallOffsTabl
 import { NavHorizontal } from '../tables/NavHorizontal.stories';
 import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
 
+// Import Call-Offs modals
+import * as CallOffRequestDetailsModal from '../modals/Call-Offs/CallOffRequestDetails.stories';
+import * as CallOffConfirmationModal from '../modals/Call-Offs/CallOffConfirmation.stories';
+import * as AutoExcuseConfirmationModal from '../modals/Call-Offs/AutoExcuseConfirmation.stories';
+import * as AutoApproveConfirmationModal from '../modals/Call-Offs/AutoApproveConfirmation.stories';
+
 export default {
     title: 'Specs/Toolkit/Pre-Session/Pages/Call-Offs',
     parameters: {
@@ -333,6 +339,186 @@ export const Interactive = () => {
                         interactive={true}
                     />
                 </PageLayout>
+            </div>
+        </div>
+    );
+};
+
+/**
+ * Call-Offs Page - With Modals
+ * Full layout with modal overlay showing Call-Offs modals
+ * Features:
+ * - Modal state toggle to switch between different Call-Offs modals
+ * - Breakpoint toggle for responsive preview
+ */
+export const WithModals = () => {
+    const [selectedTab, setSelectedTab] = useState('call-offs');
+    const [callOffState, setCallOffState] = useState('pending');
+    const [breakpoint, setBreakpoint] = useState('xl');
+    const [modalState, setModalState] = useState('request-details');
+
+    // Breakpoint widths from design system
+    const breakpointWidths = {
+        'md': 768,
+        'lg': 1024,
+        'xl': 1440,
+    };
+
+    // Modal states organized by category
+    const modalStates = {
+        'Call-Off Request': [
+            { id: 'request-details', label: 'Request Details' },
+        ],
+        'Confirmations': [
+            { id: 'confirmation', label: 'Request Submitted' },
+            { id: 'auto-excuse', label: 'Auto-Excuse' },
+            { id: 'auto-approve', label: 'Auto-Approve' },
+        ],
+    };
+
+    const tabs = [
+        { id: 'my-sessions', label: 'My sessions', count: 20 },
+        { id: 'sign-ups', label: 'Sign-ups', count: 3 },
+        { id: 'fill-ins', label: 'Fill-ins', count: 3 },
+        { id: 'call-offs', label: 'Call-offs', count: defaultPendingCallOffs.length },
+        { id: 'reflections', label: 'Reflections', count: 8 },
+    ];
+
+    // Render the appropriate modal based on state
+    const renderModal = () => {
+        const modalComponents = {
+            'request-details': CallOffRequestDetailsModal.CallOff_Request_Details,
+            'confirmation': CallOffConfirmationModal.CallOff_Confirmation,
+            'auto-excuse': AutoExcuseConfirmationModal.AutoExcuse_Confirmation,
+            'auto-approve': AutoApproveConfirmationModal.AutoApprove_Confirmation,
+        };
+
+        const ModalComponent = modalComponents[modalState];
+
+        if (!ModalComponent) {
+            return (
+                <div style={{
+                    backgroundColor: 'var(--color-surface-container-high)',
+                    borderRadius: 'var(--size-modal-radius-lg)',
+                    padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
+                    width: '672px'
+                }}>
+                    <p className="body2-txt">Modal not found: {modalState}</p>
+                </div>
+            );
+        }
+
+        return <ModalComponent />;
+    };
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
+            {/* Controls */}
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-md)',
+                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
+                backgroundColor: 'var(--color-surface-container-low)',
+                borderRadius: 'var(--size-card-radius-sm)',
+            }}>
+                {/* Breakpoint Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
+                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '80px' }}>
+                        Breakpoint:
+                    </span>
+                    {Object.entries(breakpointWidths).map(([bp, width]) => (
+                        <Button
+                            key={bp}
+                            text={`${bp.toUpperCase()} (${width}px)`}
+                            size="small"
+                            style="primary"
+                            fill={breakpoint === bp ? 'filled' : 'outline'}
+                            onClick={() => setBreakpoint(bp)}
+                        />
+                    ))}
+                </div>
+
+                {/* Modal State Toggle */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                        Modal State:
+                    </span>
+                    {Object.entries(modalStates).map(([category, states]) => (
+                        <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
+                            <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', minWidth: '120px', fontSize: '0.75rem' }}>
+                                {category}:
+                            </span>
+                            {states.map(state => (
+                                <Button
+                                    key={state.id}
+                                    text={state.label}
+                                    size="small"
+                                    style="primary"
+                                    fill={modalState === state.id ? 'filled' : 'ghost'}
+                                    onClick={() => setModalState(state.id)}
+                                />
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Page Preview with Modal */}
+            <div style={{
+                position: 'relative',
+                width: `${breakpointWidths[breakpoint]}px`,
+                margin: '0 auto',
+                border: '2px dashed var(--color-outline-variant)',
+                borderRadius: 'var(--size-card-radius-sm)',
+                overflow: 'hidden',
+                transition: 'width 0.3s ease'
+            }}>
+                {/* Background Page */}
+                <PageLayout
+                    topBarConfig={{
+                        breadcrumbs: [
+                            { text: 'Home', href: '#' },
+                            { text: 'Sessions' }
+                        ],
+                        user: { name: 'John Doe', role: 'Lead' }
+                    }}
+                    sidebarConfig={{
+                        user: 'tutor',
+                        activeTab: 'sessions'
+                    }}
+                    id="call-offs-page-with-modals"
+                >
+                    <MainContent
+                        tabs={tabs}
+                        selectedTab={selectedTab}
+                        onTabChange={setSelectedTab}
+                        callOffs={defaultPendingCallOffs}
+                        callOffState={callOffState}
+                        onCallOffStateChange={setCallOffState}
+                        timeframe="This week"
+                        onTimeframeChange={() => {}}
+                        onAction={() => {}}
+                        interactive={false}
+                    />
+                </PageLayout>
+
+                {/* Scrim Overlay */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 'var(--size-section-pad-x-lg)',
+                    zIndex: 1000
+                }}>
+                    {renderModal()}
+                </div>
             </div>
         </div>
     );

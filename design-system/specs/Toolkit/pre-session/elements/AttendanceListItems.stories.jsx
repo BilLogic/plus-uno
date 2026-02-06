@@ -2,7 +2,7 @@ import React from 'react';
 import Dropdown from '../../../../../packages/plus-ds/src/components/Dropdown/Dropdown';
 
 export default {
-    title: 'Specs/Toolkit/Pre-session/Elements/Attendance List Items',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Attendance List Items',
     component: Dropdown,
     parameters: {
         layout: 'centered',

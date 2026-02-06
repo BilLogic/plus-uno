@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../../../../../packages/plus-ds/src/components/Button/Button';
 
 export default {
-    title: 'Specs/Toolkit/Pre-Session/Elements',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Session Actions Button',
     component: Button,
     parameters: {
         layout: 'padded',

@@ -2,7 +2,7 @@ import React from 'react';
 import Badge from '../../../../../../packages/plus-ds/src/components/Badge/Badge';
 
 export default {
-    title: 'Specs/Toolkit/Pre-session/Elements/Badges/Attendance Badge',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Badges/Attendance Badge',
     component: Badge,
     parameters: {
         layout: 'centered',

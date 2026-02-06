@@ -17,6 +17,64 @@ export default {
 };
 
 /**
+ * Update Alert Component
+ * Uses semantic tokens:
+ * - Background: --color-primary-container-state-16 (primary tonal)
+ * - Border: --color-primary (primary color)
+ * - Radius: --size-modal-radius-md (modal/card radius)
+ * - Padding: --size-card-pad-y-sm, --size-card-pad-x-sm (card padding)
+ * - Gap: --size-card-gap-sm (internal card gap)
+ * - Typography: h6, body2-txt
+ */
+const UpdateAlert = ({ title, description, onClose }) => (
+    <div
+        style={{
+            backgroundColor: 'var(--color-primary-container-state-16)',
+            border: '1px solid var(--color-primary)',
+            borderRadius: 'var(--size-modal-radius-md)',
+            padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
+            display: 'flex',
+            gap: 'var(--size-card-gap-sm)',
+            width: '100%'
+        }}
+    >
+        <div
+            style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-sm)'
+            }}
+        >
+            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
+                {title}
+            </span>
+            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                {description}
+            </span>
+        </div>
+        <button
+            onClick={onClose}
+            style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                alignSelf: 'flex-start'
+            }}
+        >
+            <i
+                className="fa-solid fa-xmark"
+                style={{
+                    fontSize: 'var(--font-size-fa-h6-solid)',
+                    color: 'var(--color-on-surface-variant)'
+                }}
+            />
+        </button>
+    </div>
+);
+
+/**
  * Section Title with Info Icon
  */
 const SectionTitle = ({ title }) => (
@@ -44,6 +102,8 @@ const SectionTitle = ({ title }) => (
  * - Element gap: --size-element-gap-sm (between filter dropdowns)
  */
 const MainContent = ({
+    showAlert = true,
+    onAlertClose,
     tabs,
     selectedTab,
     onTabChange,
@@ -60,6 +120,15 @@ const MainContent = ({
             width: '100%'
         }}
     >
+        {/* Update Alert */}
+        {showAlert && (
+            <UpdateAlert
+                title="Update on your call-off request"
+                description="There's an update to your recent call-off request. Please visit the Call-offs tab to review the latest status and details."
+                onClose={onAlertClose}
+            />
+        )}
+
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h4>
@@ -168,6 +237,8 @@ export const Overview = () => (
             id="all-sessions-page"
         >
             <MainContent
+                showAlert={true}
+                onAlertClose={() => {}}
                 tabs={defaultTabs}
                 selectedTab="all-sessions"
                 onTabChange={() => {}}
@@ -189,6 +260,7 @@ export const Overview = () => (
  * - Breakpoint toggle to preview at different screen sizes
  */
 export const Interactive = () => {
+    const [showAlert, setShowAlert] = useState(true);
     const [selectedTab, setSelectedTab] = useState('all-sessions');
     const [breakpoint, setBreakpoint] = useState('xl');
     const [filters, setFilters] = useState(defaultFilters);
@@ -221,31 +293,44 @@ export const Interactive = () => {
             {/* Controls */}
             <div style={{
                 display: 'flex',
-                flexDirection: 'column',
+                alignItems: 'center',
                 gap: 'var(--size-element-gap-md)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--color-surface-container-low)',
                 borderRadius: 'var(--size-card-radius-sm)',
+                flexWrap: 'wrap'
             }}>
+                {/* Alert Toggle */}
+                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                    Alert:
+                </span>
+                <Button
+                    text={showAlert ? 'On' : 'Off'}
+                    size="small"
+                    style="primary"
+                    fill={showAlert ? 'filled' : 'outline'}
+                    onClick={() => setShowAlert(!showAlert)}
+                />
+
+                <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--size-element-gap-sm)' }} />
+
                 {/* Breakpoint Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '80px' }}>
-                        Breakpoint:
-                    </span>
-                    {Object.entries(breakpointWidths).map(([bp, width]) => (
-                        <Button
-                            key={bp}
-                            text={`${bp.toUpperCase()} (${width}px)`}
-                            size="small"
-                            style="primary"
-                            fill={breakpoint === bp ? 'filled' : 'outline'}
-                            onClick={() => setBreakpoint(bp)}
-                        />
-                    ))}
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                        Width: <strong>{breakpointWidths[breakpoint]}px</strong>
-                    </span>
-                </div>
+                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                    Breakpoint:
+                </span>
+                {Object.entries(breakpointWidths).map(([bp, width]) => (
+                    <Button
+                        key={bp}
+                        text={`${bp.toUpperCase()} (${width}px)`}
+                        size="small"
+                        style="primary"
+                        fill={breakpoint === bp ? 'filled' : 'outline'}
+                        onClick={() => setBreakpoint(bp)}
+                    />
+                ))}
+                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
+                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
+                </span>
             </div>
 
             {/* Page Preview Container */}
@@ -272,6 +357,8 @@ export const Interactive = () => {
                     id="all-sessions-page-interactive"
                 >
                     <MainContent
+                        showAlert={showAlert}
+                        onAlertClose={() => setShowAlert(false)}
                         tabs={tabs}
                         selectedTab={selectedTab}
                         onTabChange={setSelectedTab}

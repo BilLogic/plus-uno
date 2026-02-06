@@ -114,7 +114,7 @@ const defaultTabs = [
     { id: 'sign-ups', label: 'Sign-ups', count: 3 },
     { id: 'fill-ins', label: 'Fill-ins', count: 3 },
     { id: 'call-offs', label: 'Call-offs', count: 3 },
-    { id: 'reflections', label: 'Reflections' },
+    { id: 'reflections', label: 'Reflections', count: 20 },
 ];
 
 const defaultSessions = [
@@ -197,7 +197,7 @@ export const Interactive = () => {
         { id: 'sign-ups', label: 'Sign-ups', count: defaultSessions.length },
         { id: 'fill-ins', label: 'Fill-ins', count: 3 },
         { id: 'call-offs', label: 'Call-offs', count: 3 },
-        { id: 'reflections', label: 'Reflections' },
+        { id: 'reflections', label: 'Reflections', count: 20 },
     ];
 
     return (
