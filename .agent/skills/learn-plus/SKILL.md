@@ -36,5 +36,5 @@ Help designers understand the PLUS Design System.
 
 - [Context Levels](../../develop/foundations/context-levels.md)
 - [Terminology](../../develop/foundations/terminology.md)
-- [Tokens](../../develop/foundations/tokens/colors.md)
+- [Tokens](../../packages/plus-ds/guidelines/design-tokens/colors.md)
 - [Tech Stack](../../develop/foundations/tech-stack.md)

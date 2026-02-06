@@ -33,7 +33,7 @@ Load these as needed:
 
 - [Tech Stack](../develop/foundations/tech-stack.md) — Versions, commands
 - [Context Levels](../develop/foundations/context-levels.md) — Elements → Pages hierarchy
-- [Tokens](../develop/foundations/tokens/colors.md) — Design tokens logic
+- [Tokens](../packages/plus-ds/guidelines/design-tokens/colors.md) — Design tokens logic
 - [Terminology](../develop/foundations/terminology.md) — PLUS vocabulary
 
 ## Key Directories

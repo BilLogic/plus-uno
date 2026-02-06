@@ -121,4 +121,4 @@ Strict Adherence Check:
 - [Context Levels](../../develop/foundations/context-levels.md)
 - [Terminology](../../develop/foundations/terminology.md)
 - [Tech Stack](../../develop/foundations/tech-stack.md)
-- [Tokens](../../develop/foundations/tokens/colors.md) (and others in `develop/foundations/tokens/`)
+- [Tokens](../../packages/plus-ds/guidelines/design-tokens/colors.md) (and others in `packages/plus-ds/guidelines/design-tokens/`)

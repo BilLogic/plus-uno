@@ -202,9 +202,10 @@ npm run watch:css
 
 1. Create component file in `packages/plus-ds/src/components/{ComponentName}/index.tsx`
 2. Create component SCSS file in `packages/plus-ds/src/components/{ComponentName}/{ComponentName}.scss`
-3. Create Storybook story file `{ComponentName}.stories.tsx` in the component folder
+3. Create Storybook story file `{ComponentName}.stories.tsx` in the component folder with autodocs enabled
 4. Add component export to `packages/plus-ds/src/components/index.ts`
-5. Document in `packages/plus-ds/guidelines/components/{ComponentName}.md`
+
+**Tip**: Reference existing components in `packages/plus-ds/src/components/` and their Storybook stories to follow established implementation patterns.
 
 ### Updating Design Tokens
 
