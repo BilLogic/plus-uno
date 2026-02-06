@@ -31,16 +31,27 @@ You are the PLUS Design System coding agent. You help designers build, prototype
 
 Load these as needed:
 
-- [Tech Stack](../develop/foundations/tech-stack.md) — Versions, commands
-- [Context Levels](../develop/foundations/context-levels.md) — Elements → Pages hierarchy
-- [Tokens](../packages/plus-ds/guidelines/design-tokens/colors.md) — Design tokens logic
+- [Tech Stack](../develop/foundations/tech-stack.md) — Versions, commands, scripts
+- [Context Levels](../develop/foundations/context-levels.md) — Element → Page hierarchy
+- [Design Tokens](../packages/plus-ds/guidelines/design-tokens/) — Color, typography, spacing tokens
 - [Terminology](../develop/foundations/terminology.md) — PLUS vocabulary
 
-## Key Directories
+## Repository Structure
 
 | Path | Purpose |
 |------|---------|
-| `new-ds/` | Current design system source |
-| `packages/plus-ds/` | NPM package |
-| `playground/prototyping/` | Prototype experiments |
-| `.storybook/` | Storybook config |
+| `.agent/` | Agent skills and configuration |
+| `packages/plus-ds/` | Design system source (components, styles, guidelines) |
+| `develop/` | Documentation and foundations |
+| `playground/` | Prototyping workspace (templates and designer experiments) |
+| `src/` | Application source files |
+| `.storybook/` | Storybook configuration |
+
+## Tech Stack
+
+- **React** 19.2.1
+- **React-Bootstrap** 2.10.10
+- **Bootstrap** 5.3.3
+- **Vite** 6.4.1
+- **Storybook** 10.x
+- **Highcharts** 12.4.0

@@ -70,16 +70,24 @@ See **[`develop/PROJECT_STRUCTURE.md`](develop/PROJECT_STRUCTURE.md)** for compl
 
 See `playground/templates/README.md` and `playground/README.md` for detailed guidelines.
 
-### Using Cursor AI
+### Using AI Assistants (Cursor, Copilot, etc.)
 
-1. **Open this project in Cursor**
-2. **Start a new conversation** with Cursor AI
-3. **Ask for prototypes** using PLUS design system
-4. **Always reference guideline files**:
-   - `develop/standards.md` - Project rules and coding standards
-    - `packages/plus-ds/guidelines/design-tokens/` - Token reference (colors.md, typography.md, etc.)
-    - `packages/plus-ds/guidelines/overview-components.md` - Component types and terminology
-5. **Use designated areas**: Always create prototypes in `playground/templates/` or `playground/{your-name}/` directories
+**First Time Setup:**
+
+1. **Open this project in your AI-enabled editor** (Cursor, VS Code with Copilot, etc.)
+2. **Point your AI to the agent configuration:**
+   - In your first message, say: "Read `.agent/AGENT.md` to understand the PLUS Design System and your role"
+   - This gives the AI context on available skills, coding standards, and design system patterns
+3. **Start building:**
+   - Ask for prototypes using PLUS design system
+   - The AI will use the appropriate skill (building, maintaining, design-consulting)
+   - Always create prototypes in `playground/` directory
+
+**Key Reference Files:**
+- `.agent/AGENT.md` - Agent configuration and skills (read this first!)
+- `develop/foundations/` - Tech stack, terminology, context levels
+- `packages/plus-ds/guidelines/design-tokens/` - Token reference (colors, typography, spacing)
+- `packages/plus-ds/guidelines/overview-components.md` - Component library overview
 
 ### Example Prompts
 
@@ -159,10 +167,13 @@ See `packages/plus-ds/guidelines/overview-components.md` for component details a
 
 ## Tech Stack
 
-- **Bootstrap 4**: CSS framework
-- **Vanilla JavaScript**: ES6 modules
+- **React 19**: UI framework
+- **React-Bootstrap 2.10.10**: Bootstrap components for React
+- **Bootstrap 5.3.3**: CSS framework
+- **Vite 6**: Build tool and dev server
+- **Storybook 10**: Component development and documentation
 - **SASS/SCSS**: CSS preprocessing
-- **jQuery**: DOM manipulation (optional)
+- **Highcharts 12.4.0**: Charts and data visualization
 - **Font Awesome**: Icons
 
 ## Key Features
@@ -279,7 +290,11 @@ When contributing to this starter kit:
 ## Resources
 
 - [PLUS Production Repository](https://github.com/CMU-PLUS/web-app.git)
-- [Bootstrap 4 Documentation](https://getbootstrap.com/docs/4.6/)
+- [React Documentation](https://react.dev/)
+- [React-Bootstrap Documentation](https://react-bootstrap.github.io/)
+- [Bootstrap 5 Documentation](https://getbootstrap.com/docs/5.3/)
+- [Vite Documentation](https://vite.dev/)
+- [Storybook Documentation](https://storybook.js.org/)
 - [Font Awesome Icons](https://fontawesome.com/icons)
 - [SASS Documentation](https://sass-lang.com/documentation)
 
