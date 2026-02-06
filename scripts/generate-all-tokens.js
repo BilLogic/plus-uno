@@ -108,8 +108,8 @@ function toM3ColorName(name) {
  * Process and generate colors SCSS
  */
 function generateColorsSCSS() {
-    const accent = JSON.parse(fs.readFileSync('new tokens/colors _ accent.json', 'utf8'));
-    const neutral = JSON.parse(fs.readFileSync('new tokens/colors _ neutral.json', 'utf8'));
+    const accent = JSON.parse(fs.readFileSync('packages/plus-ds/src/tokens/source/colors _ accent.json', 'utf8'));
+    const neutral = JSON.parse(fs.readFileSync('packages/plus-ds/src/tokens/source/colors _ neutral.json', 'utf8'));
 
     const accentMode = Object.keys(accent.modes)[0];
     const neutralMode = Object.keys(neutral.modes)[0];
@@ -285,7 +285,7 @@ function generateColorsSCSS() {
  * Generate primitives SCSS
  */
 function generatePrimitivesSCSS() {
-    const primitives = JSON.parse(fs.readFileSync('new tokens/size _ primitive.json', 'utf8'));
+    const primitives = JSON.parse(fs.readFileSync('packages/plus-ds/src/tokens/source/size _ primitive.json', 'utf8'));
     const mode = Object.keys(primitives.modes)[0];
 
     let scss = `/**
@@ -364,7 +364,7 @@ function generatePrimitivesSCSS() {
  * Generate semantic tokens SCSS
  */
 function generateSemanticsSCSS() {
-    const semantics = JSON.parse(fs.readFileSync('new tokens/size _ semantics.json', 'utf8'));
+    const semantics = JSON.parse(fs.readFileSync('packages/plus-ds/src/tokens/source/size _ semantics.json', 'utf8'));
     const mode = Object.keys(semantics.modes)[0];
 
     let scss = `/**
@@ -431,7 +431,7 @@ function generateSemanticsSCSS() {
         // Get primitive value for radius-1000 (999px)
         let radiusPillValue = 999; // Default fallback
         try {
-            const primitives = JSON.parse(fs.readFileSync('new tokens/size _ primitive.json', 'utf8'));
+            const primitives = JSON.parse(fs.readFileSync('packages/plus-ds/src/tokens/source/size _ primitive.json', 'utf8'));
             const primitiveMode = Object.keys(primitives.modes)[0];
             const radius1000 = primitives.variables.find(v => {
                 const name = v.name.toLowerCase();
@@ -498,7 +498,7 @@ function generateSemanticsSCSS() {
  * Generate layout tokens SCSS
  */
 function generateLayoutSCSS() {
-    const layout = JSON.parse(fs.readFileSync('new tokens/size _ layout.json', 'utf8'));
+    const layout = JSON.parse(fs.readFileSync('packages/plus-ds/src/tokens/source/size _ layout.json', 'utf8'));
 
     let scss = `/**
  * Layout Tokens

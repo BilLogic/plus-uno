@@ -1,62 +1,54 @@
-# Icons (Font Awesome CDN)
+# Icon Usage
 
-## Icon System
+This design system uses **FontAwesome Free** icons via the string shorthand.
 
-This design system uses **Font Awesome Free (Solid)** via CDN.
+## How to Use Icons
 
-**DO NOT use**: Lucide, Heroicons, Material Icons, or npm packages.
-
-## Required CDN Link (Add to HTML head)
-
-```html
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-```
-
-## Usage with Button Component
+### String Shorthand (Recommended)
+Pass the icon name as a string to `leadingVisual` or `trailingVisual`:
 
 ```jsx
-// Use icon name only (without 'fa-' prefix)
-<Button leadingVisual="plus">Add Item</Button>
-<Button leadingVisual="trash">Delete</Button>
-<Button trailingVisual="arrow-right">Next</Button>
+<Button text="Add Item" leadingVisual="plus" />
+<Button text="Next" trailingVisual="arrow-right" />
 ```
 
-## Standalone Icons
+This automatically renders: `<i className="fa-solid fa-{icon-name}"></i>`
+
+### Node Prop (Advanced)
+For custom icons or non-FA icons, pass a React node:
 
 ```jsx
-<i className="fa-solid fa-check" aria-hidden="true" />
-<i className="fa-solid fa-xmark" aria-hidden="true" />
-<i className="fa-solid fa-plus" aria-hidden="true" />
+<Button text="Custom" leadingVisual={<MyCustomIcon />} />
 ```
 
-## Common Icon Names
+---
 
-| Purpose | Icon Name | Class |
-|---------|-----------|-------|
-| Add | `plus` | `fa-solid fa-plus` |
-| Delete | `trash` | `fa-solid fa-trash` |
-| Close | `xmark` | `fa-solid fa-xmark` |
-| Check | `check` | `fa-solid fa-check` |
-| Settings | `gear` | `fa-solid fa-gear` |
-| Search | `magnifying-glass` | `fa-solid fa-magnifying-glass` |
-| Home | `house` | `fa-solid fa-house` |
-| User | `user` | `fa-solid fa-user` |
-| Arrow Right | `arrow-right` | `fa-solid fa-arrow-right` |
-| Arrow Left | `arrow-left` | `fa-solid fa-arrow-left` |
+## Common Icons
 
-## Common Mistakes
+| Name | Renders | Use For |
+|------|---------|---------|
+| `plus` | ➕ | Add actions |
+| `minus` | ➖ | Remove actions |
+| `check` | ✓ | Confirm, success |
+| `xmark` | ✕ | Close, cancel, dismiss |
+| `arrow-right` | → | Next, forward navigation |
+| `arrow-left` | ← | Back, previous navigation |
+| `chevron-down` | ▼ | Dropdown, expand |
+| `chevron-up` | ▲ | Collapse |
+| `star` | ★ | Favorites, ratings |
+| `trash` | 🗑️ | Delete actions |
+| `pen` | ✏️ | Edit actions |
+| `magnifying-glass` | 🔍 | Search |
+| `user` | 👤 | User/profile |
+| `bell` | 🔔 | Notifications |
+| `gear` | ⚙️ | Settings |
 
-```jsx
-// ❌ WRONG - Don't import Lucide icons
-import { Plus, Trash2, Settings } from "lucide-react";
-<Button><Plus /></Button>
+---
 
-// ❌ WRONG - Don't use npm package imports
-import '@fortawesome/fontawesome-free/css/all.min.css';
+## Icon Verification
 
-// ✅ CORRECT - Use CDN in HTML head + leadingVisual prop
-<Button leadingVisual="plus">Add</Button>
+Before using an icon, verify it exists in FontAwesome Free:
+1. Check the list above for common icons.
+2. For other icons, reference [FontAwesome Free Icons](https://fontawesome.com/search?o=r&m=free&s=solid).
 
-// ✅ CORRECT - Or use className for standalone
-<i className="fa-solid fa-plus" />
-```
+**If the icon doesn't exist in FA Free, choose a different icon.**
