@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
 import { PageLayout } from '@/specs/Universal/Pages';
 import Button from '@/components/Button';
-import './WeeklyReport.css'; // We'll create this for specific styles
+import Card from '@/components/Card';
+import Badge from '@/components/Badge';
+import Divider from '@/components/Divider';
+import Accordion from '@/components/Accordion';
+import Progress from '@/components/Progress';
+import Section from '@/components/Section';
 
 // Mock Data
 const REPORT_DATA = {
     dateRange: 'Jan 27 – Jan 31, 2026',
     weekLabel: 'Week 18',
     stats: [
-        { label: 'Sessions completed', value: 12, delta: '↑ 3 vs last week', icon: '📅', type: 'up' },
-        { label: 'Hours tutored', value: 8.5, delta: '↑ 1.5 hrs', icon: '⏱️', type: 'up' },
-        { label: 'Students helped', value: 34, delta: '— same', icon: '🎓', type: 'same' },
+        { label: 'Sessions completed', value: 12, delta: '↑ 3 vs last week', icon: '📅', type: 'positive' },
+        { label: 'Hours tutored', value: 8.5, delta: '↑ 1.5 hrs', icon: '⏱️', type: 'positive' },
+        { label: 'Students helped', value: 34, delta: '— same', icon: '🎓', type: 'neutral' },
     ],
     studentImpact: [
-        { label: 'Student edtech minutes', value: 147, delta: '↑ 22 min', icon: '💻', type: 'up' },
+        { label: 'Student edtech minutes', value: 147, delta: '↑ 22 min', icon: '💻', type: 'positive' },
         { label: 'Skills mastered', value: 18, icon: '⭐' }
     ],
     dimensions: [
@@ -23,7 +28,7 @@ const REPORT_DATA = {
             status: 'Demonstrated',
             subStatus: 'Greeting & rapport-building',
             badge: '👋',
-            badgeType: 'demonstrated',
+            badgeType: 'success', // mapped to DS variant
             summary: 'You consistently greeted students by name, asked about their week, and established a warm tone. Observed in 11 of 12 sessions.',
             evidence: '"Hey Marcus! Good to see you again. Before we get started, how\'d that math test go? … That\'s awesome, I\'m glad you felt good about it."',
             evidenceTime: 'Tue Jan 28, 2:32 PM',
@@ -35,7 +40,7 @@ const REPORT_DATA = {
             status: 'Developing',
             subStatus: 'Redirecting rather than giving answers',
             badge: '🤚',
-            badgeType: 'developing',
+            badgeType: 'warning',
             summary: 'In 4 of 8 observed help requests, you provided the answer directly. Try responding with a leading question first.',
             evidence: 'Student: "I don\'t know how to do this one." — Tutor: "OK so the answer here is 42, because you need to multiply 6 times 7."',
             evidenceTime: 'Wed Jan 29, 3:15 PM',
@@ -48,7 +53,7 @@ const REPORT_DATA = {
             status: 'Developing',
             subStatus: 'Asking students to explain their thinking',
             badge: '💬',
-            badgeType: 'developing',
+            badgeType: 'warning',
             summary: 'Self-explanation prompts observed in only 3 of 12 sessions. Try asking "Can you walk me through how you figured that out?"',
             evidence: 'Student answers correctly. Tutor: "Good job!" and moves to next problem, without asking how they arrived at the answer.',
             evidenceTime: 'Thu Jan 30, 2:50 PM',
@@ -58,102 +63,48 @@ const REPORT_DATA = {
     ]
 };
 
-const DimensionCard = ({ dimension }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [feedback, setFeedback] = useState(null); // 'helpful', 'not-helpful', 'inaccurate'
+const FeedbackSection = () => {
+    const [feedback, setFeedback] = useState(null);
     const [comment, setComment] = useState('');
     const [submitted, setSubmitted] = useState(false);
 
-    const handleFeedback = (type) => {
-        setFeedback(type);
-    };
-
     const handleSubmit = () => {
         setSubmitted(true);
-        // In a real app, send data to backend here
     };
 
-    return (
-        <div className={`wr-dimension ${isOpen ? 'open' : ''}`}>
-            <div className="wr-dim-header" onClick={() => setIsOpen(!isOpen)}>
-                <div className={`wr-dim-badge ${dimension.badgeType}`}>{dimension.badge}</div>
-                <div className="wr-dim-info">
-                    <div className="wr-dim-name">{dimension.title}</div>
-                    <div className={`wr-dim-sub ${dimension.badgeType}`}>{dimension.subStatus}</div>
-                </div>
-                <div className={`wr-chip ${dimension.badgeType}`}>
-                    {dimension.status === 'Demonstrated' ? '✓ As Taught' : '⚬ Developing'}
-                </div>
-                <span className="wr-dim-chevron">▾</span>
+    if (submitted) {
+        return (
+            <div style={{ padding: '16px', color: 'var(--color-success)', fontWeight: 600, textAlign: 'center' }}>
+                ✓ Thanks for your feedback!
             </div>
+        );
+    }
 
-            {isOpen && (
-                <div className="wr-dim-body">
-                    <div className="wr-dim-body-inner">
-                        <div className={`wr-evidence ${dimension.needsWork ? 'needs-work' : ''}`}>
-                            <div className="wr-evidence-label">Evidence from session</div>
-                            <div className="wr-evidence-quote">{dimension.evidence}</div>
-                            <div className="wr-evidence-source">🎥 {dimension.evidenceTime}</div>
-                        </div>
-
-                        <p className="wr-dim-summary">{dimension.summary}</p>
-
-                        {dimension.lessonUrl && (
-                            <a href={dimension.lessonUrl} className="wr-lesson-btn">
-                                📖 Review Strategy →
-                            </a>
-                        )}
-
-                        <div className="wr-dim-feedback">
-                            {submitted ? (
-                                <div className="wr-feedback-submitted">
-                                    ✓ Thanks for your feedback!
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="wr-dim-fb-label">Feedback on this insight</div>
-                                    <div className="wr-fb-actions">
-                                        <button
-                                            className={`wr-fb-btn ${feedback === 'helpful' ? 'selected' : ''}`}
-                                            onClick={() => handleFeedback('helpful')}
-                                        >
-                                            👍 Helpful
-                                        </button>
-                                        <button
-                                            className={`wr-fb-btn ${feedback === 'not-helpful' ? 'selected' : ''}`}
-                                            onClick={() => handleFeedback('not-helpful')}
-                                        >
-                                            👎 Not Helpful
-                                        </button>
-                                        <button
-                                            className={`wr-fb-btn ${feedback === 'inaccurate' ? 'selected' : ''}`}
-                                            onClick={() => handleFeedback('inaccurate')}
-                                        >
-                                            🤔 Inaccurate
-                                        </button>
-                                    </div>
-
-                                    {feedback && (
-                                        <div className="wr-fb-expand">
-                                            <textarea
-                                                className="wr-fb-comment"
-                                                placeholder="Tell us more (optional)..."
-                                                value={comment}
-                                                onChange={(e) => setComment(e.target.value)}
-                                            />
-                                            <Button
-                                                size="small"
-                                                onClick={handleSubmit}
-                                                style={{ marginTop: '8px' }}
-                                            >
-                                                Submit Feedback
-                                            </Button>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </div>
+    return (
+        <div style={{ padding: '16px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#bbb', textTransform: 'uppercase', marginBottom: '8px' }}>
+                Feedback on this insight
+            </div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                <Button variant={feedback === 'helpful' ? 'primary' : 'outline-secondary'} size="small" onClick={() => setFeedback('helpful')}>
+                    👍 Helpful
+                </Button>
+                <Button variant={feedback === 'not-helpful' ? 'primary' : 'outline-secondary'} size="small" onClick={() => setFeedback('not-helpful')}>
+                    👎 Not Helpful
+                </Button>
+                <Button variant={feedback === 'inaccurate' ? 'primary' : 'outline-secondary'} size="small" onClick={() => setFeedback('inaccurate')}>
+                    🤔 Inaccurate
+                </Button>
+            </div>
+            {feedback && (
+                <div>
+                    <textarea
+                        style={{ width: '100%', border: '1px solid #ddd', borderRadius: '6px', padding: '8px', minHeight: '60px', marginBottom: '8px' }}
+                        placeholder="Tell us more (optional)..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                    />
+                    <Button size="small" onClick={handleSubmit}>Submit Feedback</Button>
                 </div>
             )}
         </div>
@@ -162,100 +113,127 @@ const DimensionCard = ({ dimension }) => {
 
 export default function WeeklyReportPage() {
     return (
-        <div className="wr-container">
-            <div className="wr-header">
-                <h1 className="wr-title">Your Week in Review</h1>
-                <div className="wr-meta">
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px' }}>
+            <div style={{ marginBottom: '32px' }}>
+                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>Your Week in Review</h1>
+                <div style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span>{REPORT_DATA.dateRange}</span>
-                    <span className="wr-week-badge">{REPORT_DATA.weekLabel}</span>
+                    <Badge style="secondary" text={REPORT_DATA.weekLabel} />
                 </div>
             </div>
 
             {/* CARD 1: STATS */}
-            <div className="wr-card fade-up">
-                <div className="wr-card-header">
-                    <div>
-                        <div className="wr-card-label">Your Numbers</div>
-                        <div className="wr-card-title">This Week at a Glance</div>
+            <Card style={{ marginBottom: '24px' }}>
+                <div style={{ padding: '24px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: 'var(--color-primary)', textTransform: 'uppercase', marginBottom: '16px' }}>
+                        This Week at a Glance
                     </div>
-                </div>
-                <div className="wr-card-body">
-                    <div className="wr-stats-row">
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
                         {REPORT_DATA.stats.map((stat, i) => (
-                            <div key={i} className={`wr-stat-tile ${i === 0 ? 'hero' : ''}`}>
-                                <div className="wr-stat-num">{stat.value}</div>
-                                <div className="wr-stat-lbl">{stat.label}</div>
+                            <div key={i} style={{
+                                background: i === 0 ? 'linear-gradient(135deg, var(--color-primary-dark), var(--color-primary))' : 'var(--bg-secondary)',
+                                color: i === 0 ? '#fff' : 'inherit',
+                                borderRadius: '12px', padding: '20px', position: 'relative'
+                            }}>
+                                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', fontWeight: 700, marginBottom: '4px', color: i === 0 ? 'var(--color-warning)' : 'inherit' }}>
+                                    {stat.value}
+                                </div>
+                                <div style={{ fontSize: '13px', fontWeight: 500, opacity: 0.8 }}>{stat.label}</div>
                                 {stat.delta && (
-                                    <span className={`wr-stat-delta ${stat.type}`}>{stat.delta}</span>
+                                    <div style={{
+                                        fontSize: '11px', fontWeight: 700, marginTop: '8px',
+                                        color: i === 0 ? '#fff' : (stat.type === 'positive' ? 'var(--color-success)' : 'var(--text-muted)'),
+                                        opacity: i === 0 ? 0.9 : 1
+                                    }}>
+                                        {stat.delta}
+                                    </div>
                                 )}
-                                <div className="wr-stat-icon">{stat.icon}</div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="wr-impact-label-row">
-                        <span>📊</span>
-                        <span className="wr-impact-label-text">Student Impact</span>
+                    <Divider style={{ margin: '24px 0' }} />
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                        <span style={{ fontSize: '16px' }}>📊</span>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-danger)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Student Impact</span>
                     </div>
 
-                    <div className="wr-impact-row">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
                         {REPORT_DATA.studentImpact.map((item, i) => (
-                            <div key={i} className="wr-impact-tile">
-                                <div className="wr-stat-num coral">{item.value}</div>
-                                <div className="wr-stat-lbl">{item.label}</div>
-                                {item.delta && <span className="wr-stat-delta up">{item.delta}</span>}
-                                <div className="wr-stat-icon">{item.icon}</div>
+                            <div key={i} style={{ background: '#fff5f0', border: '1px solid #f5ddd0', borderRadius: '12px', padding: '16px' }}>
+                                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', fontWeight: 700, color: 'var(--color-danger)' }}>{item.value}</div>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>{item.label}</div>
                             </div>
                         ))}
                     </div>
                 </div>
-            </div>
+            </Card>
 
             {/* CARD 2: TIME */}
-            <div className="wr-card fade-up delay-1">
-                <div className="wr-card-header">
-                    <div>
-                        <div className="wr-card-label">AI Observation</div>
-                        <div className="wr-card-title">How You Spent Your Time</div>
+            <Card style={{ marginBottom: '24px' }}>
+                <div style={{ padding: '24px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: 'var(--color-primary)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                        AI Observation
                     </div>
-                </div>
-                <div className="wr-card-body">
-                    <p className="wr-card-desc">Based on AI analysis of 12 sessions:</p>
-                    <div className="wr-time-bar-wrap">
-                        <div className="wr-time-bar-track">
-                            <div className="wr-time-seg tutoring" style={{ width: '52%' }}>52%</div>
-                            <div className="wr-time-seg goal" style={{ width: '14%' }}>14%</div>
-                            <div className="wr-time-seg observing" style={{ width: '18%' }}>18%</div>
-                            <div className="wr-time-seg troubleshoot" style={{ width: '10%' }}>10%</div>
-                            <div className="wr-time-seg other" style={{ width: '6%' }}></div>
+                    <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>How You Spent Your Time</div>
+
+                    <div style={{ background: 'var(--bg-secondary)', padding: '20px', borderRadius: '12px' }}>
+                        <div style={{ display: 'flex', height: '32px', borderRadius: '8px', overflow: 'hidden', marginBottom: '12px' }}>
+                            <div style={{ width: '52%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '11px', fontWeight: 600 }}>52%</div>
+                            <div style={{ width: '14%', background: 'var(--color-warning)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary-dark)', fontSize: '11px', fontWeight: 600 }}>14%</div>
+                            <div style={{ width: '18%', background: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '11px', fontWeight: 600 }}>18%</div>
+                            <div style={{ width: '16%', background: '#ccc' }}></div>
                         </div>
-                        <div className="wr-time-legend">
-                            <div className="wr-legend-item"><div className="wr-legend-dot tutoring"></div> Active Tutoring</div>
-                            <div className="wr-legend-item"><div className="wr-legend-dot goal"></div> Goal Setting</div>
-                            <div className="wr-legend-item"><div className="wr-legend-dot observing"></div> Observing</div>
+                        <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--color-primary)' }}></span> Tutoring</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--color-warning)' }}></span> Goals</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--color-primary-dark)' }}></span> Observing</div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Card>
 
-            {/* CARD 3: FEEDBACK */}
-            <div className="wr-card fade-up delay-2">
-                <div className="wr-card-header">
-                    <div>
-                        <div className="wr-card-label">Coaching Feedback</div>
-                        <div className="wr-card-title">Your Skills This Week</div>
+            {/* CARD 3: FEEDBACK (Accordion) */}
+            <Card paddingSize="md">
+                <div style={{ marginBottom: '16px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: 'var(--color-primary)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                        Coaching Feedback
                     </div>
+                    <div style={{ fontSize: '18px', fontWeight: 700 }}>Your Skills This Week</div>
                 </div>
-                <div className="wr-card-body">
-                    <p className="wr-card-desc">Click to expand details and provide feedback.</p>
-                    <div className="wr-dimensions-list">
-                        {REPORT_DATA.dimensions.map(dim => (
-                            <DimensionCard key={dim.id} dimension={dim} />
-                        ))}
-                    </div>
-                </div>
-            </div>
 
+                <Accordion>
+                    {REPORT_DATA.dimensions.map((dim) => (
+                        <Accordion.Item
+                            key={dim.id}
+                            eventKey={String(dim.id)}
+                            header={
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%' }}>
+                                    <div style={{ fontSize: '24px', background: 'var(--bg-secondary)', width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{dim.badge}</div>
+                                    <div style={{ flex: 1, textAlign: 'left' }}>
+                                        <div style={{ fontWeight: 600, fontSize: '15px' }}>{dim.title}</div>
+                                        <div style={{ fontSize: '12px', color: dim.badgeType === 'success' ? 'var(--color-success)' : 'var(--color-warning)' }}>{dim.subStatus}</div>
+                                    </div>
+                                    <Badge style={dim.badgeType} text={dim.status === 'Demonstrated' ? '✓ As Taught' : '⚬ Developing'} />
+                                </div>
+                            }
+                        >
+                            <div style={{ paddingTop: '16px' }}>
+                                <div style={{ background: 'var(--bg-secondary)', padding: '16px', borderRadius: '8px', borderLeft: `4px solid ${dim.badgeType === 'success' ? 'var(--color-success)' : 'var(--color-warning)'}`, marginBottom: '16px' }}>
+                                    <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#999', marginBottom: '8px' }}>Evidence from session</div>
+                                    <div style={{ fontStyle: 'italic', color: '#555', marginBottom: '8px' }}>{dim.evidence}</div>
+                                    <div style={{ fontSize: '12px', color: '#888' }}>🎥 {dim.evidenceTime}</div>
+                                </div>
+                                <p style={{ fontSize: '14px', lineHeight: '1.6', marginBottom: '16px' }}>{dim.summary}</p>
+
+                                <FeedbackSection />
+                            </div>
+                        </Accordion.Item>
+                    ))}
+                </Accordion>
+            </Card>
         </div>
     );
 }

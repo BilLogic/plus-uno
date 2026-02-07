@@ -69,6 +69,7 @@ const config = {
 
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
+    config.base = './'; // Ensure relative paths for subdirectory deployment
 
     config.resolve = config.resolve || {};
     config.resolve.alias = config.resolve.alias || {};

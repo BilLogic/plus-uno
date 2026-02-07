@@ -38,3 +38,6 @@ reference/production/
 prototyping/playground/*/
 !prototyping/playground/README.md
 .vercel
+
+# Local Netlify folder
+.netlify
