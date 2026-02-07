@@ -236,6 +236,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     onClick: () => setActiveContentTab(contentTabIds[i])
                                 }))}
                                 ariaLabel="Content sections"
+                                block
                             />
                         </div>
                     )}

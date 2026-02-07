@@ -10,6 +10,10 @@ const ResearchAdminApp = lazy(() =>
   import('../playground/prototyping/bill/research-assistant-chat/src/App').then((m) => ({ default: m.default }))
 );
 
+const WeeklyReportApp = lazy(() =>
+  import('../playground/prototyping/bill/weekly-report/src/App').then((m) => ({ default: m.default }))
+);
+
 /**
  * Loading fallback shown while the admin app chunk is loading.
  * @returns {JSX.Element}
@@ -52,6 +56,9 @@ function IndexPage() {
         <Link to="/sessions" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
           In-session (Your Students) prototype
         </Link>
+        <Link to="/weekly-report" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+          Weekly Report (Email Teaser + App)
+        </Link>
         <a href="/storybook/index.html" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
           Storybook Documentation
         </a>
@@ -81,6 +88,16 @@ function App() {
           }
         />
         <Route path="/sessions" element={<InSessionPage />} />
+        <Route
+          path="/weekly-report"
+          element={
+            <ErrorBoundary>
+              <Suspense fallback={<AdminPageFallback />}>
+                <WeeklyReportApp />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
       </Routes>
     </ThemeProvider>
   );
