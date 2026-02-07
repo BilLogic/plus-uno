@@ -47,6 +47,7 @@ export default function WeeklyReportApp() {
             id="weekly-report-page"
             shellLoading={shellLoading}
             shellEntered={shellEntered}
+            contentDirect={true}
         >
             <WeeklyReportPage />
         </PageLayout>
