@@ -6,13 +6,12 @@ import WeeklyReportPage from './WeeklyReportPage';
 export default function WeeklyReportApp() {
     const navigate = useNavigate();
 
-    // TopBar Configuration
+    // TopBar Configuration - no user display per design requirement
     const topBarConfig = {
         breadcrumbs: [
             { text: 'Toolkit', href: '#' },
             { text: 'Weekly Report', href: '#' }
         ],
-        user: { name: 'Albus Dumbledore', counter: null, counterValue: null, type: 'lead tutor' },
     };
 
     // Sidebar Configuration

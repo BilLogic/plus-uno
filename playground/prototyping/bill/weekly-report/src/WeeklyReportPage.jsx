@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import Button from '@/components/Button';
 import Badge from '@/components/Badge';
+import Alert from '@/components/Alert';
+import { RecommendedLessons } from '@/specs/Home/Cards';
 import './WeeklyReportPage.scss';
 
-// Mock Data matching Stitch design
+// Training card images
+import imgGivingEffectivePraise from '../../home-redesign/src/assets/giving-effective-praise.png';
+import imgReactingToErrors from '../../home-redesign/src/assets/reacting-to-errors.png';
+import imgPromptingStudentsToExplain from '../../home-redesign/src/assets/prompting-students-to-explain.png';
+import imgSupportingGrowthMindset from '../../home-redesign/src/assets/supporting-growth-mindset.png';
+
+// Mock Data matching Stitch design with FULL content
 const REPORT_DATA = {
     userName: 'Albus',
-    userFullName: 'Albus Dumbledore',
-    userRole: 'Lead',
     dateRange: 'Jan 27 – Jan 31, 2026',
     weekLabel: 'Week 18',
     impact: {
@@ -36,53 +42,74 @@ const REPORT_DATA = {
             subStatus: 'Greeting & rapport-building',
             icon: 'fa-user',
             iconBg: 'emerald',
-            summary: 'In 4 of 8 observed help requests, you provided the answer directly. Try responding with a leading question first, like "What do you think the first step might be?" to encourage independent problem solving.',
-            evidence: 'Student: I don\'t know how to do this one. — Tutor: OK so the answer here is 42, because you need to multiply 6 times 7.',
-            session: 'PS 234 • Tue Jan 28 • 12:30 – 13:10'
+            status: 'Demonstrated',
+            summary: 'You consistently greeted students by name, asked about their week, and established a warm tone. Observed in 11 of 12 sessions.',
+            evidence: 'Hey Marcus! Good to see you again. Before we get started, how\'d that math test go? … That\'s awesome, I\'m glad you felt good about it.',
+            session: 'PS 234 • Tue Jan 28, 2:32 PM • 0:00–0:45',
+            lessonUrl: '#'
         },
         {
             id: 2,
             title: 'Response to Help Requests',
             subStatus: 'Redirecting rather than giving answers',
             icon: 'fa-hand',
-            iconBg: 'amber'
+            iconBg: 'amber',
+            status: 'Developing',
+            summary: 'In 4 of 8 observed help requests, you provided the answer directly. Try responding with a leading question first, like "What do you think the first step might be?"',
+            evidence: 'Student: I don\'t know how to do this one. — Tutor: OK so the answer here is 42, because you need to multiply 6 times 7.',
+            session: 'PS 234 • Wed Jan 29, 3:15 PM • 12:30–13:10',
+            lessonUrl: '#',
+            needsWork: true
         },
         {
             id: 3,
             title: 'Prompting for Self-Explanation',
             subStatus: 'Asking students to explain their thinking',
             icon: 'fa-lightbulb',
-            iconBg: 'stone'
+            iconBg: 'stone',
+            status: 'Developing',
+            summary: 'Self-explanation prompts observed in only 3 of 12 sessions. Try asking "Can you walk me through how you figured that out?"',
+            evidence: 'Student answers correctly. Tutor: "Good job!" and moves to next problem, without asking how they arrived at the answer.',
+            session: 'PS 234 • Thu Jan 30, 2:50 PM • 8:20–8:45',
+            lessonUrl: '#',
+            needsWork: true
         },
         {
             id: 4,
             title: 'Reacting to Errors',
             subStatus: 'Normalizing mistakes & guiding correction',
             icon: 'fa-exclamation-triangle',
-            iconBg: 'rose'
+            iconBg: 'rose',
+            status: 'Not Observed',
+            summary: 'The AI did not find clear instances of student errors during the analyzed portions of this week\'s recordings. This dimension will be evaluated again when opportunities arise.',
+            evidence: null,
+            session: null,
+            lessonUrl: '#'
         },
         {
             id: 5,
             title: 'Checking for Understanding',
             subStatus: 'Frequent comprehension checks',
             icon: 'fa-check-circle',
-            iconBg: 'emerald'
+            iconBg: 'emerald',
+            status: 'Demonstrated',
+            summary: 'Great job pausing after key concepts to ask "Does that make sense?" and "How would you explain this in your own words?".',
+            evidence: 'So before we move on, can you tell me what the first step was?',
+            session: 'PS 234 • Fri Jan 31, 4:10 PM',
+            lessonUrl: '#'
         }
     ],
     training: [
-        {
-            id: 1,
-            title: 'Mastering Response to Help Requests',
-            description: 'Learn techniques to guide students toward the answer without providing it directly, encouraging critical thinking.',
-            icon: 'fa-hand',
-            iconBg: 'amber',
-            status: 'Developing'
-        }
+        { id: '1', title: 'Mastering Response to Help Requests', category: 'Social-Emotional Learning', duration: '12 mins', badgeType: 'socio-emotional', image: imgGivingEffectivePraise, status: 'Developing' },
+        { id: '2', title: 'Reacting to Errors', category: 'Advocacy', duration: '12 mins', badgeType: 'advocacy', image: imgReactingToErrors },
+        { id: '3', title: 'Prompting Students to Explain', category: 'Technology Tools', duration: '12 mins', badgeType: 'technology-tools', image: imgPromptingStudentsToExplain },
+        { id: '4', title: 'Supporting a Growth Mindset', category: 'Social-Emotional Learning', duration: '12 mins', badgeType: 'socio-emotional', image: imgSupportingGrowthMindset }
     ]
 };
 
 export default function WeeklyReportPage() {
     const [reviewedCount, setReviewedCount] = useState(0);
+    const [activeKey, setActiveKey] = useState(0); // Which card is expanded
     const totalDimensions = REPORT_DATA.dimensions.length;
 
     const getState = (index) => {
@@ -91,17 +118,47 @@ export default function WeeklyReportPage() {
         return 'locked';
     };
 
-    const handleFeedback = (helpful) => {
-        setReviewedCount(prev => Math.min(prev + 1, totalDimensions));
+    const handleFeedback = () => {
+        setReviewedCount(prev => {
+            const next = Math.min(prev + 1, totalDimensions);
+            setActiveKey(next < totalDimensions ? next : prev); // Auto-expand next
+            return next;
+        });
+    };
+
+    const handleCardClick = (index) => {
+        const state = getState(index);
+        if (state === 'locked') return; // Can't expand locked
+        setActiveKey(activeKey === index ? null : index); // Toggle
     };
 
     const allReviewed = reviewedCount >= totalDimensions;
 
+    const getIconBgColor = (bg) => {
+        const colors = {
+            emerald: 'rgba(16, 185, 129, 0.1)',
+            amber: 'rgba(245, 158, 11, 0.1)',
+            stone: 'var(--color-surface-container)',
+            rose: 'rgba(244, 63, 94, 0.1)'
+        };
+        return colors[bg] || colors.emerald;
+    };
+
+    const getIconColor = (bg) => {
+        const colors = {
+            emerald: 'var(--color-success)',
+            amber: 'var(--color-warning)',
+            stone: 'var(--color-on-surface-variant)',
+            rose: 'var(--color-danger)'
+        };
+        return colors[bg] || colors.emerald;
+    };
+
     return (
-        <div className="weekly-report" style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 40px 48px' }}>
+        <div className="weekly-report">
 
             {/* ============================================
-                HEADER
+                HEADER (No user pill)
                 ============================================ */}
             <header className="report-header">
                 <div>
@@ -112,69 +169,46 @@ export default function WeeklyReportPage() {
                         <span className="week-badge">{REPORT_DATA.weekLabel}</span>
                     </div>
                 </div>
-                <div className="user-pill">
-                    <div className="user-avatar">A</div>
-                    <div style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 500, color: 'var(--color-on-surface)' }}>{REPORT_DATA.userFullName}</span>
-                        <span className="user-role-badge">{REPORT_DATA.userRole}</span>
-                    </div>
-                </div>
             </header>
 
             {/* ============================================
                 YOUR IMPACT SECTION
                 ============================================ */}
-            <section style={{ marginBottom: '48px' }}>
-                <div className="section-header">
-                    <h2 className="section-title">Your Impact</h2>
-                </div>
+            <section className="impact-section-wrapper">
+                <h2 className="section-title">Your Impact</h2>
 
-                {/* Hero Card + Stats Grid */}
                 <div className="impact-section">
-                    {/* Hero Card (66%) */}
+                    {/* Hero Card */}
                     <div className="impact-hero-wrapper">
                         <div className="impact-hero-card">
                             <div className="impact-hero-card-content">
-                                <h3 style={{
-                                    fontSize: '18px',
-                                    fontWeight: 700,
-                                    color: 'var(--color-on-surface-variant)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em',
-                                    marginBottom: '24px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px'
-                                }}>
-                                    <i className="fa-solid fa-bolt" style={{ color: '#f43f5e' }}></i>
+                                <h3 className="impact-title">
+                                    <i className="fa-solid fa-bolt"></i>
                                     Impact on Students
                                 </h3>
 
-                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '48px', height: '100%' }}>
-                                    {/* Learning Time */}
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                                <div className="impact-metrics">
+                                    <div className="impact-metric">
+                                        <div className="metric-value-row">
                                             <span className="metric-value-xl">{REPORT_DATA.impact.learningTime.value}</span>
                                             <span className="metric-unit">{REPORT_DATA.impact.learningTime.unit}</span>
                                         </div>
-                                        <div className="delta-badge delta-badge--rose" style={{ marginTop: '8px' }}>
-                                            <i className="fa-solid fa-arrow-trend-up" style={{ marginRight: '4px', fontSize: '12px' }}></i>
+                                        <div className="delta-badge delta-badge--rose">
+                                            <i className="fa-solid fa-arrow-trend-up"></i>
                                             {REPORT_DATA.impact.learningTime.delta}
                                         </div>
                                         <p className="metric-label">Total Student Learning Time</p>
                                     </div>
 
-                                    {/* Divider */}
-                                    <div style={{ width: '1px', height: '96px', background: 'var(--color-outline-variant)', alignSelf: 'center' }}></div>
+                                    <div className="impact-divider"></div>
 
-                                    {/* Skills Mastered */}
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                                    <div className="impact-metric">
+                                        <div className="metric-value-row">
                                             <span className="metric-value-xl">{REPORT_DATA.impact.skillsMastered.value}</span>
                                             <span className="metric-unit">{REPORT_DATA.impact.skillsMastered.unit}</span>
                                         </div>
-                                        <div className="delta-badge delta-badge--success" style={{ marginTop: '8px' }}>
-                                            <i className="fa-solid fa-arrow-trend-up" style={{ marginRight: '4px', fontSize: '12px' }}></i>
+                                        <div className="delta-badge delta-badge--success">
+                                            <i className="fa-solid fa-arrow-trend-up"></i>
                                             {REPORT_DATA.impact.skillsMastered.delta}
                                         </div>
                                         <p className="metric-label">Concepts Mastered</p>
@@ -184,7 +218,7 @@ export default function WeeklyReportPage() {
                         </div>
                     </div>
 
-                    {/* Stats Grid (33%) */}
+                    {/* Stats Grid */}
                     <div className="impact-stats-grid">
                         {REPORT_DATA.stats.map((stat, i) => (
                             <div key={i} className={`stat-card stat-card--${stat.color}`}>
@@ -193,68 +227,38 @@ export default function WeeklyReportPage() {
                                 </div>
                                 <div>
                                     <span className="metric-value-lg">{stat.value}</span>
-                                    <span style={{
-                                        display: 'block',
-                                        fontSize: '12px',
-                                        fontWeight: 600,
-                                        color: 'var(--color-on-surface-variant)',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        marginTop: '4px'
-                                    }}>{stat.label}</span>
+                                    <span className="stat-label">{stat.label}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Key Insight Callout */}
-                <div className="insight-callout" style={{ marginBottom: '48px' }}>
-                    <div className="insight-callout-icon">
-                        <i className="fa-solid fa-trophy" style={{ fontSize: '20px' }}></i>
-                    </div>
-                    <p className="insight-callout-text">{REPORT_DATA.keyInsight}</p>
-                </div>
+                {/* Key Insight using Alert component */}
+                <Alert style="warning" dismissable={false} className="insight-alert">
+                    <i className="fa-solid fa-trophy insight-alert-icon"></i>
+                    {REPORT_DATA.keyInsight}
+                </Alert>
             </section>
 
             {/* ============================================
                 TIME ALLOCATION SECTION
                 ============================================ */}
-            <section style={{
-                background: 'var(--color-surface-container-lowest)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                border: '1px solid var(--color-outline-variant)',
-                padding: '32px',
-                marginBottom: '48px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-            }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: '24px' }}>
-                    Time Allocation
-                </h3>
+            <section className="time-allocation-section">
+                <h3 className="time-allocation-title">Time Allocation</h3>
 
-                {/* Legend */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
+                <div className="time-allocation-legend">
                     {REPORT_DATA.timeAllocation.map((seg, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-                            <div style={{
-                                width: '12px',
-                                height: '12px',
-                                borderRadius: '50%',
-                                background: seg.color === 'primary' ? 'var(--color-primary)'
-                                    : seg.color === 'amber' ? '#fbbf24'
-                                        : seg.color === 'indigo' ? '#a5b4fc'
-                                            : seg.color === 'rose' ? '#fb7185'
-                                                : '#e5e7eb'
-                            }}></div>
-                            <span style={{ fontWeight: 500, color: 'var(--color-on-surface)' }}>
-                                {seg.label} <span style={{ fontWeight: 400, color: 'var(--color-on-surface-variant)' }}>{seg.value}%</span>
+                        <div key={i} className="legend-item">
+                            <div className={`legend-dot legend-dot--${seg.color}`}></div>
+                            <span className="legend-label">
+                                {seg.label} <span className="legend-value">{seg.value}%</span>
                             </span>
                         </div>
                     ))}
                 </div>
 
-                {/* Bar */}
-                <div className="time-allocation-bar" style={{ marginBottom: '32px' }}>
+                <div className="time-allocation-bar">
                     {REPORT_DATA.timeAllocation.map((seg, i) => (
                         <div
                             key={i}
@@ -265,11 +269,10 @@ export default function WeeklyReportPage() {
                     ))}
                 </div>
 
-                {/* Insight Box */}
                 <div className="time-insight-box">
-                    <i className="fa-solid fa-lightbulb" style={{ color: 'var(--color-primary)', fontSize: '18px', marginTop: '2px' }}></i>
-                    <p style={{ fontSize: '14px', color: '#1e3a5f', lineHeight: 1.6 }}>
-                        <strong style={{ color: 'var(--color-primary)' }}>Insight:</strong> {REPORT_DATA.timeInsight}
+                    <i className="fa-solid fa-lightbulb time-insight-icon"></i>
+                    <p className="time-insight-text">
+                        <strong>Insight:</strong> {REPORT_DATA.timeInsight}
                     </p>
                 </div>
             </section>
@@ -277,26 +280,17 @@ export default function WeeklyReportPage() {
             {/* ============================================
                 GROWTH INSIGHTS SECTION
                 ============================================ */}
-            <section style={{ marginBottom: '48px' }}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    marginBottom: '16px',
-                    borderBottom: '1px solid var(--color-outline-variant)',
-                    paddingBottom: '8px'
-                }}>
-                    <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                            <h2 className="section-title">Growth Insights</h2>
-                            <Badge style="secondary" size="small">
-                                <i className="fa-solid fa-wand-magic-sparkles" style={{ marginRight: '4px', fontSize: '10px' }}></i>
-                                Powered by PLUS AI Coach
-                            </Badge>
-                        </div>
+            <section className="growth-insights-section">
+                <div className="growth-insights-header">
+                    <div className="growth-insights-title-row">
+                        <h2 className="section-title">Growth Insights</h2>
+                        <Badge style="secondary" size="small">
+                            <i className="fa-solid fa-wand-magic-sparkles"></i>
+                            Powered by PLUS AI Coach
+                        </Badge>
                     </div>
-                    <div style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', fontWeight: 500 }}>
-                        Review progress: <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{reviewedCount} of {totalDimensions}</span>
+                    <div className="review-progress">
+                        Review progress: <span className="review-progress-count">{reviewedCount} of {totalDimensions}</span>
                     </div>
                 </div>
 
@@ -304,136 +298,94 @@ export default function WeeklyReportPage() {
                 <div className="timeline-container">
                     {REPORT_DATA.dimensions.map((dim, index) => {
                         const state = getState(index);
+                        const isExpanded = activeKey === index;
                         const isLast = index === REPORT_DATA.dimensions.length - 1;
 
                         return (
                             <div
                                 key={dim.id}
                                 className={`timeline-item timeline-item--${state}`}
-                                style={{ paddingBottom: isLast ? 0 : '48px' }}
+                                style={{ paddingBottom: isLast ? 0 : undefined }}
                             >
                                 {/* Timeline node */}
                                 <div className={`timeline-node timeline-node--${state === 'under_review' ? 'active' : state}`}>
-                                    <i className={`fa-solid ${state === 'locked' ? 'fa-lock' : state === 'reviewed' ? 'fa-check' : 'fa-eye'}`}
-                                        style={{ color: state === 'under_review' ? 'var(--color-primary)' : state === 'reviewed' ? 'white' : '#9ca3af' }}></i>
+                                    <i className={`fa-solid ${state === 'locked' ? 'fa-lock' : state === 'reviewed' ? 'fa-check' : 'fa-eye'}`}></i>
                                 </div>
 
                                 {/* Card */}
-                                {state === 'under_review' ? (
-                                    <div className="growth-card growth-card--active">
-                                        <div style={{ padding: '24px 32px' }}>
-                                            {/* Header */}
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                                    <div style={{
-                                                        width: '48px',
-                                                        height: '48px',
-                                                        borderRadius: '12px',
-                                                        background: 'rgba(16, 185, 129, 0.1)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        color: '#10b981'
-                                                    }}>
-                                                        <i className={`fa-solid ${dim.icon}`} style={{ fontSize: '18px' }}></i>
-                                                    </div>
-                                                    <div>
-                                                        <h4 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-on-surface)' }}>{dim.title}</h4>
-                                                        <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginTop: '2px' }}>{dim.subStatus}</p>
-                                                    </div>
-                                                </div>
-                                                <Badge style="primary" size="small">Under Review</Badge>
-                                            </div>
+                                <div
+                                    className={`growth-card growth-card--${state} ${isExpanded ? 'growth-card--expanded' : ''}`}
+                                    onClick={() => handleCardClick(index)}
+                                    role={state !== 'locked' ? 'button' : undefined}
+                                    tabIndex={state !== 'locked' ? 0 : undefined}
+                                >
+                                    {/* Header (always visible) */}
+                                    <div className="growth-card-header">
+                                        <div className="growth-card-icon" style={{
+                                            background: getIconBgColor(dim.iconBg),
+                                            color: getIconColor(dim.iconBg)
+                                        }}>
+                                            <i className={`fa-solid ${dim.icon}`}></i>
+                                        </div>
+                                        <div className="growth-card-title-block">
+                                            <h4 className="growth-card-title">{dim.title}</h4>
+                                            <p className="growth-card-subtitle">{dim.subStatus}</p>
+                                        </div>
+                                        <div className="growth-card-status">
+                                            <Badge
+                                                style={state === 'reviewed' ? 'success' : state === 'under_review' ? 'primary' : 'neutral'}
+                                                size="small"
+                                            >
+                                                {state === 'reviewed' ? 'Reviewed' : state === 'under_review' ? 'Under Review' : 'Locked'}
+                                            </Badge>
+                                            {state === 'locked' && (
+                                                <span className="locked-hint">
+                                                    Complete previous step <i className="fa-solid fa-lock"></i>
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
 
-                                            {/* Summary */}
-                                            <p style={{ fontSize: '14px', lineHeight: 1.7, color: 'var(--color-on-surface)', marginBottom: '24px' }}>
-                                                {dim.summary}
-                                            </p>
+                                    {/* Expanded content */}
+                                    {isExpanded && state !== 'locked' && (
+                                        <div className="growth-card-body">
+                                            <p className="growth-card-summary">{dim.summary}</p>
 
-                                            {/* Quote */}
                                             {dim.evidence && (
                                                 <div className="quote-block">
                                                     <p className="quote-text">"{dim.evidence}"</p>
                                                 </div>
                                             )}
 
-                                            {/* Session info */}
-                                            <div style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                fontSize: '12px',
-                                                color: 'var(--color-on-surface-variant)',
-                                                borderBottom: '1px solid var(--color-outline-variant)',
-                                                paddingBottom: '16px',
-                                                marginBottom: '16px'
-                                            }}>
-                                                <span>{dim.session}</span>
-                                                <Button size="small" variant="ghost">
-                                                    <i className="fa-solid fa-play-circle" style={{ marginRight: '6px' }}></i>
-                                                    View Recording
-                                                </Button>
-                                            </div>
+                                            {dim.session && (
+                                                <div className="session-row">
+                                                    <span className="session-info">{dim.session}</span>
+                                                    <Button size="small" fill="outline">
+                                                        <i className="fa-solid fa-play-circle"></i>
+                                                        View Recording
+                                                    </Button>
+                                                </div>
+                                            )}
 
-                                            {/* Feedback */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-                                                <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-on-surface)' }}>
-                                                    Was this insight helpful?
-                                                </p>
-                                                <div style={{ display: 'flex', gap: '12px' }}>
-                                                    <button className="feedback-btn" onClick={() => handleFeedback(true)}>
-                                                        <i className="fa-solid fa-thumbs-up"></i> Helpful
-                                                    </button>
-                                                    <button className="feedback-btn" onClick={() => handleFeedback(false)}>
-                                                        <i className="fa-solid fa-thumbs-down"></i> Not Helpful
-                                                    </button>
-                                                    <button className="feedback-btn feedback-btn--negative" onClick={() => handleFeedback(false)}>
-                                                        <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
-                                                    </button>
+                                            {state === 'under_review' && (
+                                                <div className="feedback-row">
+                                                    <p className="feedback-prompt">Was this insight helpful?</p>
+                                                    <div className="feedback-buttons">
+                                                        <Button size="small" fill="outline" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
+                                                            <i className="fa-solid fa-thumbs-up"></i> Helpful
+                                                        </Button>
+                                                        <Button size="small" fill="outline" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
+                                                            <i className="fa-solid fa-thumbs-down"></i> Not Helpful
+                                                        </Button>
+                                                        <Button size="small" fill="outline" style="danger" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
+                                                            <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className={`growth-card ${state === 'locked' ? 'growth-card--locked' : ''}`}>
-                                        <div style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', filter: state === 'locked' ? 'grayscale(1)' : 'none' }}>
-                                                <div style={{
-                                                    width: '48px',
-                                                    height: '48px',
-                                                    borderRadius: '12px',
-                                                    background: dim.iconBg === 'amber' ? 'rgba(245, 158, 11, 0.1)'
-                                                        : dim.iconBg === 'stone' ? '#e7e5e4'
-                                                            : dim.iconBg === 'rose' ? 'rgba(244, 63, 94, 0.1)'
-                                                                : 'rgba(16, 185, 129, 0.1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: dim.iconBg === 'amber' ? '#f59e0b'
-                                                        : dim.iconBg === 'stone' ? '#78716c'
-                                                            : dim.iconBg === 'rose' ? '#f43f5e'
-                                                                : '#10b981'
-                                                }}>
-                                                    <i className={`fa-solid ${dim.icon}`} style={{ fontSize: '18px' }}></i>
-                                                </div>
-                                                <div>
-                                                    <h4 style={{ fontSize: '16px', fontWeight: 700, color: state === 'locked' ? '#9ca3af' : 'var(--color-on-surface)' }}>{dim.title}</h4>
-                                                    <p style={{ fontSize: '14px', color: '#9ca3af', marginTop: '2px' }}>{dim.subStatus}</p>
-                                                </div>
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                                                <Badge style={state === 'reviewed' ? 'success' : 'neutral'} size="small">
-                                                    {state === 'reviewed' ? 'Reviewed' : 'Locked'}
-                                                </Badge>
-                                                {state === 'locked' && (
-                                                    <span style={{ fontSize: '12px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                        Complete previous step <i className="fa-solid fa-lock" style={{ fontSize: '10px' }}></i>
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         );
                     })}
@@ -441,39 +393,34 @@ export default function WeeklyReportPage() {
             </section>
 
             {/* ============================================
-                RECOMMENDED TRAINING SECTION (Locked until all reviewed)
+                RECOMMENDED TRAINING SECTION
                 ============================================ */}
-            <section className={!allReviewed ? 'training-section--locked' : ''}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {!allReviewed && <i className="fa-solid fa-lock" style={{ color: '#9ca3af' }}></i>}
+            <section className={`training-section ${!allReviewed ? 'training-section--locked' : ''}`}>
+                <div className="training-header">
+                    <div className="training-title-row">
+                        {!allReviewed && <i className="fa-solid fa-lock training-lock-icon"></i>}
                         <h2 className="section-title">Recommended Training</h2>
                     </div>
                     {!allReviewed && (
-                        <span style={{ fontSize: '14px', color: '#9ca3af', fontStyle: 'italic' }}>
-                            Unlock after reviewing all insights
-                        </span>
+                        <span className="training-hint">Unlock after reviewing all insights</span>
                     )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                <div className="training-grid">
                     {REPORT_DATA.training.map((t) => (
-                        <div key={t.id} className="training-card">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                                <div style={{
-                                    padding: '12px',
-                                    borderRadius: '8px',
-                                    background: 'rgba(245, 158, 11, 0.1)',
-                                    color: '#f59e0b'
-                                }}>
-                                    <i className={`fa-solid ${t.icon}`}></i>
-                                </div>
-                                <Badge style="warning" size="small">{t.status}</Badge>
-                            </div>
-                            <h4 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: '8px' }}>{t.title}</h4>
-                            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>{t.description}</p>
-                            <Button variant="primary" style={{ width: '100%' }} disabled={!allReviewed}>Start Module</Button>
-                        </div>
+                        <RecommendedLessons
+                            key={t.id}
+                            breakpoint="XXL & above"
+                            badgeType={t.badgeType}
+                            title={t.title}
+                            duration={t.duration}
+                            status="in-progress"
+                            aiRecommended={false}
+                            image={t.image}
+                            actionLabel="Start"
+                            onReviewClick={() => { }}
+                            className={!allReviewed ? 'training-card--disabled' : ''}
+                        />
                     ))}
                 </div>
             </section>
