@@ -3,10 +3,12 @@
  * No styles for plus-page-* or plus-sidebar; only .home-redesign-* content.
  */
 
-/* Page frame: fill root (root is 1280×800 in index.css) */
+/* Page frame: fill root (root is 1280×850 in index.css) */
 #home-redesign-page {
     --home-redesign-section-pad-y: 16px;
     --home-redesign-section-pad-x: 20px;
+    width: 100%;
+    height: 100%;
 }
 
 /* TopBar: breadcrumb and user from config; UserAvatar background for demo. */

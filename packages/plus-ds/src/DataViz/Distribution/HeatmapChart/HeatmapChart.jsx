@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '../../highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
@@ -25,9 +25,13 @@ const HeatmapChart = ({
     /** When false, hides values in cells; value is represented by color/opacity only. */
     showDataLabels = true,
     /** Gap between cells (0–1). Larger = more room for breath. */
-    pointPadding = 0
+    pointPadding = 0,
+    /** When false, disables Highcharts series animation (useful to avoid replay on redraw). */
+    enableAnimation = true,
+    /** Animation duration in ms when animation is enabled. */
+    animationDuration = 1000
 }) => {
-    const options = {
+    const options = useMemo(() => ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
@@ -48,12 +52,17 @@ const HeatmapChart = ({
         },
         colorAxis: {
             min: 0,
-            minColor: minColor,
-            maxColor: maxColor
+            max: 1,
+            stops: [
+                [0, minColor],
+                [0.5, minColor], // Hold the lower color a bit longer
+                [1, maxColor]
+            ]
         },
         plotOptions: {
             heatmap: {
-                pointPadding: pointPadding
+                pointPadding: pointPadding,
+                animation: enableAnimation ? { duration: animationDuration } : false
             }
         },
         legend: {
@@ -71,13 +80,12 @@ const HeatmapChart = ({
             ...chartTheme.tooltip,
             formatter: function () {
                 return `<b>${this.series.xAxis.categories[this.point.x]}</b><br/>
-                        <b>${this.series.yAxis.categories[this.point.y]}</b>: ${this.point.value}`;
+                        <b>${this.series.yAxis.categories[this.point.y]}</b>: ${this.point.value.toFixed(2)}`;
             }
         },
         series: [{
             name: 'Heatmap',
-            borderWidth: 1,
-            borderColor: 'var(--color-outline-variant)',
+            borderWidth: 0,
             data: data,
             dataLabels: {
                 enabled: showDataLabels,
@@ -87,7 +95,21 @@ const HeatmapChart = ({
                 }
             }
         }]
-    };
+    }), [
+        animationDuration,
+        compactSpacing,
+        data,
+        enableAnimation,
+        height,
+        hideLegendNavigation,
+        maxColor,
+        minColor,
+        pointPadding,
+        showDataLabels,
+        showLegend,
+        xCategories,
+        yCategories
+    ]);
 
     return (
         <div style={{ width: '100%', height: height }}>
@@ -118,7 +140,11 @@ HeatmapChart.propTypes = {
     /** When false, hides values in cells (color/opacity only) */
     showDataLabels: PropTypes.bool,
     /** Gap between cells (0–1) for visual breathing room */
-    pointPadding: PropTypes.number
+    pointPadding: PropTypes.number,
+    /** When false, disables Highcharts series animation */
+    enableAnimation: PropTypes.bool,
+    /** Animation duration in ms */
+    animationDuration: PropTypes.number
 };
 
 export default HeatmapChart;
