@@ -183,8 +183,10 @@ export default function WeeklyReportPage() {
                         <div className="impact-hero-card">
                             <div className="impact-hero-card-content">
                                 <h3 className="impact-title">
-                                    <i className="fa-solid fa-bolt"></i>
-                                    Impact on Students
+                                    <span className="impact-title-icon" aria-hidden="true">
+                                        <i className="fa-solid fa-bolt"></i>
+                                    </span>
+                                    <span>Impact on Students</span>
                                 </h3>
 
                                 <div className="impact-metrics">
@@ -296,6 +298,7 @@ export default function WeeklyReportPage() {
 
                 {/* Timeline */}
                 <div className="timeline-container">
+                    <span className="timeline-connector" aria-hidden="true"></span>
                     {REPORT_DATA.dimensions.map((dim, index) => {
                         const state = getState(index);
                         const isExpanded = activeKey === index;

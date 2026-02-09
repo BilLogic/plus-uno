@@ -20,20 +20,27 @@
         left: 0;
         width: 100%;
         height: 100%;
-        transition: clip-path 0.3s ease-in-out;
+        clip-path: inset(100% 0 0 0);
+        transition: clip-path 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    &__fill-container--staged {
+        animation: progressRingReveal 860ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: var(--ring-delay, 0ms);
     }
 
     &__label {
         position: absolute;
-        top: 35%; // Matches Figma Y=14px (14/40)
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
         text-align: center;
-        line-height: normal; // Allow natural height
+        line-height: 1;
         display: flex;
-        align-items: flex-start; // Align to top of container
+        align-items: center;
         justify-content: center;
         width: 100%;
+        pointer-events: none;
     }
 
     &__text {
@@ -41,5 +48,24 @@
         font-size: 10px;
         font-weight: 600;
         color: var(--color-on-surface, #191c1e);
+    }
+}
+
+@keyframes progressRingReveal {
+    from {
+        clip-path: inset(100% 0 0 0);
+    }
+
+    to {
+        clip-path: var(--ring-target-inset, inset(0 0 0 0));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-progress-ring__fill-container,
+    .plus-progress-ring__fill-container--staged {
+        animation: none !important;
+        transition: none !important;
+        clip-path: var(--ring-target-inset, inset(0 0 0 0));
     }
 }

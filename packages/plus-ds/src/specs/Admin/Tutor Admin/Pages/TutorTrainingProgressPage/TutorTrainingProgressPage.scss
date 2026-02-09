@@ -136,3 +136,87 @@
         }
     }
 }
+
+/* Admin-page staged content reveal */
+.admin-reveal-root .tutor-training-progress-page__overview-header,
+.admin-reveal-root .tutor-training-progress-page__overview-cards > *,
+.admin-reveal-root .tutor-training-progress-page__details-header,
+.admin-reveal-root .tutor-training-progress-page .plus-export-search-filter-bar,
+.admin-reveal-root .export-search-filter-bar,
+.admin-reveal-root .tutor-training-progress-page__details-section .tutors-training-progress-table,
+.admin-reveal-root .tutor-training-progress-page__pagination {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__overview-header {
+    animation: adminContentReveal 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 80ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__overview-cards > *:nth-child(1) {
+    animation: adminContentReveal 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 130ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__overview-cards > *:nth-child(2) {
+    animation: adminContentReveal 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 190ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__overview-cards > *:nth-child(3) {
+    animation: adminContentReveal 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 250ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__overview-cards > *:nth-child(4) {
+    animation: adminContentReveal 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 310ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__details-header {
+    animation: adminContentReveal 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 260ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page .plus-export-search-filter-bar,
+.admin-reveal-root.has-entered .export-search-filter-bar {
+    animation: adminContentReveal 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 330ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__details-section .tutors-training-progress-table {
+    animation: adminContentReveal 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 400ms;
+}
+
+.admin-reveal-root.has-entered .tutor-training-progress-page__pagination {
+    animation: adminContentReveal 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 520ms;
+}
+
+@keyframes adminContentReveal {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-reveal-root .tutor-training-progress-page__overview-header,
+    .admin-reveal-root .tutor-training-progress-page__overview-cards > *,
+    .admin-reveal-root .tutor-training-progress-page__details-header,
+    .admin-reveal-root .tutor-training-progress-page .plus-export-search-filter-bar,
+    .admin-reveal-root .export-search-filter-bar,
+    .admin-reveal-root .tutor-training-progress-page__details-section .tutors-training-progress-table,
+    .admin-reveal-root .tutor-training-progress-page__pagination {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

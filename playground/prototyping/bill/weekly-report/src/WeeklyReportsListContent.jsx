@@ -184,12 +184,17 @@ export default function WeeklyReportsListContent() {
                                 </td>
                                 <td>
                                     <div className="completion-cell">
-                                        <Progress
-                                            value={(report.completion.done / report.completion.total) * 100}
-                                            style={getProgressColor(report.completion.done, report.completion.total)}
-                                            className="completion-progress"
-                                            size="small"
-                                        />
+                                        <div
+                                            className="completion-progress-shell"
+                                            style={{ '--progress-delay': `${520 + i * 80}ms` }}
+                                        >
+                                            <Progress
+                                                value={(report.completion.done / report.completion.total) * 100}
+                                                style={getProgressColor(report.completion.done, report.completion.total)}
+                                                className="completion-progress completion-progress--staged"
+                                                size="small"
+                                            />
+                                        </div>
                                         <span className="body3-txt">
                                             {report.completion.done}/{report.completion.total}
                                         </span>

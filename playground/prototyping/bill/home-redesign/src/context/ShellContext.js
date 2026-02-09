@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-const noop = () => {};
+const noop = () => { };
 
 export const ShellContext = createContext({
     setBreadcrumbs: noop,
@@ -9,5 +9,6 @@ export const ShellContext = createContext({
     setContentDirect: noop,
     setFloatingContent: noop,
     setActiveTabOverride: noop,
+    openStudentInsights: noop,
 });
 

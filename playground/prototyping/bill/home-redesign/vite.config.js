@@ -26,4 +26,12 @@ export default defineConfig({
         host: true,
         strictPort: true,
     },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: 'modern-compiler',
+                silenceDeprecations: ['import', 'legacy-js-api']
+            }
+        }
+    }
 });

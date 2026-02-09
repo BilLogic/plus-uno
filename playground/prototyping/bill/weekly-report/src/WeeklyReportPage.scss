@@ -10,6 +10,8 @@
     gap: var(--size-section-gap-lg);
     background: var(--color-surface);
     min-height: 100vh;
+    overflow: visible;
+    padding-bottom: var(--size-section-gap-lg);
 }
 
 /* ============================================
@@ -123,6 +125,9 @@
 .impact-hero-card-content {
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .impact-title {
@@ -138,26 +143,49 @@
 }
 
 .impact-title i {
-    color: var(--color-danger);
+    color: inherit;
+}
+
+.impact-title-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--size-element-radius-md);
+    background: var(--color-primary-state-08);
+    color: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.impact-title-icon i {
+    font-size: 14px;
+    line-height: 1;
 }
 
 .impact-metrics {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: var(--size-card-gap-lg);
-    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    column-gap: var(--size-card-gap-lg);
+    align-items: center;
+    flex: 1 1 auto;
 }
 
 .impact-metric {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    gap: var(--size-element-gap-sm);
 }
 
 .impact-divider {
     width: 1px;
-    height: 96px;
+    height: 100%;
     background: var(--color-outline-variant);
-    align-self: center;
+    align-self: stretch;
+    justify-self: center;
+    margin: 0;
 }
 
 .metric-value-row {
@@ -187,7 +215,7 @@
     border-radius: var(--size-element-radius-full);
     font-size: 12px;
     font-weight: 600;
-    margin-top: var(--size-element-gap-sm);
+    margin-top: 0;
 }
 
 .delta-badge i {
@@ -207,7 +235,7 @@
 .metric-label {
     font-size: 12px;
     color: var(--color-on-surface-variant);
-    margin-top: var(--size-element-gap-sm);
+    margin-top: 0;
 }
 
 /* Stats Grid */
@@ -221,10 +249,11 @@
     background: var(--color-surface-container-lowest);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-card-radius-sm);
-    padding: var(--size-element-pad-x-md);
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: var(--size-element-gap-md);
+    gap: var(--size-element-gap-sm);
     position: relative;
     overflow: hidden;
 }
@@ -267,6 +296,17 @@
     align-items: center;
     justify-content: center;
     font-size: 14px;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    margin: 0;
+    padding: 0;
     position: relative;
     z-index: 1;
 }
@@ -329,7 +369,7 @@
 .time-allocation-section {
     background: var(--color-surface-container-lowest);
     border: none;
-    border-radius: var(--size-card-radius-lg, 16px);
+    border-radius: var(--size-card-radius-md);
     padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
     display: flex;
     flex-direction: column;
@@ -346,7 +386,7 @@
 .time-allocation-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-element-gap-lg, 20px);
+    gap: var(--size-element-gap-lg);
 }
 
 .legend-item {
@@ -648,7 +688,8 @@
     font-size: 14px;
     color: var(--color-on-surface-variant);
     line-height: 1.6;
-    margin: var(--size-card-gap-sm) 0 0;
+    margin: 0;
+    padding-block: var(--size-element-pad-y-sm);
 }
 
 .quote-block {
@@ -751,7 +792,7 @@
     min-height: 0;
     padding: 0;
     padding-bottom: 80px;
-    gap: var(--size-surface-gap-sm, 16px);
+    gap: var(--size-surface-gap-sm);
     font-family: var(--font-family-base, var(--font-family-body));
     color: var(--color-on-surface);
 }
@@ -766,13 +807,13 @@
 }
 
 .impact-section-wrapper {
-    margin-bottom: 20px;
+    margin-bottom: var(--size-surface-gap-sm);
 }
 
 .impact-section {
     grid-template-columns: 2fr 1fr;
-    gap: 24px;
-    margin-bottom: 16px;
+    gap: var(--size-surface-gap-sm);
+    margin-bottom: var(--size-surface-gap-sm);
 }
 
 @media (max-width: 900px) {
@@ -785,18 +826,18 @@
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), #fff);
     border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 16px;
-    padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .impact-title {
     font-size: 16px;
-    margin-bottom: 24px;
+    margin-bottom: var(--size-card-gap-md);
     color: var(--color-primary);
 }
 
 .impact-metrics {
-    gap: 48px;
+    column-gap: var(--size-card-gap-lg);
 }
 
 .metric-value-xl {
@@ -814,31 +855,13 @@
 }
 
 .impact-stats-grid {
-    gap: 16px;
-}
-
-.stat-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    transition: all 0.2s ease;
+    gap: var(--size-card-gap-sm);
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-small, 0 2px 8px rgba(0, 0, 0, 0.08));
     border-color: var(--color-outline);
-}
-
-.stat-card-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    font-size: 18px;
 }
 
 .metric-value-lg {
@@ -852,8 +875,8 @@
 .time-allocation-section {
     background: #fff;
     border: none;
-    border-radius: 16px;
-    padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
+    border-radius: var(--size-card-radius-md);
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
     margin-bottom: 20px;
 }
 
@@ -917,7 +940,7 @@
 .growth-card {
     background: #fff;
     border-radius: 12px;
-    padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -934,15 +957,16 @@
 }
 
 .growth-card-body {
-    margin-top: var(--size-card-gap-md, 20px);
-    padding-top: var(--size-card-gap-md, 20px);
+    margin-top: var(--size-card-gap-md);
+    padding-top: var(--size-card-gap-md);
     border-top: 1px solid var(--color-border, var(--color-outline-variant));
 }
 
 .growth-card-summary {
     font-size: 15px;
     line-height: 1.6;
-    margin-bottom: 20px;
+    margin: 0 0 var(--size-card-gap-sm);
+    padding-block: var(--size-element-pad-y-sm);
 }
 
 .quote-block {
@@ -958,13 +982,13 @@
 }
 
 .feedback-row {
-    margin-top: var(--size-card-gap-md, 20px);
-    padding-top: var(--size-card-gap-sm, 12px);
+    margin-top: var(--size-card-gap-md);
+    padding-top: var(--size-card-gap-sm);
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: var(--size-element-gap-md, 12px);
+    gap: var(--size-element-gap-md);
     flex-wrap: nowrap;
 }
 
@@ -1064,33 +1088,13 @@
     margin: 0;
 }
 
-/* 4) Tighten spacing under "Your Impact" section */
-.impact-section-wrapper {
-    margin-bottom: var(--size-surface-gap-sm, 16px);
-    gap: var(--size-surface-gap-sm, 16px);
-}
-
-.impact-section {
-    gap: var(--size-surface-gap-sm, 16px);
-    margin-bottom: var(--size-surface-gap-sm, 16px);
-}
-
-.impact-section-wrapper .insight-alert {
-    margin-top: 4px;
-}
-
 /* ============================================
    Final Enforced Parity (authoritative)
    ============================================ */
-.weekly-report .impact-section-wrapper {
-    margin-bottom: var(--size-surface-gap-sm, 12px) !important;
-    gap: var(--size-surface-gap-sm, 12px) !important;
-}
-
 .weekly-report {
-    gap: var(--size-surface-gap-sm, 16px) !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    gap: var(--size-section-gap-md) !important;
+    padding-left: var(--size-spacing-small-space-000) !important;
+    padding-right: var(--size-spacing-small-space-000) !important;
     overflow: visible !important;
     /* Ensure shadows aren't clipped by the container itself */
 }
@@ -1104,14 +1108,9 @@
     bottom: 28px !important;
     width: 2px !important;
     background: var(--color-outline-variant, #98a2ad) !important;
-    z-index: 0 !important;
-    /* Move really far back */
+    z-index: -1 !important;
+    /* Move behind everything */
     pointer-events: none !important;
-}
-
-.weekly-report .timeline-item:last-child .timeline-node {
-    position: relative !important;
-    z-index: 10 !important;
 }
 
 .weekly-report .timeline-item {
@@ -1134,9 +1133,11 @@
 }
 
 /* Fix locked node transparency */
+/* Fix locked node transparency */
 .timeline-node--locked {
     /* Use a solid background that matches the page to hide the line underneath */
-    background-color: var(--color-background, #f8f9fa) !important;
+    background-color: #f6f8fa !important;
+    /* Explicit opaque color matching surface */
     color: var(--color-on-surface-variant);
     opacity: 1 !important;
     border-color: var(--color-outline-variant) !important;
@@ -1145,12 +1146,15 @@
 
 .weekly-report .time-allocation-section {
     border: none !important;
-    border-radius: var(--size-card-radius-lg, 16px) !important;
+    border-radius: var(--size-card-radius-md) !important;
     box-shadow: var(--elevation-light-1, 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3)) !important;
+    margin-bottom: var(--size-spacing-small-space-000) !important;
+    margin-left: var(--size-element-gap-xs, 8px) !important;
+    margin-right: var(--size-element-gap-xs, 8px) !important;
 }
 
 .weekly-report .time-allocation-legend {
-    gap: var(--size-element-gap-lg, 20px) !important;
+    gap: var(--size-element-gap-lg) !important;
 }
 
 .weekly-report .legend-label {
@@ -1236,13 +1240,9 @@
 }
 
 .weekly-report .timeline-item:not(:last-child)::before {
-    content: '' !important;
-    position: absolute !important;
-    left: -32px !important;
-    top: 64px !important;
-    bottom: 0 !important;
-    width: 2px !important;
-    background: var(--color-outline-variant) !important;
+    content: none !important;
+    /* Disable per-item line to avoid conflicts */
+    display: none !important;
 }
 
 .weekly-report .timeline-node {
@@ -1255,13 +1255,13 @@
 
 .weekly-report .growth-insights-header {
     align-items: flex-start !important;
-    margin-bottom: var(--size-surface-gap-sm, 16px) !important;
+    margin-bottom: var(--size-surface-gap-sm) !important;
 }
 
 .weekly-report .growth-insights-title-column {
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--size-element-gap-xs, 4px) !important;
+    gap: var(--size-element-gap-xs) !important;
 }
 
 .weekly-report .growth-insights-title-column .section-title {
@@ -1272,7 +1272,7 @@
 .weekly-report .powered-by {
     display: inline-flex !important;
     align-items: center !important;
-    gap: var(--size-element-gap-xs, 4px) !important;
+    gap: var(--size-element-gap-xs) !important;
     margin-top: 2px !important;
     color: var(--color-on-surface-variant) !important;
     font-size: var(--font-size-body2, 14px) !important;
@@ -1282,9 +1282,13 @@
 .weekly-report .review-progress-container {
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: var(--size-element-gap-sm, 8px) !important;
+    align-items: flex-start !important;
+    /* Left align text and bar */
+    gap: var(--size-element-gap-sm) !important;
     padding-top: 2px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
 }
 
 .weekly-report .review-bar-row {
@@ -1296,9 +1300,9 @@
 }
 
 .weekly-report .review-progress-bar {
-    width: 84px !important;
-    min-width: 84px !important;
-    flex: 0 0 84px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
 }
 
 .weekly-report .review-count {
@@ -1326,19 +1330,73 @@
    Stabilization Overrides (authoritative)
    ============================================ */
 .weekly-report {
-    padding-bottom: calc(var(--size-section-pad-y-md, 24px) + 24px) !important;
+    padding-bottom: calc(var(--size-section-pad-y-md) + var(--size-section-pad-y-sm)) !important;
 }
 
 .weekly-report .growth-insights-header {
     align-items: flex-start !important;
-    gap: 24px !important;
-    margin-bottom: 16px !important;
+    gap: var(--size-section-gap-lg) !important;
+    margin-bottom: var(--size-surface-gap-sm) !important;
+    width: 100% !important;
+}
+
+.weekly-report .impact-section-wrapper {
+    margin-bottom: var(--size-section-gap-lg) !important;
+}
+
+.weekly-report .impact-section {
+    align-items: stretch !important;
+    gap: var(--size-section-gap-lg) !important;
+    margin-bottom: var(--size-spacing-small-space-000) !important;
+}
+
+.weekly-report .impact-hero-card-content {
+    gap: var(--size-card-gap-md) !important;
+}
+
+.weekly-report .impact-metrics {
+    flex: 0 0 auto !important;
+}
+
+.weekly-report .impact-metric {
+    gap: var(--size-card-gap-md) !important;
+}
+
+.weekly-report .insight-alert {
+    margin-top: var(--size-card-gap-md) !important;
+}
+
+.weekly-report .impact-stats-grid {
+    gap: var(--size-card-gap-sm) !important;
+}
+
+.weekly-report .impact-title {
+    margin-bottom: var(--size-spacing-small-space-000) !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+}
+
+.weekly-report .impact-title-icon {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: var(--size-element-radius-sm) !important;
+}
+
+.weekly-report .impact-title-icon i {
+    font-size: 10px !important;
+    line-height: 1 !important;
+}
+
+.weekly-report .growth-insights-section {
+    margin-top: var(--size-surface-gap-md) !important;
+    margin-bottom: calc(var(--size-section-gap-md) + var(--size-surface-gap-md)) !important;
 }
 
 .weekly-report .growth-insights-title-column {
     display: flex !important;
     flex-direction: column !important;
-    gap: 6px !important;
+    gap: var(--size-element-gap-xs) !important;
+    flex: 0 0 auto !important;
 }
 
 .weekly-report .growth-insights-title-column .section-title {
@@ -1360,8 +1418,12 @@
     flex-direction: column !important;
     align-items: flex-end !important;
     justify-content: flex-start !important;
-    gap: 8px !important;
-    min-width: 176px !important;
+    gap: var(--size-element-gap-sm) !important;
+    flex: 0 0 auto !important;
+    align-self: flex-end !important;
+    width: auto !important;
+    min-width: 0 !important;
+    text-align: right !important;
 }
 
 .weekly-report .review-bar-row {
@@ -1369,17 +1431,28 @@
     align-items: center !important;
     gap: 8px !important;
     flex-wrap: nowrap !important;
+    width: auto !important;
+    justify-content: flex-end !important;
+}
+
+.weekly-report .review-progress-track {
+    flex: 0 0 60px !important;
+    min-width: 60px !important;
+    width: 60px !important;
 }
 
 .weekly-report .review-progress-bar {
-    width: 92px !important;
-    min-width: 92px !important;
-    flex: 0 0 92px !important;
+    width: 60px !important;
+    min-width: 60px !important;
+    flex: 0 0 60px !important;
 }
 
 .weekly-report .timeline-container {
     position: relative !important;
     padding-left: 64px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--size-card-gap-md) !important;
 }
 
 .weekly-report .timeline-container::before {
@@ -1397,7 +1470,7 @@
 .weekly-report .timeline-item {
     position: relative !important;
     display: block !important;
-    padding-bottom: 32px !important;
+    padding-bottom: 0 !important;
     z-index: 1 !important;
 }
 
@@ -1414,7 +1487,7 @@
     position: absolute !important;
     left: -32px !important;
     top: 60px !important;
-    bottom: -8px !important;
+    bottom: calc(-1 * var(--size-card-gap-md)) !important;
     width: 2px !important;
     background: var(--color-outline-variant) !important;
     z-index: 0 !important;
@@ -1498,11 +1571,6 @@
     pointer-events: none !important;
 }
 
-.weekly-report .timeline-item:last-child .timeline-node {
-    position: relative !important;
-    z-index: 3 !important;
-}
-
 .weekly-report .timeline-item {
     position: relative !important;
     z-index: 2 !important;
@@ -1533,57 +1601,179 @@
     border-radius: 6px !important;
 }
 
-/* Impact card polish + token-consistent padding */
-.weekly-report .impact-hero-card {
-    padding: var(--size-card-pad-y-sm, 16px) var(--size-card-pad-x-sm, 16px) !important;
+/* Final lock: prevent top gap above stat-card icons */
+
+/* Final lock: training cards container scrolls horizontally without clipping */
+.weekly-report .training-section {
+    overflow: visible !important;
 }
 
-.weekly-report .impact-stats-grid .stat-card {
-    padding: var(--size-card-pad-y-sm, 16px) var(--size-card-pad-x-sm, 16px) !important;
-    gap: var(--size-card-gap-sm, 12px) !important;
+.weekly-report .training-carousel {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: var(--size-element-gap-sm) !important;
 }
 
-.weekly-report .impact-title {
-    margin-bottom: var(--size-card-gap-sm, 12px) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
+.weekly-report .training-carousel::-webkit-scrollbar {
+    display: none !important;
 }
 
-.weekly-report .impact-title-icon {
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: var(--size-element-radius-md, 8px) !important;
-    background: var(--color-primary-state-08, rgba(4, 114, 168, 0.12)) !important;
-    color: var(--color-primary, #0472a8) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+.weekly-report .training-grid {
+    display: flex !important;
+    gap: var(--size-card-gap-md) !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    overflow: visible !important;
+    padding-bottom: var(--size-spacing-small-space-000) !important;
+}
+
+.weekly-report .training-grid > * {
     flex-shrink: 0 !important;
 }
 
-.weekly-report .impact-title-icon i {
-    font-size: 14px !important;
-    line-height: 1 !important;
+/* ============================================
+   Final Weekly Report Overrides (single source of truth)
+   ============================================ */
+.weekly-report.reveal-root.has-entered {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    gap: var(--size-section-gap-lg) !important;
+}
+
+.weekly-report .impact-section-wrapper {
+    margin-bottom: var(--size-section-gap-md) !important;
+}
+
+.weekly-report .impact-section {
+    gap: var(--size-section-gap-lg) !important;
+    margin-bottom: 0 !important;
+}
+
+.weekly-report .impact-hero-card-content {
+    gap: var(--size-card-gap-md) !important;
 }
 
 .weekly-report .impact-metrics {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr) !important;
-    column-gap: var(--size-card-gap-md, 16px) !important;
+    margin-top: var(--size-element-gap-sm) !important;
+}
+
+.weekly-report .impact-metrics {
     align-items: center !important;
+    column-gap: var(--size-card-gap-md) !important;
 }
 
 .weekly-report .impact-metric {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
+    gap: var(--size-card-gap-md) !important;
 }
 
-.weekly-report .impact-divider {
-    width: 1px !important;
-    height: 100% !important;
+.weekly-report .delta-badge {
+    align-self: flex-start !important;
+    width: auto !important;
+}
+
+.weekly-report .impact-title {
     margin: 0 !important;
-    align-self: stretch !important;
-    justify-self: center !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.05em !important;
+}
+
+.weekly-report .impact-title-icon {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+.weekly-report .impact-title-icon i {
+    font-size: 9px !important;
+}
+
+.weekly-report .time-allocation-section {
+    border-radius: var(--size-card-radius-md) !important;
+    margin-bottom: var(--size-section-gap-md) !important;
+    overflow: visible !important;
+}
+
+.weekly-report .impact-stats-grid {
+    row-gap: var(--size-card-gap-sm) !important;
+    column-gap: var(--size-card-gap-sm) !important;
+}
+
+.weekly-report .stat-card {
+    gap: var(--size-card-gap-md) !important;
+}
+
+/* ============================================
+   Weekly Report Motion Polish (data-viz + key metrics only)
+   ============================================ */
+@keyframes weeklyDataTextIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes weeklyTimeAllocGrow {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+
+@keyframes weeklyProgressGlow {
+    0% {
+        box-shadow: 0 0 0 rgba(4, 114, 168, 0);
+    }
+    45% {
+        box-shadow: 0 0 0 4px rgba(4, 114, 168, 0.12);
+    }
+    100% {
+        box-shadow: 0 0 0 rgba(4, 114, 168, 0);
+    }
+}
+
+.weekly-report .data-anim-enter {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.weekly-report.data-anim-active .data-anim-enter {
+    opacity: 0;
+    transform: translateY(6px);
+    animation: weeklyDataTextIn 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--text-delay, 380ms);
+}
+
+.weekly-report.data-anim-active .data-anim-enter--insight {
+    animation-delay: 760ms;
+}
+
+.weekly-report .time-allocation-bar.time-allocation-bar--animate .time-allocation-segment {
+    transform-origin: left center;
+    animation: weeklyTimeAllocGrow 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--segment-delay, 220ms);
+}
+
+.weekly-report .review-progress-bar.review-progress-bar--intro .plus-progress-bar,
+.weekly-report .review-progress-bar.review-progress-bar--intro .progress-bar {
+    animation: weeklyProgressGlow 700ms cubic-bezier(0.22, 1, 0.36, 1) 320ms 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .weekly-report .data-anim-enter,
+    .weekly-report .time-allocation-segment,
+    .weekly-report .review-progress-bar .plus-progress-bar,
+    .weekly-report .review-progress-bar .progress-bar {
+        animation: none !important;
+        transition: none !important;
+    }
 }

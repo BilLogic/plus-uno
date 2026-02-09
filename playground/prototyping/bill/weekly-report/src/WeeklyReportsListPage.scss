@@ -146,6 +146,10 @@
     max-width: 200px;
 }
 
+.completion-progress-shell {
+    flex: 1;
+}
+
 .completion-progress {
     flex: 1;
     height: 8px;
@@ -156,6 +160,26 @@
     :global(.progress-bar) {
         border-radius: 4px;
     }
+}
+
+@keyframes reportProgressFill {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+.reveal-root.has-entered .completion-progress-shell .completion-progress--staged .plus-progress-bar,
+.reveal-root.has-entered .completion-progress-shell .completion-progress--staged .progress-bar,
+#weekly-reports-list-page.plus-page-reveal .completion-progress-shell .completion-progress--staged .plus-progress-bar,
+#weekly-reports-list-page.plus-page-reveal .completion-progress-shell .completion-progress--staged .progress-bar {
+    transform-origin: left center;
+    transform: scaleX(0);
+    animation: reportProgressFill 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--progress-delay, 0ms);
 }
 
 .view-report-link {
@@ -192,5 +216,15 @@
     // Fix for pagination ellipsis color visibility
     .plus-pagination .page-item-ellipsis .page-link {
         color: var(--color-on-surface);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-root.has-entered .completion-progress-shell .completion-progress--staged .plus-progress-bar,
+    .reveal-root.has-entered .completion-progress-shell .completion-progress--staged .progress-bar,
+    #weekly-reports-list-page.plus-page-reveal .completion-progress-shell .completion-progress--staged .plus-progress-bar,
+    #weekly-reports-list-page.plus-page-reveal .completion-progress-shell .completion-progress--staged .progress-bar {
+        animation: none;
+        transform: none;
     }
 }

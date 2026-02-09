@@ -37,6 +37,7 @@ body {
 
 /* Fixed 1280x850 frame */
 #root {
+  position: relative;
   width: var(--demo-frame-width);
   height: var(--demo-frame-height);
   min-width: var(--demo-frame-width);
@@ -54,6 +55,7 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 #home-redesign-page .plus-page-main::-webkit-scrollbar,
 #home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
   display: none;

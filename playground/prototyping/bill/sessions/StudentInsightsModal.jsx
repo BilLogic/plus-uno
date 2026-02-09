@@ -346,8 +346,8 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     yCategories={practiceHeatmapY}
                                     data={practiceHeatmapData}
                                     height={150}
-                                    minColor="rgba(3, 122, 188, 0.16)"
-                                    maxColor="rgba(4, 114, 168, 0.86)"
+                                    minColor="rgba(176, 227, 255, 0.32)"
+                                    maxColor="rgba(0, 82, 145, 0.96)"
                                     enableAnimation={false}
                                     showLegend={false}
                                     showDataLabels={false}

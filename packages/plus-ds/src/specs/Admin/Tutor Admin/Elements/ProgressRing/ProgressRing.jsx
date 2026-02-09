@@ -8,7 +8,7 @@ import './ProgressRing.scss';
  * Custom gauge-style progress indicator.
  * Matches design used in TutorsTrainingProgressTable.
  */
-const ProgressRing = ({ value, label, size = 48, height = 40, color }) => {
+const ProgressRing = ({ value, label, size = 48, height = 40, color, animated = true, delay = 0 }) => {
     // Parse value to percentage
     let percentage = 0;
     let displayValue = label || value;
@@ -33,6 +33,8 @@ const ProgressRing = ({ value, label, size = 48, height = 40, color }) => {
     const fillColor = color || 'var(--color-progress-ring-fill, #FFE17A)';
     const trackColor = 'var(--color-surface-variant, #DEE3E5)';
 
+    const targetInset = `inset(${100 - percentage}% 0 0 0)`;
+
     return (
         <div className="plus-progress-ring" style={{ width: size, height: height }}>
             {/* Background Track */}
@@ -49,8 +51,13 @@ const ProgressRing = ({ value, label, size = 48, height = 40, color }) => {
 
             {/* Foreground Fill (Masked) */}
             <div
-                className="plus-progress-ring__fill-container"
-                style={{ clipPath: `inset(${100 - percentage}% 0 0 0)` }}
+                className={`plus-progress-ring__fill-container${animated ? ' plus-progress-ring__fill-container--staged' : ''}`}
+                style={animated
+                    ? {
+                        '--ring-target-inset': targetInset,
+                        '--ring-delay': `${delay}ms`
+                    }
+                    : { clipPath: targetInset }}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +83,9 @@ ProgressRing.propTypes = {
     label: PropTypes.string,
     size: PropTypes.number,
     height: PropTypes.number,
-    color: PropTypes.string
+    color: PropTypes.string,
+    animated: PropTypes.bool,
+    delay: PropTypes.number
 };
 
 export default ProgressRing;

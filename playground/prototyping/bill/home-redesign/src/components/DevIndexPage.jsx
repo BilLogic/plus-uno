@@ -47,7 +47,7 @@ const DevIndexPage = () => {
 
                 <Link to="/lessons" style={linkStyle}>
                     <div style={{ fontWeight: 'bold', fontSize: '18px' }}>Lessons</div>
-                    <div style={{ fontSize: '14px', color: '#666' }}>Lessons placeholder page.</div>
+                    <div style={{ fontSize: '14px', color: '#666' }}>A growth mindset simulation game.</div>
                 </Link>
             </div>
         </div>

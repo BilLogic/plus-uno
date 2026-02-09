@@ -17,6 +17,8 @@ import WeeklyReportContent from '../../weekly-report/src/WeeklyReportContent';
 
 import DevIndexPage from './components/DevIndexPage';
 
+import StudentInsightsModal from '../../sessions/StudentInsightsModal';
+
 // Map URL paths to sidebar tab IDs
 const pathToTab = {
     '/': 'home',
@@ -64,11 +66,21 @@ const ShellLayout = () => {
     const [floatingContent, setFloatingContent] = useState(null);
     const [activeTabOverride, setActiveTabOverride] = useState(null);
 
+    // Global Modal State
+    const [isInsightsModalOpen, setIsInsightsModalOpen] = useState(false);
+    const [modalOptions, setModalOptions] = useState({ student: null, allStudents: [], containerSelector: null });
+
+    const openStudentInsights = (options) => {
+        setModalOptions(options);
+        setIsInsightsModalOpen(true);
+    };
+
     // Reset override when URL changes so the new page's tab highlights correctly
     useEffect(() => {
         setActiveTabOverride(null);
         setMainClassName('');
         setContentDirect(false);
+        setIsInsightsModalOpen(false); // Close modal on navigation
     }, [location.pathname]);
 
     // Derive activeTab from URL (or use override if set)
@@ -100,7 +112,15 @@ const ShellLayout = () => {
     };
 
     return (
-        <ShellContext.Provider value={{ setBreadcrumbs, setTopBarUser, setMainClassName, setContentDirect, setFloatingContent, setActiveTabOverride }}>
+        <ShellContext.Provider value={{
+            setBreadcrumbs,
+            setTopBarUser,
+            setMainClassName,
+            setContentDirect,
+            setFloatingContent,
+            setActiveTabOverride,
+            openStudentInsights
+        }}>
             <PageLayout
                 topBarConfig={topBarConfig}
                 sidebarConfig={sidebarConfig}
@@ -112,6 +132,16 @@ const ShellLayout = () => {
             >
                 <Outlet />
             </PageLayout>
+
+            {isInsightsModalOpen && (
+                <StudentInsightsModal
+                    student={modalOptions.student}
+                    allStudents={modalOptions.allStudents}
+                    onClose={() => setIsInsightsModalOpen(false)}
+                    onSelectStudent={(s) => setModalOptions(prev => ({ ...prev, student: s }))}
+                    containerSelector={modalOptions.containerSelector}
+                />
+            )}
         </ShellContext.Provider>
     );
 };
@@ -127,7 +157,7 @@ const HomeContent = () => {
         return () => setMainClassName(''); // Reset on unmount
     }, [setBreadcrumbs, setMainClassName, setFloatingContent]);
 
-    return <Dashboard setBreadcrumbs={setBreadcrumbs} />;
+    return <Dashboard />;
 };
 
 
@@ -169,8 +199,7 @@ const ResearchAssistantContent = () => {
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/dev" element={<DevIndexPage />} />
+            <Route path="/" element={<DevIndexPage />} />
             <Route element={<ShellLayout />}>
                 <Route path="/home" element={<HomeContent />} />
                 <Route path="/reflection" element={<ReflectionContent />} />

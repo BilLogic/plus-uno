@@ -70,7 +70,10 @@ const TutorsTrainingProgressTable = ({
         >
             <span className="body3-txt">{label}</span>
             {sortable && (
-                <i className={`fas fa-arrow-up tutors-training-progress-table__sort-icon ${sortColumn === key ? 'tutors-training-progress-table__sort-icon--active' : ''}`} />
+                <i
+                    className={`fas fa-arrow-up tutors-training-progress-table__sort-icon ${sortColumn === key ? 'tutors-training-progress-table__sort-icon--active' : ''}`}
+                    style={sortColumn === key && sortDirection === 'desc' ? { transform: 'rotate(180deg)' } : undefined}
+                />
             )}
         </div>
     );
@@ -84,47 +87,73 @@ const TutorsTrainingProgressTable = ({
         { text: <span className="body3-txt">Action</span>, width: '15%', align: 'left' },
     ];
 
-    const rows = displayTutors.map((tutor) => [
+    const rows = displayTutors.map((tutor, rowIndex) => [
         {
             content: (
-                <div className="tutors-training-progress-table__custom-avatar">
-                    <div className="tutors-training-progress-table__avatar-circle">
-                        <i className="fas fa-chalkboard-user" />
-                    </div>
-                    <div className="tutors-training-progress-table__avatar-info">
-                        <span className="body2-txt font-semibold" style={{ color: 'var(--color-on-surface)' }}>{tutor.tutorName}</span>
-                        <span className="tutors-training-progress-table__email">{tutor.email}</span>
+                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                    <div className="tutors-training-progress-table__custom-avatar">
+                        <div className="tutors-training-progress-table__avatar-circle">
+                            <i className="fas fa-chalkboard-user" />
+                        </div>
+                        <div className="tutors-training-progress-table__avatar-info">
+                            <span className="body2-txt font-semibold" style={{ color: 'var(--color-on-surface)' }}>{tutor.tutorName}</span>
+                            <span className="tutors-training-progress-table__email">{tutor.email}</span>
+                        </div>
                     </div>
                 </div>
             )
         },
         {
-            content: <ProgressRing value={typeof tutor.completion === 'object' ? `${tutor.completion.value}/${tutor.completion.total}` : tutor.completion} />,
+            content: (
+                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                    <ProgressRing
+                        value={typeof tutor.completion === 'object' ? `${tutor.completion.value}/${tutor.completion.total}` : tutor.completion}
+                        delay={220 + (rowIndex * 65)}
+                    />
+                </div>
+            ),
             align: 'center'
-        },
-        {
-            content: <ProgressRing value={typeof tutor.accuracy === 'object' ? `${tutor.accuracy}%` : tutor.accuracy} />,
-            align: 'center'
-        },
-        {
-            content: <BadgeClaimedPill state={tutor.badgeClaimed} />,
-            align: 'center'
-        },
-        {
-            content: <span className="body3-txt">{tutor.timeSpent}</span>
         },
         {
             content: (
-                <button
-                    type="button"
-                    className="tutors-training-progress-table__action-btn"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onViewProgress && onViewProgress(tutor);
-                    }}
-                >
-                    View Progress
-                </button>
+                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                    <ProgressRing
+                        value={typeof tutor.accuracy === 'object' ? `${tutor.accuracy}%` : tutor.accuracy}
+                        delay={300 + (rowIndex * 65)}
+                    />
+                </div>
+            ),
+            align: 'center'
+        },
+        {
+            content: (
+                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                    <BadgeClaimedPill state={tutor.badgeClaimed} />
+                </div>
+            ),
+            align: 'center'
+        },
+        {
+            content: (
+                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                    <span className="body3-txt">{tutor.timeSpent}</span>
+                </div>
+            )
+        },
+        {
+            content: (
+                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                    <button
+                        type="button"
+                        className="tutors-training-progress-table__action-btn"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onViewProgress && onViewProgress(tutor);
+                        }}
+                    >
+                        View Progress
+                    </button>
+                </div>
             )
         }
     ]);

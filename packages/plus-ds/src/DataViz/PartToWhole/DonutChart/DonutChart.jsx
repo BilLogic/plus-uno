@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -11,11 +11,11 @@ import chartTheme from '../../chartTheme';
 
 const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 'h1' }) => {
     // Transform segments into Highcharts series data
-    const chartData = segments.map(segment => ({
+    const chartData = useMemo(() => segments.map(segment => ({
         y: segment.value,
         color: segment.color,
         name: segment.label || 'Segment'
-    }));
+    })), [segments]);
 
     // Get font size value for the center text using Figma semantic tokens
     const getFontSize = () => {
@@ -48,7 +48,7 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
         return lineHeightMap[centerTextSize] || lineHeightMap['h4'];
     };
 
-    const options = {
+    const options = useMemo(() => ({
         ...chartTheme, // Apply theme defaults
         chart: {
             type: 'pie',
@@ -63,6 +63,7 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
         },
         plotOptions: {
             pie: {
+                animation: false,
                 innerSize: '85%', // Donut thickness
                 borderWidth: 0,
                 allowPointSelect: false,
@@ -93,8 +94,9 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
             data: chartData,
             size: '100%',
             innerSize: '85%',
+            animation: false,
         }]
-    };
+    }), [size, chartData]);
 
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>

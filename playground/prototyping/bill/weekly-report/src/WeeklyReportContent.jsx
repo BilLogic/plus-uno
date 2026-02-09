@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import Button from '@/components/Button/Button';
 import Badge from '@/components/Badge/Badge';
 import Alert from '@/components/Alert/Alert';
@@ -54,6 +54,7 @@ const REPORT_DATA = {
 
 const TRAININGS_TO_SHOW = ['1', '2', '3'];
 const FILTERED_TRAINING = REPORT_DATA.training.filter(t => TRAININGS_TO_SHOW.includes(t.id));
+const STAT_KEYS = ['sessions', 'hours', 'students', 'schools'];
 
 /**
  * WeeklyReportContent: Content-only version for use inside ShellLayout.
@@ -66,7 +67,20 @@ export default function WeeklyReportContent() {
     const [activeKey, setActiveKey] = useState(0);
     const [feedbackSelections, setFeedbackSelections] = useState({});
     const [hasEntered, setHasEntered] = useState(false);
+    const [hasPlayedDataAnim, setHasPlayedDataAnim] = useState(false);
+    const [isDataAnimActive, setIsDataAnimActive] = useState(false);
+    const [animatedImpact, setAnimatedImpact] = useState({
+        learningTime: 0,
+        skillsMastered: 0,
+        sessions: 0,
+        hours: 0,
+        students: 0,
+        schools: 0
+    });
+    const [animatedTimeAlloc, setAnimatedTimeAlloc] = useState(REPORT_DATA.timeAllocation.map(() => 0));
+    const [animatedReviewPct, setAnimatedReviewPct] = useState(0);
     const totalDimensions = REPORT_DATA.dimensions.length;
+    const prefersReducedMotionRef = useRef(false);
 
     // Update shell context on mount
     useEffect(() => {
@@ -81,6 +95,100 @@ export default function WeeklyReportContent() {
     useEffect(() => {
         requestAnimationFrame(() => setHasEntered(true));
     }, []);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !window.matchMedia) return;
+        prefersReducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }, []);
+
+    useEffect(() => {
+        if (!hasEntered || hasPlayedDataAnim) return;
+
+        const impactTargets = {
+            learningTime: REPORT_DATA.impact.learningTime.value,
+            skillsMastered: REPORT_DATA.impact.skillsMastered.value,
+            sessions: REPORT_DATA.stats[0].value,
+            hours: REPORT_DATA.stats[1].value,
+            students: REPORT_DATA.stats[2].value,
+            schools: REPORT_DATA.stats[3].value
+        };
+        const timeAllocTargets = REPORT_DATA.timeAllocation.map((seg) => seg.value);
+        const reviewTarget = (reviewedCount / totalDimensions) * 100;
+
+        if (prefersReducedMotionRef.current) {
+            setAnimatedImpact(impactTargets);
+            setAnimatedTimeAlloc(timeAllocTargets);
+            setAnimatedReviewPct(reviewTarget);
+            setHasPlayedDataAnim(true);
+            return;
+        }
+
+        const timerIds = [];
+        const rafIds = [];
+
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+        const tweenNumber = ({ from = 0, to = 0, duration = 900, onUpdate }) => {
+            const start = performance.now();
+            const step = (now) => {
+                const progress = Math.min((now - start) / duration, 1);
+                const value = from + (to - from) * easeOutCubic(progress);
+                onUpdate(value);
+                if (progress < 1) {
+                    const rafId = requestAnimationFrame(step);
+                    rafIds.push(rafId);
+                }
+            };
+            const rafId = requestAnimationFrame(step);
+            rafIds.push(rafId);
+        };
+
+        setIsDataAnimActive(true);
+
+        timerIds.push(window.setTimeout(() => {
+            tweenNumber({
+                to: impactTargets.learningTime,
+                onUpdate: (value) => setAnimatedImpact((prev) => ({ ...prev, learningTime: value }))
+            });
+            tweenNumber({
+                to: impactTargets.skillsMastered,
+                onUpdate: (value) => setAnimatedImpact((prev) => ({ ...prev, skillsMastered: value }))
+            });
+        }, 0));
+
+        timerIds.push(window.setTimeout(() => {
+            STAT_KEYS.forEach((key) => {
+                tweenNumber({
+                    to: impactTargets[key],
+                    onUpdate: (value) => setAnimatedImpact((prev) => ({ ...prev, [key]: value }))
+                });
+            });
+        }, 120));
+
+        timerIds.push(window.setTimeout(() => {
+            setAnimatedTimeAlloc(timeAllocTargets);
+        }, 220));
+
+        timerIds.push(window.setTimeout(() => {
+            tweenNumber({
+                to: reviewTarget,
+                onUpdate: (value) => setAnimatedReviewPct(value)
+            });
+        }, 320));
+
+        timerIds.push(window.setTimeout(() => {
+            setAnimatedImpact(impactTargets);
+            setAnimatedTimeAlloc(timeAllocTargets);
+            setAnimatedReviewPct(reviewTarget);
+            setIsDataAnimActive(false);
+            setHasPlayedDataAnim(true);
+        }, 1400));
+
+        return () => {
+            timerIds.forEach((timerId) => window.clearTimeout(timerId));
+            rafIds.forEach((rafId) => cancelAnimationFrame(rafId));
+        };
+    }, [hasEntered, hasPlayedDataAnim, reviewedCount, totalDimensions]);
 
     // Hide scrollbar programmatically
     useEffect(() => {
@@ -160,8 +268,13 @@ export default function WeeklyReportContent() {
         return colors[bg] || colors.emerald;
     };
 
+    const formatStatValue = (key, value) => {
+        if (key === 'hours') return value.toFixed(1);
+        return String(Math.round(value));
+    };
+
     return (
-        <div className={`weekly-report reveal-root ${hasEntered ? 'has-entered' : ''}`}>
+        <div className={`weekly-report reveal-root ${hasEntered ? 'has-entered' : ''} ${isDataAnimActive ? 'data-anim-active' : ''}`}>
             <style>{`
                 @keyframes revealIn {
                     from { opacity: 0; transform: translateY(24px); }
@@ -199,88 +312,97 @@ export default function WeeklyReportContent() {
                 <h2 className="section-title">Your Impact</h2>
                 <div className="impact-section">
                     <div className="impact-hero-wrapper">
-                        <div className="impact-hero-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                        <div className="impact-hero-card">
                             <div className="blob-primary-large"></div>
                             <div className="blob-tertiary-medium"></div>
-                            <div className="impact-hero-card-content" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <div className="impact-hero-card-content">
                                 <h3 className="impact-title">
-                                    <i className="fa-solid fa-bolt"></i>
-                                    Impact on Students
+                                    <span className="impact-title-icon" aria-hidden="true">
+                                        <i className="fa-solid fa-bolt"></i>
+                                    </span>
+                                    <span>Impact on Students</span>
                                 </h3>
                                 <div className="impact-metrics">
-                                    <div className="impact-metric" style={{ flex: 1 }}>
+                                    <div className="impact-metric">
                                         <div className="metric-value-row">
-                                            <span className="metric-value-xl">{REPORT_DATA.impact.learningTime.value}</span>
+                                            <span className="metric-value-xl">{Math.round(animatedImpact.learningTime)}</span>
                                             <span className="metric-unit">{REPORT_DATA.impact.learningTime.unit}</span>
                                         </div>
                                         <div className={`delta-badge delta-badge--${REPORT_DATA.impact.learningTime.deltaType}`}>
                                             <i className="fa-solid fa-arrow-trend-up"></i>
                                             {REPORT_DATA.impact.learningTime.delta}
                                         </div>
-                                        <p className="metric-label">Total Student Learning Time</p>
+                                        <p className="metric-label data-anim-enter" style={{ '--text-delay': '380ms' }}>Total Student Learning Time</p>
                                     </div>
                                     <div className="impact-divider"></div>
-                                    <div className="impact-metric" style={{ flex: 1 }}>
+                                    <div className="impact-metric">
                                         <div className="metric-value-row">
-                                            <span className="metric-value-xl">{REPORT_DATA.impact.skillsMastered.value}</span>
+                                            <span className="metric-value-xl">{Math.round(animatedImpact.skillsMastered)}</span>
                                             <span className="metric-unit">{REPORT_DATA.impact.skillsMastered.unit}</span>
                                         </div>
                                         <div className={`delta-badge delta-badge--${REPORT_DATA.impact.skillsMastered.deltaType}`}>
                                             <i className="fa-solid fa-arrow-trend-up"></i>
                                             {REPORT_DATA.impact.skillsMastered.delta}
                                         </div>
-                                        <p className="metric-label">Concepts Mastered</p>
+                                        <p className="metric-label data-anim-enter" style={{ '--text-delay': '430ms' }}>Concepts Mastered</p>
                                     </div>
                                 </div>
+                                <Alert style="tertiary" dismissable={false} className="insight-alert">
+                                    <i className="fa-solid fa-trophy insight-alert-icon"></i>
+                                    {REPORT_DATA.keyInsight}
+                                </Alert>
                             </div>
                         </div>
                     </div>
                     <div className="impact-stats-grid">
                         {REPORT_DATA.stats.map((stat, i) => (
-                            <div key={i} className={`stat-card stat-card--${stat.color}`} style={{ position: 'relative', overflow: 'hidden' }}>
+                            <div
+                                key={i}
+                                className={`stat-card stat-card--${stat.color}`}
+                            >
                                 <div className={`stat-blob stat-blob--${stat.color}`}></div>
-                                <div className={`stat-card-icon stat-card-icon--${stat.color}`} style={{ position: 'relative', zIndex: 1 }}>
+                                <div className={`stat-card-icon stat-card-icon--${stat.color}`}>
                                     <i className={`fa-solid ${stat.icon}`}></i>
                                 </div>
-                                <div className="stat-card-text" style={{ position: 'relative', zIndex: 1 }}>
-                                    <span className="metric-value-lg">{stat.value}</span>
+                                <div className="stat-card-text">
+                                    <span className="metric-value-lg">{formatStatValue(STAT_KEYS[i], animatedImpact[STAT_KEYS[i]])}</span>
                                     <span className="stat-label">{stat.label}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
-                <Alert style="tertiary" dismissable={false} className="insight-alert">
-                    <i className="fa-solid fa-trophy insight-alert-icon" style={{ marginRight: '12px' }}></i>
-                    {REPORT_DATA.keyInsight}
-                </Alert>
             </section>
 
             {/* Time Allocation */}
             <section className="time-allocation-section reveal-section" style={{ animationDelay: '400ms' }}>
-                <h3 className="time-allocation-title">Time Allocation</h3>
+                <h3 className="time-allocation-title data-anim-enter" style={{ '--text-delay': '380ms' }}>Time Allocation</h3>
                 <div className="time-allocation-legend">
                     {REPORT_DATA.timeAllocation.map((seg, i) => (
-                        <div key={i} className="legend-item">
+                        <div key={i} className="legend-item data-anim-enter" style={{ '--text-delay': `${420 + i * 50}ms` }}>
                             <div className={`legend-dot legend-dot--${seg.color}`}></div>
                             <span className="legend-label">
-                                {seg.label}: <span className="legend-value">{seg.value}%</span>
+                                {seg.label}: <span className="legend-value data-anim-enter" style={{ '--text-delay': `${460 + i * 50}ms` }}>{seg.value}%</span>
                             </span>
                         </div>
                     ))}
                 </div>
-                <div className="time-allocation-bar" style={{ height: '40px' }}>
+                <div className={`time-allocation-bar ${isDataAnimActive ? 'time-allocation-bar--animate' : ''}`} style={{ height: '40px' }}>
                     {REPORT_DATA.timeAllocation.map((seg, i) => (
                         <div
                             key={i}
                             className={`time-allocation-segment time-allocation-segment--${seg.color}`}
-                            style={{ width: `${seg.value}%` }}
+                            style={{
+                                '--segment-target': `${seg.value}%`,
+                                '--segment-delay': `${220 + i * 70}ms`,
+                                width: `${animatedTimeAlloc[i]}%`
+                            }}
                             title={`${seg.label}: ${seg.value}%`}
                         ></div>
                     ))}
                 </div>
-                <Alert style="tertiary" dismissable={false} className="insight-alert">
-                    <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: '12px' }}></i>
+                <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
+                    <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
                     You spent 10% more time on Goal Setting this week compared to last week. Great job focusing on student objectives early in the sessions!
                 </Alert>
             </section>
@@ -298,21 +420,23 @@ export default function WeeklyReportContent() {
                     <div className="review-progress-container">
                         <span className="review-label">Review progress</span>
                         <div className="review-bar-row">
-                            <Progress
-                                value={(reviewedCount / totalDimensions) * 100}
-                                className="review-progress-bar"
-                                style="primary"
-                            />
+                            <div className="review-progress-track">
+                                <Progress
+                                    value={hasPlayedDataAnim ? (reviewedCount / totalDimensions) * 100 : animatedReviewPct}
+                                    className={`review-progress-bar ${isDataAnimActive ? 'review-progress-bar--intro' : ''}`}
+                                    style="primary"
+                                />
+                            </div>
                             <span className="review-count">{reviewedCount}/{totalDimensions}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="timeline-container">
+                    <span className="timeline-connector" aria-hidden="true" style={{ zIndex: 0, left: '31px' }}></span>
                     {REPORT_DATA.dimensions.map((dim, index) => {
                         const state = getState(index);
                         const isExpanded = activeKey === index;
-                        const isLast = index === REPORT_DATA.dimensions.length - 1;
                         const displayStatus = state === 'reviewed' ? 'Reviewed' : state === 'under_review' ? 'Under Review' : 'Locked';
                         const badgeStyle = state === 'reviewed' ? 'success' : state === 'under_review' ? 'primary' : 'neutral';
 
@@ -320,9 +444,11 @@ export default function WeeklyReportContent() {
                             <div
                                 key={dim.id}
                                 className={`timeline-item timeline-item--${state}`}
-                                style={{ paddingBottom: isLast ? 0 : undefined }}
                             >
-                                <div className={`timeline-node timeline-node--${state === 'under_review' ? 'active' : state}`}>
+                                <div
+                                    className={`timeline-node timeline-node--${state === 'under_review' ? 'active' : state}`}
+                                    style={state === 'locked' ? { backgroundColor: '#f6f8fa', opacity: 1, zIndex: 10 } : { zIndex: 10, backgroundColor: '#fff' }}
+                                >
                                     <i className={`fa-solid ${state === 'locked' ? 'fa-lock' : state === 'reviewed' ? 'fa-check' : 'fa-eye'}`}></i>
                                 </div>
 
@@ -367,7 +493,7 @@ export default function WeeklyReportContent() {
                                                 <div className="session-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span className="session-info body3-txt text-muted">{dim.session}</span>
                                                     <Button size="small" style="primary" fill="tonal">
-                                                        <i className="fa-solid fa-play-circle" style={{ marginRight: '6px' }}></i>
+                                                        <i className="fa-solid fa-play-circle" style={{ marginRight: 'var(--size-element-gap-xs)' }}></i>
                                                         View Recording
                                                     </Button>
                                                 </div>
@@ -423,22 +549,24 @@ export default function WeeklyReportContent() {
                         <span className="training-hint">Unlock after reviewing all insights</span>
                     )}
                 </div>
-                <div className="training-grid">
-                    {FILTERED_TRAINING.map((t) => (
-                        <RecommendedLessons
-                            key={t.id}
-                            breakpoint="XXL & above"
-                            badgeType={t.badgeType}
-                            title={t.title}
-                            duration={t.duration}
-                            status="in-progress"
-                            aiRecommended={false}
-                            image={t.image}
-                            actionLabel="Start"
-                            onReviewClick={() => { }}
-                            className={!allReviewed ? 'training-card--disabled' : ''}
-                        />
-                    ))}
+                <div className="training-carousel">
+                    <div className="training-grid">
+                        {FILTERED_TRAINING.map((t) => (
+                            <RecommendedLessons
+                                key={t.id}
+                                breakpoint="XXL & above"
+                                badgeType={t.badgeType}
+                                title={t.title}
+                                duration={t.duration}
+                                status="in-progress"
+                                aiRecommended={false}
+                                image={t.image}
+                                actionLabel="Start"
+                                onReviewClick={() => { }}
+                                className={!allReviewed ? 'training-card--disabled' : ''}
+                            />
+                        ))}
+                    </div>
                 </div>
             </section>
         </div>

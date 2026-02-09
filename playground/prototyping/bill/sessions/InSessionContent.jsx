@@ -15,11 +15,9 @@ import { ShellContext } from '../home-redesign/src/context/ShellContext';
  */
 const InSessionContent = () => {
     const navigate = useNavigate();
-    const { setBreadcrumbs, setMainClassName, setFloatingContent, setContentDirect } = useContext(ShellContext);
+    const { setBreadcrumbs, setMainClassName, setFloatingContent, setContentDirect, openStudentInsights } = useContext(ShellContext);
 
     const [isManageAssignmentOpen, setIsManageAssignmentOpen] = useState(false);
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [isInsightsModalOpen, setIsInsightsModalOpen] = useState(false);
     const [hoveredStudentId, setHoveredStudentId] = useState(null);
     const [hasEntered, setHasEntered] = useState(false);
 
@@ -82,31 +80,17 @@ const InSessionContent = () => {
         requestAnimationFrame(() => setHasEntered(true));
     }, []);
 
-    const openStudentInsights = (student) => {
-        setSelectedStudent(student);
-        setIsInsightsModalOpen(true);
-    };
-
-    const closeInsightsModal = () => {
-        setIsInsightsModalOpen(false);
-        setSelectedStudent(null);
-    };
-
     const handleNameKeyDown = (e, student) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            openStudentInsights(student);
+            openStudentInsights({
+                student,
+                allStudents: yourStudents
+            });
         }
     };
 
     const getStatusBadgeStyle = (status) => STATUS_STYLE_MAP[status] || 'secondary';
-
-    const modalContainerElement =
-        (typeof document !== 'undefined' &&
-            (document.querySelector('#home-redesign-page .plus-page-main-container') ||
-                document.querySelector('.plus-page-main-container'))) ||
-        sessionsRootRef.current?.closest('.plus-page-main-container') ||
-        null;
 
     return (
         <>
@@ -210,7 +194,10 @@ const InSessionContent = () => {
                                                     }}
                                                     onMouseEnter={() => setHoveredStudentId(s.id)}
                                                     onMouseLeave={() => setHoveredStudentId(null)}
-                                                    onClick={() => openStudentInsights(s)}
+                                                    onClick={() => openStudentInsights({
+                                                        student: s,
+                                                        allStudents: yourStudents
+                                                    })}
                                                 >
                                                     {s.name}
                                                 </td>
@@ -233,7 +220,10 @@ const InSessionContent = () => {
                                                         style="secondary"
                                                         fill="outline"
                                                         size="small"
-                                                        onClick={() => openStudentInsights(s)}
+                                                        onClick={() => openStudentInsights({
+                                                            student: s,
+                                                            allStudents: yourStudents
+                                                        })}
                                                     />
                                                 </td>
                                             </tr>
@@ -248,17 +238,6 @@ const InSessionContent = () => {
 
             {isManageAssignmentOpen && (
                 <ManageAssignmentModal onClose={() => setIsManageAssignmentOpen(false)} />
-            )}
-
-            {isInsightsModalOpen && selectedStudent && (
-                <StudentInsightsModal
-                    student={selectedStudent}
-                    allStudents={yourStudents}
-                    onClose={closeInsightsModal}
-                    onSelectStudent={setSelectedStudent}
-                    containerEl={modalContainerElement}
-                    containerSelector="#root > div > .plus-page-main-container"
-                />
             )}
 
         </>
