@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/main.scss';
@@ -15,11 +14,9 @@ if (!rootEl) {
     try {
         ReactDOM.createRoot(rootEl).render(
             <React.StrictMode>
-                <BrowserRouter>
-                    <ThemeProvider>
-                        <App />
-                    </ThemeProvider>
-                </BrowserRouter>
+                <ThemeProvider>
+                    <App />
+                </ThemeProvider>
             </React.StrictMode>
         );
     } catch (err) {

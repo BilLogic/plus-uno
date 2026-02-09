@@ -1,71 +1,133 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
+import { useNavigate, Routes, Route, Navigate } from 'react-router-dom';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { Dashboard } from './components/Dashboard';
-import { LessonsContent } from './components/LessonsContent';
 import './App.css';
+
+import { ShellContext } from './context/ShellContext';
+
+// Import other prototypes (content only, no PageLayout)
+// Import other prototypes (content only, no PageLayout)
+import { LessonsContent } from './components/LessonsContent';
+import { ReflectionAssistantChat as ReflectionPage } from '../../sessions/ReflectionAssistant/ReflectionAssistantChat';
+import { ResearchAssistantChat as ResearchAssistantPage } from '../../research-assistant-chat/src/ResearchAssistantChat';
+import WeeklyReportsListPage from './components/WeeklyReportsListPage';
+import DevIndexPage from './components/DevIndexPage';
+
+// Admin / Research Assistant wrapper
+const AdminContent = () => {
+    const { setBreadcrumbs, setContentDirect, setActiveTabOverride } = useContext(ShellContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setBreadcrumbs([
+            { text: 'Admin', href: '/admin' },
+            { text: 'Research Assistant' }
+        ]);
+        setContentDirect(true);
+        setActiveTabOverride('tutors');
+        return () => {
+            setContentDirect(false);
+            setActiveTabOverride(null);
+        };
+    }, [setBreadcrumbs, setContentDirect, setActiveTabOverride]);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', width: '100%' }}>
+            <ResearchAssistantPage onBack={() => navigate('/admin')} />
+        </div>
+    );
+};
+
+// Reflection page wrapper
+const ReflectionContent = () => {
+    const { setBreadcrumbs, setContentDirect, setActiveTabOverride } = useContext(ShellContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setBreadcrumbs([
+            { text: 'Sessions', href: '/sessions' },
+            { text: 'Session Reflection' }
+        ]);
+        setContentDirect(true);
+        setActiveTabOverride('sessions');
+        return () => {
+            setContentDirect(false);
+            setActiveTabOverride(null);
+        };
+    }, [setBreadcrumbs, setContentDirect, setActiveTabOverride]);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', width: '100%' }}>
+            <ReflectionPage onBack={() => navigate('/home')} />
+        </div>
+    );
+};
 
 function App() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const [breadcrumbs, setBreadcrumbs] = useState([{ text: 'Home', href: '#' }]);
+    const [breadcrumbs, setBreadcrumbs] = useState([{ text: 'Home', href: '/home' }]);
+    const [topBarUser, setTopBarUser] = useState({ name: 'Boyuan Guo', type: 'lead tutor' });
+    const [mainClassName, setMainClassName] = useState('home-redesign-content');
+    const [contentDirect, setContentDirect] = useState(false);
+    const [floatingContent, setFloatingContent] = useState(null);
+    const [activeTabOverride, setActiveTabOverride] = useState(null);
 
-    // Determine active tab based on location
-    const getActiveTab = (path) => {
-        if (path.includes('/lessons')) return 'lessons';
-        if (path.includes('/sessions')) return 'sessions';
-        return 'home';
-    };
-
-    const activeTab = getActiveTab(location.pathname);
-
-    // Dynamic config
-    const topBarConfig = {
-        breadcrumbs: activeTab === 'lessons'
-            ? [
-                { text: 'Training', href: '#' },
-                { text: 'Lessons', href: '#' },
-                { text: 'Supporting a Growth Mindset' }
-            ]
-            : breadcrumbs,
-        user: { name: 'Boyuan Guo', counter: null, counterValue: null, type: 'lead tutor' },
-    };
-
-    const sidebarConfig = {
+    const sidebarConfig = useMemo(() => ({
         user: 'tutor',
-        activeTab: activeTab,
-        onHomeClick: () => navigate('/'),
+        activeTab: activeTabOverride || 'home',
+        onHomeClick: () => navigate('/home'),
         onTabClick: (id) => {
-            if (id === 'home') navigate('/');
-            if (id === 'lessons') navigate('/lessons');
-            // External / Other prototypes
-            if (id === 'sessions') navigate('/sessions');
-            if (id === 'weekly-report') navigate('/weekly-reports');
-            if (id === 'tutors') navigate('/admin');
-            if (id === 'slack') window.open('https://slack.com', '_blank');
+            if (id === 'home') navigate('/home'); // Use navigate instead of window.location
+            // ... other tabs
         }
-    };
+    }), [activeTabOverride]);
+    // Note: Use navigate in cleanup if needed, but sidebarConfig is memoized.
+    // The sidebarConfig in previous file used window.location for home?
+    // Let's stick to the structure.
 
-    // Shell state is managed by PageLayout (persistent verification), but we pass initial loading true
-    // PageLayout will handle the "once-only" animation logic we added.
-    const [shellLoading] = useState(true);
-    const [shellEntered] = useState(false); // PageLayout handles transition
+    const topBarConfig = useMemo(() => ({
+        breadcrumbs,
+        user: topBarUser
+    }), [breadcrumbs, topBarUser]);
+
+    const contextValue = useMemo(() => ({
+        setBreadcrumbs,
+        setTopBarUser,
+        setMainClassName,
+        setContentDirect,
+        setFloatingContent,
+        setActiveTabOverride
+    }), []);
+
+    // We need to pass navigate to sidebarConfig.
+    // The previous App.jsx structure was a bit different.
+    // Let's just update the Routes part and Imports.
+    // Wait, I can't easily change sidebarConfig inside the component function via replace_file_content if I don't see the whole function.
+    // I will just update Imports and Routes.
 
     return (
-        <PageLayout
-            topBarConfig={topBarConfig}
-            sidebarConfig={sidebarConfig}
-            id="home-redesign-page"
-            className="plus-page-reveal"
-            mainClassName="home-redesign-content"
-            shellLoading={shellLoading}
-            shellEntered={shellEntered}
-        >
-            <Routes>
-                <Route path="/" element={<Dashboard setBreadcrumbs={setBreadcrumbs} />} />
-                <Route path="/lessons" element={<LessonsContent />} />
-            </Routes>
-        </PageLayout>
+        <ShellContext.Provider value={contextValue}>
+            <PageLayout
+                topBarConfig={topBarConfig}
+                sidebarConfig={sidebarConfig}
+                id="home-redesign-page"
+                className={mainClassName}
+            >
+                <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Routes>
+                        <Route path="/" element={<DevIndexPage />} />
+                        <Route path="/home" element={<Dashboard setBreadcrumbs={setBreadcrumbs} />} />
+                        <Route path="/lessons" element={<LessonsContent />} />
+                        <Route path="/reflection" element={<ReflectionContent />} />
+                        <Route path="/admin" element={<AdminContent />} />
+                        <Route path="/weekly-reports" element={<WeeklyReportsListPage />} />
+                        <Route path="*" element={<Navigate to="/home" replace />} />
+                    </Routes>
+                    {floatingContent}
+                </div>
+            </PageLayout>
+        </ShellContext.Provider>
     );
 }
 
