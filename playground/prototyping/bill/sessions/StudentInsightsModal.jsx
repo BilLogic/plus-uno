@@ -16,44 +16,36 @@ import Accordion from '@/components/Accordion';
  * @param {Array} props.allStudents - All students for tab navigation
  * @param {Function} props.onClose - Close modal callback
  * @param {Function} props.onSelectStudent - Callback when switching student via tabs
- * @param {string} [props.containerId] - When set, portal modal into this element and use position:absolute so it fills the page (e.g. sessions-in-session-page)
+ * @param {HTMLElement} [props.containerEl] - Optional container element for section-anchored overlay
+ * @param {string} [props.containerId] - Optional container element id for section-anchored overlay
+ * @param {string} [props.containerSelector] - Optional selector for section-anchored overlay
  * @returns {JSX.Element} Modal with AI Insights tab content
  */
-const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStudent, containerId }) => {
+const resolveScopedContainer = ({ containerEl, containerId, containerSelector }) => {
+    if (containerId === 'root' || containerSelector === '#root') {
+        return typeof document !== 'undefined' ? document.getElementById('root') : null;
+    }
+    const directCandidate = (
+        (containerEl && containerEl instanceof HTMLElement && containerEl) ||
+        (containerId && typeof document !== 'undefined' && document.getElementById(containerId)) ||
+        (containerSelector && typeof document !== 'undefined' && document.querySelector(containerSelector)) ||
+        null
+    );
+    if (!directCandidate) return null;
+    if (directCandidate.classList?.contains('plus-page-main-container')) return directCandidate;
+    const nestedMainContainer = directCandidate.querySelector?.('.plus-page-main-container');
+    return nestedMainContainer || directCandidate;
+};
+
+const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStudent, containerEl, containerId, containerSelector }) => {
     const [activeContentTab, setActiveContentTab] = useState('ai-insights');
     const [selectedStudentId, setSelectedStudentId] = useState(student?.id);
-    const [isLoading, setIsLoading] = useState(true);
-    const [headerReady, setHeaderReady] = useState(false);
-    const [contentReady, setContentReady] = useState(false);
+    const [isLoading] = useState(false);
+    const [headerReady] = useState(true);
+    const [contentReady] = useState(true);
 
-    // Interactive Spotlight & Accordion State
-    const [focusedColumn, setFocusedColumn] = useState(null);
+    // Accordion state
     const [activeAccordionKey, setActiveAccordionKey] = useState(null);
-
-    // Phase 1 → Phase 2: Skeleton → Header
-    useEffect(() => {
-        setIsLoading(true);
-        setHeaderReady(false);
-        setContentReady(false);
-
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-            setHeaderReady(true);
-        }, 800);
-
-        return () => clearTimeout(timer);
-    }, [selectedStudentId]);
-
-    // Phase 2 → Phase 3: Header → Content
-    useEffect(() => {
-        if (!headerReady) return;
-
-        const timer = setTimeout(() => {
-            setContentReady(true);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [headerReady]);
 
     const currentStudent = useMemo(
         () => allStudents.find((s) => s.id === selectedStudentId) || student,
@@ -109,20 +101,42 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
         return parts.length >= 2 ? `${parts[0]} ${parts[1][0]}.` : name;
     };
 
-    const backdropPosition = containerId ? 'absolute' : 'fixed';
+    const explicitScopeRequested = Boolean(containerEl || containerId || containerSelector);
+    const scopedContainer = resolveScopedContainer({ containerEl, containerId, containerSelector });
+    const rootContainer = typeof document !== 'undefined' ? document.getElementById('root') : null;
+    if (explicitScopeRequested && !scopedContainer) {
+        console.warn('[StudentInsightsModal] Scoped container not found. Blocking modal mount to avoid full-page fallback.', {
+            containerId,
+            containerSelector
+        });
+        return null;
+    }
+    const portalContainer = scopedContainer || rootContainer;
+    if (!portalContainer) return null;
+    const isSectionAnchored = Boolean(scopedContainer);
+
+    // Ensure absolute-positioned overlay is scoped to the selected section container.
+    if (isSectionAnchored && portalContainer instanceof HTMLElement) {
+        const computedPos = window.getComputedStyle(portalContainer).position;
+        if (computedPos === 'static') {
+            portalContainer.style.position = 'relative';
+        }
+    }
+
     const modalContent = (
         <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="student-insights-modal-title"
+            data-modal-container={isSectionAnchored ? 'scoped' : 'root'}
             style={{
-                position: backdropPosition,
+                position: isSectionAnchored ? 'absolute' : 'fixed',
                 inset: 0,
                 backgroundColor: 'rgba(0,0,0,0.5)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 1050,
+                zIndex: 1200,
                 padding: '24px'
             }}
             onClick={(e) => e.target === e.currentTarget && onClose?.()}
@@ -133,8 +147,10 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     position: 'relative',
                     backgroundColor: 'var(--color-surface-container-high, #fff)',
                     borderRadius: '16px',
-                    width: '75%',
-                    height: '90%',
+                    width: 'min(1120px, calc(100% - 48px))',
+                    height: 'min(900px, calc(100% - 48px))',
+                    maxWidth: '1120px',
+                    maxHeight: '900px',
                     overflow: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
@@ -149,7 +165,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     gap: '16px',
                     padding: '16px 24px 0',
                     boxSizing: 'content-box'
-                }} className={focusedColumn !== null ? 'blur-dim' : ''}>
+                }}>
                     {isLoading ? (
                         <div style={{ display: 'flex', gap: '8px', flex: 1 }}>
                             {Array.from({ length: 5 }).map((_, i) => (
@@ -184,7 +200,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 </div>
 
                 {/* Header: row 1 = name + Update goals; row 2 = status badges; no division stroke */}
-                <div style={{ padding: '16px 24px', boxSizing: 'content-box' }} className={focusedColumn !== null ? 'blur-dim' : ''}>
+                <div style={{ padding: '16px 24px', boxSizing: 'content-box' }}>
                     {isLoading ? (
                         <>
                             <div className="skeleton-block" style={{ width: '200px', height: '32px', marginBottom: '12px', borderRadius: '8px' }} />
@@ -216,7 +232,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 </div>
 
                 {/* Content tabs: AI Insights, Goals, Notes – tonal buttons; container full width, fit-content height, border-box to contain padding */}
-                <div style={{ padding: '0 24px 4px', width: '100%', height: 'fit-content', boxSizing: 'border-box', marginTop: '0', marginBottom: 0 }} className={focusedColumn !== null ? 'blur-dim' : ''}>
+                <div style={{ padding: '0 24px 4px', width: '100%', height: 'fit-content', boxSizing: 'border-box', marginTop: '0', marginBottom: 0 }}>
                     {isLoading ? (
                         <div style={{ display: 'flex', gap: '0', borderRadius: '8px', overflow: 'hidden', height: '40px' }}>
                             {['AI Insights', 'Goals', 'Notes'].map((label, i) => (
@@ -266,31 +282,6 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                             opacity: 0;
                             animation: revealIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
                             transition: opacity 0.4s ease, filter 0.4s ease;
-                        }
-
-                        /* Spotlight Dimming Classes */
-                        .spotlight-mode .animate-enter {
-                            opacity: 0.1;
-                            filter: grayscale(100%) blur(4px);
-                            pointer-events: none; /* Prevent clicks on dimmed */
-                            transition: all 0.5s ease;
-                        }
-                        .spotlight-mode .animate-enter.spotlight-active {
-                            opacity: 1;
-                            filter: none;
-                            pointer-events: auto;
-                            z-index: 10;
-                            position: relative; /* Ensure z-index works */
-                            transform: scale(1.01);
-                            box-shadow: 0 4px 32px rgba(0,0,0,0.08); /* Subtle lift */
-                        }
-
-                        /* Header & General Dimming */
-                        .blur-dim {
-                            opacity: 0.15;
-                            filter: grayscale(100%) blur(3px);
-                            transition: all 0.5s ease;
-                            pointer-events: none;
                         }
 
                         .obs-card {
@@ -365,15 +356,13 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                         </div>
                     ) : contentReady && activeContentTab === 'ai-insights' && (
                         <div
-                            className={`student-insights-content${focusedColumn !== null ? ' spotlight-mode' : ''}`}
+                            className="student-insights-content"
                             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', width: '100%', maxWidth: '100%', gap: '24px', alignItems: 'stretch', height: '100%', minHeight: 0 }}
-                            onClick={() => setFocusedColumn(null)} // Background click resets focus
                         >
                             {/* Column 1: Student Momentum (gauge + heatmap) - reduced spacing to fit */}
                             <div
-                                className={`animate-enter${focusedColumn === 0 ? ' spotlight-active' : ''}`}
-                                style={{ minHeight: 0, display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
-                                onClick={(e) => { e.stopPropagation(); setFocusedColumn(0); }}
+                                className="animate-enter"
+                                style={{ minHeight: 0, display: 'flex', flexDirection: 'column' }}
                             >
                                 <h3 className="body1-txt" style={{ fontWeight: 600, marginBottom: '8px' }}>Student Momentum</h3>
                                 <div style={{ position: 'relative', marginBottom: '0px' }}>
@@ -408,9 +397,8 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
 
                             {/* Column 2: Key Observations - cards take available height */}
                             <div
-                                className={`animate-enter delay-1${focusedColumn === 1 ? ' spotlight-active' : ''}`}
-                                style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, cursor: 'pointer' }}
-                                onClick={(e) => { e.stopPropagation(); setFocusedColumn(1); }}
+                                className="animate-enter delay-1"
+                                style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}
                             >
                                 <h3 className="body1-txt" style={{ fontWeight: 600, marginBottom: '12px' }}>Key Observations</h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, minHeight: 0, overflowY: 'hidden', width: '100%' }}>
@@ -439,9 +427,8 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
 
                             {/* Column 3: Talking Points – accordions from component library */}
                             <div
-                                className={`animate-enter delay-2${focusedColumn === 2 ? ' spotlight-active' : ''}`}
-                                style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, width: '100%', cursor: 'pointer' }}
-                                onClick={(e) => { e.stopPropagation(); setFocusedColumn(2); }}
+                                className="animate-enter delay-2"
+                                style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, width: '100%' }}
                             >
                                 <h3 className="body1-txt" style={{ fontWeight: 600, marginBottom: '12px' }}>Talking Points</h3>
                                 <div className="no-scrollbar" style={{ flex: 1, minHeight: 0, overflowY: 'auto', width: '100%', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -452,10 +439,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                             body: <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>{tp.content}</span>
                                         }))}
                                         activeKey={activeAccordionKey}
-                                        onSelect={(k) => {
-                                            setActiveAccordionKey(k === activeAccordionKey ? null : k);
-                                            setFocusedColumn(2); // Auto-focus column on interaction
-                                        }}
+                                        onSelect={(k) => setActiveAccordionKey(k === activeAccordionKey ? null : k)}
                                     />
                                     <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--color-on-surface-variant)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                                         <i className="fas fa-circle-info" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden />
@@ -475,8 +459,8 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
             </div>
         </div>
     );
-    const container = containerId ? document.getElementById(containerId) : null;
-    return container ? createPortal(modalContent, container) : modalContent;
+    if (!portalContainer) return null;
+    return createPortal(modalContent, portalContainer);
 };
 
 export default StudentInsightsModal;

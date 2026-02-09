@@ -9,9 +9,9 @@
   --chat-on-surface: #111827;
   --chat-on-surface-muted: #6b7280;
   --chat-outline: #d1d5db;
-  /* Demo frame: 1280×800 */
+  /* Fixed demo frame */
   --demo-frame-width: 1280px;
-  --demo-frame-height: 800px;
+  --demo-frame-height: 850px;
 }
 
 *,
@@ -35,12 +35,12 @@ body {
   overflow: auto;
 }
 
-/* Frame 1280×800: fixed size; border-radius matches inner plus-page-layout (8px). */
+/* Fixed 1280x850 frame */
 #root {
-  width: 1280px;
-  height: 800px;
-  min-width: 1280px;
-  min-height: 800px;
+  width: var(--demo-frame-width);
+  height: var(--demo-frame-height);
+  min-width: var(--demo-frame-width);
+  min-height: var(--demo-frame-height);
   overflow: hidden;
   box-sizing: border-box;
   border-radius: 8px;

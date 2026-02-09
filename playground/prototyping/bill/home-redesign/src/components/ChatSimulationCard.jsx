@@ -108,19 +108,11 @@ const ChatSimulationCard = ({ onClose, onComplete, coverImage }) => {
     const [messages, setMessages] = useState([]);
     const [step, setStep] = useState('intro'); // intro, selection, typing, feedback
     const [isTyping, setIsTyping] = useState(false);
-    const [contentVisible, setContentVisible] = useState(false);
     const viewportRef = useRef(null);
     const bottomRef = useRef(null);
 
-    // Loading state - match homepage progressive disclosure
-    useEffect(() => {
-        const timer = setTimeout(() => setContentVisible(true), 800);
-        return () => clearTimeout(timer);
-    }, []);
-
     // Initial Script
     useEffect(() => {
-        if (!contentVisible) return;
         let mounted = true;
         const runScript = async () => {
             // 1. Intro Text (slowed down for demo)
@@ -147,7 +139,7 @@ const ChatSimulationCard = ({ onClose, onComplete, coverImage }) => {
         };
         runScript();
         return () => { mounted = false; };
-    }, [contentVisible]);
+    }, []);
 
     // Auto-scroll
     useEffect(() => {
@@ -189,72 +181,65 @@ const ChatSimulationCard = ({ onClose, onComplete, coverImage }) => {
     };
 
     return (
-        <>
-            {!contentVisible ? (
-                <div className="chat-simulation-skeleton">
-                    <div className="skeleton-header" />
-                    <div className="skeleton-content">
-                        <div className="skeleton-bubble" />
-                        <div className="skeleton-bubble" />
-                        <div className="skeleton-bubble" />
-                    </div>
-                </div>
-            ) : (
-                <div className="chat-simulation-container">
-                    <div className="chat-header">
-                        <h2>Supporting a Growth Mindset</h2>
-                        <button className="close-btn" onClick={onClose}>×</button>
-                    </div>
+        <motion.div
+            className="chat-simulation-container"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+            <div className="chat-header">
+                <h2>Supporting a Growth Mindset</h2>
+                <button className="close-btn" onClick={onClose}>×</button>
+            </div>
 
-                    <div className="chat-viewport">
-                        <div className="thread-viewport" ref={viewportRef}>
-                            {messages.map((msg, i) => (
-                                <motion.div
-                                    key={i}
-                                    className={`message-bubble ${msg.role}-message ${msg.type === 'feedback' ? 'feedback-bubble' : ''}`}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                >
-                                    {msg.type === 'video' ? (
-                                        <VideoThumbnail coverImage={coverImage} />
-                                    ) : msg.type === 'feedback' ? (
-                                        <FeedbackMessage content={msg.content} />
-                                    ) : (
-                                        <p>{msg.content}</p>
-                                    )}
-                                </motion.div>
-                            ))}
-
-                            {step === 'selection' && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                >
-                                    <SelectionOptions
-                                        options={[
-                                            { id: '1', label: "Validate their effort" },
-                                            { id: '2', label: "Correct their mistake" },
-                                            { id: '3', label: "Offer immediate help" }
-                                        ]}
-                                        onSelect={handleSelection}
-                                    />
-                                </motion.div>
+            <div className="chat-viewport">
+                <div className="thread-viewport" ref={viewportRef}>
+                    {messages.map((msg, i) => (
+                        <motion.div
+                            key={i}
+                            className={`message-bubble ${msg.role}-message ${msg.type === 'feedback' ? 'feedback-bubble' : ''}`}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            {msg.type === 'video' ? (
+                                <VideoThumbnail coverImage={coverImage} />
+                            ) : msg.type === 'feedback' ? (
+                                <FeedbackMessage content={msg.content} />
+                            ) : (
+                                <p>{msg.content}</p>
                             )}
-                            <div ref={bottomRef} />
-                        </div>
-                    </div>
+                        </motion.div>
+                    ))}
 
-                    <div onClick={handleStartTyping}>
-                        <AutoTypeComposer
-                            onSend={handleUserSend}
-                            disabled={step !== 'typing'}
-                            isTyping={isTyping}
-                            placeholder={step === 'typing' ? "Click to respond..." : "Select an option first..."}
-                        />
-                    </div>
+                    {step === 'selection' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <SelectionOptions
+                                options={[
+                                    { id: '1', label: "Validate their effort" },
+                                    { id: '2', label: "Correct their mistake" },
+                                    { id: '3', label: "Offer immediate help" }
+                                ]}
+                                onSelect={handleSelection}
+                            />
+                        </motion.div>
+                    )}
+                    <div ref={bottomRef} />
                 </div>
-            )}
-        </>
+            </div>
+
+            <div onClick={handleStartTyping}>
+                <AutoTypeComposer
+                    onSend={handleUserSend}
+                    disabled={step !== 'typing'}
+                    isTyping={isTyping}
+                    placeholder={step === 'typing' ? "Click to respond..." : "Select an option first..."}
+                />
+            </div>
+        </motion.div>
     );
 };
 

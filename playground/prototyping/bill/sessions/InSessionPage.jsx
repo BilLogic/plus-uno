@@ -7,7 +7,6 @@ import Badge from '@/components/Badge';
 import ManageAssignmentModal from './ManageAssignmentModal';
 
 import StudentInsightsModal from './StudentInsightsModal';
-import ModalDemoController from './ModalDemoController';
 import { CompactReflectionBar } from './ReflectionAssistant/CompactReflectionBar';
 import { ReflectionAssistantChat } from './ReflectionAssistant/ReflectionAssistantChat';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,26 +39,6 @@ const InSessionPage = () => {
     const [initialReflectionPrompt, setInitialReflectionPrompt] = useState('');
 
     const navigate = useNavigate();
-
-    // Auto-Demo State
-    const [isDemoActive, setIsDemoActive] = useState(false);
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('demo') === 'true') {
-            setIsDemoActive(true);
-        }
-    }, []);
-
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key.toLowerCase() === 'd') {
-                setIsDemoActive(prev => !prev);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
 
     /** Session context per Figma 1687-173829: Hogwarts (Prof. Snape), 11:25 - 12:25pm, 12/21/2023 */
     const sessionContext = {
@@ -362,14 +341,10 @@ const InSessionPage = () => {
                     allStudents={yourStudents}
                     onClose={closeInsightsModal}
                     onSelectStudent={setSelectedStudent}
-                    containerId="sessions-in-session-page"
+                    containerId="root"
                 />
             )}
 
-            <ModalDemoController
-                isActive={isDemoActive}
-                onComplete={() => setIsDemoActive(false)}
-            />
         </PageLayout>
     );
 };

@@ -1,39 +1,7 @@
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import HomeRedesignApp from '../playground/prototyping/bill/home-redesign/src/App';
-import { ErrorBoundary } from '../playground/prototyping/bill/research-assistant-chat/src/ErrorBoundary';
-import InSessionPage from '../playground/prototyping/bill/sessions/InSessionPage';
-
-/** Lazy-loaded admin app so the shell loads first and /admin doesn't block or hang. */
-const ResearchAdminApp = lazy(() =>
-  import('../playground/prototyping/bill/research-assistant-chat/src/App').then((m) => ({ default: m.default }))
-);
-
-const WeeklyReportApp = lazy(() =>
-  import('../playground/prototyping/bill/weekly-report/src/App').then((m) => ({ default: m.default }))
-);
-
-/**
- * Loading fallback shown while the admin app chunk is loading.
- * @returns {JSX.Element}
- */
-function AdminPageFallback() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh',
-        color: 'var(--color-on-surface-variant)',
-        fontFamily: 'var(--font-family-body)',
-      }}
-    >
-      <span className="body1-txt">Loading admin…</span>
-    </div>
-  );
-}
 
 /**
  * Index page: list of prototype links (index into different pages).
@@ -75,29 +43,8 @@ function App() {
   return (
     <ThemeProvider>
       <Routes>
-        <Route path="/" element={<IndexPage />} />
-        <Route path="/home" element={<HomeRedesignApp />} />
-        <Route
-          path="/admin"
-          element={
-            <ErrorBoundary>
-              <Suspense fallback={<AdminPageFallback />}>
-                <ResearchAdminApp />
-              </Suspense>
-            </ErrorBoundary>
-          }
-        />
-        <Route path="/sessions" element={<InSessionPage />} />
-        <Route
-          path="/weekly-report"
-          element={
-            <ErrorBoundary>
-              <Suspense fallback={<AdminPageFallback />}>
-                <WeeklyReportApp />
-              </Suspense>
-            </ErrorBoundary>
-          }
-        />
+        <Route path="/prototypes" element={<IndexPage />} />
+        <Route path="/*" element={<HomeRedesignApp />} />
       </Routes>
     </ThemeProvider>
   );

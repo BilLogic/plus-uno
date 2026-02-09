@@ -114,6 +114,7 @@ const PageLayout = ({
             <div className="plus-page-main-container" style={{
                 display: 'flex',
                 flex: 1,
+                minHeight: 0,
                 overflow: 'hidden',
                 position: 'relative',
                 width: '100%',
@@ -156,8 +157,9 @@ const PageLayout = ({
                     flex: '1 0 0',
                     alignItems: 'flex-start',
                     minWidth: 0,
+                    minHeight: 0,
                     height: '100%',
-                    overflowY: 'auto',
+                    overflow: 'hidden',
                     backgroundColor: 'var(--color-surface, #f9f9fc)',
                     borderRadius: 'var(--size-surface-radius, 16px)',
                     transition: CONTENT_TRANSITION,
@@ -176,7 +178,7 @@ const PageLayout = ({
                                 boxSizing: 'border-box',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                overflow: mainClassName ? 'auto' : 'hidden',
+                                overflow: 'auto',
                                 position: 'relative'
                             }}
                         >
@@ -193,7 +195,7 @@ const PageLayout = ({
                         position: 'absolute',
                         bottom: 36,
                         right: 48,
-                        zIndex: 10,
+                        zIndex: 1200,
                         pointerEvents: 'auto',
                     }}
                 >

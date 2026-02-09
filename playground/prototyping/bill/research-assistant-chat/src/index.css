@@ -74,9 +74,12 @@ body {
 
 /** Overview cards: height 181px, full width; no horizontal scroll. */
 #tutor-training-progress-page .tutor-training-progress-page__overview-cards {
-  height: 181px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-large-space-300, 16px);
+  height: auto;
   width: 100%;
-  overflow-x: hidden;
+  overflow: visible;
 }
 
 /** UserAvatar: same as home-redesign (surface-container-lowest for demo). */

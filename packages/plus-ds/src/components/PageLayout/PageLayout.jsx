@@ -53,6 +53,7 @@ const PageLayout = ({
     sidebarConfig = {},
     topBarConfig = {},
     footerConfig = {}, // Unused for now but kept for API compatibility
+    shellEntered = false,
     id,
     className = '',
     style,
@@ -113,12 +114,14 @@ const PageLayout = ({
                 position: 'relative',
                 borderBottom: 'none'
             }}>
-                <TopBar
-                    mode={isSidebarVisible ? 'expanded' : 'collapsed'}
-                    onToggle={handleSidebarToggle}
-                    breadcrumbs={breadcrumbs}
-                    user={user}
-                />
+                <div className={`shell-reveal${shellEntered ? ' has-entered' : ''}`}>
+                    <TopBar
+                        mode={isSidebarVisible ? 'expanded' : 'collapsed'}
+                        onToggle={handleSidebarToggle}
+                        breadcrumbs={breadcrumbs}
+                        user={user}
+                    />
+                </div>
             </div>
 
             {/* Main Container */}
@@ -133,7 +136,7 @@ const PageLayout = ({
             }}>
                 {/* Sidebar Wrapper */}
                 <div
-                    className="plus-page-sidebar-wrapper"
+                    className={`plus-page-sidebar-wrapper shell-reveal${shellEntered ? ' has-entered' : ''}`}
                     style={{
                         display: isSidebarVisible ? 'block' : 'none',
                         flexShrink: 0,
@@ -186,6 +189,7 @@ PageLayout.propTypes = {
     sidebarConfig: PropTypes.object,
     topBarConfig: PropTypes.object,
     footerConfig: PropTypes.object,
+    shellEntered: PropTypes.bool,
     id: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,

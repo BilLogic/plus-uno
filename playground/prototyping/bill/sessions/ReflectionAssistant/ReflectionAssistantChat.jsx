@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { QuestionFlow, ParameterSlider } from './ToolUI';
 
 /**
@@ -80,6 +80,32 @@ const ChatHeader = ({ onBack }) => (
     </header>
 );
 
+const RESPONSE_LABEL_MAP = {
+    'math-fluency': 'Mathematical Fluency',
+    confidence: 'Solution Confidence',
+    pacing: 'Workflow Pacing',
+    'arlene-mccoy': 'Arlene McCoy',
+    'marcus-chen': 'Marcus Chen',
+    'sofia-rodriguez': 'Sofia Rodriguez',
+    'morgan-reed': 'Morgan Reed',
+    'taylor-brooks': 'Taylor Brooks',
+    'casey-jordan': 'Casey Jordan',
+    'jordan-avery': 'Jordan Avery',
+    productive: 'Very Productive',
+    okay: 'It was okay',
+    challenging: 'Challenging'
+};
+
+const normalizeAnswerToText = (value) => {
+    if (Array.isArray(value)) {
+        return normalizeAnswerToText(value[0]);
+    }
+    if (value && typeof value === 'object') {
+        return normalizeAnswerToText(Object.values(value)[0]);
+    }
+    return RESPONSE_LABEL_MAP[value] || value;
+};
+
 export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -117,6 +143,7 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         // Small pause after typing before sending
         await new Promise(r => setTimeout(r, 400));
         handleSend(text);
+        setInput('');
         setIsAutoTyping(false);
     };
 
@@ -145,7 +172,41 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         setIsTyping(false);
 
         // Logic for assistant responses
-        if (msgText.toLowerCase().includes("arlene's progress") || msgText.toLowerCase().includes("student progress")) {
+        // Handle student selection from initial question flow
+        if (msgText.includes('Arlene McCoy') || msgText.includes('Marcus Chen') || msgText.includes('Sofia Rodriguez')) {
+            const studentName = msgText.includes('Arlene McCoy') ? 'Arlene McCoy'
+                : msgText.includes('Marcus Chen') ? 'Marcus Chen'
+                    : 'Sofia Rodriguez';
+
+            addMessage('assistant', {
+                type: 'text',
+                text: `Great choice! Let's reflect on your session with ${studentName}. How did it go today?`
+            });
+            await new Promise(r => setTimeout(r, 1000));
+            addMessage('assistant', {
+                type: 'widget',
+                name: 'question-flow',
+                data: {
+                    id: 'session-reflection',
+                    steps: [
+                        {
+                            id: 'session-feeling',
+                            title: "How would you describe the session?",
+                            description: `Think about your overall experience with ${studentName}`,
+                            options: [
+                                { id: 'productive', label: 'Very Productive', description: 'Made significant progress today' },
+                                { id: 'okay', label: 'It was okay', description: 'Some progress, room for improvement' },
+                                { id: 'challenging', label: 'Challenging', description: 'Struggled with some concepts' }
+                            ]
+                        }
+                    ]
+                }
+            });
+        } else if (
+            msgText.toLowerCase().includes("arlene's progress") ||
+            msgText.toLowerCase().includes("student progress") ||
+            msgText.toLowerCase().includes("growth areas")
+        ) {
             addMessage('assistant', {
                 type: 'text',
                 text: "To help you reflect deeply on Arlene McCoy's recent session, let's explore your perception of her growth areas. \n\nWhat standing feedback would you prioritize for her next session?"
@@ -196,19 +257,18 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
             // Show student selection widget for next student
             addMessage('assistant', {
                 type: 'widget',
-                widgetType: 'question-flow',
-                widgetProps: {
-                    mode: 'upfront',
+                name: 'question-flow',
+                data: {
+                    id: 'next-student-selection',
                     steps: [{
                         id: 'next-student',
-                        label: 'Select a student',
-                        type: 'multi-select',
-                        maxSelections: 1,
+                        title: 'Select a student',
+                        description: 'Choose who you want to reflect on next.',
                         options: [
-                            { id: 'morgan-reed', label: 'Morgan Reed', sublabel: 'Needs to set goals' },
-                            { id: 'taylor-brooks', label: 'Taylor Brooks', sublabel: 'On track' },
-                            { id: 'casey-jordan', label: 'Casey Jordan', sublabel: 'Needs content help' },
-                            { id: 'jordan-avery', label: 'Jordan Avery', sublabel: 'Needs challenge' }
+                            { id: 'morgan-reed', label: 'Morgan Reed', description: 'Needs to set goals' },
+                            { id: 'taylor-brooks', label: 'Taylor Brooks', description: 'On track' },
+                            { id: 'casey-jordan', label: 'Casey Jordan', description: 'Needs content help' },
+                            { id: 'jordan-avery', label: 'Jordan Avery', description: 'Needs challenge' }
                         ]
                     }]
                 }
@@ -236,8 +296,10 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         } else {
             addMessage('assistant', {
                 type: 'text',
-                text: "I'm ready to help you reflect on your session with Arlene. What would you like to focus on?"
+                text: "Let's explore your perception of her growth areas. What standing feedback would you prioritize for her next session?"
             });
+            // Set up auto-response for demo - clicking input will trigger this
+            setPendingAutoResponse("Let's focus on Arlene's growth areas for next session.");
         }
     };
 
@@ -250,11 +312,35 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
             handleSend(initialPrompt);
         } else if (messages.length === 0) {
             hasStartedRef.current = true;
-            // Intro message
+            // Show student selection widget on initial load
             addMessage('assistant', {
                 type: 'text',
-                text: "Hi! I'm your Reflection Assistant. I'm here to help you decompress and capture insights from your session with Arlene McCoy. \n\nHow did it go today?"
+                text: "Hi! I'm your Reflection Assistant. Let's start by selecting the student you'd like to reflect on."
             });
+            // Add student selection question flow
+            // Longer delay for smoother progressive disclosure
+            const timer = setTimeout(() => {
+                addMessage('assistant', {
+                    type: 'widget',
+                    name: 'question-flow',
+                    data: {
+                        id: 'student-selection',
+                        steps: [
+                            {
+                                id: 'select-student',
+                                title: "Who are you reflecting on today?",
+                                description: "Select a student from your recent sessions",
+                                options: [
+                                    { id: 'arlene-mccoy', label: 'Arlene McCoy', description: 'Last session: Today, 2:30 PM' },
+                                    { id: 'marcus-chen', label: 'Marcus Chen', description: 'Last session: Today, 1:00 PM' },
+                                    { id: 'sofia-rodriguez', label: 'Sofia Rodriguez', description: 'Last session: Yesterday, 4:15 PM' }
+                                ]
+                            }
+                        ]
+                    }
+                });
+            }, 1800);
+            return () => clearTimeout(timer);
         }
     }, [initialPrompt]);
 
@@ -319,33 +405,10 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                                     <QuestionFlow
                                         {...msg.content.data}
                                         onComplete={(answers) => {
-                                            // answers is an object like { focus: 'math-fluency' }
-                                            // Extract the first value from the answers object
-                                            const id = typeof answers === 'object' && !Array.isArray(answers)
-                                                ? Object.values(answers)[0]
-                                                : (Array.isArray(answers) ? answers[0] : answers);
-
-                                            // Map ID to label
-                                            const labelMap = {
-                                                'math-fluency': 'Mathematical Fluency',
-                                                'confidence': 'Solution Confidence',
-                                                'pacing': 'Workflow Pacing'
-                                            };
-                                            const label = labelMap[id] || id;
-                                            handleSend(label);
+                                            handleSend(normalizeAnswerToText(answers));
                                         }}
                                         onSelect={(selectedIds) => {
-                                            // onSelect receives an array of IDs like ['math-fluency']
-                                            const id = Array.isArray(selectedIds) ? selectedIds[0] : selectedIds;
-
-                                            // Map ID to label
-                                            const labelMap = {
-                                                'math-fluency': 'Mathematical Fluency',
-                                                'confidence': 'Solution Confidence',
-                                                'pacing': 'Workflow Pacing'
-                                            };
-                                            const label = labelMap[id] || id;
-                                            handleSend(label);
+                                            handleSend(normalizeAnswerToText(selectedIds));
                                         }}
                                     />
                                 )}

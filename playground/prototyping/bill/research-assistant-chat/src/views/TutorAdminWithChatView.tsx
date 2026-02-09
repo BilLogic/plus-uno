@@ -6,7 +6,6 @@ import { PageLayout } from '@plus-ds/specs/Universal/Pages';
 import { TrainingProgressContent } from '../components/TrainingProgressContent';
 import { CompactChatBar } from '../components/CompactChatBar';
 import { ResearchAssistantChat } from '../ResearchAssistantChat';
-import { AdminSkeletons } from '../components/AdminSkeletons';
 import '@plus-ds/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
 const topBarConfig = {
@@ -37,35 +36,15 @@ export function TutorAdminWithChatView(): React.ReactElement {
   const navigate = useNavigate();
 
   // Loading & Disclosure States (matching Homepage pattern)
-  const [shellLoading, setShellLoading] = useState(true);
-  const [shellReady, setShellReady] = useState(false);
   const [shellEntered, setShellEntered] = useState(false);
-  const [contentReady, setContentReady] = useState(false);
-  const [contentVisible, setContentVisible] = useState(false);
+  const [contentVisible, setContentVisible] = useState(true);
   const [hasEntered, setHasEntered] = useState(false);
 
-  /** Shell + content sync point: slowing down to 800ms for more premium feel */
+  /** Shell reveal immediately (no skeleton phase). */
   useEffect(() => {
-    const t = setTimeout(() => {
-      setShellLoading(false);
-      setShellReady(true);
-      setContentReady(true);
-    }, 800);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    if (!shellReady) return;
     const id = requestAnimationFrame(() => setShellEntered(true));
     return () => cancelAnimationFrame(id);
-  }, [shellReady]);
-
-  /** Content reveal: simultaneously with sidebar start */
-  useEffect(() => {
-    if (!contentReady) return;
-    const t = setTimeout(() => setContentVisible(true), 0);
-    return () => clearTimeout(t);
-  }, [contentReady]);
+  }, []);
 
   useEffect(() => {
     if (!contentVisible) return;
@@ -90,7 +69,6 @@ export function TutorAdminWithChatView(): React.ReactElement {
       id="tutor-training-progress-page"
       mainClassName={!chatExpanded ? 'tutor-training-progress-page__content' : ''}
       contentDirect={chatExpanded}
-      shellLoading={shellLoading}
       shellEntered={shellEntered}
       floatingContent={
         !chatExpanded ? (
@@ -120,14 +98,6 @@ export function TutorAdminWithChatView(): React.ReactElement {
           >
             <ResearchAssistantChat onBack={handleBack} />
           </motion.div>
-        ) : !contentVisible ? (
-          <div
-            key="skeleton"
-            className={`admin-skeleton-root${contentReady ? ' is-exiting' : ''}`}
-            style={{ width: '100%' }}
-          >
-            <AdminSkeletons />
-          </div>
         ) : (
           <motion.div
             key="content"

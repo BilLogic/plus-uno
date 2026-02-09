@@ -145,7 +145,11 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         setIsTyping(false);
 
         // Logic for assistant responses
-        if (msgText.toLowerCase().includes("arlene's progress") || msgText.toLowerCase().includes("student progress")) {
+        if (
+            msgText.toLowerCase().includes("arlene's progress") ||
+            msgText.toLowerCase().includes("student progress") ||
+            msgText.toLowerCase().includes("growth areas")
+        ) {
             addMessage('assistant', {
                 type: 'text',
                 text: "To help you reflect deeply on Arlene McCoy's recent session, let's explore your perception of her growth areas. \n\nWhat standing feedback would you prioritize for her next session?"
@@ -236,8 +240,9 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         } else {
             addMessage('assistant', {
                 type: 'text',
-                text: "I'm ready to help you reflect on your session with Arlene. What would you like to focus on?"
+                text: "Let's explore your perception of her growth areas. What standing feedback would you prioritize for her next session?"
             });
+            setPendingAutoResponse("Let's focus on Arlene's growth areas for next session.");
         }
     };
 

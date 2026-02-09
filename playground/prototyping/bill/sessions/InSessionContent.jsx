@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
 import Badge from '@/components/Badge';
 import ManageAssignmentModal from './ManageAssignmentModal';
 import StudentInsightsModal from './StudentInsightsModal';
-import ModalDemoController from './ModalDemoController';
 import { CompactReflectionBar } from './ReflectionAssistant/CompactReflectionBar';
 import { ReflectionAssistantChat } from './ReflectionAssistant/ReflectionAssistantChat';
 import { ShellContext } from '../home-redesign/src/context/ShellContext';
@@ -27,9 +26,7 @@ const InSessionContent = () => {
     // Chat / Reflection States
     const [chatExpanded, setChatExpanded] = useState(false);
     const [initialReflectionPrompt, setInitialReflectionPrompt] = useState('');
-
-    // Auto-Demo State
-    const [isDemoActive, setIsDemoActive] = useState(false);
+    const sessionsRootRef = useRef(null);
 
     const sessionContext = {
         sessionLabel: 'Hogwarts (Prof. Snape), 11:25 - 12:25pm, 12/21/2023'
@@ -82,23 +79,6 @@ const InSessionContent = () => {
     }, [chatExpanded, setBreadcrumbs, setMainClassName, setContentDirect, setFloatingContent]);
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('demo') === 'true') {
-            setIsDemoActive(true);
-        }
-    }, []);
-
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key.toLowerCase() === 'd') {
-                setIsDemoActive(prev => !prev);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
-
-    useEffect(() => {
         requestAnimationFrame(() => setHasEntered(true));
     }, []);
 
@@ -120,6 +100,13 @@ const InSessionContent = () => {
     };
 
     const getStatusBadgeStyle = (status) => STATUS_STYLE_MAP[status] || 'secondary';
+
+    const modalContainerElement =
+        (typeof document !== 'undefined' &&
+            (document.querySelector('#home-redesign-page .plus-page-main-container') ||
+                document.querySelector('.plus-page-main-container'))) ||
+        sessionsRootRef.current?.closest('.plus-page-main-container') ||
+        null;
 
     return (
         <>
@@ -155,6 +142,7 @@ const InSessionContent = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className={`sessions-main-reveal ${hasEntered ? 'has-entered' : ''}`}
+                        ref={sessionsRootRef}
                         style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', width: '100%' }}
                     >
                         <style>{`
@@ -268,14 +256,10 @@ const InSessionContent = () => {
                     allStudents={yourStudents}
                     onClose={closeInsightsModal}
                     onSelectStudent={setSelectedStudent}
-                    containerId="spa-shell"
+                    containerId="root"
                 />
             )}
 
-            <ModalDemoController
-                isActive={isDemoActive}
-                onComplete={() => setIsDemoActive(false)}
-            />
         </>
     );
 };

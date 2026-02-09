@@ -62,6 +62,8 @@
     overflow-x: auto;
     overflow-y: visible;
     box-sizing: content-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
     /* Cards hug content vertically; no fixed height */
     > * {
@@ -77,6 +79,10 @@
             flex: 0 1 auto;
         }
     }
+}
+
+.tutor-training-progress-page__overview-cards::-webkit-scrollbar {
+    display: none;
 }
 
 .tutor-training-progress-page__details-section {

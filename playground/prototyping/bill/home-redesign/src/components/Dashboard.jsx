@@ -197,14 +197,12 @@ function StudentMomentumCard() {
 }
 
 export const Dashboard = ({ setBreadcrumbs }) => {
+    const navigate = useNavigate();
     const [activeSimulation, setActiveSimulation] = useState(null);
-    const [isSpotlightActive, setIsSpotlightActive] = useState(false);
     const carouselRef = useRef(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(true);
 
-    const [contentReady, setContentReady] = useState(true);
-    const [contentVisible, setContentVisible] = useState(true);
     const [hasEntered, setHasEntered] = useState(false);
 
     // Get setActiveTabOverride from context (optional)
@@ -236,8 +234,6 @@ export const Dashboard = ({ setBreadcrumbs }) => {
 
     const scrollCarousel = (direction) => {
         if (!carouselRef.current) return;
-        setIsSpotlightActive(true);
-        setTimeout(() => setIsSpotlightActive(false), 2000);
         const scrollAmount = 320;
         carouselRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
         setTimeout(() => {
@@ -251,184 +247,119 @@ export const Dashboard = ({ setBreadcrumbs }) => {
     };
 
     return (
-        <>
-            {!contentVisible ? (
-                <div
-                    className={`home-redesign-skeleton-root${contentReady ? ' is-exiting' : ''}`}
-                    style={{ display: 'contents' }}
-                    aria-busy="true"
-                    aria-label="Loading content"
-                >
-                    <div className="home-redesign-jumbotron-section">
-                        <div className="home-redesign-skeleton-jumbotron">
-                            <div className="home-redesign-skeleton-tabs-row">
-                                <span className="home-redesign-skeleton-block home-redesign-skeleton-pill" />
-                                <span className="home-redesign-skeleton-block home-redesign-skeleton-pill" />
-                                <span className="home-redesign-skeleton-block home-redesign-skeleton-pill" />
+        <div id="home-redesign-page" style={{ position: 'relative', width: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <AnimatePresence mode="wait">
+                {activeSimulation ? (
+                    <ChatSimulationCard
+                        key="simulation"
+                        onClose={() => setActiveSimulation(null)}
+                        onComplete={() => setActiveSimulation(null)}
+                        coverImage={imgSupportingGrowthMindset}
+                    />
+                ) : (
+                    <motion.div
+                        key="dashboard"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className={`home-redesign-reveal-root${hasEntered ? ' has-entered' : ''}`}
+                        style={{ display: 'contents' }}
+                    >
+                        <div className="home-redesign-jumbotron-section">
+                            <HomepageJumbotron
+                                tutorName="Boyuan"
+                                onSignUp={() => { }}
+                                onViewSchedule={() => { }}
+                                onSubmitReflection={() => navigate('/reflection')}
+                            />
+                        </div>
+                        <div className="home-redesign-three-cards">
+                            <div className="home-redesign-card-tutoring">
+                                <DataVisualizationSkillsProgress
+                                    unwrapCard={true}
+                                    title="Tutoring Performance"
+                                    skillsOverviewData={DEFAULT_SKILLS_OVERVIEW}
+                                    skillsProgressData={{
+                                        sessionRanges: ['64-68', '74-78', '84-88', '94-98', '104-108'],
+                                        averageScores: [30, 55, 12, 25, 65],
+                                    }}
+                                    defaultActiveTab="skills-overview"
+                                    variant="buttonGroup"
+                                    hideRadarYAxisLabels={true}
+                                    radarCategoryLabelBody3Regular={true}
+                                    radarCategoryIcons={DEFAULT_SKILLS_OVERVIEW.categoryIcons}
+                                    radarChartSpacing={[8, 16, 24, 16]}
+                                    radarHeight="100%"
+                                />
                             </div>
-                            <div className="home-redesign-skeleton-divider" />
-                            <div className="home-redesign-skeleton-block home-redesign-skeleton-title" />
-                            <div className="home-redesign-skeleton-block home-redesign-skeleton-line" />
-                            <div className="home-redesign-skeleton-block home-redesign-skeleton-line home-redesign-skeleton-line-short" />
-                            <div className="home-redesign-skeleton-actions">
-                                <span className="home-redesign-skeleton-block home-redesign-skeleton-btn" />
-                                <span className="home-redesign-skeleton-block home-redesign-skeleton-btn home-redesign-skeleton-btn-sm" />
+                            <div className="home-redesign-card-weekly">
+                                <WeeklyTutoringLoadCard />
+                            </div>
+                            <div className="home-redesign-card-momentum">
+                                <StudentMomentumCard />
                             </div>
                         </div>
-                    </div>
-                    <div className="home-redesign-three-cards">
-                        <div className="home-redesign-card-tutoring">
-                            <div className="home-redesign-skeleton-card">
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-card-title" />
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-card-content" />
-                            </div>
-                        </div>
-                        <div className="home-redesign-card-weekly">
-                            <div className="home-redesign-skeleton-card">
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-card-title" />
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-card-content" />
-                            </div>
-                        </div>
-                        <div className="home-redesign-card-momentum">
-                            <div className="home-redesign-skeleton-card">
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-card-title" />
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-card-content" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="home-redesign-trainings-section">
-                        <div className="home-redesign-skeleton-trainings">
-                            <div className="home-redesign-skeleton-trainings-header">
-                                <div className="home-redesign-skeleton-block home-redesign-skeleton-trainings-title" />
-                                <div className="home-redesign-skeleton-trainings-controls">
-                                    <span className="home-redesign-skeleton-block home-redesign-skeleton-icon" />
-                                    <span className="home-redesign-skeleton-block home-redesign-skeleton-icon" />
+
+                        <div className="home-redesign-trainings-section">
+                            <div className="home-redesign-trainings-header">
+                                <h4 className="h4">Personalized Trainings</h4>
+                                <div className="home-redesign-trainings-controls">
+                                    <Button
+                                        style="primary"
+                                        fill="outline"
+                                        size="small"
+                                        leadingVisual="arrow-left"
+                                        onClick={() => scrollCarousel('left')}
+                                        disabled={!canScrollLeft}
+                                        aria-label="Scroll left"
+                                    />
+                                    <Button
+                                        style="primary"
+                                        fill="outline"
+                                        size="small"
+                                        leadingVisual="arrow-right"
+                                        onClick={() => scrollCarousel('right')}
+                                        disabled={!canScrollRight}
+                                        aria-label="Scroll right"
+                                    />
                                 </div>
                             </div>
-                            <div className="home-redesign-skeleton-carousel">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <span key={i} className="home-redesign-skeleton-block home-redesign-skeleton-carousel-card" />
+                            <div
+                                ref={carouselRef}
+                                className="home-redesign-trainings-carousel"
+                                onScroll={() => {
+                                    if (carouselRef.current) {
+                                        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+                                        setCanScrollLeft(scrollLeft > 0);
+                                        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+                                    }
+                                }}
+                            >
+                                {PERSONALIZED_TRAININGS.map((item) => (
+                                    <RecommendedLessons
+                                        key={item.id}
+                                        data-training-id={item.id}
+                                        breakpoint="XXL & above"
+                                        badgeType={item.badgeType}
+                                        title={item.title}
+                                        duration={item.duration}
+                                        status="in-progress"
+                                        aiRecommended={false}
+                                        image={item.image}
+                                        actionLabel={item.id === '4' ? 'Start' : 'Review'}
+                                        onReviewClick={() => {
+                                            if (item.id === '4') {
+                                                setActiveSimulation(item.id);
+                                            }
+                                        }}
+                                    />
                                 ))}
                             </div>
                         </div>
-                    </div>
-                </div>
-            ) : (
-                <div id="home-redesign-page" style={{ position: 'relative', width: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <AnimatePresence mode="wait">
-                        {activeSimulation ? (
-                            <ChatSimulationCard
-                                key="simulation"
-                                onClose={() => setActiveSimulation(null)}
-                                onComplete={() => setActiveSimulation(null)}
-                                coverImage={imgSupportingGrowthMindset}
-                            />
-                        ) : (
-                            <motion.div
-                                key="dashboard"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className={`home-redesign-reveal-root${hasEntered ? ' has-entered' : ''} ${isSpotlightActive ? 'spotlight-active' : ''}`}
-                                style={{ display: 'contents' }}
-                            >
-                                <div className={`home-redesign-jumbotron-section ${isSpotlightActive ? 'is-dimmed' : ''}`}>
-                                    <HomepageJumbotron
-                                        tutorName="Boyuan"
-                                        onSignUp={() => { }}
-                                        onViewSchedule={() => { }}
-                                        onSubmitReflection={() => navigate('/reflection')}
-                                    />
-                                </div>
-                                <div className={`home-redesign-three-cards ${isSpotlightActive ? 'is-dimmed' : ''}`}>
-                                    <div className="home-redesign-card-tutoring">
-                                        <DataVisualizationSkillsProgress
-                                            unwrapCard={true}
-                                            title="Tutoring Performance"
-                                            skillsOverviewData={DEFAULT_SKILLS_OVERVIEW}
-                                            skillsProgressData={{
-                                                sessionRanges: ['64-68', '74-78', '84-88', '94-98', '104-108'],
-                                                averageScores: [30, 55, 12, 25, 65],
-                                            }}
-                                            defaultActiveTab="skills-overview"
-                                            variant="buttonGroup"
-                                            hideRadarYAxisLabels={true}
-                                            radarCategoryLabelBody3Regular={true}
-                                            radarCategoryIcons={DEFAULT_SKILLS_OVERVIEW.categoryIcons}
-                                            radarChartSpacing={[8, 16, 24, 16]}
-                                            radarHeight="100%"
-                                        />
-                                    </div>
-                                    <div className="home-redesign-card-weekly">
-                                        <WeeklyTutoringLoadCard />
-                                    </div>
-                                    <div className="home-redesign-card-momentum">
-                                        <StudentMomentumCard />
-                                    </div>
-                                </div>
-
-                                <div className={`home-redesign-trainings-section ${isSpotlightActive ? 'spotlight-active' : ''}`}>
-                                    <div className="home-redesign-trainings-header">
-                                        <h4 className="h4">Personalized Trainings</h4>
-                                        <div className="home-redesign-trainings-controls">
-                                            <Button
-                                                style="primary"
-                                                fill="outline"
-                                                size="small"
-                                                leadingVisual="arrow-left"
-                                                onClick={() => scrollCarousel('left')}
-                                                disabled={!canScrollLeft}
-                                                aria-label="Scroll left"
-                                            />
-                                            <Button
-                                                style="primary"
-                                                fill="outline"
-                                                size="small"
-                                                leadingVisual="arrow-right"
-                                                onClick={() => scrollCarousel('right')}
-                                                disabled={!canScrollRight}
-                                                aria-label="Scroll right"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div
-                                        ref={carouselRef}
-                                        className="home-redesign-trainings-carousel"
-                                        onScroll={() => {
-                                            if (carouselRef.current) {
-                                                const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-                                                setCanScrollLeft(scrollLeft > 0);
-                                                setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-                                            }
-                                        }}
-                                    >
-                                        {PERSONALIZED_TRAININGS.map((item) => (
-                                            <RecommendedLessons
-                                                key={item.id}
-                                                data-training-id={item.id}
-                                                breakpoint="XXL & above"
-                                                badgeType={item.badgeType}
-                                                title={item.title}
-                                                duration={item.duration}
-                                                status="in-progress"
-                                                aiRecommended={false}
-                                                image={item.image}
-                                                actionLabel={item.id === '4' ? 'Start' : 'Review'}
-                                                onReviewClick={() => {
-                                                    if (item.id === '4') {
-                                                        setActiveSimulation(item.id);
-                                                    }
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            )}
-        </>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 };

@@ -61,7 +61,6 @@ const linkStyle = {
     border: '1px solid var(--color-outline-variant, #e0e0e0)',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: 'inherit',
     color: 'var(--color-on-surface, #000)',
     transition: 'transform 0.2s, box-shadow 0.2s',
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)'

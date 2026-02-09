@@ -6,7 +6,7 @@ import { TrainingProgressContent } from '../components/TrainingProgressContent';
 import { CompactChatBar } from '../components/CompactChatBar';
 import { ResearchAssistantChat } from '../ResearchAssistantChat';
 
-import '@plus-ds/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
+import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
 const CHAT_PANEL_EASE = [0.16, 1, 0.3, 1];
 const CHAT_PANEL_DURATION = 0.36;

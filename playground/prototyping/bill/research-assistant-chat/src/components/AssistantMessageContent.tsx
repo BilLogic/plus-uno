@@ -2,14 +2,11 @@
  * Renders assistant message content: text parts and data parts (engagement-chart, strategy-heatmap).
  * Decoupled from assistant-ui context to allow manual rendering.
  */
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { EngagementChart } from './EngagementChart';
 import { StrategyHeatmap } from './StrategyHeatmap';
-import { ChartSkeleton } from './ChartSkeleton';
 import { ToolTerminal, ToolStats, ToolCarousel, ToolCard } from './FakeTools';
 import { TypingText } from './TypingText';
-
-const SKELETON_MS = 900;
 
 /**
  * Renders a single part: text (with InProgress) or data (chart/heatmap with skeleton).
@@ -70,13 +67,6 @@ function DataPartRenderer({
   theme: string;
   data: any;
 }): React.ReactElement {
-  const [showContent, setShowContent] = useState(false);
-  useEffect(() => {
-    const t = window.setTimeout(() => setShowContent(true), SKELETON_MS);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Removed old containerStyle as ToolCard handles it now
   const skeletonContainerStyle: React.CSSProperties = {
     marginBottom: '8px',
     padding: '8px',
@@ -84,14 +74,6 @@ function DataPartRenderer({
     borderRadius: '12px',
     border: '1px solid var(--chat-outline, #d1d5db)',
   };
-
-  if (!showContent) {
-    return (
-      <div style={skeletonContainerStyle}>
-        <ChartSkeleton width={600} height={300} theme={theme as 'light' | 'dark'} />
-      </div>
-    );
-  }
 
   if (name === 'terminal') {
     return (

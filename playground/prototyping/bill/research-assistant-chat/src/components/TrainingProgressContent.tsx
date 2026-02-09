@@ -5,18 +5,18 @@
 import React, { useState } from 'react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore – plus-ds JSX components
-import Button from '@plus-ds/components/Button/Button';
+import Button from '@/components/Button/Button';
 // @ts-ignore
-import ButtonGroup from '@plus-ds/components/ButtonGroup/ButtonGroup';
+import ButtonGroup from '@/components/ButtonGroup/ButtonGroup';
 // @ts-ignore
-import Pagination from '@plus-ds/components/Pagination/Pagination';
+import Pagination from '@/components/Pagination/Pagination';
 // @ts-ignore
-import OverviewCard from '@plus-ds/specs/Universal/Cards/OverviewCard/OverviewCard';
+import OverviewCard from '@/specs/Universal/Cards/OverviewCard/OverviewCard';
 // @ts-ignore
-import TutorsTrainingProgressTable from '@plus-ds/specs/Admin/Tutor Admin/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable';
+import TutorsTrainingProgressTable from '@/specs/Admin/Tutor Admin/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable';
 // @ts-ignore
-import ExportSearchFilterBar from '@plus-ds/specs/Admin/Tutor Admin/Elements/ExportSearchFilterBar/ExportSearchFilterBar';
-import '@plus-ds/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
+import ExportSearchFilterBar from '@/specs/Admin/Tutor Admin/Elements/ExportSearchFilterBar/ExportSearchFilterBar';
+import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
 const DEFAULT_TUTORS = [
   { id: 1, tutorName: 'Ben Green', email: 'dummy@gmail.com', completion: '8/18', accuracy: '30%', badgeClaimed: 'Yes', timeSpent: 328 },
