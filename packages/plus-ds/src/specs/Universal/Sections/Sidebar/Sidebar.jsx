@@ -173,7 +173,8 @@ const Sidebar = ({
             title: 'Toolkit',
             items: [
                 { text: 'Sessions', icon: 'calendar-alt', id: 'sessions' },
-                { text: 'Slack', icon: 'arrow-up-right-from-square', id: 'slack' }
+                { text: 'Reports', icon: 'chart-bar', id: 'weekly-report' }
+                // Slack hidden globally
             ]
         }
     ];
@@ -185,8 +186,7 @@ const Sidebar = ({
                 { text: 'Tutors', icon: 'chart-pie', id: 'tutors' },
                 { text: 'Sessions', icon: 'calendar-week', id: 'admin-sessions' },
                 { text: 'Students', icon: 'users', id: 'students' },
-                { text: 'Groups', icon: 'users-rectangle', id: 'groups' },
-                { text: 'Compliance', icon: 'clipboard-check', id: 'compliance-monitor' }
+                { text: 'Groups', icon: 'users-rectangle', id: 'groups' }
             ]
         });
     }
@@ -222,11 +222,12 @@ const Sidebar = ({
                 icon="house"
                 state={activeTab === 'home' ? 'selected' : 'enabled'}
                 onClick={onHomeClick}
+                className="plus-sidebar-home-tab"
             />
 
             {/* Sections */}
             {categories.map((category, index) => (
-                <div key={index} className="plus-sidebar-section" style={{
+                <div key={index} className={`plus-sidebar-section plus-sidebar-section-${category.title.toLowerCase().replace(/\s+/g, '-')}`} style={{
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 'var(--size-element-gap-sm)'
