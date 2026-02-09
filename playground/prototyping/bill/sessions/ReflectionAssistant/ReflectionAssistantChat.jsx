@@ -117,7 +117,6 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         // Small pause after typing before sending
         await new Promise(r => setTimeout(r, 400));
         handleSend(text);
-        setInput('');
         setIsAutoTyping(false);
     };
 
@@ -146,37 +145,7 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
         setIsTyping(false);
 
         // Logic for assistant responses
-        // Handle student selection from initial question flow
-        if (msgText.includes('Arlene McCoy') || msgText.includes('Marcus Chen') || msgText.includes('Sofia Rodriguez')) {
-            const studentName = msgText.includes('Arlene McCoy') ? 'Arlene McCoy'
-                : msgText.includes('Marcus Chen') ? 'Marcus Chen'
-                    : 'Sofia Rodriguez';
-
-            addMessage('assistant', {
-                type: 'text',
-                text: `Great choice! Let's reflect on your session with ${studentName}. How did it go today?`
-            });
-            await new Promise(r => setTimeout(r, 1000));
-            addMessage('assistant', {
-                type: 'widget',
-                name: 'question-flow',
-                data: {
-                    id: 'session-reflection',
-                    steps: [
-                        {
-                            id: 'session-feeling',
-                            title: "How would you describe the session?",
-                            description: `Think about your overall experience with ${studentName}`,
-                            options: [
-                                { id: 'productive', label: 'Very Productive', description: 'Made significant progress today' },
-                                { id: 'okay', label: 'It was okay', description: 'Some progress, room for improvement' },
-                                { id: 'challenging', label: 'Challenging', description: 'Struggled with some concepts' }
-                            ]
-                        }
-                    ]
-                }
-            });
-        } else if (msgText.toLowerCase().includes("arlene's progress") || msgText.toLowerCase().includes("student progress")) {
+        if (msgText.toLowerCase().includes("arlene's progress") || msgText.toLowerCase().includes("student progress")) {
             addMessage('assistant', {
                 type: 'text',
                 text: "To help you reflect deeply on Arlene McCoy's recent session, let's explore your perception of her growth areas. \n\nWhat standing feedback would you prioritize for her next session?"
@@ -269,8 +238,6 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                 type: 'text',
                 text: "I'm ready to help you reflect on your session with Arlene. What would you like to focus on?"
             });
-            // Set up auto-response for demo - clicking input will trigger this
-            setPendingAutoResponse("I'd like to reflect on Arlene's progress today.");
         }
     };
 
@@ -283,34 +250,11 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
             handleSend(initialPrompt);
         } else if (messages.length === 0) {
             hasStartedRef.current = true;
-            // Show student selection widget on initial load
+            // Intro message
             addMessage('assistant', {
                 type: 'text',
-                text: "Hi! I'm your Reflection Assistant. Let's start by selecting the student you'd like to reflect on."
+                text: "Hi! I'm your Reflection Assistant. I'm here to help you decompress and capture insights from your session with Arlene McCoy. \n\nHow did it go today?"
             });
-            // Add student selection question flow
-            // Longer delay for smoother progressive disclosure
-            setTimeout(() => {
-                addMessage('assistant', {
-                    type: 'widget',
-                    name: 'question-flow',
-                    data: {
-                        id: 'student-selection',
-                        steps: [
-                            {
-                                id: 'select-student',
-                                title: "Who are you reflecting on today?",
-                                description: "Select a student from your recent sessions",
-                                options: [
-                                    { id: 'arlene-mccoy', label: 'Arlene McCoy', description: 'Last session: Today, 2:30 PM' },
-                                    { id: 'marcus-chen', label: 'Marcus Chen', description: 'Last session: Today, 1:00 PM' },
-                                    { id: 'sofia-rodriguez', label: 'Sofia Rodriguez', description: 'Last session: Yesterday, 4:15 PM' }
-                                ]
-                            }
-                        ]
-                    }
-                });
-            }, 1800);
         }
     }, [initialPrompt]);
 
