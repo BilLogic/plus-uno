@@ -5,6 +5,7 @@ import { ShellContext } from '../../../home-redesign/src/context/ShellContext';
 import { TrainingProgressContent } from '../components/TrainingProgressContent';
 import { CompactChatBar } from '../components/CompactChatBar';
 import { ResearchAssistantChat } from '../ResearchAssistantChat';
+import '../ResearchAssistantChat.css';
 
 import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
