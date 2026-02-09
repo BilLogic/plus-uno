@@ -127,7 +127,13 @@
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5),
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
     opacity: 0;
     transform: translateY(24px);
 }
@@ -172,6 +178,36 @@
     animation-delay: 1960ms;
 }
 
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2240ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2520ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2800ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 3080ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 3360ms;
+}
+
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
+    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 3640ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
 
     #home-redesign-page .shell-reveal .plus-topbar .topbar-left-section,
@@ -188,6 +224,12 @@
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6),
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo,
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab,
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
@@ -195,7 +237,13 @@
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
     #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5),
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
         animation: none;
         opacity: 1;
         transform: none;

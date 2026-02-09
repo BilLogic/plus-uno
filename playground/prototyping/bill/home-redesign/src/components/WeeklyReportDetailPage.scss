@@ -1146,3 +1146,109 @@
 .weekly-report .legend-dot--rose {
   background: #db2777 !important;
 }
+
+/* Final lock-in for timeline connector + bar radii */
+.weekly-report .timeline-container {
+  position: relative !important;
+}
+
+.weekly-report .timeline-connector {
+  position: absolute !important;
+  left: 32px !important;
+  top: 44px !important;
+  bottom: 28px !important;
+  width: 2px !important;
+  background: var(--color-outline-variant, #98a2ad) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+.weekly-report .timeline-item:last-child .timeline-node {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.weekly-report .timeline-item {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.weekly-report .time-allocation-bar {
+  border-radius: 4px !important;
+}
+
+.weekly-report .time-allocation-segment:first-child {
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+.weekly-report .time-allocation-segment:last-child {
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.weekly-report .review-progress-bar.plus-progress,
+.weekly-report .review-progress-bar.progress {
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+.weekly-report .review-progress-bar .plus-progress-bar,
+.weekly-report .review-progress-bar .progress-bar {
+  border-radius: 6px !important;
+}
+
+/* Impact card polish + token-consistent padding */
+.weekly-report .impact-hero-card {
+  padding: var(--size-card-pad-y-sm, 16px) var(--size-card-pad-x-sm, 16px) !important;
+}
+
+.weekly-report .impact-stats-grid .stat-card {
+  padding: var(--size-card-pad-y-sm, 16px) var(--size-card-pad-x-sm, 16px) !important;
+  gap: var(--size-card-gap-sm, 12px) !important;
+}
+
+.weekly-report .impact-title {
+  margin-bottom: var(--size-card-gap-sm, 12px) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.weekly-report .impact-title-icon {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: var(--size-element-radius-md, 8px) !important;
+  background: var(--color-primary-state-08, rgba(4, 114, 168, 0.12)) !important;
+  color: var(--color-primary, #0472a8) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.weekly-report .impact-title-icon i {
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+
+.weekly-report .impact-metrics {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr) !important;
+  column-gap: var(--size-card-gap-md, 16px) !important;
+  align-items: center !important;
+}
+
+.weekly-report .impact-metric {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.weekly-report .impact-divider {
+  width: 1px !important;
+  height: 100% !important;
+  margin: 0 !important;
+  align-self: stretch !important;
+  justify-self: center !important;
+}

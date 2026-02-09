@@ -256,7 +256,8 @@ const InSessionContent = () => {
                     allStudents={yourStudents}
                     onClose={closeInsightsModal}
                     onSelectStudent={setSelectedStudent}
-                    containerId="root"
+                    containerEl={modalContainerElement}
+                    containerSelector="#root > div > .plus-page-main-container"
                 />
             )}
 
