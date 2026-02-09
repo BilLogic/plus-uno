@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * QuestionFlow: Guided multi-step interaction for reflection.
@@ -16,6 +17,30 @@ export const QuestionFlow = ({ steps, onComplete }) => {
         } else {
             setCurrentStep(prev => prev + 1);
             setSelectedOption(null);
+        }
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.15,
+                delayChildren: 0.4
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15 },
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "tween",
+                ease: "easeOut",
+                duration: 0.5
+            }
         }
     };
 
@@ -50,10 +75,16 @@ export const QuestionFlow = ({ steps, onComplete }) => {
             <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600 }}>{step.title}</h3>
             <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: 'var(--color-on-surface-variant, #6b7280)' }}>{step.description}</p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}
+            >
                 {step.options.map(option => (
-                    <button
+                    <motion.button
                         key={option.id}
+                        variants={itemVariants}
                         onClick={() => setSelectedOption(option.id)}
                         style={{
                             padding: '12px 16px',
@@ -65,7 +96,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '12px',
-                            transition: 'all 0.2s ease'
+                            transition: 'background 0.2s ease, border-color 0.2s ease'
                         }}
                     >
                         <div style={{
@@ -80,9 +111,9 @@ export const QuestionFlow = ({ steps, onComplete }) => {
                             {selectedOption === option.id && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-primary, #0472a8)' }} />}
                         </div>
                         <span style={{ fontSize: '14px', fontWeight: selectedOption === option.id ? 600 : 400 }}>{option.label}</span>
-                    </button>
+                    </motion.button>
                 ))}
-            </div>
+            </motion.div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button
