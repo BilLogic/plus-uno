@@ -79,7 +79,14 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
     const momentumPercent = 92;
     const practiceHeatmapY = PRACTICE_HEATMAP_Y;
     const practiceHeatmapX = PRACTICE_HEATMAP_X;
-    const practiceHeatmapData = PRACTICE_HEATMAP_DATA;
+    const practiceHeatmapData = useMemo(() => {
+        // Stretch observed values to full 0..1 to increase visible saturation variance.
+        const values = PRACTICE_HEATMAP_DATA.map(([, , v]) => v);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const span = Math.max(max - min, 1e-6);
+        return PRACTICE_HEATMAP_DATA.map(([x, y, v]) => [x, y, (v - min) / span]);
+    }, []);
 
     const keyObservations = [
         { title: 'Persistence Score', subtitle: 'Attempts before giving up', value: '4.2', badge: 'avg', comparison: 'vs. 3.8 last week', badgeStyle: 'primary' },

@@ -87,6 +87,32 @@ const TutorsTrainingProgressTable = ({
         { text: <span className="body3-txt">Action</span>, width: '15%', align: 'left' },
     ];
 
+    const getPercentage = (metric) => {
+        if (typeof metric === 'object' && metric !== null && typeof metric.percentage === 'number') {
+            return Math.max(0, Math.min(100, metric.percentage));
+        }
+        if (typeof metric === 'string' && metric.includes('/')) {
+            const [num, den] = metric.split('/').map(Number);
+            if (Number.isFinite(num) && Number.isFinite(den) && den > 0) {
+                return Math.max(0, Math.min(100, (num / den) * 100));
+            }
+        }
+        if (typeof metric === 'string' && metric.includes('%')) {
+            const p = parseFloat(metric.replace('%', '').trim());
+            return Number.isFinite(p) ? Math.max(0, Math.min(100, p)) : 0;
+        }
+        if (typeof metric === 'number') {
+            return Math.max(0, Math.min(100, metric));
+        }
+        return 0;
+    };
+
+    const getStateColor = (percentage) => {
+        if (percentage >= 85) return 'var(--color-success-container, #d6f7c8)';
+        if (percentage >= 60) return 'var(--color-warning-container, #f8efc1)';
+        return 'var(--color-error-container, #f8d7d7)';
+    };
+
     const rows = displayTutors.map((tutor, rowIndex) => [
         {
             content: (
@@ -105,10 +131,11 @@ const TutorsTrainingProgressTable = ({
         },
         {
             content: (
-                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                <div className="tutors-training-progress-table__cell-reveal tutors-training-progress-table__cell-reveal--gauge" style={{ '--row-index': rowIndex }}>
                     <ProgressRing
                         value={typeof tutor.completion === 'object' ? `${tutor.completion.value}/${tutor.completion.total}` : tutor.completion}
-                        delay={220 + (rowIndex * 65)}
+                        color={getStateColor(getPercentage(tutor.completion))}
+                        delay={rowIndex * 120}
                     />
                 </div>
             ),
@@ -116,10 +143,11 @@ const TutorsTrainingProgressTable = ({
         },
         {
             content: (
-                <div className="tutors-training-progress-table__cell-reveal" style={{ '--row-index': rowIndex }}>
+                <div className="tutors-training-progress-table__cell-reveal tutors-training-progress-table__cell-reveal--gauge" style={{ '--row-index': rowIndex }}>
                     <ProgressRing
                         value={typeof tutor.accuracy === 'object' ? `${tutor.accuracy}%` : tutor.accuracy}
-                        delay={300 + (rowIndex * 65)}
+                        color={getStateColor(getPercentage(tutor.accuracy))}
+                        delay={110 + (rowIndex * 120)}
                     />
                 </div>
             ),

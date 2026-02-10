@@ -187,8 +187,9 @@ export function ToolStats({
         <ToolCard title={title || "Key Metrics"} description={description}>
             <div style={{
                 padding: '0',
-                display: 'grid',
-                gridTemplateColumns: stats.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(140px, 1fr))',
+                display: 'flex',
+                flexWrap: 'nowrap',
+                width: '100%'
             }}>
                 {stats.map((stat, index) => {
                     // Determine if the change is positive based on upIsPositive flag
@@ -211,7 +212,9 @@ export function ToolStats({
                                 padding: '24px 24px',
                                 minHeight: '140px',
                                 justifyContent: 'flex-start',
-                                borderTop: index > 0 && stats.length > 2 ? '1px solid var(--chat-outline, #e5e7eb)' : 'none',
+                                flex: 1,
+                                minWidth: 0,
+                                borderLeft: index > 0 ? '1px solid var(--chat-outline, #e5e7eb)' : 'none',
                                 background: '#f9fafb',
                                 overflow: 'hidden'
                             }}
@@ -221,8 +224,9 @@ export function ToolStats({
                                 <div style={{
                                     position: 'absolute',
                                     right: 0,
-                                    bottom: 12,
+                                    bottom: 0,
                                     pointerEvents: 'none',
+                                    opacity: 0.72,
                                 }}>
                                     <Sparkline
                                         data={stat.sparkline.data}
@@ -230,7 +234,7 @@ export function ToolStats({
                                         width={180}
                                         height={70}
                                         showFill
-                                        fillOpacity={0.05}
+                                        fillOpacity={0.03}
                                     />
                                 </div>
                             )}
@@ -250,6 +254,7 @@ export function ToolStats({
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
+                                flexWrap: 'nowrap',
                                 gap: '8px',
                                 position: 'relative',
                                 zIndex: 1,
@@ -271,6 +276,7 @@ export function ToolStats({
                                         fontWeight: 600,
                                         display: 'inline-flex',
                                         alignItems: 'center',
+                                        whiteSpace: 'nowrap',
                                         gap: '4px',
                                         color: diffColor,
                                         background: diffBg,

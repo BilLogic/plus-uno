@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useContext, useState, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ShellContext } from '../../../home-redesign/src/context/ShellContext';
 import { TrainingProgressContent } from '../components/TrainingProgressContent';
 import { CompactChatBar } from '../components/CompactChatBar';
@@ -9,9 +9,6 @@ import '../ResearchAssistantChat.css';
 
 import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
-const CHAT_PANEL_EASE = [0.16, 1, 0.3, 1];
-const CHAT_PANEL_DURATION = 0.36;
-
 /**
  * TutorAdminContent: Content-only version for use inside ShellLayout.
  * Uses ShellContext to update TopBar, Layout, and FloatingContent.
@@ -19,68 +16,131 @@ const CHAT_PANEL_DURATION = 0.36;
 export const TutorAdminContent = () => {
     const { setBreadcrumbs, setMainClassName, setFloatingContent, setContentDirect } = useContext(ShellContext);
 
-    const [chatExpanded, setChatExpanded] = useState(false);
     const [hasEntered, setHasEntered] = useState(false);
+    const [hasStageOverview, setHasStageOverview] = useState(false);
+    const [hasStageDetails, setHasStageDetails] = useState(false);
+    const [hasStageRows, setHasStageRows] = useState(false);
+    const [chatExpanded, setChatExpanded] = useState(false);
+    const lockResearchRouteRef = useRef(false);
 
     const navigate = useNavigate();
-    const handleExpand = () => navigate('/research-assistant');
-    const handleBack = () => setChatExpanded(false);
+    const location = useLocation();
+    const normalizedPath = (location.pathname || '/').replace(/\/+$/, '') || '/';
+    const browserPath = typeof window !== 'undefined'
+        ? ((window.location.pathname || '/').replace(/\/+$/, '') || '/')
+        : normalizedPath;
+    const isResearchAssistantRoute = normalizedPath === '/research-assistant' || browserPath === '/research-assistant';
+    const showResearchAssistant = isResearchAssistantRoute || chatExpanded;
+    const handleExpand = () => {
+        if (typeof window !== 'undefined') {
+            window.sessionStorage.setItem('forceResearchAssistantUntil', String(Date.now() + 10000));
+        }
+        lockResearchRouteRef.current = true;
+        setChatExpanded(true);
+        navigate('/research-assistant');
+    };
 
-    // Update shell context on mount and when chat state changes
     useEffect(() => {
+        setChatExpanded(isResearchAssistantRoute);
+    }, [isResearchAssistantRoute]);
+
+    useEffect(() => {
+        if (!lockResearchRouteRef.current) {
+            return;
+        }
+        if (!isResearchAssistantRoute) {
+            navigate('/research-assistant', { replace: true });
+        }
+    }, [isResearchAssistantRoute, navigate]);
+
+    // Update shell context for admin content route.
+    useEffect(() => {
+        if (showResearchAssistant) {
+            setBreadcrumbs([
+                { text: 'Admin', href: '#' },
+                { text: 'Research Assistant' }
+            ]);
+            setMainClassName('');
+            setContentDirect(true);
+            setFloatingContent(null);
+            return;
+        }
+
         setBreadcrumbs([
             { text: 'Admin', href: '#' },
             { text: 'Tutors', href: '#' },
             { text: 'Training Progress' }
         ]);
-        setMainClassName(!chatExpanded ? 'tutor-training-progress-page__content' : '');
-        setContentDirect(chatExpanded);
-        setFloatingContent(!chatExpanded ? (
-            <div style={{ maxWidth: 420 }}>
+        setMainClassName('tutor-training-progress-page__content');
+        setContentDirect(false);
+        setFloatingContent(
+            <div style={{ width: 'min(680px, calc(100vw - 160px))' }}>
                 <CompactChatBar onExpand={handleExpand} />
             </div>
-        ) : null);
-    }, [chatExpanded, setBreadcrumbs, setMainClassName, setContentDirect, setFloatingContent]);
+        );
+    }, [showResearchAssistant, setBreadcrumbs, setMainClassName, setContentDirect, setFloatingContent, navigate]);
 
     useEffect(() => {
         requestAnimationFrame(() => setHasEntered(true));
     }, []);
 
+    useEffect(() => {
+        if (!hasEntered || showResearchAssistant) {
+            return undefined;
+        }
+
+        const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) {
+            setHasStageOverview(true);
+            setHasStageDetails(true);
+            setHasStageRows(true);
+            return undefined;
+        }
+
+        setHasStageOverview(true);
+        const detailsTimer = window.setTimeout(() => setHasStageDetails(true), 360);
+        const rowsTimer = window.setTimeout(() => setHasStageRows(true), 760);
+
+        return () => {
+            window.clearTimeout(detailsTimer);
+            window.clearTimeout(rowsTimer);
+        };
+    }, [hasEntered, showResearchAssistant]);
+
+    if (showResearchAssistant) {
+        return (
+            <motion.div
+                key="research-assistant-content"
+                initial={{ opacity: 0, scale: 0.995 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flex: 1,
+                    minHeight: 0,
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
+                }}
+            >
+                <ResearchAssistantChat />
+            </motion.div>
+        );
+    }
+
     return (
-        <AnimatePresence mode="wait">
-            {chatExpanded ? (
-                <motion.div
-                    key="chat"
-                    initial={{ opacity: 0, scale: 0.995 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.995 }}
-                    transition={{ duration: CHAT_PANEL_DURATION, ease: CHAT_PANEL_EASE }}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flex: 1,
-                        minHeight: 0,
-                        width: '100%',
-                        height: '100%',
-                        position: 'relative',
-                    }}
-                >
-                    <ResearchAssistantChat onBack={handleBack} />
-                </motion.div>
-            ) : (
-                <motion.div
-                    key="content"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className={`admin-reveal-root${hasEntered ? ' has-entered' : ''}`}
-                    style={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
-                >
-                    <div className="reveal-section">
-                        <TrainingProgressContent />
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+        <motion.div
+            key="content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className={`admin-reveal-root${hasEntered ? ' has-entered' : ''}${hasStageOverview ? ' has-stage-overview' : ''}${hasStageDetails ? ' has-stage-details' : ''}${hasStageRows ? ' has-stage-rows' : ''}`}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
+        >
+            <div className="reveal-section">
+                <TrainingProgressContent />
+            </div>
+        </motion.div>
     );
 };
 

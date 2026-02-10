@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import { useNavigate, Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { Dashboard } from './components/Dashboard';
@@ -10,7 +10,6 @@ import { ShellContext } from './context/ShellContext';
 import InSessionContent from '../../sessions/InSessionContent';
 import { LessonsContent } from './components/LessonsContent';
 import { ReflectionAssistantChat as ReflectionPage } from '../../sessions/ReflectionAssistant/ReflectionAssistantChat';
-import { ResearchAssistantChat as ResearchAssistantPage } from '../../research-assistant-chat/src/ResearchAssistantChat';
 import TutorAdminContent from '../../research-assistant-chat/src/views/TutorAdminContent';
 import WeeklyReportsListContent from '../../weekly-report/src/WeeklyReportsListContent';
 import WeeklyReportContent from '../../weekly-report/src/WeeklyReportContent';
@@ -83,10 +82,40 @@ const ShellLayout = () => {
         setIsInsightsModalOpen(false); // Close modal on navigation
     }, [location.pathname]);
 
+    // Cross-remount guard: keep route on research assistant right after compare-button navigation.
+    useEffect(() => {
+        if (location.pathname !== '/admin') return;
+        if (typeof window === 'undefined') return;
+        const forceUntilRaw = window.sessionStorage.getItem('forceResearchAssistantUntil');
+        const forceUntil = forceUntilRaw ? Number(forceUntilRaw) : 0;
+        if (Number.isFinite(forceUntil) && forceUntil > Date.now()) {
+            navigate('/research-assistant', { replace: true });
+        }
+    }, [location.pathname, navigate]);
+
     // Derive activeTab from URL (or use override if set)
+    const normalizedPath = (location.pathname || '/').replace(/\/+$/, '') || '/';
+    const browserPath = typeof window !== 'undefined'
+        ? ((window.location.pathname || '/').replace(/\/+$/, '') || '/')
+        : normalizedPath;
+    const effectivePath = browserPath === '/research-assistant' ? browserPath : normalizedPath;
     const isLessonsPath = location.pathname.startsWith('/lessons');
-    const activeTab = activeTabOverride || (isLessonsPath ? 'lessons' : (pathToTab[location.pathname] || 'home'));
-    const userType = isLessonsPath ? 'tutor' : (pathToUserType[location.pathname] || 'supervisor');
+    const isAdminRoute = effectivePath === '/admin' || effectivePath === '/research-assistant';
+    const activeTab = activeTabOverride || (isLessonsPath ? 'lessons' : (pathToTab[effectivePath] || 'home'));
+    const userType = isLessonsPath ? 'tutor' : (pathToUserType[effectivePath] || 'supervisor');
+
+    useLayoutEffect(() => {
+        const root = document.getElementById('root');
+        if (!root) return undefined;
+        if (isAdminRoute) {
+            root.classList.add('admin-demo-frame');
+        } else {
+            root.classList.remove('admin-demo-frame');
+        }
+        return () => {
+            root.classList.remove('admin-demo-frame');
+        };
+    }, [isAdminRoute]);
 
     const topBarConfig = {
         breadcrumbs,
@@ -102,7 +131,7 @@ const ShellLayout = () => {
             if (id === 'lessons') navigate('/lessons/supporting-growth-mindset');
             if (id === 'sessions') navigate('/sessions');
             if (id === 'weekly-report') navigate('/weekly-reports');
-            if (id === 'tutors') navigate('/admin');
+            if (id === 'tutors') navigate(effectivePath === '/research-assistant' ? '/research-assistant' : '/admin');
             if (id === 'onboarding') navigate('/lessons/supporting-growth-mindset');
             if (id === 'admin-sessions') navigate('/admin');
             if (id === 'students') navigate('/admin');
@@ -125,12 +154,13 @@ const ShellLayout = () => {
                 topBarConfig={topBarConfig}
                 sidebarConfig={sidebarConfig}
                 id="home-redesign-page"
-                className={`plus-page-reveal ${mainClassName}`.trim()}
+                className={`plus-page-reveal ${isAdminRoute ? 'admin-demo-layout' : ''} ${mainClassName}`.trim()}
                 shellEntered={shellEntered}
                 contentDirect={contentDirect}
                 floatingContent={floatingContent}
+                sidebarHidden={isAdminRoute}
             >
-                <Outlet />
+                <Outlet key={location.pathname} />
             </PageLayout>
 
             {isInsightsModalOpen && (
@@ -178,24 +208,6 @@ const ReflectionContent = () => {
     return <ReflectionPage />;
 };
 
-// Research assistant route wrapper (content-direct chat view)
-const ResearchAssistantContent = () => {
-    const { setBreadcrumbs, setMainClassName, setFloatingContent, setContentDirect } = useContext(ShellContext);
-
-    useEffect(() => {
-        setBreadcrumbs([
-            { text: 'Admin', href: '#' },
-            { text: 'Research Assistant' }
-        ]);
-        setMainClassName('');
-        setContentDirect(true);
-        setFloatingContent(null);
-        return () => setContentDirect(false);
-    }, [setBreadcrumbs, setMainClassName, setContentDirect, setFloatingContent]);
-
-    return <ResearchAssistantPage />;
-};
-
 function App() {
     return (
         <Routes>
@@ -208,7 +220,7 @@ function App() {
                 <Route path="/lessons/*" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
                 <Route path="/lessons/supporting-growth-mindset" element={<LessonsContent />} />
                 <Route path="/admin" element={<TutorAdminContent />} />
-                <Route path="/research-assistant" element={<ResearchAssistantContent />} />
+                <Route path="/research-assistant" element={<TutorAdminContent />} />
                 <Route path="/weekly-reports" element={<WeeklyReportsListContent />} />
                 <Route path="/weekly-report" element={<WeeklyReportContent />} />
                 <Route path="*" element={<Navigate to="/home" replace />} />

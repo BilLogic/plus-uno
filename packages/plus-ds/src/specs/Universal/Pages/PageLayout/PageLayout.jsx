@@ -33,12 +33,18 @@ const PageLayout = ({
     shellLoading = false,
     /** When true, apply shell-reveal has-entered for entrance animation (TopBar + Sidebar). */
     shellEntered = false,
+    /** When true, keep sidebar hidden regardless of viewport size/toggle state. */
+    sidebarHidden = false,
 }) => {
-    const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+    const [isSidebarVisible, setIsSidebarVisible] = useState(!sidebarHidden);
     const containerRef = React.useRef(null);
     const breakpoint = 1024; // lg-min breakpoint per DS schema
 
     useEffect(() => {
+        if (sidebarHidden) {
+            setIsSidebarVisible(false);
+            return undefined;
+        }
         if (!containerRef.current) return;
 
         const observer = new ResizeObserver((entries) => {
@@ -51,9 +57,10 @@ const PageLayout = ({
         observer.observe(containerRef.current);
 
         return () => observer.disconnect();
-    }, []);
+    }, [sidebarHidden]);
 
     const handleSidebarToggle = (newMode) => {
+        if (sidebarHidden) return;
         setIsSidebarVisible(newMode === 'expanded');
     };
 
@@ -134,9 +141,9 @@ const PageLayout = ({
                         backgroundColor: 'var(--color-surface-container)',
                         transition: SIDEBAR_TRANSITION,
                         zIndex: 100,
-                        width: isSidebarVisible ? 184 : 0,
-                        minWidth: isSidebarVisible ? 184 : 0,
-                        pointerEvents: isSidebarVisible ? 'auto' : 'none',
+                        width: (!sidebarHidden && isSidebarVisible) ? 184 : 0,
+                        minWidth: (!sidebarHidden && isSidebarVisible) ? 184 : 0,
+                        pointerEvents: (!sidebarHidden && isSidebarVisible) ? 'auto' : 'none',
                     }}
                 >
                     <div style={{ width: 184, minWidth: 184, height: '100%', overflowY: 'auto' }}>
@@ -219,6 +226,7 @@ PageLayout.propTypes = {
     contentDirect: PropTypes.bool,
     shellLoading: PropTypes.bool,
     shellEntered: PropTypes.bool,
+    sidebarHidden: PropTypes.bool,
 };
 
 export default PageLayout;

@@ -6,7 +6,7 @@
  * 2. Metric Cards (status, completion, accuracy, etc.) - with donut chart
  */
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import DonutChart from '@/DataViz/PartToWhole/DonutChart/DonutChart';
 import './OverviewCard.scss';
@@ -121,11 +121,39 @@ const OverviewCard = ({
     chartValue = 20,
     chartLabel,
     chartColor,
+    animateIntro = false,
+    introDelay = 0,
     editLink,
     className = '',
     style,
     ...props
 }) => {
+    const hasRunIntroRef = useRef(false);
+    const cardRef = useRef(null);
+    const [introPlayed, setIntroPlayed] = useState(!animateIntro);
+    const [animatedChartValue, setAnimatedChartValue] = useState(animateIntro ? 0 : chartValue);
+    const [animatedMetricLabel, setAnimatedMetricLabel] = useState('');
+    const [animatedSmartData, setAnimatedSmartData] = useState(animateIntro ? {
+        socio: 0,
+        mastering: 0,
+        advocacy: 0,
+        relationships: 0,
+        technology: 0
+    } : smartData);
+
+    useEffect(() => {
+        if (!animateIntro) {
+            setIntroPlayed(true);
+            return undefined;
+        }
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            setIntroPlayed(true);
+            return undefined;
+        }
+        setIntroPlayed(false);
+        return undefined;
+    }, [animateIntro]);
+
     // Determine if this is a SMART card or metric card
     const isSmartCard = ['relationships', 'socio-emotional', 'mastering-content', 'advocacy', 'technology-tools', 'undefined'].includes(type);
     const isMetricCard = ['status', 'completion', 'accuracy', 'avg-accuracy', 'avg-completion', 'time-spent', 'effort', 'progress'].includes(type);
@@ -146,10 +174,13 @@ const OverviewCard = ({
     const smartColors = smartTypeKey ? SMART_COLORS[smartTypeKey] : null;
 
     // Donut chart segments for metric cards
-    const getDonutSegments = (val) => [
-        { value: val, color: chartColor || 'var(--color-primary, #006b5e)', label: 'Value' },
-        { value: 100 - val, color: 'var(--color-surface-variant, #dde3ea)', label: 'Remaining' }
-    ];
+    const getDonutSegments = (val) => {
+        const clamped = Math.max(0, Math.min(100, Number.isFinite(val) ? val : 0));
+        return [
+            { value: clamped, color: chartColor || 'var(--color-primary, #006b5e)', label: 'Value' },
+            { value: 100 - clamped, color: 'var(--color-surface-variant, #dde3ea)', label: 'Remaining' }
+        ];
+    };
 
     // Default subtitles based on type
     const getDefaultSubtitle = () => {
@@ -216,9 +247,139 @@ const OverviewCard = ({
         return titleMap[type] || 'Student Need';
     };
 
+    const targetMetricLabel = subtitle || getDefaultSubtitle();
+
+    useEffect(() => {
+        if (!animateIntro) {
+            setAnimatedChartValue(chartValue);
+            setAnimatedMetricLabel(targetMetricLabel);
+            setAnimatedSmartData(smartData);
+            return undefined;
+        }
+        if (hasRunIntroRef.current) {
+            setAnimatedChartValue(chartValue);
+            setAnimatedMetricLabel(targetMetricLabel);
+            setAnimatedSmartData(smartData);
+            return undefined;
+        }
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            hasRunIntroRef.current = true;
+            setAnimatedChartValue(chartValue);
+            setAnimatedMetricLabel(targetMetricLabel);
+            setAnimatedSmartData(smartData);
+            setIntroPlayed(true);
+            return undefined;
+        }
+
+        const metricMatch = /^(-?\d+(?:\.\d+)?)\s*(%)?$/.exec(String(targetMetricLabel).trim());
+        const metricTarget = metricMatch ? parseFloat(metricMatch[1]) : chartValue;
+        const metricSuffix = metricMatch && metricMatch[2] ? '%' : '';
+        const metricDecimals = metricMatch && metricMatch[1].includes('.') ? metricMatch[1].split('.')[1].length : 0;
+
+        setAnimatedChartValue(0);
+        setAnimatedMetricLabel(metricMatch ? `0${metricSuffix}` : targetMetricLabel);
+        setAnimatedSmartData({
+            socio: 0,
+            mastering: 0,
+            advocacy: 0,
+            relationships: 0,
+            technology: 0
+        });
+
+        const startDelay = Math.max(0, introDelay);
+        let frameId;
+        let delayTimer;
+        let observer;
+        let fallbackTimer;
+        let intersectionObserver;
+
+        const runIntro = () => {
+            if (hasRunIntroRef.current) {
+                return;
+            }
+            delayTimer = window.setTimeout(() => {
+                hasRunIntroRef.current = true;
+                setIntroPlayed(true);
+                const start = performance.now();
+                const duration = 1100;
+                const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+                const step = (now) => {
+                    const progress = Math.min((now - start) / duration, 1);
+                    const eased = easeOut(progress);
+                    setAnimatedChartValue(chartValue * eased);
+                    setAnimatedSmartData({
+                        socio: (smartData.socio || 0) * eased,
+                        mastering: (smartData.mastering || 0) * eased,
+                        advocacy: (smartData.advocacy || 0) * eased,
+                        relationships: (smartData.relationships || 0) * eased,
+                        technology: (smartData.technology || 0) * eased
+                    });
+                    if (metricMatch) {
+                        setAnimatedMetricLabel(`${(metricTarget * eased).toFixed(metricDecimals)}${metricSuffix}`);
+                    }
+                    if (progress < 1) {
+                        frameId = window.requestAnimationFrame(step);
+                    } else {
+                        setAnimatedChartValue(chartValue);
+                        setAnimatedMetricLabel(targetMetricLabel);
+                        setAnimatedSmartData(smartData);
+                    }
+                };
+                frameId = window.requestAnimationFrame(step);
+            }, startDelay);
+        };
+
+        const root = cardRef.current ? cardRef.current.closest('.admin-reveal-root') : null;
+        const cardNode = cardRef.current;
+        if (root && !root.classList.contains('has-stage-overview')) {
+            observer = new MutationObserver(() => {
+                if (root.classList.contains('has-stage-overview')) {
+                    observer.disconnect();
+                    runIntro();
+                }
+            });
+            observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+        } else {
+            runIntro();
+        }
+
+        // Safety net: if stage class is missed, still play once the card is visible.
+        if (cardNode && typeof IntersectionObserver !== 'undefined') {
+            intersectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        runIntro();
+                    }
+                });
+            }, { threshold: 0.25 });
+            intersectionObserver.observe(cardNode);
+        }
+        fallbackTimer = window.setTimeout(runIntro, 1400);
+
+        return () => {
+            if (delayTimer) {
+                window.clearTimeout(delayTimer);
+            }
+            if (fallbackTimer) {
+                window.clearTimeout(fallbackTimer);
+            }
+            if (frameId) {
+                window.cancelAnimationFrame(frameId);
+            }
+            if (observer) {
+                observer.disconnect();
+            }
+            if (intersectionObserver) {
+                intersectionObserver.disconnect();
+            }
+        };
+    }, [animateIntro, introDelay, chartValue, targetMetricLabel, smartData]);
+
     return (
         <div
-            className={`plus-overview-card plus-overview-card--${type} ${className}`}
+            ref={cardRef}
+            className={`plus-overview-card plus-overview-card--${type} ${animateIntro && introPlayed ? 'plus-overview-card--intro-active' : ''} ${className}`}
             style={style}
             {...props}
         >
@@ -235,7 +396,7 @@ const OverviewCard = ({
                 {/* Text content */}
                 <div className="plus-overview-card__text">
                     <span className="plus-overview-card__subtitle">
-                        {subtitle || getDefaultSubtitle()}
+                        {isMetricCard ? animatedMetricLabel || targetMetricLabel : (subtitle || getDefaultSubtitle())}
                     </span>
                     <p className="plus-overview-card__description">
                         {description || getDefaultDescription()}
@@ -249,7 +410,7 @@ const OverviewCard = ({
                 <div className="plus-overview-card__visualization">
                     {isSmartCard && (
                         <SMARTVisualization
-                            data={smartData}
+                            data={animatedSmartData}
                             highlightedCategory={smartTypeKey}
                         />
                     )}
@@ -257,9 +418,12 @@ const OverviewCard = ({
                         <div className="plus-overview-card__donut">
                             <DonutChart
                                 size={96}
-                                segments={getDonutSegments(chartValue)}
-                                value={`${chartValue}%`}
+                                segments={getDonutSegments(animatedChartValue)}
+                                value={animatedMetricLabel || targetMetricLabel}
                                 centerTextSize="h4"
+                                animate={false}
+                                animationDelay={0}
+                                animationDuration={1100}
                             />
                         </div>
                     )}
@@ -307,6 +471,10 @@ OverviewCard.propTypes = {
     chartLabel: PropTypes.string,
     /** Custom color for the donut chart value segment */
     chartColor: PropTypes.string,
+    /** Whether to animate chart visualization on initial mount */
+    animateIntro: PropTypes.bool,
+    /** Intro animation delay in milliseconds */
+    introDelay: PropTypes.number,
     /** Show edit link (for time-spent type) */
     editLink: PropTypes.bool,
     /** Additional CSS classes */

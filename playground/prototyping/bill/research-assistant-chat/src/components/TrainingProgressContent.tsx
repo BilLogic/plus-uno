@@ -57,10 +57,39 @@ export function TrainingProgressContent(): React.ReactElement {
               subtitle="Advocacy"
               description="is where tutors had received least training."
               smartData={{ socio: 0.8, mastering: 0.6, advocacy: 0.2, relationships: 0.9, technology: 0.7 }}
+              animateIntro
+              introDelay={90}
             />
-            <OverviewCard type="avg-completion" title="Avg Completion Rate" chartValue={20} chartColor="#f5d061" subtitle="20%" description="of total lessons have been completed" />
-            <OverviewCard type="completion" title="Tutor Badge Completions" chartValue={20} chartColor="#f5d061" subtitle="20%" description="of eligible tutors have finished" />
-            <OverviewCard type="completion" title="Onboarding Completion" chartValue={20} chartColor="#f5d061" subtitle="20%" description="of tutors had finished" />
+            <OverviewCard
+              type="avg-completion"
+              title="Avg Completion Rate"
+              chartValue={20}
+              chartColor="#f5d061"
+              subtitle="20%"
+              description="of total lessons have been completed"
+              animateIntro
+              introDelay={230}
+            />
+            <OverviewCard
+              type="completion"
+              title="Tutor Badge Completions"
+              chartValue={20}
+              chartColor="#f5d061"
+              subtitle="20%"
+              description="of eligible tutors have finished"
+              animateIntro
+              introDelay={370}
+            />
+            <OverviewCard
+              type="completion"
+              title="Onboarding Completion"
+              chartValue={20}
+              chartColor="#f5d061"
+              subtitle="20%"
+              description="of tutors had finished"
+              animateIntro
+              introDelay={510}
+            />
           </div>
         </section>
       </div>

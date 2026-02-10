@@ -58,6 +58,28 @@ body {
   width: 100%;
 }
 
+/* Admin demo frame override: requested 800 x 900 setup. */
+#root.admin-demo-frame {
+  width: 800px;
+  height: 900px;
+  min-width: 800px;
+  min-height: 900px;
+}
+
+/* Admin demo mode: hide sidebar and let content take full width. */
+#tutor-training-progress-page.admin-demo-layout .plus-page-main-container {
+  gap: 0 !important;
+}
+
+#tutor-training-progress-page.admin-demo-layout .plus-page-sidebar-wrapper {
+  display: none !important;
+}
+
+#tutor-training-progress-page.admin-demo-layout .plus-page-content-wrapper {
+  width: 100%;
+  flex-basis: 100%;
+}
+
 /** Page fills root frame; no horizontal scroll. */
 #tutor-training-progress-page {
   width: 100%;
