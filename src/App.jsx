@@ -24,8 +24,8 @@ function IndexPage() {
         <Link to="/sessions" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
           In-session (Your Students) prototype
         </Link>
-        <Link to="/weekly-report" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
-          Weekly Report (Email Teaser + App)
+        <Link to="/monthly-report" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+          Monthly Report
         </Link>
         <a href="/storybook/index.html" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
           Storybook Documentation

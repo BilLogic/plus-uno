@@ -10,9 +10,8 @@ const TUTORING_PROMPTS: SuggestedPrompt[] = [
 
 /** FAB size (px); entry bar matches this height. */
 const FAB_SIZE = 56;
-/** Disclosed container width: at least 2× previous (768). */
-const DISCLOSED_MIN_WIDTH = 768;
-const DISCLOSED_MAX_WIDTH = 768;
+/** Disclosed container width: responsive to available viewport/frame. */
+const DISCLOSED_MAX_WIDTH = 'min(680px, calc(100vw - 160px))';
 
 /** Delay after entry bar grow-in before showing prompt bubbles (ms). */
 const PROMPTS_DELAY_MS = 400;
@@ -106,8 +105,6 @@ export function CompactChatBar({
               flexDirection: 'column',
               alignItems: 'flex-end',
               gap: 'var(--size-element-gap-md, 16px)',
-              minWidth: DISCLOSED_MIN_WIDTH,
-              maxWidth: DISCLOSED_MAX_WIDTH,
               width: DISCLOSED_MAX_WIDTH,
             }}
           >
@@ -128,7 +125,7 @@ export function CompactChatBar({
                 style={{
                   display: 'flex',
                   gap: 'var(--size-element-gap-sm, 8px)',
-                  flexWrap: 'nowrap',
+                  flexWrap: 'wrap',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
                   width: '100%',
@@ -153,7 +150,11 @@ export function CompactChatBar({
                   >
                     <button
                       type="button"
-                      onClick={onExpand}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onExpand();
+                      }}
                       style={{
                         padding:
                           'var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px)',
@@ -195,7 +196,11 @@ export function CompactChatBar({
             <motion.div
               role="button"
               tabIndex={0}
-              onClick={onExpand}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onExpand();
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();

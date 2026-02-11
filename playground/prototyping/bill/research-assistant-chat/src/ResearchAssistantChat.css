@@ -88,100 +88,100 @@
 }
 
 /* Staggered Sidebar & TopBar Reveal (Ported from Home Redesign) */
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar>.plus-sidebar-tab,
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section-title,
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-tab {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar>.plus-sidebar-tab,
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section-title,
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-tab {
     opacity: 0;
     transform: translateY(24px);
 }
 
 /* TopBar Stagger (Rolls in after skeletons) */
-#tutor-training-progress-page .shell-reveal.has-entered .plus-topbar .topbar-left-section {
+:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .topbar-left-section {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
-#tutor-training-progress-page .shell-reveal.has-entered .plus-topbar .topbar-center-section {
+:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .topbar-center-section {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 280ms;
 }
 
-#tutor-training-progress-page .shell-reveal.has-entered .plus-topbar .topbar-right-section {
+:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .topbar-right-section {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 560ms;
 }
 
 /* Sidebar Stagger (div:nth-of-type counts tag siblings: 1=Logo, 2=Home, 3=S1, 4=S2, 5=S3) */
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 120ms;
 }
 
 /* Section 1: Training (3rd div) */
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 240ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 360ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 480ms;
 }
 
 /* Section 2: Toolkit (4th div) */
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 600ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 720ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 840ms;
 }
 
 /* Section 3: Admin (5th div) */
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 960ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 1080ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 1200ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 1320ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 1440ms;
 }
 
-#tutor-training-progress-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
+:is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 1560ms;
 }

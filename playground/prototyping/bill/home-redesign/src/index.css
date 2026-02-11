@@ -37,6 +37,7 @@ body {
 
 /* Fixed 1280x850 frame */
 #root {
+  position: relative;
   width: var(--demo-frame-width);
   height: var(--demo-frame-height);
   min-width: var(--demo-frame-width);
@@ -48,12 +49,36 @@ body {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
+/* Admin demo mode: fixed frame requested by user. */
+#root.admin-demo-frame {
+  width: 800px;
+  height: 900px;
+  min-width: 800px;
+  min-height: 900px;
+}
+
+/* Admin demo mode: hide sidebar and give content full width. */
+#home-redesign-page.admin-demo-layout .plus-page-main-container {
+  gap: 0 !important;
+}
+
+#home-redesign-page.admin-demo-layout .plus-page-sidebar-wrapper {
+  display: none !important;
+}
+
+#home-redesign-page.admin-demo-layout .plus-page-content-wrapper {
+  width: 100%;
+  flex-basis: 100%;
+}
+
+
 /** Hide scrollbars on main content area; scrolling still enabled (same as reference). */
 #home-redesign-page .plus-page-main,
 #home-redesign-page .plus-page-content-wrapper {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 #home-redesign-page .plus-page-main::-webkit-scrollbar,
 #home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
   display: none;

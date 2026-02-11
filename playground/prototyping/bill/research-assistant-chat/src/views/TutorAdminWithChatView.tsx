@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 // @ts-ignore – plus-ds
 import { PageLayout } from '@plus-ds/specs/Universal/Pages';
@@ -34,16 +34,39 @@ const CHAT_PANEL_DURATION = 0.36;
 export function TutorAdminWithChatView(): React.ReactElement {
   const [chatExpanded, setChatExpanded] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const normalizedPath = (location.pathname || '/').replace(/\/+$/, '') || '/';
+  const browserPath = typeof window !== 'undefined'
+    ? ((window.location.pathname || '/').replace(/\/+$/, '') || '/')
+    : normalizedPath;
+  const isResearchAssistantRoute = normalizedPath === '/research-assistant' || browserPath === '/research-assistant';
+  const showResearchAssistant = isResearchAssistantRoute || chatExpanded;
+  const lockResearchRouteRef = useRef(false);
 
   // Loading & Disclosure States (matching Homepage pattern)
   const [shellEntered, setShellEntered] = useState(false);
   const [contentVisible, setContentVisible] = useState(true);
   const [hasEntered, setHasEntered] = useState(false);
+  const [hasStageOverview, setHasStageOverview] = useState(false);
+  const [hasStageDetails, setHasStageDetails] = useState(false);
+  const [hasStageRows, setHasStageRows] = useState(false);
 
   /** Shell reveal immediately (no skeleton phase). */
   useEffect(() => {
     const id = requestAnimationFrame(() => setShellEntered(true));
     return () => cancelAnimationFrame(id);
+  }, []);
+
+  // Demo-only admin frame: 800x900 and admin-specific shell treatment.
+  useEffect(() => {
+    const root = document.getElementById('root');
+    if (!root) {
+      return undefined;
+    }
+    root.classList.add('admin-demo-frame');
+    return () => {
+      root.classList.remove('admin-demo-frame');
+    };
   }, []);
 
   useEffect(() => {
@@ -52,8 +75,50 @@ export function TutorAdminWithChatView(): React.ReactElement {
     return () => cancelAnimationFrame(id);
   }, [contentVisible]);
 
-  const handleExpand = useCallback(() => setChatExpanded(true), []);
-  const handleBack = useCallback(() => setChatExpanded(false), []);
+  useEffect(() => {
+    if (!hasEntered || showResearchAssistant) {
+      return undefined;
+    }
+
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      setHasStageOverview(true);
+      setHasStageDetails(true);
+      setHasStageRows(true);
+      return undefined;
+    }
+
+    setHasStageOverview(true);
+    const detailsTimer = window.setTimeout(() => setHasStageDetails(true), 420);
+    const rowsTimer = window.setTimeout(() => setHasStageRows(true), 900);
+
+    return () => {
+      window.clearTimeout(detailsTimer);
+      window.clearTimeout(rowsTimer);
+    };
+  }, [hasEntered, showResearchAssistant]);
+
+  useEffect(() => {
+    setChatExpanded(isResearchAssistantRoute);
+  }, [isResearchAssistantRoute]);
+
+  useEffect(() => {
+    if (!lockResearchRouteRef.current) {
+      return;
+    }
+    if (!isResearchAssistantRoute) {
+      navigate('/research-assistant', { replace: true });
+    }
+  }, [isResearchAssistantRoute, navigate]);
+
+  const handleExpand = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('forceResearchAssistantUntil', String(Date.now() + 10000));
+    }
+    lockResearchRouteRef.current = true;
+    setChatExpanded(true);
+    navigate('/research-assistant');
+  }, [navigate]);
 
   return (
     <PageLayout
@@ -63,23 +128,24 @@ export function TutorAdminWithChatView(): React.ReactElement {
         onHomeClick: () => navigate('/home'),
         onTabClick: (id: string) => {
           if (id === 'sessions') navigate('/sessions');
-          if (id === 'tutors') navigate('/admin');
+          if (id === 'tutors') navigate(isResearchAssistantRoute ? '/research-assistant' : '/admin');
         },
       }}
       id="tutor-training-progress-page"
-      mainClassName={!chatExpanded ? 'tutor-training-progress-page__content' : ''}
-      contentDirect={chatExpanded}
+      className="admin-demo-layout"
+      mainClassName={!showResearchAssistant ? 'tutor-training-progress-page__content' : ''}
+      contentDirect={showResearchAssistant}
       shellEntered={shellEntered}
       floatingContent={
-        !chatExpanded ? (
-          <div style={{ maxWidth: 420 }}>
+        !showResearchAssistant ? (
+          <div style={{ width: 'min(680px, calc(100vw - 160px))' }}>
             <CompactChatBar onExpand={handleExpand} />
           </div>
         ) : null
       }
     >
       <AnimatePresence mode="wait">
-        {chatExpanded ? (
+        {showResearchAssistant ? (
           <motion.div
             key="chat"
             initial={{ opacity: 0, scale: 0.995 }}
@@ -96,14 +162,14 @@ export function TutorAdminWithChatView(): React.ReactElement {
               position: 'relative',
             }}
           >
-            <ResearchAssistantChat onBack={handleBack} />
+            <ResearchAssistantChat />
           </motion.div>
         ) : (
           <motion.div
             key="content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className={`admin-reveal-root${hasEntered ? ' has-entered' : ''}`}
+            className={`admin-reveal-root${hasEntered ? ' has-entered' : ''}${hasStageOverview ? ' has-stage-overview' : ''}${hasStageDetails ? ' has-stage-details' : ''}${hasStageRows ? ' has-stage-rows' : ''}`}
             style={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
           >
             <div className="reveal-section">

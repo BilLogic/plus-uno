@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -23,15 +23,18 @@ const BarChart = ({
     chartSpacing,
     yAxisTickPositions,
     columnPointPadding = 0.2,
-    fillOpacity
+    fillOpacity,
+    animate = false,
+    animationDelay = 0,
+    animationDuration = 900
 }) => {
-    const seriesWithTheme = series.map((s, i) => ({
+    const seriesWithTheme = useMemo(() => series.map((s, i) => ({
         ...s,
         color: s.color || chartTheme.colors[i % chartTheme.colors.length]
-    }));
+    })), [series]);
 
     // Column: xAxis = categories, yAxis = values. Bar (horizontal): xAxis = values, yAxis = categories.
-    const xAxisConfig = horizontal
+    const xAxisConfig = useMemo(() => horizontal
         ? {
             ...chartTheme.xAxis,
             min: 0,
@@ -43,9 +46,9 @@ const BarChart = ({
             ...chartTheme.xAxis,
             categories: categories,
             labels: { ...chartTheme.xAxis.labels, enabled: !hideXAxisLabels }
-        };
+        }, [horizontal, xAxisMax, hideXAxisLabels, categories]);
 
-    const yAxisConfig = horizontal
+    const yAxisConfig = useMemo(() => horizontal
         ? {
             ...chartTheme.yAxis,
             categories: categories,
@@ -58,9 +61,9 @@ const BarChart = ({
             ...(yAxisMax !== undefined && { max: yAxisMax }),
             ...(yAxisTickPositions && { tickPositions: yAxisTickPositions }),
             labels: { ...chartTheme.yAxis.labels, enabled: !hideYAxisLabels }
-        };
+        }, [horizontal, categories, hideYAxisLabels, yAxisLabel, yAxisMax, yAxisTickPositions]);
 
-    const options = {
+    const options = useMemo(() => ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
@@ -72,6 +75,9 @@ const BarChart = ({
         xAxis: xAxisConfig,
         yAxis: yAxisConfig,
         plotOptions: {
+            series: {
+                animation: animate ? { duration: animationDuration, defer: animationDelay } : false
+            },
             column: {
                 pointPadding: columnPointPadding,
                 borderWidth: 0,
@@ -89,7 +95,20 @@ const BarChart = ({
             shared: true
         },
         series: seriesWithTheme
-    };
+    }), [
+        horizontal,
+        height,
+        chartSpacing,
+        xAxisConfig,
+        yAxisConfig,
+        animate,
+        animationDuration,
+        animationDelay,
+        columnPointPadding,
+        fillOpacity,
+        showLegend,
+        seriesWithTheme
+    ]);
 
     return (
         <div style={{ width: '100%', height: height }}>
@@ -115,7 +134,10 @@ BarChart.propTypes = {
     chartSpacing: PropTypes.arrayOf(PropTypes.number),
     yAxisTickPositions: PropTypes.arrayOf(PropTypes.number),
     columnPointPadding: PropTypes.number,
-    fillOpacity: PropTypes.number
+    fillOpacity: PropTypes.number,
+    animate: PropTypes.bool,
+    animationDelay: PropTypes.number,
+    animationDuration: PropTypes.number
 };
 
 export default BarChart;

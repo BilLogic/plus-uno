@@ -3,10 +3,12 @@
  * No styles for plus-page-* or plus-sidebar; only .home-redesign-* content.
  */
 
-/* Page frame: fill root (root is 1280×800 in index.css) */
+/* Page frame: fill root (root is 1280×850 in index.css) */
 #home-redesign-page {
     --home-redesign-section-pad-y: 16px;
     --home-redesign-section-pad-x: 20px;
+    width: 100%;
+    height: 100%;
 }
 
 /* TopBar: breadcrumb and user from config; UserAvatar background for demo. */
@@ -42,7 +44,7 @@
 
 .home-redesign-reveal-root .home-redesign-jumbotron-section,
 .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-tutoring,
-.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-weekly,
+.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-monthly,
 .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-momentum,
 .home-redesign-reveal-root .home-redesign-trainings-section {
     opacity: 0;
@@ -51,10 +53,10 @@
 
 .home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section,
 .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring,
-.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly,
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-monthly,
 .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum,
 .home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: revealIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section {
@@ -62,31 +64,31 @@
 }
 
 .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring {
-    animation-delay: 280ms;
+    animation-delay: 320ms;
 }
 
-.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly {
-    animation-delay: 560ms;
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-monthly {
+    animation-delay: 640ms;
 }
 
 .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum {
-    animation-delay: 840ms;
+    animation-delay: 960ms;
 }
 
 .home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
-    animation-delay: 1120ms;
+    animation-delay: 1280ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
 
     .home-redesign-reveal-root .home-redesign-jumbotron-section,
     .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-tutoring,
-    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-weekly,
+    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-monthly,
     .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-momentum,
     .home-redesign-reveal-root .home-redesign-trainings-section,
     .home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section,
     .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring,
-    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly,
+    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-monthly,
     .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum,
     .home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
         animation: none;
@@ -105,18 +107,18 @@
 }
 
 #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-left-section {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
 #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-center-section {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 280ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 200ms;
 }
 
 #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-right-section {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 560ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 400ms;
 }
 
 /* Sidebar: per-item reveal (logo, Home, section titles, tabs) – same motion as content. */
@@ -139,73 +141,73 @@
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 280ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 200ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 560ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 400ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 840ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 600ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1120ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 800ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1400ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1000ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1680ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1200ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1960ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1400ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2240ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1600ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2520ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 1800ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2800ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2000ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 3080ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2200ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 3360ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2400ms;
 }
 
 #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
-    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 3640ms;
+    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 2600ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -261,6 +263,19 @@
     box-sizing: border-box;
 }
 
+/* Monthly report needs visible overflow for card elevation and horizontal training carousel */
+#home-redesign-page.monthly-report-page-scroller .plus-page-main-container {
+    overflow: visible;
+}
+
+#home-redesign-page.monthly-report-page-scroller .plus-page-content-wrapper {
+    overflow: visible;
+}
+
+#home-redesign-page.monthly-report-page-scroller .plus-page-main {
+    overflow: auto;
+}
+
 /* Tighter spacing between top (jumbotron) and three-cards section */
 .home-redesign-content>.home-redesign-jumbotron-section+.home-redesign-three-cards {
     margin-top: 0;
@@ -310,7 +325,7 @@
 
 /* Single card per section: fill grid cell, min width so no cutoff when sidebar visible */
 .home-redesign-card-tutoring,
-.home-redesign-card-weekly,
+.home-redesign-card-monthly,
 .home-redesign-card-momentum {
     width: 361px;
     min-width: 361px;
@@ -335,15 +350,15 @@
     overflow: hidden;
 }
 
-/* Weekly load: breakdown fills rest of space and is spaced out */
-.home-redesign-weekly-load-inner {
+/* Monthly load: breakdown fills rest of space and is spaced out */
+.home-redesign-monthly-load-inner {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
 }
 
-.home-redesign-weekly-load-inner .home-redesign-breakdown {
+.home-redesign-monthly-load-inner .home-redesign-breakdown {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -352,7 +367,7 @@
     min-height: 0;
 }
 
-.home-redesign-weekly-load-inner .home-redesign-breakdown-row {
+.home-redesign-monthly-load-inner .home-redesign-breakdown-row {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
@@ -383,8 +398,8 @@
     gap: var(--size-element-gap-xs);
 }
 
-/* Weekly Tutoring Load – match Figma 158-21725: scale, layout, typography */
-.home-redesign-weekly-load-inner .home-redesign-card-title {
+/* Monthly Tutoring Load – match Figma 158-21725: scale, layout, typography */
+.home-redesign-monthly-load-inner .home-redesign-card-title {
     font-family: var(--font-family-header);
     font-size: var(--font-size-h4);
     font-weight: var(--font-weight-bold);
@@ -392,7 +407,7 @@
     color: var(--color-on-surface);
 }
 
-.home-redesign-weekly-top {
+.home-redesign-monthly-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -400,14 +415,14 @@
     margin-bottom: var(--size-element-gap-sm, 8px);
 }
 
-.home-redesign-weekly-summary {
+.home-redesign-monthly-summary {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
 /* 16.8 hrs – H1 level, Lato bold; keep on one line */
-.home-redesign-weekly-value {
+.home-redesign-monthly-value {
     font-family: var(--font-family-header);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-h1);
@@ -418,7 +433,7 @@
 }
 
 /* of 20.0 hrs – smaller, regular, body style */
-.home-redesign-weekly-of {
+.home-redesign-monthly-of {
     font-family: var(--font-family-body);
     font-size: var(--font-size-body2);
     font-weight: var(--font-weight-body2-regular);
@@ -479,6 +494,27 @@
 /* Progress bar: design system Progress (size small) – leaner height override */
 .home-redesign-breakdown-progress-wrap {
     width: 100%;
+}
+
+@keyframes homeProgressFill {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+
+.home-redesign-breakdown-progress .plus-progress-bar,
+.home-redesign-breakdown-progress .progress-bar {
+    transform-origin: left;
+    transform: scaleX(0);
+}
+
+.home-redesign-reveal-root.has-entered .home-redesign-breakdown-progress-wrap .plus-progress-bar,
+.home-redesign-reveal-root.has-entered .home-redesign-breakdown-progress-wrap .progress-bar {
+    animation: homeProgressFill 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--progress-delay, 0ms);
 }
 
 /* Second row: full-width gray track, colored bar on top (legacy) */

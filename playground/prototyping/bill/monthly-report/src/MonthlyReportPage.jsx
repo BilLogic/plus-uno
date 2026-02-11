@@ -3,7 +3,7 @@ import Button from '@/components/Button';
 import Badge from '@/components/Badge';
 import Alert from '@/components/Alert';
 import { RecommendedLessons } from '@/specs/Home/Cards';
-import './WeeklyReportPage.scss';
+import './MonthlyReportPage.scss';
 
 // Training card images
 import imgGivingEffectivePraise from '../../home-redesign/src/assets/giving-effective-praise.png';
@@ -14,11 +14,11 @@ import imgSupportingGrowthMindset from '../../home-redesign/src/assets/supportin
 // Mock Data matching Stitch design with FULL content
 const REPORT_DATA = {
     userName: 'Albus',
-    dateRange: 'Jan 27 – Jan 31, 2026',
-    weekLabel: 'Week 18',
+    dateRange: 'January 2026',
+    monthLabel: 'Jan 2026',
     impact: {
-        learningTime: { value: 147, unit: 'min', delta: '+22% vs last week', deltaType: 'rose' },
-        skillsMastered: { value: 18, unit: 'skills', delta: '+4 vs last week', deltaType: 'success' }
+        learningTime: { value: 147, unit: 'min', delta: '+22% vs last month', deltaType: 'rose' },
+        skillsMastered: { value: 18, unit: 'skills', delta: '+4 vs last month', deltaType: 'success' }
     },
     stats: [
         { label: 'Sessions', value: 12, icon: 'fa-video', color: 'blue' },
@@ -34,7 +34,7 @@ const REPORT_DATA = {
         { label: 'Troubleshooting', value: 10, color: 'rose' },
         { label: 'Other', value: 6, color: 'gray' }
     ],
-    timeInsight: 'You spent 10% more time on Goal Setting this week compared to last week. Great job focusing on student objectives early in the sessions!',
+    timeInsight: 'You spent 10% more time on Goal Setting this month compared to last week. Great job focusing on student objectives early in the sessions!',
     dimensions: [
         {
             id: 1,
@@ -81,7 +81,7 @@ const REPORT_DATA = {
             icon: 'fa-exclamation-triangle',
             iconBg: 'rose',
             status: 'Not Observed',
-            summary: 'The AI did not find clear instances of student errors during the analyzed portions of this week\'s recordings. This dimension will be evaluated again when opportunities arise.',
+            summary: 'The AI did not find clear instances of student errors during the analyzed portions of this month\'s recordings. This dimension will be evaluated again when opportunities arise.',
             evidence: null,
             session: null,
             lessonUrl: '#'
@@ -107,7 +107,7 @@ const REPORT_DATA = {
     ]
 };
 
-export default function WeeklyReportPage() {
+export default function MonthlyReportPage() {
     const [reviewedCount, setReviewedCount] = useState(0);
     const [activeKey, setActiveKey] = useState(0); // Which card is expanded
     const totalDimensions = REPORT_DATA.dimensions.length;
@@ -155,18 +155,18 @@ export default function WeeklyReportPage() {
     };
 
     return (
-        <div className="weekly-report">
+        <div className="monthly-report">
 
             {/* ============================================
                 HEADER (No user pill)
                 ============================================ */}
             <header className="report-header">
                 <div>
-                    <h1 className="header-title">Your Week in Review, {REPORT_DATA.userName}</h1>
+                    <h1 className="header-title">Your Month in Review, {REPORT_DATA.userName}</h1>
                     <div className="header-meta">
                         <span>{REPORT_DATA.dateRange}</span>
                         <span className="header-meta-dot"></span>
-                        <span className="week-badge">{REPORT_DATA.weekLabel}</span>
+                        <span className="month-badge">{REPORT_DATA.monthLabel}</span>
                     </div>
                 </div>
             </header>
@@ -183,8 +183,10 @@ export default function WeeklyReportPage() {
                         <div className="impact-hero-card">
                             <div className="impact-hero-card-content">
                                 <h3 className="impact-title">
-                                    <i className="fa-solid fa-bolt"></i>
-                                    Impact on Students
+                                    <span className="impact-title-icon" aria-hidden="true">
+                                        <i className="fa-solid fa-bolt"></i>
+                                    </span>
+                                    <span>Impact on Students</span>
                                 </h3>
 
                                 <div className="impact-metrics">
@@ -296,6 +298,7 @@ export default function WeeklyReportPage() {
 
                 {/* Timeline */}
                 <div className="timeline-container">
+                    <span className="timeline-connector" aria-hidden="true"></span>
                     {REPORT_DATA.dimensions.map((dim, index) => {
                         const state = getState(index);
                         const isExpanded = activeKey === index;

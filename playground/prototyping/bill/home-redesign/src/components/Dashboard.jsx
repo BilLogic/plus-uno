@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShellContext } from '../context/ShellContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,7 +41,7 @@ const DEFAULT_SKILLS_OVERVIEW = {
     averagePerformance: [90, 90, 100, 80, 70],
 };
 
-const WEEKLY_LOAD_SEGMENTS = [
+const MONTHLY_LOAD_SEGMENTS = [
     { label: 'Direct tutoring', hours: 8.0, color: '#0472a8' },
     { label: 'Student support & follow-ups', hours: 4.0, color: '#8659a9' },
     { label: 'Prep & planning', hours: 2.5, color: '#c70b77' },
@@ -50,6 +50,8 @@ const WEEKLY_LOAD_SEGMENTS = [
 const TOTAL_HOURS = 20;
 const SCHEDULED_HOURS = 16.8;
 const SCHEDULED_PCT = 84;
+const MONTHLY_REVEAL_DELAY = 640;
+const MOMENTUM_REVEAL_DELAY = 960;
 
 const STUDENT_MOMENTUM_DATA = [
     { name: 'Alex P.', color: 'var(--color-social-emotional, #8c6600)', data: [3, 4, 5, 6, 7, 8, 8] },
@@ -69,18 +71,18 @@ const PERSONALIZED_TRAININGS = [
     { id: '4', title: 'Supporting a Growth Mindset', category: 'Social-Emotional Learning', duration: '12 mins', badgeType: 'socio-emotional', image: imgSupportingGrowthMindset },
 ];
 
-function WeeklyTutoringLoadCard() {
-    const donutSegments = [
-        ...WEEKLY_LOAD_SEGMENTS.map((s) => ({ value: (s.hours / TOTAL_HOURS) * 100, color: s.color, label: s.label })),
+function MonthlyTutoringLoadCard() {
+    const donutSegments = useMemo(() => [
+        ...MONTHLY_LOAD_SEGMENTS.map((s) => ({ value: (s.hours / TOTAL_HOURS) * 100, color: s.color, label: s.label })),
         { value: 100 - SCHEDULED_PCT, color: '#bec8ca', label: 'Unscheduled' },
-    ];
+    ], []);
     return (
-        <div className="home-redesign-section-card home-redesign-weekly-load-inner">
-            <h4 className="h4 home-redesign-card-title">Weekly Tutoring Load</h4>
-            <div className="home-redesign-weekly-top">
-                <div className="home-redesign-weekly-summary">
-                    <span className="h1 home-redesign-weekly-value">{SCHEDULED_HOURS} hrs</span>
-                    <span className="body2-txt home-redesign-weekly-of">of {TOTAL_HOURS.toFixed(1)} hrs</span>
+        <div className="home-redesign-section-card home-redesign-monthly-load-inner">
+            <h4 className="h4 home-redesign-card-title">Monthly Tutoring Load</h4>
+            <div className="home-redesign-monthly-top">
+                <div className="home-redesign-monthly-summary">
+                    <span className="h1 home-redesign-monthly-value">{SCHEDULED_HOURS} hrs</span>
+                    <span className="body2-txt home-redesign-monthly-of">of {TOTAL_HOURS.toFixed(1)} hrs</span>
                 </div>
                 <div className="home-redesign-donut-wrap">
                     <DonutChart
@@ -93,7 +95,7 @@ function WeeklyTutoringLoadCard() {
                 </div>
             </div>
             <ul className="home-redesign-breakdown">
-                {WEEKLY_LOAD_SEGMENTS.slice(0, 3).map((segment) => (
+                {MONTHLY_LOAD_SEGMENTS.slice(0, 3).map((segment, index) => (
                     <li key={segment.label} className="home-redesign-breakdown-row">
                         <div className="home-redesign-breakdown-label-line">
                             <span className="home-redesign-breakdown-label">{segment.label}</span>
@@ -101,7 +103,7 @@ function WeeklyTutoringLoadCard() {
                         </div>
                         <div
                             className="home-redesign-breakdown-progress-wrap"
-                            style={{ ['--color-primary']: segment.color }}
+                            style={{ ['--color-primary']: segment.color, ['--progress-delay']: `${MONTHLY_REVEAL_DELAY + index * 160}ms` }}
                         >
                             <Progress
                                 value={(segment.hours / TOTAL_HOURS) * 100}
@@ -119,15 +121,21 @@ function WeeklyTutoringLoadCard() {
     );
 }
 
-function MomentumChartCell({ student }) {
+function MomentumChartCell({ student, delay = 0 }) {
     const wrapRef = useRef(null);
-    const [chartHeight, setChartHeight] = useState(70);
+    const [chartHeight, setChartHeight] = useState(null);
+    const categories = useMemo(() => student.data.map(() => ''), [student.data]);
+    const series = useMemo(() => ([
+        { name: student.name, data: student.data, color: colorToRgba(student.color, 0.6) },
+    ]), [student.name, student.data, student.color]);
 
     useEffect(() => {
         if (!wrapRef.current) return;
         const el = wrapRef.current;
         const updateHeight = () => {
-            if (el) setChartHeight(Math.max(60, el.clientHeight));
+            if (!el) return;
+            const nextHeight = Math.max(60, Math.round(el.clientHeight));
+            setChartHeight((prev) => (prev === nextHeight ? prev : nextHeight));
         };
         updateHeight();
         const ro = new ResizeObserver(updateHeight);
@@ -137,20 +145,23 @@ function MomentumChartCell({ student }) {
 
     return (
         <div ref={wrapRef} className="home-redesign-momentum-chart-wrap">
-            <BarChart
-                categories={student.data.map(() => '')}
-                series={[
-                    { name: student.name, data: student.data, color: colorToRgba(student.color, 0.6) },
-                ]}
-                height={chartHeight}
-                showLegend={false}
-                yAxisMax={MOMENTUM_Y_MAX}
-                hideXAxisLabels={true}
-                hideYAxisLabels={false}
-                yAxisTickPositions={[0, 5, 10]}
-                chartSpacing={[12, 36, 12, 4]}
-                columnPointPadding={0}
-            />
+            {chartHeight !== null && (
+                <BarChart
+                    categories={categories}
+                    series={series}
+                    height={chartHeight}
+                    showLegend={false}
+                    yAxisMax={MOMENTUM_Y_MAX}
+                    hideXAxisLabels={true}
+                    hideYAxisLabels={false}
+                    yAxisTickPositions={[0, 5, 10]}
+                    chartSpacing={[12, 36, 12, 4]}
+                    columnPointPadding={0}
+                    animate={true}
+                    animationDelay={delay}
+                    animationDuration={900}
+                />
+            )}
         </div>
     );
 }
@@ -185,10 +196,13 @@ function StudentMomentumCard() {
                 </div>
             </div>
             <div className="home-redesign-momentum-grid">
-                {displayList.map((student) => (
-                    <div key={student.name} className="home-redesign-momentum-cell">
-                        <span className="body2-txt home-redesign-momentum-name">{student.name}</span>
-                        <MomentumChartCell student={student} />
+                {displayList.map((student, index) => (
+                    <div
+                        key={student.name}
+                        className="home-redesign-momentum-cell"
+                    >
+                        <span className="body2-txt home-redesign-momentum-name" style={{ transition: 'color 0.2s ease' }}>{student.name}</span>
+                        <MomentumChartCell student={student} delay={MOMENTUM_REVEAL_DELAY + index * 140} />
                     </div>
                 ))}
             </div>
@@ -196,7 +210,7 @@ function StudentMomentumCard() {
     );
 }
 
-export const Dashboard = ({ setBreadcrumbs }) => {
+export const Dashboard = () => {
     const navigate = useNavigate();
     const [activeSimulation, setActiveSimulation] = useState(null);
     const carouselRef = useRef(null);
@@ -204,9 +218,7 @@ export const Dashboard = ({ setBreadcrumbs }) => {
     const [canScrollRight, setCanScrollRight] = useState(true);
 
     const [hasEntered, setHasEntered] = useState(false);
-
-    // Get setActiveTabOverride from context (optional)
-    const { setActiveTabOverride } = useContext(ShellContext) || {};
+    const { setBreadcrumbs, setActiveTabOverride } = useContext(ShellContext) || {};
 
     // Update breadcrumbs and active tab based on simulation state
     useEffect(() => {
@@ -293,8 +305,8 @@ export const Dashboard = ({ setBreadcrumbs }) => {
                                     radarHeight="100%"
                                 />
                             </div>
-                            <div className="home-redesign-card-weekly">
-                                <WeeklyTutoringLoadCard />
+                            <div className="home-redesign-card-monthly">
+                                <MonthlyTutoringLoadCard />
                             </div>
                             <div className="home-redesign-card-momentum">
                                 <StudentMomentumCard />

@@ -1,18 +1,16 @@
-
 /**
- * Weekly Reports List Page
- * 
- * Overview page showing all weekly reports with completion metrics and table view.
- * Uses PageLayout and manual table styling to match Sessions Page implementation.
+ * WeeklyReportsListContent
+ * Content-only version of WeeklyReportsListPage for use inside ShellLayout.
+ * No PageLayout wrapper - uses ShellContext to update TopBar/Layout config.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageLayout } from '@/specs/Universal/Pages';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Pagination from '@/components/Pagination/Pagination';
 import Progress from '@/components/Progress/Progress';
+import { ShellContext } from '../../home-redesign/src/context/ShellContext';
 import './WeeklyReportsListPage.scss';
 
 // Mock data for weekly reports
@@ -30,21 +28,24 @@ const AVG_COMPLETION = 84;
 const COMPLETION_DELTA = 2;
 const ITEMS_PER_PAGE = 6;
 
-export default function WeeklyReportsListPage() {
+export default function WeeklyReportsListContent() {
     const navigate = useNavigate();
+    const { setBreadcrumbs, setMainClassName, setFloatingContent } = useContext(ShellContext);
     const [currentPage, setCurrentPage] = useState(1);
+    const [hasEntered, setHasEntered] = useState(false);
 
-    // Shell loading state for PageLayout reveal
-    const [shellLoading, setShellLoading] = useState(true);
-    const [shellEntered, setShellEntered] = useState(false);
+    // Set shell context on mount
+    useEffect(() => {
+        setBreadcrumbs([
+            { text: 'Toolkit', href: '/home' },
+            { text: 'Reviews', href: '/weekly-reports' }
+        ]);
+        setMainClassName('weekly-reports-content');
+        setFloatingContent(null);
+    }, [setBreadcrumbs, setMainClassName, setFloatingContent]);
 
     useEffect(() => {
-        // Simulate initial load
-        const t = setTimeout(() => {
-            setShellLoading(false);
-            requestAnimationFrame(() => setShellEntered(true));
-        }, 500);
-        return () => clearTimeout(t);
+        requestAnimationFrame(() => setHasEntered(true));
     }, []);
 
     // Hide scrollbar programmatically
@@ -54,14 +55,11 @@ export default function WeeklyReportsListPage() {
             const style = document.createElement('style');
             style.id = styleId;
             style.textContent = `
-                #weekly-reports-list-page .plus-page-main::-webkit-scrollbar,
-                #weekly-reports-list-page .plus-page-content-wrapper::-webkit-scrollbar {
+                .weekly-reports-content::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
-                    background: transparent !important;
                 }
-                #weekly-reports-list-page .plus-page-main,
-                #weekly-reports-list-page .plus-page-content-wrapper {
+                .weekly-reports-content {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;
                 }
@@ -80,15 +78,6 @@ export default function WeeklyReportsListPage() {
         navigate('/weekly-report');
     };
 
-    const handlePrevious = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
-    };
-
-    const handleNext = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-    };
-
-    // Calculate display range
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, TOTAL_REPORTS);
 
@@ -104,35 +93,43 @@ export default function WeeklyReportsListPage() {
     };
 
     return (
-        <PageLayout
-            shellLoading={shellLoading}
-            shellEntered={shellEntered}
-            topBarConfig={{
-                breadcrumbs: [
-                    { text: 'Toolkit', href: '#' },
-                    { text: 'Reports', href: '#' }
-                ],
-                user: { name: 'Boyuan Guo', counter: null, counterValue: null, type: 'lead tutor' }
-            }}
-            sidebarConfig={{
-                user: 'tutor',
-                activeTab: 'weekly-report',
-                onHomeClick: () => navigate('/home'),
-                onTabClick: (id) => {
-                    if (id === 'home') navigate('/home');
-                    if (id === 'sessions') navigate('/sessions');
-                    if (id === 'weekly-report') navigate('/weekly-reports');
-                    if (id === 'lessons') navigate('/lessons');
-                    if (id === 'tutors') navigate('/admin');
-                }
-            }}
+        <div
             id="weekly-reports-list-page"
-            className="plus-page-reveal"
-            mainClassName="weekly-reports-content"
+            className={`reveal-root ${hasEntered ? 'has-entered' : ''}`}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+            }}
         >
-            <div className="reports-header-row page-content-reveal" style={{ animationDelay: '0ms' }}>
+            <style>{`
+                @keyframes revealIn {
+                    from { opacity: 0; transform: translateY(24px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .reveal-root .reveal-section {
+                    opacity: 0;
+                }
+                .reveal-root.has-entered .reveal-section {
+                    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                }
+                .reveal-root .reveal-row {
+                    opacity: 0;
+                }
+                .reveal-root.has-entered .reveal-row {
+                    animation: revealIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .reveal-root .reveal-section,
+                    .reveal-root .reveal-row {
+                        opacity: 1;
+                        animation: none !important;
+                    }
+                }
+            `}</style>
+            <div className="reports-header-row reveal-section" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2-txt">Weekly Reports</h1>
+                    <h1 className="h2-txt">Weekly Reviews</h1>
                     <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>
@@ -156,7 +153,7 @@ export default function WeeklyReportsListPage() {
                 </div>
             </div>
 
-            <div className="reports-table-container page-content-reveal" style={{ animationDelay: '100ms' }}>
+            <div className="reports-table-container reveal-section" style={{ animationDelay: '200ms' }}>
                 <table className="reports-table">
                     <thead>
                         <tr>
@@ -171,6 +168,8 @@ export default function WeeklyReportsListPage() {
                         {REPORTS_DATA.map((report, i) => (
                             <tr
                                 key={report.id}
+                                className="reveal-row"
+                                style={{ animationDelay: `${400 + i * 80}ms` }}
                                 onClick={() => handleViewReport(report.id)}
                             >
                                 <td className="body2-txt">Week {report.week}</td>
@@ -185,12 +184,17 @@ export default function WeeklyReportsListPage() {
                                 </td>
                                 <td>
                                     <div className="completion-cell">
-                                        <Progress
-                                            value={(report.completion.done / report.completion.total) * 100}
-                                            style={getProgressColor(report.completion.done, report.completion.total)}
-                                            className="completion-progress"
-                                            size="small"
-                                        />
+                                        <div
+                                            className="completion-progress-shell"
+                                            style={{ '--progress-delay': `${520 + i * 80}ms` }}
+                                        >
+                                            <Progress
+                                                value={(report.completion.done / report.completion.total) * 100}
+                                                style={getProgressColor(report.completion.done, report.completion.total)}
+                                                className="completion-progress completion-progress--staged"
+                                                size="small"
+                                            />
+                                        </div>
                                         <span className="body3-txt">
                                             {report.completion.done}/{report.completion.total}
                                         </span>
@@ -199,11 +203,9 @@ export default function WeeklyReportsListPage() {
                                 <td>
                                     <Button
                                         text="View"
-                                        style="secondary" // or primary? InSessionPage uses secondary outline
+                                        style="secondary"
                                         fill="outline"
                                         size="small"
-                                        // InSessionPage used Button component. My design used a link.
-                                        // Let's use a text button with arrow.
                                         trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -218,7 +220,7 @@ export default function WeeklyReportsListPage() {
                 </table>
             </div>
 
-            <footer className="reports-footer page-content-reveal" style={{ animationDelay: '200ms' }}>
+            <footer className="reports-footer reveal-section" style={{ animationDelay: '900ms' }}>
                 <span className="body3-txt text-muted">
                     Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of <strong>{TOTAL_REPORTS}</strong> results
                 </span>
@@ -230,6 +232,6 @@ export default function WeeklyReportsListPage() {
                     />
                 </div>
             </footer>
-        </PageLayout>
+        </div>
     );
 }

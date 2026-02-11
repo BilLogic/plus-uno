@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -9,13 +9,22 @@ import HighchartsReact from 'highcharts-react-official';
  */
 import chartTheme from '../../chartTheme';
 
-const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 'h1' }) => {
+const DonutChart = ({
+    size = 228,
+    segments = [],
+    value,
+    label,
+    centerTextSize = 'h1',
+    animate = false,
+    animationDelay = 0,
+    animationDuration = 900
+}) => {
     // Transform segments into Highcharts series data
-    const chartData = segments.map(segment => ({
+    const chartData = useMemo(() => segments.map(segment => ({
         y: segment.value,
         color: segment.color,
         name: segment.label || 'Segment'
-    }));
+    })), [segments]);
 
     // Get font size value for the center text using Figma semantic tokens
     const getFontSize = () => {
@@ -48,7 +57,7 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
         return lineHeightMap[centerTextSize] || lineHeightMap['h4'];
     };
 
-    const options = {
+    const options = useMemo(() => ({
         ...chartTheme, // Apply theme defaults
         chart: {
             type: 'pie',
@@ -63,6 +72,7 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
         },
         plotOptions: {
             pie: {
+                animation: animate ? { duration: animationDuration, defer: animationDelay } : false,
                 innerSize: '85%', // Donut thickness
                 borderWidth: 0,
                 allowPointSelect: false,
@@ -93,8 +103,9 @@ const DonutChart = ({ size = 228, segments = [], value, label, centerTextSize = 
             data: chartData,
             size: '100%',
             innerSize: '85%',
+            animation: animate ? { duration: animationDuration, defer: animationDelay } : false,
         }]
-    };
+    }), [size, chartData, animate, animationDelay, animationDuration]);
 
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>
@@ -147,7 +158,13 @@ DonutChart.propTypes = {
     /** Label text below the value */
     label: PropTypes.string,
     /** CSS class for the center value text size */
-    centerTextSize: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'body3'])
+    centerTextSize: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'body3']),
+    /** Whether to animate the donut fill on first render */
+    animate: PropTypes.bool,
+    /** Delay before donut animation starts in milliseconds */
+    animationDelay: PropTypes.number,
+    /** Duration of donut animation in milliseconds */
+    animationDuration: PropTypes.number
 };
 
 export default DonutChart;

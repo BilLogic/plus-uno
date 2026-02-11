@@ -33,7 +33,7 @@ const Sidebar = ({
             title: 'Toolkit',
             items: [
                 { text: 'Sessions', icon: 'calendar-alt', id: 'sessions' },
-                { text: 'Reports', icon: 'chart-bar', id: 'weekly-report' }
+                { text: 'Reviews', icon: 'chart-bar', id: 'reviews' }
             ]
         }
     ];

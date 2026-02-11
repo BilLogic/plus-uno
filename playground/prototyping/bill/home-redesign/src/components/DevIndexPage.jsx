@@ -40,14 +40,14 @@ const DevIndexPage = () => {
                     <div style={{ fontSize: '14px', color: '#666' }}>AI research assistant for tutors.</div>
                 </Link>
 
-                <Link to="/weekly-reports" style={linkStyle}>
-                    <div style={{ fontWeight: 'bold', fontSize: '18px' }}>Weekly Reports</div>
-                    <div style={{ fontSize: '14px', color: '#666' }}>Student weekly performance reports.</div>
+                <Link to="/monthly-reports" style={linkStyle}>
+                    <div style={{ fontWeight: 'bold', fontSize: '18px' }}>Monthly Reports</div>
+                    <div style={{ fontSize: '14px', color: '#666' }}>Tutor monthly performance reports.</div>
                 </Link>
 
                 <Link to="/lessons" style={linkStyle}>
                     <div style={{ fontWeight: 'bold', fontSize: '18px' }}>Lessons</div>
-                    <div style={{ fontSize: '14px', color: '#666' }}>Lessons placeholder page.</div>
+                    <div style={{ fontSize: '14px', color: '#666' }}>A growth mindset simulation game.</div>
                 </Link>
             </div>
         </div>

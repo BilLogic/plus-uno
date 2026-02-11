@@ -1,26 +1,28 @@
+
 /**
- * WeeklyReportsListContent
- * Content-only version of WeeklyReportsListPage for use inside ShellLayout.
- * No PageLayout wrapper - uses ShellContext to update TopBar/Layout config.
+ * Monthly Reports List Page
+ *
+ * Overview page showing all monthly reports with completion metrics and table view.
+ * Uses PageLayout and manual table styling to match Sessions Page implementation.
  */
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageLayout } from '@/specs/Universal/Pages';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Pagination from '@/components/Pagination/Pagination';
 import Progress from '@/components/Progress/Progress';
-import { ShellContext } from '../../home-redesign/src/context/ShellContext';
-import './WeeklyReportsListPage.scss';
+import './MonthlyReportsListPage.scss';
 
-// Mock data for weekly reports
+// Mock data for monthly reports
 const REPORTS_DATA = [
-    { id: 1, week: 18, dateRange: 'Jan 27 – 31, 2026', status: 'Not viewed', completion: { done: 0, total: 5 } },
-    { id: 2, week: 17, dateRange: 'Jan 20 – 24, 2026', status: 'Viewed', completion: { done: 5, total: 5 } },
-    { id: 3, week: 16, dateRange: 'Jan 13 – 17, 2026', status: 'Viewed', completion: { done: 5, total: 5 } },
-    { id: 4, week: 15, dateRange: 'Jan 06 – 10, 2026', status: 'Viewed', completion: { done: 5, total: 5 } },
-    { id: 5, week: 14, dateRange: 'Dec 30, 2025 – Jan 03, 2026', status: 'Viewed', completion: { done: 5, total: 5 } },
-    { id: 6, week: 13, dateRange: 'Dec 23 – 27, 2025', status: 'Viewed', completion: { done: 5, total: 5 } },
+    { id: 1, month: 'January', dateRange: 'January 2026', status: 'Not viewed', completion: { done: 0, total: 5 } },
+    { id: 2, month: 'December', dateRange: 'December 2025', status: 'Viewed', completion: { done: 5, total: 5 } },
+    { id: 3, month: 'November', dateRange: 'November 2025', status: 'Viewed', completion: { done: 5, total: 5 } },
+    { id: 4, month: 'October', dateRange: 'October 2025', status: 'Viewed', completion: { done: 5, total: 5 } },
+    { id: 5, month: 'September', dateRange: 'September 2025', status: 'Viewed', completion: { done: 5, total: 5 } },
+    { id: 6, month: 'August', dateRange: 'August 2025', status: 'Viewed', completion: { done: 5, total: 5 } },
 ];
 
 const TOTAL_REPORTS = 124;
@@ -28,38 +30,38 @@ const AVG_COMPLETION = 84;
 const COMPLETION_DELTA = 2;
 const ITEMS_PER_PAGE = 6;
 
-export default function WeeklyReportsListContent() {
+export default function MonthlyReportsListPage() {
     const navigate = useNavigate();
-    const { setBreadcrumbs, setMainClassName, setFloatingContent } = useContext(ShellContext);
     const [currentPage, setCurrentPage] = useState(1);
-    const [hasEntered, setHasEntered] = useState(false);
 
-    // Set shell context on mount
-    useEffect(() => {
-        setBreadcrumbs([
-            { text: 'Toolkit', href: '/home' },
-            { text: 'Reports', href: '/weekly-reports' }
-        ]);
-        setMainClassName('weekly-reports-content');
-        setFloatingContent(null);
-    }, [setBreadcrumbs, setMainClassName, setFloatingContent]);
+    // Shell loading state for PageLayout reveal
+    const [shellLoading, setShellLoading] = useState(true);
+    const [shellEntered, setShellEntered] = useState(false);
 
     useEffect(() => {
-        requestAnimationFrame(() => setHasEntered(true));
+        // Simulate initial load
+        const t = setTimeout(() => {
+            setShellLoading(false);
+            requestAnimationFrame(() => setShellEntered(true));
+        }, 500);
+        return () => clearTimeout(t);
     }, []);
 
     // Hide scrollbar programmatically
     useEffect(() => {
-        const styleId = 'weekly-reports-list-scrollbar-hide';
+        const styleId = 'monthly-reports-list-scrollbar-hide';
         if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
             style.id = styleId;
             style.textContent = `
-                .weekly-reports-content::-webkit-scrollbar {
+                #monthly-reports-list-page .plus-page-main::-webkit-scrollbar,
+                #monthly-reports-list-page .plus-page-content-wrapper::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
+                    background: transparent !important;
                 }
-                .weekly-reports-content {
+                #monthly-reports-list-page .plus-page-main,
+                #monthly-reports-list-page .plus-page-content-wrapper {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;
                 }
@@ -74,10 +76,19 @@ export default function WeeklyReportsListContent() {
 
     const totalPages = Math.ceil(TOTAL_REPORTS / ITEMS_PER_PAGE);
 
-    const handleViewReport = (weekId) => {
-        navigate('/weekly-report');
+    const handleViewReport = (reportId) => {
+        navigate('/monthly-report');
     };
 
+    const handlePrevious = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    // Calculate display range
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, TOTAL_REPORTS);
 
@@ -93,43 +104,35 @@ export default function WeeklyReportsListContent() {
     };
 
     return (
-        <div
-            id="weekly-reports-list-page"
-            className={`reveal-root ${hasEntered ? 'has-entered' : ''}`}
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                flex: 1,
+        <PageLayout
+            shellLoading={shellLoading}
+            shellEntered={shellEntered}
+            topBarConfig={{
+                breadcrumbs: [
+                    { text: 'Toolkit', href: '#' },
+                    { text: 'Reports', href: '#' }
+                ],
+                user: { name: 'Boyuan Guo', counter: null, counterValue: null, type: 'lead tutor' }
             }}
+            sidebarConfig={{
+                user: 'tutor',
+                activeTab: 'monthly-report',
+                onHomeClick: () => navigate('/home'),
+                onTabClick: (id) => {
+                    if (id === 'home') navigate('/home');
+                    if (id === 'sessions') navigate('/sessions');
+                    if (id === 'monthly-report') navigate('/monthly-reports');
+                    if (id === 'lessons') navigate('/lessons');
+                    if (id === 'tutors') navigate('/admin');
+                }
+            }}
+            id="monthly-reports-list-page"
+            className="plus-page-reveal"
+            mainClassName="monthly-reports-content"
         >
-            <style>{`
-                @keyframes revealIn {
-                    from { opacity: 0; transform: translateY(24px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .reveal-root .reveal-section {
-                    opacity: 0;
-                }
-                .reveal-root.has-entered .reveal-section {
-                    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-                }
-                .reveal-root .reveal-row {
-                    opacity: 0;
-                }
-                .reveal-root.has-entered .reveal-row {
-                    animation: revealIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-                }
-                @media (prefers-reduced-motion: reduce) {
-                    .reveal-root .reveal-section,
-                    .reveal-root .reveal-row {
-                        opacity: 1;
-                        animation: none !important;
-                    }
-                }
-            `}</style>
-            <div className="reports-header-row reveal-section" style={{ animationDelay: '0ms' }}>
+            <div className="reports-header-row page-content-reveal" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2-txt">Weekly Reports</h1>
+                    <h1 className="h2-txt">Monthly Reports</h1>
                     <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>
@@ -153,11 +156,11 @@ export default function WeeklyReportsListContent() {
                 </div>
             </div>
 
-            <div className="reports-table-container reveal-section" style={{ animationDelay: '200ms' }}>
+            <div className="reports-table-container page-content-reveal" style={{ animationDelay: '100ms' }}>
                 <table className="reports-table">
                     <thead>
                         <tr>
-                            <th>WEEK</th>
+                            <th>MONTH</th>
                             <th>DATE RANGE</th>
                             <th>STATUS</th>
                             <th>FEEDBACK REVIEWED</th>
@@ -168,11 +171,9 @@ export default function WeeklyReportsListContent() {
                         {REPORTS_DATA.map((report, i) => (
                             <tr
                                 key={report.id}
-                                className="reveal-row"
-                                style={{ animationDelay: `${400 + i * 80}ms` }}
                                 onClick={() => handleViewReport(report.id)}
                             >
-                                <td className="body2-txt">Week {report.week}</td>
+                                <td className="body2-txt">{report.month}</td>
                                 <td className="body2-txt">{report.dateRange}</td>
                                 <td>
                                     <Badge
@@ -184,12 +185,17 @@ export default function WeeklyReportsListContent() {
                                 </td>
                                 <td>
                                     <div className="completion-cell">
-                                        <Progress
-                                            value={(report.completion.done / report.completion.total) * 100}
-                                            style={getProgressColor(report.completion.done, report.completion.total)}
-                                            className="completion-progress"
-                                            size="small"
-                                        />
+                                        <div
+                                            className="completion-progress-shell"
+                                            style={{ '--progress-delay': `${220 + i * 80}ms` }}
+                                        >
+                                            <Progress
+                                                value={(report.completion.done / report.completion.total) * 100}
+                                                style={getProgressColor(report.completion.done, report.completion.total)}
+                                                className="completion-progress completion-progress--staged"
+                                                size="small"
+                                            />
+                                        </div>
                                         <span className="body3-txt">
                                             {report.completion.done}/{report.completion.total}
                                         </span>
@@ -198,9 +204,11 @@ export default function WeeklyReportsListContent() {
                                 <td>
                                     <Button
                                         text="View"
-                                        style="secondary"
+                                        style="secondary" // or primary? InSessionPage uses secondary outline
                                         fill="outline"
                                         size="small"
+                                        // InSessionPage used Button component. My design used a link.
+                                        // Let's use a text button with arrow.
                                         trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -215,7 +223,7 @@ export default function WeeklyReportsListContent() {
                 </table>
             </div>
 
-            <footer className="reports-footer reveal-section" style={{ animationDelay: '900ms' }}>
+            <footer className="reports-footer page-content-reveal" style={{ animationDelay: '200ms' }}>
                 <span className="body3-txt text-muted">
                     Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of <strong>{TOTAL_REPORTS}</strong> results
                 </span>
@@ -227,6 +235,6 @@ export default function WeeklyReportsListContent() {
                     />
                 </div>
             </footer>
-        </div>
+        </PageLayout>
     );
 }

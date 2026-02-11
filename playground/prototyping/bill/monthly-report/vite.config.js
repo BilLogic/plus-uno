@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// Repo root: four levels up from playground/prototyping/bill/weekly-report
+// Repo root: four levels up from playground/prototyping/bill/monthly-report
 const root = path.resolve(__dirname, '../../../..');
 
 export default defineConfig({

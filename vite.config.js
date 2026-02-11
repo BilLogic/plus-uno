@@ -39,7 +39,30 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id) return undefined;
+
+          // Vendor splitting to avoid a single oversized app chunk.
+          if (id.includes('node_modules')) {
+            if (id.includes('/framer-motion/')) {
+              return 'vendor-motion';
+            }
+            if (id.includes('/highcharts') || id.includes('/highcharts-react-official')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('/react-bootstrap/') || id.includes('/bootstrap/')) {
+              return 'vendor-bootstrap';
+            }
+            return 'vendor-core';
+          }
+          return undefined;
+        }
+      }
+    }
   },
   css: {
     preprocessorOptions: {
@@ -50,7 +73,7 @@ export default defineConfig({
           path.resolve(dirname, 'packages/plus-ds/src/styles'),
           path.resolve(dirname, 'packages/plus-ds/src/forms')
         ],
-        silenceDeprecations: ['legacy-js-api']
+        silenceDeprecations: ['import', 'legacy-js-api']
       }
     }
   },
