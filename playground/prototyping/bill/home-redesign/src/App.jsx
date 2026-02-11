@@ -11,8 +11,8 @@ import InSessionContent from '../../sessions/InSessionContent';
 import { LessonsContent } from './components/LessonsContent';
 import { ReflectionAssistantChat as ReflectionPage } from '../../sessions/ReflectionAssistant/ReflectionAssistantChat';
 import TutorAdminContent from '../../research-assistant-chat/src/views/TutorAdminContent';
-import WeeklyReportsListContent from '../../weekly-report/src/WeeklyReportsListContent';
-import WeeklyReportContent from '../../weekly-report/src/WeeklyReportContent';
+import MonthlyReportsListContent from '../../monthly-report/src/MonthlyReportsListContent';
+import MonthlyReportContent from '../../monthly-report/src/MonthlyReportContent';
 
 import DevIndexPage from './components/DevIndexPage';
 
@@ -29,8 +29,8 @@ const pathToTab = {
     '/lessons/supporting-growth-mindset': 'lessons',
     '/admin': 'tutors',
     '/research-assistant': 'tutors',
-    '/weekly-reports': 'weekly-report',
-    '/weekly-report': 'weekly-report'
+    '/monthly-reports': 'reviews',
+    '/monthly-report': 'reviews'
 };
 
 // Map URL paths to user type (tutor vs supervisor)
@@ -43,8 +43,8 @@ const pathToUserType = {
     '/lessons/supporting-growth-mindset': 'tutor',
     '/admin': 'supervisor',
     '/research-assistant': 'supervisor',
-    '/weekly-reports': 'tutor',
-    '/weekly-report': 'tutor'
+    '/monthly-reports': 'tutor',
+    '/monthly-report': 'tutor'
 };
 
 // ShellLayout: Persistent PageLayout with Outlet for child routes
@@ -130,7 +130,7 @@ const ShellLayout = () => {
             if (id === 'home') navigate('/home');
             if (id === 'lessons') navigate('/lessons/supporting-growth-mindset');
             if (id === 'sessions') navigate('/sessions');
-            if (id === 'weekly-report') navigate('/weekly-reports');
+            if (id === 'reviews') navigate('/monthly-reports');
             if (id === 'tutors') navigate(effectivePath === '/research-assistant' ? '/research-assistant' : '/admin');
             if (id === 'onboarding') navigate('/lessons/supporting-growth-mindset');
             if (id === 'admin-sessions') navigate('/admin');
@@ -221,8 +221,8 @@ function App() {
                 <Route path="/lessons/supporting-growth-mindset" element={<LessonsContent />} />
                 <Route path="/admin" element={<TutorAdminContent />} />
                 <Route path="/research-assistant" element={<TutorAdminContent />} />
-                <Route path="/weekly-reports" element={<WeeklyReportsListContent />} />
-                <Route path="/weekly-report" element={<WeeklyReportContent />} />
+                <Route path="/monthly-reports" element={<MonthlyReportsListContent />} />
+                <Route path="/monthly-report" element={<MonthlyReportContent />} />
                 <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
         </Routes>

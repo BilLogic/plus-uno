@@ -1,12 +1,19 @@
+/**
+ * WeeklyReportsListContent
+ * Content-only version of WeeklyReportsListPage for use inside ShellLayout.
+ * No PageLayout wrapper - uses ShellContext to update TopBar/Layout config.
+ */
+
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Pagination from '@/components/Pagination/Pagination';
 import Progress from '@/components/Progress/Progress';
-import { ShellContext } from '../context/ShellContext';
-import './WeeklyReportsContent.scss';
+import { ShellContext } from '../../home-redesign/src/context/ShellContext';
+import './WeeklyReportsListPage.scss';
 
+// Mock data for weekly reports
 const REPORTS_DATA = [
     { id: 1, week: 18, dateRange: 'Jan 27 – 31, 2026', status: 'Not viewed', completion: { done: 0, total: 5 } },
     { id: 2, week: 17, dateRange: 'Jan 20 – 24, 2026', status: 'Viewed', completion: { done: 5, total: 5 } },
@@ -21,34 +28,62 @@ const AVG_COMPLETION = 84;
 const COMPLETION_DELTA = 2;
 const ITEMS_PER_PAGE = 6;
 
-export default function WeeklyReportsListPage() {
+export default function WeeklyReportsListContent() {
     const navigate = useNavigate();
-    const { setBreadcrumbs, setActiveTabOverride, setContentDirect, setFloatingContent } = useContext(ShellContext);
+    const { setBreadcrumbs, setMainClassName, setFloatingContent } = useContext(ShellContext);
     const [currentPage, setCurrentPage] = useState(1);
+    const [hasEntered, setHasEntered] = useState(false);
 
+    // Set shell context on mount
     useEffect(() => {
         setBreadcrumbs([
-            { text: 'Toolkit', href: '/weekly-reports' },
-            { text: 'Reports' }
+            { text: 'Toolkit', href: '/home' },
+            { text: 'Reviews', href: '/weekly-reports' }
         ]);
-        setActiveTabOverride('weekly-report');
-        setContentDirect(false);
+        setMainClassName('weekly-reports-content');
         setFloatingContent(null);
-        return () => setActiveTabOverride(null);
-    }, [setBreadcrumbs, setActiveTabOverride, setContentDirect, setFloatingContent]);
+    }, [setBreadcrumbs, setMainClassName, setFloatingContent]);
+
+    useEffect(() => {
+        requestAnimationFrame(() => setHasEntered(true));
+    }, []);
+
+    // Hide scrollbar programmatically
+    useEffect(() => {
+        const styleId = 'weekly-reports-list-scrollbar-hide';
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
+                .weekly-reports-content::-webkit-scrollbar {
+                    display: none !important;
+                    width: 0 !important;
+                }
+                .weekly-reports-content {
+                    scrollbar-width: none !important;
+                    -ms-overflow-style: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        return () => {
+            const style = document.getElementById(styleId);
+            if (style) style.remove();
+        };
+    }, []);
 
     const totalPages = Math.ceil(TOTAL_REPORTS / ITEMS_PER_PAGE);
 
-    const handleViewReport = () => {
+    const handleViewReport = (weekId) => {
         navigate('/weekly-report');
     };
 
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, TOTAL_REPORTS);
 
-    const getStatusBadgeStyle = (status) => (
-        status === 'Unviewed' || status === 'Not viewed' ? 'warning' : 'success'
-    );
+    const getStatusBadgeStyle = (status) => {
+        return (status === 'Unviewed' || status === 'Not viewed') ? 'warning' : 'success';
+    };
 
     const getProgressColor = (done, total) => {
         const pct = (done / total) * 100;
@@ -58,10 +93,43 @@ export default function WeeklyReportsListPage() {
     };
 
     return (
-        <>
-            <div className="reports-header-row page-content-reveal" style={{ animationDelay: '0ms' }}>
+        <div
+            id="weekly-reports-list-page"
+            className={`reveal-root ${hasEntered ? 'has-entered' : ''}`}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+            }}
+        >
+            <style>{`
+                @keyframes revealIn {
+                    from { opacity: 0; transform: translateY(24px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .reveal-root .reveal-section {
+                    opacity: 0;
+                }
+                .reveal-root.has-entered .reveal-section {
+                    animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                }
+                .reveal-root .reveal-row {
+                    opacity: 0;
+                }
+                .reveal-root.has-entered .reveal-row {
+                    animation: revealIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .reveal-root .reveal-section,
+                    .reveal-root .reveal-row {
+                        opacity: 1;
+                        animation: none !important;
+                    }
+                }
+            `}</style>
+            <div className="reports-header-row reveal-section" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2-txt">Weekly Reports</h1>
+                    <h1 className="h2-txt">Weekly Reviews</h1>
                     <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>
@@ -78,12 +146,14 @@ export default function WeeklyReportsListPage() {
                     </div>
                     <div className="stat-item">
                         <span className="stat-label">TOTAL REPORTS</span>
-                        <div className="stat-value">{TOTAL_REPORTS}</div>
+                        <div className="stat-value">
+                            {TOTAL_REPORTS}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="reports-table-container page-content-reveal" style={{ animationDelay: '100ms' }}>
+            <div className="reports-table-container reveal-section" style={{ animationDelay: '200ms' }}>
                 <table className="reports-table">
                     <thead>
                         <tr>
@@ -95,8 +165,13 @@ export default function WeeklyReportsListPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {REPORTS_DATA.map((report) => (
-                            <tr key={report.id} onClick={handleViewReport}>
+                        {REPORTS_DATA.map((report, i) => (
+                            <tr
+                                key={report.id}
+                                className="reveal-row"
+                                style={{ animationDelay: `${400 + i * 80}ms` }}
+                                onClick={() => handleViewReport(report.id)}
+                            >
                                 <td className="body2-txt">Week {report.week}</td>
                                 <td className="body2-txt">{report.dateRange}</td>
                                 <td>
@@ -109,12 +184,17 @@ export default function WeeklyReportsListPage() {
                                 </td>
                                 <td>
                                     <div className="completion-cell">
-                                        <Progress
-                                            value={(report.completion.done / report.completion.total) * 100}
-                                            style={getProgressColor(report.completion.done, report.completion.total)}
-                                            className="completion-progress"
-                                            size="small"
-                                        />
+                                        <div
+                                            className="completion-progress-shell"
+                                            style={{ '--progress-delay': `${520 + i * 80}ms` }}
+                                        >
+                                            <Progress
+                                                value={(report.completion.done / report.completion.total) * 100}
+                                                style={getProgressColor(report.completion.done, report.completion.total)}
+                                                className="completion-progress completion-progress--staged"
+                                                size="small"
+                                            />
+                                        </div>
                                         <span className="body3-txt">
                                             {report.completion.done}/{report.completion.total}
                                         </span>
@@ -129,7 +209,7 @@ export default function WeeklyReportsListPage() {
                                         trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleViewReport();
+                                            handleViewReport(report.id);
                                         }}
                                         className="view-report-btn"
                                     />
@@ -140,7 +220,7 @@ export default function WeeklyReportsListPage() {
                 </table>
             </div>
 
-            <footer className="reports-footer page-content-reveal" style={{ animationDelay: '200ms' }}>
+            <footer className="reports-footer reveal-section" style={{ animationDelay: '900ms' }}>
                 <span className="body3-txt text-muted">
                     Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of <strong>{TOTAL_REPORTS}</strong> results
                 </span>
@@ -152,6 +232,6 @@ export default function WeeklyReportsListPage() {
                     />
                 </div>
             </footer>
-        </>
+        </div>
     );
 }

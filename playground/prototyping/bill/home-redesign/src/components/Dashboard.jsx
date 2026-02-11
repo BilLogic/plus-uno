@@ -41,7 +41,7 @@ const DEFAULT_SKILLS_OVERVIEW = {
     averagePerformance: [90, 90, 100, 80, 70],
 };
 
-const WEEKLY_LOAD_SEGMENTS = [
+const MONTHLY_LOAD_SEGMENTS = [
     { label: 'Direct tutoring', hours: 8.0, color: '#0472a8' },
     { label: 'Student support & follow-ups', hours: 4.0, color: '#8659a9' },
     { label: 'Prep & planning', hours: 2.5, color: '#c70b77' },
@@ -50,7 +50,7 @@ const WEEKLY_LOAD_SEGMENTS = [
 const TOTAL_HOURS = 20;
 const SCHEDULED_HOURS = 16.8;
 const SCHEDULED_PCT = 84;
-const WEEKLY_REVEAL_DELAY = 640;
+const MONTHLY_REVEAL_DELAY = 640;
 const MOMENTUM_REVEAL_DELAY = 960;
 
 const STUDENT_MOMENTUM_DATA = [
@@ -71,18 +71,18 @@ const PERSONALIZED_TRAININGS = [
     { id: '4', title: 'Supporting a Growth Mindset', category: 'Social-Emotional Learning', duration: '12 mins', badgeType: 'socio-emotional', image: imgSupportingGrowthMindset },
 ];
 
-function WeeklyTutoringLoadCard() {
+function MonthlyTutoringLoadCard() {
     const donutSegments = useMemo(() => [
-        ...WEEKLY_LOAD_SEGMENTS.map((s) => ({ value: (s.hours / TOTAL_HOURS) * 100, color: s.color, label: s.label })),
+        ...MONTHLY_LOAD_SEGMENTS.map((s) => ({ value: (s.hours / TOTAL_HOURS) * 100, color: s.color, label: s.label })),
         { value: 100 - SCHEDULED_PCT, color: '#bec8ca', label: 'Unscheduled' },
     ], []);
     return (
-        <div className="home-redesign-section-card home-redesign-weekly-load-inner">
-            <h4 className="h4 home-redesign-card-title">Weekly Tutoring Load</h4>
-            <div className="home-redesign-weekly-top">
-                <div className="home-redesign-weekly-summary">
-                    <span className="h1 home-redesign-weekly-value">{SCHEDULED_HOURS} hrs</span>
-                    <span className="body2-txt home-redesign-weekly-of">of {TOTAL_HOURS.toFixed(1)} hrs</span>
+        <div className="home-redesign-section-card home-redesign-monthly-load-inner">
+            <h4 className="h4 home-redesign-card-title">Monthly Tutoring Load</h4>
+            <div className="home-redesign-monthly-top">
+                <div className="home-redesign-monthly-summary">
+                    <span className="h1 home-redesign-monthly-value">{SCHEDULED_HOURS} hrs</span>
+                    <span className="body2-txt home-redesign-monthly-of">of {TOTAL_HOURS.toFixed(1)} hrs</span>
                 </div>
                 <div className="home-redesign-donut-wrap">
                     <DonutChart
@@ -95,7 +95,7 @@ function WeeklyTutoringLoadCard() {
                 </div>
             </div>
             <ul className="home-redesign-breakdown">
-                {WEEKLY_LOAD_SEGMENTS.slice(0, 3).map((segment, index) => (
+                {MONTHLY_LOAD_SEGMENTS.slice(0, 3).map((segment, index) => (
                     <li key={segment.label} className="home-redesign-breakdown-row">
                         <div className="home-redesign-breakdown-label-line">
                             <span className="home-redesign-breakdown-label">{segment.label}</span>
@@ -103,7 +103,7 @@ function WeeklyTutoringLoadCard() {
                         </div>
                         <div
                             className="home-redesign-breakdown-progress-wrap"
-                            style={{ ['--color-primary']: segment.color, ['--progress-delay']: `${WEEKLY_REVEAL_DELAY + index * 160}ms` }}
+                            style={{ ['--color-primary']: segment.color, ['--progress-delay']: `${MONTHLY_REVEAL_DELAY + index * 160}ms` }}
                         >
                             <Progress
                                 value={(segment.hours / TOTAL_HOURS) * 100}
@@ -305,8 +305,8 @@ export const Dashboard = () => {
                                     radarHeight="100%"
                                 />
                             </div>
-                            <div className="home-redesign-card-weekly">
-                                <WeeklyTutoringLoadCard />
+                            <div className="home-redesign-card-monthly">
+                                <MonthlyTutoringLoadCard />
                             </div>
                             <div className="home-redesign-card-momentum">
                                 <StudentMomentumCard />

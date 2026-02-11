@@ -3,9 +3,10 @@ import Button from '@/components/Button/Button';
 import Badge from '@/components/Badge/Badge';
 import Alert from '@/components/Alert/Alert';
 import Progress from '@/components/Progress/Progress';
+import Accordion from '@/components/Accordion/Accordion';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import { ShellContext } from '../../home-redesign/src/context/ShellContext';
-import './WeeklyReportPage.scss';
+import './MonthlyReportPage.scss';
 
 // Training card images
 import imgGivingEffectivePraise from '../../home-redesign/src/assets/giving-effective-praise.png';
@@ -16,11 +17,11 @@ import imgSupportingGrowthMindset from '../../home-redesign/src/assets/supportin
 // Mock Data
 const REPORT_DATA = {
     userName: 'Boyuan',
-    dateRange: 'Jan 27 – Jan 31, 2026',
-    weekLabel: 'Week 18',
+    dateRange: 'January 2026',
+    monthLabel: 'Jan 2026',
     impact: {
-        learningTime: { value: 147, unit: 'min', delta: '+22% vs last week', deltaType: 'success' },
-        skillsMastered: { value: 18, unit: 'skills', delta: '+4 vs last week', deltaType: 'success' }
+        learningTime: { value: 147, unit: 'min', delta: '+22% vs last month', deltaType: 'success' },
+        skillsMastered: { value: 18, unit: 'skills', delta: '+4 vs last month', deltaType: 'success' }
     },
     stats: [
         { label: 'Sessions', value: 12, icon: 'fa-video', color: 'blue' },
@@ -36,12 +37,19 @@ const REPORT_DATA = {
         { label: 'Troubleshooting', value: 10, color: 'amber', icon: 'fa-wrench' },
         { label: 'Other', value: 6, color: 'slate', icon: 'fa-ellipsis' }
     ],
-    timeInsight: 'You spent 10% more time on Goal Setting this week compared to last week. Great job focusing on student objectives early in the sessions!',
+    peerAverage: [
+        { label: 'Active Tutoring', value: 45, color: 'primary' },
+        { label: 'Goal Setting', value: 10, color: 'indigo' },
+        { label: 'Observing', value: 25, color: 'teal' },
+        { label: 'Troubleshooting', value: 15, color: 'amber' },
+        { label: 'Other', value: 5, color: 'slate' }
+    ],
+    timeInsight: 'You spent 10% more time on Goal Setting this month compared to last month. Great job focusing on student objectives early in the sessions!',
     dimensions: [
         { id: 1, title: 'Interpersonal Comfort', subStatus: 'Greeting & rapport-building', icon: 'fa-user', iconBg: 'emerald', status: 'Demonstrated', summary: 'You consistently greeted students by name, asked about their week, and established a warm tone. Observed in 11 of 12 sessions.', evidence: 'Hey Marcus! Good to see you again. Before we get started, how\'d that math test go? … That\'s awesome, I\'m glad you felt good about it.', session: 'PS 234 • Tue Jan 28, 2:32 PM • 0:00–0:45', lessonUrl: '#' },
         { id: 2, title: 'Response to Help Requests', subStatus: 'Redirecting rather than giving answers', icon: 'fa-hand', iconBg: 'amber', status: 'Developing', summary: 'In 4 of 8 observed help requests, you provided the answer directly. Try responding with a leading question first, like "What do you think the first step might be?"', evidence: 'Student: I don\'t know how to do this one. — Tutor: OK so the answer here is 42, because you need to multiply 6 times 7.', session: 'PS 234 • Wed Jan 29, 3:15 PM • 12:30–13:10', lessonUrl: '#', needsWork: true },
         { id: 3, title: 'Prompting for Self-Explanation', subStatus: 'Asking students to explain their thinking', icon: 'fa-lightbulb', iconBg: 'stone', status: 'Developing', summary: 'Self-explanation prompts observed in only 3 of 12 sessions. Try asking "Can you walk me through how you figured that out?"', evidence: 'Student answers correctly. Tutor: "Good job!" and moves to next problem, without asking how they arrived at the answer.', session: 'PS 234 • Thu Jan 30, 2:50 PM • 8:20–8:45', lessonUrl: '#', needsWork: true },
-        { id: 4, title: 'Reacting to Errors', subStatus: 'Normalizing mistakes & guiding correction', icon: 'fa-exclamation-triangle', iconBg: 'amber', status: 'Not Observed', summary: 'The AI did not find clear instances of student errors during the analyzed portions of this week\'s recordings. This dimension will be evaluated again when opportunities arise.', evidence: null, session: null, lessonUrl: '#' },
+        { id: 4, title: 'Reacting to Errors', subStatus: 'Normalizing mistakes & guiding correction', icon: 'fa-exclamation-triangle', iconBg: 'amber', status: 'Not Observed', summary: 'The AI did not find clear instances of student errors during the analyzed portions of this month\'s recordings. This dimension will be evaluated again when opportunities arise.', evidence: null, session: null, lessonUrl: '#' },
         { id: 5, title: 'Checking for Understanding', subStatus: 'Frequent comprehension checks', icon: 'fa-check-circle', iconBg: 'emerald', status: 'Demonstrated', summary: 'Great job pausing after key concepts to ask "Does that make sense?" and "How would you explain this in your own words?".', evidence: 'So before we move on, can you tell me what the first step was?', session: 'PS 234 • Fri Jan 31, 4:10 PM', lessonUrl: '#' }
     ],
     training: [
@@ -49,6 +57,67 @@ const REPORT_DATA = {
         { id: '2', title: 'Reacting to Errors', category: 'Advocacy', duration: '12 mins', badgeType: 'advocacy', image: imgReactingToErrors },
         { id: '3', title: 'Prompting Students to Explain', category: 'Technology Tools', duration: '12 mins', badgeType: 'technology-tools', image: imgPromptingStudentsToExplain },
         { id: '4', title: 'Supporting a Growth Mindset', category: 'Social-Emotional Learning', duration: '12 mins', badgeType: 'socio-emotional', image: imgSupportingGrowthMindset }
+    ],
+    goalProgress: [
+        {
+            id: 1,
+            abbr: 'LH',
+            abbrColor: '#3b82f6',
+            school: 'Lincoln High',
+            teacher: 'Mrs. Smith',
+            students: [
+                { initials: 'JI', color: '#ef4444' },
+                { initials: 'AL', color: '#f59e0b' },
+                { initials: 'RI', color: '#10b981' },
+                { initials: 'SI', color: '#eab308' }
+            ],
+            extraStudents: 2,
+            progressGoal: 85,
+            progressDelta: '+5%',
+            progressDeltaType: 'success',
+            effortGoal: 92,
+            effortDelta: '+2%',
+            effortDeltaType: 'success'
+        },
+        {
+            id: 2,
+            abbr: 'WA',
+            abbrColor: '#10b981',
+            school: 'Washington Academy',
+            teacher: 'Mr. Johnson',
+            students: [
+                { initials: 'MI', color: '#f59e0b' },
+                { initials: 'EV', color: '#10b981' },
+                { initials: 'LI', color: '#8b5cf6' }
+            ],
+            extraStudents: 3,
+            progressGoal: 72,
+            progressDelta: '-3%',
+            progressDeltaType: 'danger',
+            effortGoal: 78,
+            effortDelta: '+1%',
+            effortDeltaType: 'success'
+        },
+        {
+            id: 3,
+            abbr: 'RV',
+            abbrColor: '#f59e0b',
+            school: 'River Valley HS',
+            teacher: 'Ms. Davis',
+            students: [
+                { initials: 'JI', color: '#3b82f6' },
+                { initials: 'KI', color: '#f59e0b' },
+                { initials: 'TV', color: '#10b981' },
+                { initials: 'NI', color: '#8b5cf6' }
+            ],
+            extraStudents: 4,
+            progressGoal: 94,
+            progressDelta: '0%',
+            progressDeltaType: 'neutral',
+            effortGoal: 88,
+            effortDelta: '-2%',
+            effortDeltaType: 'danger'
+        }
     ]
 };
 
@@ -57,10 +126,10 @@ const FILTERED_TRAINING = REPORT_DATA.training.filter(t => TRAININGS_TO_SHOW.inc
 const STAT_KEYS = ['sessions', 'hours', 'students', 'schools'];
 
 /**
- * WeeklyReportContent: Content-only version for use inside ShellLayout.
+ * MonthlyReportContent: Content-only version for use inside ShellLayout.
  * Uses ShellContext to update TopBar breadcrumbs and mainClassName.
  */
-export default function WeeklyReportContent() {
+export default function MonthlyReportContent() {
     const { setBreadcrumbs, setMainClassName } = useContext(ShellContext);
 
     const [reviewedCount, setReviewedCount] = useState(0);
@@ -78,6 +147,7 @@ export default function WeeklyReportContent() {
         schools: 0
     });
     const [animatedTimeAlloc, setAnimatedTimeAlloc] = useState(REPORT_DATA.timeAllocation.map(() => 0));
+    const [animatedPeerAlloc, setAnimatedPeerAlloc] = useState(REPORT_DATA.peerAverage.map(() => 0));
     const [animatedReviewPct, setAnimatedReviewPct] = useState(0);
     const totalDimensions = REPORT_DATA.dimensions.length;
     const prefersReducedMotionRef = useRef(false);
@@ -86,10 +156,10 @@ export default function WeeklyReportContent() {
     useEffect(() => {
         setBreadcrumbs([
             { text: 'Toolkit', href: '/' },
-            { text: 'Reports', href: '/weekly-reports' },
-            { text: 'Week 18' }
+            { text: 'Reviews', href: '/monthly-reports' },
+            { text: 'Jan 2026' }
         ]);
-        setMainClassName('weekly-report-page-scroller');
+        setMainClassName('monthly-report-page-scroller');
     }, [setBreadcrumbs, setMainClassName]);
 
     useEffect(() => {
@@ -113,11 +183,13 @@ export default function WeeklyReportContent() {
             schools: REPORT_DATA.stats[3].value
         };
         const timeAllocTargets = REPORT_DATA.timeAllocation.map((seg) => seg.value);
+        const peerAllocTargets = REPORT_DATA.peerAverage.map((seg) => seg.value);
         const reviewTarget = (reviewedCount / totalDimensions) * 100;
 
         if (prefersReducedMotionRef.current) {
             setAnimatedImpact(impactTargets);
             setAnimatedTimeAlloc(timeAllocTargets);
+            setAnimatedPeerAlloc(peerAllocTargets);
             setAnimatedReviewPct(reviewTarget);
             setHasPlayedDataAnim(true);
             return;
@@ -170,6 +242,10 @@ export default function WeeklyReportContent() {
         }, 220));
 
         timerIds.push(window.setTimeout(() => {
+            setAnimatedPeerAlloc(peerAllocTargets);
+        }, 340));
+
+        timerIds.push(window.setTimeout(() => {
             tweenNumber({
                 to: reviewTarget,
                 onUpdate: (value) => setAnimatedReviewPct(value)
@@ -179,6 +255,7 @@ export default function WeeklyReportContent() {
         timerIds.push(window.setTimeout(() => {
             setAnimatedImpact(impactTargets);
             setAnimatedTimeAlloc(timeAllocTargets);
+            setAnimatedPeerAlloc(peerAllocTargets);
             setAnimatedReviewPct(reviewTarget);
             setIsDataAnimActive(false);
             setHasPlayedDataAnim(true);
@@ -192,7 +269,7 @@ export default function WeeklyReportContent() {
 
     // Hide scrollbar programmatically
     useEffect(() => {
-        const styleId = 'weekly-report-scrollbar-hide';
+        const styleId = 'monthly-report-scrollbar-hide';
         if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
             style.id = styleId;
@@ -201,7 +278,7 @@ export default function WeeklyReportContent() {
                 #spa-shell .plus-page-content-wrapper::-webkit-scrollbar,
                 #home-redesign-page .plus-page-main::-webkit-scrollbar,
                 #home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar,
-                .weekly-report-page-scroller::-webkit-scrollbar {
+                .monthly-report-page-scroller::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
                     background: transparent !important;
@@ -210,7 +287,7 @@ export default function WeeklyReportContent() {
                 #spa-shell .plus-page-content-wrapper,
                 #home-redesign-page .plus-page-main,
                 #home-redesign-page .plus-page-content-wrapper,
-                .weekly-report-page-scroller {
+                .monthly-report-page-scroller {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;
                 }
@@ -274,7 +351,7 @@ export default function WeeklyReportContent() {
     };
 
     return (
-        <div className={`weekly-report reveal-root ${hasEntered ? 'has-entered' : ''} ${isDataAnimActive ? 'data-anim-active' : ''}`}>
+        <div className={`monthly-report reveal-root ${hasEntered ? 'has-entered' : ''} ${isDataAnimActive ? 'data-anim-active' : ''}`}>
             <style>{`
                 @keyframes revealIn {
                     from { opacity: 0; transform: translateY(24px); }
@@ -296,12 +373,12 @@ export default function WeeklyReportContent() {
             {/* Header */}
             <header className="report-header reveal-section" style={{ animationDelay: '0ms' }}>
                 <div>
-                    <h1 className="header-title">Your Week in Review, {REPORT_DATA.userName}</h1>
+                    <h1 className="header-title">Your Month in Review, {REPORT_DATA.userName}</h1>
                     <div className="header-meta">
                         <span>{REPORT_DATA.dateRange}</span>
                         <span className="header-meta-dot"></span>
-                        <div className="week-badge-container">
-                            <Badge text={REPORT_DATA.weekLabel} style="primary" size="default" fill="tonal" />
+                        <div className="month-badge-container">
+                            <Badge text={REPORT_DATA.monthLabel} style="primary" size="default" fill="tonal" />
                         </div>
                     </div>
                 </div>
@@ -328,10 +405,6 @@ export default function WeeklyReportContent() {
                                             <span className="metric-value-xl">{Math.round(animatedImpact.learningTime)}</span>
                                             <span className="metric-unit">{REPORT_DATA.impact.learningTime.unit}</span>
                                         </div>
-                                        <div className={`delta-badge delta-badge--${REPORT_DATA.impact.learningTime.deltaType}`}>
-                                            <i className="fa-solid fa-arrow-trend-up"></i>
-                                            {REPORT_DATA.impact.learningTime.delta}
-                                        </div>
                                         <p className="metric-label data-anim-enter" style={{ '--text-delay': '380ms' }}>Total Student Learning Time</p>
                                     </div>
                                     <div className="impact-divider"></div>
@@ -339,10 +412,6 @@ export default function WeeklyReportContent() {
                                         <div className="metric-value-row">
                                             <span className="metric-value-xl">{Math.round(animatedImpact.skillsMastered)}</span>
                                             <span className="metric-unit">{REPORT_DATA.impact.skillsMastered.unit}</span>
-                                        </div>
-                                        <div className={`delta-badge delta-badge--${REPORT_DATA.impact.skillsMastered.deltaType}`}>
-                                            <i className="fa-solid fa-arrow-trend-up"></i>
-                                            {REPORT_DATA.impact.skillsMastered.delta}
                                         </div>
                                         <p className="metric-label data-anim-enter" style={{ '--text-delay': '430ms' }}>Concepts Mastered</p>
                                     </div>
@@ -376,34 +445,71 @@ export default function WeeklyReportContent() {
 
             {/* Time Allocation */}
             <section className="time-allocation-section reveal-section" style={{ animationDelay: '400ms' }}>
-                <h3 className="time-allocation-title data-anim-enter" style={{ '--text-delay': '380ms' }}>Time Allocation</h3>
+                <div className="time-allocation-header">
+                    <div>
+                        <h3 className="time-allocation-title data-anim-enter" style={{ '--text-delay': '380ms' }}>Time Allocation with Students</h3>
+                        <p className="time-allocation-subtitle data-anim-enter" style={{ '--text-delay': '400ms' }}>
+                            See how your session time breaks down compared to the tutor average.
+                        </p>
+                    </div>
+                </div>
+                {/* Your Breakdown */}
+                <div className="time-allocation-bar-group">
+                    <div className="time-allocation-bar-header">
+                        <span className="time-allocation-bar-label data-anim-enter" style={{ '--text-delay': '440ms' }}>Your Breakdown</span>
+                        <span className="time-allocation-bar-total data-anim-enter" style={{ '--text-delay': '440ms' }}>Total: 100%</span>
+                    </div>
+                    <div className={`time-allocation-bar ${isDataAnimActive ? 'time-allocation-bar--animate' : ''}`}>
+                        {REPORT_DATA.timeAllocation.map((seg, i) => (
+                            <div
+                                key={i}
+                                className={`time-allocation-segment time-allocation-segment--${seg.color}`}
+                                style={{
+                                    '--segment-target': `${seg.value}%`,
+                                    '--segment-delay': `${220 + i * 70}ms`,
+                                    width: `${animatedTimeAlloc[i]}%`
+                                }}
+                                title={`${seg.label}: ${seg.value}%`}
+                            >
+                                {seg.value >= 8 && <span className="segment-label">{seg.value}%</span>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                {/* Peer Average */}
+                <div className="time-allocation-bar-group">
+                    <div className="time-allocation-bar-header">
+                        <span className="time-allocation-bar-label time-allocation-bar-label--peer data-anim-enter" style={{ '--text-delay': '500ms' }}>Peer Average</span>
+                        <span className="time-allocation-bar-total data-anim-enter" style={{ '--text-delay': '500ms' }}>Total: 100%</span>
+                    </div>
+                    <div className={`time-allocation-bar time-allocation-bar--peer ${isDataAnimActive ? 'time-allocation-bar--animate' : ''}`}>
+                        {REPORT_DATA.peerAverage.map((seg, i) => (
+                            <div
+                                key={i}
+                                className={`time-allocation-segment time-allocation-segment--${seg.color}`}
+                                style={{
+                                    '--segment-target': `${seg.value}%`,
+                                    '--segment-delay': `${340 + i * 70}ms`,
+                                    width: `${animatedPeerAlloc[i]}%`
+                                }}
+                                title={`${seg.label}: ${seg.value}%`}
+                            >
+                                {seg.value >= 8 && <span className="segment-label">{seg.value}%</span>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
                 <div className="time-allocation-legend">
                     {REPORT_DATA.timeAllocation.map((seg, i) => (
-                        <div key={i} className="legend-item data-anim-enter" style={{ '--text-delay': `${420 + i * 50}ms` }}>
+                        <div key={i} className="legend-item data-anim-enter" style={{ '--text-delay': `${520 + i * 50}ms` }}>
                             <div className={`legend-dot legend-dot--${seg.color}`}></div>
-                            <span className="legend-label">
-                                {seg.label}: <span className="legend-value data-anim-enter" style={{ '--text-delay': `${460 + i * 50}ms` }}>{seg.value}%</span>
-                            </span>
+                            <span className="legend-label">{seg.label}</span>
                         </div>
-                    ))}
-                </div>
-                <div className={`time-allocation-bar ${isDataAnimActive ? 'time-allocation-bar--animate' : ''}`} style={{ height: '40px' }}>
-                    {REPORT_DATA.timeAllocation.map((seg, i) => (
-                        <div
-                            key={i}
-                            className={`time-allocation-segment time-allocation-segment--${seg.color}`}
-                            style={{
-                                '--segment-target': `${seg.value}%`,
-                                '--segment-delay': `${220 + i * 70}ms`,
-                                width: `${animatedTimeAlloc[i]}%`
-                            }}
-                            title={`${seg.label}: ${seg.value}%`}
-                        ></div>
                     ))}
                 </div>
                 <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                     <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
-                    You spent 10% more time on Goal Setting this week compared to last week. Great job focusing on student objectives early in the sessions!
+                    You spent 10% more time on Goal Setting this month compared to last month. Great job focusing on student objectives early in the sessions!
                 </Alert>
             </section>
 
@@ -487,15 +593,14 @@ export default function WeeklyReportContent() {
                                             {dim.evidence && (
                                                 <div className={`quote-block quote-block--${dim.iconBg === 'emerald' ? 'success' : dim.iconBg === 'amber' || dim.iconBg === 'rose' ? 'warning' : 'primary'}`}>
                                                     <p className="quote-text">"{dim.evidence}"</p>
-                                                </div>
-                                            )}
-                                            {dim.session && (
-                                                <div className="session-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span className="session-info body3-txt text-muted">{dim.session}</span>
-                                                    <Button size="small" style="primary" fill="tonal">
-                                                        <i className="fa-solid fa-play-circle" style={{ marginRight: 'var(--size-element-gap-xs)' }}></i>
-                                                        View Recording
-                                                    </Button>
+                                                    {dim.session && (
+                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                            <span className="session-info body3-txt text-muted">
+                                                                <i className="fa-solid fa-video" style={{ marginRight: '8px' }}></i>
+                                                                {dim.session}
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                             {(state === 'under_review' || state === 'reviewed') && (
@@ -538,35 +643,121 @@ export default function WeeklyReportContent() {
                 </div>
             </section>
 
-            {/* Training */}
-            <section className={`training-section ${!allReviewed ? 'training-section--locked' : ''} reveal-section`} style={{ animationDelay: '800ms' }}>
-                <div className="training-header">
-                    <div className="training-title-row">
-                        {!allReviewed && <i className="fa-solid fa-lock training-lock-icon"></i>}
-                        <h2 className="section-title">Recommended Training</h2>
+            <Accordion defaultActiveKey={[]} alwaysOpen className="monthly-report-accordion reveal-section" style={{ animationDelay: '800ms' }}>
+                <Accordion.Item eventKey="0" header="Recommended Training to Review">
+                    <div className="training-carousel">
+                        <div className="training-grid">
+                            {FILTERED_TRAINING.map((t) => (
+                                <RecommendedLessons
+                                    key={t.id}
+                                    breakpoint="XXL & above"
+                                    badgeType={t.badgeType}
+                                    title={t.title}
+                                    duration={t.duration}
+                                    status="in-progress"
+                                    aiRecommended={false}
+                                    image={t.image}
+                                    actionLabel="Start"
+                                    onReviewClick={() => { }}
+                                />
+                            ))}
+                        </div>
                     </div>
-                    {!allReviewed && (
-                        <span className="training-hint">Unlock after reviewing all insights</span>
-                    )}
-                </div>
-                <div className="training-carousel">
-                    <div className="training-grid">
-                        {FILTERED_TRAINING.map((t) => (
-                            <RecommendedLessons
-                                key={t.id}
-                                breakpoint="XXL & above"
-                                badgeType={t.badgeType}
-                                title={t.title}
-                                duration={t.duration}
-                                status="in-progress"
-                                aiRecommended={false}
-                                image={t.image}
-                                actionLabel="Start"
-                                onReviewClick={() => { }}
-                                className={!allReviewed ? 'training-card--disabled' : ''}
-                            />
-                        ))}
+                </Accordion.Item>
+                <Accordion.Item eventKey="1" header="Student Goal Progress">
+                    <table className="goal-progress-table">
+                        <thead>
+                            <tr>
+                                <th>SCHOOL NAME</th>
+                                <th>STUDENTS</th>
+                                <th>PROGRESS GOAL</th>
+                                <th>EFFORT GOAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {REPORT_DATA.goalProgress.map((row) => (
+                                <tr key={row.id}>
+                                    <td>
+                                        <div className="school-cell">
+                                            <div className="school-abbr" style={{ borderColor: row.abbrColor, color: row.abbrColor }}>
+                                                {row.abbr}
+                                            </div>
+                                            <div className="school-info">
+                                                <span className="school-name">{row.school}</span>
+                                                <span className="school-teacher">{row.teacher}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="students-cell">
+                                            {row.students.map((s, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="student-avatar"
+                                                    style={{ backgroundColor: `${s.color}18`, color: s.color, zIndex: row.students.length - i }}
+                                                >
+                                                    {s.initials}
+                                                </div>
+                                            ))}
+                                            {row.extraStudents > 0 && (
+                                                <div className="student-avatar student-avatar--extra">
+                                                    +{row.extraStudents}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="goal-cell">
+                                            <Progress
+                                                value={row.progressGoal}
+                                                style="primary"
+                                                className="goal-progress-bar"
+                                                size="small"
+                                            />
+                                            <span className="goal-value">{row.progressGoal}%</span>
+                                            <span className={`goal-delta goal-delta--${row.progressDeltaType}`}>
+                                                {row.progressDeltaType !== 'neutral' && <i className={`fa-solid ${row.progressDeltaType === 'success' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}`}></i>}
+                                                {row.progressDeltaType === 'neutral' && '–'} {row.progressDelta}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="goal-cell">
+                                            <Progress
+                                                value={row.effortGoal}
+                                                style="secondary"
+                                                className="goal-progress-bar goal-progress-bar--effort"
+                                                size="small"
+                                            />
+                                            <span className="goal-value">{row.effortGoal}%</span>
+                                            <span className={`goal-delta goal-delta--${row.effortDeltaType}`}>
+                                                {row.effortDeltaType !== 'neutral' && <i className={`fa-solid ${row.effortDeltaType === 'success' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}`}></i>}
+                                                {row.effortDeltaType === 'neutral' && '–'} {row.effortDelta}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </Accordion.Item>
+            </Accordion>
+
+            {/* CTA: Sign up for more sessions */}
+            <section className="cta-section reveal-section" style={{ animationDelay: '1200ms' }}>
+                <div className="cta-content">
+                    <div className="cta-text">
+                        <h2 className="cta-title">Keep the Momentum Going</h2>
+                        <p className="cta-subtitle">Sign up for additional sessions next month.</p>
                     </div>
+                    <Button
+                        text="Sign up"
+                        style="primary"
+                        fill="filled"
+                        size="medium"
+                        onClick={() => { }}
+                        trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
+                    />
                 </div>
             </section>
         </div>

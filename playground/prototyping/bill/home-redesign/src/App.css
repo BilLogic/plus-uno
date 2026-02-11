@@ -44,7 +44,7 @@
 
 .home-redesign-reveal-root .home-redesign-jumbotron-section,
 .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-tutoring,
-.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-weekly,
+.home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-monthly,
 .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-momentum,
 .home-redesign-reveal-root .home-redesign-trainings-section {
     opacity: 0;
@@ -53,7 +53,7 @@
 
 .home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section,
 .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring,
-.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly,
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-monthly,
 .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum,
 .home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
     animation: revealIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -67,7 +67,7 @@
     animation-delay: 320ms;
 }
 
-.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly {
+.home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-monthly {
     animation-delay: 640ms;
 }
 
@@ -83,12 +83,12 @@
 
     .home-redesign-reveal-root .home-redesign-jumbotron-section,
     .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-tutoring,
-    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-weekly,
+    .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-monthly,
     .home-redesign-reveal-root .home-redesign-three-cards .home-redesign-card-momentum,
     .home-redesign-reveal-root .home-redesign-trainings-section,
     .home-redesign-reveal-root.has-entered .home-redesign-jumbotron-section,
     .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-tutoring,
-    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-weekly,
+    .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-monthly,
     .home-redesign-reveal-root.has-entered .home-redesign-three-cards .home-redesign-card-momentum,
     .home-redesign-reveal-root.has-entered .home-redesign-trainings-section {
         animation: none;
@@ -263,16 +263,16 @@
     box-sizing: border-box;
 }
 
-/* Weekly report needs visible overflow for card elevation and horizontal training carousel */
-#home-redesign-page.weekly-report-page-scroller .plus-page-main-container {
+/* Monthly report needs visible overflow for card elevation and horizontal training carousel */
+#home-redesign-page.monthly-report-page-scroller .plus-page-main-container {
     overflow: visible;
 }
 
-#home-redesign-page.weekly-report-page-scroller .plus-page-content-wrapper {
+#home-redesign-page.monthly-report-page-scroller .plus-page-content-wrapper {
     overflow: visible;
 }
 
-#home-redesign-page.weekly-report-page-scroller .plus-page-main {
+#home-redesign-page.monthly-report-page-scroller .plus-page-main {
     overflow: auto;
 }
 
@@ -325,7 +325,7 @@
 
 /* Single card per section: fill grid cell, min width so no cutoff when sidebar visible */
 .home-redesign-card-tutoring,
-.home-redesign-card-weekly,
+.home-redesign-card-monthly,
 .home-redesign-card-momentum {
     width: 361px;
     min-width: 361px;
@@ -350,15 +350,15 @@
     overflow: hidden;
 }
 
-/* Weekly load: breakdown fills rest of space and is spaced out */
-.home-redesign-weekly-load-inner {
+/* Monthly load: breakdown fills rest of space and is spaced out */
+.home-redesign-monthly-load-inner {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
 }
 
-.home-redesign-weekly-load-inner .home-redesign-breakdown {
+.home-redesign-monthly-load-inner .home-redesign-breakdown {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -367,7 +367,7 @@
     min-height: 0;
 }
 
-.home-redesign-weekly-load-inner .home-redesign-breakdown-row {
+.home-redesign-monthly-load-inner .home-redesign-breakdown-row {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
@@ -398,8 +398,8 @@
     gap: var(--size-element-gap-xs);
 }
 
-/* Weekly Tutoring Load – match Figma 158-21725: scale, layout, typography */
-.home-redesign-weekly-load-inner .home-redesign-card-title {
+/* Monthly Tutoring Load – match Figma 158-21725: scale, layout, typography */
+.home-redesign-monthly-load-inner .home-redesign-card-title {
     font-family: var(--font-family-header);
     font-size: var(--font-size-h4);
     font-weight: var(--font-weight-bold);
@@ -407,7 +407,7 @@
     color: var(--color-on-surface);
 }
 
-.home-redesign-weekly-top {
+.home-redesign-monthly-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -415,14 +415,14 @@
     margin-bottom: var(--size-element-gap-sm, 8px);
 }
 
-.home-redesign-weekly-summary {
+.home-redesign-monthly-summary {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
 /* 16.8 hrs – H1 level, Lato bold; keep on one line */
-.home-redesign-weekly-value {
+.home-redesign-monthly-value {
     font-family: var(--font-family-header);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-h1);
@@ -433,7 +433,7 @@
 }
 
 /* of 20.0 hrs – smaller, regular, body style */
-.home-redesign-weekly-of {
+.home-redesign-monthly-of {
     font-family: var(--font-family-body);
     font-size: var(--font-size-body2);
     font-weight: var(--font-weight-body2-regular);
