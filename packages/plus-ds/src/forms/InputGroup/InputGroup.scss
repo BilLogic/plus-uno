@@ -13,14 +13,19 @@
         border-radius: 0;
     }
     
-    // First element (addon or input) gets left border radius
-    > *:first-child {
+    // Input alone (no addons) gets border-radius 0
+    > .plus-input-group-input:only-child {
+        border-radius: 0;
+    }
+    
+    // First element (addon or input) gets left border radius when there are multiple children
+    > *:first-child:not(:only-child) {
         border-top-left-radius: var(--size-element-radius-md, 4px);
         border-bottom-left-radius: var(--size-element-radius-md, 4px);
     }
     
-    // Last element (addon or input) gets right border radius
-    > *:last-child {
+    // Last element (addon or input) gets right border radius when there are multiple children
+    > *:last-child:not(:only-child) {
         border-top-right-radius: var(--size-element-radius-md, 4px);
         border-bottom-right-radius: var(--size-element-radius-md, 4px);
     }
@@ -72,28 +77,25 @@
 // Size variants for input
 .plus-input-group-small {
     .plus-input-group-input {
-        padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
         font-size: var(--font-size-body3);
         line-height: var(--font-line-height-body3);
-        min-height: 40px;
     }
 }
 
 .plus-input-group-medium {
     .plus-input-group-input {
-        padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
         font-size: var(--font-size-body2);
         line-height: var(--font-line-height-body2);
-        min-height: 48px;
     }
 }
 
 .plus-input-group-large {
     .plus-input-group-input {
-        padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
+        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
         font-size: var(--font-size-body1);
         line-height: var(--font-line-height-body1);
-        min-height: 56px;
     }
 }
 
@@ -107,8 +109,7 @@
     padding: 0;
     margin: 0;
     
-    // Button and Dropdown addons should have primary border color
-    &.plus-input-group-button,
+    // Dropdown addons should have primary border color
     &.plus-input-group-dropdown {
         border-color: var(--color-primary);
     }
@@ -425,52 +426,39 @@
     }
 }
 
-// Button addon
-.plus-input-group-button {
-    padding: 0;
+// Button addon — uses plain div wrapper to avoid Bootstrap border stripping
+.plus-input-group-button-wrapper {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
     
     .plus-input-group-button-element {
-        // Remove Button's own border completely - the addon wrapper provides the border
-        border: none !important;
-        border-width: 0 !important;
-        border-radius: 0 !important;
-        height: 100%;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        // Ensure Button fills the addon container
-        min-width: 0;
-        
-        // Remove any box-shadow that might create a border effect
         box-shadow: none !important;
-        
-        // Override Button's default padding to match InputGroup sizing
-        &.plus-btn--small {
-            padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px) !important;
-        }
-        
-        &.plus-btn--medium {
-            padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px) !important;
-        }
-        
-        &.plus-btn--large {
-            padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px) !important;
-        }
-        
-        // Ensure ghost variant doesn't have any border artifacts
-        &.plus-btn--ghost {
-            border: none !important;
-            border-width: 0 !important;
-        }
-        
-        // Ensure outline variant doesn't show its border (addon wrapper provides it)
-        &.plus-btn--outline {
-            border: none !important;
-            border-width: 0 !important;
-        }
     }
+    
+    // Leading button: remove right border, flatten inner radius
+    &:first-child .plus-input-group-button-element {
+        border-right: none !important;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    
+    // Trailing button: remove left border, flatten inner radius
+    &:last-child .plus-input-group-button-element {
+        border-left: none !important;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+}
+
+// Input border turns primary on the side adjacent to a button wrapper
+.plus-input-group-button-wrapper + .plus-input-group-input {
+    border-left-color: var(--color-primary) !important;
+}
+
+// Use :has() to target the input's right border when followed by a button
+.plus-input-group-wrapper .plus-input-group-input:has(+ .plus-input-group-button-wrapper) {
+    border-right-color: var(--color-primary) !important;
 }
 
 // Dropdown addon

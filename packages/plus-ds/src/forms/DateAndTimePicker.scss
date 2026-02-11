@@ -125,7 +125,7 @@
 
 .plus-datetime-time-input-group {
     display: flex;
-    width: fit-content;
+    width: 100%;
     align-items: stretch;
     
     // Remove default InputGroup styling
@@ -142,8 +142,8 @@
 }
 
 .plus-datetime-time-input {
-    flex: 0 0 auto;
-    width: 70px;
+    flex: 1 1 auto;
+    min-width: 70px;
     border: 0.8px solid;
     border-right: none;
     border-radius: var(--size-element-radius-sm) 0 0 var(--size-element-radius-sm);
@@ -152,14 +152,14 @@
     font-size: var(--font-size-body2);
     line-height: var(--font-line-height-body2);
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-    text-align: center;
+    text-align: left;
     color: var(--color-on-surface-variant);
     background-color: var(--color-surface);
     height: auto;
     min-height: calc(var(--size-element-pad-y-md) * 2 + var(--font-size-body2) * var(--font-line-height-body2));
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     transition: border-color 0.15s ease-in-out, border-width 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
     
     &::placeholder {
@@ -213,6 +213,44 @@
         border-width: 2px;
         border-color: var(--color-inverse-primary);
         margin-left: -2px; // Adjust for 2px border
+    }
+    
+    // Invalid state
+    &.plus-datetime-validation-invalid {
+        border-color: var(--color-danger);
+        
+        // Focus state in invalid
+        .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
+            border-width: 2px;
+            border-color: var(--color-danger);
+            margin-left: -2px;
+        }
+        
+        // Active/expanded state in invalid
+        .plus-datetime-am-pm-dropdown.show & {
+            border-width: 2px;
+            border-color: var(--color-danger);
+            margin-left: -2px;
+        }
+    }
+    
+    // Success state
+    &.plus-datetime-validation-success {
+        border-color: var(--color-success);
+        
+        // Focus state in success
+        .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
+            border-width: 2px;
+            border-color: var(--color-success);
+            margin-left: -2px;
+        }
+        
+        // Active/expanded state in success
+        .plus-datetime-am-pm-dropdown.show & {
+            border-width: 2px;
+            border-color: var(--color-success);
+            margin-left: -2px;
+        }
     }
 }
 
@@ -290,6 +328,60 @@
         
         .fa-caret-down {
             color: var(--color-on-surface-variant);
+        }
+    }
+    
+    // Invalid state
+    &.plus-datetime-am-pm-toggle-invalid {
+        color: var(--color-danger-text);
+        
+        .fa-caret-down {
+            color: var(--color-danger);
+        }
+        
+        &:hover:not(:disabled) {
+            border-color: var(--color-danger);
+        }
+        
+        &:focus {
+            box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
+        }
+        
+        &[aria-expanded="true"],
+        &.plus-datetime-am-pm-toggle-active {
+            background-color: var(--color-danger-state-12);
+            color: var(--color-danger-text);
+            
+            .fa-caret-down {
+                color: var(--color-on-surface-variant);
+            }
+        }
+    }
+    
+    // Success state
+    &.plus-datetime-am-pm-toggle-success {
+        color: var(--color-success-text);
+        
+        .fa-caret-down {
+            color: var(--color-success);
+        }
+        
+        &:hover:not(:disabled) {
+            border-color: var(--color-success);
+        }
+        
+        &:focus {
+            box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
+        }
+        
+        &[aria-expanded="true"],
+        &.plus-datetime-am-pm-toggle-active {
+            background-color: var(--color-success-state-12);
+            color: var(--color-success-text);
+            
+            .fa-caret-down {
+                color: var(--color-on-surface-variant);
+            }
         }
     }
 }

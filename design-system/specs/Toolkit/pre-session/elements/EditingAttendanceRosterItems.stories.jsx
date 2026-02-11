@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../../../../../packages/plus-ds/src/components/Button/Button';
+import Badge from '../../../../../packages/plus-ds/src/components/Badge';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Editing Attendance Roster Items',
@@ -8,13 +9,13 @@ export default {
     },
 };
 
-const RosterItem = ({ name, isLead, removeState, isHovered }) => {
+export const RosterItem = ({ name, isLead, removeState, isHovered }) => {
     // Container styles
     const containerStyle = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        width: '320px', // Fixed width for demo
+        width: '100%',
         padding: 'var(--size-element-pad-y-sm) var(--size-element-pad-x-sm)', // 4px 8px
         backgroundColor: isHovered ? 'var(--color-surface-container-highest)' : 'transparent',
         borderRadius: 'var(--size-element-radius-md)',
@@ -30,26 +31,12 @@ const RosterItem = ({ name, isLead, removeState, isHovered }) => {
         flex: 1,
     };
 
-    const badgeStyle = {
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 var(--size-element-pad-x-sm)', // 0 8px
-        borderRadius: 'var(--size-element-radius-full)',
-        backgroundColor: 'var(--color-info-state-08)',
-        color: 'var(--color-info-text)',
-        fontSize: '14px',
-        lineHeight: '1.571',
-    };
-
     return (
         <div style={containerStyle}>
             <div style={nameStyle}>
                 <span className="body2-txt">{name}</span>
                 {isLead && (
-                    <div style={badgeStyle}>
-                        <span>Lead</span>
-                    </div>
+                    <Badge text="Lead" style="info" size="b3" />
                 )}
             </div>
 

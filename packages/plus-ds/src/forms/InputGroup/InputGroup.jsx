@@ -231,13 +231,12 @@ const InputGroupButton = ({
     disabled = false,
     onClick,
     style = 'primary',
-    fill = 'ghost',
+    fill = 'outline',
     className = '',
     ...props
 }) => {
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
     return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-button ${sizeClass} ${className}`} {...props}>
+        <div className={`plus-input-group-button-wrapper ${className}`} {...props}>
             <Button
                 text={text || children}
                 size={size}
@@ -247,7 +246,7 @@ const InputGroupButton = ({
                 fill={fill}
                 className="plus-input-group-button-element"
             />
-        </BootstrapInputGroup.Text>
+        </div>
     );
 };
 

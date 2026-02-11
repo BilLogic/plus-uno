@@ -1,5 +1,6 @@
 import React from 'react';
-import Badge from '../../../../../packages/plus-ds/src/components/Badge';
+import { AttendanceBadge } from './badges/AttendanceBadge.jsx';
+import { LeadBadge } from './badges/TutorBadges.jsx';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Pop-up Modal Attendance Roster',
@@ -11,88 +12,92 @@ export default {
 
 /**
  * Attendance Roster Row
- * A single row in the attendance roster showing name and status badge
+ * A single row in the attendance roster showing name, optional lead badge, and attendance status badge.
+ *
+ * Types:
+ * - student: Name + Attendance Badge
+ * - tutor: Name + Lead Badge (optional) + Attendance Badge
+ *
+ * Tokens:
+ * - Padding: --size-element-pad-y-lg
+ * - Gap: --size-element-gap-sm
+ * - Typography: body2-txt (light weight)
+ * - Color: --color-on-surface
+ * - Border radius: --size-modal-radius-md (legacy radius-3)
  */
-export const AttendanceRosterRow = ({ name, state = 'unknown', showDropdown = false }) => (
+export const AttendanceRosterRow = ({
+    name,
+    type = 'student',
+    status = 'unknown',
+    showDropdown = true,
+    showBadge = true,
+    isLead = false,
+}) => (
     <div
-        className="d-flex justify-content-between align-items-center w-100"
+        className="d-flex align-items-center w-100"
         style={{
             padding: 'var(--size-element-pad-y-lg) 0',
             gap: 'var(--size-element-gap-sm)',
+            borderRadius: 'var(--size-modal-radius-md)',
         }}
     >
-        {/* Name */}
-        <span
-            className="body2-txt font-weight-light"
-            style={{ color: 'var(--color-on-surface)' }}
+        {/* Name Tag */}
+        <div
+            className="d-flex align-items-center"
+            style={{
+                flex: '1 0 0',
+                gap: type === 'tutor' ? 'var(--size-element-gap-sm)' : '0',
+            }}
         >
-            {name}
-        </span>
+            <span
+                className="body2-txt font-weight-light"
+                style={{
+                    color: 'var(--color-on-surface)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                }}
+            >
+                {name}
+            </span>
 
-        {/* Status Badge */}
-        {state === 'unknown' ? (
-            <Badge
-                text={showDropdown ? 'Select' : 'N/A'}
-                style="secondary"
-                size="b2"
-                trailingVisual={showDropdown ? <i className="fa-solid fa-caret-down" /> : undefined}
-            />
-        ) : (
-            <Badge
-                text={state === 'present' ? 'Present' : 'Absent'}
-                style={state === 'present' ? 'success' : 'danger'}
-                size="b2"
-            />
-        )}
+            {/* Lead Badge (tutor only) */}
+            {type === 'tutor' && isLead && <LeadBadge />}
+        </div>
+
+        {/* Attendance Badge */}
+        {showBadge && <AttendanceBadge status={status} showDropdown={showDropdown} />}
     </div>
 );
 
 /**
  * Overview
- * Shows all states of the attendance roster row
+ * Shows all types and states of the attendance roster row
  */
 export const Overview = () => (
-    <div style={{ width: '380px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div
+        style={{
+            width: '380px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-lg)',
+        }}
+    >
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>All States</h6>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-md)' }}>Student Rows</h6>
             <div>
-                <AttendanceRosterRow name="Ben Green" state="unknown" />
-                <AttendanceRosterRow name="Ben Green" state="unknown" showDropdown={true} />
-                <AttendanceRosterRow name="Ben Green" state="present" />
-                <AttendanceRosterRow name="Ben Green" state="absent" />
+                <AttendanceRosterRow name="Ben Green" type="student" status="unknown" showDropdown />
+                <AttendanceRosterRow name="Ben Green" type="student" status="present" showDropdown={false} />
+                <AttendanceRosterRow name="Ben Green" type="student" status="absent" showDropdown={false} />
+                <AttendanceRosterRow name="Ben Green" type="student" status="na" showDropdown={false} />
+            </div>
+        </section>
+
+        <section>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-md)' }}>Tutor Rows</h6>
+            <div>
+                <AttendanceRosterRow name="Ben Green" type="tutor" status="unknown" showDropdown />
+                <AttendanceRosterRow name="Ben Green" type="tutor" status="unknown" showDropdown isLead />
             </div>
         </section>
     </div>
 );
-
-/**
- * Interactive
- * Customize the attendance roster row
- */
-export const Interactive = {
-    render: (args) => (
-        <div style={{ width: '380px' }}>
-            <AttendanceRosterRow {...args} />
-        </div>
-    ),
-    args: {
-        name: 'Ben Green',
-        state: 'unknown',
-        showDropdown: false,
-    },
-    argTypes: {
-        name: {
-            control: 'text',
-            description: 'Attendee name',
-        },
-        state: {
-            control: 'select',
-            options: ['unknown', 'present', 'absent'],
-            description: 'Attendance state',
-        },
-        showDropdown: {
-            control: 'boolean',
-            description: 'Show dropdown caret (only for unknown state)',
-        },
-    },
-};

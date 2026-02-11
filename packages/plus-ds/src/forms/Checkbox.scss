@@ -33,7 +33,7 @@
         min-height: 18px;
         padding: 0;
         margin: 0;
-        margin-right: var(--size-element-gap-xs, 4px); // Spacing between checkbox and label
+        margin-right: var(--size-element-gap-sm, 8px); // Spacing between checkbox and label
         border: var(--size-element-stroke-md, 2px) solid var(--color-primary);
         border-radius: var(--size-element-radius-sm, 2px);
         background-color: var(--color-surface-container-lowest);

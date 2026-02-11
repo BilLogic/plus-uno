@@ -65,6 +65,11 @@ export default {
             description: 'HTML ID attribute',
             table: { category: 'Development' }
         },
+        showSectionLabels: {
+            control: 'boolean',
+            description: 'Show or hide the Date/Time section labels above each input',
+            table: { category: 'Content' }
+        },
         className: {
             control: 'text',
             description: 'Additional CSS classes',
@@ -90,6 +95,7 @@ export const Overview = () => {
                     id="datetime-default"
                     label="Month"
                     required
+                    showSectionLabels={false}
                 />
             </section>
 
@@ -103,6 +109,7 @@ export const Overview = () => {
                     id="datetime-focus"
                     label="Month"
                     required
+                    showSectionLabels={false}
                 />
             </section>
 
@@ -117,6 +124,7 @@ export const Overview = () => {
                     label="Month"
                     required
                     disabled
+                    showSectionLabels={false}
                 />
             </section>
 
@@ -132,6 +140,7 @@ export const Overview = () => {
                     required
                     validation="invalid"
                     validationMessage="Validation message"
+                    showSectionLabels={false}
                 />
             </section>
 
@@ -147,6 +156,7 @@ export const Overview = () => {
                     required
                     validation="success"
                     validationMessage="Validation message"
+                    showSectionLabels={false}
                 />
             </section>
         </div>
@@ -190,7 +200,8 @@ Interactive.args = {
     disabled: false,
     readonly: false,
     validation: 'none',
-    validationMessage: ''
+    validationMessage: '',
+    showSectionLabels: false
 };
 
 

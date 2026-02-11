@@ -58,7 +58,7 @@ const Alert = ({
         >
             <div className="plus-alert-content">
                 {title && <RBAlert.Heading className="plus-alert-title h4">{title}</RBAlert.Heading>}
-                <div className="plus-alert-text body1-txt">{children}</div>
+                <div className="plus-alert-text body2-txt">{children}</div>
             </div>
 
             {dismissable && (

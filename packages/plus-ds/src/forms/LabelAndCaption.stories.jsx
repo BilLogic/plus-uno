@@ -101,6 +101,21 @@ const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) 
         }
     };
 
+    const getIconColor = () => {
+        switch (state) {
+            case 'success':
+                return 'var(--color-success)';
+            case 'danger':
+                return 'var(--color-danger)';
+            case 'warning':
+                return 'var(--color-warning)';
+            case 'disabled':
+            case 'default':
+            default:
+                return 'var(--color-on-surface-variant)';
+        }
+    };
+
     const showIcon = ['default', 'success', 'danger', 'warning', 'disabled'].includes(state);
 
     return (
@@ -125,7 +140,7 @@ const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) 
                         style={{
                             fontSize: '10px',
                             lineHeight: 2,
-                            color: 'var(--color-on-surface-variant)'
+                            color: getIconColor()
                         }}
                     />
                 </div>

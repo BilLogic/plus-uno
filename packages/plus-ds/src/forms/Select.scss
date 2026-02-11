@@ -40,8 +40,9 @@
     flex-wrap: wrap;
     gap: var(--size-element-gap-sm, 6px);
     width: 100%;
-    min-height: 48px;
-    padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 16px);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
     background-color: var(--color-surface-container-lowest);
     border: 0.8px solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-sm, 2px);
@@ -61,15 +62,15 @@
 
 // Size variants
 .plus-select-sm .plus-select-trigger {
-    min-height: 40px;
-    padding: var(--size-element-pad-y-sm, 6px) var(--size-element-pad-x-sm, 12px);
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
     font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
 }
 
 .plus-select-lg .plus-select-trigger {
-    min-height: 56px;
-    padding: var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-lg, 20px);
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
     font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
 }
 
 // ===== BADGES - Full width wrapping =====

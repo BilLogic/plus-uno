@@ -188,6 +188,7 @@ $btn-themes: (
         // 2. TONAL (Modified: uses state-08 layer per Figma spec, with text-safe color)
         &.plus-btn--tonal {
             background-color: var($col-state);
+            border-color: transparent;
             color: var($col-text);
 
             &:hover,

@@ -9,6 +9,8 @@ const DateAndTimePicker = ({
     label,
     required = false,
     showLabel = true,
+    showSectionLabels = true,
+    showDate = true,
     datePlaceholder = 'MM/DD/YY',
     timePlaceholder = '__ : __',
     dateValue,
@@ -365,8 +367,8 @@ const DateAndTimePicker = ({
             )}
             
             {/* Date Picker Section */}
-            <div className="plus-datetime-section">
-                <div className="plus-datetime-section-label">Date</div>
+            {showDate && <div className="plus-datetime-section">
+                {showSectionLabels && <div className="plus-datetime-section-label">Date</div>}
                 <div className="plus-datetime-date-wrapper">
                     <Dropdown
                         show={isCalendarOpen}
@@ -439,11 +441,11 @@ const DateAndTimePicker = ({
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
-            </div>
+            </div>}
 
             {/* Time Picker Section */}
             <div className="plus-datetime-section">
-                <div className="plus-datetime-section-label">Time</div>
+                {showSectionLabels && <div className="plus-datetime-section-label">Time</div>}
                 <InputGroup className="plus-datetime-time-input-group">
                     <Form.Control
                         ref={timeInputRef}
@@ -485,18 +487,22 @@ const DateAndTimePicker = ({
                             }
                         }}
                     />
-                    <div className="plus-datetime-am-pm-wrapper">
+                    <div className={`plus-datetime-am-pm-wrapper ${validation === 'invalid' ? 'plus-datetime-validation-invalid' : ''} ${validation === 'success' ? 'plus-datetime-validation-success' : ''}`}>
                         <Dropdown
                             show={isAmPmOpen}
                             onToggle={setIsAmPmOpen}
                             className="plus-datetime-am-pm-dropdown"
                         >
                             <Dropdown.Toggle
-                                className={`plus-datetime-am-pm-toggle ${sizeClass} ${isAmPmOpen ? 'plus-datetime-am-pm-toggle-active' : ''} ${readonly ? 'plus-datetime-am-pm-toggle-readonly' : ''}`}
+                                className={`plus-datetime-am-pm-toggle ${sizeClass} ${isAmPmOpen ? 'plus-datetime-am-pm-toggle-active' : ''} ${readonly ? 'plus-datetime-am-pm-toggle-readonly' : ''} ${validation === 'invalid' ? 'plus-datetime-am-pm-toggle-invalid' : ''} ${validation === 'success' ? 'plus-datetime-am-pm-toggle-success' : ''}`}
                                 disabled={disabled || readonly}
                                 style={{
-                                    backgroundColor: isAmPmOpen ? 'var(--color-primary-state-12)' : (timeFocused ? 'var(--color-primary-state-12)' : 'transparent'),
-                                    color: isAmPmOpen ? 'var(--color-primary-text)' : 'var(--color-primary-text)'
+                                    backgroundColor: isAmPmOpen 
+                                        ? (validation === 'invalid' ? 'var(--color-danger-state-12)' : validation === 'success' ? 'var(--color-success-state-12)' : 'var(--color-primary-state-12)') 
+                                        : (timeFocused ? (validation === 'invalid' ? 'var(--color-danger-state-12)' : validation === 'success' ? 'var(--color-success-state-12)' : 'var(--color-primary-state-12)') : 'transparent'),
+                                    color: isAmPmOpen 
+                                        ? (validation === 'invalid' ? 'var(--color-danger-text)' : validation === 'success' ? 'var(--color-success-text)' : 'var(--color-primary-text)') 
+                                        : (validation === 'invalid' ? 'var(--color-danger-text)' : validation === 'success' ? 'var(--color-success-text)' : 'var(--color-primary-text)')
                                 }}
                             >
                                 {amPm}
@@ -527,6 +533,8 @@ DateAndTimePicker.propTypes = {
     label: PropTypes.node,
     required: PropTypes.bool,
     showLabel: PropTypes.bool,
+    showSectionLabels: PropTypes.bool,
+    showDate: PropTypes.bool,
     datePlaceholder: PropTypes.string,
     timePlaceholder: PropTypes.string,
     dateValue: PropTypes.string,
