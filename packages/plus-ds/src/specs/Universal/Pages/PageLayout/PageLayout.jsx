@@ -31,10 +31,10 @@ const PageLayout = ({
     contentDirect = false,
     /** When true, show TopBar skeleton + Sidebar loading (shimmer). */
     shellLoading = false,
-    /** When true, apply shell-reveal has-entered for entrance animation (TopBar + Sidebar). */
     shellEntered = false,
     /** When true, keep sidebar hidden regardless of viewport size/toggle state. */
     sidebarHidden = false,
+    onSidebarToggle,
 }) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(!sidebarHidden);
     const containerRef = React.useRef(null);
@@ -60,8 +60,11 @@ const PageLayout = ({
     }, [sidebarHidden]);
 
     const handleSidebarToggle = (newMode) => {
-        if (sidebarHidden) return;
+
         setIsSidebarVisible(newMode === 'expanded');
+        if (onSidebarToggle) {
+            onSidebarToggle(newMode);
+        }
     };
 
     return (
@@ -227,6 +230,7 @@ PageLayout.propTypes = {
     shellLoading: PropTypes.bool,
     shellEntered: PropTypes.bool,
     sidebarHidden: PropTypes.bool,
+    onSidebarToggle: PropTypes.func,
 };
 
 export default PageLayout;

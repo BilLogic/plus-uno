@@ -57,6 +57,11 @@ const ShellLayout = () => {
         requestAnimationFrame(() => setShellEntered(true));
     }, []);
 
+
+
+    // Admin frame mode: 'focused' (900px, sidebar hidden) or 'desktop' (1280px, sidebar visible)
+    const [adminFrameMode, setAdminFrameMode] = useState('focused');
+
     // Dynamic config from child pages via context
     const [breadcrumbs, setBreadcrumbs] = useState([{ text: 'Home', href: '/home' }]);
     const [topBarUser, setTopBarUser] = useState({ name: 'Boyuan Guo', counter: null, counterValue: null, type: 'lead tutor' });
@@ -107,15 +112,20 @@ const ShellLayout = () => {
     useLayoutEffect(() => {
         const root = document.getElementById('root');
         if (!root) return undefined;
+        // Clean up previous classes
+        root.classList.remove('admin-demo-frame', 'admin-frame-focused', 'admin-frame-desktop');
+
         if (isAdminRoute) {
-            root.classList.add('admin-demo-frame');
-        } else {
-            root.classList.remove('admin-demo-frame');
+            if (adminFrameMode === 'desktop') {
+                root.classList.add('admin-frame-desktop');
+            } else {
+                root.classList.add('admin-frame-focused');
+            }
         }
         return () => {
-            root.classList.remove('admin-demo-frame');
+            root.classList.remove('admin-demo-frame', 'admin-frame-focused', 'admin-frame-desktop');
         };
-    }, [isAdminRoute]);
+    }, [isAdminRoute, adminFrameMode]);
 
     const topBarConfig = {
         breadcrumbs,
@@ -154,11 +164,16 @@ const ShellLayout = () => {
                 topBarConfig={topBarConfig}
                 sidebarConfig={sidebarConfig}
                 id="home-redesign-page"
-                className={`plus-page-reveal ${isAdminRoute ? 'admin-demo-layout' : ''} ${mainClassName}`.trim()}
+                className={`plus-page-reveal ${isAdminRoute ? (adminFrameMode === 'desktop' ? 'admin-frame-desktop' : 'admin-frame-focused') : ''} ${isAdminRoute ? 'admin-demo-layout' : ''} ${mainClassName}`.trim()}
                 shellEntered={shellEntered}
                 contentDirect={contentDirect}
                 floatingContent={floatingContent}
-                sidebarHidden={isAdminRoute}
+                sidebarHidden={isAdminRoute && adminFrameMode === 'focused'}
+                onSidebarToggle={(mode) => {
+                    if (isAdminRoute) {
+                        setAdminFrameMode(mode === 'expanded' ? 'desktop' : 'focused');
+                    }
+                }}
             >
                 <Outlet key={location.pathname} />
             </PageLayout>

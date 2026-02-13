@@ -50,23 +50,30 @@ body {
 }
 
 /* Admin demo mode: fixed frame requested by user. */
-#root.admin-demo-frame {
-  width: 800px;
-  height: 900px;
-  min-width: 800px;
-  min-height: 900px;
+#root.admin-frame-focused {
+  width: 900px;
+  height: 800px;
+  min-width: 900px;
+  min-height: 800px;
 }
 
-/* Admin demo mode: hide sidebar and give content full width. */
-#home-redesign-page.admin-demo-layout .plus-page-main-container {
+#root.admin-frame-desktop {
+  width: 1280px;
+  height: 800px;
+  min-width: 1280px;
+  min-height: 800px;
+}
+
+/* Admin demo mode: hide sidebar and give content full width in focused mode. */
+#home-redesign-page.admin-frame-focused .plus-page-main-container {
   gap: 0 !important;
 }
 
-#home-redesign-page.admin-demo-layout .plus-page-sidebar-wrapper {
+#home-redesign-page.admin-frame-focused .plus-page-sidebar-wrapper {
   display: none !important;
 }
 
-#home-redesign-page.admin-demo-layout .plus-page-content-wrapper {
+#home-redesign-page.admin-frame-focused .plus-page-content-wrapper {
   width: 100%;
   flex-basis: 100%;
 }
