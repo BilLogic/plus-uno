@@ -265,14 +265,17 @@ const SideNavBar = ({
             </div>
 
             {/* Submit Button — disabled */}
-            <Button
-                text="Submit"
-                style="secondary"
-                fill="filled"
-                size="medium"
-                disabled={true}
-                block={true}
-            />
+            {/* Figma specifies layer opacity 38% for disabled state here, overriding default 0.65 */}
+            <div style={{ opacity: 0.38, width: '100%' }}>
+                <Button
+                    text="Submit"
+                    style="default"
+                    fill="filled"
+                    size="medium"
+                    disabled={true}
+                    block={true}
+                />
+            </div>
         </div>
     );
 };
@@ -280,7 +283,7 @@ const SideNavBar = ({
 // ─── Icon helpers ────────────────────────────────────────────────
 
 const checkIcon = (
-    <i className="fa-solid fa-circle-check" style={{ color: 'var(--color-on-surface-variant)' }} />
+    <i className="fa-solid fa-circle-check" style={{ color: 'var(--color-success)' }} />
 );
 
 const spinnerIcon = (
