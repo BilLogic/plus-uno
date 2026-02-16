@@ -1,0 +1,61 @@
+{
+  "name": "plus-vibe-coding-starting-kit",
+  "version": "1.0.0",
+  "description": "Starter kit for PLUS design prototyping with Cursor agent",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 6006 --host 127.0.0.1 --config-dir .storybook",
+    "build-storybook": "storybook build --config-dir .storybook -o storybook-static",
+    "sync:tokens": "node scripts/sync-figma-tokens.js",
+    "generate:tokens": "node scripts/generate-all-tokens.js",
+    "start": "vite",
+    "dev:react": "vite",
+    "build:react": "vite build",
+    "build": "npm run build:react",
+    "build:netlify": "npm run build",
+    "preview:react": "vite preview",
+    "dev:home-redesign": "vite --config playground/prototyping/bill/home-redesign/vite.config.js"
+  },
+  "keywords": [
+    "plus",
+    "design-system",
+    "prototyping",
+    "cursor"
+  ],
+  "author": "PLUS Design Team",
+  "license": "ISC",
+  "devDependencies": {
+    "@storybook/addon-docs": "^10.2.7",
+    "@storybook/addon-links": "^10.2.7",
+    "@storybook/builder-vite": "^10.2.4",
+    "@storybook/html": "^10.2.7",
+    "@storybook/html-vite": "^10.2.7",
+    "@storybook/react": "^10.2.7",
+    "@storybook/react-vite": "^10.2.7",
+    "@vitest/browser-playwright": "^4.0.15",
+    "@vitest/coverage-v8": "^4.0.15",
+    "dotenv": "^16.4.5",
+    "playwright": "^1.58.2",
+    "sass": "^1.77.8",
+    "storybook": "^10.2.7",
+    "vite": "~6.4.1",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@assistant-ui/react": "^0.12.3",
+    "@popperjs/core": "^2.11.8",
+    "@vitejs/plugin-react": "^5.1.1",
+    "bootstrap": "^5.3.3",
+    "framer-motion": "^12.33.0",
+    "highcharts": "^12.4.0",
+    "highcharts-react-official": "^3.2.3",
+    "react": "^19.2.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^7.13.0",
+    "typescript": "^5.9.3"
+  }
+}

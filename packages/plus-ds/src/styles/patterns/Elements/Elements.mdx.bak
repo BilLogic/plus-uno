@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Styles/Patterns/Elements" />
+
+# Elements
+
+Atomic building blocks used for general interactions.
+
+## 1. Identity
+*   **Context**: Active State vs Default / Read State
+*   **Required Tokens**:
+    *   **Active**: `surface-container-highest`
+    *   **Default / Read**: `surface`
+
+## 2. Variations & Sizes
+*   *Pending population from specs/components*
+
+## 3. Spacing & Gaps
+*   *Pending population from specs/components*
+
+## 4. Elevation & Layering
+*   **Elevation**:
+    *   **Default**: 0
+    *   **Active**: 0 (Visual differentiation via token change)
+
+## 5. Interaction Rules
+*   **Hover**: Add `on-surface` @ 8% opacity
+*   **Pressed**: Add `on-surface` @ 16% opacity
+*   **Focus**: Add `on-surface` @ 12% opacity AND change border to `Inverse Primary`
+*   **Disabled**: Set total opacity to 38%
+
+## 6. Guidelines
+> **WARNING**:
+> *   **NEVER** use hex codes for colors.
+> *   **NEVER** replace fills on hover; always use the additive overlay.
+
+## 7. Visual Examples
+*(Placeholder for live rendered examples)*

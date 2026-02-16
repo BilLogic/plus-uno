@@ -1,0 +1,259 @@
+/*
+ * Toast Component Styles
+ * Per Figma specs - extends React Bootstrap Toast
+ * Uses design system tokens - no hardcoded values
+ */
+
+.plus-toast.toast,
+.plus-toast,
+.toast.plus-toast {
+    width: 300px;
+    background-color: var(--color-surface);
+    border-radius: var(--size-modal-radius-md);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    border: none;
+
+    // --- HEADER ---
+    .plus-toast-header,
+    .toast-header {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm);
+        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+        background-color: var(--color-surface);
+        border: none;
+
+        .plus-toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            i {
+                font-size: var(--font-size-fa-body1-solid);
+                color: var(--color-on-surface-variant);
+            }
+        }
+
+        .plus-toast-title {
+            font-family: var(--font-family-body);
+            font-size: var(--font-size-body1);
+            font-weight: var(--font-weight-bold);
+            line-height: var(--font-line-height-body1);
+            color: var(--color-on-surface);
+            flex: 1;
+        }
+
+        .plus-toast-timestamp {
+            font-family: var(--font-family-body);
+            font-size: var(--font-size-body3);
+            font-weight: var(--font-weight-normal);
+            line-height: var(--font-line-height-body3);
+            color: var(--color-on-surface);
+            flex-shrink: 0;
+        }
+
+        // Custom close button with Font Awesome
+        .plus-toast-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin-left: var(--size-element-gap-sm);
+            cursor: pointer;
+            opacity: 0.6;
+            flex-shrink: 0;
+
+            i {
+                font-size: var(--font-size-fa-body1-solid);
+                color: var(--color-on-surface);
+            }
+
+            &:hover {
+                opacity: 1;
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    // --- DIVIDER ---
+    .plus-toast-divider {
+        height: 1px;
+        width: 100%;
+        background-color: var(--color-surface-container-high);
+    }
+
+    // --- BODY ---
+    .plus-toast-body,
+    .toast-body {
+        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3);
+        font-weight: var(--font-weight-light);
+        line-height: var(--font-line-height-body3);
+        color: var(--color-on-surface);
+    }
+
+    // --- STYLE VARIANTS ---
+    // Using !important to override base styles
+    &.danger {
+
+        .plus-toast-header,
+        .toast-header {
+            background-color: var(--color-danger) !important;
+
+            .plus-toast-icon i {
+                color: var(--color-on-danger) !important;
+            }
+
+            .plus-toast-title {
+                color: var(--color-on-danger) !important;
+            }
+
+            .plus-toast-timestamp {
+                color: var(--color-on-danger) !important;
+            }
+
+            .plus-toast-close i {
+                color: var(--color-on-danger) !important;
+            }
+        }
+    }
+
+    &.success {
+
+        .plus-toast-header,
+        .toast-header {
+            background-color: var(--color-success) !important;
+
+            .plus-toast-icon i {
+                color: var(--color-on-success) !important;
+            }
+
+            .plus-toast-title {
+                color: var(--color-on-success) !important;
+            }
+
+            .plus-toast-timestamp {
+                color: var(--color-on-success) !important;
+            }
+
+            .plus-toast-close i {
+                color: var(--color-on-success) !important;
+            }
+        }
+    }
+
+    &.warning {
+
+        .plus-toast-header,
+        .toast-header {
+            background-color: var(--color-warning) !important;
+
+            .plus-toast-icon i {
+                color: var(--color-on-warning) !important;
+            }
+
+            .plus-toast-title {
+                color: var(--color-on-warning) !important;
+            }
+
+            .plus-toast-timestamp {
+                color: var(--color-on-warning) !important;
+            }
+
+            .plus-toast-close i {
+                color: var(--color-on-warning) !important;
+            }
+        }
+    }
+
+    &.info {
+
+        .plus-toast-header,
+        .toast-header {
+            background-color: var(--color-info) !important;
+
+            .plus-toast-icon i {
+                color: var(--color-on-info) !important;
+            }
+
+            .plus-toast-title {
+                color: var(--color-on-info) !important;
+            }
+
+            .plus-toast-timestamp {
+                color: var(--color-on-info) !important;
+            }
+
+            .plus-toast-close i {
+                color: var(--color-on-info) !important;
+            }
+        }
+    }
+
+    &.primary {
+
+        .plus-toast-header,
+        .toast-header {
+            background-color: var(--color-primary) !important;
+
+            .plus-toast-icon i {
+                color: var(--color-on-primary) !important;
+            }
+
+            .plus-toast-title {
+                color: var(--color-on-primary) !important;
+            }
+
+            .plus-toast-timestamp {
+                color: var(--color-on-primary) !important;
+            }
+
+            .plus-toast-close i {
+                color: var(--color-on-primary) !important;
+            }
+        }
+    }
+
+    &.secondary {
+
+        .plus-toast-header,
+        .toast-header {
+            background-color: var(--color-secondary) !important;
+
+            .plus-toast-icon i {
+                color: var(--color-on-secondary) !important;
+            }
+
+            .plus-toast-title {
+                color: var(--color-on-secondary) !important;
+            }
+
+            .plus-toast-timestamp {
+                color: var(--color-on-secondary) !important;
+            }
+
+            .plus-toast-close i {
+                color: var(--color-on-secondary) !important;
+            }
+        }
+    }
+}
+
+// --- TOAST CONTAINER ---
+.plus-toast-container,
+.toast-container {
+    z-index: 1050;
+
+    .plus-toast+.plus-toast,
+    .toast+.toast {
+        margin-top: var(--size-element-gap-md);
+    }
+}

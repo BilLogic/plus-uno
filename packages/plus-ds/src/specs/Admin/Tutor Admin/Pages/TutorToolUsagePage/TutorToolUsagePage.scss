@@ -1,0 +1,57 @@
+/**
+ * TutorToolUsagePage Styles
+ */
+
+.tutor-tool-usage-page__content {
+    padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-tool-usage-page__tabs {
+    margin-bottom: var(--spacing-medium-space-200, 12px);
+}
+
+.tutor-tool-usage-page__actions {
+    display: flex;
+    gap: var(--spacing-medium-space-200, 12px);
+    margin-bottom: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-tool-usage-page__overview-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-tool-usage-page__overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-tool-usage-page__details-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+    margin-top: var(--spacing-large-space-400, 24px);
+}
+
+.tutor-tool-usage-page__details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-tool-usage-page__details-actions {
+    display: flex;
+    gap: var(--spacing-medium-space-200, 12px);
+}
+
+.tutor-tool-usage-page__pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
+}

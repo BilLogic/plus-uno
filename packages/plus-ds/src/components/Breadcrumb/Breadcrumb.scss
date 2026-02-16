@@ -1,0 +1,49 @@
+@use "sass:map";
+
+/* breadcrumb override */
+.plus-breadcrumb {
+    .breadcrumb {
+        margin-bottom: 0; // Remove default bootstrap margin if any
+        background-color: transparent; // Ensure transparent background
+        padding: 0; // Removing default bootstrap padding to let container handle it or being flush
+
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm); // Figma: 8px gap
+
+        // Typography handled by body1-txt utility class in JSX
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+
+        // Separator Style
+        &+.breadcrumb-item {
+            padding-left: 0; // Reset bootstrap padding since we use gap
+
+            &::before {
+                float: none; // Reset bootstrap float
+                padding-right: var(--size-element-gap-sm); // Visual spacing for separator
+                color: var(--color-on-surface-variant); // Figma: #3f484a
+                content: var(--bs-breadcrumb-divider); // Allow overriding via CSS var or default /
+            }
+        }
+
+        // Link Style (Inactive / Navigable)
+        a {
+            color: var(--color-primary-text); // Figma: #00547e
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+                color: var(--color-primary-text);
+            }
+        }
+
+        // Active Item Style (Current Page)
+        &.active {
+            color: var(--color-on-surface-variant); // Figma: #3f484a
+        }
+    }
+}

@@ -1,0 +1,143 @@
+.plus-training-progress-card {
+    width: 100%;
+    box-sizing: border-box; // Ensure padding is included in width calculation
+}
+
+.plus-training-progress-card-default {
+    width: 275.33px; /* Fixed width from Figma design */
+}
+
+.plus-training-progress-card-small {
+    width: 218.67px; /* Fixed width from Figma design */
+}
+
+.plus-training-progress-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-md); /* 16px */
+    width: 100%;
+}
+
+.plus-training-progress-title {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs); /* spacer-2 = 4px */
+    width: 100%;
+}
+
+.plus-training-progress-title-text {
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-semibold-2);
+    font-size: var(--font-size-h5);
+    line-height: var(--font-line-height-h5);
+    color: var(--color-social-emotional-text);
+    margin: 0;
+}
+
+.plus-training-progress-title i {
+    color: var(--color-social-emotional);
+    font-size: 16px;
+}
+
+.plus-training-progress-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between; /* Maximum space between bars and breakdown until hitting padding edges */
+    width: 100%;
+}
+
+.plus-training-progress-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs); /* spacer-2 = 4px */
+    flex: 1;
+}
+
+.plus-training-progress-value {
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-h3);
+    line-height: var(--font-line-height-h3);
+    color: var(--color-social-emotional-text);
+    margin: 0;
+}
+
+.plus-training-progress-label {
+    color: var(--color-social-emotional-text);
+    margin: 0;
+}
+
+.plus-training-progress-competencies {
+    display: flex;
+    gap: 0; /* No gap when using space-between - bars will have natural spacing */
+    align-items: flex-end; /* Align items at bottom so labels align with breakdown */
+    justify-content: space-between; /* Match breakdown distribution */
+    height: 104px; /* Fixed height to match breakdown container exactly */
+    flex-shrink: 0; /* Don't shrink - maintain natural width */
+}
+
+.plus-training-progress-competency {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs); /* spacer-2 = 4px between bar and label */
+    align-items: center;
+    justify-content: flex-end; /* Position label at bottom to align with breakdown */
+    height: 96px; /* Fixed height: 72px bar + 4px gap + 20px label */
+    width: 6px; /* Bar width */
+    margin: 0 3px; /* Add spacing between bars (6px total = 3px on each side) */
+}
+
+.plus-training-progress-bar-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+    min-height: 72px;
+}
+
+.plus-training-progress-bar-bg {
+    position: absolute;
+    background-color: var(--color-surface-container-lowest);
+    border-radius: 16px;
+    bottom: 0;
+}
+
+.plus-training-progress-bar-fill {
+    border-radius: 16px;
+    position: relative;
+}
+
+.plus-training-progress-competency-label {
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0;
+}
+
+.plus-training-progress-breakdown {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between; /* Distribute items evenly - gap property ignored when using space-between */
+    height: 100%;
+    min-height: 104px;
+    flex-shrink: 0; /* Don't shrink - maintain natural width */
+}
+
+.plus-training-progress-breakdown-item {
+    display: flex;
+    gap: var(--size-spacing-small-space-075); /* spacer-2-5 = 6px */
+    align-items: center;
+    justify-content: center;
+}
+
+.plus-training-progress-breakdown-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 16px;
+    flex-shrink: 0;
+}.plus-training-progress-breakdown-item span {
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase;
+}

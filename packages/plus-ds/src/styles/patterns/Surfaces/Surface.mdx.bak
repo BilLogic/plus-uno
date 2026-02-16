@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Styles/Patterns/Surfaces" />
+
+# Surfaces
+
+The application shell and navigation layers.
+
+## 1. Identity
+*   **Context**: Base Background
+*   **Required Token**: `surface`
+
+## 2. Variations & Sizes
+*   *Pending population from specs/components*
+
+## 3. Spacing & Gaps
+*   *Pending population from specs/components*
+
+## 4. Elevation & Layering
+*   **Elevation**: 0
+
+## 5. Interaction Rules
+*   Base surfaces are generally static.
+
+## 6. Guidelines
+> **WARNING**:
+> *   **NEVER** use hex codes for the app background.
+
+## 7. Visual Examples
+*(Placeholder for live rendered examples)*

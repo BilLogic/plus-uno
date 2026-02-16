@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Badge Smart Test</title>
+    <link rel="stylesheet" href="../dist/css/main.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            font-family: sans-serif;
+        }
+
+        .test-section {
+            margin-bottom: 40px;
+        }
+
+        .test-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .label {
+            width: 150px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Static Badge Smart Test</h1>
+
+    <div class="test-section">
+        <h2>Socio-Emotional</h2>
+        <div id="se-h1" class="test-row"><span class="label">H1</span></div>
+        <div id="se-h2" class="test-row"><span class="label">H2</span></div>
+        <div id="se-b1" class="test-row"><span class="label">B1</span></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Mastering Content</h2>
+        <div id="mc-h1" class="test-row"><span class="label">H1</span></div>
+    </div>
+
+    <script type="module">
+        import { createStaticBadgeSmart } from '../design-system/components/StaticBadgeSmart/index.js';
+        import { createBadge } from '../design-system/components/Badge/index.js';
+
+        // Helper to append badge
+        function appendBadge(containerId, options) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                const badge = createStaticBadgeSmart(options);
+                container.appendChild(badge);
+            }
+        }
+
+        appendBadge('se-h1', { type: 'socio-emotional', size: 'h1' });
+        appendBadge('se-h2', { type: 'socio-emotional', size: 'h2' });
+        appendBadge('se-b1', { type: 'socio-emotional', size: 'b1' });
+
+        appendBadge('mc-h1', { type: 'mastering-content', size: 'h1' });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+.plus-tutor-home-page-different-layout {
+    .plus-tutor-home-content-different-layout {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-section-gap-lg, 32px);
+        width: 100%;
+    }
+
+    .plus-tutor-home-jumbotron-section-different {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .plus-tutor-home-training-progress-section {
+        display: grid !important;
+        grid-template-columns: 60% 40% !important; // 60/40 split: Radar chart wider, Metrics cards narrower
+        gap: var(--size-section-gap-md, 24px) !important;
+        align-items: stretch;
+        width: 100% !important;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0; // No padding at grid level - each column handles its own
+
+        // Only stack on mobile, not tablet
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr !important;
+            gap: var(--size-section-gap-sm, 16px) !important;
+            align-items: flex-start;
+        }
+    }
+
+    .plus-tutor-home-training-progress-left {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        grid-column: 1;
+        padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
+        background-color: var(--color-surface-container-low); // Gray background fill around this card
+        border-radius: var(--size-surface-radius, 16px);
+        box-sizing: border-box;
+        
+        // Remove white background from the card - let gray background show through
+        .plus-data-viz-card {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important; // Remove card padding - wrapper handles it
+        }
+        
+        // Ensure DataVisualization fills the container
+        > * {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .plus-tutor-home-training-progress-right {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-md, 16px);
+        width: 100%;
+        height: 100%;
+        grid-column: 2;
+        padding: var(--size-card-pad-y-md, 20px) var(--size-card-pad-x-md, 20px);
+        background-color: var(--color-surface-container-low); // Gray background for the component
+        border-radius: var(--size-card-radius-md, 16px);
+        border: none; // No border
+        box-shadow: none; // No shadow
+        box-sizing: border-box;
+        
+        // Ensure MetricsCard container fills available space
+        .plus-metrics-card-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--size-card-gap-md, 16px);
+            width: 100%;
+            height: 100%;
+        }
+        
+        // Each stacked metric card should have white background - gray shows between cards via gap
+        .plus-metrics-stacked-card {
+            background-color: var(--color-surface-container-lowest) !important;
+            border: var(--size-card-border-sm) solid var(--color-outline-variant) !important;
+            box-shadow: none !important; // Remove shadows
+            border-radius: var(--size-card-radius-md, 16px) !important;
+            width: 100%;
+        }
+    }
+
+    .plus-tutor-home-onboarding-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-section-gap-lg);
+        width: 100%;
+        padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
+        background-color: var(--color-surface-container-low); // Gray background fill around onboarding section
+        border-radius: var(--size-surface-radius, 16px);
+        box-sizing: border-box; // Ensure padding is included in width calculation
+    }
+
+    .plus-tutor-home-onboarding-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin: 0; // Remove any default margins to ensure alignment
+        
+        .h4 {
+            margin: 0; // Remove h4 default margin
+        }
+    }
+
+    .plus-tutor-home-onboarding-controls {
+        display: flex;
+        gap: var(--size-element-gap-xs);
+    }
+
+    .plus-tutor-home-onboarding-carousel {
+        display: flex;
+        gap: var(--size-card-gap-md);
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+
+        &::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        > * {
+            flex-shrink: 0;
+        }
+    }
+}

@@ -1,0 +1,94 @@
+/**
+ * GroupsTable Styles
+ * Figma Node: 322-155598
+ */
+
+.groups-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.groups-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: separate;
+    border-spacing: 0;
+    /* Ensure table chrome is transparent like other admin tables */
+    background-color: transparent;
+
+    // Header styles
+    thead .groups-table__header {
+        background-color: transparent !important;
+
+        .groups-table__header-cell {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            border: none;
+            background-color: transparent !important;
+
+            .groups-table__header-content {
+                display: flex;
+                gap: var(--size-table-cell-gap);
+                align-items: center;
+            }
+        }
+    }
+
+    // Row styles
+    .groups-table__row {
+        border-radius: var(--size-table-radius-md);
+        transition: background-color 0.2s ease;
+        /* Override Bootstrap table striping – rows should be transparent by default */
+        background-color: transparent !important;
+
+        &.groups-table__row--hover:hover {
+            background-color: var(--color-on-surface-state-08);
+        }
+
+        .groups-table__cell {
+            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            border: none;
+            vertical-align: middle;
+            background-color: transparent;
+        }
+    }
+
+    // Group Name cell
+    .groups-table__cell--name {
+        .groups-table__expand-btn {
+            display: flex;
+            gap: var(--size-element-gap-sm);
+            align-items: center;
+            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: var(--size-element-radius-sm);
+
+            &:hover {
+                background-color: var(--color-on-surface-state-08);
+            }
+        }
+    }
+
+    // Group Size cell
+    .groups-table__cell--size {
+        .groups-table__size-badge {
+            &.plus-badge--info {
+                background-color: var(--color-info-state-08);
+                padding: 0 var(--size-element-pad-x-sm);
+                border-radius: var(--size-element-radius-full);
+                min-width: unset;
+            }
+        }
+    }
+
+    // Action cell
+    .groups-table__cell--action {
+        .groups-table__action-buttons {
+            display: flex;
+            gap: var(--size-table-cell-gap);
+            align-items: center;
+        }
+    }
+}
