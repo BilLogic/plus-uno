@@ -8,13 +8,8 @@ const __dirname = path.dirname(__filename);
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    // Prefer brace expansion here (more consistently supported across globbers than extglob @())
+    // packages/plus-ds is the source of truth (includes specs; design-system/specs excluded to avoid duplicate story IDs with Toolkit)
     '../packages/plus-ds/src/**/*.stories.{js,jsx,ts,tsx}',
-    // '../packages/plus-ds/src/**/*.mdx',
-
-    // Source of truth in this repo (legacy but still actively used)
-    '../design-system/specs/**/*.stories.{js,jsx,ts,tsx}',
-    // '../design-system/specs/**/*.mdx',
 
     // Playground prototypes
     '../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}',
@@ -46,7 +41,7 @@ const config = {
     autodocs: true,
   },
   server: {
-    host: '127.0.0.1',
+    host: '0.0.0.0',
     port: 6006,
   },
   staticDirs: (() => {
@@ -139,8 +134,8 @@ const config = {
       rootDir,
       srcPath
     ];
-    // Allow 127.0.0.1 hostname for Vite
-    config.server.allowedHosts = ['127.0.0.1', 'localhost'];
+    // Allow all hosts so Storybook works at 127.0.0.1 or localhost (dev only)
+    config.server.allowedHosts = true;
 
     // Improve HMR stability
     config.server.hmr = config.server.hmr || {};
