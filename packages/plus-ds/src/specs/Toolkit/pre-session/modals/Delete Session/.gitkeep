@@ -1,0 +1,27 @@
+# Delete Session Modals
+
+This section contains modals for the Delete Session workflow in the Pre-Session toolkit.
+
+## Modal Structure
+
+Each modal follows the established pattern:
+- Single Storybook story file per modal
+- Uses design system components (Modal, Button, Radio, etc.)
+- Semantic spacing, color, and typography tokens
+- No hardcoded values
+
+## Components Used
+
+- **Modal**: Main modal container from design system
+- **Button**: Primary, outline, and danger variants
+- **Radio**: Form radio buttons for selection
+- **DatePicker**: Date range selection
+- **Badge**: Status indicators
+- **SupervisorManagementButtons**: Cancel/Confirm actions
+
+## Tokens
+
+- **Modal**: `--size-modal-pad-*`, `--size-modal-gap-*`, `--size-modal-radius-*`
+- **Element**: `--size-element-gap-*`, `--size-element-pad-*`, `--size-element-radius-*`
+- **Color**: `--color-surface-container-*`, `--color-primary`, `--color-danger`
+- **Typography**: `h4`, `body2-txt`, etc.
