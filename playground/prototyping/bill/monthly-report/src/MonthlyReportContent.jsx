@@ -137,6 +137,7 @@ export default function MonthlyReportContent() {
     const [activeKey, setActiveKey] = useState(0);
     const [feedbackSelections, setFeedbackSelections] = useState({});
     const [feedbackText, setFeedbackText] = useState({});
+    const [savedFeedbackText, setSavedFeedbackText] = useState({}); // New state to track committed/saved text
     const [hasEntered, setHasEntered] = useState(false);
     const [hasPlayedDataAnim, setHasPlayedDataAnim] = useState(false);
     const [isDataAnimActive, setIsDataAnimActive] = useState(false);
@@ -328,6 +329,9 @@ export default function MonthlyReportContent() {
     };
 
     const handleFeedbackSubmit = (dimId) => {
+        // Save the feedback text as committed
+        setSavedFeedbackText(prev => ({ ...prev, [dimId]: feedbackText[dimId] }));
+
         // Find index of this dimension
         const index = REPORT_DATA.dimensions.findIndex(d => d.id === dimId);
 
@@ -680,7 +684,11 @@ export default function MonthlyReportContent() {
                                                         <Button
                                                             size="small"
                                                             style="primary"
-                                                            disabled={!feedbackText[dim.id] || feedbackText[dim.id].length < 10}
+                                                            disabled={
+                                                                !feedbackText[dim.id] ||
+                                                                feedbackText[dim.id].length < 10 ||
+                                                                (state === 'reviewed' && feedbackText[dim.id] === savedFeedbackText[dim.id])
+                                                            }
                                                             onClick={(e) => { e.stopPropagation(); handleFeedbackSubmit(dim.id); }}
                                                         >
                                                             {state === 'reviewed' ? 'Update Feedback' : 'Submit & Continue'}
