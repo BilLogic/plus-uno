@@ -501,18 +501,15 @@ export default function MonthlyReportContent() {
                     </div>
                 </div>
                 {/* Peer Average */}
-                {/* Key Takeaway Insight */}
-                <div className="time-allocation-key-takeaway data-anim-enter" style={{ '--text-delay': '500ms', marginTop: 'var(--size-element-gap-lg)' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--size-element-gap-md)', backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--size-element-pad-lg)', borderRadius: 'var(--radius-md)', borderLeft: '4px solid var(--color-interactive-primary)' }}>
-                        <i className="fa-solid fa-lightbulb" style={{ color: 'var(--color-interactive-primary)', marginTop: '2px' }}></i>
-                        <div>
-                            <span style={{ display: 'block', fontWeight: 'bold', marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>Key Takeaway</span>
-                            <span style={{ color: 'var(--color-on-surface-variant)', lineHeight: '1.5' }}>
-                                We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
-                                Consider transitioning into guided questioning earlier to keep students actively reasoning.
-                            </span>
-                        </div>
-                    </div>
+                {/* Recommended Range Nudge */}
+                <div style={{ marginTop: 'var(--size-element-gap-lg)' }}>
+                    <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
+                        <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
+                        <span>
+                            We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
+                            Consider transitioning into guided questioning earlier to keep students actively reasoning.
+                        </span>
+                    </Alert>
                 </div>
             </section>
 
