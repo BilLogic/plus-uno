@@ -502,7 +502,7 @@ export default function MonthlyReportContent() {
                 </div>
                 {/* Peer Average */}
                 {/* Recommended Range Nudge */}
-                <div style={{ marginTop: 'var(--size-element-gap-md)' }}>
+                <div style={{ marginTop: 'var(--size-element-gap-xs)' }}>
                     <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                         <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
                         <span>
@@ -634,22 +634,8 @@ export default function MonthlyReportContent() {
                                                     </div>
                                                 </div>
                                             )}
-                                            {/* Progressive Training Disclosure */}
-                                            {feedbackSelections[dim.id] === 'helpful' && (
-                                                <div className="training-disclosure-card data-anim-enter" style={{ marginTop: 'var(--size-element-gap-md)', backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--size-element-pad-md)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)' }}>
-                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span style={{ fontSize: 'var(--text-size-sm)', color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Recommended Training</span>
-                                                        <span style={{ fontWeight: '500', color: 'var(--color-on-surface)' }}>
-                                                            {REPORT_DATA.training.find(t => t.id === dim.trainingId)?.title || 'Relevant Training Module'}
-                                                        </span>
-                                                    </div>
-                                                    <Button size="small" style="text" onClick={(e) => { e.stopPropagation(); /* Handle review click */ }}>
-                                                        Review Training <i className="fa-solid fa-arrow-right" style={{ marginLeft: 'var(--size-element-gap-xs)' }}></i>
-                                                    </Button>
-                                                </div>
-                                            )}
                                             {/* Feedback Input for Negative Feedback */}
-                                            {(state === 'under_review' || (state === 'reviewed' && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate'))) && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate') && (
+                                            {(state === 'under_review' || (state === 'reviewed' && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate' || feedbackSelections[dim.id] === 'helpful'))) && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate') && (
                                                 <div className="feedback-input-container" style={{ marginTop: 'var(--size-element-gap-md)' }}>
                                                     <Input
                                                         label={feedbackSelections[dim.id] === 'not_helpful' ? "What’s missing or off about this insight?" : "What feels inaccurate from this AI insight?"}
@@ -688,28 +674,33 @@ export default function MonthlyReportContent() {
                 </div>
             </section>
 
-            <Accordion defaultActiveKey={[]} alwaysOpen className="monthly-report-accordion reveal-section" style={{ animationDelay: '800ms' }}>
-                <Accordion.Item eventKey="0" header="Recommended Training to Review">
-                    <div className="training-carousel">
-                        <div className="training-grid">
-                            {FILTERED_TRAINING.map((t) => (
-                                <RecommendedLessons
-                                    key={t.id}
-                                    breakpoint="XXL & above"
-                                    badgeType={t.badgeType}
-                                    title={t.title}
-                                    duration={t.duration}
-                                    status="in-progress"
-                                    aiRecommended={false}
-                                    image={t.image}
-                                    actionLabel="Start"
-                                    onReviewClick={() => { }}
-                                />
-                            ))}
+            {reviewedCount === REPORT_DATA.dimensions.length && (
+                <Accordion defaultActiveKey={['0']} alwaysOpen className="monthly-report-accordion reveal-section" style={{ animationDelay: '800ms' }}>
+                    <Accordion.Item eventKey="0" header="Recommended Training to Review">
+                        <div className="training-carousel">
+                            <div className="training-grid">
+                                {FILTERED_TRAINING.map((t) => (
+                                    <RecommendedLessons
+                                        key={t.id}
+                                        breakpoint="XXL & above"
+                                        badgeType={t.badgeType}
+                                        title={t.title}
+                                        duration={t.duration}
+                                        status="in-progress"
+                                        aiRecommended={false}
+                                        image={t.image}
+                                        actionLabel="Start"
+                                        onReviewClick={() => { }}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </Accordion.Item>
-                <Accordion.Item eventKey="1" header="Student Goal Progress">
+                    </Accordion.Item>
+                </Accordion>
+            )}
+
+            <Accordion defaultActiveKey={['0']} alwaysOpen className="monthly-report-accordion reveal-section" style={{ animationDelay: '800ms' }}>
+                <Accordion.Item eventKey="0" header="Student Goal Progress">
                     <table className="goal-progress-table">
                         <thead>
                             <tr>
