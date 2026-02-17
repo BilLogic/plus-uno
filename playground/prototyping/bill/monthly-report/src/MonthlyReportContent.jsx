@@ -4,6 +4,7 @@ import Badge from '@/components/Badge/Badge';
 import Alert from '@/components/Alert/Alert';
 import Progress from '@/components/Progress/Progress';
 import Accordion from '@/components/Accordion/Accordion';
+import Input from '@/forms/Input';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import { ShellContext } from '../../home-redesign/src/context/ShellContext';
 import './MonthlyReportPage.scss';
@@ -135,6 +136,7 @@ export default function MonthlyReportContent() {
     const [reviewedCount, setReviewedCount] = useState(0);
     const [activeKey, setActiveKey] = useState(0);
     const [feedbackSelections, setFeedbackSelections] = useState({});
+    const [feedbackText, setFeedbackText] = useState({});
     const [hasEntered, setHasEntered] = useState(false);
     const [hasPlayedDataAnim, setHasPlayedDataAnim] = useState(false);
     const [isDataAnimActive, setIsDataAnimActive] = useState(false);
@@ -308,11 +310,35 @@ export default function MonthlyReportContent() {
 
     const handleFeedback = (dimId, feedbackType) => {
         setFeedbackSelections(prev => ({ ...prev, [dimId]: feedbackType }));
-        setReviewedCount(prev => {
-            const next = Math.min(prev + 1, totalDimensions);
-            setActiveKey(next < totalDimensions ? next : prev);
-            return next;
-        });
+
+        // If helpful, advance immediately. If not, wait for text input.
+        if (feedbackType === 'helpful') {
+            // Find index of this dimension
+            const index = REPORT_DATA.dimensions.findIndex(d => d.id === dimId);
+
+            // Only advance if this is the current item under review
+            if (index === reviewedCount) {
+                setReviewedCount(prev => {
+                    const next = Math.min(prev + 1, totalDimensions);
+                    setActiveKey(next < totalDimensions ? next : prev);
+                    return next;
+                });
+            }
+        }
+    };
+
+    const handleFeedbackSubmit = (dimId) => {
+        // Find index of this dimension
+        const index = REPORT_DATA.dimensions.findIndex(d => d.id === dimId);
+
+        // Only advance if this is the current item under review
+        if (index === reviewedCount) {
+            setReviewedCount(prev => {
+                const next = Math.min(prev + 1, totalDimensions);
+                setActiveKey(next < totalDimensions ? next : prev);
+                return next;
+            });
+        }
     };
 
     const handleCardClick = (index) => {
@@ -605,7 +631,7 @@ export default function MonthlyReportContent() {
                                             )}
                                             {(state === 'under_review' || state === 'reviewed') && (
                                                 <div className="feedback-row">
-                                                    <p className="feedback-prompt">{state === 'reviewed' ? 'Your feedback:' : 'Was this insight helpful?'}</p>
+                                                    <p className="feedback-prompt">{state === 'reviewed' ? (feedbackSelections[dim.id] === 'helpful' ? 'Marked as helpful' : 'Your feedback:') : 'Was this insight helpful?'}</p>
                                                     <div className="feedback-buttons">
                                                         <Button
                                                             size="small"
@@ -630,6 +656,34 @@ export default function MonthlyReportContent() {
                                                             onClick={(e) => { e.stopPropagation(); handleFeedback(dim.id, 'inaccurate'); }}
                                                         >
                                                             <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Feedback Input for Negative Feedback */}
+                                            {(state === 'under_review' || (state === 'reviewed' && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate'))) && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate') && (
+                                                <div className="feedback-input-container" style={{ marginTop: 'var(--size-element-gap-md)' }}>
+                                                    <Input
+                                                        label={feedbackSelections[dim.id] === 'not_helpful' ? "What’s missing or off about this insight?" : "What feels inaccurate from this AI insight?"}
+                                                        value={feedbackText[dim.id] || ''}
+                                                        onChange={(e) => setFeedbackText(prev => ({ ...prev, [dim.id]: e.target.value }))}
+                                                        autoFocus={state === 'under_review'}
+                                                        required
+                                                        validation={(feedbackText[dim.id] || '').length > 0 && (feedbackText[dim.id] || '').length < 10 ? 'invalid' : 'none'}
+                                                        validationMessage={(feedbackText[dim.id] || '').length < 10
+                                                            ? `${(feedbackText[dim.id] || '').length}/10 characters minimum`
+                                                            : `${(feedbackText[dim.id] || '').length} characters`
+                                                        }
+                                                    />
+                                                    <div style={{ marginTop: 'var(--size-element-gap-sm)', display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <Button
+                                                            size="small"
+                                                            style="primary"
+                                                            disabled={!feedbackText[dim.id] || feedbackText[dim.id].length < 10}
+                                                            onClick={(e) => { e.stopPropagation(); handleFeedbackSubmit(dim.id); }}
+                                                        >
+                                                            {state === 'reviewed' ? 'Update Feedback' : 'Submit & Continue'}
                                                         </Button>
                                                     </div>
                                                 </div>
