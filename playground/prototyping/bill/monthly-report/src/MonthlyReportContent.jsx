@@ -150,7 +150,6 @@ export default function MonthlyReportContent() {
         schools: 0
     });
     const [animatedTimeAlloc, setAnimatedTimeAlloc] = useState(REPORT_DATA.timeAllocation.map(() => 0));
-    const [animatedPeerAlloc, setAnimatedPeerAlloc] = useState(REPORT_DATA.peerAverage.map(() => 0));
     const [animatedReviewPct, setAnimatedReviewPct] = useState(0);
     const totalDimensions = REPORT_DATA.dimensions.length;
     const prefersReducedMotionRef = useRef(false);
@@ -192,7 +191,6 @@ export default function MonthlyReportContent() {
         if (prefersReducedMotionRef.current) {
             setAnimatedImpact(impactTargets);
             setAnimatedTimeAlloc(timeAllocTargets);
-            setAnimatedPeerAlloc(peerAllocTargets);
             setAnimatedReviewPct(reviewTarget);
             setHasPlayedDataAnim(true);
             return;
@@ -243,10 +241,6 @@ export default function MonthlyReportContent() {
         timerIds.push(window.setTimeout(() => {
             setAnimatedTimeAlloc(timeAllocTargets);
         }, 220));
-
-        timerIds.push(window.setTimeout(() => {
-            setAnimatedPeerAlloc(peerAllocTargets);
-        }, 340));
 
         timerIds.push(window.setTimeout(() => {
             tweenNumber({
@@ -479,7 +473,7 @@ export default function MonthlyReportContent() {
                     <div>
                         <h3 className="time-allocation-title data-anim-enter" style={{ '--text-delay': '380ms' }}>Time Allocation with Students</h3>
                         <p className="time-allocation-subtitle data-anim-enter" style={{ '--text-delay': '400ms' }}>
-                            See how your session time breaks down compared to the tutor average.
+                            Breakdown of your session time by activity.
                         </p>
                     </div>
                 </div>
@@ -507,40 +501,19 @@ export default function MonthlyReportContent() {
                     </div>
                 </div>
                 {/* Peer Average */}
-                <div className="time-allocation-bar-group">
-                    <div className="time-allocation-bar-header">
-                        <span className="time-allocation-bar-label time-allocation-bar-label--peer data-anim-enter" style={{ '--text-delay': '500ms' }}>Peer Average</span>
-                        <span className="time-allocation-bar-total data-anim-enter" style={{ '--text-delay': '500ms' }}>Total: 100%</span>
-                    </div>
-                    <div className={`time-allocation-bar time-allocation-bar--peer ${isDataAnimActive ? 'time-allocation-bar--animate' : ''}`}>
-                        {REPORT_DATA.peerAverage.map((seg, i) => (
-                            <div
-                                key={i}
-                                className={`time-allocation-segment time-allocation-segment--${seg.color}`}
-                                style={{
-                                    '--segment-target': `${seg.value}%`,
-                                    '--segment-delay': `${340 + i * 70}ms`,
-                                    width: `${animatedPeerAlloc[i]}%`
-                                }}
-                                title={`${seg.label}: ${seg.value}%`}
-                            >
-                                {seg.value >= 8 && <span className="segment-label">{seg.value}%</span>}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="time-allocation-legend">
-                    {REPORT_DATA.timeAllocation.map((seg, i) => (
-                        <div key={i} className="legend-item data-anim-enter" style={{ '--text-delay': `${520 + i * 50}ms` }}>
-                            <div className={`legend-dot legend-dot--${seg.color}`}></div>
-                            <span className="legend-label">{seg.label}</span>
+                {/* Key Takeaway Insight */}
+                <div className="time-allocation-key-takeaway data-anim-enter" style={{ '--text-delay': '500ms', marginTop: 'var(--size-element-gap-lg)' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--size-element-gap-md)', backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--size-element-pad-lg)', borderRadius: 'var(--radius-md)', borderLeft: '4px solid var(--color-interactive-primary)' }}>
+                        <i className="fa-solid fa-lightbulb" style={{ color: 'var(--color-interactive-primary)', marginTop: '2px' }}></i>
+                        <div>
+                            <span style={{ display: 'block', fontWeight: 'bold', marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>Key Takeaway</span>
+                            <span style={{ color: 'var(--color-on-surface-variant)', lineHeight: '1.5' }}>
+                                We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
+                                Consider transitioning into guided questioning earlier to keep students actively reasoning.
+                            </span>
                         </div>
-                    ))}
+                    </div>
                 </div>
-                <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
-                    <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
-                    You spent 10% more time on Goal Setting this month compared to last month. Great job focusing on student objectives early in the sessions!
-                </Alert>
             </section>
 
             {/* Growth Insights */}
