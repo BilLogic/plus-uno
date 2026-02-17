@@ -47,11 +47,11 @@ const REPORT_DATA = {
     ],
     timeInsight: 'You spent 10% more time on Goal Setting this month compared to last month. Great job focusing on student objectives early in the sessions!',
     dimensions: [
-        { id: 1, title: 'Interpersonal Comfort', subStatus: 'Greeting & rapport-building', icon: 'fa-user', iconBg: 'emerald', status: 'Demonstrated', summary: 'You consistently greeted students by name, asked about their week, and established a warm tone. Observed in 11 of 12 sessions.', evidence: 'Hey Marcus! Good to see you again. Before we get started, how\'d that math test go? … That\'s awesome, I\'m glad you felt good about it.', session: 'PS 234 • Tue Jan 28, 2:32 PM • 0:00–0:45', lessonUrl: '#' },
-        { id: 2, title: 'Response to Help Requests', subStatus: 'Redirecting rather than giving answers', icon: 'fa-hand', iconBg: 'amber', status: 'Developing', summary: 'In 4 of 8 observed help requests, you provided the answer directly. Try responding with a leading question first, like "What do you think the first step might be?"', evidence: 'Student: I don\'t know how to do this one. — Tutor: OK so the answer here is 42, because you need to multiply 6 times 7.', session: 'PS 234 • Wed Jan 29, 3:15 PM • 12:30–13:10', lessonUrl: '#', needsWork: true },
-        { id: 3, title: 'Prompting for Self-Explanation', subStatus: 'Asking students to explain their thinking', icon: 'fa-lightbulb', iconBg: 'stone', status: 'Developing', summary: 'Self-explanation prompts observed in only 3 of 12 sessions. Try asking "Can you walk me through how you figured that out?"', evidence: 'Student answers correctly. Tutor: "Good job!" and moves to next problem, without asking how they arrived at the answer.', session: 'PS 234 • Thu Jan 30, 2:50 PM • 8:20–8:45', lessonUrl: '#', needsWork: true },
-        { id: 4, title: 'Reacting to Errors', subStatus: 'Normalizing mistakes & guiding correction', icon: 'fa-exclamation-triangle', iconBg: 'amber', status: 'Not Observed', summary: 'The AI did not find clear instances of student errors during the analyzed portions of this month\'s recordings. This dimension will be evaluated again when opportunities arise.', evidence: null, session: null, lessonUrl: '#' },
-        { id: 5, title: 'Checking for Understanding', subStatus: 'Frequent comprehension checks', icon: 'fa-check-circle', iconBg: 'emerald', status: 'Demonstrated', summary: 'Great job pausing after key concepts to ask "Does that make sense?" and "How would you explain this in your own words?".', evidence: 'So before we move on, can you tell me what the first step was?', session: 'PS 234 • Fri Jan 31, 4:10 PM', lessonUrl: '#' }
+        { id: 1, title: 'Interpersonal Comfort', trainingId: '4', subStatus: 'Greeting & rapport-building', icon: 'fa-user', iconBg: 'emerald', status: 'Demonstrated', summary: 'You consistently greeted students by name, asked about their week, and established a warm tone. Observed in 11 of 12 sessions.', evidence: 'Hey Marcus! Good to see you again. Before we get started, how\'d that math test go? … That\'s awesome, I\'m glad you felt good about it.', session: 'PS 234 • Tue Jan 28, 2:32 PM • 0:00–0:45', lessonUrl: '#' },
+        { id: 2, title: 'Response to Help Requests', trainingId: '1', subStatus: 'Redirecting rather than giving answers', icon: 'fa-hand', iconBg: 'amber', status: 'Developing', summary: 'In 4 of 8 observed help requests, you provided the answer directly. Try responding with a leading question first, like "What do you think the first step might be?"', evidence: 'Student: I don\'t know how to do this one. — Tutor: OK so the answer here is 42, because you need to multiply 6 times 7.', session: 'PS 234 • Wed Jan 29, 3:15 PM • 12:30–13:10', lessonUrl: '#', needsWork: true },
+        { id: 3, title: 'Prompting for Self-Explanation', trainingId: '3', subStatus: 'Asking students to explain their thinking', icon: 'fa-lightbulb', iconBg: 'stone', status: 'Developing', summary: 'Self-explanation prompts observed in only 3 of 12 sessions. Try asking "Can you walk me through how you figured that out?"', evidence: 'Student answers correctly. Tutor: "Good job!" and moves to next problem, without asking how they arrived at the answer.', session: 'PS 234 • Thu Jan 30, 2:50 PM • 8:20–8:45', lessonUrl: '#', needsWork: true },
+        { id: 4, title: 'Reacting to Errors', trainingId: '2', subStatus: 'Normalizing mistakes & guiding correction', icon: 'fa-exclamation-triangle', iconBg: 'amber', status: 'Not Observed', summary: 'The AI did not find clear instances of student errors during the analyzed portions of this month\'s recordings. This dimension will be evaluated again when opportunities arise.', evidence: null, session: null, lessonUrl: '#' },
+        { id: 5, title: 'Checking for Understanding', trainingId: '1', subStatus: 'Frequent comprehension checks', icon: 'fa-check-circle', iconBg: 'emerald', status: 'Demonstrated', summary: 'Great job pausing after key concepts to ask "Does that make sense?" and "How would you explain this in your own words?".', evidence: 'So before we move on, can you tell me what the first step was?', session: 'PS 234 • Fri Jan 31, 4:10 PM', lessonUrl: '#' }
     ],
     training: [
         { id: '1', title: 'Mastering Response to Help Requests', category: 'Social-Emotional Learning', duration: '12 mins', badgeType: 'socio-emotional', image: imgGivingEffectivePraise, status: 'Developing' },
@@ -502,7 +502,7 @@ export default function MonthlyReportContent() {
                 </div>
                 {/* Peer Average */}
                 {/* Recommended Range Nudge */}
-                <div style={{ marginTop: 'var(--size-element-gap-lg)' }}>
+                <div style={{ marginTop: 'var(--size-element-gap-md)' }}>
                     <Alert style="tertiary" dismissable={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                         <i className="fa-solid fa-lightbulb insight-alert-icon" style={{ marginRight: 'var(--size-element-gap-sm)' }}></i>
                         <span>
@@ -634,7 +634,20 @@ export default function MonthlyReportContent() {
                                                     </div>
                                                 </div>
                                             )}
-
+                                            {/* Progressive Training Disclosure */}
+                                            {feedbackSelections[dim.id] === 'helpful' && (
+                                                <div className="training-disclosure-card data-anim-enter" style={{ marginTop: 'var(--size-element-gap-md)', backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--size-element-pad-md)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <span style={{ fontSize: 'var(--text-size-sm)', color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>Recommended Training</span>
+                                                        <span style={{ fontWeight: '500', color: 'var(--color-on-surface)' }}>
+                                                            {REPORT_DATA.training.find(t => t.id === dim.trainingId)?.title || 'Relevant Training Module'}
+                                                        </span>
+                                                    </div>
+                                                    <Button size="small" style="text" onClick={(e) => { e.stopPropagation(); /* Handle review click */ }}>
+                                                        Review Training <i className="fa-solid fa-arrow-right" style={{ marginLeft: 'var(--size-element-gap-xs)' }}></i>
+                                                    </Button>
+                                                </div>
+                                            )}
                                             {/* Feedback Input for Negative Feedback */}
                                             {(state === 'under_review' || (state === 'reviewed' && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate'))) && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate') && (
                                                 <div className="feedback-input-container" style={{ marginTop: 'var(--size-element-gap-md)' }}>
