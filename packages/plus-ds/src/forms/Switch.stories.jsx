@@ -23,12 +23,6 @@ export default {
             description: 'Controlled checked state',
             table: { category: 'State' }
         },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant',
-            table: { category: 'Design' }
-        },
         disabled: {
             control: 'boolean',
             description: 'Disable the switch',
@@ -48,14 +42,6 @@ export const Overview = () => (
                 <Switch id="switch-disabled-on" name="switch-disabled-on" label="Disabled (On)" disabled defaultChecked />
             </div>
         </section>
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <Switch id="switch-small" name="switch-small" label="Small" size="small" defaultChecked />
-                <Switch id="switch-medium" name="switch-medium" label="Medium (Default)" size="medium" defaultChecked />
-                <Switch id="switch-large" name="switch-large" label="Large" size="large" defaultChecked />
-            </div>
-        </section>
     </div>
 );
 
@@ -68,7 +54,6 @@ export const Interactive = (args) => {
             name="switch-interactive"
             label={args.label}
             checked={checked}
-            size={args.size}
             disabled={args.disabled}
             onChange={(e) => setChecked(e.target.checked)}
         />
@@ -78,6 +63,5 @@ export const Interactive = (args) => {
 Interactive.args = {
     label: 'Toggle Switch',
     checked: false,
-    size: 'medium',
     disabled: false
 };

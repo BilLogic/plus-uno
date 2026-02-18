@@ -37,9 +37,7 @@
 
 .plus-rating-comments-label {
     color: var(--color-on-surface);
-    margin-top: var(--size-element-gap-sm, 8px);
-    text-align: center;
-    width: 40px; // Match star width for alignment
+    text-align: left;
 }
 
 // Rating Item Wrapper (for numeric variant)
@@ -52,7 +50,7 @@
 
 .plus-rating-item-label {
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-normal);
     text-align: center;
     min-width: 20px;
 }

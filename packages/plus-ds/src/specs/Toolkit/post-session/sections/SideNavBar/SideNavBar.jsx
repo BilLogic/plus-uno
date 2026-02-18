@@ -85,6 +85,8 @@ const SideNavBar = ({
                 borderRadius: '16px',
                 minWidth: '240px',
                 width: '240px',
+                alignSelf: 'flex-start',
+                flexShrink: 0,
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>

@@ -16,6 +16,8 @@ const Rating = ({
     required = false,
     value = 0,
     variant = 'comments', // 'comments' or 'numeric'
+    showCommentsLabel = true,
+    commentsLabel = 'Comments',
     disabled = false,
     onChange,
     className = '',
@@ -57,15 +59,15 @@ const Rating = ({
                                 disabled={disabled}
                                 onClick={() => handleStarClick(starValue)}
                             />
-                            {variant === 'comments' && starValue === 1 && (
-                                <div className="plus-rating-comments-label body2-txt">
-                                    Comments
-                                </div>
-                            )}
                         </div>
                     );
                 })}
             </div>
+            {variant === 'comments' && showCommentsLabel && (
+                <div className="plus-rating-comments-label body2-txt">
+                    {commentsLabel}
+                </div>
+            )}
         </div>
     );
 };
@@ -77,6 +79,8 @@ Rating.propTypes = {
     required: PropTypes.bool,
     value: PropTypes.number,
     variant: PropTypes.oneOf(['comments', 'numeric']),
+    showCommentsLabel: PropTypes.bool,
+    commentsLabel: PropTypes.node,
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
     className: PropTypes.string,
