@@ -1,3 +1,5 @@
+<!-- ~550 tokens | Load for: discovery questions, orientation, no new implementation -->
+
 # Learning Mode Reference
 
 ## When to Use This Mode
@@ -55,7 +57,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 3. Provide Navigation
 - Always include next files to open.
-- Route to `references/components-guide.md` and `references/examples-guide.md` for quick lookup.
+- Route to `references/components-guide.md` and `references/implementation-guide.md` for quick lookup.
 
 4. Stay Read-Only
 - Learning mode is analysis and explanation only.

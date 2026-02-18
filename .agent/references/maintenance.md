@@ -1,3 +1,5 @@
+<!-- ~350 tokens | Load for: keeping .agent guidance aligned with actual codebase -->
+
 # Skill and Design-System Maintenance Runbook
 
 This runbook keeps agent guidance aligned with actual code.

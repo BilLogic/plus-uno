@@ -1,3 +1,5 @@
+<!-- ~180 tokens | Load for: building and previewing locally -->
+
 # Local Preview Runbook
 
 Use this flow from repo root to verify a production-like preview.

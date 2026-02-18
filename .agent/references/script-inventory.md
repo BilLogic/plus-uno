@@ -1,3 +1,5 @@
+<!-- ~350 tokens | Load for: understanding which repo scripts exist and when to use them -->
+
 # Script Inventory and Usage Guidance
 
 This is a practical inventory of existing repository scripts and when to use them.

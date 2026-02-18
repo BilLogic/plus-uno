@@ -1,3 +1,5 @@
+<!-- ~750 tokens | Load for: modifying DS source, tokens, components, or docs -->
+
 # Maintaining Mode Reference
 
 ## Contents

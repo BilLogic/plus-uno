@@ -1,3 +1,5 @@
+<!-- ~500 tokens | Load for: comparing 3-5 UI alternatives with tradeoffs -->
+
 # Iteration Mode Reference
 
 ## When to Use This Mode
@@ -35,8 +37,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - Playground prototypes in `playground/prototyping/**`
 
 4. Composition examples
-- `references/examples-guide.md`
-- `references/patterns-guide.md`
+- `references/implementation-guide.md`
 
 ## How to Respond in Iteration Mode
 
