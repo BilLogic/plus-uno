@@ -539,3 +539,37 @@ $dropdown-themes: (
         }
     }
 }
+
+// =============================================================================
+// OVERRIDES & SPECIFIC ADJUSTMENTS
+// =============================================================================
+
+// Fix: Match 'Default Outline' dropdown border to standard Form Input borders (Date Picker, etc.)
+// User feedback: "Stroke around the dropdowns is so bold" (was dark grey, needs to be light grey)
+.pdropdown.pdropdown-default.pdropdown-outline {
+
+    .pdropdown-toggle,
+    .pdropdown-default-toggle,
+    .pdropdown-split-text-btn,
+    .pdropdown-split-toggle-btn {
+        border-color: var(--color-outline-variant) !important; // Light grey match
+        color: var(--color-on-surface);
+
+        // Ensure icon matches text/input icon style
+        &::after {
+            color: var(--color-on-surface-variant) !important;
+        }
+
+        &:hover {
+            border-color: var(--color-outline) !important; // Slightly darker on hover
+            background-color: var(--color-surface-container-low);
+        }
+
+        &:active,
+        &.active,
+        &.show {
+            border-color: var(--color-primary) !important; // Highlight on active
+            background-color: var(--color-surface-container);
+        }
+    }
+}
