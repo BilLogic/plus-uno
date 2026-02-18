@@ -16,6 +16,7 @@
 
 ### Decision Tree
 - If design is approved and implementation-ready: use Finalization Mode.
+- If validating an idea with high-fidelity but disposal code: use Prototyping Mode.
 - If still comparing alternatives: use Iteration Mode.
 - If only asking conceptual structure: use Consulting Mode.
 

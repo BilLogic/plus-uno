@@ -1,6 +1,6 @@
 ---
 name: plus-design-system-router
-description: Cross-agent router for working in the PLUS design system repository. Use when an AI coding agent needs to choose one mode (learning, maintaining, consulting, iteration, or finalization), discover components, apply design tokens, follow import conventions, and execute design-system workflows across Storybook, Figma MCP, Stitch MCP, and repo scripts.
+description: Cross-agent router for working in the PLUS design system repository. Use when an AI coding agent needs to choose one mode (learning, maintaining, consulting, iteration, prototyping, or finalization), discover components, apply design tokens, follow import conventions, and execute design-system workflows across Storybook, Figma MCP, Stitch MCP, and repo scripts.
 ---
 
 # PLUS Design System Skill Router
@@ -71,6 +71,10 @@ Choose exactly one mode per request:
 - Reference: `references/iteration.md`
 - Summary: Generate 3-5 variations with tradeoffs.
 
+74. Prototyping Mode
+- Reference: `references/prototyping.md`
+- Summary: Build high-fidelity, low-rigor proof-of-concepts (disposable code).
+
 5. Finalization Mode
 - Reference: `references/finalization.md`
 - Summary: Production-ready implementation with all states and accessibility.
@@ -78,9 +82,9 @@ Choose exactly one mode per request:
 ## Critical Routing Behavior
 
 Before generating any code, ask these three questions verbatim:
-1. "Which scenario are we in: learning, maintaining, consulting, iteration, or finalization?"
+1. "Which scenario are we in: learning, maintaining, consulting, iteration, prototyping, or finalization?"
 2. "Are you implementing from a design tool (Figma/etc), or building from scratch?"
-3. "What fidelity do you need: structure only, mid-fidelity exploration, or production-ready?"
+3. "What fidelity do you need: structure only, mid-fidelity exploration, high-fidelity prototype, or production-ready?"
 
 Then load only the matching mode file in `references/` and proceed.
 

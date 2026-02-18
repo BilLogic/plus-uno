@@ -8,6 +8,7 @@
 ### Decision Tree
 - If user wants options/tradeoffs: use Iteration Mode.
 - If user wants one final production implementation: use Finalization Mode.
+- If user wants to validate one high-fidelity idea without production rigor: use Prototyping Mode.
 - If user only wants conceptual structure: use Consulting Mode.
 
 ## Design Constraints
