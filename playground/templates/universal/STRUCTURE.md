@@ -6,8 +6,8 @@ This template contains complete page implementations for universal/shared compon
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Overview**: `../../../design-system/specs/Universal/Universal.stories.js`
-- **Component Library**: `../../../design-system/components/`
+- **Specs Overview**: `../../../packages/plus-ds/specs/Universal/Universal.stories.js`
+- **Component Library**: `../../../packages/plus-ds/components/`
 
 ## Template Structure
 
@@ -35,8 +35,8 @@ playground/templates/universal/
 
 ## Implementation Guidelines
 
-1. **Reference Specs First**: Always check `../../../design-system/specs/Universal/` for component specifications
-2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/styles/`
+1. **Reference Specs First**: Always check `../../../packages/plus-ds/specs/Universal/` for component specifications
+2. **Use Design Tokens**: Always use semantic design tokens from `../../../packages/plus-ds/styles/`
 3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations
@@ -52,7 +52,7 @@ Current template files in this directory:
 - Start from the specs documentation to understand component structure
 - Implement complete pages, not just individual components
 - Use existing PLUS components when possible
-- Follow coding standards from `../../../develop/standards.md`
+- Follow coding standards from `../../../.agent/SKILL.md`
 - Include proper accessibility attributes
 - Ensure responsive design
 - Universal templates should be reusable across different product pillars

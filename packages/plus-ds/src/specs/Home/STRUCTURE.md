@@ -6,7 +6,7 @@ The Home organism contains components for the home page, including dashboard ele
 ## Directory Structure
 
 ```
-design-system/components/organisms/Home/
+packages/plus-ds/src/specs/Home/
 ├── STRUCTURE.md (this file)
 ├── Home.stories.js (main organism overview story)
 │

@@ -1,51 +1,23 @@
-# WORKFLOW: CONSUMER (BUILDER)
+# Workflow: Consumer (Builder)
 
-**ROLE**: Builder / Prototyper
-**GOAL**: Generate production-ready code matching Design System standards.
+This workflow document is maintained for compatibility.
 
-## ALGORITHM: BUILD_FEATURE
+## Canonical Source
 
-### STEP 1: INPUT_ANALYSIS
-**INPUT**: User Request
-**PROCESS**:
-1.  **CHECK**: Is the request ambiguous? (e.g., "Make a dashboard")
-    *   **IF YES**: -> **STOP**. **ASK** clarifying questions.
-    *   **IF NO**: -> Continue.
-2.  **CHECK**: Is there a Figma link?
-    *   **IF YES**: -> **EXECUTE** `mcp_Figma_Desktop_get_design_context`.
-    *   **IF NO**: -> **PROPOSE** text-based plan.
+Agent workflow routing and implementation behavior is now defined in:
 
-### STEP 2: DESIGN_PROPOSAL (PATTERN)
-**PROCESS**:
-1.  **IDENTIFY Pattern**: Define the high-level design intent (e.g., "I need a *Card Layout* for the user profile").
-2.  **SELECT Components**: Map patterns to specific components (e.g., "I will use `createCard`, `createAvatar`, and `createButton`").
-3.  **OUTPUT**: Propose this plan to the User. **WAIT** for approval.
+- `.agent/SKILL.md`
+- `.agent/references/finalization.md`
+- `.agent/references/iteration.md`
+- `.agent/references/consulting.md`
+- `.agent/references/learning.md`
 
-### STEP 2.5: LOAD_CONTEXT (REQUIRED)
-**PROCESS**:
-1.  **READ** `develop/foundations/colors.md` (for color tokens).
-2.  **TOKENS**: Use tokens from `packages/plus-ds/guidelines/design-tokens/` (e.g., `var(--size-pad-md)`).
-3.  **READ** `develop/foundations/layout.md` (for spacing/radius).
-**CRITICAL**: Do not proceed until you have loaded these tokens into context.
+## DS-Specific References
 
-### STEP 3: IMPLEMENTATION (COMPONENT)
-**CONSTRAINT**: **NEVER** create custom CSS/HTML. **ALWAYS** use `PlusInterface`.
-**PROCESS**:
-1.  **IMPORT** components from `design-system/components/index.js`.
-2.  **ASSEMBLE** using `PlusInterface.create{Component}` (as defined in Pattern Packs).
-3.  **STYLE** using Semantic Tokens (`var(--color-*)`, `var(--size-*)`).
+- Components: `packages/plus-ds/guidelines/overview-components.md`
+- Tokens: `packages/plus-ds/guidelines/design-tokens/`
+- Figma flow: `packages/plus-ds/guidelines/guides/figma-workflow.md`
 
-## CHEATSHEET: PATTERN_ROUTING
+## Notes
 
-| UI Element | Pattern Pack |
-| :--- | :--- |
-| **Inputs, Buttons** | `patterns/elements.md` |
-| **Cards, Tiles** | `patterns/cards.md` |
-| **Sections, Lists** | `patterns/sections.md` |
-| **Modals, Alerts** | `patterns/modals.md` |
-| **Navbars, Layouts** | `patterns/surfaces.md` |
-| **Tables** | `patterns/tables.md` |
-
-## REFERENCE: ASSETS
-*   **Images**: Use `https://placehold.co/600x400` or `assets/images/`.
-*   **Icons**: Use Font Awesome + Tokens (`var(--font-size-fa-*)`).
+Use `.agent` references as the operational source of truth for agent behavior.

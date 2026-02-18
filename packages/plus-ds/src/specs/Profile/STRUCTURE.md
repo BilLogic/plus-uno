@@ -6,7 +6,7 @@ The Profile organism contains components for user profile management and tutor p
 ## Directory Structure
 
 ```
-design-system/components/organisms/Profile/
+packages/plus-ds/src/specs/Profile/
 ├── STRUCTURE.md (this file)
 ├── Profile.stories.js (main organism overview story)
 │

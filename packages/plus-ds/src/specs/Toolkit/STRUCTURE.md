@@ -6,7 +6,7 @@ The Toolkit organism contains components for sessions, sign-ups, call-offs, refl
 ## Directory Structure
 
 ```
-design-system/components/organisms/Toolkit/
+packages/plus-ds/src/specs/Toolkit/
 ├── STRUCTURE.md (this file)
 ├── Toolkit.stories.js (main organism overview story)
 │

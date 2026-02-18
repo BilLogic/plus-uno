@@ -1,42 +1,25 @@
-# WORKFLOW: CONTRIBUTOR (MAINTAINER)
+# Workflow: Contributor (Maintainer)
 
-**ROLE**: Maintainer / System Engineer
-**GOAL**: Update, Refactor, or Fix the Design System.
+This workflow document is maintained for compatibility.
 
-## PROTOCOL: SYSTEM_UPDATE
+## Canonical Source
 
-### STEP 1: SCOPE_IDENTIFICATION
-**INPUT**: User Request
-**PROCESS**: Identify the Target Scope.
+Design-system maintenance behavior is now defined in:
 
-| Target | Path | Action |
-| :--- | :--- | :--- |
-| **Component** | `packages/plus-ds/src/components/{Name}/` | Update Logic/UI |
-| **Spec** | `packages/plus-ds/src/specs/{Pillar}/` | Update Template |
-| **Token** | `packages/plus-ds/src/styles/` | Update Foundation |
-| **Asset** | `packages/plus-ds/src/assets/` | Update Resource |
+- `.agent/SKILL.md`
+- `.agent/references/maintaining.md`
+- `.agent/references/tokens.md`
+- `.agent/scripts/maintenance.md`
 
-### STEP 2: BRANCHING_STRATEGY
-**COMMAND**: `git checkout -b {type}/{name}`
-*   `feat/`: New component or feature.
-*   `fix/`: Bug fix.
-*   `refactor/`: Code cleanup.
+## Current Verification Commands
 
-### STEP 3: IMPLEMENTATION_RULES
-**CONSTRAINT**: **STRICT ADHERENCE** to Standards.
-1.  **DESIGN**: **MUST** check [Figma Handoff Guide](../guides/figma-workflow.md).
-2.  **TOKENS**: **MUST** use Semantic Tokens. No hardcoded values.
-3.  **REUSE**: **MUST** extend existing components. No duplication.
-4.  **DOCS**: **MUST** update `packages/plus-ds/guidelines/{components/design-tokens}/*.md` if API changes.
+```bash
+npm run storybook
+npm run sync:tokens
+npm run generate:tokens
+npm run build
+```
 
-### STEP 4: VERIFICATION
-**PROCESS**:
-1.  **STORYBOOK**: Verify changes in isolation.
-2.  **TEST**: Run automated tests `npm test`.
-3.  **BROWSER**: Manual check via `npm run serve`.
+## Notes
 
-## CHEATSHEET: FILE_STRUCTURE
-
-*   **Components**: `packages/plus-ds/src/components/` (Flat Structure)
-*   **Specs**: `packages/plus-ds/src/specs/` (Page Templates)
-*   **Styles**: `packages/plus-ds/src/styles/` (Tokens)
+Use `.agent` references as the operational source of truth for agent behavior.

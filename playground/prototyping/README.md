@@ -166,8 +166,8 @@ By default, prototyping directories are ignored by git (see `.gitignore`). If yo
 
 ## See Also
 
-- **Building skill**: `.agent/skills/building/SKILL.md` — Agent protocol for implementation (prototyping uses this + modes above)
+- **Agent router**: `.agent/SKILL.md` — Mode-based protocol for implementation (learning/maintaining/consulting/iteration/finalization)
 - **Templates**: `../templates/` — Curated templates based on specs documentation
 - **Design System**: `../../packages/plus-ds/` — Component library and tokens
-- **Documentation**: `../../develop/` — Technical documentation
+- **Agent references**: `../../.agent/references/` — Canonical workflow and foundation docs
 - **Token Reference**: `../../packages/plus-ds/guidelines/design-tokens/` — Colors, typography, layout

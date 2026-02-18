@@ -45,7 +45,7 @@ The design system supports automatic syncing of tokens from Figma via GitHub Act
 ### How It Works
 1.  **Daily Sync**: GitHub Actions runs daily.
 2.  **Manual Sync**: Run `npm run sync:tokens`.
-3.  **Generation**: SCSS files are generated in `develop/tokens/`.
+3.  **Generation**: SCSS files are generated in `packages/plus-ds/src/tokens/`.
 
 ### Manual Sync (Fallback)
 1.  Export JSON tokens from Figma to `new tokens/`.

@@ -1,45 +1,16 @@
-# How to View the Supervisor Session Prototype
+# How to View This Prototype
 
-## File Location
-The prototype file is located at: `templates/admin/supervisor-session-prototype.html`
+Run from repository root:
 
-## Steps to View
+```bash
+cd "/Users/billguo/Desktop/Vibe Coding/PLUS - ONE/plus-vibe-coding-starting-kit"
+npm install
+npm run dev
+```
 
-1. **Make sure you're in the project root directory:**
-   ```bash
-   cd /path/to/plus-vibe-coding-starting-kit
-   ```
+Then open the route/path used by this template in your local Vite server.
 
-2. **Build the CSS (if you haven't already):**
-   ```bash
-   npm run build:css
-   ```
+## Notes
 
-3. **Start a local HTTP server from the project root:**
-   ```bash
-   python3 -m http.server 8000
-   ```
-   OR
-   ```bash
-   python -m http.server 8000
-   ```
-
-4. **Open in your browser:**
-   ```
-   http://localhost:8000/templates/admin/supervisor-session-prototype.html
-   ```
-
-## Important Notes
-
-- The prototype requires the compiled CSS file (`dist/css/main.css`)
-- Make sure `npm run build:css` has been run to compile all SCSS changes
-- The server must be running from the project root directory
-- If you see 404 errors, check that you're accessing the correct URL and the server is running from the correct directory
-
-## Features
-
-- **Home Screen**: Displays sessions list with filters, summary cards, and navigation tabs
-- **Create Session Modal**: Click "Fill in" button to open a 3-step modal for creating a new session
-- **Session Details Modal**: Click "Details" on any session row to view session information
-- **Responsive Design**: Uses PLUS design system tokens and components throughout
-
+- Do not use legacy `build:css` workflows in this repository.
+- Use `.agent/SKILL.md` and `.agent/references/` for current implementation guidance.

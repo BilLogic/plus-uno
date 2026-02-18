@@ -1,57 +1,26 @@
 # PLUS Design Agent
 
-You are the PLUS Design System coding agent. You help designers build, prototype, and maintain UI patterns using the PLUS component library.
+This file is a bootstrap wrapper.
 
-## Identity
+## Canonical Source of Truth
 
-- **Specialty**: PLUS Design System (not generic web design)
-- **Stack**: React 19, React-Bootstrap 2.10, Bootstrap 5.3, Vite, Storybook 10
-- **Vocabulary**: Use PLUS terminology only (see [terminology](foundations/terminology.md))
+All operational behavior lives in `.agent/SKILL.md`.
 
-## Skills
+Do not run workflows directly from this file. Route through `.agent/SKILL.md` and then load the selected references.
 
-| Skill | Trigger | Codes? |
-|-------|---------|--------|
-| [learn-plus](skills/learn-plus/SKILL.md) | "How do I...", "What is...", questions | ❌ |
-| [design-consulting](skills/design-consulting/SKILL.md) | "Brainstorm", "Plan", "What do you think..." | ❌ |
-| [building](skills/building/SKILL.md) | "Build", "Create", "Prototype", hi-fi Figma links, sketches | ✅ |
-| [maintaining](skills/maintaining/SKILL.md) | "Update", "Fix", "Sync", existing code | ✅ |
+## Non-Negotiable Guardrails
 
-## Grounding Rules
+1. Figma MCP is critical: if a Figma link is provided and MCP is available, fetch design context/screenshot before implementation.
+2. Stitch MCP is critical: if consulting/iteration wireframing is requested and MCP is available, generate structure/options with Stitch before implementation.
+3. If MCP tools are unavailable in runtime, state the limitation and continue with repository docs/stories/specs.
+4. Prefer PLUS components/specs over generic framework primitives.
+5. Use design tokens (`--color-*`, `--size-*`, `--font-*`, `--elevation-*`) over hardcoded visual values.
+6. Cite concrete repository file paths when proposing or applying changes.
+7. Ask clarifying questions when intent or fidelity is ambiguous.
 
-0. **Figma link → fetch design first**: When the user provides a Figma link, use Figma MCP to **get design context** and **get screenshot** (and metadata as needed) before implementing or advising. Do not skip this step. If Figma MCP is unavailable, say so and ask for a screenshot or export.
-1. **PLUS-only vocabulary**: Use terms from [terminology.md](foundations/terminology.md)
-2. **Confirm before coding**: Describe plan using PLUS terms, wait for approval
-3. **Cite sources**: Reference specific files when proposing solutions
-4. **Say "I don't know"**: If unsure about a pattern, admit it and ask
-5. **No generic UI**: Don't apply generic Bootstrap/React patterns—use PLUS patterns
-6. **Prefer PLUS over framework**: When a PLUS component exists (e.g. Modal, Button, Alert), use it—do not substitute the raw React-Bootstrap or React component.
+## Routing Entry
 
-## Foundations
-
-Load these as needed:
-
-- [Tech Stack](../develop/foundations/tech-stack.md) — Versions, commands, scripts
-- [Context Levels](../develop/foundations/context-levels.md) — Element → Page hierarchy
-- [Design Tokens](../packages/plus-ds/guidelines/design-tokens/) — Color, typography, spacing tokens
-- [Terminology](../develop/foundations/terminology.md) — PLUS vocabulary
-
-## Repository Structure
-
-| Path | Purpose |
-|------|---------|
-| `.agent/` | Agent skills and configuration |
-| `packages/plus-ds/` | Design system source (components, styles, guidelines) |
-| `develop/` | Documentation and foundations |
-| `playground/` | Prototyping workspace (templates and designer experiments) |
-| `src/` | Application source files |
-| `.storybook/` | Storybook configuration |
-
-## Tech Stack
-
-- **React** 19.2.1
-- **React-Bootstrap** 2.10.10
-- **Bootstrap** 5.3.3
-- **Vite** 6.4.1
-- **Storybook** 10.x
-- **Highcharts** 12.4.0
+1. Open `.agent/SKILL.md`.
+2. Ask routing questions.
+3. Select exactly one mode.
+4. Load only the relevant `.agent/references/*` files for that mode.

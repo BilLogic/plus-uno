@@ -6,7 +6,7 @@ The Login organism is a higher-level component that combines multiple molecules,
 ## Directory Structure
 
 ```
-design-system/components/organisms/Login/
+packages/plus-ds/src/specs/Login/
 ├── STRUCTURE.md (this file)
 ├── Login.stories.js (main organism overview story)
 │

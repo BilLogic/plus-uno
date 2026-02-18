@@ -7,55 +7,55 @@
 
 | Component | Pattern Pack | Source |
 | :--- | :--- | :--- |
-| **Alert** | [Modals](../patterns/modals.md) | `design-system/components/Alert` |
-| **Badge** | [Elements](../patterns/elements.md) | `design-system/components/Badge` |
-| **Breadcrumb** | [Modals](../patterns/modals.md) | `design-system/components/Breadcrumb` |
-| **Button** | [Elements](../patterns/elements.md) | `design-system/components/Button` |
-| **ButtonGroup** | [Elements](../patterns/elements.md) | `design-system/components/ButtonGroup` |
-| **Card** | [Cards](../patterns/cards.md) | `design-system/components/Card` |
-| **Carousel** | [Sections](../patterns/sections.md) | `design-system/components/Carousel` |
-| **Checkbox** | [Elements](../patterns/elements.md) | `design-system/components/Checkbox` |
-| **Chip** | [Elements](../patterns/elements.md) | `design-system/components/Chip` |
-| **Collapse** | [Sections](../patterns/sections.md) | `design-system/components/Collapse` |
-| **CompetencyBadge** | [Elements](../patterns/elements.md) | `design-system/components/CompetencyBadge` |
-| **DatePicker** | [Modals](../patterns/modals.md) | `design-system/components/DatePicker` |
-| **Divider** | [Elements](../patterns/elements.md) | `design-system/components/Divider` |
-| **Dropdown** | [Elements](../patterns/elements.md) | `design-system/components/Dropdown` |
-| **Form** | [Elements](../patterns/elements.md) | `design-system/components/Form` |
-| **Input** | [Elements](../patterns/elements.md) | `design-system/components/Input` |
-| **InputGroup** | [Elements](../patterns/elements.md) | `design-system/components/InputGroup` |
-| **Jumbotron** | [Sections](../patterns/sections.md) | `design-system/components/Jumbotron` |
-| **ListGroup** | [Sections](../patterns/sections.md) | `design-system/components/ListGroup` |
-| **LoadingGif** | [Modals](../patterns/modals.md) | `design-system/components/LoadingGif` |
-| **MediaObject** | [Cards](../patterns/cards.md) | `design-system/components/MediaObject` |
-| **Modal** | [Modals](../patterns/modals.md) | `design-system/components/Modal` |
-| **Navbar** | [Surfaces](../patterns/surfaces.md) | `design-system/components/Navbar` |
-| **Navigation** | [Surfaces](../patterns/surfaces.md) | `design-system/components/Navigation` |
-| **Pagination** | [Tables](../patterns/tables.md) | `design-system/components/Pagination` |
-| **Popover** | [Modals](../patterns/modals.md) | `design-system/components/Popover` |
-| **Progress** | [Elements](../patterns/elements.md) | `design-system/components/Progress` |
-| **Radio** | [Elements](../patterns/elements.md) | `design-system/components/Radio` |
-| **RichTextEditor** | [Elements](../patterns/elements.md) | `design-system/components/RichTextEditor` |
-| **Scrollspy** | [Surfaces](../patterns/surfaces.md) | `design-system/components/Scrollspy` |
-| **Section** | [Sections](../patterns/sections.md) | `design-system/components/Section` |
-| **SidebarTab** | [Surfaces](../patterns/surfaces.md) | `design-system/components/SidebarTab` |
-| **Spinner** | [Modals](../patterns/modals.md) | `design-system/components/Spinner` |
-| **StaticBadgeSmart** | [Elements](../patterns/elements.md) | `design-system/components/StaticBadgeSmart` |
-| **SuperCompPill** | [Elements](../patterns/elements.md) | `design-system/components/SuperCompPill` |
-| **Switch** | [Elements](../patterns/elements.md) | `design-system/components/Switch` |
-| **Table** | [Tables](../patterns/tables.md) | `design-system/components/Table` |
-| **Toast** | [Modals](../patterns/modals.md) | `design-system/components/Toast` |
-| **Tooltip** | [Modals](../patterns/modals.md) | `design-system/components/Tooltip` |
-| **UserAvatar** | [Elements](../patterns/elements.md) | `design-system/components/UserAvatar` |
+| **Alert** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Alert` |
+| **Badge** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Badge` |
+| **Breadcrumb** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Breadcrumb` |
+| **Button** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Button` |
+| **ButtonGroup** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/ButtonGroup` |
+| **Card** | [Cards](../patterns/cards.md) | `packages/plus-ds/src/components/Card` |
+| **Carousel** | [Sections](../patterns/sections.md) | `packages/plus-ds/src/components/Carousel` |
+| **Checkbox** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Checkbox` |
+| **Chip** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Chip` |
+| **Collapse** | [Sections](../patterns/sections.md) | `packages/plus-ds/src/components/Collapse` |
+| **CompetencyBadge** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/CompetencyBadge` |
+| **DatePicker** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/DatePicker` |
+| **Divider** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Divider` |
+| **Dropdown** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Dropdown` |
+| **Form** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Form` |
+| **Input** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Input` |
+| **InputGroup** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/InputGroup` |
+| **Jumbotron** | [Sections](../patterns/sections.md) | `packages/plus-ds/src/components/Jumbotron` |
+| **ListGroup** | [Sections](../patterns/sections.md) | `packages/plus-ds/src/components/ListGroup` |
+| **LoadingGif** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/LoadingGif` |
+| **MediaObject** | [Cards](../patterns/cards.md) | `packages/plus-ds/src/components/MediaObject` |
+| **Modal** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Modal` |
+| **Navbar** | [Surfaces](../patterns/surfaces.md) | `packages/plus-ds/src/components/Navbar` |
+| **Navigation** | [Surfaces](../patterns/surfaces.md) | `packages/plus-ds/src/components/Navigation` |
+| **Pagination** | [Tables](../patterns/tables.md) | `packages/plus-ds/src/components/Pagination` |
+| **Popover** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Popover` |
+| **Progress** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Progress` |
+| **Radio** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Radio` |
+| **RichTextEditor** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/RichTextEditor` |
+| **Scrollspy** | [Surfaces](../patterns/surfaces.md) | `packages/plus-ds/src/components/Scrollspy` |
+| **Section** | [Sections](../patterns/sections.md) | `packages/plus-ds/src/components/Section` |
+| **SidebarTab** | [Surfaces](../patterns/surfaces.md) | `packages/plus-ds/src/components/SidebarTab` |
+| **Spinner** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Spinner` |
+| **StaticBadgeSmart** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/StaticBadgeSmart` |
+| **SuperCompPill** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/SuperCompPill` |
+| **Switch** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/Switch` |
+| **Table** | [Tables](../patterns/tables.md) | `packages/plus-ds/src/components/Table` |
+| **Toast** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Toast` |
+| **Tooltip** | [Modals](../patterns/modals.md) | `packages/plus-ds/src/components/Tooltip` |
+| **UserAvatar** | [Elements](../patterns/elements.md) | `packages/plus-ds/src/components/UserAvatar` |
 
 ## 2. Specs (Page Templates)
 
 | Spec | Description | Source |
 | :--- | :--- | :--- |
-| **Admin** | Admin dashboard layouts and tables. | `design-system/specs/Admin` |
-| **Home** | Landing page layouts. | `design-system/specs/Home` |
-| **Login** | Authentication flows. | `design-system/specs/Login` |
-| **Profile** | User profile settings. | `design-system/specs/Profile` |
-| **Toolkit** | Tool-specific layouts. | `design-system/specs/Toolkit` |
-| **Training** | Training module layouts. | `design-system/specs/Training` |
-| **Universal** | Global shared layouts. | `design-system/specs/Universal` |
+| **Admin** | Admin dashboard layouts and tables. | `packages/plus-ds/src/specs/Admin` |
+| **Home** | Landing page layouts. | `packages/plus-ds/src/specs/Home` |
+| **Login** | Authentication flows. | `packages/plus-ds/src/specs/Login` |
+| **Profile** | User profile settings. | `packages/plus-ds/src/specs/Profile` |
+| **Toolkit** | Tool-specific layouts. | `packages/plus-ds/src/specs/Toolkit` |
+| **Training** | Training module layouts. | `packages/plus-ds/src/specs/Training` |
+| **Universal** | Global shared layouts. | `packages/plus-ds/src/specs/Universal` |
