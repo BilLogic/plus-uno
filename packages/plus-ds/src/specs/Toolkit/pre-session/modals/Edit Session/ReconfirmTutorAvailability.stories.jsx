@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '../../../../../components/Modal';
-import Checkbox from '../../../../../forms/Checkbox';
+import Checkbox from '@/forms/Checkbox';
 import { CancelButton, ConfirmButton } from '../../elements/SupervisorManagementButtons.stories';
 
 export default {
