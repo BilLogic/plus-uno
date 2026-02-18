@@ -1,3 +1,5 @@
+<!-- ~550 tokens | Load for: early-stage wireframing and information architecture -->
+
 # Consulting Mode Reference
 
 ## When to Use This Mode
@@ -34,7 +36,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 4. Structural examples
 - `playground/templates/**/STRUCTURE.md`
-- `references/patterns-guide.md`
+- `references/implementation-guide.md`
 
 5. Wireframe tooling (critical when available)
 - Stitch MCP for PRD/brief-to-wireframe generation and structural variants.

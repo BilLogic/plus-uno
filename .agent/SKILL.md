@@ -12,7 +12,9 @@ description: Cross-agent router for working in the PLUS design system repository
 - Component Discovery Process
 - Import Conventions
 - Critical Rules (Always Apply)
+- Fast Path (Returning Agent)
 - Reference Loading Order
+- Loading Triggers
 - Progressive Loading Rule
 
 This skill is the entry point for coding agents working in this repository. It standardizes how agents interpret requests, choose one workflow mode, discover components, and implement work using existing PLUS design-system patterns.
@@ -26,7 +28,8 @@ This repository includes:
 - Design system docs: `packages/plus-ds/guidelines`
 - Storybook config: `.storybook`
 - Token sync and generation scripts: `scripts/sync-figma-tokens.js`, `scripts/generate-all-tokens.js`
-- Existing agent guidance: `.agent/AGENT.md`, `.agent/references/*`, `.agent/assets/*`, `.agent/scripts/*`
+- Existing agent guidance: `.agent/AGENT.md`, `.agent/references/*`, `.agent/assets/*`
+- Validation scripts: `.agent/scripts/*`
 
 Integrations available in this repo workflow:
 - Figma API token sync via scripts (`FIGMA_FILE_KEY`, `FIGMA_ACCESS_TOKEN`)
@@ -77,12 +80,40 @@ Choose exactly one mode per request:
 
 ## Critical Routing Behavior
 
-Before generating any code, ask these three questions verbatim:
+### Mode Inference (Try First)
+
+If the user's intent clearly maps to one mode, select it and confirm:
+- "I'm treating this as **[mode]** work — let me know if you'd prefer a different approach."
+
+Common inference signals:
+- "What is…" / "How does…" / "Where is…" → **Learning**
+- "Update the component" / "Sync tokens" / "Add to the DS" → **Maintaining**
+- "What should the layout be" / "Help me plan the page" → **Consulting**
+- "Show me options" / "Compare approaches" → **Iteration**
+- "Build this" / "Implement the design" / Figma link provided → **Finalization**
+
+### Explicit Routing (When Ambiguous)
+
+If the intent is genuinely ambiguous, ask these three questions:
 1. "Which scenario are we in: learning, maintaining, consulting, iteration, or finalization?"
 2. "Are you implementing from a design tool (Figma/etc), or building from scratch?"
 3. "What fidelity do you need: structure only, mid-fidelity exploration, or production-ready?"
 
 Then load only the matching mode file in `references/` and proceed.
+
+### Mode Transitions
+
+When a user's request shifts modes mid-conversation (e.g., consulting → finalization):
+
+1. **Summarize** what was decided in the current mode (selected structure, chosen option, key constraints).
+2. **Load** the new mode file. Do not retain the previous mode file — it is no longer relevant.
+3. **Carry forward** only the actionable decisions (e.g., "Option B was selected" or "Dashboard layout: KPI strip + split pane"), not the full exploration context.
+
+Common transition paths:
+- Consulting → Iteration (structure decided, now exploring styled variations)
+- Iteration → Finalization (option selected, now implementing)
+- Learning → any mode (user understood enough, now wants to act)
+- Consulting → Finalization (structure decided, skipping iteration)
 
 ## Component Discovery Process
 
@@ -138,23 +169,55 @@ Use repository-established imports:
 10. In production/finalization work, include accessibility and interactive states explicitly.
 11. Validate in Storybook for visual and prop-level correctness when component behavior is touched.
 
+## Fast Path (Returning Agent)
+
+If you already know the mode and context from a prior turn or the user's request is unambiguous:
+1. Load the mode file directly — skip routing questions.
+2. Load only the specific guides needed for this task.
+3. Do not re-read files already loaded in the current session.
+
+This avoids redundant turns and keeps context lean for experienced agents or continuation work.
+
 ## Reference Loading Order
 
-- Mode logic: `references/{selected-mode}.md`
-- Shared foundations: `references/foundations-guide.md`
-- Token specifics: `references/tokens-guide.md`
-- Integrations: `references/integrations-guide.md`
-- Reference index: `references/index.md`
-- Practical lookup content: `references/components-guide.md`, `references/patterns-guide.md`, `references/examples-guide.md`
-- Machine-readable indexes: `assets/index-manifest.json`, `assets/foundations-index.json`, `assets/components-index.json`, `assets/patterns-index.json`, `assets/tokens-index.json`, `assets/examples-index.json`, `assets/integrations-index.json`
-- Runbooks: `references/local-preview-runbook.md`
-- Maintenance/process docs: `scripts/maintenance.md`, `scripts/script-inventory.md`, `scripts/sync-checklist.md`
+Load files in this order, stopping as soon as you have enough context.
+
+| Layer | File(s) | ~Tokens | When to load |
+|-------|---------|---------|--------------|
+| Mode logic | `references/{selected-mode}.md` | 500-900 | Always — first thing after routing |
+| Foundations | `references/foundations-guide.md` | 150 | Before implementation work |
+| Tokens | `references/tokens-guide.md` | 350 | When applying visual values |
+| Integrations | `references/integrations-guide.md` | 120 | When using Figma/Stitch MCP |
+| Components | `references/components-guide.md` | 140 | When selecting DS components |
+| Implementation | `references/implementation-guide.md` | 200 | When choosing implementation approach or example |
+| JSON indexes | `assets/*.json` | 150-500 each | Only for exhaustive path/glob lookup |
+| Runbooks | `references/local-preview-runbook.md` | 180 | When building or previewing |
+| Maintenance | `references/maintenance.md`, `references/script-inventory.md`, `references/sync-checklist.md` | 300-350 each | When maintaining agent docs |
+
+**Typical task budget:** ~2,000-2,500 tokens (mode + 2-3 guides).
+**Worst-case full load:** ~5,500 tokens (all files). Avoid this.
+
+## Loading Triggers
+
+Load additional references reactively based on what comes up in conversation:
+
+| Trigger | Load |
+|---------|------|
+| User mentions tokens, colors, spacing, fonts, or elevation | `references/tokens-guide.md` |
+| User provides a Figma link or mentions MCP tools | `references/integrations-guide.md` |
+| User asks "which component" or needs component selection | `references/components-guide.md` |
+| User asks about build, preview, or deployment | `references/local-preview-runbook.md` |
+| Agent needs exact file paths, globs, or env vars | Relevant `assets/*-index.json` |
+| User asks about repo scripts or token sync | `references/script-inventory.md` |
+| Agent is checking for stale docs or maintaining `.agent/` | `references/sync-checklist.md` |
 
 ## Progressive Loading Rule
 
 - Keep context lean: load the selected mode file first, then only the specific reference files needed for that task.
 - Do not bulk-load all files in `references/` unless explicitly requested.
 - Load `assets/*.json` only when you need exhaustive lookup data (paths, globs, commands, env vars).
+- Once a reference is loaded in the current session, do not re-read it. Treat it as active context for the remainder of the task.
+- After mode selection, references from other modes are irrelevant — do not retain or load them.
 
 ## References vs Assets Contract
 

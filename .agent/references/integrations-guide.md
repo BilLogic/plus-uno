@@ -1,3 +1,5 @@
+<!-- ~120 tokens | Load for: deciding which MCP or integration path to use -->
+
 # Integrations Guide
 
 ## When to Load

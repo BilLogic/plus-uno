@@ -1,3 +1,5 @@
+<!-- ~200 tokens | Load for: table of contents of all reference and asset files -->
+
 # Reference Index
 
 ## Mode References
@@ -14,8 +16,7 @@
 - `tokens-guide.md`
 - `integrations-guide.md`
 - `components-guide.md`
-- `patterns-guide.md`
-- `examples-guide.md`
+- `implementation-guide.md`
 
 Note:
 - `*-guide.md` files contain concise decision/workflow guidance.
@@ -24,6 +25,16 @@ Note:
 ## Runbooks
 
 - `local-preview-runbook.md`
+
+## Maintenance
+
+- `maintenance.md`
+- `script-inventory.md`
+- `sync-checklist.md`
+
+## Platform Integration
+
+- `platform-integration.md`
 
 ## Asset Policy
 

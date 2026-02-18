@@ -1,3 +1,5 @@
+<!-- ~300 tokens | Load for: staleness prevention checks on .agent docs -->
+
 # Sync Checklist
 
 Use this checklist to prevent `.agent` guidance from going stale.

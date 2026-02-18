@@ -1,3 +1,5 @@
+<!-- ~150 tokens | Load for: shared baseline context, terminology, context-level heuristic -->
+
 # Foundations Guide
 
 ## When to Load

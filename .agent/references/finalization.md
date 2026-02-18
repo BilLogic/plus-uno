@@ -1,3 +1,5 @@
+<!-- ~900 tokens | Load for: production-ready implementation with all states and accessibility -->
+
 # Finalization Mode Reference
 
 ## Contents

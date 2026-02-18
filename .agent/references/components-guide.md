@@ -1,3 +1,5 @@
+<!-- ~140 tokens | Load for: component selection and discovery workflow -->
+
 # Components Guide
 
 ## When to Load
