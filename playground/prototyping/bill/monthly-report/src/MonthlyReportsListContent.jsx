@@ -74,8 +74,9 @@ export default function MonthlyReportsListContent() {
 
     const totalPages = Math.ceil(TOTAL_REPORTS / ITEMS_PER_PAGE);
 
-    const handleViewReport = (reportId) => {
-        navigate('/monthly-report');
+    const handleViewReport = (month, dateRange) => {
+        // Navigate with month parameter so the report page knows which month to display
+        navigate(`/monthly-report?month=${encodeURIComponent(dateRange)}`);
     };
 
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
@@ -209,7 +210,7 @@ export default function MonthlyReportsListContent() {
                                         trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleViewReport(report.id);
+                                            handleViewReport(report.month, report.dateRange);
                                         }}
                                         className="view-report-btn"
                                     />

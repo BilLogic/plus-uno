@@ -355,7 +355,8 @@
 
 /* Insight Alert */
 .insight-alert {
-    margin-top: var(--size-card-gap-sm);
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .insight-alert-icon {
@@ -1614,7 +1615,8 @@
 }
 
 .monthly-report .insight-alert {
-    margin-top: var(--size-card-gap-md) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 .monthly-report .impact-stats-grid {
