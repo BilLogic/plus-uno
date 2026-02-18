@@ -11,7 +11,8 @@ Use this checklist to prevent `.agent` guidance from going stale.
 ## B. Path Accuracy
 
 - [ ] Every path referenced in `.agent/references/*.md` exists.
-- [ ] Every path referenced in `.agent/assets/*.md` exists.
+- [ ] Every path referenced in nested reference files (for example mode references and core references) exists.
+- [ ] `.agent/assets/` contains only output artifacts/templates plus `README.md` policy file.
 - [ ] Import conventions still match `packages/plus-ds/src` and Storybook alias config.
 
 ## C. Token Integrity
@@ -31,6 +32,7 @@ Use this checklist to prevent `.agent` guidance from going stale.
 - [ ] Figma workflow links resolve.
 - [ ] Token sync scripts and env variable names still accurate.
 - [ ] CI workflow path and behavior still accurate.
+- [ ] Asset index files in `.agent/assets/*.json` still match current paths and commands.
 
 ## F. Suggested Drift Check Commands
 

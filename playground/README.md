@@ -20,7 +20,7 @@ npm run dev
 ## Guidance
 
 - Agent workflow: `.agent/SKILL.md`
-- Foundations: `.agent/references/foundations/`
+- Foundations: `.agent/references/foundations-guide.md` (details in `.agent/assets/foundations-index.json`)
 - Tokens: `packages/plus-ds/guidelines/design-tokens/`
 - Components: `packages/plus-ds/guidelines/overview-components.md`
 

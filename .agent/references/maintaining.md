@@ -1,5 +1,13 @@
 # Maintaining Mode Reference
 
+## Contents
+- When to Use This Mode
+- User Persona
+- Resources to Reference
+- How to Respond in Maintaining Mode
+- Confirmation Template (Before Editing)
+- Detailed Workflows
+
 ## When to Use This Mode
 - Adding or updating design-system components in `packages/plus-ds/src`.
 - Updating component APIs, stories, styles, or exports.
@@ -17,6 +25,8 @@
 - Not product developers building isolated feature screens
 
 ## Resources to Reference
+
+For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
 
 1. Token sync and generation
 - `scripts/sync-figma-tokens.js`

@@ -18,6 +18,8 @@
 
 ## Resources to Reference
 
+For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
+
 1. Layout and structural patterns
 - `packages/plus-ds/guidelines/layout-grid.md`
 - `packages/plus-ds/src/specs/**`
@@ -32,7 +34,7 @@
 
 4. Structural examples
 - `playground/templates/**/STRUCTURE.md`
-- `assets/patterns.md`
+- `references/patterns-guide.md`
 
 5. Wireframe tooling (critical when available)
 - Stitch MCP for PRD/brief-to-wireframe generation and structural variants.

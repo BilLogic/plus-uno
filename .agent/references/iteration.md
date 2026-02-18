@@ -18,8 +18,10 @@
 
 ## Resources to Reference
 
+For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
+
 1. Design tokens
-- `references/tokens.md`
+- `references/tokens-guide.md`
 - `packages/plus-ds/src/tokens/*.scss`
 
 2. Component pattern options
@@ -32,8 +34,8 @@
 - Playground prototypes in `playground/prototyping/**`
 
 4. Composition examples
-- `assets/examples.md`
-- `assets/patterns.md`
+- `references/examples-guide.md`
+- `references/patterns-guide.md`
 
 ## How to Respond in Iteration Mode
 

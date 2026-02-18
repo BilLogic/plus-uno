@@ -3,7 +3,7 @@
 Use this flow from repo root to verify a production-like preview.
 
 ```bash
-cd "/Users/billguo/Desktop/Vibe Coding/PLUS - ONE/plus-vibe-coding-starting-kit"
+cd <repo-root>
 
 # 1) Build the app
 npm run build

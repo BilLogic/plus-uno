@@ -43,9 +43,9 @@ For AI coding agents:
 Core references:
 
 - `.agent/references/index.md`
-- `.agent/references/tokens.md`
-- `.agent/assets/components.md`
-- `.agent/assets/patterns.md`
+- `.agent/references/tokens-guide.md`
+- `.agent/references/components-guide.md`
+- `.agent/references/patterns-guide.md`
 
 ## Design System Guidance
 

@@ -1,5 +1,14 @@
 # Finalization Mode Reference
 
+## Contents
+- When to Use This Mode
+- Design Constraints
+- Resources to Reference
+- How to Respond in Finalization Mode
+- Strict Adherence Checklist
+- Technical Guardrails
+- Finalization Mode Example
+
 ## When to Use This Mode
 - Implementing approved designs in production-quality code.
 - Translating final design tool artifacts to DS components.
@@ -19,8 +28,10 @@
 
 ## Resources to Reference
 
+For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
+
 1. Full tokens
-- `references/tokens.md`
+- `references/tokens-guide.md`
 - `packages/plus-ds/src/tokens/*.scss`
 
 2. Component APIs and behavior

@@ -5,6 +5,16 @@ description: Cross-agent router for working in the PLUS design system repository
 
 # PLUS Design System Skill Router
 
+## Contents
+- Scope and Integrations
+- Mode Routing (Mutually Exclusive)
+- Critical Routing Behavior
+- Component Discovery Process
+- Import Conventions
+- Critical Rules (Always Apply)
+- Reference Loading Order
+- Progressive Loading Rule
+
 This skill is the entry point for coding agents working in this repository. It standardizes how agents interpret requests, choose one workflow mode, discover components, and implement work using existing PLUS design-system patterns.
 
 This router is agent-agnostic and works across Cursor, Windsurf, Claude Code, and other coding agents.
@@ -131,8 +141,23 @@ Use repository-established imports:
 ## Reference Loading Order
 
 - Mode logic: `references/{selected-mode}.md`
-- Shared foundations: `references/foundations/{tech-stack,terminology,context-levels}.md`
-- Token specifics: `references/tokens.md`
+- Shared foundations: `references/foundations-guide.md`
+- Token specifics: `references/tokens-guide.md`
+- Integrations: `references/integrations-guide.md`
 - Reference index: `references/index.md`
-- Practical lookup content: `assets/components.md`, `assets/patterns.md`, `assets/examples.md`, `assets/design-tool-links.md`
+- Practical lookup content: `references/components-guide.md`, `references/patterns-guide.md`, `references/examples-guide.md`
+- Machine-readable indexes: `assets/index-manifest.json`, `assets/foundations-index.json`, `assets/components-index.json`, `assets/patterns-index.json`, `assets/tokens-index.json`, `assets/examples-index.json`, `assets/integrations-index.json`
+- Runbooks: `references/local-preview-runbook.md`
 - Maintenance/process docs: `scripts/maintenance.md`, `scripts/script-inventory.md`, `scripts/sync-checklist.md`
+
+## Progressive Loading Rule
+
+- Keep context lean: load the selected mode file first, then only the specific reference files needed for that task.
+- Do not bulk-load all files in `references/` unless explicitly requested.
+- Load `assets/*.json` only when you need exhaustive lookup data (paths, globs, commands, env vars).
+
+## References vs Assets Contract
+
+- `references/`: markdown knowledge intended for context loading (workflows, patterns, mode guidance, integration notes).
+- `assets/`: non-markdown output artifacts and templates that may be copied into generated output.
+- `assets/README.md` is allowed as policy documentation; do not place operational guidance markdown in `assets/`.

@@ -18,6 +18,8 @@
 
 ## Resources to Reference
 
+For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
+
 1. Component documentation
 - `packages/plus-ds/guidelines/overview-components.md`
 - `packages/plus-ds/guidelines/reference/component-index.md`
@@ -25,12 +27,14 @@
 2. Design token documentation
 - `packages/plus-ds/guidelines/design-tokens/*.md`
 - `packages/plus-ds/src/tokens/*.scss`
-- `references/tokens.md`
+- `references/tokens-guide.md`
 
 3. Example implementations
 - `packages/plus-ds/src/**/*.stories.jsx`
 - `playground/templates/**`
 - `playground/prototyping/**`
+- `playground/Ashley/**`
+- `playground/Bill/**`
 
 4. Storybook and tooling
 - `.storybook/main.js`
@@ -51,7 +55,7 @@
 
 3. Provide Navigation
 - Always include next files to open.
-- Route to `assets/components.md` and `assets/examples.md` for quick lookup.
+- Route to `references/components-guide.md` and `references/examples-guide.md` for quick lookup.
 
 4. Stay Read-Only
 - Learning mode is analysis and explanation only.
@@ -69,7 +73,7 @@ Q: "How do imports work here?"
 A: "Public consumers use `@tutors.plus/design-system`; internal DS source commonly uses alias `@` mapped to `packages/plus-ds/src` (see `.storybook/main.js` and `packages/plus-ds/vite.config.js`)."
 
 Q: "Where can I see realistic usage?"
-A: "Check stories under `packages/plus-ds/src/**/*.stories.jsx`, then compare full-page assemblies in `packages/plus-ds/src/specs/**` and `playground/prototyping/**`."
+A: "Check stories under `packages/plus-ds/src/**/*.stories.jsx`, then compare full-page assemblies in `packages/plus-ds/src/specs/**`, `playground/prototyping/**`, `playground/Ashley/**`, and `playground/Bill/**`."
 
 Q: "How do I start from a Figma link?"
 A: "Use the flow in `packages/plus-ds/guidelines/guides/figma-workflow.md`: fetch design context + screenshot first, then map to DS components."
