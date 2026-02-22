@@ -210,7 +210,7 @@ const SessionReflectionPart2 = ({
                         <div
                             style={{
                                 display: 'flex',
-                                gap: 'var(--size-section-gap-lg)',
+                                gap: 'var(--size-element-gap-lg)',
                                 alignItems: 'center',
                             }}
                         >

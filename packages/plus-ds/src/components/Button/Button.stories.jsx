@@ -167,6 +167,33 @@ export const Overview = () => (
             </div>
         </section>
 
+        {/* Disabled States per Variant */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '24px' }}>Disabled States</h6>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                {['filled', 'tonal', 'outline', 'ghost'].map(fill => (
+                    <div key={fill}>
+                        <p className="plus-body-2" style={{ marginBottom: '12px', textTransform: 'capitalize', color: 'var(--color-neutral-text)' }}>{fill} – disabled</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                            {['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger'].map(s => (
+                                <Button key={s} text={s.charAt(0).toUpperCase() + s.slice(1)} style={s} fill={fill} disabled leadingVisual="square-plus" trailingVisual="square-plus" />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+
+        {/* Icon spacing */}
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Icon Spacing (gap only, no extra margin)</h6>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <Button text="Small" size="small" style="primary" fill="filled" leadingVisual="plus" trailingVisual="chevron-right" />
+                <Button text="Medium" size="medium" style="primary" fill="filled" leadingVisual="plus" trailingVisual="chevron-right" />
+                <Button text="Large" size="large" style="primary" fill="filled" leadingVisual="plus" trailingVisual="chevron-right" />
+            </div>
+        </section>
+
         {/* States / Layouts */}
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>States & Layouts</h6>

@@ -125,6 +125,11 @@ const SideNavBar = ({
                     state={activeTab === 'self-reflection' ? 'selected' : 'enabled'}
                     onClick={() => onTabClick?.('self-reflection')}
                 />
+                <SideBarTab
+                    text="Form Feedback"
+                    state={activeTab === 'form-feedback' ? 'selected' : 'enabled'}
+                    onClick={() => onTabClick?.('form-feedback')}
+                />
             </div>
             {/* Submit Button with correct Figma opacity (38%) */}
             <div style={{ opacity: activeTab !== 'submission' ? 0.38 : 1, width: '100%' }}>

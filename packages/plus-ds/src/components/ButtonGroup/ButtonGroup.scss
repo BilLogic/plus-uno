@@ -11,35 +11,54 @@
     // Reset default RB button-group styles
     display: inline-flex;
     vertical-align: middle;
-    gap: 0; // Connected buttons
+    gap: 0;
     border-radius: var(--size-element-radius-md);
-    overflow: hidden; // Ensure child border-radius is clipped
+    overflow: hidden;
 
     // Direct Button children styling for group context
     >.plus-btn,
     >.btn {
-        // Remove individual border-radius for middle buttons
         border-radius: 0;
-
-        // Remove borders between buttons for seamless look
+        border: none;
         margin: 0;
         position: relative;
+        box-shadow: none;
+        outline: none;
 
-        // First button in horizontal group
         &:first-child {
             border-top-left-radius: var(--size-element-radius-md);
             border-bottom-left-radius: var(--size-element-radius-md);
         }
 
-        // Last button in horizontal group
         &:last-child {
             border-top-right-radius: var(--size-element-radius-md);
             border-bottom-right-radius: var(--size-element-radius-md);
         }
 
-        // Single button
         &:only-child {
             border-radius: var(--size-element-radius-md);
+        }
+    }
+
+    // Override Bootstrap's .btn-group rules which have higher specificity
+    &.btn-group {
+        >.btn,
+        >.plus-btn {
+            border: none;
+            margin-left: 0;
+            margin-right: 0;
+            box-shadow: none;
+
+            &:not(:first-child) {
+                margin-left: 0;
+            }
+
+            &:focus,
+            &:active,
+            &.active {
+                box-shadow: none;
+                outline: none;
+            }
         }
     }
 
@@ -50,17 +69,14 @@
 
         >.plus-btn,
         >.btn {
-            // Reset horizontal radius for vertical mode
             border-radius: 0;
 
-            // First button in vertical group
             &:first-child {
                 border-top-left-radius: var(--size-element-radius-md);
                 border-top-right-radius: var(--size-element-radius-md);
                 border-bottom-left-radius: 0;
             }
 
-            // Last button in vertical group
             &:last-child {
                 border-bottom-left-radius: var(--size-element-radius-md);
                 border-bottom-right-radius: var(--size-element-radius-md);
@@ -71,10 +87,19 @@
                 border-radius: var(--size-element-radius-md);
             }
         }
+
+        &.btn-group {
+            >.btn,
+            >.plus-btn {
+                &:not(:first-child) {
+                    margin-top: 0;
+                    margin-left: 0;
+                }
+            }
+        }
     }
 
     // --- SIZE VARIANTS ---
-    // Uses React Bootstrap size classes (btn-group-sm, btn-group-lg)
 
     &.btn-group-sm {
         border-radius: var(--size-element-radius-sm);
@@ -117,8 +142,6 @@
 
     &.btn-group-lg {
         border-radius: var(--size-element-radius-md);
-
-        // Large uses same radius as medium per Figma
     }
 
     &--block {

@@ -47,7 +47,7 @@ const SORT_CONFIG = {
     }
 };
 
-const SortingOptions = ({
+export const SortingOptions = ({
     initialOpen = false,
     initialSort = 'name',
     initialOrder = 'az',

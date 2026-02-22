@@ -28,6 +28,8 @@ const Modal = ({
     const effectivePaddingSize = paddingSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
     const effectiveGapSize = gapSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
 
+    const bodyOnly = !title && !showBottomButtons;
+
     const classes = [
         'plus-modal',
         type === 'scrollable' ? 'plus-modal-scrollable' : 'plus-modal-default',
@@ -35,6 +37,7 @@ const Modal = ({
         `plus-modal-gap-${effectiveGapSize}`,
         radiusSize ? `plus-modal-radius-${radiusSize}` : '',
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
+        bodyOnly ? 'plus-modal-body-only' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -49,19 +52,22 @@ const Modal = ({
 
     return (
         <div id={id} className={classes} style={modalStyle} {...props}>
-            <div className="plus-modal-header">
-                {title && <div className="plus-modal-title h5">{title}</div>}
-                <button
-                    type="button"
-                    className={`plus-modal-close-btn ${closeBtnClass}`}
-                    aria-label="Close modal"
-                    onClick={onClose}
-                >
-                    <i className="fas fa-xmark" aria-hidden="true" />
-                </button>
-            </div>
-
-            <div className="plus-modal-divider" />
+            {!bodyOnly && (
+                <>
+                    <div className="plus-modal-header">
+                        {title && <div className="plus-modal-title h5">{title}</div>}
+                        <button
+                            type="button"
+                            className={`plus-modal-close-btn ${closeBtnClass}`}
+                            aria-label="Close modal"
+                            onClick={onClose}
+                        >
+                            <i className="fas fa-xmark" aria-hidden="true" />
+                        </button>
+                    </div>
+                    <div className="plus-modal-divider" />
+                </>
+            )}
 
             <div className={`plus-modal-body ${type === 'scrollable' ? 'plus-modal-body-scrollable' : ''}`}>
                 <div className="plus-modal-content">
