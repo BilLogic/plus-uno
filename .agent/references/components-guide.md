@@ -17,5 +17,6 @@
 
 ## Guardrails
 - Prefer PLUS components/forms/specs before generic framework primitives.
+- **CRITICAL ANTI-HALLUCINATION RULE:** Never guess or assume component props (e.g., `primaryAction` vs `primaryButton`). You MUST strictly check the target component's `.jsx` file or its `.stories.jsx` file to verify the exact prop names before implementing it.
 - Verify props/states in stories before implementing.
 - If two families are plausible, ask for clarification instead of guessing.

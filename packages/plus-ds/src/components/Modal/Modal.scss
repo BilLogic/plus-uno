@@ -123,3 +123,25 @@
     gap: var(--size-element-gap-md);
     flex-wrap: wrap;
 }
+
+/* 
+ * React-Bootstrap Overrides 
+ * These classes strip away Bootstrap's default modal styling so our 
+ * .plus-modal class can perfectly control the box appearance.
+ */
+.plus-bootstrap-modal-dialog-reset {
+    /* Allow the width prop on our inner div to define the modal width */
+    max-width: none !important;
+    width: fit-content !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.plus-bootstrap-modal-content-reset {
+    /* Strip all Bootstrap content styling */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}

@@ -84,6 +84,8 @@ Choose exactly one mode per request:
 
 ## Critical Routing Behavior
 
+**MANDATORY RULE:** Before executing anything from any task from the user, you must read the user's request, try to see if you can fit the task into one of the established modes, and explicitly state your selected Mode. Do not proceed with implementation without determining the correct Mode first.
+
 ### Mode Inference (Try First)
 
 If the user's intent clearly maps to one mode, select it and confirm:
@@ -121,6 +123,8 @@ Common transition paths:
 - Consulting → Finalization (structure decided, skipping iteration)
 
 ## Component Discovery Process
+
+0. **Mandatory Existing Component Check:** You MUST always check if there is a similar or exact component that already exists within the design system FIRST before starting to implement any new custom component. Do not build from scratch if the design system already provides it.
 
 1. Check design-to-code mapping first
 - If a design link is provided, fetch design context/screenshot first.
@@ -162,17 +166,19 @@ Use repository-established imports:
 
 ## Critical Rules (Always Apply)
 
-1. Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
-2. Never skip reading component source + story + styles before using unfamiliar components.
-3. Use PLUS components/specs first; only fall back to generic framework primitives when no PLUS equivalent exists.
-4. When Figma design input exists, fetch design context and screenshot before implementation.
-5. When consulting/iteration work is requested and Stitch MCP is available, use it for structured wireframe generation before hand-coding variants.
-6. Keep terminology consistent with repo foundations and component naming.
-7. Cite concrete repository file paths when proposing or explaining implementation choices.
-8. If unsure about a pattern, state uncertainty and ask for clarification instead of guessing.
-9. Confirm implementation plan and touched files before large or risky edits.
-10. In production/finalization work, include accessibility and interactive states explicitly.
-11. Validate in Storybook for visual and prop-level correctness when component behavior is touched.
+1. Never hardcode colors, spacing, typography, radius, or elevation when a token exists. You must always map variable names to explicit compile-ready Design System tokens (e.g., `var(--color-on-surface-state-08)`) instead of using raw Figma literal names (e.g., `var(--State-layers-...)`).
+2. **THE CHEAT SHEET IS LAW:** Before you write any React component from `@plus-ds` or apply any CSS variable token, you MUST read `.agent/assets/PLUS_CHEAT_SHEET.md`. Do not guess component names or token values. If it is not in the Cheat Sheet, it does not exist.
+3. **NEVER HALLUCINATE LAYOUTS:** When building a new page or screen, you MUST read `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` and use the official structural React formulas (e.g., `<PageLayout>`). Do not write raw HTML flexbox grids for page architecture.
+4. **NEVER HALLUCINATE PROPS:** Never skip reading component source + story + styles before using unfamiliar components. You MUST check the component's `.jsx` file or `.stories.jsx` file to verify exact prop names and types before implementing it (e.g., do not guess `primaryAction` instead of `primaryButton`).
+5. Use PLUS components/specs first; only fall back to generic framework primitives when no PLUS equivalent exists.
+6. When Figma design input exists, fetch design context and screenshot before implementation.
+7. When consulting/iteration work is requested and Stitch MCP is available, use it for structured wireframe generation before hand-coding variants.
+8. Keep terminology consistent with repo foundations and component naming.
+9. Cite concrete repository file paths when proposing or explaining implementation choices.
+10. If unsure about a pattern, state uncertainty and ask for clarification instead of guessing.
+11. Confirm implementation plan and touched files before large or risky edits.
+12. In production/finalization work, include accessibility and interactive states explicitly.
+13. Validate in Storybook for visual and prop-level correctness when component behavior is touched.
 
 ## Fast Path (Returning Agent)
 
@@ -190,8 +196,10 @@ Load files in this order, stopping as soon as you have enough context.
 | Layer | File(s) | ~Tokens | When to load |
 |-------|---------|---------|--------------|
 | Mode logic | `references/{selected-mode}.md` | 500-900 | Always — first thing after routing |
+| Cheat Sheet | `.agent/assets/PLUS_CHEAT_SHEET.md` | 500 | MANDATORY when writing UI code, using components, or applying tokens. |
+| Layout Cheat Sheet | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` | 300 | MANDATORY when building new pages, dashboards, or modals. |
 | Foundations | `references/foundations-guide.md` | 150 | Before implementation work |
-| Tokens | `references/tokens-guide.md` | 350 | When applying visual values |
+| Tokens | `references/tokens-guide.md` | 350 | For advanced token architecture (use Cheat Sheet for daily use) |
 | Integrations | `references/integrations-guide.md` | 120 | When using Figma/Stitch MCP |
 | Components | `references/components-guide.md` | 140 | When selecting DS components |
 | Implementation | `references/implementation-guide.md` | 200 | When choosing implementation approach or example |
@@ -208,9 +216,10 @@ Load additional references reactively based on what comes up in conversation:
 
 | Trigger | Load |
 |---------|------|
-| User mentions tokens, colors, spacing, fonts, or elevation | `references/tokens-guide.md` |
+| User asks to build UI, or mentions tokens, colors, spacing, components, or UI | `.agent/assets/PLUS_CHEAT_SHEET.md` |
+| User asks to build a new page, screen, dashboard, or layout | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` |
 | User provides a Figma link or mentions MCP tools | `references/integrations-guide.md` |
-| User asks "which component" or needs component selection | `references/components-guide.md` |
+| User explicitly asks for component architecture rules | `references/components-guide.md` |
 | User asks about build, preview, or deployment | `references/local-preview-runbook.md` |
 | Agent needs exact file paths, globs, or env vars | Relevant `assets/*-index.json` |
 | User asks about repo scripts or token sync | `references/script-inventory.md` |

@@ -1,9 +1,9 @@
 import React from 'react';
-import Page1 from './Page1';
+import PostSessionPage from './PostSessionPage';
 
 export default {
-    title: 'Specs/Toolkit/Post-Session/Pages/1 Learnings',
-    component: Page1,
+    title: 'Specs/Toolkit/Post-Session/Pages/Post Session Page',
+    component: PostSessionPage,
     parameters: {
         layout: 'fullscreen',
     },

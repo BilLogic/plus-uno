@@ -14,6 +14,7 @@
 - If user only wants conceptual structure: use Consulting Mode.
 
 ## Design Constraints
+- **Mandatory Existing Component Check:** You MUST always check if there is a similar or exact component that already exists within the design system FIRST before starting to implement any new custom component. Do not build from scratch if the design system already provides it.
 - Use design tokens for colors, spacing, and typography.
 - Generate 3-5 clearly distinct variations.
 - Explain tradeoffs for each option.
@@ -41,7 +42,12 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 ## How to Respond in Iteration Mode
 
-1. Generate Multiple Options
+43. Propose & Verify Plan
+- **STOP and ask for approval** before generating any code.
+- Summarize the 3-5 directions you plan to take.
+- Confirm the level of divergence and the primary goal for each.
+
+2. Generate Multiple Options
 - Provide 3-5 labeled alternatives.
 - Each option should prioritize a different goal (speed, density, clarity, emphasis, etc.).
 
@@ -61,7 +67,12 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 5. Ask Clarifying Questions
 - Which metric matters most: clarity, speed, or density?
 - Is this for first-time or expert users?
-- Do we prefer conservative or bold layout change?
+### Follow-up Questions (Context Gathering)
+If not specified in the prompt, ask:
+- "Do you have any **high-fidelity references** (Figma/screenshots) to ground these variations?"
+- "How **divergent** should the options be? (Mild tweaks vs. radically different structures)"
+- "What is the primary **user goal** we are optimizing for in each variation? (e.g. speed vs. clarity)"
+- "Are there specific screens sizes we should test? (Default is responsive md/lg/xl)"
 
 ## Iteration Mode Example
 

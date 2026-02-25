@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import SideNavBar from '../../sections/SideNavBar/SideNavBar';
 import SessionInformationForm from '../../sections/SessionInformationForm/SessionInformationForm';
 
-const Page1 = ({
+const PostSessionPage = ({
     initialSessionData,
     initialStudents = [],
     initialSelectedStudents = [],
@@ -20,7 +20,7 @@ const Page1 = ({
     const activeStudents = initialStudents.filter(s => selectedStudentIds.includes(s.name));
 
     return (
-        <div className={`post-session-page-1 ${className}`} style={{ display: 'flex', gap: '24px', minHeight: '600px', backgroundColor: 'var(--color-surface)', padding: '24px' }}>
+        <div className={`post-session-page ${className}`} style={{ display: 'flex', gap: '24px', minHeight: '600px', backgroundColor: 'var(--color-surface)', padding: '24px' }}>
             <SideNavBar
                 state="default"
                 students={activeStudents}
@@ -50,18 +50,18 @@ const Page1 = ({
     );
 };
 
-Page1.propTypes = {
+PostSessionPage.propTypes = {
     initialSessionData: PropTypes.object,
     initialStudents: PropTypes.array,
     initialSelectedStudents: PropTypes.array,
     className: PropTypes.string,
 };
 
-Page1.defaultProps = {
+PostSessionPage.defaultProps = {
     initialSessionData: {},
     initialStudents: [],
     initialSelectedStudents: [],
     className: '',
 };
 
-export default Page1;
+export default PostSessionPage;

@@ -11,6 +11,7 @@ export { default as Card } from '@/components/Card';
 export { default as Carousel } from '@/components/Carousel';
 export { default as Collapse } from '@/components/Collapse';
 export { default as Divider } from '@/components/Divider';
+export { default as Dropdown } from '@/components/Dropdown';
 export { default as Footer } from '@/components/Footer/Footer';
 export * from '@/forms';
 export { default as Jumbotron } from '@/components/Jumbotron';

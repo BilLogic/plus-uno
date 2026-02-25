@@ -58,6 +58,36 @@ export const Overview = () => {
                     <NavTabs.Item eventKey="3">Tab Three</NavTabs.Item>
                 </NavTabs>
             </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Interactive States</h6>
+                <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--color-on-surface-variant)' }}>
+                    NavTabs support distinct visual states for interactions. The states below are artificially forced for demonstration.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                    {/* Unselected States */}
+                    <div>
+                        <p className="body3-txt" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected Tab States</p>
+                        <NavTabs defaultActiveKey="none">
+                            <NavTabs.Item eventKey="default">Default</NavTabs.Item>
+                            <NavTabs.Item eventKey="hover" className="pseudo-hover">Hovered</NavTabs.Item>
+                            <NavTabs.Item eventKey="focus" className="pseudo-focus">Focused</NavTabs.Item>
+                            <NavTabs.Item eventKey="pressed" className="pseudo-pressed">Pressed</NavTabs.Item>
+                        </NavTabs>
+                    </div>
+
+                    {/* Selected States */}
+                    <div>
+                        <p className="body3-txt" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Active/Selected Tab States</p>
+                        <NavTabs defaultActiveKey="none">
+                            {/* We use active prop to force active without relying on activeKey which only selects one */}
+                            <NavTabs.Item eventKey="active-default" active>Active (Default)</NavTabs.Item>
+                            <NavTabs.Item eventKey="active-hover" active className="pseudo-hover">Active (Hovered)</NavTabs.Item>
+                            <NavTabs.Item eventKey="active-focus" active className="pseudo-focus">Active (Focused)</NavTabs.Item>
+                            <NavTabs.Item eventKey="active-pressed" active className="pseudo-pressed">Active (Pressed)</NavTabs.Item>
+                        </NavTabs>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };

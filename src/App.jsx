@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import HomeRedesignApp from '../playground/prototyping/bill/home-redesign/src/App';
+import SidebarIterationApp from '../playground/prototyping/victor/sidebar-iteration/src/App';
 
 /**
  * Index page: list of prototype links (index into different pages).
@@ -15,6 +16,9 @@ function IndexPage() {
         Choose a prototype to view. All run on localhost:3000.
       </p>
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+        <Link to="/sidebar-iteration" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+          Sidebar Iteration (Victor)
+        </Link>
         <Link to="/home" className="body1-txt" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
           Homepage prototype
         </Link>
@@ -44,6 +48,7 @@ function App() {
     <ThemeProvider>
       <Routes>
         <Route path="/prototypes" element={<IndexPage />} />
+        <Route path="/sidebar-iteration/*" element={<SidebarIterationApp />} />
         <Route path="/*" element={<HomeRedesignApp />} />
       </Routes>
     </ThemeProvider>

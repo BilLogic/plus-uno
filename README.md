@@ -1,5 +1,12 @@
 # PLUS Vibe Coding Starting Kit
 
+## 🚨 FOR AI AGENTS (READ FIRST) 🚨
+
+AI Agents must IMMEDIATELY load and follow the instructions in:
+**`.agent/SKILL.md`**
+
+Go there now. Do not guess implementation.
+
 Starter workspace for PLUS design-system prototyping and implementation.
 
 ## What This Repo Contains

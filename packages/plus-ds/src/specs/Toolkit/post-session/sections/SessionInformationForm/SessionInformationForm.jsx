@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
@@ -6,6 +7,10 @@ import Col from 'react-bootstrap/Col';
 import Card from '../../../../../components/Card';
 import Button from '../../../../../components/Button';
 import Dropdown from '../../../../../components/Dropdown';
+import Switch from '../../../../../forms/Switch';
+import Input from '../../../../../forms/Input';
+import Checkbox from '../../../../../forms/Checkbox';
+import Textarea from '../../../../../forms/Textarea';
 
 /**
  * SessionInformationForm
@@ -37,6 +42,17 @@ const SessionInformationForm = ({
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleDidNotHappenChange = (checked) => {
+        setFormData(prev => ({
+            ...prev,
+            didNotHappen: checked,
+            // Optionally reset cancellation reasons if untoggled
+            // cancellationReasons: checked ? prev.cancellationReasons : [],
+            // otherReason: checked ? prev.otherReason : '',
+            // reason: checked ? prev.reason : '',
         }));
     };
 
@@ -118,27 +134,19 @@ const SessionInformationForm = ({
 
             <Form onSubmit={handleSubmit}>
                 <div className="d-flex flex-column gap-4">
-                    {/* Session Details Group */}
                     <div className="d-flex flex-column gap-3">
                         {/* Session Date */}
-                        <Form.Group controlId="date">
-                            <Form.Label className="body2-txt font-weight-bold">
-                                Session Date <span className="text-danger">*</span>
-                            </Form.Label>
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-1 border-end-0">
-                                    <i className="fa-regular fa-calendar" style={{ color: 'var(--color-on-surface-variant)' }}></i>
-                                </span>
-                                <Form.Control
-                                    type="date"
-                                    name="date"
-                                    value={formData.date}
-                                    onChange={handleChange}
-                                    className="body2-txt border-start-0 ps-0"
-                                    required
-                                />
-                            </div>
-                        </Form.Group>
+                        <Input
+                            id="date"
+                            name="date"
+                            type="date"
+                            label="Session Date"
+                            required
+                            value={formData.date}
+                            onChange={handleChange}
+                            leadingVisual="fa-regular fa-calendar"
+                            className="body2-txt"
+                        />
 
                         {/* Select Session */}
                         <Form.Group controlId="sessionOption">
@@ -162,17 +170,16 @@ const SessionInformationForm = ({
                             />
                         </Form.Group>
 
-                        {/* Session did not happen toggle */}
-                        <Form.Check
-                            type="switch"
-                            id="didNotHappen"
-                            label="Session did not happen"
-                            name="didNotHappen"
-                            checked={formData.didNotHappen}
-                            onChange={handleChange}
-                            className="body2-txt text-muted custom-switch-primary"
-                            style={{ '--bs-form-switch-bg': 'var(--color-primary)' }} // Inline override for switch color if class doesn't exist
-                        />
+                        {/* Did not happen switch */}
+                        <div className="d-flex align-items-center mb-4">
+                            <Switch
+                                id="did-not-happen-switch"
+                                label="Session did not happen"
+                                checked={formData.didNotHappen}
+                                onChange={(e) => handleDidNotHappenChange(e.target.checked)}
+                                className="d-flex align-items-center gap-2"
+                            />
+                        </div>
                     </div>
 
                     <hr className="m-0" style={{ borderTop: '1px solid var(--color-border)' }} />
@@ -198,8 +205,7 @@ const SessionInformationForm = ({
                                         <div className="d-flex flex-column gap-2">
                                             {cancellationOptions.map((option) => (
                                                 <div key={option} className="d-flex align-items-center gap-2">
-                                                    <Form.Check
-                                                        type="checkbox"
+                                                    <Checkbox
                                                         id={`reason-${option}`}
                                                         label={option}
                                                         checked={(formData.cancellationReasons || []).includes(option)}
@@ -207,13 +213,13 @@ const SessionInformationForm = ({
                                                         className="body2-txt"
                                                     />
                                                     {option === "Other" && (formData.cancellationReasons || []).includes("Other") && (
-                                                        <Form.Control
+                                                        <Input
                                                             type="text"
                                                             name="otherReason"
                                                             value={formData.otherReason}
                                                             onChange={handleChange}
                                                             placeholder="Please specify"
-                                                            size="sm"
+                                                            size="small"
                                                             className="body2-txt ms-2"
                                                             style={{ maxWidth: '200px' }}
                                                         />
@@ -229,17 +235,14 @@ const SessionInformationForm = ({
                                         <p className="body2-txt text-muted mb-0">
                                             Please briefly describe the situation.
                                         </p>
-                                        <Form.Group controlId="reason">
-                                            <Form.Control
-                                                as="textarea"
-                                                rows={3}
-                                                name="reason"
-                                                value={formData.reason}
-                                                onChange={handleChange}
-                                                placeholder="e.g., Student absent, technical issues, etc."
-                                                className="body2-txt"
-                                            />
-                                        </Form.Group>
+                                        <Textarea
+                                            rows={3}
+                                            name="reason"
+                                            value={formData.reason}
+                                            onChange={handleChange}
+                                            placeholder="e.g., Student absent, technical issues, etc."
+                                            className="body2-txt"
+                                        />
                                     </div>
                                 </div>
                             ) : (
