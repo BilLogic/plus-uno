@@ -54,6 +54,15 @@ Core references:
 - `.agent/references/components-guide.md`
 - `.agent/references/patterns-guide.md`
 
+### For Designers: When to Start a New Chat
+
+To prevent the AI agent from getting confused or forgetting its instructions (token bloat), start a **new chat window** in these scenarios:
+
+1. **Major Phase Shifts:** When moving from messy exploration (consulting/iteration) to strict execution (finalization).
+2. **Context Window Degradation:** If the agent starts hallucinating component names or ignoring rules like the PLUS Cheat Sheet.
+3. **Task Switching:** When you finish one feature/bug and move to an entirely unrelated one.
+4. **Codebase State Desync:** If you manually refactor a lot of code yourself, or the agent gets stuck in a "death loop" trying to fix the same bug repeatedly.
+
 ## Design System Guidance
 
 Primary DS documentation is under:
