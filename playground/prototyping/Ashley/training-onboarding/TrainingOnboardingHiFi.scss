@@ -41,6 +41,24 @@
  *   --size-card-pad-y-sm             12px
  */
 
+// ─── PageLayout content scrolling override ────────────────────────────────────
+// The PageLayout sets overflow:hidden on .plus-page-content-wrapper and
+// .plus-page-main. For the training onboarding page we need vertical scrolling
+// so the HeroProgressCard is fully visible and the user can scroll to the table.
+
+#training-onboarding-hifi {
+    .plus-page-content-wrapper {
+        overflow-y: auto !important;
+    }
+
+    .plus-page-main {
+        overflow-y: auto !important;
+        // Ensure the flex column child (.oob-hifi) is not squeezed to zero height
+        height: auto !important;
+        flex-shrink: 0;
+    }
+}
+
 // ─── Root page wrapper ────────────────────────────────────────────────────────
 
 .oob-hifi {

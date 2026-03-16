@@ -52,7 +52,9 @@ body {
 #sessions-in-session-page .plus-page-main,
 #sessions-in-session-page .plus-page-content-wrapper,
 #tutor-training-progress-page .plus-page-main,
-#tutor-training-progress-page .plus-page-content-wrapper {
+#tutor-training-progress-page .plus-page-content-wrapper,
+#training-onboarding-hifi .plus-page-main,
+#training-onboarding-hifi .plus-page-content-wrapper {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -61,8 +63,15 @@ body {
 #sessions-in-session-page .plus-page-main::-webkit-scrollbar,
 #sessions-in-session-page .plus-page-content-wrapper::-webkit-scrollbar,
 #tutor-training-progress-page .plus-page-main::-webkit-scrollbar,
-#tutor-training-progress-page .plus-page-content-wrapper::-webkit-scrollbar {
+#tutor-training-progress-page .plus-page-content-wrapper::-webkit-scrollbar,
+#training-onboarding-hifi .plus-page-main::-webkit-scrollbar,
+#training-onboarding-hifi .plus-page-content-wrapper::-webkit-scrollbar {
   display: none;
+}
+
+/* Training onboarding: allow content-wrapper to scroll so HeroCard + table are fully visible */
+#training-onboarding-hifi .plus-page-content-wrapper {
+  overflow-y: auto;
 }
 
 /* Sessions page: shell reveal (TopBar + Sidebar) – same pace as homepage (clip-path top-to-bottom, staggered). */
