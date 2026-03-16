@@ -4,7 +4,7 @@ import { Dropdown } from 'react-bootstrap';
 import Badge from '@/components/Badge';
 import Button from '@/components/Button';
 import ListGroup, { ListGroupItem } from '@/components/ListGroup/ListGroup';
-import InputGroup from './InputGroup/InputGroup';
+import Input from './Input';
 import './Select.scss';
 
 /**
@@ -48,6 +48,9 @@ const Select = ({
     placeholder = 'Select...',
     searchable = false,
     creatable = false,
+    open,
+    defaultOpen = false,
+    defaultSearchTerm = '',
     displayMode = 'badges',
     lineWrap = true,
     truncate = false,
@@ -63,17 +66,32 @@ const Select = ({
     ...props
 }) => {
     // State
-    const [isOpen, setIsOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [isOpen, setIsOpen] = useState(Boolean(open ?? defaultOpen));
+    const [searchTerm, setSearchTerm] = useState(defaultSearchTerm);
+    const [addValue, setAddValue] = useState('');
     const [internalValue, setInternalValue] = useState(
         defaultValue || (mode === 'multi' ? [] : '')
     );
+    const [createdOptions, setCreatedOptions] = useState([]);
     const searchInputRef = useRef(null);
     const dropdownRef = useRef(null);
+
+    // Allow controlled open state for Storybook demos
+    useEffect(() => {
+        if (open !== undefined) setIsOpen(Boolean(open));
+    }, [open]);
+
+    // Keep searchTerm in sync for Storybook demos
+    useEffect(() => {
+        setSearchTerm(defaultSearchTerm || '');
+    }, [defaultSearchTerm]);
 
     // Controlled vs uncontrolled
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
+
+    // Combine original options with options created via "Add new value"
+    const allOptions = [...options, ...createdOptions];
 
     // For multi-select, ensure value is always an array
     const selectedValues = mode === 'multi'
@@ -84,14 +102,15 @@ const Select = ({
     const listItemSize = size === 'small' ? 'b3' : size === 'large' ? 'b1' : 'b2';
 
     // Filter options based on search
-    const filteredOptions = options.filter(opt => {
+    const filteredOptions = allOptions.filter(opt => {
         const label = opt.label || opt.text || opt.value;
         return label.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
-    // Check if search term can be added as new value
-    const canAddNew = creatable && searchTerm.trim() &&
-        !options.some(opt => (opt.value || opt.label || opt.text) === searchTerm.trim());
+    // Check if Add row input can be added as new value
+    const trimmedAddValue = addValue.trim();
+    const canAddNew = creatable && trimmedAddValue &&
+        !allOptions.some(opt => (opt.value || opt.label || opt.text) === trimmedAddValue);
 
     // Handle selection
     const handleSelect = (optValue) => {
@@ -121,9 +140,13 @@ const Select = ({
     // Handle adding new value
     const handleAddNew = () => {
         if (!canAddNew) return;
-        const newVal = searchTerm.trim();
+        const newVal = trimmedAddValue;
+
+        // Add new option to local list so it appears in dropdown
+        setCreatedOptions(prev => [...prev, { value: newVal, label: newVal }]);
+
         handleSelect(newVal);
-        setSearchTerm('');
+        setAddValue('');
     };
 
     // Handle badge dismiss
@@ -176,6 +199,7 @@ const Select = ({
     ].filter(Boolean).join(' ');
 
     const showBadgesInTrigger = mode === 'multi' && displayMode === 'badges' && selectedValues.length > 0;
+    const badgesDismissible = !disabled && !readonly;
 
     return (
             <Dropdown
@@ -190,19 +214,19 @@ const Select = ({
                 {showBadgesInTrigger && (
                     <div className="plus-select-badges">
                         {selectedValues.map((val) => {
-                            const opt = options.find(o => o.value === val);
+                            const opt = allOptions.find(o => o.value === val);
                             const label = opt ? (opt.label || opt.text || opt.value) : val;
                             return (
                                 <Badge
                                     key={val}
                                     text={label}
-                                    dismissible
+                                    dismissible={badgesDismissible}
                                     onDismiss={(e) => {
                                         // Stop propagation to prevent toggling dropdown when dismissing badge
                                         e && e.stopPropagation && e.stopPropagation();
                                         handleBadgeDismiss(val);
                                     }}
-                                    size="b3"
+                                    size="b2"
                                     style="secondary"
                                 />
                             );
@@ -216,67 +240,104 @@ const Select = ({
                     </span>
                 )}
 
-                <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'} plus-select-chevron`} />
+                <i className="fa-solid fa-caret-down plus-select-chevron" aria-hidden="true" />
             </Dropdown.Toggle>
 
             {/* Dropdown Menu */}
             <Dropdown.Menu className="plus-select-menu">
-                {/* Search input using InputGroup */}
+                {/* Search input */}
                 {searchable && (
                     <div className="plus-select-search">
-                        <InputGroup
-                            inputRef={searchInputRef}
-                            size="small" // Always small for compact dropdown search
-                            placeholder="Search..."
+                        <Input
+                            id={`${id || name}-search`}
+                            showLabel={false}
+                            placeholder="Search"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            onFocus={(e) => e && e.stopPropagation && e.stopPropagation()}
+                            onBlur={(e) => e && e.stopPropagation && e.stopPropagation()}
                             onClick={(e) => e.stopPropagation()}
-                            leadingVisual={<InputGroup.Icon size="small" className="text-muted" />}
-                            className="w-100 border-0 rounded-0" // Remove border/radius from input group so it fits flush
-                            style={{ boxShadow: 'none' }} // Ensure no shadow
+                            size="medium"
+                            inputRef={searchInputRef}
                         />
                     </div>
                 )}
 
-                {/* Options list using ListGroup */}
-                <ListGroup flush className="plus-select-options">
-                    {filteredOptions.map((opt, idx) => {
-                        const optValue = opt.value;
-                        const optLabel = opt.label || opt.text || opt.value;
-                        const isSelected = mode === 'multi'
-                            ? selectedValues.includes(optValue)
-                            : selectedValues === optValue;
-                        const isDisabled = opt.disabled;
-
-                        return (
-                            <ListGroupItem
-                                key={idx}
-                                value={optValue}
-                                label={optLabel}
-                                selectable={mode === 'multi' ? 'multi' : 'single'}
-                                name={`${name || id}-option`}
-                                selected={isSelected}
-                                disabled={isDisabled}
-                                size={listItemSize}
-                                onClick={() => handleSelect(optValue)}
-                            />
-                        );
-                    })}
-
-                    {/* Add new option using ghost Button */}
-                    {canAddNew && (
-                        <div className="plus-select-option-add">
-                            <Button
-                                text={`Add "${searchTerm}"`}
-                                style="ghost"
-                                size="small"
-                                leadingVisual={<i className="fas fa-plus" />}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAddNew();
+                <div className="plus-select-dropdown">
+                    {/* Add new value row (inline input, independent from Search) */}
+                    {creatable && (
+                        <div className="plus-select-add-row">
+                            <i className="fa-solid fa-plus plus-select-add-icon" aria-hidden="true" />
+                            <input
+                                type="text"
+                                className="plus-select-add-input"
+                                value={addValue}
+                                placeholder="Add new value"
+                                onChange={(e) => setAddValue(e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddNew();
+                                    }
                                 }}
-                                className="plus-select-add-button"
                             />
+                        </div>
+                    )}
+
+                    {/* Options list */}
+                    {mode === 'multi' ? (
+                        <ListGroup flush className="plus-select-options">
+                            {filteredOptions.map((opt, idx) => {
+                                const optValue = opt.value;
+                                const optLabel = opt.label || opt.text || opt.value;
+                                const isSelected = selectedValues.includes(optValue);
+                                const isDisabled = Boolean(opt.disabled);
+
+                                return (
+                                    <ListGroupItem
+                                        key={idx}
+                                        value={optValue}
+                                        label={optLabel}
+                                        selectable="multi"
+                                        name={`${name || id}-option`}
+                                        selected={isSelected}
+                                        disabled={isDisabled}
+                                        size={listItemSize}
+                                        className="plus-select-option-item"
+                                        onClick={() => handleSelect(optValue)}
+                                    />
+                                );
+                            })}
+                        </ListGroup>
+                    ) : (
+                        <div className="plus-select-options">
+                            {filteredOptions.map((opt, idx) => {
+                                const optValue = opt.value;
+                                const optLabel = opt.label || opt.text || opt.value;
+                                const isSelected = selectedValues === optValue;
+                                const isDisabled = Boolean(opt.disabled);
+
+                                const itemClass = [
+                                    'dropdown-item',
+                                    isSelected ? 'selected' : '',
+                                    isDisabled ? 'disabled' : ''
+                                ].filter(Boolean).join(' ');
+
+                                return (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        className={itemClass}
+                                        disabled={isDisabled}
+                                        onClick={() => !isDisabled && handleSelect(optValue)}
+                                    >
+                                        <span className="plus-select-option-label">
+                                            {optLabel}
+                                        </span>
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
 
@@ -286,7 +347,7 @@ const Select = ({
                             No options found
                         </div>
                     )}
-                </ListGroup>
+                </div>
             </Dropdown.Menu>
         </Dropdown>
     );
@@ -314,6 +375,9 @@ Select.propTypes = {
     placeholder: PropTypes.string,
     searchable: PropTypes.bool,
     creatable: PropTypes.bool,
+    open: PropTypes.bool,
+    defaultOpen: PropTypes.bool,
+    defaultSearchTerm: PropTypes.string,
     displayMode: PropTypes.oneOf(['badges', 'text']),
     lineWrap: PropTypes.bool,
     truncate: PropTypes.bool,

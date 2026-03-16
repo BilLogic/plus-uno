@@ -11,11 +11,15 @@
     gap: var(--size-element-gap-xs, 4px);
 }
 
+.plus-input-wrapper-disabled {
+    opacity: 0.38;
+}
+
 .plus-input-label {
     margin-bottom: 0;
     color: var(--color-on-surface);
-    // Figma spec: Body/B3/Semibold (12px, weight 400)
-    font-weight: var(--font-weight-semibold-1);
+    // Figma spec: Body/B3/Regular (12px, weight 400)
+    font-weight: var(--font-weight-normal);
     font-size: var(--font-size-body3);
     line-height: var(--font-line-height-body3);
     
@@ -34,14 +38,14 @@
 
 .plus-input {
     width: 100%;
-    border: 0.8px solid var(--color-outline-variant);
+    border: 0.8px solid var(--color-outline-variant); // placeholder state
     border-radius: var(--size-element-radius-sm, 2px);
     background-color: var(--color-surface);
     color: var(--color-on-surface);
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);
     padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
-    transition: border-color 0.15s ease-in-out, border-width 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: border-color 0.15s ease-in-out;
     
     &::placeholder {
         color: var(--color-on-surface-variant);
@@ -54,38 +58,35 @@
         border-color: var(--color-outline);
     }
     
-    // Hover state - applies to both placeholder and value states
+    // Hover state (Figma doesn't change width; keep 0.8px)
     &:hover:not(:disabled):not(.plus-input-readonly):not(.plus-input-invalid):not(.plus-input-success):not(:focus),
     &.plus-input-hover:not(:disabled):not(.plus-input-readonly):not(.plus-input-invalid):not(.plus-input-success):not(:focus) {
         outline: none;
-        border-width: 2px;
         border-color: var(--color-inverse-primary);
     }
     
     &:focus {
         outline: none;
-        border-width: 2px;
         border-color: var(--color-inverse-primary);
         box-shadow: none;
     }
     
     // Disabled state
     &.plus-input-disabled {
-        background-color: var(--color-surface-container-low);
+        background-color: var(--color-surface);
         border-color: var(--color-outline-variant);
         color: var(--color-on-surface-variant);
-        opacity: 0.6;
         cursor: not-allowed;
         
         &::placeholder {
             color: var(--color-on-surface-variant);
-            opacity: 0.6;
+            opacity: 1;
         }
     }
     
     // Read-only state
     &.plus-input-readonly {
-        background-color: var(--color-surface-container);
+        background-color: var(--color-surface-variant);
         border-color: var(--color-outline-variant);
         cursor: default;
         
@@ -100,12 +101,10 @@
         border-color: var(--color-danger);
         
         &:hover:not(:disabled) {
-            border-width: 2px;
             border-color: var(--color-danger);
         }
         
         &:focus {
-            border-width: 2px;
             border-color: var(--color-danger);
             box-shadow: none;
         }
@@ -115,12 +114,10 @@
         border-color: var(--color-success);
         
         &:hover:not(:disabled) {
-            border-width: 2px;
             border-color: var(--color-success);
         }
         
         &:focus {
-            border-width: 2px;
             border-color: var(--color-success);
             box-shadow: none;
         }
@@ -134,14 +131,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-primary);
+    color: var(--color-on-surface-variant);
     z-index: 1;
     pointer-events: none;
     width: auto;
     height: auto;
     
     i {
-        font-size: var(--font-size-body2);
+        font-size: 12px; // Fontawesome/Solid/B2
     }
 }
 
@@ -164,7 +161,7 @@
     height: auto;
     
     i {
-        font-size: var(--font-size-body2);
+        font-size: 12px; // Fontawesome/Solid/B2
     }
 }
 

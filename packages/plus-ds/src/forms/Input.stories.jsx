@@ -91,335 +91,145 @@ export default {
 
 /**
  * Overview
- * Comprehensive view of Input configurations matching Figma specifications.
+ * Matches Figma content/copy, using the standard Forms overview vertical layout.
  */
 export const Overview = () => {
-    const [value1, setValue1] = useState('');
-    const [value2, setValue2] = useState('Value');
-    const [value3, setValue3] = useState('');
-    const [value4, setValue4] = useState('Value');
-    const [value5, setValue5] = useState('');
-    const [value6, setValue6] = useState('Value');
-    const [value7, setValue7] = useState('');
-    const [value8, setValue8] = useState('Value');
-    const [value9, setValue9] = useState('');
-    const [value10, setValue10] = useState('Value');
-    const [value11, setValue11] = useState('');
-    const [value12, setValue12] = useState('Value');
+    const DemoBlock = ({ children }) => (
+        <div
+            style={{
+                backgroundColor: 'rgba(221, 227, 234, 0.16)',
+                borderRadius: 8,
+                padding: 64,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 20,
+                flexWrap: 'wrap',
+            }}
+        >
+            {children}
+        </div>
+    );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '1200px' }}>
-            {/* Size Section */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Size</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Available in 3 sizes: small, medium (default), large.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-small"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            size="small"
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-medium"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            size="medium"
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-large"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            size="large"
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
+                <div className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    <div>Available in the following size:</div>
+                    <ul style={{ margin: 0, paddingLeft: 21 }}>
+                        <li>medium (default)</li>
+                    </ul>
                 </div>
+                <DemoBlock>
+                    <Input id="input-size-medium" placeholder="Placeholder" value="" size="medium" trailingVisual="fa-solid fa-icons" />
+                </DemoBlock>
             </section>
 
-            {/* State Section */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>State</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Text inputs have 3 states: default, disabled, focus, read-only.
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-                    <Input
-                        id="input-default-placeholder"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        value={value1}
-                        onChange={(e) => setValue1(e.target.value)}
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                    <Input
-                        id="input-default-value"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        value={value2}
-                        onChange={(e) => setValue2(e.target.value)}
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                    <Input
-                        id="input-hover-placeholder"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        value={value3}
-                        onChange={(e) => setValue3(e.target.value)}
-                        className="plus-input-hover"
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                    <Input
-                        id="input-focus-value"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        value={value4}
-                        onChange={(e) => setValue4(e.target.value)}
-                        autoFocus
-                        trailingVisual="fa-solid fa-icons"
-                    />
+                <div className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    <div>Text inputs have 4 states:</div>
+                    <ul style={{ margin: 0, paddingLeft: 21 }}>
+                        <li>default</li>
+                        <li>disabled</li>
+                        <li>focus</li>
+                        <li>read-only</li>
+                    </ul>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginTop: '16px' }}>
-                    <Input
-                        id="input-disabled-placeholder"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        disabled
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                    <Input
-                        id="input-disabled-value"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        value="Value"
-                        disabled
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                    <Input
-                        id="input-readonly-placeholder"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        readonly
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                    <Input
-                        id="input-readonly-value"
-                        label="Label"
-                        required
-                        placeholder="Placeholder"
-                        value="Value"
-                        readonly
-                        trailingVisual="fa-solid fa-icons"
-                    />
-                </div>
+                <DemoBlock>
+                    <Input id="input-state-default" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+                    <Input id="input-state-disabled" placeholder="Placeholder" value="" disabled trailingVisual="fa-solid fa-icons" />
+                    <Input id="input-state-focus" placeholder="Placeholder" value="" autoFocus trailingVisual="fa-solid fa-icons" />
+                    <Input id="input-state-readonly" placeholder="Placeholder" value="" readonly trailingVisual="fa-solid fa-icons" />
+                </DemoBlock>
             </section>
 
-            {/* Input Section */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Input</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    There are 2 styles for the input box: placeholder, value. Placeholder has a lighter color for both box border and text, while value has a darker color for both.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-placeholder-style"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            value={value5}
-                            onChange={(e) => setValue5(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-value-style"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            value={value6}
-                            onChange={(e) => setValue6(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
+                <div className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    <div>There are 2 styles for the input box:</div>
+                    <ul style={{ margin: 0, paddingLeft: 21 }}>
+                        <li>placeholder: for displaying placeholder text. It has a lighter color for both the box border and the text inside.</li>
+                        <li>value: for displaying text entered by the user. It has a darker color for both the box border and the text inside.</li>
+                    </ul>
                 </div>
+                <DemoBlock>
+                    <Input id="input-style-placeholder" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+                    <Input id="input-style-value" placeholder="Placeholder" value="Value" trailingVisual="fa-solid fa-icons" />
+                </DemoBlock>
             </section>
 
-            {/* Validation Section */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Validation</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Validation types include: none, invalid, success. Adding validation changes border color and shows validation messages.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-validation-none"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            validation="none"
-                            value={value7}
-                            onChange={(e) => setValue7(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-validation-invalid"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            validation="invalid"
-                            validationMessage="Validation message"
-                            value={value8}
-                            onChange={(e) => setValue8(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-validation-success"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            validation="success"
-                            validationMessage="Validation message"
-                            value={value9}
-                            onChange={(e) => setValue9(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
+                <div className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    <div>Add validation to any text input when the value needs to be within a set of parameters. Validation is represented with a color change in the border color. You can edit the validation message by clicking into the text.</div>
+                    <div style={{ marginTop: 8 }}>Validation types include:</div>
+                    <ul style={{ margin: 0, paddingLeft: 21 }}>
+                        <li>none</li>
+                        <li>invalid</li>
+                        <li>success</li>
+                    </ul>
                 </div>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '16px' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-validation-invalid-value"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            validation="invalid"
-                            validationMessage="Validation message"
-                            value={value10}
-                            onChange={(e) => setValue10(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-validation-success-value"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            validation="success"
-                            validationMessage="Validation message"
-                            value={value11}
-                            onChange={(e) => setValue11(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                </div>
+                <DemoBlock>
+                    <Input id="input-validation-none" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+                    <Input
+                        id="input-validation-invalid"
+                        placeholder="Placeholder"
+                        value=""
+                        validation="invalid"
+                        validationMessage="Validation message"
+                        trailingVisual="fa-solid fa-icons"
+                    />
+                    <Input
+                        id="input-validation-success"
+                        placeholder="Placeholder"
+                        value=""
+                        validation="success"
+                        validationMessage="Validation message"
+                        trailingVisual="fa-solid fa-icons"
+                    />
+                </DemoBlock>
             </section>
 
-            {/* Label Section */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Label?</h6>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Toggle the label? switch to show or hide the label.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-with-label"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            showLabel={true}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-without-label"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            showLabel={false}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                </div>
+                <DemoBlock>
+                    <Input id="input-label-on" placeholder="Placeholder" value="" showLabel label="Label" trailingVisual="fa-solid fa-icons" />
+                    <Input id="input-label-off" placeholder="Placeholder" value="" showLabel={false} label="Label" trailingVisual="fa-solid fa-icons" />
+                </DemoBlock>
             </section>
 
-            {/* Required Section */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Required?</h6>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Toggle the required switch to show or hide a * next to the label to show if the input is required.
+                    Toggle the required switch to show or hide a <span style={{ color: 'var(--color-danger)' }}>*</span> next to the label to show if the input is required.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-required"
-                            label="Label"
-                            required={true}
-                            placeholder="Placeholder"
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-not-required"
-                            label="Label"
-                            required={false}
-                            placeholder="Placeholder"
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                </div>
+                <DemoBlock>
+                    <Input id="input-required-on" placeholder="Placeholder" value="" label="Label" required trailingVisual="fa-solid fa-icons" />
+                    <Input id="input-required-off" placeholder="Placeholder" value="" label="Label" trailingVisual="fa-solid fa-icons" />
+                </DemoBlock>
             </section>
 
-            {/* LeadingVisual & TrailingVisual Section */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>LeadingVisual? & TrailingVisual?</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    LeadingVisual and TrailingVisual are togglable switches. LeadingVisual is always an icon, and TrailingVisual can be an icon or a dropdown arrow. Emphasizes matching the TrailingVisual size to the form size.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '300px' }}>
-                        <Input
-                            id="input-with-visuals"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            leadingVisual="fa-solid fa-network-wired"
-                            trailingVisual="dropdown"
-                            size="large"
-                            value={value12}
-                            onChange={(e) => setValue12(e.target.value)}
-                        />
-                    </div>
+                <div className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    <div>To toggle the leadingVisual? and trailingVisual? switches, you need to double-click on the form component to get into <strong>_Form</strong> component.</div>
+                    <div style={{ marginTop: 8 }}>The leadingVisual is always an icon, and the trailingVisual can be an icon or a dropdown arrow.</div>
+                    <div style={{ marginTop: 8 }}>If you change the trailingVisual to an arrow, make sure to select the proper trailingVisual size to match the form size.</div>
                 </div>
+                <DemoBlock>
+                    <Input
+                        id="input-visuals"
+                        placeholder="Placeholder"
+                        value=""
+                        leadingVisual="fa-solid fa-icons"
+                        trailingVisual="dropdown"
+                    />
+                </DemoBlock>
             </section>
         </div>
     );

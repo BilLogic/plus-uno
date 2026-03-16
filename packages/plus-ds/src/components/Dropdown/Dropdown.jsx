@@ -63,12 +63,17 @@ const Dropdown = ({
     ].filter(Boolean).join(' ');
 
     const renderToggle = () => {
+        const caretClass =
+            direction === 'dropup' ? 'pdropdown-caret-up' :
+            direction === 'dropleft' ? 'pdropdown-caret-left' :
+            direction === 'dropright' ? 'pdropdown-caret-right' :
+            // For standard dropdown direction, use up caret when menu is open
+            show ? 'pdropdown-caret-up' : '';
+
         const toggleClasses = [
             split ? 'pdropdown-split-toggle-btn' : 'pdropdown-default-toggle',
-            'dropdown-toggle', // Note: Ensure CSS suppresses the default Bootstrap caret if standard bootstrap is loaded
-            direction === 'dropup' ? 'pdropdown-caret-up' : '',
-            direction === 'dropleft' ? 'pdropdown-caret-left' : '',
-            direction === 'dropright' ? 'pdropdown-caret-right' : ''
+            'dropdown-toggle',
+            caretClass
         ].filter(Boolean).join(' ');
 
         return (

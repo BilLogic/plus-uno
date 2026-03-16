@@ -14,7 +14,7 @@
     width: 100%;
 
     &.plus-select-disabled {
-        opacity: 0.5;
+        opacity: 0.38; // Figma disabled
         pointer-events: none;
     }
     
@@ -36,27 +36,25 @@
 // ===== TRIGGER / INPUT FIELD =====
 .plus-select-trigger {
     display: flex;
-    align-items: flex-start; // Allow badges to wrap from top
+    align-items: flex-start; // Allow badges to wrap from top (multi)
     flex-wrap: wrap;
-    gap: var(--size-element-gap-sm, 6px);
+    gap: var(--size-element-gap-md, 10px); // Figma: element/gap-md
     width: 100%;
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
     font-size: var(--font-size-body2);
     line-height: var(--font-line-height-body2);
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--color-surface); // Figma: neutral/surface (#f9f9fc)
     border: 0.8px solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-sm, 2px);
     cursor: pointer;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.15s ease;
 
     &:hover:not([aria-disabled="true"]) {
-        border-color: var(--color-outline);
+        border-color: var(--color-inverse-primary);
     }
 
     .plus-select-open & {
-        border-color: var(--color-primary);
-        border-width: 2px;
-        box-shadow: none;
+        border-color: var(--color-inverse-primary);
     }
 }
 
@@ -82,9 +80,18 @@
     min-width: 0; // Allow shrinking
     max-width: calc(100% - 24px); // Leave room for chevron
 
-    // Badge styling adjustments
     .plus-badge {
         flex-shrink: 0;
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-normal);
+        line-height: var(--font-line-height-body2);
+        color: var(--secondary-secondary-text, #3B525F);
+        border: none;
+
+        &.plus-badge--dismissible {
+            border: none;
+        }
     }
 }
 
@@ -161,51 +168,162 @@
     color: var(--color-on-surface-variant);
     margin-left: auto;
     align-self: center;
-    transition: transform 0.2s ease;
-
-    .plus-select-open & {
-        color: var(--color-primary);
-    }
 }
 
 // ===== DROPDOWN MENU / POPUP =====
-// Popup must have correct surface-container background and elevation per DS specs
-// ===== DROPDOWN MENU / POPUP =====
-// Popup must have correct surface-container background and elevation per DS specs
-// ===== DROPDOWN MENU / POPUP =====
-// Popup must have correct surface-container background and elevation per DS specs
 .plus-select-menu {
     width: 100%;
-    // Set max height on the menu container, but don't scroll IT directly
-    max-height: 280px;
     padding: 0 !important;
-    margin-top: 4px !important;
+    margin-top: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
 
-    // Use Flex column layout to stack fixed search + scrollable options
-    // BUT only when shown. Default to hidden (inherit from Bootstrap .dropdown-menu) via lack of 'show'
-    display: none;
-
-    &.show {
-        display: flex;
-        flex-direction: column;
-    }
-
-    // Background: surface-container-low for popups per DS (not plain surface)
-    background-color: var(--color-surface-container-low, #f5f5f5) !important;
-
-    // Border for definition
-    border: 1px solid var(--color-outline-variant) !important;
-    border-radius: var(--size-modal-radius-sm, 8px) !important;
-
-    // Elevation 2 shadow per DS popup specs
-    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
-    0px 2px 6px 2px rgba(0, 0, 0, 0.15) !important;
-
-    // Ensure overflow is hidden on the container so corners are clipped
+// Dropdown container (Figma dropdown list)
+.plus-select-dropdown {
+    background-color: var(--color-surface);
+    border: 0.8px solid var(--color-outline-variant);
+    border-top: none;
+    border-bottom-left-radius: var(--size-modal-radius-sm, 4px);
+    border-bottom-right-radius: var(--size-modal-radius-sm, 4px);
     overflow: hidden;
 }
 
-// ... rest of file (search, options etc)
+.plus-select-search {
+    .plus-input {
+        border-radius: 0;
+        border: 0.8px solid var(--color-outline-variant);
+        width: 100%;
+        background-color: var(--color-surface);
+    }
+}
+
+.plus-select-add-row {
+    display: flex;
+    min-width: 28px;
+    align-items: center;
+    gap: var(--size-element-gap-md, 10px);
+    flex: 1 0 0;
+    border: 0.8px solid var(--color-outline-variant, #BEC8CA);
+    background: var(--color-surface, #F9F9FC);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+
+    .plus-select-add-icon {
+        font-size: var(--font-size-fa-body2-solid);
+        color: var(--primary-primary-text, #00547E);
+    }
+
+    .plus-select-add-input {
+        flex: 1 0 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--primary-primary-text, #00547E);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-semibold-1);
+        line-height: var(--font-line-height-body2);
+    }
+}
+
+.plus-select-options {
+    background-color: transparent;
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-md, 10px);
+        width: 100%;
+        padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 10px);
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-light);
+        line-height: var(--font-line-height-body2);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        &:hover:not(.disabled) {
+            background-color: var(--color-on-surface-state-08);
+            color: var(--color-on-surface);
+        }
+
+        &:active:not(.disabled) {
+            background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+        }
+
+        &.selected {
+            position: relative;
+            background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08));
+            color: var(--color-on-surface);
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background-color: var(--color-primary-container);
+            }
+        }
+
+        &.disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .plus-select-option-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .plus-list-option.plus-select-option-item {
+        padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 10px);
+        background-color: var(--color-surface);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-light);
+        line-height: var(--font-line-height-body2);
+
+        .form-check-label {
+            color: var(--color-on-surface);
+        }
+
+        &:hover:not(.disabled) {
+            background-color: var(--color-on-surface-state-08);
+        }
+
+        &.active {
+            position: relative;
+            /* Override OptionList active background to match single-select selected */
+            background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08)) !important;
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background-color: var(--color-primary-container);
+            }
+        }
+
+        &.disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    }
+}
 
 // Remove the redundant .dropdown-menu .show override at the bottom since we handled it above
 // The .plus-select-wrapper.dropdown block can be removed or simplified if it does nothing else useful.
