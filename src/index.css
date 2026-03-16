@@ -91,11 +91,34 @@ body.page--training-onboarding #root {
   display: none;
 }
 
-/* Training onboarding: allow content-wrapper + main to scroll so HeroCard + table are fully visible */
-#training-onboarding-hifi .plus-page-content-wrapper,
+/* ── Training Onboarding scroll fix ─────────────────────────────────────────
+   PageLayout uses inline styles (very high specificity), so !important is
+   required to override overflow:hidden and alignItems:flex-start.
+
+   .plus-page-main-container  → overflow:hidden clips the sidebar+content row;
+                                  needs overflow:visible so content can grow.
+   .plus-page-content-wrapper → overflow:hidden and alignItems:flex-start clip
+                                  the hero bubble track; needs overflow-y:auto
+                                  and align-items:stretch so main fills height.
+   .plus-page-main            → already overflow:auto in PageLayout, but also
+                                  needs a stable height so it scrolls correctly.
+*/
+#training-onboarding-hifi .plus-page-main-container {
+  overflow: visible !important;
+}
+
+#training-onboarding-hifi .plus-page-content-wrapper {
+  overflow: hidden !important;   /* keep x clipped */
+  overflow-y: auto !important;   /* allow vertical scroll */
+  align-items: stretch !important; /* children fill full height so main scrolls */
+  height: 100% !important;
+}
+
 #training-onboarding-hifi .plus-page-main {
   overflow-y: auto !important;
-  height: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;       /* grow with content, not fixed to parent */
+  flex: 1 1 auto !important;
 }
 
 /* Sessions page: shell reveal (TopBar + Sidebar) – same pace as homepage (clip-path top-to-bottom, staggered). */
