@@ -48,14 +48,11 @@
     border-radius: var(--size-element-radius-sm, 2px);
     cursor: pointer;
     transition: border-color 0.15s ease;
+}
 
-    &:hover:not([aria-disabled="true"]) {
-        border-color: var(--color-inverse-primary);
-    }
-
-    .plus-select-open & {
-        border-color: var(--color-inverse-primary);
-    }
+.plus-select-open .plus-select-trigger {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 // Size variants
@@ -195,6 +192,12 @@
         border: 0.8px solid var(--color-outline-variant);
         width: 100%;
         background-color: var(--color-surface);
+        color: var(--color-on-surface-variant);
+        font-weight: var(--font-weight-light);
+
+        &::placeholder {
+            color: var(--color-on-surface-variant);
+        }
     }
 }
 
@@ -223,6 +226,10 @@
         font-size: var(--font-size-body2);
         font-weight: var(--font-weight-semibold-1);
         line-height: var(--font-line-height-body2);
+
+        &::placeholder {
+            color: var(--primary-primary-text, #00547E);
+        }
     }
 }
 
@@ -288,6 +295,7 @@
     .plus-list-option.plus-select-option-item {
         padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 10px);
         background-color: var(--color-surface);
+        border: none;
         font-family: var(--font-family-body);
         font-size: var(--font-size-body2);
         font-weight: var(--font-weight-light);
