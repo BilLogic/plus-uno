@@ -1,0 +1,196 @@
+.login-portal-card {
+    width: 100%;
+    /* Match Figma login portal card width (~558px) while remaining responsive */
+    max-width: 558px;
+    background: var(--color-surface-container-lowest);
+    border-radius: var(--size-card-radius-md);
+    box-shadow: var(--elevation-light-3);
+    padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-lg); // 32px between major sections
+}
+
+
+.login-portal-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm); // 8px in Figma (Element/gap-sm)
+    color: var(--color-on-surface);
+}
+
+.login-portal-header__title {
+    margin: 0;
+}
+
+.login-portal-header__subtitle {
+    margin: 0;
+    color: var(--color-on-surface);
+}
+
+.login-or-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-lg);
+    width: 100%;
+}
+
+.login-or-divider__line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-outline-variant);
+    border-radius: var(--size-border-radius-radius-0);
+}
+
+.login-or-divider__text {
+    color: var(--color-on-surface);
+}
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+}
+
+.login-field__label {
+    color: var(--color-on-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+}
+
+.login-field__required {
+    color: var(--color-danger);
+}
+
+.login-field__caption {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-element-gap-sm);
+    color: var(--color-on-surface-variant);
+}
+
+.login-field__link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--color-primary-text);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.login-auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-lg);
+    width: 100%;
+}
+
+.login-auth-buttons__google-icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.login-auth-buttons__clever {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--size-element-radius-md);
+    border: var(--size-element-border) solid #2e76ff; // Clever brand blue (image expects this surround)
+    background: #2e76ff;
+    overflow: hidden;
+    padding: 0;
+}
+
+.login-auth-buttons__clever-image {
+    height: 100%;
+    width: auto;
+    display: block;
+}
+
+.login-portal-demo-role-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-section-gap-md); // 24px token-equivalent
+    width: 100%;
+}
+
+.login-portal-demo-role-buttons__btn {
+    flex: 1;
+}
+
+.login-portal-demo-role-icon {
+    color: var(--color-primary);
+}
+
+// Override default Button icon sizing for this specific vertical button pattern.
+// Button.scss sets `large` icons to Fontawesome/Solid/H3 (24px); this card needs
+// Fontawesome/Solid/H2 (28px) like the Figma spec.
+//
+// Use higher specificity (and !important) so this wins regardless of CSS load order.
+.login-portal-demo-role-buttons .plus-btn.plus-btn--large .plus-btn-visual {
+    font-size: var(--font-size-fa-h2-solid) !important;
+    line-height: var(--font-line-height-fa-h2-solid) !important;
+}
+
+// If Font Awesome is rendering SVGs, make sure they scale with the font-size above.
+.login-portal-demo-role-buttons .plus-btn.plus-btn--large .plus-btn-visual svg {
+    width: 1em;
+    height: 1em;
+}
+
+// Override label typography for the Admin/Tutor demo buttons to match Title/H5
+// (20px) while keeping the icon at H2 (28px). This recreates the Figma ratio.
+.login-portal-demo-role-buttons .plus-btn.plus-btn--large .plus-btn-text {
+    font-size: var(--font-size-h5);
+    line-height: var(--font-line-height-h5);
+}
+
+.login-portal-terms {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+}
+
+.login-portal-terms__checkbox {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+    background: var(--color-on-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--size-border-radius-radius-50, 2px);
+}
+
+.login-portal-terms__text {
+    color: var(--color-on-surface);
+}
+
+.login-portal-terms__link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.login-portal-terms__required {
+    color: var(--color-danger);
+}
+
+// Disabled action buttons (Continue / Log in) wrapper
+// Matches Figma: bg = state-layers/on-surface/opacity-0_12, text opacity 0.38
+.login-portal-disabled-button {
+    width: 100%;
+    background-color: var(--color-on-surface-state-12);
+    border-radius: var(--size-element-radius-md);
+    opacity: var(--color-disabled-opacity);
+}
+

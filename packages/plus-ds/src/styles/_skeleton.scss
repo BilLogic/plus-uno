@@ -1,0 +1,33 @@
+/**
+ * Shared skeleton/shimmer loading style for plus-ds.
+ * Used by Sidebar loading state and can be used by prototypes for consistent loading UI.
+ */
+
+@keyframes plus-skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.plus-skeleton-block {
+    display: block;
+    background: linear-gradient(
+        90deg,
+        var(--color-outline-variant, #bec8ca) 0%,
+        var(--color-surface-container-highest, #e2e2e5) 50%,
+        var(--color-outline-variant, #bec8ca) 100%
+    );
+    background-size: 200% 100%;
+    animation: plus-skeleton-shimmer 2s ease-in-out infinite;
+    border-radius: var(--size-surface-radius, 8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-skeleton-block {
+        animation: none;
+        background: var(--color-outline-variant, #bec8ca);
+    }
+}

@@ -1,0 +1,145 @@
+/**
+ * TutorStatusWarningsPage Styles
+ */
+
+.tutor-status-warnings-page__content {
+    padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-status-warnings-page__tabs {
+    margin-bottom: var(--spacing-medium-space-200, 12px);
+}
+
+.tutor-status-warnings-page__actions {
+    display: flex;
+    gap: var(--spacing-medium-space-200, 12px);
+    margin-bottom: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-status-warnings-page__overview-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+}
+
+.tutor-status-warnings-page__overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+// Replaces __charts
+.tutor-status-overview-card {
+    display: flex;
+    flex-direction: column; // Main axis vertical for charts row + legend
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    border-radius: var(--card-radius-sm, 12px);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
+    gap: var(--spacing-xxlarge-space-500, 32px);
+    width: 100%;
+    min-width: 0;
+    min-height: 376px;
+
+    &__row {
+        display: flex;
+        flex-direction: row;
+        gap: var(--spacing-xxlarge-space-500, 32px);
+        width: 100%;
+        flex: 1; // Take available height
+    }
+
+    &__section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        gap: var(--spacing-large-space-300, 16px);
+    }
+
+    &__header {
+        display: flex;
+        align-items: center; // Center vertically
+        gap: var(--spacing-small-space-100, 8px);
+
+        .title-h4 {
+            font-family: 'Lato', sans-serif;
+            font-size: var(--font-size-h4, 24px);
+            font-weight: 700; // Bold to match screenshot
+            line-height: var(--line-height-h4, 1.33);
+            color: var(--color-on-surface, #191c1e);
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .help-icon {
+            color: var(--color-on-surface-variant-3, #C4C7C5);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            // Removed margin-top for centered alignment
+        }
+    }
+
+    &__content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        flex: 1;
+        height: 100%;
+    }
+
+    &__legend {
+        display: flex;
+        flex-wrap: wrap; // Allow wrap if screen is small
+        justify-content: center; // Center align items
+        gap: var(--spacing-large-space-400, 24px); // Legend item gap
+        width: 100%;
+        padding-top: var(--spacing-small-space-100, 8px);
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-small-space-100, 8px);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px; // Soft square
+        }
+
+        .legend-label {
+            font-family: 'Merriweather Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 400; // Regular/Normal weight
+            color: var(--color-on-surface-variant, #3f484a);
+        }
+    }
+}
+
+.tutor-status-warnings-page__details-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-large-space-300, 16px);
+    margin-top: var(--spacing-large-space-400, 24px);
+}
+
+.tutor-status-warnings-page__details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutor-status-warnings-page__pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
+}

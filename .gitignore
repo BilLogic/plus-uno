@@ -1,0 +1,44 @@
+.npm-cache/
+storybook-static/
+storybook_*.txt
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+.sass-cache/
+
+# Environment
+.env
+.env.local
+
+# Reference files (production repo)
+reference/production/
+
+# Playground directories (opt-in to commit)
+prototyping/playground/*/
+!prototyping/playground/README.md
+.vercel
+
+# Local Netlify folder
+.netlify

@@ -1,0 +1,103 @@
+/**
+ * TopBar Component
+ * 
+ * Top navigation bar with sidebar control, breadcrumbs, and user avatar.
+ * Figma Spec: node-id=111-227860, 111-227866
+ */
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import Breadcrumb from '../../../../components/Breadcrumb';
+import { UserAvatar } from '../../Elements';
+import Button from '../../../../components/Button';
+import './TopBar.scss';
+
+/** Collapsed left section width (toggle button only); matches PageLayout motion. */
+const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
+const TOPBAR_LEFT_EXPANDED_WIDTH = 184;
+
+const TopBar = ({
+    mode = 'expanded',
+    onToggle,
+    breadcrumbs = [{ text: 'Home', href: '#' }, { text: 'Page' }],
+    user = null,
+    className = '',
+    style,
+    ...props
+}) => {
+    const handleToggle = () => {
+        if (onToggle) {
+            onToggle(mode === 'expanded' ? 'collapsed' : 'expanded');
+        }
+    };
+
+    // Numeric width so CSS can transition; aligns with sidebar (184px when expanded).
+    const leftSectionWidth = mode === 'expanded' ? TOPBAR_LEFT_EXPANDED_WIDTH : TOPBAR_LEFT_COLLAPSED_WIDTH;
+
+    return (
+        <div
+            className={`plus-topbar ${className}`}
+            style={style}
+            {...props}
+        >
+            {/* Left: Sidebar Control */}
+            <div
+                className="topbar-left-section"
+                style={{ width: leftSectionWidth }}
+            >
+                <Button
+                    className="topbar-toggle-btn"
+                    style="primary" // Logic handled by class override, but keeping semantically primary
+                    fill="tonal"    // Logic handled by class override
+                    leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
+                    onClick={handleToggle}
+                    aria-label={mode === 'expanded' ? "Collapse sidebar" : "Expand sidebar"}
+                />
+            </div>
+
+            {/* Center: Breadcrumbs */}
+            <div className="topbar-center-section">
+                <Breadcrumb items={breadcrumbs} />
+            </div>
+
+            {/* Right: User Avatar & Notification */}
+            <div className="topbar-right-section">
+                {user && (
+                    <UserAvatar
+                        firstChar={user.firstChar ?? user.name?.charAt(0) ?? 'U'}
+                        name={user.name || 'User'}
+                        avatarUrl={user.avatarUrl}
+                        counter={user.counter}
+                        counterValue={user.counterValue}
+                        type={user.type}
+                    />
+                )}
+            </div>
+        </div>
+    );
+};
+
+TopBar.propTypes = {
+    /** Current sidebar mode */
+    mode: PropTypes.oneOf(['expanded', 'collapsed']),
+    /** Callback when toggle button is clicked, receives new mode */
+    onToggle: PropTypes.func,
+    /** Breadcrumb items array */
+    breadcrumbs: PropTypes.arrayOf(PropTypes.shape({
+        text: PropTypes.string.isRequired,
+        href: PropTypes.string
+    })),
+    /** User object for avatar. firstChar overrides auto-initials; avatarUrl shows profile image per Figma 4551-59322 */
+    user: PropTypes.shape({
+        name: PropTypes.string,
+        firstChar: PropTypes.string,
+        avatarUrl: PropTypes.string,
+        counter: PropTypes.bool,
+        counterValue: PropTypes.number,
+        type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin'])
+    }),
+    className: PropTypes.string,
+    style: PropTypes.object
+};
+
+export default TopBar;

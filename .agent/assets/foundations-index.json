@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "updated_for_branch": "main",
+  "runtime_and_tooling": {
+    "framework": "React",
+    "ui_library": "React-Bootstrap",
+    "bundler": "Vite",
+    "storybook": "Storybook"
+  },
+  "canonical_commands": [
+    "npm run dev",
+    "npm run storybook",
+    "npm run build",
+    "npm run build-storybook",
+    "npm run preview:react",
+    "npm run sync:tokens",
+    "npm run generate:tokens"
+  ],
+  "key_paths": {
+    "agent_system": ".agent/",
+    "design_system_source": "packages/plus-ds/src/",
+    "design_system_docs": "packages/plus-ds/guidelines/",
+    "storybook_config": ".storybook/",
+    "token_scripts": "scripts/",
+    "playground_prototyping": "playground/prototyping/"
+  },
+  "context_levels": [
+    {
+      "name": "element",
+      "token_scope": "--size-element-*",
+      "typical_locations": [
+        "packages/plus-ds/src/components/",
+        "packages/plus-ds/src/forms/"
+      ]
+    },
+    {
+      "name": "card",
+      "token_scope": "--size-card-*",
+      "typical_locations": [
+        "packages/plus-ds/src/specs/*/Cards/"
+      ]
+    },
+    {
+      "name": "section",
+      "token_scope": "--size-section-*",
+      "typical_locations": [
+        "packages/plus-ds/src/specs/*/Sections/"
+      ]
+    },
+    {
+      "name": "table",
+      "token_scope": "--size-table-*",
+      "typical_locations": [
+        "packages/plus-ds/src/specs/*/Tables/"
+      ]
+    },
+    {
+      "name": "modal",
+      "token_scope": "--size-modal-*",
+      "typical_locations": [
+        "packages/plus-ds/src/components/",
+        "packages/plus-ds/src/specs/*/Modals/"
+      ]
+    },
+    {
+      "name": "page_or_spec",
+      "typical_locations": [
+        "packages/plus-ds/src/specs/*/Pages/"
+      ]
+    }
+  ],
+  "terminology": {
+    "element": "Small reusable unit (button, input, badge).",
+    "card": "Grouped content container.",
+    "section": "Major page region.",
+    "table": "Structured tabular layout.",
+    "modal": "Overlay dialog surface.",
+    "spec": "Higher-level composition in packages/plus-ds/src/specs."
+  },
+  "token_prefixes": [
+    "--color-*",
+    "--size-*",
+    "--font-*",
+    "--elevation-*"
+  ]
+}

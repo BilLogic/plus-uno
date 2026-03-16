@@ -1,0 +1,219 @@
+/**
+ * Enhanced Select Component Styles
+ * Custom dropdown using existing DS components:
+ * - Checkbox for multi-select
+ * - Radio for single-select
+ * - Badge for selected values
+ * - Ghost Button for creatable
+ */
+
+// ===== WRAPPER =====
+.plus-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    &.plus-select-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    
+    &.plus-select-readonly {
+        pointer-events: none;
+        
+        .plus-select-trigger {
+            background-color: var(--color-surface-variant, #dde3ea); // Figma: --neutral-colors/alternative/surface-variant
+            cursor: default;
+            border: 0.8px solid var(--color-outline-variant, #bec8ca);
+            
+            &:hover {
+                border-color: var(--color-outline-variant);
+            }
+        }
+    }
+}
+
+// ===== TRIGGER / INPUT FIELD =====
+.plus-select-trigger {
+    display: flex;
+    align-items: flex-start; // Allow badges to wrap from top
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 6px);
+    width: 100%;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    background-color: var(--color-surface-container-lowest);
+    border: 0.8px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm, 2px);
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover:not([aria-disabled="true"]) {
+        border-color: var(--color-outline);
+    }
+
+    .plus-select-open & {
+        border-color: var(--color-primary);
+        border-width: 2px;
+        box-shadow: none;
+    }
+}
+
+// Size variants
+.plus-select-sm .plus-select-trigger {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-select-lg .plus-select-trigger {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+}
+
+// ===== BADGES - Full width wrapping =====
+.plus-select-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 6px);
+    flex: 1 1 100%; // Take full width
+    min-width: 0; // Allow shrinking
+    max-width: calc(100% - 24px); // Leave room for chevron
+
+    // Badge styling adjustments
+    .plus-badge {
+        flex-shrink: 0;
+    }
+}
+
+// ===== NOWRAP MODE - Single line with overflow =====
+.plus-select-nowrap {
+    .plus-select-trigger {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--color-outline-variant);
+            border-radius: 2px;
+        }
+    }
+
+    .plus-select-badges {
+        flex-wrap: nowrap;
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+}
+
+// ===== TRUNCATE MODE - Show overflow indicator =====
+.plus-select-truncate {
+    .plus-select-trigger {
+        overflow: hidden;
+    }
+
+    .plus-select-badges {
+        position: relative;
+        overflow: hidden;
+
+        // Fade gradient on right edge when truncated
+        &::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 32px;
+            background: linear-gradient(to right, transparent, var(--color-surface-container-lowest));
+            pointer-events: none;
+        }
+    }
+}
+
+// ===== TEXT DISPLAY =====
+.plus-select-text {
+    flex: 1;
+    font-family: var(--font-family-body);
+    font-size: inherit;
+    font-weight: var(--font-weight-light);
+    color: var(--color-on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    align-self: center;
+
+    &.plus-select-placeholder {
+        color: var(--color-on-surface-variant);
+    }
+}
+
+// ===== CHEVRON ICON =====
+.plus-select-chevron {
+    flex-shrink: 0;
+    font-size: var(--font-size-fa-body2-solid, 12px);
+    color: var(--color-on-surface-variant);
+    margin-left: auto;
+    align-self: center;
+    transition: transform 0.2s ease;
+
+    .plus-select-open & {
+        color: var(--color-primary);
+    }
+}
+
+// ===== DROPDOWN MENU / POPUP =====
+// Popup must have correct surface-container background and elevation per DS specs
+// ===== DROPDOWN MENU / POPUP =====
+// Popup must have correct surface-container background and elevation per DS specs
+// ===== DROPDOWN MENU / POPUP =====
+// Popup must have correct surface-container background and elevation per DS specs
+.plus-select-menu {
+    width: 100%;
+    // Set max height on the menu container, but don't scroll IT directly
+    max-height: 280px;
+    padding: 0 !important;
+    margin-top: 4px !important;
+
+    // Use Flex column layout to stack fixed search + scrollable options
+    // BUT only when shown. Default to hidden (inherit from Bootstrap .dropdown-menu) via lack of 'show'
+    display: none;
+
+    &.show {
+        display: flex;
+        flex-direction: column;
+    }
+
+    // Background: surface-container-low for popups per DS (not plain surface)
+    background-color: var(--color-surface-container-low, #f5f5f5) !important;
+
+    // Border for definition
+    border: 1px solid var(--color-outline-variant) !important;
+    border-radius: var(--size-modal-radius-sm, 8px) !important;
+
+    // Elevation 2 shadow per DS popup specs
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+    0px 2px 6px 2px rgba(0, 0, 0, 0.15) !important;
+
+    // Ensure overflow is hidden on the container so corners are clipped
+    overflow: hidden;
+}
+
+// ... rest of file (search, options etc)
+
+// Remove the redundant .dropdown-menu .show override at the bottom since we handled it above
+// The .plus-select-wrapper.dropdown block can be removed or simplified if it does nothing else useful.
+// It hid the caret. We should keep that.
+.plus-select-wrapper.dropdown {
+    .dropdown-toggle {
+        &::after {
+            display: none; // Remove default caret
+        }
+    }
+}

@@ -1,0 +1,82 @@
+@use '@plus-ds/tokens/_colors.scss';
+@use '@plus-ds/tokens/_spacing_semantics.scss';
+@use '@plus-ds/tokens/_fonts.scss';
+
+.app-container {
+    min-height: 100vh;
+    background-color: var(--color-surface);
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.header-action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--size-section-gap-md);
+
+    h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--color-on-surface);
+    }
+}
+
+.summary-cards-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--size-element-gap-lg);
+    margin-bottom: var(--size-section-gap-lg);
+
+    .card-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--color-on-surface-variant);
+        margin-bottom: var(--size-element-gap-sm);
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .card-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--color-on-surface);
+    }
+}
+
+.table-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--size-element-gap-md);
+
+    h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-on-surface);
+    }
+
+    .table-filters {
+        display: flex;
+        gap: var(--size-element-gap-sm);
+    }
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    font-weight: 600;
+    font-size: 14px;
+}

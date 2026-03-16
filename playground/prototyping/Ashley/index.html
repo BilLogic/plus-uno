@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ashley's Prototype</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&family=Merriweather+Sans:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Fullscreen layout for standalone component */
+        html,
+        body,
+        #root {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Agent usually has its own constraints or overlays */
+            font-family: 'Lato', sans-serif;
+            background-color: #f8f9fa;
+            /* Light gray background */
+        }
+
+        /* Add any global styles needed for the prototype context */
+        :root {
+            --color-primary: #007bff;
+            --color-bg-surface-default: #ffffff;
+            --color-on-surface: #212529;
+            --color-on-surface-variant: #6c757d;
+            --color-primary-text: #007bff;
+            --color-primary-container: #dfefff;
+            --color-mastering-content-text: #6610f2;
+            --color-mastering-content-container: #e0cffc;
+            --color-warning-text: #ffc107;
+            --color-warning-container: #fff3cd;
+            --color-advocacy-text: #fd7e14;
+            --color-advocacy-container: #ffe5d0;
+            --color-relationship-container: #f8d7da;
+            --color-on-relationship-container: #842029;
+            --color-technology-tools-container: #cff4fc;
+            --color-on-technology-tools-container: #055160;
+            --size-section-pad-y-md: 24px;
+            --size-section-pad-x-md: 32px;
+            --size-section-gap-md: 16px;
+            --size-section-gap-lg: 24px;
+            --size-element-gap-md: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module" src="./main.jsx"></script>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+/**
+ * AdminDateRangeFilter Styles
+ * Figma Node: 258-262321
+ */
+
+.admin-date-range-filter {
+    display: flex;
+    align-items: center;
+    gap: var(--element-gap-lg, 12px);
+
+    &__dropdowns {
+        display: flex;
+        align-items: center;
+        gap: var(--element-gap-sm, 8px);
+    }
+
+    &__dropdown {
+        // Button styles are handled by the Dropdown component
+    }
+
+    &__date-range {
+        display: flex;
+        align-items: center;
+        gap: var(--element-gap-sm, 8px);
+    }
+
+    &__date-button {
+        // Button styles are handled by the Dropdown component
+    }
+
+    &__separator {
+        color: var(--color-on-surface, #191c1e);
+        font-weight: var(--font-weight-light, 300);
+    }
+}

@@ -1,0 +1,134 @@
+@use "sass:map";
+@use "sass:list";
+
+/*
+ * ButtonGroup Component Styles
+ * Strictly implements Design System tokens for grouped buttons.
+ * Uses tonal fill as default per Figma specification.
+ */
+
+.plus-button-group {
+    // Reset default RB button-group styles
+    display: inline-flex;
+    vertical-align: middle;
+    gap: 0; // Connected buttons
+    border-radius: var(--size-element-radius-md);
+    overflow: hidden; // Ensure child border-radius is clipped
+
+    // Direct Button children styling for group context
+    >.plus-btn,
+    >.btn {
+        // Remove individual border-radius for middle buttons
+        border-radius: 0;
+
+        // Remove borders between buttons for seamless look
+        margin: 0;
+        position: relative;
+
+        // First button in horizontal group
+        &:first-child {
+            border-top-left-radius: var(--size-element-radius-md);
+            border-bottom-left-radius: var(--size-element-radius-md);
+        }
+
+        // Last button in horizontal group
+        &:last-child {
+            border-top-right-radius: var(--size-element-radius-md);
+            border-bottom-right-radius: var(--size-element-radius-md);
+        }
+
+        // Single button
+        &:only-child {
+            border-radius: var(--size-element-radius-md);
+        }
+    }
+
+    // --- VERTICAL ALIGNMENT ---
+    &.btn-group-vertical,
+    &--vertical {
+        flex-direction: column;
+
+        >.plus-btn,
+        >.btn {
+            // Reset horizontal radius for vertical mode
+            border-radius: 0;
+
+            // First button in vertical group
+            &:first-child {
+                border-top-left-radius: var(--size-element-radius-md);
+                border-top-right-radius: var(--size-element-radius-md);
+                border-bottom-left-radius: 0;
+            }
+
+            // Last button in vertical group
+            &:last-child {
+                border-bottom-left-radius: var(--size-element-radius-md);
+                border-bottom-right-radius: var(--size-element-radius-md);
+                border-top-right-radius: 0;
+            }
+
+            &:only-child {
+                border-radius: var(--size-element-radius-md);
+            }
+        }
+    }
+
+    // --- SIZE VARIANTS ---
+    // Uses React Bootstrap size classes (btn-group-sm, btn-group-lg)
+
+    &.btn-group-sm {
+        border-radius: var(--size-element-radius-sm);
+
+        >.plus-btn,
+        >.btn {
+            &:first-child {
+                border-top-left-radius: var(--size-element-radius-sm);
+                border-bottom-left-radius: var(--size-element-radius-sm);
+            }
+
+            &:last-child {
+                border-top-right-radius: var(--size-element-radius-sm);
+                border-bottom-right-radius: var(--size-element-radius-sm);
+            }
+
+            &:only-child {
+                border-radius: var(--size-element-radius-sm);
+            }
+        }
+
+        &.btn-group-vertical {
+
+            >.plus-btn,
+            >.btn {
+                &:first-child {
+                    border-top-left-radius: var(--size-element-radius-sm);
+                    border-top-right-radius: var(--size-element-radius-sm);
+                    border-bottom-left-radius: 0;
+                }
+
+                &:last-child {
+                    border-bottom-left-radius: var(--size-element-radius-sm);
+                    border-bottom-right-radius: var(--size-element-radius-sm);
+                    border-top-right-radius: 0;
+                }
+            }
+        }
+    }
+
+    &.btn-group-lg {
+        border-radius: var(--size-element-radius-md);
+
+        // Large uses same radius as medium per Figma
+    }
+
+    &--block {
+        display: flex;
+        width: 100%;
+
+        >.plus-btn,
+        >.btn {
+            flex: 1;
+            width: 100%;
+        }
+    }
+}

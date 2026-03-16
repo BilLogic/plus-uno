@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Styles/Patterns/Sections" />
+
+# Sections
+
+Large structural blocks for page layout.
+
+## 1. Identity
+*   **Context**: Default Section
+*   **Required Token**: `surface-container-low` (or `no-fill` depending on needs)
+
+## 2. Variations & Sizes
+*   *Pending population from specs/components*
+
+## 3. Spacing & Gaps
+*   *Pending population from specs/components*
+
+## 4. Elevation & Layering
+*   **Elevation**: 0
+
+## 5. Interaction Rules
+*   Generally non-interactive containers, but children follow standard rules.
+
+## 6. Guidelines
+> **WARNING**:
+> *   **NEVER** apply elevation shadows to basic sections.
+
+## 7. Visual Examples
+*(Placeholder for live rendered examples)*

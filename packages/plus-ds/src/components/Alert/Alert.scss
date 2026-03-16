@@ -1,0 +1,72 @@
+/**
+ * Alert Component Styles
+ * Matches Figma design system specifications
+ */
+
+.plus-alert {
+    display: flex !important;
+    /* Override Bootstrap display: block    display: flex; */
+    align-items: flex-start;
+    border-radius: var(--size-modal-radius-md);
+    width: 100%;
+    /* Full width - responsive */
+    max-width: 100%;
+    border: var(--size-element-border) solid;
+    box-sizing: border-box;
+    /* Figma: Padding on container (16px), Gap between content and dismiss (variable) */
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    gap: var(--size-card-gap-sm);
+}
+
+/* Inner content wrapper - Padding applied here (wrapping subcomponent) */
+.plus-alert-content {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    /* 8px internal gap */
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+    /* Padding moved to parent */
+    position: relative;
+}
+
+
+
+/* Typography & Layout Resets */
+
+.plus-alert-title {
+    white-space: pre-wrap;
+}
+
+.plus-alert-text {
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.plus-alert-dismiss-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    /* No padding */
+    color: var(--color-on-surface-variant);
+    background: none;
+    border: none;
+}
+
+/* Alert Style Variants */
+
+$alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
+
+@each $theme in $alert-themes {
+    .plus-alert.#{$theme} {
+        background-color: var(--color-#{$theme}-state-08);
+        border-color: var(--color-#{$theme});
+        color: var(--color-on-#{$theme}-container);
+    }
+}

@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build:ashley"
+  publish = "dist-ashley"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

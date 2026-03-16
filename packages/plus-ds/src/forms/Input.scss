@@ -1,0 +1,284 @@
+/**
+ * Input Component Styles
+ * Implements text input component with all states, sizes, and validation
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-xs, 4px);
+}
+
+.plus-input-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+    // Figma spec: Body/B3/Semibold (12px, weight 400)
+    font-weight: var(--font-weight-semibold-1);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    
+    .plus-input-required {
+        color: var(--color-danger);
+        margin-left: var(--size-element-gap-xs, 4px);
+    }
+}
+
+.plus-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.plus-input {
+    width: 100%;
+    border: 0.8px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm, 2px);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+    transition: border-color 0.15s ease-in-out, border-width 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+    
+    // Value state - darker border when input has value (not showing placeholder)
+    // Only apply when not hovered or focused
+    &:not(:placeholder-shown):not(:hover):not(:focus) {
+        border-color: var(--color-outline);
+    }
+    
+    // Hover state - applies to both placeholder and value states
+    &:hover:not(:disabled):not(.plus-input-readonly):not(.plus-input-invalid):not(.plus-input-success):not(:focus),
+    &.plus-input-hover:not(:disabled):not(.plus-input-readonly):not(.plus-input-invalid):not(.plus-input-success):not(:focus) {
+        outline: none;
+        border-width: 2px;
+        border-color: var(--color-inverse-primary);
+    }
+    
+    &:focus {
+        outline: none;
+        border-width: 2px;
+        border-color: var(--color-inverse-primary);
+        box-shadow: none;
+    }
+    
+    // Disabled state
+    &.plus-input-disabled {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+        
+        &::placeholder {
+            color: var(--color-on-surface-variant);
+            opacity: 0.6;
+        }
+    }
+    
+    // Read-only state
+    &.plus-input-readonly {
+        background-color: var(--color-surface-container);
+        border-color: var(--color-outline-variant);
+        cursor: default;
+        
+        &:focus {
+            border-color: var(--color-outline-variant);
+            box-shadow: none;
+        }
+    }
+    
+    // Validation states
+    &.plus-input-invalid {
+        border-color: var(--color-danger);
+        
+        &:hover:not(:disabled) {
+            border-width: 2px;
+            border-color: var(--color-danger);
+        }
+        
+        &:focus {
+            border-width: 2px;
+            border-color: var(--color-danger);
+            box-shadow: none;
+        }
+    }
+    
+    &.plus-input-success {
+        border-color: var(--color-success);
+        
+        &:hover:not(:disabled) {
+            border-width: 2px;
+            border-color: var(--color-success);
+        }
+        
+        &:focus {
+            border-width: 2px;
+            border-color: var(--color-success);
+            box-shadow: none;
+        }
+    }
+}
+
+// Leading visual (icon on the left)
+.plus-input-leading-visual {
+    position: absolute;
+    left: var(--size-element-pad-x-md, 10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    z-index: 1;
+    pointer-events: none;
+    width: auto;
+    height: auto;
+    
+    i {
+        font-size: var(--font-size-body2);
+    }
+}
+
+// Adjust input padding when leading visual exists
+.plus-input-container:has(.plus-input-leading-visual) .plus-input {
+    padding-left: calc(var(--size-element-pad-x-md, 10px) + var(--size-element-gap-md, 10px));
+}
+
+// Trailing visual (icon or dropdown arrow on the right)
+.plus-input-trailing-visual {
+    position: absolute;
+    right: var(--size-element-pad-x-md, 10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-on-surface-variant);
+    z-index: 1;
+    pointer-events: none;
+    width: auto;
+    height: auto;
+    
+    i {
+        font-size: var(--font-size-body2);
+    }
+}
+
+// Adjust input padding when trailing visual exists
+.plus-input-container:has(.plus-input-trailing-visual) .plus-input {
+    padding-right: calc(var(--size-element-pad-x-md, 10px) + var(--size-element-gap-md, 10px));
+}
+
+// Validation message
+.plus-input-validation {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    margin-top: var(--size-element-gap-xs, 4px);
+    
+    i {
+        font-size: var(--font-size-body3);
+        flex-shrink: 0;
+    }
+}
+
+.plus-input-validation-invalid {
+    color: var(--color-danger);
+    
+    i {
+        color: var(--color-danger);
+    }
+}
+
+.plus-input-validation-success {
+    color: var(--color-success);
+    
+    i {
+        color: var(--color-success);
+    }
+}
+
+.plus-input-validation-message {
+    flex: 1;
+}
+
+// Size variants
+.plus-input-small {
+    border-width: 0.6px;
+    padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    
+    &::placeholder {
+        font-size: var(--font-size-body3);
+    }
+}
+
+// Small size adjustments for leading/trailing visuals
+.plus-input-container:has(.plus-input-small) .plus-input-leading-visual {
+    left: var(--size-element-pad-x-sm, 8px);
+    
+    i {
+        font-size: 10px; // Fontawesome/Solid/B3
+    }
+}
+
+.plus-input-container:has(.plus-input-small):has(.plus-input-leading-visual) .plus-input {
+    padding-left: calc(var(--size-element-pad-x-sm, 8px) + var(--size-element-gap-sm, 8px));
+}
+
+.plus-input-container:has(.plus-input-small) .plus-input-trailing-visual {
+    right: var(--size-element-pad-x-sm, 8px);
+    
+    i {
+        font-size: 10px; // Fontawesome/Solid/B3
+    }
+}
+
+.plus-input-container:has(.plus-input-small):has(.plus-input-trailing-visual) .plus-input {
+    padding-right: calc(var(--size-element-pad-x-sm, 8px) + var(--size-element-gap-sm, 8px));
+}
+
+.plus-input-large {
+    border-width: 1px;
+    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+    
+    &::placeholder {
+        font-size: var(--font-size-body1);
+    }
+}
+
+// Large size adjustments for leading/trailing visuals
+.plus-input-container:has(.plus-input-large) .plus-input-leading-visual {
+    left: var(--size-element-pad-x-lg, 16px);
+    
+    i {
+        font-size: var(--font-size-body1);
+    }
+}
+
+.plus-input-container:has(.plus-input-large):has(.plus-input-leading-visual) .plus-input {
+    padding-left: calc(var(--size-element-pad-x-lg, 16px) + var(--size-element-gap-lg, 12px));
+}
+
+.plus-input-container:has(.plus-input-large) .plus-input-trailing-visual {
+    right: var(--size-element-pad-x-lg, 16px);
+    
+    i {
+        font-size: 14px; // Fontawesome/Solid/B1
+    }
+}
+
+.plus-input-container:has(.plus-input-large):has(.plus-input-trailing-visual) .plus-input {
+    padding-right: calc(var(--size-element-pad-x-lg, 16px) + var(--size-element-gap-lg, 12px));
+}
+
+

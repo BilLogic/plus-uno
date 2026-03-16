@@ -1,0 +1,300 @@
+/**
+ * TrainingOnboardingPage — Wireframe Styles
+ *
+ * CONSULTING BRIEF: Low-fidelity structural wireframe.
+ * These styles serve legibility and layout ONLY.
+ * No brand colours, no visual design decisions.
+ * Token-based sizing where possible.
+ *
+ * UX Principles embedded in layout:
+ *   P1 — Progress bar prominent and persistent
+ *   P2 — Next Step CTA visually dominant above path
+ *   P3 — Path uses sequential, linear list (not grid/carousel)
+ */
+
+.tob {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-surface-gap-md, 24px);
+    width: 100%;
+    padding-bottom: 48px;
+
+    // ── Section wrapper ────────────────────────────────────────────────────────
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-section-gap-sm, 8px);
+        width: 100%;
+    }
+
+    &__section-title {
+        margin: 0 0 8px;
+    }
+
+    // ── SECTION 1: Welcome Header + Progress ───────────────────────────────────
+    &__welcome {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: var(--size-section-pad-y-md, 16px) var(--size-section-pad-x-md, 16px);
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__welcome-title {
+        margin: 0 0 4px;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__welcome-subtitle {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__progress {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__progress-label {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // P1 — Progress bar: simple, legible, persistent
+    &__progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: var(--color-surface-variant, #dde3ea);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    &__progress-fill {
+        height: 100%;
+        background-color: var(--color-primary, #006492);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    // ── SECTION 2: Next Step CTA ───────────────────────────────────────────────
+    // P2 — Visually dominant, above the fold, single action
+    &__next-step {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: var(--size-section-pad-y-md, 20px) var(--size-section-pad-x-md, 20px);
+        background-color: var(--color-surface, #ffffff);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 2px solid var(--color-primary, #006492);
+    }
+
+    &__next-step-label {
+        color: var(--color-primary, #006492);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    &__next-step-body {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    &__next-step-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1 1 280px;
+    }
+
+    &__next-step-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__next-step-desc {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__next-step-duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__next-step-action {
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    // ── SECTION 3: Onboarding Path ─────────────────────────────────────────────
+    // P3 — Linear sequential list; each step is explicitly numbered
+    &__step-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+        border-radius: var(--size-section-radius-sm, 8px);
+        overflow: hidden;
+    }
+}
+
+// ── Step row ──────────────────────────────────────────────────────────────────
+.tob-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+    background-color: var(--color-surface, #ffffff);
+    transition: background-color 0.15s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    // Completed — clickable but de-emphasised
+    &--completed {
+        cursor: pointer;
+        opacity: 0.85;
+
+        &:hover {
+            background-color: var(--color-surface-container-low, #f4f8f9);
+        }
+    }
+
+    // In-progress — highlighted, clearly clickable
+    &--in-progress {
+        cursor: pointer;
+        background-color: var(--color-primary-container, #e3f2fd);
+
+        &:hover {
+            background-color: #d0e8f6;
+        }
+    }
+
+    // Locked — muted, not interactive
+    &--locked {
+        opacity: 0.45;
+        cursor: default;
+    }
+
+    &__number {
+        min-width: 24px;
+        color: var(--color-on-surface-variant, #5a5a5a);
+        text-align: center;
+    }
+
+    &__icon {
+        font-size: 18px;
+        min-width: 24px;
+        text-align: center;
+
+        &--completed {
+            color: var(--color-primary, #006492);
+        }
+
+        &--in-progress {
+            color: var(--color-secondary, #4f7b8c);
+        }
+
+        &--locked {
+            color: var(--color-outline, #c0c8cc);
+        }
+    }
+
+    &__content {
+        display: flex;
+        flex: 1 1 auto;
+        gap: 8px;
+        align-items: baseline;
+        flex-wrap: wrap;
+    }
+
+    &__title {
+        font-weight: 600;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__status-badge {
+        flex-shrink: 0;
+    }
+
+    &__badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 40px;
+        font-weight: 600;
+
+        &--completed {
+            background-color: var(--color-primary-container, #dce9f2);
+            color: var(--color-on-primary-container, #003550);
+        }
+
+        &--in-progress {
+            background-color: var(--color-secondary-container, #cde5f0);
+            color: var(--color-on-secondary-container, #0a3040);
+        }
+
+        &--locked {
+            background-color: var(--color-surface-variant, #e8eef0);
+            color: var(--color-on-surface-variant, #5a5a5a);
+        }
+    }
+}
+
+// ── SECTION 4: Supplemental Resources ─────────────────────────────────────────
+.tob {
+    &__supplemental-toggle {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: none;
+        border: none;
+        padding: 8px 0;
+        cursor: pointer;
+        color: var(--color-on-surface-variant, #5a5a5a);
+        text-decoration: underline;
+        font-family: inherit;
+
+        &:hover {
+            color: var(--color-primary, #006492);
+        }
+    }
+
+    &__supplemental-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 16px;
+        margin: 0;
+        list-style: none;
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__supplemental-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__supplemental-type {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+}

@@ -1,0 +1,79 @@
+@use '../../tokens/colors' as *;
+@use '../../tokens/fonts' as *;
+@use '../../tokens/spacing_semantics' as *;
+@use '../../tokens/elevation' as *;
+
+.plus-session-availability-snackbar {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface);
+    border-radius: var(--size-modal-radius-md); // 6px
+    box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3); // Elevation Light/3
+    overflow: hidden;
+    width: 300px;
+    max-width: 100%;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg); // 8px 16px
+        background-color: var(--color-success);
+        color: var(--color-surface);
+
+        &-content {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-sm); // 8px
+        }
+    }
+
+    &__icon {
+        font-size: 16px;
+    }
+
+    &__title {
+        font-family: var(--font-family-body);
+        font-size: 16px; // Body/B1/Bold
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm);
+    }
+
+    &__timestamp {
+        font-family: var(--font-family-body);
+        font-size: 12px;
+        font-weight: 300;
+        opacity: 0.8;
+    }
+
+    &__close {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        font-size: 14px;
+        opacity: 0.8;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__body {
+        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg); // 8px 16px
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
+        font-family: var(--font-family-body);
+        font-size: 14px; // Body/B2
+        line-height: 1.5;
+    }
+}

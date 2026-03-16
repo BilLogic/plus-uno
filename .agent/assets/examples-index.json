@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "updated_for_branch": "main",
+  "example_story_globs": [
+    "packages/plus-ds/src/**/*.stories.jsx",
+    "playground/prototyping/**/*.stories.{js,jsx,ts,tsx}",
+    "playground/Ashley/**/*.stories.{js,jsx,ts,tsx}",
+    "playground/Bill/**/*.stories.{js,jsx,ts,tsx}"
+  ],
+  "spec_roots": [
+    "packages/plus-ds/src/specs/Login",
+    "packages/plus-ds/src/specs/Toolkit",
+    "packages/plus-ds/src/specs/Home",
+    "packages/plus-ds/src/specs/Profile"
+  ],
+  "template_roots": [
+    "playground/templates"
+  ],
+  "prototype_root": "playground/prototyping"
+}
