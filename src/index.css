@@ -47,6 +47,28 @@ body {
   width: 100%;
 }
 
+/* ── Training Onboarding: full-height frame, no aspect-ratio clip ────────────
+   Applied via body.page--training-onboarding set in main.jsx on route change.
+   Removes the fixed 1280×800 frame so the hero card + scrollable list are
+   fully visible on Netlify (no overflow:hidden cut-off). */
+body.page--training-onboarding,
+body.page--training-onboarding html {
+  align-items: flex-start;
+  background-color: var(--color-surface-container, #f4f8f9);
+}
+
+body.page--training-onboarding #root {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  aspect-ratio: unset;
+  overflow: hidden;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 #home-redesign-page .plus-page-main,
 #home-redesign-page .plus-page-content-wrapper,
 #sessions-in-session-page .plus-page-main,
@@ -69,9 +91,11 @@ body {
   display: none;
 }
 
-/* Training onboarding: allow content-wrapper to scroll so HeroCard + table are fully visible */
-#training-onboarding-hifi .plus-page-content-wrapper {
-  overflow-y: auto;
+/* Training onboarding: allow content-wrapper + main to scroll so HeroCard + table are fully visible */
+#training-onboarding-hifi .plus-page-content-wrapper,
+#training-onboarding-hifi .plus-page-main {
+  overflow-y: auto !important;
+  height: 100% !important;
 }
 
 /* Sessions page: shell reveal (TopBar + Sidebar) – same pace as homepage (clip-path top-to-bottom, staggered). */

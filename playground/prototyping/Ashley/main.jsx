@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import TrainingOnboardingClickthrough from './training-onboarding/TrainingOnboardingClickthrough';
 import StorybookAIAgent from './storybook-ai-agent-llm-api/StorybookAIAgent';
@@ -117,11 +117,32 @@ function AIAgentPage() {
     );
 }
 
+// ─── Route Body Class  ────────────────────────────────────────────────────────
+// Applies a CSS class to <body> based on current route so index.css can
+// override the fixed 1280×800 frame for the training onboarding page.
+
+const ROUTE_CLASSES = {
+    '/training-onboarding': 'page--training-onboarding',
+};
+
+function RouteBodyClass() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        // Remove all managed route classes first
+        Object.values(ROUTE_CLASSES).forEach((cls) => document.body.classList.remove(cls));
+        // Apply the matching class (if any)
+        const cls = ROUTE_CLASSES[pathname];
+        if (cls) document.body.classList.add(cls);
+    }, [pathname]);
+    return null;
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 function App() {
     return (
         <ThemeProvider>
+            <RouteBodyClass />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/training-onboarding" element={<TrainingOnboardingClickthrough userName="Ashley Xu" defaultView="list" />} />
