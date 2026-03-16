@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const defaultOpenai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /* ── Navigation intent parser prompt ── */
 const NAVIGATION_SYSTEM_PROMPT = `You are a navigation intent parser for a Storybook design system.
@@ -86,12 +86,19 @@ IMPORTANT: Even if you don't know the exact PLUS ONE variant, provide your best 
 
 /* ── Main AI endpoint ── */
 app.post('/api/ai', async (req, res) => {
-    const { feature, userInput, context } = req.body;
-    console.log(`[AI Request] Feature: ${feature} | Input: "${userInput}"`);
+    const { feature, userInput, context, apiKey } = req.body;
+    console.log(`[AI Request] Feature: ${feature} | Input: "${userInput}" | HasApiKey: ${!!apiKey}`);
 
     if (!feature || !userInput) {
         return res.status(400).json({ error: 'Missing required fields: feature, userInput' });
     }
+
+    const activeApiKey = apiKey || process.env.OPENAI_API_KEY;
+    if (!activeApiKey) {
+        return res.status(401).json({ error: 'No OpenAI API key provided' });
+    }
+
+    const openai = apiKey ? new OpenAI({ apiKey }) : defaultOpenai;
 
     try {
         const isNavigation = feature === 'smart_navigation';
