@@ -840,7 +840,9 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
     const fetchAIResponse = async (feature, userInput, context) => {
         setIsTyping(true);
         try {
-            const response = await fetch('http://localhost:3001/api/ai', {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const apiUrl = isLocal ? 'http://localhost:3001/api/ai' : '/.netlify/functions/ai';
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ feature, userInput, context })

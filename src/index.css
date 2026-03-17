@@ -35,6 +35,7 @@ body {
   aspect-ratio: 1280 / 800;
   max-height: min(var(--demo-frame-height), 100vh);
   overflow: hidden;
+  position: relative;
   box-sizing: border-box;
   border-radius: 8px;
   background-color: var(--color-surface-container-lowest, #fff);
