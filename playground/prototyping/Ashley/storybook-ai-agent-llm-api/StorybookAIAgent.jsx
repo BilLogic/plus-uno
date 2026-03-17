@@ -718,9 +718,6 @@ const PANEL_DEFAULT_HEIGHT = 560;
 const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userName = 'Ashley' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
-    const [aiMode, setAiMode] = useState(() => localStorage.getItem('PLUS_AI_MODE') || null);
-    const [apiKey, setApiKey] = useState(() => localStorage.getItem('PLUS_AI_API_KEY') || '');
-    const [tempKey, setTempKey] = useState(apiKey);
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -846,7 +843,7 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
             const response = await fetch('http://localhost:3001/api/ai', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ feature, userInput, context, apiKey: aiMode === 'full' ? apiKey : null })
+                body: JSON.stringify({ feature, userInput, context })
             });
             const data = await response.json();
             setIsTyping(false);
@@ -1012,13 +1009,8 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
             setTimeout(() => inputRef.current?.focus(), 0);
         } else if (actionId === 'explain') {
             setMessages(p => [...p, { role: 'user', content: action.label }]);
-            if (aiMode === 'local') {
-                // local fallback explicitly
-                fetchAIResponse('screen_explain_local', 'Explain this screen', null);
-            } else {
-                const storyId = getCurrentStoryId();
-                fetchAIResponse('screen_explain', 'Explain this screen', { storyId, pageContext });
-            }
+            const storyId = getCurrentStoryId();
+            fetchAIResponse('screen_explain', 'Explain this screen', { storyId, pageContext });
         } else {
             setMessages(p => [...p, { role: 'user', content: action.label }]);
             respond(buildResponse(actionId, pageContext));
@@ -1042,17 +1034,6 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
 
         if (hasNavigationIntent(text)) {
             runSmartNavigation(text);
-            return;
-        }
-
-        if (aiMode === 'local') {
-            // Check usage match locally, or fallback
-            const usageEntry = matchUsageGuide(text);
-            if (usageEntry) {
-                respond(usageEntry.answer);
-            } else {
-                respond(<p style={{ color: 'var(--color-error)' }}>⚠️ Large Language Model features are disabled in Local Mode. Turn on Mode 1 to chat with AI.</p>);
-            }
             return;
         }
 
@@ -1150,138 +1131,89 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
 
                     {/* Main - Scrollable Body */}
                     <div className="sb-ai-agent__body" ref={bodyRef}>
-                        {!aiMode ? (
-                            <div className="sb-ai-agent__setup" style={{ padding: 24, paddingBottom: 0 }}>
-                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                <h4 style={{ marginTop: 16, marginBottom: 8, color: 'var(--color-on-surface)' }}>Welcome to the Agent</h4>
-                                <p style={{ fontSize: 13, marginBottom: 16, color: 'var(--color-on-surface-variant)' }}>
-                                    Bill suggested a two-mode approach to protect your ChatGPT API key.
-                                </p>
-                                
-                                <div style={{ background: 'var(--color-surface-container-high)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
-                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 1: Full AI Functionality</p>
-                                    <input 
-                                        type="password" 
-                                        placeholder="sk-..." 
-                                        value={tempKey} 
-                                        onChange={e => setTempKey(e.target.value)} 
-                                        style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-outline)', marginBottom: 12, outline: 'none' }}
-                                    />
-                                    <button 
-                                        disabled={!tempKey.trim()}
-                                        onClick={() => {
-                                            localStorage.setItem('PLUS_AI_API_KEY', tempKey.trim());
-                                            localStorage.setItem('PLUS_AI_MODE', 'full');
-                                            setApiKey(tempKey.trim());
-                                            setAiMode('full');
-                                        }}
-                                        style={{ background: 'var(--color-primary)', color: 'white', padding: '10px 16px', borderRadius: 8, border: 'none', fontWeight: 600, width: '100%', cursor: tempKey.trim() ? 'pointer' : 'not-allowed', opacity: tempKey.trim() ? 1 : 0.5 }}
-                                    >Save Key & Start Mode 1</button>
-                                </div>
-                                
-                                <div style={{ background: 'var(--color-surface-container)', padding: 16, borderRadius: 12 }}>
-                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 2: Local Processing</p>
-                                    <p style={{ fontSize: 12, color: 'var(--color-on-surface-variant)', marginBottom: 12, lineHeight: 1.4 }}>
-                                        Hide or disable the remote LLM AI features to prevent excessive API usage.
-                                    </p>
-                                    <button 
-                                        onClick={() => {
-                                            localStorage.setItem('PLUS_AI_MODE', 'local');
-                                            setAiMode('local');
-                                        }}
-                                        style={{ background: 'transparent', color: 'var(--color-primary)', padding: '10px 16px', borderRadius: 8, border: '1px solid var(--color-primary)', fontWeight: 600, width: '100%', cursor: 'pointer' }}
-                                    >Continue in Mode 2 (No API Key)</button>
-                                </div>
+                        {/* Welcome Message */}
+                        <div className="sb-ai-agent__welcome-msg">
+                            <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                            <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
+                                Welcome to PLUS ONE Agent. How can I assist you today?
                             </div>
-                        ) : (
-                            <>
-                                {/* Welcome Message */}
-                                <div className="sb-ai-agent__welcome-msg">
-                                    <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                    <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
-                                        Welcome to PLUS ONE Agent. How can I assist you today?
+                        </div>
+                        <p className="sb-ai-agent__tip">
+                            Tip: Type &quot;Shortcuts&quot; To See All Available Keyboard Shortcuts.
+                        </p>
+
+                        {/* Quick Actions */}
+                        <div className="sb-ai-agent__quick-actions">
+                            {QUICK_ACTIONS.map(a => (
+                                <button key={a.id} className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
+                                    <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
+                                        <span style={{ color: a.color }}>
+                                            <a.Icon />
+                                        </span>
                                     </div>
-                                </div>
-                                <p className="sb-ai-agent__tip">
-                                    Tip: Type &quot;Shortcuts&quot; To See All Available Keyboard Shortcuts.
-                                </p>
+                                    <span className="sb-ai-agent__quick-label">{a.label}</span>
+                                </button>
+                            ))}
+                        </div>
 
-                                {/* Quick Actions */}
-                                <div className="sb-ai-agent__quick-actions">
-                                    {QUICK_ACTIONS.map(a => (
-                                        <button key={a.id} className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
-                                            <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                                                <span style={{ color: a.color }}>
-                                                    <a.Icon />
-                                                </span>
-                                            </div>
-                                            <span className="sb-ai-agent__quick-label">{a.label}</span>
-                                        </button>
-                                    ))}
-                                </div>
-
-                                {/* Message List */}
-                                <div className="sb-ai-agent__message-list">
-                                    {messages.map((m, i) => (
-                                        <div key={i} className={`sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
-                                            {m.role === 'bot' && (
-                                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                            )}
-                                            <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
-                                                {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
-                                                    <>
-                                                        <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
-                                                        {navMatches.length > 0 && (
-                                                            <NavMatchList
-                                                                matches={navMatches}
-                                                                selectedIndex={selectedNavIndex}
-                                                                onSelect={navigateToEntry}
-                                                            />
-                                                        )}
-                                                    </>
-                                                ) : m.content}
-                                            </div>
-                                            {m.role === 'user' && (
-                                                <div className="sb-ai-agent__user-avatar">A</div>
-                                            )}
-                                        </div>
-                                    ))}
-
-                                    {/* Typing indicator (Bot Message Loading) */}
-                                    {isTyping && (
-                                        <div className="sb-ai-agent__msg sb-ai-agent__msg--bot">
-                                            <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                            <div className="sb-ai-agent__typing">
-                                                <span /><span /><span />
-                                            </div>
-                                        </div>
+                        {/* Message List */}
+                        <div className="sb-ai-agent__message-list">
+                            {messages.map((m, i) => (
+                                <div key={i} className={`sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
+                                    {m.role === 'bot' && (
+                                        <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                    )}
+                                    <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
+                                        {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
+                                            <>
+                                                <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
+                                                {navMatches.length > 0 && (
+                                                    <NavMatchList
+                                                        matches={navMatches}
+                                                        selectedIndex={selectedNavIndex}
+                                                        onSelect={navigateToEntry}
+                                                    />
+                                                )}
+                                            </>
+                                        ) : m.content}
+                                    </div>
+                                    {m.role === 'user' && (
+                                        <div className="sb-ai-agent__user-avatar">A</div>
                                     )}
                                 </div>
-                            </>
-                        )}
+                            ))}
+
+                            {/* Typing indicator (Bot Message Loading) */}
+                            {isTyping && (
+                                <div className="sb-ai-agent__msg sb-ai-agent__msg--bot">
+                                    <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                    <div className="sb-ai-agent__typing">
+                                        <span /><span /><span />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Footer / Input */}
-                    {aiMode && (
-                        <div className="sb-ai-agent__footer">
-                            <div className="sb-ai-agent__input-container">
-                                <div className="sb-ai-agent__input-wrapper">
-                                    <input
-                                        ref={inputRef}
-                                        className="sb-ai-agent__input"
-                                        type="text"
-                                        placeholder={aiMode === 'local' ? "Chat disabled (Local Mode)" : "Ask me anything..."}
-                                        value={inputValue}
-                                        onChange={e => setInputValue(e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && handleSend()}
-                                    />
-                                    <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
-                                        <Icons.Send />
-                                    </button>
-                                </div>
+                    <div className="sb-ai-agent__footer">
+                        <div className="sb-ai-agent__input-container">
+                            <div className="sb-ai-agent__input-wrapper">
+                                <input
+                                    ref={inputRef}
+                                    className="sb-ai-agent__input"
+                                    type="text"
+                                    placeholder="Ask me anything..."
+                                    value={inputValue}
+                                    onChange={e => setInputValue(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleSend()}
+                                />
+                                <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
+                                    <Icons.Send />
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
 
                 </div>
 
