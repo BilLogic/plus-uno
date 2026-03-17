@@ -1,23 +1,22 @@
 import React from 'react';
-import Modal from '../../../../../../packages/plus-ds/src/components/Modal';
-import ButtonGroup from '../../../../../../packages/plus-ds/src/components/ButtonGroup';
-import Button from '../../../../../../packages/plus-ds/src/components/Button';
-import Badge from '../../../../../../packages/plus-ds/src/components/Badge';
-import Alert from '../../../../../../packages/plus-ds/src/components/Alert';
-import Checkbox from '../../../../../../packages/plus-ds/src/forms/Checkbox';
-import Pagination from '../../../../../../packages/plus-ds/src/components/Pagination';
+import Modal from '../../../../../components/Modal';
+import ButtonGroup from '../../../../../components/ButtonGroup';
+import Button from '../../../../../components/Button';
+import Badge from '../../../../../components/Badge';
+import Alert from '../../../../../components/Alert';
+import Checkbox from '../../../../../forms/Checkbox';
+import Pagination from '../../../../../components/Pagination';
 
-// Dependencies live in packages/plus-ds (design-system/specs pre-session has no cards/elements)
-import { SessionInfoCard } from '../../../../../../packages/plus-ds/src/specs/Toolkit/pre-session/cards/SessionInfoCard.stories';
-import { CloseButton, FillInButton } from '../../../../../../packages/plus-ds/src/specs/Toolkit/pre-session/elements/CTATutorViewButtons.stories';
+import { SessionInfoCard } from '../../cards/SessionInfoCard.stories';
+import { CloseButton, FillInButton } from '../../elements/CTATutorViewButtons.stories';
 import {
     BackButton,
     CopyRecruitmentMessageButton,
     CheckScheduleButton,
-} from '../../../../../../packages/plus-ds/src/specs/Toolkit/pre-session/elements/CTA Sign-Up Related Buttons/index.jsx';
-import { TableRow, TableHeaderRow } from '../../../../../../packages/plus-ds/src/specs/Toolkit/pre-session/tables/FillInSchedule.stories';
-import { TableHeaderRow as MySessionsTableHeaderRow, TableRow as MySessionsTableRow } from '../../../../../../packages/plus-ds/src/specs/Toolkit/pre-session/tables/MySessions.stories';
-import { FillInsTableHeaderRow, FillInsTableRow } from '../../tables/FillIns/FillIns.stories';
+} from '../../elements/CTA Sign-Up Related Buttons/index.jsx';
+import { TableRow, TableHeaderRow } from '../../tables/FillInSchedule.stories';
+import { TableHeaderRow as MySessionsTableHeaderRow, TableRow as MySessionsTableRow } from '../../tables/MySessions.stories';
+import { FillInsTableHeaderRow, FillInsTableRow } from '../../tables/FillInTable.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Session Fill-ins',
