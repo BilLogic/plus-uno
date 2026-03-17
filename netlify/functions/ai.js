@@ -1,4 +1,4 @@
-const OpenAI = require('openai');
+import OpenAI from 'openai';
 
 const NAVIGATION_SYSTEM_PROMPT = `You are a navigation intent parser for a Storybook design system.
 
@@ -72,7 +72,7 @@ For "screen_explain" feature, return:
 IMPORTANT: Even if you don't know the exact PLUS ONE variant, provide your best design-system guidance based on React Bootstrap conventions. Never return an error, always return a helpful JSON response.
 `;
 
-exports.handler = async function (event, context) {
+export const handler = async function (event, context) {
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
