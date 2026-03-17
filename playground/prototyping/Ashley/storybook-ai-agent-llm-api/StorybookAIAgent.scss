@@ -6,7 +6,7 @@
 /* ── Root ── */
 /* Use absolute so the agent stays at bottom-right of the responsive frame (simulated screen), not the Storybook canvas */
 .sb-ai-agent {
-  position: absolute;
+  position: fixed; /* Changed from absolute to fixed to prevent cutoff by #root overflow:hidden */
   bottom: 16px;
   right: 16px;
   z-index: 9999;
@@ -179,7 +179,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-center: center;
+  justify-content: center;
   transition: background 0.15s ease;
   color: var(--color-on-surface-variant);
 
@@ -197,6 +197,7 @@
 /* ── Main - Scrollable Body ── */
 .sb-ai-agent__body {
   flex: 1;
+  min-height: 0; /* Fix flexbox scrolling issue */
   overflow-y: auto;
   overflow-x: hidden;
   padding: 20px;
