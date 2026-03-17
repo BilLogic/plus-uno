@@ -568,6 +568,7 @@ const ShortcutsHelpContent = () => (
             <tbody>
                 <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + /</td><td>Toggle/Close AI Agent</td></tr>
                 <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + Shift + /</td><td>Hide AI (Focus Mode)</td></tr>
+                <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + s</td><td>Reset AI Agent Configuration</td></tr>
             </tbody>
         </table>
     </div>
@@ -582,7 +583,6 @@ const SmartNavIntroMessage = () => (
             <li>“Where are the cards?”</li>
             <li>“Open destructive modal”</li>
             <li>“Go to Training Progress page”</li>
-            <li>“Show spacing tokens”</li>
             <li>“Buttons”</li>
         </ul>
     </div>
@@ -718,6 +718,9 @@ const PANEL_DEFAULT_HEIGHT = 560;
 const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userName = 'Ashley' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
+    const [aiMode, setAiMode] = useState(() => localStorage.getItem('PLUS_AI_MODE') || null);
+    const [apiKey, setApiKey] = useState(() => localStorage.getItem('PLUS_AI_API_KEY') || '');
+    const [tempKey, setTempKey] = useState(apiKey);
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -746,11 +749,21 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
         if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
     }, [messages, isTyping]);
 
-    /* Keyboard shortcuts: ⌘+/ toggle panel, ⌘+Shift+/ hide. */
+    /* Keyboard shortcuts: ⌘+/ toggle panel, ⌘+Shift+/ hide, ⌘+S reset. */
     useEffect(() => {
         const handler = (e) => {
             const mod = e.metaKey || e.ctrlKey;
-            if (!mod || e.key !== '/') return;
+            if (!mod) return;
+
+            if (e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                localStorage.removeItem('PLUS_AI_MODE');
+                setAiMode(null);
+                setMessages([]);
+                return;
+            }
+
+            if (e.key !== '/') return;
             if (e.shiftKey) {
                 e.preventDefault();
                 setIsHidden(true);
@@ -840,20 +853,101 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
     const fetchAIResponse = async (feature, userInput, context) => {
         setIsTyping(true);
         try {
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const apiUrl = isLocal ? 'http://localhost:3001/api/ai' : '/api/ai';
-            const response = await fetch(apiUrl, {
+            if (aiMode !== 'full' || !apiKey) {
+                throw new Error("Local mode active or API key missing.");
+            }
+
+            const isNavigation = feature === 'smart_navigation';
+            const systemPrompt = isNavigation ? 
+`You are a navigation intent parser for a Storybook design system.
+
+Return JSON only in this exact format:
+{
+  "intent": "navigate" | "unknown",
+  "target": "string"
+}
+
+RULES:
+1. Do NOT hallucinate URLs or paths
+2. Do NOT explain or add commentary
+3. Do NOT include any text outside the JSON
+4. Only extract the most likely component/page/folder name from user input
+5. Keep target concise (1-3 words maximum)
+6. If the user wants to navigate OR is asking WHERE something is, return intent: "navigate"
+7. If unclear or not navigation-related, return intent: "unknown"
+8. "Where are the X" or "Where is X" queries are ALWAYS navigation intent
+
+EXAMPLES:
+User: "go to button" → {"intent": "navigate", "target": "button"}
+User: "show me modal" → {"intent": "navigate", "target": "modal"}
+User: "where are the cards" → {"intent": "navigate", "target": "cards"}` : 
+`You are an expert design system AI assistant for the PLUS ONE design system, built on React Bootstrap.
+
+The PLUS ONE design system includes all standard Bootstrap components plus custom PLUS-specific components:
+Modal, Card, Button, Badge, Alert, Accordion, Breadcrumb, Dropdown, NavTabs, Pagination, Progress, Tooltip,
+Popover, ListGroup, Spinner, Form, Input, Table, Tabs, Offcanvas, Toast, Collapse, Carousel, ButtonGroup,
+OverviewCard, TutorsTrainingProgressTable, ExportSearchFilterBar, SidebarTab, NavBar, and more.
+
+You help designers and developers understand:
+- When and how to use each component
+- Tradeoffs between similar components
+- Design system best practices
+- How to interpret and explain screens/pages
+
+Always respond in valid JSON matching the feature type requested. Do NOT add any text outside the JSON.
+
+For "component_usage" feature, return:
+{
+  "intent": "component_usage",
+  "components": ["ComponentName1" OR "ComponentA vs ComponentB"],
+  "purpose": "Clear 1-2 sentence purpose",
+  "when_to_use": ["Specific use case 1", "Specific use case 2", "Specific use case 3"],
+  "when_not_to_use": ["Avoid when case 1", "Avoid when case 2"],
+  "variants": ["Variant or style option 1", "Variant or style option 2"],
+  "tip": "One practical design tip or accessibility note"
+}
+
+For "screen_explain" feature, return:
+{
+  "intent": "screen_explain",
+  "screen_name": "Human-readable screen name",
+  "purpose": "What this screen is for in 1-2 sentences",
+  "structure": ["Top section description", "Middle section description", "Bottom section description"],
+  "components_used": ["Button", "Table", "Badge", "NavTabs", "Pagination"]
+}
+
+IMPORTANT: Even if you don't know the exact PLUS ONE variant, provide your best design-system guidance based on React Bootstrap conventions. Never return an error, always return a helpful JSON response.`;
+
+            const userMessage = isNavigation
+                ? userInput
+                : `Feature: ${feature}\nContext: ${JSON.stringify(context)}\nUser Input: ${userInput}`;
+
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ feature, userInput, context })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({ 
+                    model: 'gpt-4o-mini',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userMessage }
+                    ],
+                    temperature: 0.2,
+                    max_tokens: isNavigation ? 200 : 800,
+                    response_format: { type: 'json_object' }
+                })
             });
-            const data = await response.json();
+            const responseData = await response.json();
             setIsTyping(false);
 
-            if (data.error) {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>{data.error}</p> }]);
+            if (responseData.error) {
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>{responseData.error.message || 'API Error'}</p> }]);
                 return;
             }
+
+            const data = JSON.parse(responseData.choices[0].message.content);
 
             if (data.intent === 'navigate') {
                 // GPT extracted a navigation target — run local fuzzy match
@@ -936,7 +1030,7 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
             }
         } catch (error) {
             setIsTyping(false);
-            if (feature === 'screen_explain') {
+            if (feature === 'screen_explain' || feature === 'screen_explain_local') {
                 setMessages(p => [...p, {
                     role: 'bot', content: (
                         <div>
@@ -1011,8 +1105,13 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
             setTimeout(() => inputRef.current?.focus(), 0);
         } else if (actionId === 'explain') {
             setMessages(p => [...p, { role: 'user', content: action.label }]);
-            const storyId = getCurrentStoryId();
-            fetchAIResponse('screen_explain', 'Explain this screen', { storyId, pageContext });
+            if (aiMode === 'local') {
+                // local fallback explicitly
+                fetchAIResponse('screen_explain_local', 'Explain this screen', null);
+            } else {
+                const storyId = getCurrentStoryId();
+                fetchAIResponse('screen_explain', 'Explain this screen', { storyId, pageContext });
+            }
         } else {
             setMessages(p => [...p, { role: 'user', content: action.label }]);
             respond(buildResponse(actionId, pageContext));
@@ -1029,6 +1128,13 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
         /* Helper: Find first component match */
         const findComp = (t) => findBestMatch(t, storyIndex).find(m => m.entry.category === 'Component' || m.entry.category === 'Docs')?.entry;
 
+        if (text.toLowerCase() === 'reset' || text.toLowerCase() === 'logout') {
+            localStorage.removeItem('PLUS_AI_MODE');
+            setAiMode(null);
+            setMessages([]);
+            return;
+        }
+
         if (hasShortcutIntent(text)) {
             setMessages(p => [...p, { role: 'bot', content: <ShortcutsHelpContent /> }]);
             return;
@@ -1036,6 +1142,17 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
 
         if (hasNavigationIntent(text)) {
             runSmartNavigation(text);
+            return;
+        }
+
+        if (aiMode === 'local') {
+            // Check usage match locally, or fallback
+            const usageEntry = matchUsageGuide(text);
+            if (usageEntry) {
+                respond(usageEntry.answer);
+            } else {
+                respond(<p style={{ color: 'var(--color-error)' }}>⚠️ Large Language Model features are disabled in Local Mode. Turn on Mode 1 to chat with AI.</p>);
+            }
             return;
         }
 
@@ -1133,89 +1250,135 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
 
                     {/* Main - Scrollable Body */}
                     <div className="sb-ai-agent__body" ref={bodyRef}>
-                        {/* Welcome Message */}
-                        <div className="sb-ai-agent__welcome-msg">
-                            <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                            <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
-                                Welcome to PLUS ONE Agent. How can I assist you today?
+                        {!aiMode ? (
+                            <div className="sb-ai-agent__setup" style={{ padding: 24, paddingBottom: 0 }}>
+                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                <h4 style={{ marginTop: 16, marginBottom: 8, color: 'var(--color-on-surface)' }}>Welcome to the Inline Agent</h4>
+                                
+                                <div style={{ background: 'var(--color-surface-container-high)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
+                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 1: Full AI Functionality</p>
+                                    <input 
+                                        type="password" 
+                                        placeholder="sk-..." 
+                                        value={tempKey} 
+                                        onChange={e => setTempKey(e.target.value)} 
+                                        style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-outline)', marginBottom: 12, outline: 'none' }}
+                                    />
+                                    <button 
+                                        disabled={!tempKey.trim()}
+                                        onClick={() => {
+                                            localStorage.setItem('PLUS_AI_API_KEY', tempKey.trim());
+                                            localStorage.setItem('PLUS_AI_MODE', 'full');
+                                            setApiKey(tempKey.trim());
+                                            setAiMode('full');
+                                        }}
+                                        style={{ background: 'var(--color-primary)', color: 'white', padding: '10px 16px', borderRadius: 8, border: 'none', fontWeight: 600, width: '100%', cursor: tempKey.trim() ? 'pointer' : 'not-allowed', opacity: tempKey.trim() ? 1 : 0.5 }}
+                                    >Save Key & Start Mode 1</button>
+                                </div>
+                                
+                                <div style={{ background: 'var(--color-surface-container)', padding: 16, borderRadius: 12 }}>
+                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 2: Local Processing</p>
+                                    <p style={{ fontSize: 12, color: 'var(--color-on-surface-variant)', marginBottom: 12, lineHeight: 1.4 }}>
+                                        Hide or disable the remote LLM AI features to prevent excessive API usage.
+                                    </p>
+                                    <button 
+                                        onClick={() => {
+                                            localStorage.setItem('PLUS_AI_MODE', 'local');
+                                            setAiMode('local');
+                                        }}
+                                        style={{ background: 'transparent', color: 'var(--color-primary)', padding: '10px 16px', borderRadius: 8, border: '1px solid var(--color-primary)', fontWeight: 600, width: '100%', cursor: 'pointer' }}
+                                    >Continue in Mode 2 (No API Key)</button>
+                                </div>
                             </div>
-                        </div>
-                        <p className="sb-ai-agent__tip">
-                            Tip: Type &quot;Shortcuts&quot; To See All Available Keyboard Shortcuts.
-                        </p>
-
-                        {/* Quick Actions */}
-                        <div className="sb-ai-agent__quick-actions">
-                            {QUICK_ACTIONS.map(a => (
-                                <button key={a.id} className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
-                                    <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                                        <span style={{ color: a.color }}>
-                                            <a.Icon />
-                                        </span>
-                                    </div>
-                                    <span className="sb-ai-agent__quick-label">{a.label}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Message List */}
-                        <div className="sb-ai-agent__message-list">
-                            {messages.map((m, i) => (
-                                <div key={i} className={`sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
-                                    {m.role === 'bot' && (
-                                        <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                    )}
-                                    <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
-                                        {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
-                                            <>
-                                                <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
-                                                {navMatches.length > 0 && (
-                                                    <NavMatchList
-                                                        matches={navMatches}
-                                                        selectedIndex={selectedNavIndex}
-                                                        onSelect={navigateToEntry}
-                                                    />
-                                                )}
-                                            </>
-                                        ) : m.content}
-                                    </div>
-                                    {m.role === 'user' && (
-                                        <div className="sb-ai-agent__user-avatar">A</div>
-                                    )}
-                                </div>
-                            ))}
-
-                            {/* Typing indicator (Bot Message Loading) */}
-                            {isTyping && (
-                                <div className="sb-ai-agent__msg sb-ai-agent__msg--bot">
+                        ) : (
+                            <>
+                                {/* Welcome Message */}
+                                <div className="sb-ai-agent__welcome-msg">
                                     <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                    <div className="sb-ai-agent__typing">
-                                        <span /><span /><span />
+                                    <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
+                                        Welcome to PLUS ONE Inline Agent. How can I assist you today?
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                                <p className="sb-ai-agent__tip">
+                                    Tip: Type &quot;Shortcuts&quot; To See All Available Keyboard Shortcuts.
+                                </p>
+
+                                {/* Quick Actions */}
+                                <div className="sb-ai-agent__quick-actions">
+                                    {QUICK_ACTIONS.map(a => (
+                                        <button key={a.id} className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
+                                            <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
+                                                <span style={{ color: a.color }}>
+                                                    <a.Icon />
+                                                </span>
+                                            </div>
+                                            <span className="sb-ai-agent__quick-label">{a.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Message List */}
+                                <div className="sb-ai-agent__message-list">
+                                    {messages.map((m, i) => (
+                                        <div key={i} className={`sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
+                                            {m.role === 'bot' && (
+                                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                            )}
+                                            <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
+                                                {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
+                                                    <>
+                                                        <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
+                                                        {navMatches.length > 0 && (
+                                                            <NavMatchList
+                                                                matches={navMatches}
+                                                                selectedIndex={selectedNavIndex}
+                                                                onSelect={navigateToEntry}
+                                                            />
+                                                        )}
+                                                    </>
+                                                ) : m.content}
+                                            </div>
+                                            {m.role === 'user' && (
+                                                <div className="sb-ai-agent__user-avatar">A</div>
+                                            )}
+                                        </div>
+                                    ))}
+
+                                    {/* Typing indicator (Bot Message Loading) */}
+                                    {isTyping && (
+                                        <div className="sb-ai-agent__msg sb-ai-agent__msg--bot">
+                                            <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                            <div className="sb-ai-agent__typing">
+                                                <span /><span /><span />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Footer / Input */}
-                    <div className="sb-ai-agent__footer">
-                        <div className="sb-ai-agent__input-container">
-                            <div className="sb-ai-agent__input-wrapper">
-                                <input
-                                    ref={inputRef}
-                                    className="sb-ai-agent__input"
-                                    type="text"
-                                    placeholder="Ask me anything..."
-                                    value={inputValue}
-                                    onChange={e => setInputValue(e.target.value)}
-                                    onKeyDown={e => e.key === 'Enter' && handleSend()}
-                                />
-                                <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
-                                    <Icons.Send />
-                                </button>
+                    {aiMode && (
+                        <div className="sb-ai-agent__footer">
+                            <div className="sb-ai-agent__input-container">
+                                <div className="sb-ai-agent__input-wrapper">
+                                    <input
+                                        ref={inputRef}
+                                        className="sb-ai-agent__input"
+                                        type="text"
+                                        placeholder={aiMode === 'local' ? "Chat disabled (Local Mode)" : "Ask me anything..."}
+                                        value={inputValue}
+                                        onChange={e => setInputValue(e.target.value)}
+                                        onKeyDown={e => e.key === 'Enter' && handleSend()}
+                                    />
+                                    <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
+                                        <Icons.Send />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                 </div>
 
