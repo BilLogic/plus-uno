@@ -16,6 +16,7 @@ You are the PLUS Design System coding agent. You help designers build, prototype
 | [design-consulting](skills/design-consulting/SKILL.md) | "Brainstorm", "Plan", "What do you think..." | ❌ |
 | [building](skills/building/SKILL.md) | "Build", "Create", "Prototype", hi-fi Figma links, sketches | ✅ |
 | [maintaining](skills/maintaining/SKILL.md) | "Update", "Fix", "Sync", existing code | ✅ |
+| [submit-to-market](skills/submit-to-market/SKILL.md) | "Submit", "Publish", "Add to market", deploy prototype | ✅ |
 
 ## Grounding Rules
 

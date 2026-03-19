@@ -1,0 +1,157 @@
+.prototype-market {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--size-section-pad-y-lg, 32px) var(--size-section-pad-x-lg, 32px);
+  font-family: var(--font-family-body, sans-serif);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-section-gap-md, 20px);
+  min-height: 0; // Allow flex child to shrink so overflow can scroll
+  overflow-y: auto;
+  flex: 1;
+
+  // ── Header ──────────────────────────────────
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs, 4px);
+  }
+
+  &__title {
+    color: var(--color-on-surface, #1a1a1a);
+    margin: 0;
+  }
+
+  &__subtitle {
+    color: var(--color-on-surface-variant, #666);
+    margin: 0;
+  }
+
+  // ── Search ──────────────────────────────────
+  &__search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--color-on-surface-variant, #999);
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
+
+  &__search-input {
+    width: 100%;
+    padding: 10px 36px 10px 36px;
+    border: 1px solid var(--color-outline-variant, #ddd);
+    border-radius: var(--size-surface-radius, 8px);
+    background: var(--color-surface-container-lowest, #fff);
+    color: var(--color-on-surface, #1a1a1a);
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+    transition: border-color 0.15s ease;
+
+    &::placeholder {
+      color: var(--color-on-surface-variant, #999);
+    }
+
+    &:focus {
+      border-color: var(--color-primary, #1a73e8);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+    }
+  }
+
+  &__search-clear {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-on-surface-variant, #999);
+    padding: 4px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+
+    &:hover {
+      color: var(--color-on-surface, #333);
+      background: var(--color-surface-container-low, #f5f5f5);
+    }
+  }
+
+  // ── Filters ─────────────────────────────────
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-lg, 20px);
+    align-items: flex-start;
+  }
+
+  &__filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs, 4px);
+    min-width: 200px;
+  }
+
+  &__filter-label {
+    color: var(--color-on-surface-variant, #666);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  // ── Result count ────────────────────────────
+  &__count {
+    color: var(--color-on-surface-variant, #666);
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px);
+  }
+
+  &__clear-filters {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-primary, #1a73e8);
+    padding: 0;
+    text-decoration: underline;
+    font-family: inherit;
+
+    &:hover {
+      color: var(--color-on-surface, #333);
+    }
+  }
+
+  // ── Card grid ───────────────────────────────
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--size-section-gap-md, 20px);
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── Empty state ─────────────────────────────
+  &__empty {
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--color-on-surface-variant, #999);
+  }
+
+  &__empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+}

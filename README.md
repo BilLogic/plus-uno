@@ -155,6 +155,20 @@ See `packages/plus-ds/guidelines/overview-components.md` for component details a
 - **[Figma Integration](develop/FIGMA_DESIGN_SYSTEM.md)** - Figma integration guide
 - **[Project Structure](develop/PROJECT_STRUCTURE.md)** - Complete project structure guide
 
+## Agent Skills
+
+This repo includes agent skills that any AI coding assistant can follow. Read `.agent/AGENT.md` for full context, or reference individual skills directly:
+
+| Skill | File | Purpose |
+|-------|------|---------|
+| Learn PLUS | `.agent/skills/learn-plus/SKILL.md` | Answers questions about the design system |
+| Design Consulting | `.agent/skills/design-consulting/SKILL.md` | Brainstorming and planning before coding |
+| Building | `.agent/skills/building/SKILL.md` | Creates prototypes and components from designs or sketches |
+| Maintaining | `.agent/skills/maintaining/SKILL.md` | Updates, fixes, and syncs existing code with Figma |
+| Submit to Market | `.agent/skills/submit-to-market/SKILL.md` | Guides submission of a prototype to the Prototype Market (`/market`) |
+
+To use with **Claude Code**, point it to `.agent/AGENT.md` or the specific skill file. For **Cursor**, skills are auto-discovered. For other tools, paste the relevant SKILL.md content into your prompt.
+
 ## Design System Principles
 
 1. **CSS Custom Properties**: All design tokens use CSS variables

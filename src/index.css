@@ -34,9 +34,10 @@ body {
   height: auto;
   aspect-ratio: 1280 / 800;
   max-height: min(var(--demo-frame-height), 100vh);
-  overflow: hidden;
+  overflow-y: overlay;
+  overflow-x: hidden;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 8px 0 0 8px;
   background-color: var(--color-surface-container-lowest, #fff);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
@@ -45,6 +46,30 @@ body {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
+}
+
+/* Root scrollbar: thin overlay, flush to edge */
+#root {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+#root::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+
+#root::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#root::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+#root::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 #home-redesign-page .plus-page-main,
