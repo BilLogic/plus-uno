@@ -12,6 +12,7 @@
     position: relative;
     display: inline-block;
     width: 100%;
+    --bs-dropdown-spacer: 0px;
 
     &.plus-select-disabled {
         opacity: 0.38; // Figma disabled
@@ -48,11 +49,20 @@
     border-radius: var(--size-element-radius-sm, 2px);
     cursor: pointer;
     transition: border-color 0.15s ease;
+
+    &:hover:not([aria-disabled="true"]) {
+        border-color: var(--color-inverse-primary);
+    }
 }
 
 .plus-select-open .plus-select-trigger {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-bottom-left-radius: var(--size-element-radius-sm, 2px);
+    border-bottom-right-radius: var(--size-element-radius-sm, 2px);
+    border-color: var(--color-outline-variant) !important;
+}
+
+.plus-select-open .plus-select-trigger:hover {
+    border-color: var(--color-outline-variant) !important;
 }
 
 // Size variants
@@ -174,29 +184,67 @@
     margin-top: 0 !important;
     border: none !important;
     background: transparent !important;
+    z-index: 2000;
 }
 
-// Dropdown container (Figma dropdown list)
-.plus-select-dropdown {
+// react-bootstrap/Bootstrap applies a spacer via `.dropdown-menu[data-bs-popper]`.
+// Force it to 0 so the menu touches the select field with no visual gap.
+.plus-select-menu[data-bs-popper] {
+    margin-top: 0 !important;
+    --bs-dropdown-spacer: 0px !important;
+}
+
+// When the dropdown opens upwards, reverse corner radii and overlap spacing.
+.plus-select-menu[data-bs-popper][data-popper-placement^="top"] .plus-select-dropdown,
+.plus-select-menu[data-bs-popper][data-popper-placement^="top"] .plus-select-options-list {
+    margin-top: 0;
+    margin-bottom: -2px;
+    border-top-left-radius: var(--size-modal-radius-sm, 4px);
+    border-top-right-radius: var(--size-modal-radius-sm, 4px);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+// Options list container (Search + Add + Options)
+.plus-select-dropdown,
+.plus-select-options-list {
     background-color: var(--color-surface);
     border: 0.8px solid var(--color-outline-variant);
-    border-top: none;
+    margin-top: -2px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     border-bottom-left-radius: var(--size-modal-radius-sm, 4px);
     border-bottom-right-radius: var(--size-modal-radius-sm, 4px);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .plus-select-search {
     .plus-input {
         border-radius: 0;
-        border: 0.8px solid var(--color-outline-variant);
+        border: none;
+        border-bottom: 0.8px solid var(--color-outline-variant);
+        margin-bottom: 0;
         width: 100%;
         background-color: var(--color-surface);
+        transition: none !important;
         color: var(--color-on-surface-variant);
         font-weight: var(--font-weight-light);
 
         &::placeholder {
             color: var(--color-on-surface-variant);
+        }
+
+        &:hover {
+            background-color: var(--color-on-surface-state-08) !important;
+            border-color: var(--color-outline-variant) !important;
+        }
+
+        &:focus,
+        &:focus-visible {
+            border-color: var(--color-outline-variant) !important;
         }
     }
 }
@@ -207,9 +255,20 @@
     align-items: center;
     gap: var(--size-element-gap-md, 10px);
     flex: 1 0 0;
-    border: 0.8px solid var(--color-outline-variant, #BEC8CA);
-    background: var(--color-surface, #F9F9FC);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+    border: none;
+    border-bottom: 0.8px solid var(--color-outline-variant, #BEC8CA);
+    border-radius: 0;
+    background-color: var(--color-surface, #F9F9FC);
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    margin-bottom: -0.8px;
+
+    &:hover:not(.disabled) {
+        background-color: var(--color-on-surface-state-08);
+    }
 
     .plus-select-add-icon {
         font-size: var(--font-size-fa-body2-solid);
@@ -236,12 +295,22 @@
 .plus-select-options {
     background-color: transparent;
 
+    // Multi-select dropdown should not render row separators/borders.
+    // ListGroup default styles add border-bottom on each item; override here.
+    &.list-group-flush {
+        .plus-list-option.plus-select-option-item {
+            border: none !important;
+            border-bottom: none !important;
+        }
+    }
+
     .dropdown-item {
         display: flex;
         align-items: center;
         gap: var(--size-element-gap-md, 10px);
         width: 100%;
-        padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 10px);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
+        box-sizing: border-box;
         background-color: var(--color-surface);
         color: var(--color-on-surface);
         font-family: var(--font-family-body);
@@ -251,21 +320,30 @@
         text-align: left;
         text-decoration: none;
         cursor: pointer;
+        border: none !important;
+        box-shadow: none !important;
         transition: background-color 0.15s ease;
 
         &:hover:not(.disabled) {
             background-color: var(--color-on-surface-state-08);
             color: var(--color-on-surface);
+            border: none !important;
+            box-shadow: none !important;
         }
 
         &:active:not(.disabled) {
             background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+            border: none !important;
+            box-shadow: none !important;
         }
 
         &.selected {
             position: relative;
             background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08));
             color: var(--color-on-surface);
+            font-weight: var(--font-weight-light) !important;
+            border: none !important;
+            box-shadow: none !important;
 
             &::before {
                 content: '';
@@ -282,6 +360,8 @@
             opacity: 0.38;
             pointer-events: none;
             cursor: not-allowed;
+            border: none !important;
+            box-shadow: none !important;
         }
 
         .plus-select-option-label {
@@ -293,13 +373,17 @@
     }
 
     .plus-list-option.plus-select-option-item {
-        padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 10px);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
+        box-sizing: border-box;
         background-color: var(--color-surface);
-        border: none;
         font-family: var(--font-family-body);
         font-size: var(--font-size-body2);
         font-weight: var(--font-weight-light);
         line-height: var(--font-line-height-body2);
+        gap: var(--size-element-gap-md, 10px);
+        align-items: center;
+        border: none !important;
+        box-shadow: none !important;
 
         .form-check-label {
             color: var(--color-on-surface);
@@ -307,12 +391,17 @@
 
         &:hover:not(.disabled) {
             background-color: var(--color-on-surface-state-08);
+            border: none !important;
+            box-shadow: none !important;
         }
 
         &.active {
             position: relative;
             /* Override OptionList active background to match single-select selected */
             background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08)) !important;
+            font-weight: var(--font-weight-light) !important;
+            border: none !important;
+            box-shadow: none !important;
 
             &::before {
                 content: '';
@@ -329,6 +418,8 @@
             opacity: 0.38;
             pointer-events: none;
             cursor: not-allowed;
+            border: none !important;
+            box-shadow: none !important;
         }
     }
 }
