@@ -14,6 +14,11 @@ const DevIndexPage = () => {
                 Select a prototype to view:
             </p>
 
+            <Link to="/market" style={{ ...linkStyle, marginBottom: '24px', borderColor: 'var(--color-primary)', backgroundColor: 'var(--color-surface-container-lowest, #f5f5f5)' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '18px', color: 'var(--color-primary)' }}>Prototype Market</div>
+                <div style={{ fontSize: '14px', color: '#666' }}>Browse all prototypes with search, filters, and deployment links.</div>
+            </Link>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <Link to="/home" style={linkStyle}>
                     <div style={{ fontWeight: 'bold', fontSize: '18px' }}>Home Redesign (Dashboard)</div>
