@@ -75,7 +75,7 @@ export const BasicInformationSection = ({ changed = false }) => {
     return (
         <div
             style={{
-                width: '848px',
+                width: '100%',
                 backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
                 border: '1px solid var(--color-surface-container-low, #f3f3f6)',
                 borderRadius: 'var(--size-section-radius-md, 12px)',
@@ -120,7 +120,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '162px',
+                        maxWidth: '285px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 'var(--size-small-gap-xs, 4px)',
@@ -142,7 +142,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '162px',
+                        maxWidth: '285px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 'var(--size-small-gap-xs, 4px)',
@@ -164,7 +164,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '162px',
+                        maxWidth: '285px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 'var(--size-small-gap-xs, 4px)',
@@ -184,7 +184,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '162px',
+                        maxWidth: '285px',
                         overflow: 'hidden',
                     }}
                 >
@@ -196,8 +196,7 @@ export const BasicInformationSection = ({ changed = false }) => {
             <div
                 style={{
                     display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 'var(--size-element-gap-sm, 8px)',
+                    gap: 'var(--size-element-gap-lg, 12px)',
                     width: '100%',
                 }}
             >
@@ -205,7 +204,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '218.67px',
+                        maxWidth: '382.67px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 'var(--size-small-gap-xs, 4px)',
@@ -227,7 +226,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '218.67px',
+                        maxWidth: '382.67px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 'var(--size-small-gap-xs, 4px)',
@@ -280,7 +279,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <div
                     style={{
                         flex: '1 0 0',
-                        maxWidth: '218.67px',
+                        maxWidth: '382.67px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 'var(--size-small-gap-xs, 4px)',

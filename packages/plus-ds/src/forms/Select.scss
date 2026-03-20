@@ -23,13 +23,22 @@
         pointer-events: none;
         
         .plus-select-trigger {
-            background-color: var(--color-surface-variant, #dde3ea); // Figma: --neutral-colors/alternative/surface-variant
+            background-color: var(--color-surface-variant, #dde3ea);
             cursor: default;
             border: 0.8px solid var(--color-outline-variant, #bec8ca);
             
             &:hover {
                 border-color: var(--color-outline-variant);
             }
+        }
+
+        .plus-select-chevron {
+            display: none;
+        }
+
+        .plus-select-badges {
+            max-width: 100%;
+            gap: var(--size-element-gap-xs, 4px);
         }
     }
 }

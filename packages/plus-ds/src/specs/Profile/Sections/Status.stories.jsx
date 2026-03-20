@@ -88,7 +88,7 @@ export const StatusSection = () => {
     return (
         <div
             style={{
-                width: '774px',
+                width: '100%',
                 backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
                 border: '1px solid var(--color-surface-container-low, #f3f3f6)',
                 borderRadius: 'var(--size-section-radius-md, 12px)',
@@ -263,7 +263,7 @@ export const StatusSection = () => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    maxWidth: '332px',
+                    maxWidth: '580px',
                     width: '100%',
                 }}
             >

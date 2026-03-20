@@ -176,7 +176,7 @@ export const Interactive = {
 
                     {/* ====== Basic Information Section (interactive) ====== */}
                     <div style={{
-                        width: '848px',
+                        width: '100%',
                         backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
                         border: '1px solid var(--color-surface-container-low, #f3f3f6)',
                         borderRadius: 'var(--size-section-radius-md, 12px)',
@@ -189,30 +189,30 @@ export const Interactive = {
 
                         {/* Row 1 */}
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--size-element-gap-sm, 8px)', width: '100%' }}>
-                            <div style={{ flex: '1 0 0', maxWidth: '162px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '285px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
                                 <Label text="First Name" required={false} />
                                 <Input id="bi-first-name" value="Veronica" readonly={true} size="medium" showLabel={false} />
                             </div>
-                            <div style={{ flex: '1 0 0', maxWidth: '162px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '285px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
                                 <Label text="Last Name" required={false} />
                                 <Input id="bi-last-name" value="Lodge" readonly={true} size="medium" showLabel={false} />
                             </div>
-                            <div style={{ flex: '1 0 0', maxWidth: '162px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '285px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
                                 <Label text="Preferred Name" required={false} />
                                 <Input id="bi-preferred-name" placeholder="Enter" value={preferredName} onChange={(e) => setPreferredName(e.target.value)} size="medium" showLabel={false} />
                             </div>
-                            <div style={{ flex: '1 0 0', maxWidth: '162px' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '285px' }}>
                                 <Pronouns id="bi-pronouns" onChange={() => setPronounsDirty(true)} />
                             </div>
                         </div>
 
                         {/* Row 2 */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--size-element-gap-sm, 8px)', width: '100%' }}>
-                            <div style={{ flex: '1 0 0', maxWidth: '218.67px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg, 12px)', width: '100%' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '382.67px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
                                 <Label text="PLUS Account Email" required={false} />
                                 <Input id="bi-plus-email" value="pl2-app-demo@gmail.com" readonly={true} size="medium" showLabel={false} />
                             </div>
-                            <div style={{ flex: '1 0 0', maxWidth: '218.67px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '382.67px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
                                 <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050, 4px)', alignItems: 'flex-start' }}>
                                     <Label text="Additional Email" required={false} />
                                     <Tooltip text="Get notifications sent to an alternate email address" placement="right" size="small" id="tooltip-bi-additional-email">
@@ -223,7 +223,7 @@ export const Interactive = {
                                 </div>
                                 <Input id="bi-additional-email" placeholder="pl2-app-demo@gmail.com" value={additionalEmail} onChange={(e) => setAdditionalEmail(e.target.value)} size="medium" showLabel={false} />
                             </div>
-                            <div style={{ flex: '1 0 0', maxWidth: '218.67px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
+                            <div style={{ flex: '1 0 0', maxWidth: '382.67px', display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)', overflow: 'hidden' }}>
                                 <Label text="Slack Email" required={false} />
                                 <Input id="bi-slack-email" placeholder="pl2-app-demo@gmail.com" value={slackEmail} onChange={(e) => setSlackEmail(e.target.value)} size="medium" showLabel={false} />
                             </div>
@@ -236,7 +236,7 @@ export const Interactive = {
 
                     {/* ====== Status & Clearance Section (readonly — reuse as-is) ====== */}
                     <div style={{
-                        width: '774px',
+                        width: '100%',
                         backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
                         border: '1px solid var(--color-surface-container-low, #f3f3f6)',
                         borderRadius: 'var(--size-section-radius-md, 12px)',
@@ -264,7 +264,7 @@ export const Interactive = {
                                 </div>
                             ))}
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '332px', width: '100%' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '580px', width: '100%' }}>
                             <SemesterAtPLUS id="status-semester-interactive" defaultValue={['fall-2024', 'spring-2025', 'summer-2025', 'fall-2025']} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-small-gap-xs, 4px)' }}>
@@ -280,7 +280,7 @@ export const Interactive = {
 
                     {/* ====== Background & Matching Section (interactive) ====== */}
                     <div style={{
-                        width: '896px',
+                        width: '100%',
                         backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
                         border: '1px solid var(--color-surface-container-low, #f3f3f6)',
                         borderRadius: 'var(--size-section-radius-md, 12px)',
@@ -304,22 +304,22 @@ export const Interactive = {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
                             {/* Row 1 */}
                             <div style={{ display: 'flex', gap: 'var(--size-spacing-between-components-spacer-2, 8px)', width: '100%' }}>
-                                <div style={{ flex: '1 0 0', maxWidth: '218.67px' }}>
+                                <div style={{ flex: '1 0 0', maxWidth: '382.67px' }}>
                                     <StudentTypeDropdown id="bg-student-type" onChange={() => setStudentTypeDirty(true)} required={true} />
                                 </div>
-                                <div style={{ flex: '1 0 0', maxWidth: '218.67px' }}>
+                                <div style={{ flex: '1 0 0', maxWidth: '382.67px' }}>
                                     <University id="bg-university" onChange={() => setUniversityDirty(true)} />
                                 </div>
-                                <div style={{ flex: '1 0 0', maxWidth: '218.67px' }}>
+                                <div style={{ flex: '1 0 0', maxWidth: '382.67px' }}>
                                     <GradYearDropdown id="bg-grad-year" onChange={() => setGradYearDirty(true)} />
                                 </div>
                             </div>
                             {/* Row 2 */}
                             <div style={{ display: 'flex', gap: 'var(--size-spacing-between-components-spacer-2, 8px)', width: '100%' }}>
-                                <div style={{ flex: '1 0 0', maxWidth: '218.67px' }}>
+                                <div style={{ flex: '1 0 0', maxWidth: '578px' }}>
                                     <MathLevel id="bg-math-level" onChange={() => setMathLevelDirty(true)} required={true} />
                                 </div>
-                                <div style={{ flex: '1 0 0', maxWidth: '332px' }}>
+                                <div style={{ flex: '1 0 0', maxWidth: '578px' }}>
                                     <LanguagePreferences id="bg-languages" onChange={() => setLanguagesDirty(true)} />
                                 </div>
                             </div>

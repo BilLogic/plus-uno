@@ -88,7 +88,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
     return (
         <div
             style={{
-                width: '896px',
+                width: '100%',
                 backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
                 border: '1px solid var(--color-surface-container-low, #f3f3f6)',
                 borderRadius: 'var(--size-section-radius-md, 12px)',
@@ -186,7 +186,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     <div
                         style={{
                             flex: '1 0 0',
-                            maxWidth: '218.67px',
+                            maxWidth: '382.67px',
                             overflow: 'hidden',
                         }}
                     >
@@ -200,7 +200,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     <div
                         style={{
                             flex: '1 0 0',
-                            maxWidth: '218.67px',
+                            maxWidth: '382.67px',
                             overflow: 'hidden',
                         }}
                     >
@@ -211,7 +211,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     <div
                         style={{
                             flex: '1 0 0',
-                            maxWidth: '218.67px',
+                            maxWidth: '382.67px',
                             overflow: 'hidden',
                         }}
                     >
@@ -231,7 +231,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     <div
                         style={{
                             flex: '1 0 0',
-                            maxWidth: '218.67px',
+                            maxWidth: '578px',
                             overflow: 'hidden',
                         }}
                     >
@@ -242,7 +242,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     <div
                         style={{
                             flex: '1 0 0',
-                            maxWidth: '332px',
+                            maxWidth: '578px',
                             overflow: 'hidden',
                         }}
                     >

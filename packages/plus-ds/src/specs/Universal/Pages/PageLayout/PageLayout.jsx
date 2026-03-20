@@ -167,7 +167,7 @@ const PageLayout = ({
                     padding: 'var(--size-surface-pad-y, 24px) var(--size-surface-pad-x, 32px)',
                     gap: 'var(--size-surface-gap-md, 24px)',
                     flex: '1 0 0',
-                    alignItems: 'flex-start',
+                    alignItems: 'stretch',
                     minWidth: 0,
                     minHeight: 0,
                     height: '100%',
