@@ -1,66 +1,80 @@
 import React from 'react';
-import Card from '@/components/Card';
 import Rating from '@/forms/Rating';
 import Textarea from '@/forms/Textarea';
+
+const sessionRatingCommentsByValue = {
+    1: 'Lots of room for improvement.',
+    2: 'Not so well, adjustments are needed.',
+    3: "Okay, could've gone better.",
+    4: 'Good, with some room for improvement.',
+    5: 'Excellent session!',
+};
 
 export default function SessionOverview({ formState, dispatch }) {
     const { sessionRating, whatWentWell, whatWasChallenging } = formState;
 
     return (
-        <div className="section-container">
-            <div className="section-header">
-                <h2 className="h5-txt" style={{ color: 'var(--color-on-surface)' }}>
-                    Session Overview
-                </h2>
-                <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Reflect on the session as a whole. This is asked once, not per student.
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-lg)',
+            }}
+        >
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--size-element-gap-lg)',
+                }}
+            >
+                <p className="h6 m-0" style={{ color: 'var(--color-on-surface)' }}>
+                    How was the overall session?
+                    <span style={{ color: 'var(--color-danger)' }}> *</span>
                 </p>
+
+                <Rating
+                    id="session-rating"
+                    name="sessionRating"
+                    value={sessionRating}
+                    variant="comments"
+                    showCommentsLabel={!!sessionRatingCommentsByValue[sessionRating]}
+                    commentsLabel={sessionRatingCommentsByValue[sessionRating] || null}
+                    onChange={(val) =>
+                        dispatch({ type: 'SET_FIELD', field: 'sessionRating', value: val })
+                    }
+                />
             </div>
 
-            <Card paddingSize="lg" gapSize="md" radiusSize="sm">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)' }}>
-                    <Rating
-                        name="sessionRating"
-                        label="How would you rate this session overall?"
-                        value={sessionRating}
-                        variant="comments"
-                        showCommentsLabel={false}
-                        onChange={(val) =>
-                            dispatch({ type: 'SET_FIELD', field: 'sessionRating', value: val })
-                        }
-                    />
+            <Textarea
+                name="whatWentWell"
+                label="What went well?"
+                placeholder="Describe what worked during this session..."
+                rows={4}
+                value={whatWentWell}
+                onChange={(e) =>
+                    dispatch({
+                        type: 'SET_FIELD',
+                        field: 'whatWentWell',
+                        value: e.target.value,
+                    })
+                }
+            />
 
-                    <Textarea
-                        name="whatWentWell"
-                        label="What went well?"
-                        placeholder="Describe what worked during this session..."
-                        rows={4}
-                        value={whatWentWell}
-                        onChange={(e) =>
-                            dispatch({
-                                type: 'SET_FIELD',
-                                field: 'whatWentWell',
-                                value: e.target.value,
-                            })
-                        }
-                    />
-
-                    <Textarea
-                        name="whatWasChallenging"
-                        label="What was challenging?"
-                        placeholder="Describe any difficulties or areas for improvement..."
-                        rows={4}
-                        value={whatWasChallenging}
-                        onChange={(e) =>
-                            dispatch({
-                                type: 'SET_FIELD',
-                                field: 'whatWasChallenging',
-                                value: e.target.value,
-                            })
-                        }
-                    />
-                </div>
-            </Card>
+            <Textarea
+                name="whatWasChallenging"
+                label="What was challenging?"
+                placeholder="Describe any difficulties or areas for improvement..."
+                rows={4}
+                value={whatWasChallenging}
+                onChange={(e) =>
+                    dispatch({
+                        type: 'SET_FIELD',
+                        field: 'whatWasChallenging',
+                        value: e.target.value,
+                    })
+                }
+            />
         </div>
     );
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import Card from '@/components/Card';
 import Badge from '@/components/Badge';
 import Scale from '@/forms/RadioButtonGroup';
 import MultipleChoice from '@/forms/MultipleChoice';
@@ -9,39 +8,32 @@ export default function TeachingStrategies({ formState, dispatch }) {
     const { selectedStrategies, strategyDetails } = formState;
 
     return (
-        <div className="section-container">
-            <div className="section-header">
-                <h2 className="h5-txt" style={{ color: 'var(--color-on-surface)' }}>
-                    Teaching Strategies
-                </h2>
-                <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Select the strategies you used during this session, then rate their effectiveness.
-                </p>
-            </div>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-lg)',
+            }}
+        >
+            <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Select the strategies you used during this session, then rate their effectiveness.
+            </p>
 
-            <Card paddingSize="lg" gapSize="md" radiusSize="sm">
-                <MultipleChoice
-                    name="strategies"
-                    type="checkbox"
-                    options={STRATEGIES}
-                    value={selectedStrategies}
-                    onChange={(val) =>
-                        dispatch({ type: 'SET_FIELD', field: 'selectedStrategies', value: val })
-                    }
-                />
-            </Card>
+            <MultipleChoice
+                name="strategies"
+                type="checkbox"
+                options={STRATEGIES}
+                value={selectedStrategies}
+                onChange={(val) =>
+                    dispatch({ type: 'SET_FIELD', field: 'selectedStrategies', value: val })
+                }
+            />
 
             {selectedStrategies.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
-                    <span
-                        className="body2-txt"
-                        style={{
-                            fontWeight: 'var(--font-weight-body2-semibold)',
-                            color: 'var(--color-on-surface)',
-                        }}
-                    >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)' }}>
+                    <p className="h6 m-0" style={{ color: 'var(--color-on-surface)' }}>
                         Rate each strategy
-                    </span>
+                    </p>
 
                     {selectedStrategies.map((strategyValue) => {
                         const strategy = STRATEGIES.find((s) => s.value === strategyValue);
@@ -49,10 +41,18 @@ export default function TeachingStrategies({ formState, dispatch }) {
                         const detail = strategyDetails[strategyValue] || {};
 
                         return (
-                            <div key={strategyValue} className="strategy-detail">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
-                                    <Badge text={strategy.label} style="primary" size="b2" />
-                                </div>
+                            <div
+                                key={strategyValue}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 'var(--size-element-gap-md)',
+                                    padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
+                                    backgroundColor: 'var(--color-surface-container-low, #f5f5f5)',
+                                    borderRadius: 'var(--size-card-radius-sm)',
+                                }}
+                            >
+                                <Badge text={strategy.label} style="primary" size="b2" />
 
                                 <Scale
                                     name={`effectiveness-${strategyValue}`}

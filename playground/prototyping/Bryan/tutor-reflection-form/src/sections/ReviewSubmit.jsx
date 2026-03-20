@@ -9,7 +9,6 @@ import Divider from '@/components/Divider';
 import {
     STUDENTS,
     STRATEGIES,
-    SEVERITY_OPTIONS,
     RECOMMENDED_ACTIONS,
 } from '../data/mockData';
 
@@ -39,15 +38,16 @@ export default function ReviewSubmit({ formState, dispatch, onSubmit }) {
     );
 
     return (
-        <div className="section-container">
-            <div className="section-header">
-                <h2 className="h5-txt" style={{ color: 'var(--color-on-surface)' }}>
-                    Review & Submit
-                </h2>
-                <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Review your reflection and submit when ready.
-                </p>
-            </div>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-lg)',
+            }}
+        >
+            <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Review your reflection and submit when ready.
+            </p>
 
             {hasEscalations && (
                 <Alert
@@ -66,13 +66,10 @@ export default function ReviewSubmit({ formState, dispatch, onSubmit }) {
                             {escalatedStudents.map((s) => {
                                 const sev = studentDeepDive[s.id]?.severity || 'low';
                                 const sevStyle =
-                                    sev === 'urgent'
-                                        ? 'danger'
-                                        : sev === 'high'
-                                          ? 'warning'
-                                          : sev === 'medium'
-                                            ? 'info'
-                                            : 'secondary';
+                                    sev === 'urgent' ? 'danger'
+                                        : sev === 'high' ? 'warning'
+                                            : sev === 'medium' ? 'info'
+                                                : 'secondary';
                                 return (
                                     <Badge
                                         key={s.id}
@@ -112,77 +109,53 @@ export default function ReviewSubmit({ formState, dispatch, onSubmit }) {
                 </Card>
             )}
 
+            {/* Summary */}
             <Card paddingSize="lg" gapSize="md" radiusSize="sm" title="Summary">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)' }}>
-                    {/* Session Info Summary */}
-                    <div className="summary-section">
-                        <span
-                            className="body2-txt"
-                            style={{ fontWeight: 'var(--font-weight-body2-semibold)', color: 'var(--color-primary)' }}
-                        >
+                    {/* Session Info */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-primary)' }}>
                             Session Information
                         </span>
-                        <div className="summary-row">
-                            <span className="summary-label body3-txt">Session</span>
-                            <span className="summary-value body2-txt">
-                                {selectedSession || 'Not selected'}
-                            </span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Session</span>
+                            <span className="body2-txt">{selectedSession || 'Not selected'}</span>
                         </div>
-                        {sessionDidNotHappen && (
-                            <Badge text="Session Cancelled" style="danger" size="b2" />
-                        )}
+                        {sessionDidNotHappen && <Badge text="Session Cancelled" style="danger" size="b2" />}
                     </div>
 
-                    <Divider />
-
-                    {/* Session Overview Summary */}
                     {!sessionDidNotHappen && (
                         <>
-                            <div className="summary-section">
-                                <span
-                                    className="body2-txt"
-                                    style={{ fontWeight: 'var(--font-weight-body2-semibold)', color: 'var(--color-primary)' }}
-                                >
+                            <Divider />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-primary)' }}>
                                     Session Overview
                                 </span>
-                                <div className="summary-row">
-                                    <span className="summary-label body3-txt">Rating</span>
-                                    <span className="summary-value body2-txt">
-                                        {sessionRating ? `${sessionRating}/5` : 'Not rated'}
-                                    </span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Rating</span>
+                                    <span className="body2-txt">{sessionRating ? `${sessionRating}/5` : 'Not rated'}</span>
                                 </div>
                                 {whatWentWell && (
-                                    <div className="summary-row">
-                                        <span className="summary-label body3-txt">Went well</span>
-                                        <span className="summary-value body3-txt">{whatWentWell}</span>
-                                    </div>
-                                )}
-                                {whatWasChallenging && (
-                                    <div className="summary-row">
-                                        <span className="summary-label body3-txt">Challenging</span>
-                                        <span className="summary-value body3-txt">{whatWasChallenging}</span>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)' }}>
+                                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', minWidth: 100 }}>Went well</span>
+                                        <span className="body3-txt" style={{ textAlign: 'right' }}>{whatWentWell}</span>
                                     </div>
                                 )}
                             </div>
 
                             <Divider />
-
-                            {/* Student Check-In Summary */}
-                            <div className="summary-section">
-                                <span
-                                    className="body2-txt"
-                                    style={{ fontWeight: 'var(--font-weight-body2-semibold)', color: 'var(--color-primary)' }}
-                                >
-                                    Student Check-In
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-primary)' }}>
+                                    Students
                                 </span>
                                 {STUDENTS.filter(
                                     (s) => attendance[s.id] === 'present' || attendance[s.id] === 'late'
                                 ).map((student) => {
                                     const data = studentCheckIn[student.id] || {};
                                     return (
-                                        <div key={student.id} className="summary-row">
-                                            <span className="summary-label body3-txt">{student.name}</span>
-                                            <span className="summary-value body3-txt">
+                                        <div key={student.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span className="body3-txt">{student.name}</span>
+                                            <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                                                 {data.engagement || '—'} / {data.understanding || '—'}
                                                 {data.flagForDeepDive && (
                                                     <Badge text="Flagged" style="warning" size="b3" className="ms-2" />
@@ -194,14 +167,9 @@ export default function ReviewSubmit({ formState, dispatch, onSubmit }) {
                             </div>
 
                             <Divider />
-
-                            {/* Strategies Summary */}
-                            <div className="summary-section">
-                                <span
-                                    className="body2-txt"
-                                    style={{ fontWeight: 'var(--font-weight-body2-semibold)', color: 'var(--color-primary)' }}
-                                >
-                                    Teaching Strategies
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-primary)' }}>
+                                    Strategies
                                 </span>
                                 {selectedStrategies.length === 0 ? (
                                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -228,17 +196,6 @@ export default function ReviewSubmit({ formState, dispatch, onSubmit }) {
                     )}
                 </div>
             </Card>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    text="Submit Reflection"
-                    style="primary"
-                    fill="filled"
-                    size="large"
-                    leadingVisual="paper-plane"
-                    onClick={onSubmit}
-                />
-            </div>
         </div>
     );
 }
