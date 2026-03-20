@@ -62,6 +62,14 @@
     &:hover:not([aria-disabled="true"]) {
         border-color: var(--color-inverse-primary);
     }
+
+    &:focus,
+    &:focus-visible,
+    &:active {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: var(--color-outline-variant) !important;
+    }
 }
 
 .plus-select-open .plus-select-trigger {
