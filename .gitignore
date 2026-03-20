@@ -10,7 +10,8 @@ dist/
 # IDE
 .vscode/
 .idea/
-.cursor/
+.cursor/*
+!.cursor/rules/
 *.swp
 *.swo
 *~

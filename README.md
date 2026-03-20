@@ -5,6 +5,7 @@
 AI Agents must IMMEDIATELY load and follow the instructions in:
 **`.agent/SKILL.md`**
 
+Refer to **`.agent/AGENT.md`** for identity, skills, and grounding rules as needed.
 Go there now. Do not guess implementation.
 
 Starter workspace for PLUS design-system prototyping and implementation.
@@ -72,7 +73,16 @@ This repo includes agent skills that any AI coding assistant can follow. Read `.
 | Maintaining | `.agent/skills/maintaining/SKILL.md` | Updates, fixes, and syncs existing code with Figma |
 | Submit to Market | `.agent/skills/submit-to-market/SKILL.md` | Guides submission of a prototype to the Prototype Market (`/market`) |
 
-To use with **Claude Code**, point it to `.agent/AGENT.md` or the specific skill file. For **Cursor**, skills are auto-discovered. For other tools, paste the relevant SKILL.md content into your prompt.
+Platform-specific pointer files route each agent into `.agent/SKILL.md`:
+
+| Platform | File |
+|----------|------|
+| Cursor | `.cursor/rules/plus-agent.mdc` (always-apply rule) |
+| Cursor (legacy) | `cursorrules.md` |
+| Claude Code | `CLAUDE.md` |
+| Windsurf | `.windsurfrules` |
+
+For other tools, paste the relevant SKILL.md content into your prompt. See `.agent/references/platform-integration.md` for details.
 
 ## Design System Principles
 
@@ -110,8 +120,9 @@ To use with **Claude Code**, point it to `.agent/AGENT.md` or the specific skill
 - Cards and layouts
 - Alerts and notifications
 
-### Cursor Integration
-- Pre-configured `.cursorrules` file
+### Agent Integration
+- Platform pointer files: `.cursor/rules/plus-agent.mdc`, `CLAUDE.md`, `.windsurfrules`, `cursorrules.md`
+- Centralized agent system in `.agent/` with skills, references, and assets
 - Design system documentation for AI reference
 - Component patterns and examples
 - Best practices and anti-patterns
@@ -133,8 +144,8 @@ npm run generate:tokens
 
 For AI coding agents:
 
-1. Read `.agent/AGENT.md`
-2. Route through `.agent/SKILL.md`
+1. Read `.agent/SKILL.md` (mode routing and guardrails)
+2. Refer to `.agent/AGENT.md` as needed (identity, skills, grounding rules)
 3. Select one mode:
    - `learning`
    - `maintaining`
