@@ -229,20 +229,4 @@ export const prototypes = [
     localPath: null,
     repoPath: 'playground/prototyping/Bryan/tutor-reflection-form/',
   },
-  {
-    id: 'bryan-starter',
-    title: 'Starter Prototype',
-    description:
-      'Blank playground project scaffolded with the PLUS design system. Use as a template for new prototypes.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'low',
-    lastUpdated: '2026-01-20',
-    creators: ['Bryan'],
-    contributors: ['Bryan'],
-    productPillar: 'universal',
-    localPath: null,
-    repoPath: 'playground/prototyping/Bryan/starter/',
-  },
 ];
