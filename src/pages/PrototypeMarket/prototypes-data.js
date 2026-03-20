@@ -214,6 +214,22 @@ export const prototypes = [
     repoPath: 'playground/prototyping/Ashley/tutor-risk-interventions/',
   },
   {
+    id: 'bryan-tutor-reflection-form',
+    title: 'Tutor Reflection Form Test',
+    description:
+      'Redesigned post-session reflection form with one-form-per-session flow, adaptive branching, student deep dive, strategy effectiveness ratings, and escalation tracking.',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'mid',
+    lastUpdated: '2026-03-19',
+    creators: ['Bryan'],
+    contributors: ['Bryan'],
+    productPillar: 'toolkit',
+    localPath: null,
+    repoPath: 'playground/prototyping/Bryan/tutor-reflection-form/',
+  },
+  {
     id: 'bryan-starter',
     title: 'Starter Prototype',
     description:
