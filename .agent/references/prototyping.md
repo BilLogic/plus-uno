@@ -36,6 +36,17 @@
 - **Data**: Mock/Hardcoded data is acceptable and encouraged for speed.
 - **State**: Happy path only. Complex loading/error states are optional unless being tested.
 - **Location**: Must be built in `playground/prototyping/` (never `packages/plus-ds`).
+- **NEVER BUILD CUSTOM REPLICAS OF EXISTING SPEC COMPONENTS:** If a component already exists in `packages/plus-ds/src/specs/`, you MUST import and use it directly — even in prototyping mode. Do NOT recreate it as a custom file in your prototype. This applies to all spec-level components, including but not limited to:
+  - `SideNavBar` (`specs/Toolkit/post-session/sections/SideNavBar/SideNavBar.jsx`)
+  - `FormFeedback` (`specs/Toolkit/post-session/sections/FormFeedback/FormFeedback.jsx`)
+  - `TopBar`, `Sidebar`, `PageLayout` (`specs/Universal/`)
+  - Any other section or page spec under `specs/`
+
+  **Why this matters:** Custom replicas drift from the real component's styling, dimensions, and token usage — producing visual inconsistencies (wrong padding, wrong widths, wrong selected states) that undermine the prototype's value for design review. The whole point of prototyping mode is to look indistinguishable from production, which requires using the production components.
+
+  **If a spec component doesn't perfectly fit your use case** (e.g., hardcoded labels that don't match your form's sections), import it anyway and adapt your prototype's data/flow to work with it. Flag the gap to the design team as a future improvement (e.g., "SideNavBar should accept tabs as props"). Do NOT build a custom clone to work around it.
+
+  **The only acceptable custom components** in a prototype are domain-specific compositions that don't exist anywhere in the DS — for example, a `StudentCard` composed from `Card` + `UserAvatar` is valid because no student card spec exists. But if a spec exists, use it.
 
 ## Resources to Reference
 
