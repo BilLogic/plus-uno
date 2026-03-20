@@ -1,8 +1,8 @@
-import React, { useReducer, useMemo } from 'react';
+import React, { useReducer, useMemo, useState } from 'react';
 import { PageLayout } from '@/specs/Universal/Pages';
-import FormSidebar from './components/FormSidebar';
+import SideNavBar from '@/specs/Toolkit/post-session/sections/SideNavBar/SideNavBar';
+import FormFeedback from '@/specs/Toolkit/post-session/sections/FormFeedback/FormFeedback';
 import FormProgress from './components/FormProgress';
-import SuccessScreen from './components/SuccessScreen';
 import SessionInfo from './sections/SessionInfo';
 import SessionOverview from './sections/SessionOverview';
 import StudentCheckIn from './sections/StudentCheckIn';
@@ -13,9 +13,6 @@ import Button from '@/components/Button';
 import { STUDENTS } from './data/mockData';
 
 const initialState = {
-    currentStep: 1,
-    completedSteps: [],
-
     selectedSession: '',
     recordingFile: null,
     sessionDidNotHappen: false,
@@ -43,23 +40,10 @@ function formReducer(state, action) {
         case 'SET_FIELD':
             return { ...state, [action.field]: action.value };
 
-        case 'SET_STEP':
-            return { ...state, currentStep: action.step };
-
-        case 'COMPLETE_STEP': {
-            const completed = state.completedSteps.includes(action.step)
-                ? state.completedSteps
-                : [...state.completedSteps, action.step];
-            return { ...state, completedSteps: completed };
-        }
-
         case 'SET_ATTENDANCE':
             return {
                 ...state,
-                attendance: {
-                    ...state.attendance,
-                    [action.studentId]: action.value,
-                },
+                attendance: { ...state.attendance, [action.studentId]: action.value },
             };
 
         case 'SET_STUDENT_CHECKIN': {
@@ -68,10 +52,7 @@ function formReducer(state, action) {
                 ...state,
                 studentCheckIn: {
                     ...state.studentCheckIn,
-                    [action.studentId]: {
-                        ...current,
-                        [action.field]: action.value,
-                    },
+                    [action.studentId]: { ...current, [action.field]: action.value },
                 },
             };
         }
@@ -82,10 +63,7 @@ function formReducer(state, action) {
                 ...state,
                 studentDeepDive: {
                     ...state.studentDeepDive,
-                    [action.studentId]: {
-                        ...current,
-                        [action.field]: action.value,
-                    },
+                    [action.studentId]: { ...current, [action.field]: action.value },
                 },
             };
         }
@@ -96,10 +74,7 @@ function formReducer(state, action) {
                 ...state,
                 strategyDetails: {
                     ...state.strategyDetails,
-                    [action.strategyId]: {
-                        ...current,
-                        [action.field]: action.value,
-                    },
+                    [action.strategyId]: { ...current, [action.field]: action.value },
                 },
             };
         }
@@ -115,73 +90,114 @@ function formReducer(state, action) {
     }
 }
 
+/**
+ * Tab-to-section mapping.
+ * The SideNavBar has fixed tabs designed for the existing reflection flow.
+ * We map our redesigned sections to those tab IDs so we use the real DS
+ * component rather than building a custom sidebar.
+ *
+ *   SideNavBar tab             →  Our section
+ *   ─────────────────────────────────────────
+ *   session-information        →  Session Information (1)
+ *   student-reflection         →  Student Check-In (2)
+ *     student-0..N (children)  →  per-student cards
+ *   session-reflection         →  Session Overview (3)
+ *   self-reflection            →  Teaching Strategies (4)
+ *   form-feedback              →  Review & Submit (5)
+ */
+const TAB_TO_SECTION = {
+    'session-information': 'session-info',
+    'student-reflection': 'student-checkin',
+    'session-reflection': 'session-overview',
+    'self-reflection': 'teaching-strategies',
+    'form-feedback': 'review-submit',
+};
+
+const SECTION_TO_TAB = Object.fromEntries(
+    Object.entries(TAB_TO_SECTION).map(([k, v]) => [v, k])
+);
+
+const SECTION_ORDER = [
+    'session-info',
+    'session-overview',
+    'student-checkin',
+    'student-deepdive',
+    'teaching-strategies',
+    'review-submit',
+];
+
+const SECTION_TITLES = {
+    'session-info': 'Session Information',
+    'session-overview': 'Session Evaluation: How did the session go?',
+    'student-checkin': 'Student Check-In',
+    'student-deepdive': 'Student Deep Dive',
+    'teaching-strategies': 'Teaching Strategies',
+    'review-submit': 'Review & Submit',
+};
+
 export default function App() {
     const [state, dispatch] = useReducer(formReducer, initialState);
+    const [activeSection, setActiveSection] = useState('session-info');
 
-    const skippedSteps = useMemo(() => {
-        if (state.sessionDidNotHappen) return [2, 3, 4, 5];
-        return [];
-    }, [state.sessionDidNotHappen]);
-
-    const sidebarStudents = useMemo(() => {
+    const sideNavStudents = useMemo(() => {
         return STUDENTS.map((s) => ({
-            ...s,
-            checked: !!state.studentCheckIn[s.id]?.engagement,
+            name: s.name,
+            status: state.studentCheckIn[s.id]?.engagement ? 'complete' : undefined,
         }));
     }, [state.studentCheckIn]);
 
-    const nextStep = () => {
-        dispatch({ type: 'COMPLETE_STEP', step: state.currentStep });
-        let next = state.currentStep + 1;
-        while (next <= 6 && skippedSteps.includes(next)) {
+    const activeTab = SECTION_TO_TAB[activeSection] || 'session-information';
+
+    const handleTabClick = (tabId) => {
+        if (tabId.startsWith('student-') && tabId !== 'student-reflection') {
+            setActiveSection('student-checkin');
+            return;
+        }
+        const section = TAB_TO_SECTION[tabId];
+        if (section) setActiveSection(section);
+    };
+
+    const currentIdx = SECTION_ORDER.indexOf(activeSection);
+
+    const nextSection = () => {
+        let next = currentIdx + 1;
+        if (state.sessionDidNotHappen && SECTION_ORDER[next] === 'session-overview') {
+            next = SECTION_ORDER.indexOf('review-submit');
+        }
+        if (
+            SECTION_ORDER[next] === 'student-deepdive' &&
+            !STUDENTS.some((s) => state.studentCheckIn[s.id]?.flagForDeepDive)
+        ) {
             next++;
         }
-        if (next <= 6) {
-            dispatch({ type: 'SET_STEP', step: next });
+        if (next < SECTION_ORDER.length) {
+            setActiveSection(SECTION_ORDER[next]);
         }
     };
 
-    const prevStep = () => {
-        let prev = state.currentStep - 1;
-        while (prev >= 1 && skippedSteps.includes(prev)) {
+    const prevSection = () => {
+        let prev = currentIdx - 1;
+        if (
+            SECTION_ORDER[prev] === 'student-deepdive' &&
+            !STUDENTS.some((s) => state.studentCheckIn[s.id]?.flagForDeepDive)
+        ) {
             prev--;
         }
-        if (prev >= 1) {
-            dispatch({ type: 'SET_STEP', step: prev });
+        if (
+            state.sessionDidNotHappen &&
+            ['session-overview', 'student-checkin', 'student-deepdive', 'teaching-strategies'].includes(
+                SECTION_ORDER[prev]
+            )
+        ) {
+            prev = 0;
         }
-    };
-
-    const goToStep = (step) => {
-        if (!skippedSteps.includes(step)) {
-            dispatch({ type: 'SET_STEP', step });
+        if (prev >= 0) {
+            setActiveSection(SECTION_ORDER[prev]);
         }
     };
 
     const handleSubmit = () => {
-        dispatch({ type: 'COMPLETE_STEP', step: 6 });
         dispatch({ type: 'SUBMIT' });
-    };
-
-    const renderSection = () => {
-        const props = { formState: state, dispatch };
-        switch (state.currentStep) {
-            case 1: return <SessionInfo {...props} />;
-            case 2: return <SessionOverview {...props} />;
-            case 3: return <StudentCheckIn {...props} />;
-            case 4: return <StudentDeepDive {...props} />;
-            case 5: return <TeachingStrategies {...props} />;
-            case 6: return <ReviewSubmit {...props} onSubmit={handleSubmit} />;
-            default: return null;
-        }
-    };
-
-    const sectionTitles = {
-        1: 'Session Information',
-        2: 'Session Evaluation: How did the session go?',
-        3: 'Student Check-In',
-        4: 'Student Deep Dive',
-        5: 'Teaching Strategies',
-        6: 'Review & Submit',
     };
 
     if (state.submitted) {
@@ -196,19 +212,40 @@ export default function App() {
                         ],
                         user: { name: 'Bryan', type: 'regular tutor' },
                     }}
-                    sidebarConfig={{
-                        user: 'tutor',
-                        activeTabId: 'sessions',
-                    }}
+                    sidebarConfig={{ user: 'tutor', activeTabId: 'sessions' }}
                 >
-                    <SuccessScreen
-                        formState={state}
-                        onReturnToDashboard={() => dispatch({ type: 'RESET' })}
+                    <FormFeedback
+                        title="Reflection Submitted"
+                        message="Thank you for completing your session reflection. Your responses have been recorded and are ready for review."
+                        primaryAction={{
+                            label: 'Return to Dashboard',
+                            onClick: () => dispatch({ type: 'RESET' }),
+                        }}
+                        secondaryAction={{
+                            label: 'View Summary',
+                            onClick: () => window.print(),
+                        }}
                     />
                 </PageLayout>
             </div>
         );
     }
+
+    const renderSection = () => {
+        const props = { formState: state, dispatch };
+        switch (activeSection) {
+            case 'session-info': return <SessionInfo {...props} />;
+            case 'session-overview': return <SessionOverview {...props} />;
+            case 'student-checkin': return <StudentCheckIn {...props} />;
+            case 'student-deepdive': return <StudentDeepDive {...props} />;
+            case 'teaching-strategies': return <TeachingStrategies {...props} />;
+            case 'review-submit': return <ReviewSubmit {...props} onSubmit={handleSubmit} />;
+            default: return null;
+        }
+    };
+
+    const isLast = activeSection === 'review-submit';
+    const isFirst = activeSection === 'session-info';
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
@@ -221,10 +258,7 @@ export default function App() {
                     ],
                     user: { name: 'Bryan', type: 'regular tutor' },
                 }}
-                sidebarConfig={{
-                    user: 'tutor',
-                    activeTabId: 'sessions',
-                }}
+                sidebarConfig={{ user: 'tutor', activeTabId: 'sessions' }}
             >
                 <div
                     style={{
@@ -234,17 +268,13 @@ export default function App() {
                         minHeight: '100%',
                     }}
                 >
-                    {/* Form-specific side nav */}
-                    <FormSidebar
-                        currentStep={state.currentStep}
-                        completedSteps={state.completedSteps}
-                        skippedSteps={skippedSteps}
-                        students={sidebarStudents}
-                        onStepClick={goToStep}
-                        onSubmitClick={handleSubmit}
+                    <SideNavBar
+                        state="default"
+                        students={sideNavStudents}
+                        activeTab={activeTab}
+                        onTabClick={handleTabClick}
                     />
 
-                    {/* Content area */}
                     <div
                         style={{
                             display: 'flex',
@@ -253,22 +283,18 @@ export default function App() {
                             flex: '1 0 0',
                         }}
                     >
-                        {/* Progress bar */}
                         <FormProgress
-                            currentStep={state.currentStep}
-                            totalSteps={6}
-                            skippedSteps={skippedSteps}
+                            currentStep={currentIdx + 1}
+                            totalSteps={SECTION_ORDER.length}
+                            skippedSteps={[]}
                         />
 
-                        {/* Section title */}
                         <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
-                            {sectionTitles[state.currentStep]}
+                            {SECTION_TITLES[activeSection]}
                         </h4>
 
-                        {/* Active section */}
                         {renderSection()}
 
-                        {/* Navigation */}
                         <div
                             style={{
                                 display: 'flex',
@@ -276,23 +302,11 @@ export default function App() {
                                 alignItems: 'center',
                             }}
                         >
-                            {state.currentStep > 1 && (
-                                <Button
-                                    text="Previous"
-                                    style="primary"
-                                    fill="tonal"
-                                    size="medium"
-                                    onClick={prevStep}
-                                />
+                            {!isFirst && (
+                                <Button text="Previous" style="primary" fill="tonal" size="medium" onClick={prevSection} />
                             )}
-                            {state.currentStep < 6 && (
-                                <Button
-                                    text="Next"
-                                    style="primary"
-                                    fill="tonal"
-                                    size="medium"
-                                    onClick={nextStep}
-                                />
+                            {!isLast && (
+                                <Button text="Next" style="primary" fill="tonal" size="medium" onClick={nextSection} />
                             )}
                         </div>
                     </div>
