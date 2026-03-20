@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Modal from '../../../../../components/Modal';
 import Button from '../../../../../components/Button';
-import Select from '../../../../../forms/Select';
-import TextareaVer2 from '../../../../../forms/TextareaVer2';
-import Switch from '../../../../../forms/Switch';
+import Select from '@/forms/Select';
+import TextareaVer2 from '@/forms/TextareaVer2';
+import Switch from '@/forms/Switch';
 
 // Import CTA button components from Tutor View
 import {

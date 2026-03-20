@@ -32,7 +32,7 @@ const config = {
   },
   typescript: {
     check: false,
-    reactDocgen: 'react-docgen-typescript',
+    reactDocgen: 'react-docgen',
   },
   features: {
     storyStoreV7: true,

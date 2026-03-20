@@ -14,6 +14,7 @@ const getStatusConfig = (status) => {
     const configs = {
         'Scheduled': { style: 'primary', icon: 'circle-check' },
         'Live': { style: 'primary', icon: 'circle-check' },
+        'In progress': { style: 'info', icon: 'play' },
         'Starting soon': { style: 'warning', icon: 'clock' },
         'Cancelled': { style: 'danger', icon: 'circle-xmark' }
     };

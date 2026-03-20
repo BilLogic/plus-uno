@@ -10,7 +10,6 @@ const Switch = ({
     value = 'on',
     checked,
     defaultChecked,
-    size = 'medium',
     disabled = false,
     onChange,
     onFocus,
@@ -20,12 +19,10 @@ const Switch = ({
     ...props
 }) => {
     const isControlled = checked !== undefined;
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
     const wrapperClasses = [
         'plus-form-switch-wrapper',
-        `plus-form-switch-${size}`,
-        sizeClass,
+        'body2-txt',
         disabled ? 'plus-form-switch-disabled' : '',
         className
     ].filter(Boolean).join(' ');
@@ -58,7 +55,6 @@ Switch.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     checked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,

@@ -12,9 +12,9 @@ import { Modal, Form } from 'react-bootstrap';
 import TutorSessionsTable from '../../Tables/TutorSessionsTable/TutorSessionsTable';
 import Button from '../../../../../components/Button/Button';
 import Badge from '../../../../../components/Badge/Badge';
-import Switch from '../../../../../forms/Switch';
-import Select from '../../../../../forms/Select';
-import Input from '../../../../../forms/Input';
+import Switch from '@/forms/Switch';
+import Select from '@/forms/Select';
+import Input from '@/forms/Input';
 import Pagination from '../../../../../components/Pagination/Pagination';
 import './TutorModal.scss';
 

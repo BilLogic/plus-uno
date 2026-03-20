@@ -85,6 +85,8 @@ const SideNavBar = ({
                 borderRadius: '16px',
                 minWidth: '240px',
                 width: '240px',
+                alignSelf: 'flex-start',
+                flexShrink: 0,
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
@@ -122,6 +124,11 @@ const SideNavBar = ({
                     text="Self Reflection"
                     state={activeTab === 'self-reflection' ? 'selected' : 'enabled'}
                     onClick={() => onTabClick?.('self-reflection')}
+                />
+                <SideBarTab
+                    text="Form Feedback"
+                    state={activeTab === 'form-feedback' ? 'selected' : 'enabled'}
+                    onClick={() => onTabClick?.('form-feedback')}
                 />
             </div>
             {/* Submit Button with correct Figma opacity (38%) */}

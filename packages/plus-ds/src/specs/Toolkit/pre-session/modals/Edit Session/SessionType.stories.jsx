@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '../../../../../components/Modal';
-import Radio from '../../../../../forms/Radio';
+import Radio from '@/forms/Radio';
 import { DeleteModalSessionCard } from '../../cards/DeleteModalSessionCard.stories';
 import { CancelButton, ConfirmButton } from '../../elements/SupervisorManagementButtons.stories';
 

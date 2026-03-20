@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../../../../components/Button/Button';
-import InputGroup from '../../../../../forms/InputGroup/InputGroup';
+import InputGroup from '@/forms/InputGroup/InputGroup';
 import './ExportSearchFilterBar.scss';
 
 const ExportSearchFilterBar = ({

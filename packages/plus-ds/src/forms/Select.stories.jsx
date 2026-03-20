@@ -29,60 +29,128 @@ export default {
 };
 
 const sampleOptions = [
-    { value: 'apple', label: 'Apple' },
-    { value: 'banana', label: 'Banana' },
-    { value: 'cherry', label: 'Cherry' },
-    { value: 'date', label: 'Date' },
-    { value: 'elderberry', label: 'Elderberry' },
-    { value: 'fig', label: 'Fig' },
-    { value: 'grape', label: 'Grape' },
-    { value: 'honeydew', label: 'Honeydew' }
+    { value: 'option-1', label: 'Option #1' },
+    { value: 'option-2', label: 'Option #2' },
+    { value: 'option-3', label: 'Option #3' },
+    { value: 'option-4', label: 'Option #4' },
+    { value: 'option-5', label: 'Option #5' },
 ];
 
 /**
  * Overview
- * Shows all Select configurations
+ * Matches Figma content/copy, using the standard Forms overview vertical layout.
  */
 export const Overview = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
+            {/* Use Cases */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Single Select</h6>
-                <Select options={sampleOptions} placeholder="Select a fruit..." />
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Use Cases</h6>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    There are five types of Select uses: Single-select, Multi-select, Search + Single-select, Search + Multi-select, Add New Value + multi-select.
+                </p>
+                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'flex', justifyContent: 'center' }}>
+                    <Select
+                        mode="multi"
+                        searchable
+                        creatable
+                        options={sampleOptions}
+                        placeholder="Select {value(s)} from below"
+                        style={{ maxWidth: 400 }}
+                    />
+                </div>
+            </section>
+
+            {/* When Activated */}
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>When Activated</h6>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    When activated, Select has 4 states: closed and empty, open and empty, closed and filled, open and filled.
+                </p>
+                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Empty</div>
+                        <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Filled</div>
+                        <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <Select defaultValue="option-3" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Multi-Select with Badges</h6>
-                <Select
-                    mode="multi"
-                    options={sampleOptions}
-                    placeholder="Select fruits..."
-                    defaultValue={['apple', 'cherry']}
-                />
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Read only and Disabled</h6>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    There are 2 additional special states: Read only (display only, no add/delete/edit) and Disabled (cannot be used temporarily).
+                </p>
+                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only: Single-select</div>
+                        <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only: Multi-select</div>
+                        <Select mode="multi" readonly defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled: Single-select</div>
+                        <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled: Multi-select</div>
+                        <Select mode="multi" disabled defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
+                    </div>
+                </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Searchable</h6>
-                <Select options={sampleOptions} placeholder="Type to search..." searchable />
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Search + Single-Select</h6>
+                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <Select searchable defaultValue="option-3" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+                    </div>
+                </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Creatable (Multi)</h6>
-                <Select
-                    mode="multi"
-                    options={sampleOptions}
-                    placeholder="Add or select..."
-                    searchable
-                    creatable
-                />
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Search + Multi-Select</h6>
+                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <Select mode="multi" searchable options={sampleOptions} placeholder="Select {value(s)} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <Select mode="multi" searchable defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
+                    </div>
+                </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Sizes</h6>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <Select size="small" options={sampleOptions} placeholder="Small" />
-                    <Select size="medium" options={sampleOptions} placeholder="Medium (default)" />
-                    <Select size="large" options={sampleOptions} placeholder="Large" />
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Add New Value + Multi-Select</h6>
+                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
+                    </div>
+                    <div>
+                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <Select mode="multi" searchable creatable defaultValue={['option-1', 'option-2', 'option-3', 'option-4']} options={sampleOptions} placeholder="Select {value(s)} from below" />
+                    </div>
                 </div>
             </section>
         </div>

@@ -6,8 +6,8 @@ import Button from '@/components/Button';
 /**
  * Modal component for PLUS design system.
  * Universal modal component for creating dialog windows that overlay the main content.
- * 
- * Note: This component is wrapped in a react-bootstrap Modal under the hood to handle 
+ *
+ * Note: This component is wrapped in a react-bootstrap Modal under the hood to handle
  * automatic overlay creation, backdrop clicking, and centering.
  */
 const Modal = ({
@@ -36,6 +36,8 @@ const Modal = ({
     const effectivePaddingSize = paddingSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
     const effectiveGapSize = gapSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
 
+    const bodyOnly = !title && !showBottomButtons;
+
     const classes = [
         'plus-modal',
         type === 'scrollable' ? 'plus-modal-scrollable' : 'plus-modal-default',
@@ -43,6 +45,7 @@ const Modal = ({
         `plus-modal-gap-${effectiveGapSize}`,
         radiusSize ? `plus-modal-radius-${radiusSize}` : '',
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
+        bodyOnly ? 'plus-modal-body-only' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -55,6 +58,79 @@ const Modal = ({
 
     const closeBtnClass = showBottomButtons ? 'plus-modal-close-btn-h5' : 'plus-modal-close-btn-h3';
 
+    const modalContent = (
+        <div id={id} className={classes} style={modalStyle} {...props}>
+            {!bodyOnly && (
+                <>
+                    <div className="plus-modal-header">
+                        {title && <div className="plus-modal-title h5">{title}</div>}
+                        <button
+                            type="button"
+                            className={`plus-modal-close-btn ${closeBtnClass}`}
+                            aria-label="Close modal"
+                            onClick={onClose}
+                        >
+                            <i className="fas fa-xmark" aria-hidden="true" />
+                        </button>
+                    </div>
+                    <div className="plus-modal-divider" />
+                </>
+            )}
+
+            <div className={`plus-modal-body ${type === 'scrollable' ? 'plus-modal-body-scrollable' : ''}`}>
+                <div className="plus-modal-content">
+                    {body && (typeof body === 'string' ? <div className="body1-txt">{body}</div> : body)}
+                    {children}
+                </div>
+                {type === 'scrollable' && (
+                    <div className="plus-modal-scrollbar">
+                        <div className="plus-modal-scrollbar-icon">
+                            <i className="fas fa-caret-up" />
+                        </div>
+                        <div className="plus-modal-scrollbar-track">
+                            <div className="plus-modal-scrollbar-bar" />
+                        </div>
+                        <div className="plus-modal-scrollbar-icon">
+                            <i className="fas fa-caret-down" />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {showBottomButtons && (primaryButton || secondaryButton) && (
+                <>
+                    <div className="plus-modal-divider" />
+                    <div className="plus-modal-footer">
+                        <div className="plus-modal-button-row">
+                            {secondaryButton && (
+                                <Button
+                                    text={secondaryButton.text || 'Cancel'}
+                                    style={secondaryButton.style || 'secondary'}
+                                    fill={secondaryButton.fill || 'tonal'}
+                                    size={secondaryButton.size || 'medium'}
+                                    onClick={secondaryButton.onClick}
+                                    leadingVisual={secondaryButton.icon}
+                                    className="plus-modal-button plus-modal-button-secondary"
+                                />
+                            )}
+                            {primaryButton && (
+                                <Button
+                                    text={primaryButton.text || 'Confirm'}
+                                    style={primaryButton.style || 'primary'}
+                                    fill={primaryButton.fill || 'filled'}
+                                    size={primaryButton.size || 'medium'}
+                                    onClick={primaryButton.onClick}
+                                    leadingVisual={primaryButton.icon}
+                                    className="plus-modal-button plus-modal-button-primary"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+
     return (
         <BootstrapModal
             show={show}
@@ -62,78 +138,10 @@ const Modal = ({
             backdrop={backdrop}
             keyboard={keyboard}
             centered={centered}
-            contentClassName="plus-bootstrap-modal-content-reset" // We will need to reset bootstrap container styles
-            dialogClassName="plus-bootstrap-modal-dialog-reset" // We will need to allow our width logic to apply
+            contentClassName="plus-bootstrap-modal-content-reset"
+            dialogClassName="plus-bootstrap-modal-dialog-reset"
         >
-            <div id={id} className={classes} style={modalStyle} {...props}>
-                <div className="plus-modal-header">
-                    {title && <div className="plus-modal-title h5">{title}</div>}
-                    <button
-                        type="button"
-                        className={`plus-modal-close-btn ${closeBtnClass}`}
-                        aria-label="Close modal"
-                        onClick={onClose}
-                    >
-                        <i className="fas fa-xmark" aria-hidden="true" />
-                    </button>
-                </div>
-
-                <div className="plus-modal-divider" />
-
-                <div className={`plus-modal-body ${type === 'scrollable' ? 'plus-modal-body-scrollable' : ''}`}>
-                    <div className="plus-modal-content">
-                        {body && (typeof body === 'string' ? <div className="body1-txt">{body}</div> : body)}
-                        {children}
-                    </div>
-                    {type === 'scrollable' && (
-                        <div className="plus-modal-scrollbar">
-                            <div className="plus-modal-scrollbar-icon">
-                                <i className="fas fa-caret-up" />
-                            </div>
-                            <div className="plus-modal-scrollbar-track">
-                                <div className="plus-modal-scrollbar-bar" />
-                            </div>
-                            <div className="plus-modal-scrollbar-icon">
-                                <i className="fas fa-caret-down" />
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {showBottomButtons && (primaryButton || secondaryButton) && (
-                    <>
-                        <div className="plus-modal-divider" />
-                        <div className="plus-modal-footer">
-                            <div className="plus-modal-button-row">
-                                {secondaryButton && (
-                                    <Button
-                                        btnText={secondaryButton.text || 'Cancel'}
-                                        btnStyle={secondaryButton.style || 'secondary'}
-                                        btnFill={secondaryButton.fill || 'tonal'}
-                                        btnSize={secondaryButton.size || 'default'}
-                                        onClick={secondaryButton.onClick}
-                                        icon={secondaryButton.icon}
-                                        iconPosition={secondaryButton.iconPosition || 'left'}
-                                        className="plus-modal-button plus-modal-button-secondary"
-                                    />
-                                )}
-                                {primaryButton && (
-                                    <Button
-                                        btnText={primaryButton.text || 'Confirm'}
-                                        btnStyle={primaryButton.style || 'primary'}
-                                        btnFill={primaryButton.fill || 'filled'}
-                                        btnSize={primaryButton.size || 'default'}
-                                        onClick={primaryButton.onClick}
-                                        icon={primaryButton.icon}
-                                        iconPosition={primaryButton.iconPosition || 'left'}
-                                        className="plus-modal-button plus-modal-button-primary"
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
+            {modalContent}
         </BootstrapModal>
     );
 };

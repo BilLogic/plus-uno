@@ -214,17 +214,21 @@ export const CardSpacings = () => (
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
-                { token: '--size-card-pad-x-lg', value: '24px', description: 'Large horizontal padding' },
-                { token: '--size-card-pad-x-md', value: '20px', description: 'Medium horizontal padding' },
                 { token: '--size-card-pad-x-sm', value: '16px', description: 'Small horizontal padding' },
-                { token: '--size-card-pad-y-lg', value: '24px', description: 'Large vertical padding' },
-                { token: '--size-card-pad-y-md', value: '20px', description: 'Medium vertical padding' },
+                { token: '--size-card-pad-x-md', value: '20px', description: 'Medium horizontal padding' },
+                { token: '--size-card-pad-x-lg', value: '24px', description: 'Large horizontal padding' },
                 { token: '--size-card-pad-y-sm', value: '16px', description: 'Small vertical padding' },
-                { token: '--size-card-gap-lg', value: '32px', description: 'Large gap' },
+                { token: '--size-card-pad-y-md', value: '20px', description: 'Medium vertical padding' },
+                { token: '--size-card-pad-y-lg', value: '24px', description: 'Large vertical padding' },
+                { token: '--size-card-gap-sm', value: '10px', description: 'Small gap' },
                 { token: '--size-card-gap-md', value: '16px', description: 'Medium gap' },
-                { token: '--size-card-gap-sm', value: '8px', description: 'Small gap' },
+                { token: '--size-card-gap-lg', value: '20px', description: 'Large gap' },
                 { token: '--size-card-radius-sm', value: '12px', description: 'Small border radius' },
                 { token: '--size-card-radius-md', value: '16px', description: 'Medium border radius' },
+                { token: '--size-card-radius-full', value: '999px', description: 'Pill shape' },
+                { token: '--size-card-border-sm', value: '1px', description: 'Small border' },
+                { token: '--size-card-border-md', value: '1.5px', description: 'Medium border' },
+                { token: '--size-card-border-lg', value: '2px', description: 'Large border' },
             ]}
         />
     </div>
@@ -259,18 +263,22 @@ export const ModalSpacings = () => (
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
-                { token: '--size-modal-pad-x-lg', value: '40px', description: 'Large horizontal padding' },
-                { token: '--size-modal-pad-x-md', value: '16px', description: 'Medium horizontal padding' },
                 { token: '--size-modal-pad-x-sm', value: '10px', description: 'Small horizontal padding' },
-                { token: '--size-modal-pad-y-lg', value: '24px', description: 'Large vertical padding' },
-                { token: '--size-modal-pad-y-md', value: '12px', description: 'Medium vertical padding' },
+                { token: '--size-modal-pad-x-md', value: '16px', description: 'Medium horizontal padding' },
+                { token: '--size-modal-pad-x-lg', value: '20px', description: 'Large horizontal padding' },
                 { token: '--size-modal-pad-y-sm', value: '8px', description: 'Small vertical padding' },
-                { token: '--size-modal-gap-lg', value: '32px', description: 'Large gap' },
-                { token: '--size-modal-gap-md', value: '12px', description: 'Medium gap' },
+                { token: '--size-modal-pad-y-md', value: '12px', description: 'Medium vertical padding' },
+                { token: '--size-modal-pad-y-lg', value: '16px', description: 'Large vertical padding' },
                 { token: '--size-modal-gap-sm', value: '8px', description: 'Small gap' },
+                { token: '--size-modal-gap-md', value: '12px', description: 'Medium gap' },
+                { token: '--size-modal-gap-lg', value: '20px', description: 'Large gap' },
                 { token: '--size-modal-radius-sm', value: '4px', description: 'Small border radius' },
                 { token: '--size-modal-radius-md', value: '6px', description: 'Medium border radius' },
                 { token: '--size-modal-radius-lg', value: '12px', description: 'Large border radius' },
+                { token: '--size-modal-radius-full', value: '999px', description: 'Pill shape' },
+                { token: '--size-modal-border-sm', value: '1px', description: 'Small border' },
+                { token: '--size-modal-border-md', value: '1.5px', description: 'Medium border' },
+                { token: '--size-modal-border-lg', value: '2px', description: 'Large border' },
             ]}
         />
     </div>

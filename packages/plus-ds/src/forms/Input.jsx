@@ -11,6 +11,7 @@ const Input = ({
     showLabel = true,
     placeholder,
     value,
+    inputRef,
     size = 'medium',
     disabled = false,
     readonly = false,
@@ -40,20 +41,6 @@ const Input = ({
         if (onBlur) onBlur(e);
     };
 
-    // Determine background color based on state
-    const getBackgroundColor = () => {
-        if (disabled) return 'var(--color-surface-container-low)';
-        if (readonly) return 'var(--color-surface-container)';
-        return 'var(--color-surface-container-lowest)';
-    };
-
-    // Determine text color based on state
-    const getTextColor = () => {
-        if (disabled) return 'var(--color-on-surface-variant)';
-        if (readonly && !value) return 'var(--color-on-surface-variant)';
-        return 'var(--color-on-surface)';
-    };
-
     const inputClasses = [
         'plus-input',
         `plus-input-${size}`,
@@ -65,13 +52,6 @@ const Input = ({
         className
     ].filter(Boolean).join(' ');
 
-    const inputStyle = {
-        // Removed borderColor - now handled entirely by CSS for hover/focus states
-        backgroundColor: getBackgroundColor(),
-        color: getTextColor(),
-        ...style
-    };
-
     const validationIcon = validation === 'invalid' ? (
         <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
     ) : validation === 'success' ? (
@@ -79,7 +59,7 @@ const Input = ({
     ) : null;
 
     return (
-        <div className="plus-input-wrapper">
+        <div className={`plus-input-wrapper ${disabled ? 'plus-input-wrapper-disabled' : ''}`}>
             {showLabel && label && (
                 <Form.Label htmlFor={id || name} className="plus-input-label">
                     {label}
@@ -104,10 +84,11 @@ const Input = ({
                     type={type}
                     placeholder={placeholder}
                     value={value}
+                    ref={inputRef}
                     disabled={disabled}
                     readOnly={readonly}
                     className={inputClasses}
-                    style={inputStyle}
+                    style={style}
                     onChange={onChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
@@ -145,6 +126,10 @@ Input.propTypes = {
     showLabel: PropTypes.bool,
     placeholder: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    inputRef: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.shape({ current: PropTypes.any })
+    ]),
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readonly: PropTypes.bool,
