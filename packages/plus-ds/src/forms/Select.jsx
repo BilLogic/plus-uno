@@ -172,15 +172,8 @@ const Select = ({
         }
     };
 
-    // Focus search on open
-    useEffect(() => {
-        if (isOpen && searchable && searchInputRef.current) {
-            // Small timeout to ensure dropdown is fully rendered/visible
-            setTimeout(() => {
-                if (searchInputRef.current) searchInputRef.current.focus();
-            }, 50);
-        }
-    }, [isOpen, searchable]);
+    // Intentionally do not auto-focus search on open.
+    // Users should click into the search field if they want to type.
 
     // Size classes
     const sizeClass = size === 'small' ? 'plus-select-sm' :
@@ -244,26 +237,26 @@ const Select = ({
             </Dropdown.Toggle>
 
             {/* Dropdown Menu */}
-            <Dropdown.Menu className="plus-select-menu">
-                {/* Search input */}
-                {searchable && (
-                    <div className="plus-select-search">
-                        <Input
-                            id={`${id || name}-search`}
-                            showLabel={false}
-                            placeholder="Search"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onFocus={(e) => e && e.stopPropagation && e.stopPropagation()}
-                            onBlur={(e) => e && e.stopPropagation && e.stopPropagation()}
-                            onClick={(e) => e.stopPropagation()}
-                            size="medium"
-                            inputRef={searchInputRef}
-                        />
-                    </div>
-                )}
+            <Dropdown.Menu className="plus-select-menu" flip={false}>
+                <div className="plus-select-options-list">
+                    {/* Search input */}
+                    {searchable && (
+                        <div className="plus-select-search">
+                            <Input
+                                id={`${id || name}-search`}
+                                showLabel={false}
+                                placeholder="Search"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onFocus={(e) => e && e.stopPropagation && e.stopPropagation()}
+                                onBlur={(e) => e && e.stopPropagation && e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
+                                size="medium"
+                                inputRef={searchInputRef}
+                            />
+                        </div>
+                    )}
 
-                <div className="plus-select-dropdown">
                     {/* Add new value row (inline input, independent from Search) */}
                     {creatable && (
                         <div className="plus-select-add-row">

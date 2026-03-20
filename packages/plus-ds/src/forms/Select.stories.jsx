@@ -167,18 +167,18 @@ export const Interactive = {
 
         return (
             <div style={{ maxWidth: '400px' }}>
+                <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    Selected: {args.mode === 'multi'
+                        ? (value.length > 0 ? value.join(', ') : 'None')
+                        : (value || 'None')
+                    }
+                </p>
                 <Select
                     {...args}
                     options={sampleOptions}
                     value={value}
                     onChange={setValue}
                 />
-                <p className="body3-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Selected: {args.mode === 'multi'
-                        ? (value.length > 0 ? value.join(', ') : 'None')
-                        : (value || 'None')
-                    }
-                </p>
             </div>
         );
     },
@@ -189,7 +189,8 @@ export const Interactive = {
         creatable: false,
         displayMode: 'badges',
         size: 'medium',
-        disabled: false
+        disabled: false,
+        open: false
     },
     argTypes: {
         mode: {
