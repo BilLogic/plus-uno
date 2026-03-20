@@ -1,0 +1,46 @@
+.cynthia-starter-page {
+    min-height: 100vh;
+    padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 24px);
+    background: var(--color-surface-container-low, #f5f5f5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cynthia-starter-card {
+    width: min(760px, 100%);
+    border-radius: var(--size-card-radius-md, 12px);
+    background: var(--color-surface-container-lowest, #ffffff);
+    border: 1px solid var(--color-outline-variant, #c2c7ce);
+    padding: var(--size-card-pad-y-lg, 24px) var(--size-card-pad-x-lg, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md, 16px);
+}
+
+.cynthia-starter-title {
+    margin: 0;
+    color: var(--color-on-surface, #191c1e);
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px);
+
+    i {
+        color: var(--color-primary, #00658e);
+    }
+}
+
+.cynthia-starter-description {
+    margin: 0;
+    color: var(--color-on-surface-variant, #40484d);
+
+    code {
+        font-family: var(--font-family-body, 'Merriweather Sans'), sans-serif;
+    }
+}
+
+.cynthia-starter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 8px);
+}
