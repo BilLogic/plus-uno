@@ -23,16 +23,16 @@
 For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
 
 1. Layout and structural patterns
-- `packages/plus-ds/guidelines/layout-grid.md`
-- `packages/plus-ds/src/specs/**`
+- `design-system/guidelines/layout-grid.md`
+- `design-system/src/specs/**`
 
 2. Spacing and hierarchy tokens
-- `packages/plus-ds/src/tokens/_spacing_semantics.scss`
-- `packages/plus-ds/src/tokens/_layout.scss`
+- `design-system/src/tokens/_spacing_semantics.scss`
+- `design-system/src/tokens/_layout.scss`
 
 3. Typography hierarchy
-- `packages/plus-ds/src/tokens/_fonts.scss`
-- `packages/plus-ds/guidelines/design-tokens/typography.md`
+- `design-system/src/tokens/_fonts.scss`
+- `design-system/guidelines/design-tokens/typography.md`
 
 4. Structural examples
 - `playground/templates/**/STRUCTURE.md`

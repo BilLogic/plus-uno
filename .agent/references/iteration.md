@@ -26,12 +26,12 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 1. Design tokens
 - `references/tokens-guide.md`
-- `packages/plus-ds/src/tokens/*.scss`
+- `design-system/src/tokens/*.scss`
 
 2. Component pattern options
-- `packages/plus-ds/src/components/**`
-- `packages/plus-ds/src/forms/**`
-- `packages/plus-ds/src/specs/**`
+- `design-system/src/components/**`
+- `design-system/src/forms/**`
+- `design-system/src/specs/**`
 
 3. Multi-approach examples
 - Story variants in `*.stories.jsx`

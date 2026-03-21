@@ -12,8 +12,8 @@ Starter workspace for PLUS design-system prototyping and implementation.
 
 ## What This Repo Contains
 
-- Design system package source: `packages/plus-ds/`
-- Storybook configuration and stories: `.storybook/`, `packages/plus-ds/src/**/*.stories.jsx`
+- Design system package source: `design-system/`
+- Storybook configuration and stories: `.storybook/`, `design-system/src/**/*.stories.jsx`
 - Agent instruction system: `.agent/`
 - Prototyping workspace: `playground/`
 
@@ -45,19 +45,19 @@ Components are organized into two main categories:
 - **Components**: Reusable UI components (Input, Button, Card, Alert, Form, etc.)
 - **Specs**: Complex interface sections composed of multiple components (Login, Home, Profile, Training, Toolkit, Universal, Admin)
 
-See `packages/plus-ds/guidelines/overview-components.md` for component details and `develop/PROJECT_STRUCTURE.md` for complete project organization.
+See `design-system/guidelines/overview-components.md` for component details and `develop/PROJECT_STRUCTURE.md` for complete project organization.
 
 ## Documentation
 
 ### Essential Guidelines (Always Reference)
 - **[Coding Standards](develop/standards.md)** - Project rules, coding standards, setup guides, best practices
-- **[Token Reference](packages/plus-ds/guidelines/design-tokens/)** - Complete token reference
-- **[Component Terminology](packages/plus-ds/guidelines/overview-components.md)** - UI component types and terminology
-- **[Import Paths](develop/imports.md)** - Component import path reference (see `packages/plus-ds`)
+- **[Token Reference](design-system/guidelines/design-tokens/)** - Complete token reference
+- **[Component Terminology](design-system/guidelines/overview-components.md)** - UI component types and terminology
+- **[Import Paths](develop/imports.md)** - Component import path reference (see `design-system`)
  
  ### Additional Documentation
-- **[Components](packages/plus-ds/guidelines/overview-components.md)** - Component library documentation
-- **[Styles Overview](packages/plus-ds/guidelines/design-tokens/)** - Design token system overview
+- **[Components](design-system/guidelines/overview-components.md)** - Component library documentation
+- **[Styles Overview](design-system/guidelines/design-tokens/)** - Design token system overview
 - **[Figma Integration](develop/FIGMA_DESIGN_SYSTEM.md)** - Figma integration guide
 - **[Project Structure](develop/PROJECT_STRUCTURE.md)** - Complete project structure guide
 
@@ -173,10 +173,10 @@ To prevent the AI agent from getting confused or forgetting its instructions (to
 
 Primary DS documentation is under:
 
-- `packages/plus-ds/guidelines/overview-components.md`
-- `packages/plus-ds/guidelines/design-tokens/`
-- `packages/plus-ds/guidelines/guides/figma-workflow.md`
-- `packages/plus-ds/guidelines/guides/Storybook.md`
+- `design-system/guidelines/overview-components.md`
+- `design-system/guidelines/design-tokens/`
+- `design-system/guidelines/guides/figma-workflow.md`
+- `design-system/guidelines/guides/Storybook.md`
 
 ## Prototyping
 

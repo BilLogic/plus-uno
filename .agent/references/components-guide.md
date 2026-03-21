@@ -8,11 +8,11 @@
 
 ## Discovery Workflow
 1. Read component docs first:
-- `packages/plus-ds/guidelines/overview-components.md`
-- `packages/plus-ds/guidelines/reference/component-index.md`
+- `design-system/guidelines/overview-components.md`
+- `design-system/guidelines/reference/component-index.md`
 2. Inspect implementation triplet for candidate component:
 - `{Component}.jsx`, `{Component}.scss`, `{Component}.stories.jsx`
-3. Confirm composition fit in `packages/plus-ds/src/specs/**`.
+3. Confirm composition fit in `design-system/src/specs/**`.
 4. Prefer existing export entrypoints over deep imports.
 
 ## Guardrails

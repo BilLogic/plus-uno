@@ -8,8 +8,8 @@ const __dirname = path.dirname(__filename);
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    // packages/plus-ds is the source of truth (includes specs; design-system/specs excluded to avoid duplicate story IDs with Toolkit)
-    '../packages/plus-ds/src/**/*.stories.{js,jsx,ts,tsx}',
+    // design-system is the source of truth (includes specs; design-system/specs excluded to avoid duplicate story IDs with Toolkit)
+    '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
     // Playground prototypes
     '../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}',
@@ -47,8 +47,8 @@ const config = {
   staticDirs: (() => {
     const staticDirs = [];
     const rootDistPath = path.resolve(__dirname, '../dist');
-    const distPath = path.resolve(__dirname, '../packages/plus-ds/dist');
-    const assetsPath = path.resolve(__dirname, '../packages/plus-ds/src/assets');
+    const distPath = path.resolve(__dirname, '../design-system/dist');
+    const assetsPath = path.resolve(__dirname, '../design-system/src/assets');
 
     // Include root dist directory for CSS files
     if (fs.existsSync(rootDistPath)) {
@@ -67,7 +67,7 @@ const config = {
   viteFinal: async (config) => {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
-    const srcPath = path.resolve(rootDir, 'packages/plus-ds/src');
+    const srcPath = path.resolve(rootDir, 'design-system/src');
 
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;

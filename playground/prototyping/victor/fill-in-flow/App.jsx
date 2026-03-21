@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavTabs, Card, Table, Toast, Dropdown, Button, Badge, Alert } from '@plus-ds/components';
 import { ToastContainer } from 'react-bootstrap'; // Fallback for positioning container only
 import { Calendar as CalendarIcon, Clock, Share, Box, Check, CheckCircleFill, ExclamationCircleFill, XCircleFill } from 'react-bootstrap-icons';
-import TopBar from '../../../../packages/plus-ds/src/specs/Universal/Sections/TopBar/TopBar';
+import TopBar from '../../../../design-system/src/specs/Universal/Sections/TopBar/TopBar';
 import FillInModal from './FillInModal';
 import './App.scss';
 

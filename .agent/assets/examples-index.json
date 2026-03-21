@@ -2,16 +2,16 @@
   "schema_version": "1.0",
   "updated_for_branch": "main",
   "example_story_globs": [
-    "packages/plus-ds/src/**/*.stories.jsx",
+    "design-system/src/**/*.stories.jsx",
     "playground/prototyping/**/*.stories.{js,jsx,ts,tsx}",
     "playground/Ashley/**/*.stories.{js,jsx,ts,tsx}",
     "playground/Bill/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "spec_roots": [
-    "packages/plus-ds/src/specs/Login",
-    "packages/plus-ds/src/specs/Toolkit",
-    "packages/plus-ds/src/specs/Home",
-    "packages/plus-ds/src/specs/Profile"
+    "design-system/src/specs/Login",
+    "design-system/src/specs/Toolkit",
+    "design-system/src/specs/Home",
+    "design-system/src/specs/Profile"
   ],
   "template_roots": [
     "playground/templates"

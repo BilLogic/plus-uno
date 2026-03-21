@@ -6,9 +6,9 @@ This template contains complete page implementations for authentication and logi
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Documentation**: `../../../packages/plus-ds/specs/Login/STRUCTURE.md`
-- **Specs Overview**: `../../../packages/plus-ds/specs/Login/Login.stories.js`
-- **Component Library**: `../../../packages/plus-ds/components/`
+- **Specs Documentation**: `../../../design-system/specs/Login/STRUCTURE.md`
+- **Specs Overview**: `../../../design-system/specs/Login/Login.stories.js`
+- **Component Library**: `../../../design-system/components/`
 
 ## Template Structure
 
@@ -62,8 +62,8 @@ playground/templates/login/
 
 ## Implementation Guidelines
 
-1. **Reference Specs First**: Always check `../../../packages/plus-ds/specs/Login/STRUCTURE.md` for detailed component breakdowns
-2. **Use Design Tokens**: Always use semantic design tokens from `../../../packages/plus-ds/styles/`
+1. **Reference Specs First**: Always check `../../../design-system/specs/Login/STRUCTURE.md` for detailed component breakdowns
+2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/styles/`
 3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations
@@ -84,5 +84,5 @@ Current template files in this directory:
 - Follow coding standards from `../../../.agent/SKILL.md`
 - Include proper accessibility attributes
 - Ensure responsive design
-- Reference: `../../../packages/plus-ds/specs/Login/STRUCTURE.md` for complete component breakdown
+- Reference: `../../../design-system/specs/Login/STRUCTURE.md` for complete component breakdown
 

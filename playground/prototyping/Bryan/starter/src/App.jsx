@@ -13,7 +13,7 @@ import './App.css';
  *   import Badge from '@/components/Badge';
  *   import Alert from '@/components/Alert';
  *   import PageLayout from '@/components/PageLayout';
- *   ... and more from packages/plus-ds/src/components/
+ *   ... and more from design-system/src/components/
  * 
  * Design tokens are available as CSS variables:
  *   --color-primary, --color-surface-container, --color-on-surface, etc.

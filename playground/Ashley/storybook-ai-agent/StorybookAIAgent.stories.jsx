@@ -1,7 +1,7 @@
 import React from 'react';
 import StorybookAIAgent from './StorybookAIAgent';
-import TutorTrainingProgressPage from '../../../packages/plus-ds/src/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
-import ResponsiveFrame from '../../../packages/plus-ds/src/specs/Universal/ResponsiveFrame';
+import TutorTrainingProgressPage from '../../../design-system/src/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
+import ResponsiveFrame from '../../../design-system/src/specs/Universal/ResponsiveFrame';
 
 export default {
     title: 'Playground/Ashley/Storybook AI Agent',

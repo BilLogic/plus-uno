@@ -16,8 +16,8 @@
 - **MANDATORY INVENTORY CHECK (COMPONENTS & TEMPLATES):** Before writing *any* custom UI code or layout, you MUST explicitly take inventory of what is already provided by the PLUS Design System. 
   1. **Token/Component Cheat Sheet First:** You MUST start by reading `.agent/assets/PLUS_CHEAT_SHEET.md`. This auto-generated file contains the exact names of every valid exported component. If it's not in the cheat sheet, it doesn't exist.
   2. **Layout Cheat Sheet Second:** You MUST read `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md`. This file contains the exact structural React formulas for building Dashboards, Modals, and Cards. You must use these exact formulas instead of writing raw HTML divs.
-  3. **Templates/Specs Third:** Always check `packages/plus-ds/src/specs` for pre-built universal layouts, sections, or macro-components (e.g., `TopBar`, `PageLayout`, `Sidebar`). Do not manually assemble micro-components into a layout if a spec template already exists for it.
-  4. **Micro-Components Fourth:** Check `packages/plus-ds/src/components` and `packages/plus-ds/src/forms` for individual elements. Do not build from scratch if the design system provides the required piece.
+  3. **Templates/Specs Third:** Always check `design-system/src/specs` for pre-built universal layouts, sections, or macro-components (e.g., `TopBar`, `PageLayout`, `Sidebar`). Do not manually assemble micro-components into a layout if a spec template already exists for it.
+  4. **Micro-Components Fourth:** Check `design-system/src/components` and `design-system/src/forms` for individual elements. Do not build from scratch if the design system provides the required piece.
 - **Components**: STRICT use of PLUS Design System components when available. NEVER use raw HTML/CSS (like `<div>` grids, custom CSS classes for padding/margins, or `<table>` tags) to bypass the design system. If you are asked to replicate a UI, you MUST assemble existing `@plus-ds` components (e.g., `<TopBar>`, `<Badge>`, `<Card>`). If a highly specific component is genuinely missing, build it using default `react-bootstrap` components as a base. Then, customize the `react-bootstrap` code using PLUS design tokens and adapt it to the PLUS component style. You should look at a few other similar existing PLUS components to get a feel for what they look like and ensure stylistic consistency. NEVER fall back to raw custom HTML/CSS for speed.
 - **MANDATORY COMPONENT DOCS REVIEW:** Before implementing ANY component from `@plus-ds`, you MUST read its corresponding `*.stories.jsx` AND its `README.md` file (if one exists in the component folder). 
   - The `*.stories.jsx` file is the absolute source of truth for valid prop combinations, variants, and the intended code recipe. 
@@ -27,16 +27,16 @@
 - **NO GUESSING ALLOWED:** NEVER guess, assume, or hallucinate token names based on general CSS knowledge (e.g. Bootstrap) or other design systems. If you need a spacing variable, you must find it in the Cheat Sheet. If it is not in the Cheat Sheet, tell the user it does not exist.
 - **SOURCE OF TRUTH FOR TOKENS:**
   - **Cheat Sheet (Primary):** `.agent/assets/PLUS_CHEAT_SHEET.md`
-  - **Colors (Fallback):** `packages/plus-ds/src/tokens/_colors.scss`
-  - **Spacing (Fallback):** `packages/plus-ds/src/tokens/_spacing_semantics.scss` and `packages/plus-ds/src/tokens/_primitives.scss`
-  - **Typography (Fallback):** `packages/plus-ds/src/tokens/_fonts.scss`
-- **Reference Page Templates:** If you are unsure how to assemble a layout after checking `specs/Universal`, look at how other pages have been constructed in `packages/plus-ds/src/specs/**/pages/` (e.g., `specs/Toolkit/pre-session/pages`). Think of these existing specification pages as reference templates for structuring UI.
+  - **Colors (Fallback):** `design-system/src/tokens/_colors.scss`
+  - **Spacing (Fallback):** `design-system/src/tokens/_spacing_semantics.scss` and `design-system/src/tokens/_primitives.scss`
+  - **Typography (Fallback):** `design-system/src/tokens/_fonts.scss`
+- **Reference Page Templates:** If you are unsure how to assemble a layout after checking `specs/Universal`, look at how other pages have been constructed in `design-system/src/specs/**/pages/` (e.g., `specs/Toolkit/pre-session/pages`). Think of these existing specification pages as reference templates for structuring UI.
 - **Strict Semantic Tokens:** When assembling layouts or filling gaps between design system components, you MUST exclusively use verified semantic tokens from the Source of Truth files for spacing, padding, typography, radius, and color (e.g., `var(--size-section-gap-lg)`, `var(--size-element-pad-x-sm)`, `var(--font-size-body2)`). NEVER hardcode arbitrary px values (like `padding: 12px;` or `font-size: 14px;`) unless explicitly requested as a standalone one-off override.
 - **Foundation First (Figma / Screenshots):** When provided with a Figma link or a screenshot, you MUST completely build the foundational static layout first. Ensure the structure, spacing, typography, and visual components match the reference perfectly in a static state before attempting to implement complex React state, interactivity, or modals. Do not jump straight into building interactive pieces if the base layout is not complete.
 - **Data**: Mock/Hardcoded data is acceptable and encouraged for speed.
 - **State**: Happy path only. Complex loading/error states are optional unless being tested.
-- **Location**: Must be built in `playground/prototyping/` (never `packages/plus-ds`).
-- **NEVER BUILD CUSTOM REPLICAS OF EXISTING SPEC COMPONENTS:** If a component already exists in `packages/plus-ds/src/specs/`, you MUST import and use it directly — even in prototyping mode. Do NOT recreate it as a custom file in your prototype. This applies to all spec-level components, including but not limited to:
+- **Location**: Must be built in `playground/prototyping/` (never `design-system`).
+- **NEVER BUILD CUSTOM REPLICAS OF EXISTING SPEC COMPONENTS:** If a component already exists in `design-system/src/specs/`, you MUST import and use it directly — even in prototyping mode. Do NOT recreate it as a custom file in your prototype. This applies to all spec-level components, including but not limited to:
   - `SideNavBar` (`specs/Toolkit/post-session/sections/SideNavBar/SideNavBar.jsx`)
   - `FormFeedback` (`specs/Toolkit/post-session/sections/FormFeedback/FormFeedback.jsx`)
   - `TopBar`, `Sidebar`, `PageLayout` (`specs/Universal/`)
@@ -54,12 +54,12 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 1. Design tokens (Use Strictly)
 - `references/tokens-guide.md`
-- `packages/plus-ds/src/tokens/*.scss`
+- `design-system/src/tokens/*.scss`
 
 2. Component Library (Use Strictly)
-- `packages/plus-ds/src/components/**`
-- `packages/plus-ds/src/forms/**`
-- `packages/plus-ds/src/specs/**`
+- `design-system/src/components/**`
+- `design-system/src/forms/**`
+- `design-system/src/specs/**`
 
 3. Prototyping Playground
 - `playground/prototyping/README.md`
@@ -87,7 +87,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 3. **Isolate the Code**
 - Create a new directory in `playground/prototyping/[user-name]/[feature-name]`.
-- Do not modify core `packages/plus-ds` files.
+- Do not modify core `design-system` files.
 - Treat this code as "disposable" — it will be rewritten for production.
 
 ### Follow-up Questions (Context Gathering)

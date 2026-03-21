@@ -49,7 +49,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add packages/plus-ds/src/tokens/*.scss
+          git add design-system/src/tokens/*.scss
           git add "new tokens/" || true
           git commit -m "chore: sync design tokens from Figma [skip ci]" || exit 0
           git push

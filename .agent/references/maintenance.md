@@ -16,13 +16,13 @@ This runbook keeps agent guidance aligned with actual code.
 - Confirm `.env` contains Figma keys when token sync is needed.
 - Run `npm run sync:tokens` (if pulling from Figma).
 - Run `npm run generate:tokens`.
-- Inspect diffs in `packages/plus-ds/src/tokens/*.scss`.
+- Inspect diffs in `design-system/src/tokens/*.scss`.
 
 2. Verify component discovery paths
 - Spot-check exports in:
-  - `packages/plus-ds/src/index.js`
-  - `packages/plus-ds/src/components/index.js`
-  - `packages/plus-ds/src/forms/index.js`
+  - `design-system/src/index.js`
+  - `design-system/src/components/index.js`
+  - `design-system/src/forms/index.js`
 - Confirm referenced components still exist.
 
 3. Verify Storybook coverage
@@ -45,7 +45,7 @@ Update `.agent` files when any of these change:
 ## Recommended Validation Commands
 
 - `rg --files .agent`
-- `rg -n "packages/plus-ds|playground|.storybook|scripts/" .agent`
+- `rg -n "design-system|playground|.storybook|scripts/" .agent`
 - `.agent/scripts/validate-doc-links.sh`
 - `npm run storybook` (manual verification)
 - `npm run sync:tokens && npm run generate:tokens` (when token sync is in scope)

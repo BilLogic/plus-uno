@@ -10,7 +10,7 @@ export default defineConfig({
     root: __dirname,
     resolve: {
         alias: {
-            '@': path.resolve(root, 'packages/plus-ds/src'),
+            '@': path.resolve(root, 'design-system/src'),
             'react': path.resolve(root, 'node_modules/react'),
             'react-dom': path.resolve(root, 'node_modules/react-dom'),
         }
@@ -20,7 +20,7 @@ export default defineConfig({
             scss: {
                 loadPaths: [
                     path.resolve(root, 'develop/tokens'),
-                    path.resolve(root, 'packages/plus-ds/src/styles'),
+                    path.resolve(root, 'design-system/src/styles'),
                 ],
             },
         },

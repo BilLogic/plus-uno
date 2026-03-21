@@ -13,23 +13,23 @@
       "name": "plus_component_first",
       "rule": "Prefer PLUS components/forms/specs before generic framework primitives.",
       "references": [
-        "packages/plus-ds/src/components",
-        "packages/plus-ds/src/forms",
-        "packages/plus-ds/src/specs"
+        "design-system/src/components",
+        "design-system/src/forms",
+        "design-system/src/specs"
       ]
     },
     {
       "name": "story_driven_verification",
       "rule": "Update and validate stories for behavior/state changes.",
       "references": [
-        "packages/plus-ds/guidelines/guides/Storybook.md"
+        "design-system/guidelines/guides/Storybook.md"
       ]
     },
     {
       "name": "figma_to_code",
       "rule": "Fetch design context/screenshot first, then map to DS components/specs.",
       "references": [
-        "packages/plus-ds/guidelines/guides/figma-workflow.md"
+        "design-system/guidelines/guides/figma-workflow.md"
       ]
     },
     {
@@ -40,24 +40,24 @@
       "name": "responsive_verification",
       "rule": "Use md/lg/xl checks and ResponsiveFrame patterns for page-level UI.",
       "references": [
-        "packages/plus-ds/src/specs/Universal/ResponsiveFrame.jsx"
+        "design-system/src/specs/Universal/ResponsiveFrame.jsx"
       ]
     },
     {
       "name": "card_styling_alignment",
       "rule": "Align section/chart card styling with admin spec patterns.",
       "references": [
-        "packages/plus-ds/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss",
-        "packages/plus-ds/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss",
-        "packages/plus-ds/src/specs/Admin/Session Admin/Sections/SessionOverviewSection/SessionOverviewSection.scss"
+        "design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss",
+        "design-system/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss",
+        "design-system/src/specs/Admin/Session Admin/Sections/SessionOverviewSection/SessionOverviewSection.scss"
       ]
     },
     {
       "name": "table_styling_alignment",
       "rule": "Respect global table behavior and align table SCSS with admin implementations.",
       "references": [
-        "packages/plus-ds/src/styles/main.scss",
-        "packages/plus-ds/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss"
+        "design-system/src/styles/main.scss",
+        "design-system/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss"
       ]
     },
     {

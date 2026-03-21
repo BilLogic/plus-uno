@@ -24,8 +24,8 @@ This router is agent-agnostic and works across Cursor, Windsurf, Claude Code, an
 ## Scope and Integrations
 
 This repository includes:
-- Design system source: `packages/plus-ds/src`
-- Design system docs: `packages/plus-ds/guidelines`
+- Design system source: `design-system/src`
+- Design system docs: `design-system/guidelines`
 - Storybook config: `.storybook`
 - Token sync and generation scripts: `scripts/sync-figma-tokens.js`, `scripts/generate-all-tokens.js`
 - Existing agent guidance: `.agent/AGENT.md`, `.agent/references/*`, `.agent/assets/*`
@@ -33,7 +33,7 @@ This repository includes:
 
 Integrations available in this repo workflow:
 - Figma API token sync via scripts (`FIGMA_FILE_KEY`, `FIGMA_ACCESS_TOKEN`)
-- Figma MCP workflow documented in `packages/plus-ds/guidelines/guides/figma-workflow.md`
+- Figma MCP workflow documented in `design-system/guidelines/guides/figma-workflow.md`
 - Stitch MCP workflow for rapid wireframe generation and PRD-to-structure exploration (runtime-dependent)
 - Storybook for component verification (`npm run storybook`)
 - GitHub Action token automation (`.github/workflows/sync-figma-tokens.yml`)
@@ -41,6 +41,7 @@ Integrations available in this repo workflow:
 Critical MCP integrations:
 - Figma MCP: required for design-tool-driven implementation when available in runtime.
 - Stitch MCP: required for consulting/iteration wireframe generation when available in runtime.
+- Playwright MCP: optional/required for capturing external sites to Figma or running browser automation tests.
 
 Figma MCP common calls:
 - `get_design_context` / `get_screenshot` (or equivalent `get_code` / `get_image` in other runtimes)
@@ -131,14 +132,14 @@ Common transition paths:
 - If Code Connect mapping exists, use that mapping before guessing component usage.
 
 2. Check component documentation
-- Start with `packages/plus-ds/guidelines/overview-components.md`
-- Then inspect story files: `packages/plus-ds/src/**/*.stories.jsx`
+- Start with `design-system/guidelines/overview-components.md`
+- Then inspect story files: `design-system/src/**/*.stories.jsx`
 - Use `.storybook/main.js` story globs to locate authoritative examples.
 
 3. Understand hierarchy before implementing
-- Primitives/tokens: `packages/plus-ds/src/tokens/*`
-- Reusable components: `packages/plus-ds/src/components/*`, `packages/plus-ds/src/forms/*`, `packages/plus-ds/src/DataViz/*`
-- Higher-level compositions/specs: `packages/plus-ds/src/specs/*`
+- Primitives/tokens: `design-system/src/tokens/*`
+- Reusable components: `design-system/src/components/*`, `design-system/src/forms/*`, `design-system/src/DataViz/*`
+- Higher-level compositions/specs: `design-system/src/specs/*`
 
 4. Decide when to ask vs proceed
 - Ask when design intent is ambiguous, target context level is unclear, or multiple component families fit equally.
@@ -153,13 +154,13 @@ Use repository-established imports:
   - `import { Button } from '@tutors.plus/design-system'`
 
 - Internal source usage (inside repo):
-  - Alias `@` maps to `packages/plus-ds/src` in Storybook and DS Vite config.
+  - Alias `@` maps to `design-system/src` in Storybook and DS Vite config.
   - Example: `import Alert from '@/components/Alert'`
 
 - Export entry points:
-  - `packages/plus-ds/src/index.js`
-  - `packages/plus-ds/src/components/index.js`
-  - `packages/plus-ds/src/forms/index.js`
+  - `design-system/src/index.js`
+  - `design-system/src/components/index.js`
+  - `design-system/src/forms/index.js`
 
 - Do not import from ad hoc legacy paths unless file history requires it.
 - Prefer existing index exports over deep relative traversals.

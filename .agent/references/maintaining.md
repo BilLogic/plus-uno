@@ -11,7 +11,7 @@
 - Detailed Workflows
 
 ## When to Use This Mode
-- Adding or updating design-system components in `packages/plus-ds/src`.
+- Adding or updating design-system components in `design-system/src`.
 - Updating component APIs, stories, styles, or exports.
 - Syncing design tokens from Figma and regenerating token SCSS.
 - Updating DS documentation and integration workflows.
@@ -37,30 +37,30 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - `.github/workflows/sync-figma-tokens.yml`
 
 2. Component creation/update patterns
-- `packages/plus-ds/src/components/*`
-- `packages/plus-ds/src/forms/*`
-- `packages/plus-ds/src/specs/*`
+- `design-system/src/components/*`
+- `design-system/src/forms/*`
+- `design-system/src/specs/*`
 - Existing `*.stories.jsx` colocation patterns
 
 3. Documentation patterns
-- `packages/plus-ds/guidelines/*`
-- `packages/plus-ds/guidelines/guides/Storybook.md`
-- `packages/plus-ds/guidelines/guides/figma-workflow.md`
+- `design-system/guidelines/*`
+- `design-system/guidelines/guides/Storybook.md`
+- `design-system/guidelines/guides/figma-workflow.md`
 
 4. Integration setup
 - Storybook configuration: `.storybook/main.js`, `.storybook/preview.jsx`
-- Package exports: `packages/plus-ds/src/index.js`, `packages/plus-ds/package.json`
+- Package exports: `design-system/src/index.js`, `design-system/package.json`
 
 ## How to Respond in Maintaining Mode
 
 1. Syncing Design Tokens
 - Confirm env vars (`FIGMA_FILE_KEY`, `FIGMA_ACCESS_TOKEN`).
 - Run token sync, then generation.
-- Review generated files under `packages/plus-ds/src/tokens/`.
+- Review generated files under `design-system/src/tokens/`.
 - Validate token naming and semantic mapping; avoid introducing hardcoded fallback drift.
 
 2. Adding New Components
-- Identify nearest component pattern in `packages/plus-ds/src/components` or `forms`.
+- Identify nearest component pattern in `design-system/src/components` or `forms`.
 - Create component, SCSS, story, and export updates.
 - Follow existing prop naming conventions (`style`, `fill`, size props, etc.).
 - Verify via Storybook.
@@ -102,7 +102,7 @@ Use this confirmation step for API changes, token changes, spec-level updates, a
 1. Confirm `.env` values for Figma API.
 2. Run `npm run sync:tokens`.
 3. Run `npm run generate:tokens`.
-4. Inspect `packages/plus-ds/src/tokens/*.scss` changes.
+4. Inspect `design-system/src/tokens/*.scss` changes.
 5. Run Storybook and inspect token-dependent stories.
 6. Update docs if naming/values changed.
 

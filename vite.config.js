@@ -27,8 +27,8 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom', 'framer-motion'],
     alias: {
-      '@': path.resolve(__dirname, './packages/plus-ds/src'),
-      '@plus-ds': path.resolve(__dirname, './packages/plus-ds/src'),
+      '@': path.resolve(__dirname, './design-system/src'),
+      '@plus-ds': path.resolve(__dirname, './design-system/src'),
       '~': path.resolve(__dirname, './node_modules')
     }
   },
@@ -69,9 +69,9 @@ export default defineConfig({
       scss: {
         api: 'modern-compiler',
         loadPaths: [
-          path.resolve(dirname, 'packages/plus-ds/src/tokens'),
-          path.resolve(dirname, 'packages/plus-ds/src/styles'),
-          path.resolve(dirname, 'packages/plus-ds/src/forms')
+          path.resolve(dirname, 'design-system/src/tokens'),
+          path.resolve(dirname, 'design-system/src/styles'),
+          path.resolve(dirname, 'design-system/src/forms')
         ],
         silenceDeprecations: ['import', 'legacy-js-api']
       }

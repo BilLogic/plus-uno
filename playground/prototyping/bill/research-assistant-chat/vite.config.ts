@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-const plusDsSrc = path.resolve(__dirname, '../../../../packages/plus-ds/src');
+const plusDsSrc = path.resolve(__dirname, '../../../../design-system/src');
 
 /**
  * Vite config for Research Assistant Chat prototype.

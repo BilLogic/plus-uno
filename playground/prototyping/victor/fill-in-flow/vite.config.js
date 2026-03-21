@@ -7,14 +7,14 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
         alias: {
-            '@plus-ds': path.resolve(__dirname, '../../../../packages/plus-ds/src'),
-            '@': path.resolve(__dirname, '../../../../packages/plus-ds/src'),
+            '@plus-ds': path.resolve(__dirname, '../../../../design-system/src'),
+            '@': path.resolve(__dirname, '../../../../design-system/src'),
         },
     },
     css: {
         preprocessorOptions: {
             scss: {
-                includePaths: [path.resolve(__dirname, '../../../../packages/plus-ds/src')],
+                includePaths: [path.resolve(__dirname, '../../../../design-system/src')],
             },
         },
     },

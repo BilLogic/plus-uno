@@ -35,19 +35,19 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 1. Full tokens
 - `references/tokens-guide.md`
-- `packages/plus-ds/src/tokens/*.scss`
+- `design-system/src/tokens/*.scss`
 
 2. Component APIs and behavior
-- `packages/plus-ds/src/components/**`
-- `packages/plus-ds/src/forms/**`
-- `packages/plus-ds/src/DataViz/**`
+- `design-system/src/components/**`
+- `design-system/src/forms/**`
+- `design-system/src/DataViz/**`
 
 3. Production patterns/examples
-- `packages/plus-ds/src/specs/**`
-- `packages/plus-ds/src/**/*.stories.jsx`
+- `design-system/src/specs/**`
+- `design-system/src/**/*.stories.jsx`
 
 4. Design-tool integration
-- `packages/plus-ds/guidelines/guides/figma-workflow.md`
+- `design-system/guidelines/guides/figma-workflow.md`
 - `scripts/sync-figma-tokens.js`
 - Figma MCP for design-context extraction (`get_design_context`/`get_screenshot` or runtime equivalents)
 - Code Connect and variable inspection (`get_code_connect_map`, `get_variable_defs`) when available
@@ -115,20 +115,20 @@ Before finishing, verify:
 1. Card surfaces in section/chart contexts
 - Prefer DS surface tokens and existing admin card patterns.
 - Reference:
-  - `packages/plus-ds/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss`
-  - `packages/plus-ds/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss`
-  - `packages/plus-ds/src/specs/Admin/Session Admin/Sections/SessionOverviewSection/SessionOverviewSection.scss`
+  - `design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss`
+  - `design-system/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss`
+  - `design-system/src/specs/Admin/Session Admin/Sections/SessionOverviewSection/SessionOverviewSection.scss`
 
 2. Table styling consistency
-- Respect global table reset behavior from `packages/plus-ds/src/styles/main.scss`.
+- Respect global table reset behavior from `design-system/src/styles/main.scss`.
 - Avoid reintroducing hard borders/backgrounds that conflict with DS table conventions.
 - Reference:
-  - `packages/plus-ds/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss`
+  - `design-system/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss`
 
 3. Responsive verification
 - For page-level stories, include breakpoint checks (`md`, `lg`, `xl`) and use `ResponsiveFrame` patterns when applicable.
 - Reference:
-  - `packages/plus-ds/src/specs/Universal/ResponsiveFrame.jsx`
+  - `design-system/src/specs/Universal/ResponsiveFrame.jsx`
 
 ## Finalization Mode Example
 

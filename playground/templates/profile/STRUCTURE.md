@@ -6,9 +6,9 @@ This template contains complete page implementations for user profile management
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Documentation**: `../../../packages/plus-ds/specs/Profile/STRUCTURE.md`
-- **Specs Overview**: `../../../packages/plus-ds/specs/Profile/Profile.stories.js`
-- **Component Library**: `../../../packages/plus-ds/components/`
+- **Specs Documentation**: `../../../design-system/specs/Profile/STRUCTURE.md`
+- **Specs Overview**: `../../../design-system/specs/Profile/Profile.stories.js`
+- **Component Library**: `../../../design-system/components/`
 
 ## Template Structure
 
@@ -40,8 +40,8 @@ playground/templates/profile/
 
 ## Implementation Guidelines
 
-1. **Reference Specs First**: Always check `../../../packages/plus-ds/specs/Profile/STRUCTURE.md` for detailed component breakdowns
-2. **Use Design Tokens**: Always use semantic design tokens from `../../../packages/plus-ds/styles/`
+1. **Reference Specs First**: Always check `../../../design-system/specs/Profile/STRUCTURE.md` for detailed component breakdowns
+2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/styles/`
 3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations
@@ -54,5 +54,5 @@ playground/templates/profile/
 - Follow coding standards from `../../../.agent/SKILL.md`
 - Include proper accessibility attributes
 - Ensure responsive design
-- Reference: `../../../packages/plus-ds/specs/Profile/STRUCTURE.md` for complete component breakdown
+- Reference: `../../../design-system/specs/Profile/STRUCTURE.md` for complete component breakdown
 

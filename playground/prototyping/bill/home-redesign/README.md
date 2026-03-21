@@ -15,17 +15,17 @@ Use Figma MCP to keep the prototype aligned with the design:
 
 ## Token usage
 
-Styling uses **PLUS design tokens** from `packages/plus-ds/src/styles`:
+Styling uses **PLUS design tokens** from `design-system/src/styles`:
 
 - **Colors**: `--color-primary`, `--color-surface-container-low`, `--color-on-surface`, `--color-outline-variant`, `--color-social-emotional`, `--color-mastering-content`, `--color-advocacy`, `--color-relationship`, etc.
 - **Typography**: `--font-family-header`, `--font-family-body`, `--font-size-title-m4`, `--font-size-body2`, `--font-line-height-title`.
 - **Spacing/layout**: `--size-section-gap-lg`, `--size-section-pad-y-lg`, `--size-surface-radius`, `--size-element-gap-*`.
 
-See `packages/plus-ds/guidelines/design-tokens/` for the full token set.
+See `design-system/guidelines/design-tokens/` for the full token set.
 
 ## Data visualization framework
 
-This prototype uses the **PLUS DataViz** framework from `packages/plus-ds/src/DataViz`:
+This prototype uses the **PLUS DataViz** framework from `design-system/src/DataViz`:
 
 - **Tutoring Performance** – `DataVisualizationSkillsProgress` (radar: Your vs Average) from Home specs.
 - **Weekly Tutoring Load** – `DonutChart` (PartToWhole) with 5 segments; breakdown list with colored progress bars matching segment colors.
@@ -54,7 +54,7 @@ If you run from the `home-redesign` folder instead, use `npx vite` there; the co
 ## Files
 
 - `index.html` – Entry HTML
-- `vite.config.js` – Vite config, aliases to `packages/plus-ds/src`
+- `vite.config.js` – Vite config, aliases to `design-system/src`
 - `src/main.jsx` – React mount
 - `src/App.jsx` – Main app and section components
 - `src/App.css` – Layout and section styles (uses design tokens)

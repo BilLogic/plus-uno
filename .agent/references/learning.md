@@ -23,16 +23,16 @@
 For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
 
 1. Component documentation
-- `packages/plus-ds/guidelines/overview-components.md`
-- `packages/plus-ds/guidelines/reference/component-index.md`
+- `design-system/guidelines/overview-components.md`
+- `design-system/guidelines/reference/component-index.md`
 
 2. Design token documentation
-- `packages/plus-ds/guidelines/design-tokens/*.md`
-- `packages/plus-ds/src/tokens/*.scss`
+- `design-system/guidelines/design-tokens/*.md`
+- `design-system/src/tokens/*.scss`
 - `references/tokens-guide.md`
 
 3. Example implementations
-- `packages/plus-ds/src/**/*.stories.jsx`
+- `design-system/src/**/*.stories.jsx`
 - `playground/templates/**`
 - `playground/prototyping/**`
 - `playground/Ashley/**`
@@ -41,7 +41,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 4. Storybook and tooling
 - `.storybook/main.js`
 - `.storybook/preview.jsx`
-- `packages/plus-ds/guidelines/guides/Storybook.md`
+- `design-system/guidelines/guides/Storybook.md`
 
 ## How to Respond in Learning Mode
 
@@ -66,16 +66,16 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 ## Sample Q&A
 
 Q: "What button styles are available?"
-A: "Start with `packages/plus-ds/src/components/Button/Button.stories.jsx` and `packages/plus-ds/src/components/Button/Button.jsx`. The DS uses `style` and `fill` props rather than Bootstrap `variant` in this codebase."
+A: "Start with `design-system/src/components/Button/Button.stories.jsx` and `design-system/src/components/Button/Button.jsx`. The DS uses `style` and `fill` props rather than Bootstrap `variant` in this codebase."
 
 Q: "Where do I find spacing tokens?"
-A: "Read `packages/plus-ds/src/tokens/_spacing_semantics.scss` for runtime variables and `packages/plus-ds/src/tokens/source/size _ semantics.json` for source values. Use semantic tokens (for example `--size-element-*`, `--size-card-*`) instead of primitives."
+A: "Read `design-system/src/tokens/_spacing_semantics.scss` for runtime variables and `design-system/src/tokens/source/size _ semantics.json` for source values. Use semantic tokens (for example `--size-element-*`, `--size-card-*`) instead of primitives."
 
 Q: "How do imports work here?"
-A: "Public consumers use `@tutors.plus/design-system`; internal DS source commonly uses alias `@` mapped to `packages/plus-ds/src` (see `.storybook/main.js` and `packages/plus-ds/vite.config.js`)."
+A: "Public consumers use `@tutors.plus/design-system`; internal DS source commonly uses alias `@` mapped to `design-system/src` (see `.storybook/main.js` and `design-system/vite.config.js`)."
 
 Q: "Where can I see realistic usage?"
-A: "Check stories under `packages/plus-ds/src/**/*.stories.jsx`, then compare full-page assemblies in `packages/plus-ds/src/specs/**`, `playground/prototyping/**`, `playground/Ashley/**`, and `playground/Bill/**`."
+A: "Check stories under `design-system/src/**/*.stories.jsx`, then compare full-page assemblies in `design-system/src/specs/**`, `playground/prototyping/**`, `playground/Ashley/**`, and `playground/Bill/**`."
 
 Q: "How do I start from a Figma link?"
-A: "Use the flow in `packages/plus-ds/guidelines/guides/figma-workflow.md`: fetch design context + screenshot first, then map to DS components."
+A: "Use the flow in `design-system/guidelines/guides/figma-workflow.md`: fetch design context + screenshot first, then map to DS components."

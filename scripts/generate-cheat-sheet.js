@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 const ROOT_DIR = path.resolve(import.meta.dirname, '../');
-const TOKENS_DIR = path.join(ROOT_DIR, 'packages/plus-ds/src/tokens');
-const COMPONENTS_INDEX = path.join(ROOT_DIR, 'packages/plus-ds/src/components/index.js');
+const TOKENS_DIR = path.join(ROOT_DIR, 'design-system/src/tokens');
+const COMPONENTS_INDEX = path.join(ROOT_DIR, 'design-system/src/components/index.js');
 const OUTPUT_FILE = path.join(ROOT_DIR, '.agent/assets/PLUS_CHEAT_SHEET.md');
 
 // 1. Extract SCSS Variables

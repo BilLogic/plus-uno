@@ -112,7 +112,7 @@
 // Chart Card - Following TutorDataCard pattern
 .tutor-risk-interventions-page__chart-card {
     // PLUS Pattern: Cards use surface-container-lowest (white) per design system rules
-    // Reference: packages/plus-ds/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss
+    // Reference: design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss
     background-color: var(--color-surface-container-lowest, #ffffff);
     border-radius: var(--card-radius-sm, 12px);
     padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);

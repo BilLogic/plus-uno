@@ -2,14 +2,14 @@
   "schema_version": "1.0",
   "updated_for_branch": "main",
   "token_scss_files": [
-    "packages/plus-ds/src/tokens/_colors.scss",
-    "packages/plus-ds/src/tokens/_spacing_semantics.scss",
-    "packages/plus-ds/src/tokens/_fonts.scss",
-    "packages/plus-ds/src/tokens/_elevation.scss",
-    "packages/plus-ds/src/tokens/_layout.scss",
-    "packages/plus-ds/src/tokens/_primitives.scss"
+    "design-system/src/tokens/_colors.scss",
+    "design-system/src/tokens/_spacing_semantics.scss",
+    "design-system/src/tokens/_fonts.scss",
+    "design-system/src/tokens/_elevation.scss",
+    "design-system/src/tokens/_layout.scss",
+    "design-system/src/tokens/_primitives.scss"
   ],
-  "token_source_json_glob": "packages/plus-ds/src/tokens/source/*.json",
+  "token_source_json_glob": "design-system/src/tokens/source/*.json",
   "sync_scripts": [
     "scripts/sync-figma-tokens.js",
     "scripts/generate-all-tokens.js"

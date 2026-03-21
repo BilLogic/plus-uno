@@ -18,8 +18,8 @@
   ],
   "key_paths": {
     "agent_system": ".agent/",
-    "design_system_source": "packages/plus-ds/src/",
-    "design_system_docs": "packages/plus-ds/guidelines/",
+    "design_system_source": "design-system/src/",
+    "design_system_docs": "design-system/guidelines/",
     "storybook_config": ".storybook/",
     "token_scripts": "scripts/",
     "playground_prototyping": "playground/prototyping/"
@@ -29,43 +29,43 @@
       "name": "element",
       "token_scope": "--size-element-*",
       "typical_locations": [
-        "packages/plus-ds/src/components/",
-        "packages/plus-ds/src/forms/"
+        "design-system/src/components/",
+        "design-system/src/forms/"
       ]
     },
     {
       "name": "card",
       "token_scope": "--size-card-*",
       "typical_locations": [
-        "packages/plus-ds/src/specs/*/Cards/"
+        "design-system/src/specs/*/Cards/"
       ]
     },
     {
       "name": "section",
       "token_scope": "--size-section-*",
       "typical_locations": [
-        "packages/plus-ds/src/specs/*/Sections/"
+        "design-system/src/specs/*/Sections/"
       ]
     },
     {
       "name": "table",
       "token_scope": "--size-table-*",
       "typical_locations": [
-        "packages/plus-ds/src/specs/*/Tables/"
+        "design-system/src/specs/*/Tables/"
       ]
     },
     {
       "name": "modal",
       "token_scope": "--size-modal-*",
       "typical_locations": [
-        "packages/plus-ds/src/components/",
-        "packages/plus-ds/src/specs/*/Modals/"
+        "design-system/src/components/",
+        "design-system/src/specs/*/Modals/"
       ]
     },
     {
       "name": "page_or_spec",
       "typical_locations": [
-        "packages/plus-ds/src/specs/*/Pages/"
+        "design-system/src/specs/*/Pages/"
       ]
     }
   ],
@@ -75,7 +75,7 @@
     "section": "Major page region.",
     "table": "Structured tabular layout.",
     "modal": "Overlay dialog surface.",
-    "spec": "Higher-level composition in packages/plus-ds/src/specs."
+    "spec": "Higher-level composition in design-system/src/specs."
   },
   "token_prefixes": [
     "--color-*",

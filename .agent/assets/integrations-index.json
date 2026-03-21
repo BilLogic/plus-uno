@@ -18,7 +18,7 @@
     }
   ],
   "design_workflow_docs": [
-    "packages/plus-ds/guidelines/guides/figma-workflow.md",
+    "design-system/guidelines/guides/figma-workflow.md",
     ".agent/references/integrations-guide.md"
   ],
   "storybook": {

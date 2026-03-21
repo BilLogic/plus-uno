@@ -13,8 +13,8 @@ Reusable prototype starters organized by product area.
 - Agent router: `.agent/SKILL.md`
 - Mode references: `.agent/references/*.md`
 - Token reference: `.agent/references/tokens.md`
-- DS component docs: `packages/plus-ds/guidelines/overview-components.md`
-- DS token docs: `packages/plus-ds/guidelines/design-tokens/`
+- DS component docs: `design-system/guidelines/overview-components.md`
+- DS token docs: `design-system/guidelines/design-tokens/`
 
 ## Authoring Rules
 

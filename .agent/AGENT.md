@@ -34,7 +34,7 @@ Load these as needed:
 
 - [Tech Stack](../develop/foundations/tech-stack.md) — Versions, commands, scripts
 - [Context Levels](../develop/foundations/context-levels.md) — Element → Page hierarchy
-- [Design Tokens](../packages/plus-ds/guidelines/design-tokens/) — Color, typography, spacing tokens
+- [Design Tokens](../design-system/guidelines/design-tokens/) — Color, typography, spacing tokens
 - [Terminology](../develop/foundations/terminology.md) — PLUS vocabulary
 
 ## Repository Structure
@@ -42,7 +42,7 @@ Load these as needed:
 | Path | Purpose |
 |------|---------|
 | `.agent/` | Agent skills and configuration |
-| `packages/plus-ds/` | Design system source (components, styles, guidelines) |
+| `design-system/` | Design system source (components, styles, guidelines) |
 | `develop/` | Documentation and foundations |
 | `playground/` | Prototyping workspace (templates and designer experiments) |
 | `src/` | Application source files |

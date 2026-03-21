@@ -79,7 +79,7 @@ Describe what you want **in Cursor chat** using the modes above. For example: "I
 
 1. Create a directory with your name (e.g. `playground/prototyping/bill/` or `playground/prototyping/victor/`)
 2. Create a subdirectory for your prototype (e.g. `playground/prototyping/victor/my-feature/`)
-3. Create a **React/Vite app** in that folder: `package.json`, `vite.config.js` (with alias to workspace `packages/plus-ds` and SCSS load paths), `index.html`, `src/main.jsx` (or `index.jsx`), and your app component(s). Copy from an existing prototype (e.g. `victor/tutor-performance/`) if needed.
+3. Create a **React/Vite app** in that folder: `package.json`, `vite.config.js` (with alias to workspace `design-system` and SCSS load paths), `index.html`, `src/main.jsx` (or `index.jsx`), and your app component(s). Copy from an existing prototype (e.g. `victor/tutor-performance/`) if needed.
 4. Add a `README.md` in your prototype directory to document your work
 5. Run `npm install` then `npm run dev` from the prototype folder to start
 
@@ -93,7 +93,7 @@ npm install
 npm run dev
 ```
 
-Vite will start a local server (e.g. http://localhost:3008) and open the app. Use the prototype’s `vite.config.js` to resolve the workspace design system (`@` or similar alias to `packages/plus-ds/src`).
+Vite will start a local server (e.g. http://localhost:3008) and open the app. Use the prototype’s `vite.config.js` to resolve the workspace design system (`@` or similar alias to `design-system/src`).
 
 ## Structure
 
@@ -128,8 +128,8 @@ playground/
 2. **Document your work**: Include README.md files explaining your prototypes
 3. **Use templates**: Start from templates in `../templates/` when appropriate
 4. **Follow design system**:
-   - **Styles**: `packages/plus-ds/guidelines/design-tokens/`
-   - **Components**: `packages/plus-ds/guidelines/overview-components.md`
+   - **Styles**: `design-system/guidelines/design-tokens/`
+   - **Components**: `design-system/guidelines/overview-components.md`
 5. **Keep it clean**: Remove experimental code that didn't work out
 
 ## When to Use Prototyping vs Templates
@@ -148,7 +148,7 @@ If your prototype becomes a useful template for others:
 
 ## Import paths (React/Vite)
 
-In a prototype, use the alias from `vite.config.js` (e.g. `@` → `packages/plus-ds/src`) to import PLUS components and styles:
+In a prototype, use the alias from `vite.config.js` (e.g. `@` → `design-system/src`) to import PLUS components and styles:
 
 ```javascript
 import { Button, Modal } from '@/components/index.js';
@@ -168,6 +168,6 @@ By default, prototyping directories are ignored by git (see `.gitignore`). If yo
 
 - **Agent router**: `.agent/SKILL.md` — Mode-based protocol for implementation (learning/maintaining/consulting/iteration/finalization)
 - **Templates**: `../templates/` — Curated templates based on specs documentation
-- **Design System**: `../../packages/plus-ds/` — Component library and tokens
+- **Design System**: `../../design-system/` — Component library and tokens
 - **Agent references**: `../../.agent/references/` — Canonical workflow and foundation docs
-- **Token Reference**: `../../packages/plus-ds/guidelines/design-tokens/` — Colors, typography, layout
+- **Token Reference**: `../../design-system/guidelines/design-tokens/` — Colors, typography, layout

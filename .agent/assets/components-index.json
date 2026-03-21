@@ -2,24 +2,24 @@
   "schema_version": "1.0",
   "updated_for_branch": "main",
   "component_roots": [
-    "packages/plus-ds/src/components",
-    "packages/plus-ds/src/forms",
-    "packages/plus-ds/src/DataViz",
-    "packages/plus-ds/src/specs"
+    "design-system/src/components",
+    "design-system/src/forms",
+    "design-system/src/DataViz",
+    "design-system/src/specs"
   ],
   "export_entrypoints": [
-    "packages/plus-ds/src/index.js",
-    "packages/plus-ds/src/components/index.js",
-    "packages/plus-ds/src/forms/index.js"
+    "design-system/src/index.js",
+    "design-system/src/components/index.js",
+    "design-system/src/forms/index.js"
   ],
   "storybook_story_globs": [
-    "../packages/plus-ds/src/**/*.stories.{js,jsx,ts,tsx}",
+    "../design-system/src/**/*.stories.{js,jsx,ts,tsx}",
     "../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}",
     "../playground/Ashley/**/*.stories.{js,jsx,ts,tsx}",
     "../playground/Bill/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [
-    "packages/plus-ds/guidelines/overview-components.md",
-    "packages/plus-ds/guidelines/reference/component-index.md"
+    "design-system/guidelines/overview-components.md",
+    "design-system/guidelines/reference/component-index.md"
   ]
 }

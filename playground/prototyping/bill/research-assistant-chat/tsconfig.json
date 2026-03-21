@@ -18,7 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@plus-ds/*": ["./../../../../packages/plus-ds/src/*"]
+      "@plus-ds/*": ["./../../../../design-system/src/*"]
     }
   },
   "include": ["src"]

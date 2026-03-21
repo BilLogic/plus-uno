@@ -15,11 +15,11 @@ Use this checklist to prevent `.agent` guidance from going stale.
 - [ ] Every path referenced in `.agent/references/*.md` exists.
 - [ ] Every path referenced in nested reference files (for example mode references and core references) exists.
 - [ ] `.agent/assets/` contains only output artifacts/templates plus `README.md` policy file.
-- [ ] Import conventions still match `packages/plus-ds/src` and Storybook alias config.
+- [ ] Import conventions still match `design-system/src` and Storybook alias config.
 
 ## C. Token Integrity
 
-- [ ] Token docs align with `packages/plus-ds/src/tokens/*.scss`.
+- [ ] Token docs align with `design-system/src/tokens/*.scss`.
 - [ ] Semantic token layer examples still valid.
 - [ ] No hardcoded-value guidance conflicts with source conventions.
 
@@ -40,6 +40,6 @@ Use this checklist to prevent `.agent` guidance from going stale.
 
 ```bash
 rg --files .agent
-rg -n "packages/plus-ds|playground|.storybook|scripts/" .agent
+rg -n "design-system|playground|.storybook|scripts/" .agent
 .agent/scripts/validate-doc-links.sh
 ```
