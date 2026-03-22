@@ -2,7 +2,7 @@
  * Prototype Market catalog data.
  *
  * Each entry represents one deployed (or deployable) prototype.
- * Designers add their own entry here after deploying to Netlify.
+ * Designers add their own entry via the /po:post skill or manually here.
  *
  * PRODUCT_PILLARS and STAGES are the canonical filter value sets;
  * keep card data consistent with these.
@@ -38,7 +38,7 @@ export const PILLAR_META = {
 
 export const prototypes = [
   {
-    id: 'bill-home-redesign',
+    id: 'home-redesign',
     title: 'Home Redesign (Dashboard)',
     description:
       'New student dashboard with tutoring performance radar, weekly tutoring load donut, student momentum charts, and personalized training carousel.',
@@ -51,10 +51,10 @@ export const prototypes = [
     contributors: ['Bill'],
     productPillar: 'home',
     localPath: '/home',
-    repoPath: 'playground/prototyping/bill/home-redesign/',
+    repoPath: 'playground/home-redesign/',
   },
   {
-    id: 'bill-research-assistant',
+    id: 'research-assistant-chat',
     title: 'Research Assistant Chat',
     description:
       'AI-powered research assistant for tutors using @assistant-ui/react with strategy heatmaps, training progress, and chat interface.',
@@ -67,10 +67,10 @@ export const prototypes = [
     contributors: ['Bill'],
     productPillar: 'admin',
     localPath: '/research-assistant',
-    repoPath: 'playground/prototyping/bill/research-assistant-chat/',
+    repoPath: 'playground/research-assistant-chat/',
   },
   {
-    id: 'bill-sessions',
+    id: 'in-session-ux',
     title: 'In-Session & Reflection',
     description:
       'In-session view with student management, reflection assistant, and manage-assignment modal.',
@@ -83,10 +83,10 @@ export const prototypes = [
     contributors: ['Bill'],
     productPillar: 'toolkit',
     localPath: '/sessions',
-    repoPath: 'playground/prototyping/bill/sessions/',
+    repoPath: 'playground/in-session-ux/',
   },
   {
-    id: 'bill-monthly-report',
+    id: 'monthly-report',
     title: 'Monthly Reports',
     description:
       'Tutor monthly performance reports list and detail view with metrics and progress indicators.',
@@ -99,10 +99,10 @@ export const prototypes = [
     contributors: ['Bill'],
     productPillar: 'admin',
     localPath: '/monthly-reports',
-    repoPath: 'playground/prototyping/bill/monthly-report/',
+    repoPath: 'playground/monthly-report/',
   },
   {
-    id: 'bill-weekly-report',
+    id: 'weekly-report-demo',
     title: 'Weekly Report Demo',
     description:
       'Weekly report page and list view for tutor performance summaries.',
@@ -115,10 +115,10 @@ export const prototypes = [
     contributors: ['Bill'],
     productPillar: 'admin',
     localPath: null,
-    repoPath: 'playground/prototyping/bill/weekly-report-demo/',
+    repoPath: 'playground/weekly-report-demo/',
   },
   {
-    id: 'victor-sessions',
+    id: 'session-management',
     title: 'Sessions Management',
     description:
       'Sessions page with session cards, attendance modal with attended/absent badges, and edit session modal with tutor/student rosters.',
@@ -131,10 +131,10 @@ export const prototypes = [
     contributors: ['Victor'],
     productPillar: 'toolkit',
     localPath: null,
-    repoPath: 'playground/prototyping/victor/sessions/',
+    repoPath: 'playground/session-management/',
   },
   {
-    id: 'victor-tutor-performance',
+    id: 'tutor-performance',
     title: 'Tutor Performance',
     description:
       'Tutor Admin performance page with attendance/sign-up donut charts, sortable tutor table, and click-to-open attendance modal.',
@@ -147,10 +147,10 @@ export const prototypes = [
     contributors: ['Victor'],
     productPillar: 'admin',
     localPath: null,
-    repoPath: 'playground/prototyping/victor/tutor-performance/',
+    repoPath: 'playground/tutor-performance/',
   },
   {
-    id: 'victor-training-progress',
+    id: 'training-progress',
     title: 'Training Progress',
     description:
       'Tutor Admin training progress page with completion/accuracy metrics, tutor table with progress rings, and lesson details modal.',
@@ -163,10 +163,42 @@ export const prototypes = [
     contributors: ['Victor'],
     productPillar: 'training',
     localPath: null,
-    repoPath: 'playground/prototyping/victor/training-progress/',
+    repoPath: 'playground/training-progress/',
   },
   {
-    id: 'ashley-group-modal',
+    id: 'fill-in-flow',
+    title: 'Fill-In Flow',
+    description:
+      'Session fill-in request and approval flow for covering open session slots.',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'mid',
+    lastUpdated: '2026-02-15',
+    creators: ['Victor'],
+    contributors: ['Victor'],
+    productPillar: 'toolkit',
+    localPath: null,
+    repoPath: 'playground/fill-in-flow/',
+  },
+  {
+    id: 'sidebar-iteration',
+    title: 'Sidebar Iteration',
+    description:
+      'Navigation sidebar redesign iterations for the toolkit section IA revision.',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'mid',
+    lastUpdated: '2026-03-17',
+    creators: ['Victor'],
+    contributors: ['Victor'],
+    productPillar: 'universal',
+    localPath: null,
+    repoPath: 'playground/sidebar-iteration/',
+  },
+  {
+    id: 'group-modal',
     title: 'Group Modal',
     description:
       'Group Admin modal for adding/editing a group with name, school select, multi-select tutors, and group size fields.',
@@ -179,10 +211,10 @@ export const prototypes = [
     contributors: ['Ashley'],
     productPillar: 'admin',
     localPath: null,
-    repoPath: 'playground/prototyping/Ashley/group-modal/',
+    repoPath: 'playground/group-modal/',
   },
   {
-    id: 'ashley-group-performance',
+    id: 'group-performance-v2',
     title: 'Group Performance v2',
     description:
       'Group Admin performance page with attendance pie chart, session distribution stacked bar, tutor table with color-coded badges, and pagination.',
@@ -195,10 +227,10 @@ export const prototypes = [
     contributors: ['Ashley'],
     productPillar: 'admin',
     localPath: null,
-    repoPath: 'playground/prototyping/Ashley/group-performance-v2/',
+    repoPath: 'playground/group-performance-v2/',
   },
   {
-    id: 'ashley-tutor-risk',
+    id: 'tutor-risk-interventions',
     title: 'Tutor Risk & Interventions',
     description:
       'Tutor Admin risk page with at-risk stats, trend line chart, interventions bar chart, filter controls, and 20-row data table.',
@@ -211,11 +243,11 @@ export const prototypes = [
     contributors: ['Ashley'],
     productPillar: 'admin',
     localPath: null,
-    repoPath: 'playground/prototyping/Ashley/tutor-risk-interventions/',
+    repoPath: 'playground/tutor-risk-interventions/',
   },
   {
-    id: 'bryan-tutor-reflection-form',
-    title: 'Tutor Reflection Form Test',
+    id: 'tutor-reflection-form',
+    title: 'Tutor Reflection Form',
     description:
       'Redesigned post-session reflection form with one-form-per-session flow, adaptive branching, student deep dive, strategy effectiveness ratings, and escalation tracking.',
     deploymentUrl: null,
@@ -227,6 +259,22 @@ export const prototypes = [
     contributors: ['Bryan'],
     productPillar: 'toolkit',
     localPath: null,
-    repoPath: 'playground/prototyping/Bryan/tutor-reflection-form/',
+    repoPath: 'playground/tutor-reflection-form/',
+  },
+  {
+    id: 'storybook-ai-agent',
+    title: 'Storybook AI Agent',
+    description:
+      'AI-powered Storybook automation agent for component documentation and testing.',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'low',
+    lastUpdated: '2026-02-10',
+    creators: ['Ashley'],
+    contributors: ['Ashley'],
+    productPillar: 'universal',
+    localPath: null,
+    repoPath: 'playground/storybook-ai-agent/',
   },
 ];

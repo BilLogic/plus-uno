@@ -11,14 +11,7 @@ const config = {
     // design-system is the source of truth (includes specs; design-system/specs excluded to avoid duplicate story IDs with Toolkit)
     '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
-    // Playground prototypes
-    '../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}',
-
-    // Ashley playground
-    '../playground/Ashley/**/*.stories.{js,jsx,ts,tsx}',
-
-    // Bill playground
-    '../playground/Bill/**/*.stories.{js,jsx,ts,tsx}',
+    // Playground prototypes are displayed in the Marketplace, not Storybook
   ],
   addons: [
     '@storybook/addon-links',
