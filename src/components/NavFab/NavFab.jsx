@@ -8,13 +8,13 @@ const NAV_ITEMS = [
     id: 'storybook',
     label: 'Storybook',
     icon: 'fa-solid fa-book-open',
-    href: 'http://localhost:4200'
+    href: '/storybook'
   },
   {
     id: 'marketplace',
     label: 'Marketplace',
     icon: 'fa-solid fa-store',
-    href: 'http://localhost:4100'
+    href: '/'
   }
 ];
 

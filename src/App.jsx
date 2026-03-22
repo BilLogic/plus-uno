@@ -7,6 +7,24 @@ import SidebarIterationApp from '../playground/sidebar-iteration/src/App';
 import { PrototypeMarket } from './pages/PrototypeMarket';
 import './App.scss';
 
+function StorybookEmbed() {
+  return (
+    <iframe
+      src="http://localhost:4200"
+      title="Storybook"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        border: 'none',
+        zIndex: 1
+      }}
+    />
+  );
+}
+
 function App() {
   return (
     <ThemeProvider>
@@ -16,6 +34,9 @@ function App() {
         <Route path="/" element={<PrototypeMarket />} />
         <Route path="/market" element={<PrototypeMarket />} />
         <Route path="/prototypes" element={<PrototypeMarket />} />
+
+        {/* Storybook — embedded via iframe from port 4200 */}
+        <Route path="/storybook" element={<StorybookEmbed />} />
 
         {/* Embedded prototypes — all sub-routes of home-redesign shell */}
         <Route path="/home/*" element={<HomeRedesignApp />} />
