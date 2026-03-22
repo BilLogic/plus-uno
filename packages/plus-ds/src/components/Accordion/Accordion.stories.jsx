@@ -4,7 +4,7 @@ import Accordion from './Accordion';
 export default {
     title: 'Components/Accordion',
     component: Accordion,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -86,63 +86,54 @@ const sampleItems = [
     }
 ];
 
-/**
- * Overview
- * Comprehensive view of Accordion configurations matching Figma specifications.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
+const accordionPage = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' };
 
-        {/* 1. Default Accordion */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Default Accordion</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Standard accordion with borders and one item open at a time.
-            </p>
-            <Accordion
-                items={sampleItems}
-                defaultActiveKey="0"
-            />
-        </section>
+function AccordionVariantsDemos() {
+    return (
+        <>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Default Accordion</h6>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                    Standard accordion with borders and one item open at a time.
+                </p>
+                <Accordion items={sampleItems} defaultActiveKey="0" />
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Flush Accordion</h6>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                    Borderless accordion for seamless integration with surrounding content.
+                </p>
+                <div style={{ border: '1px dashed var(--color-outline-variant)', padding: '0' }}>
+                    <Accordion items={sampleItems} defaultActiveKey="0" flush />
+                </div>
+            </section>
+        </>
+    );
+}
 
-        {/* 2. Flush Accordion */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Flush Accordion</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Borderless accordion for seamless integration with surrounding content.
-            </p>
-            <div style={{ border: '1px dashed var(--color-outline-variant)', padding: '0' }}>
-                <Accordion
-                    items={sampleItems}
-                    defaultActiveKey="0"
-                    flush
-                />
-            </div>
-        </section>
+function AccordionBehaviorDemos() {
+    return (
+        <>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Always Open (Multiple Expanded)</h6>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                    Multiple accordion items can be open simultaneously.
+                </p>
+                <Accordion items={sampleItems} defaultActiveKey={['0', '1']} alwaysOpen />
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>All Collapsed</h6>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                    Accordion with no default expanded item.
+                </p>
+                <Accordion items={sampleItems} />
+            </section>
+        </>
+    );
+}
 
-        {/* 3. Always Open */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Always Open (Multiple Expanded)</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Multiple accordion items can be open simultaneously.
-            </p>
-            <Accordion
-                items={sampleItems}
-                defaultActiveKey={['0', '1']}
-                alwaysOpen
-            />
-        </section>
-
-        {/* 4. All Collapsed */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>All Collapsed</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Accordion with no default expanded item.
-            </p>
-            <Accordion items={sampleItems} />
-        </section>
-
-        {/* 5. With Disabled Item */}
+function AccordionInteractionDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>With Disabled Item</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -157,8 +148,11 @@ export const Overview = () => (
                 defaultActiveKey="0"
             />
         </section>
+    );
+}
 
-        {/* 6. Using Children Pattern */}
+function AccordionContentDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Using Children (Alternative Pattern)</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -167,7 +161,7 @@ export const Overview = () => (
             <Accordion defaultActiveKey="custom-1">
                 <Accordion.Item eventKey="custom-1" header="Custom Header One">
                     <p>This is custom content passed as children.</p>
-                    <button className="plus-btn plus-btn--primary plus-btn--filled plus-btn--small">
+                    <button className="plus-btn plus-btn--primary plus-btn--filled plus-btn--small" type="button">
                         Action Button
                     </button>
                 </Accordion.Item>
@@ -176,6 +170,39 @@ export const Overview = () => (
                 </Accordion.Item>
             </Accordion>
         </section>
+    );
+}
+
+export const Variants = () => (
+    <div style={accordionPage}>
+        <AccordionVariantsDemos />
+    </div>
+);
+
+export const Behavior = () => (
+    <div style={accordionPage}>
+        <AccordionBehaviorDemos />
+    </div>
+);
+
+export const InteractionStates = () => (
+    <div style={accordionPage}>
+        <AccordionInteractionDemos />
+    </div>
+);
+
+export const Content = () => (
+    <div style={accordionPage}>
+        <AccordionContentDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={accordionPage}>
+        <AccordionVariantsDemos />
+        <AccordionBehaviorDemos />
+        <AccordionInteractionDemos />
+        <AccordionContentDemos />
     </div>
 );
 

@@ -4,7 +4,7 @@ import ButtonGroup from '../../../../../components/ButtonGroup';
 import Button from '../../../../../components/Button';
 import Badge from '../../../../../components/Badge';
 import Alert from '../../../../../components/Alert';
-import Checkbox from '../../../../../forms/Checkbox';
+import Checkbox from '@/forms/Checkbox';
 
 // Import the reusable SessionInfoCard component
 import { SessionInfoCard } from '../../cards/SessionInfoCard.stories';

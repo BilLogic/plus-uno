@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'module';
@@ -23,7 +24,7 @@ try {
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-  plugins: [react()],
+  plugins: [tailwindcss(), react()],
   resolve: {
     dedupe: ['react', 'react-dom', 'framer-motion'],
     alias: {

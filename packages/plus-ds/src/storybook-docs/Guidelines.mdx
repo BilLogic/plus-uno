@@ -1,0 +1,60 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Info } from 'lucide-react';
+
+import { DocHero, DocPage, DocSection } from '@/storybook-docs/doc-layout';
+import { Alert, AlertDescription, AlertTitle } from '@/storybook-docs/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/storybook-docs/ui/tabs';
+
+<Meta
+  title="PLUS Docs/Guidelines"
+  parameters={{
+    docs: {
+      description: {
+        story: 'How to use this Storybook for design review and implementation.',
+      },
+    },
+  }}
+/>
+
+<DocPage width="narrow">
+  <DocHero
+    title="Guidelines"
+    lead="Practical expectations for using PLUS Docs and the canvas. This page is documentation
+      chrome only—it does not change design-system components."
+  />
+
+  <Alert>
+    <Info />
+    <AlertTitle>Docs vs canvas</AlertTitle>
+    <AlertDescription>
+      <strong className="text-foreground">PLUS Docs</strong> pages (this layout) are for reading and
+      navigation. The <strong className="text-foreground">Canvas</strong> tab is where real DS
+      components are interactive with Controls.
+    </AlertDescription>
+  </Alert>
+
+  <Tabs defaultValue="designers">
+    <TabsList className="w-full max-w-md">
+      <TabsTrigger value="designers">Designers</TabsTrigger>
+      <TabsTrigger value="engineers">Engineers</TabsTrigger>
+    </TabsList>
+    <TabsContent value="designers" className="mt-4 space-y-4">
+      <DocSection title="Review workflow">
+        <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+          <li>Use <strong className="text-foreground">Viewport</strong> and <strong className="text-foreground">Backgrounds</strong> to match target surfaces.</li>
+          <li>Compare stories side by side in the sidebar; open <strong className="text-foreground">Docs</strong> for written context.</li>
+          <li>Specs under <strong className="text-foreground">Specs</strong> mirror product flows—treat them as reference, not production routes.</li>
+        </ul>
+      </DocSection>
+    </TabsContent>
+    <TabsContent value="engineers" className="mt-4 space-y-4">
+      <DocSection title="Implementation workflow">
+        <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+          <li>Import from established paths (e.g. <code className="rounded bg-muted px-1 py-0.5 text-xs">@/components/...</code>) as in stories.</li>
+          <li>Prefer <strong className="text-foreground">Controls</strong> and <strong className="text-foreground">argTypes</strong> to document new props when adding stories.</li>
+          <li>Keep shadcn-only code under <code className="rounded bg-muted px-1 py-0.5 text-xs">storybook-docs/</code>—never ship it as DS product UI.</li>
+        </ul>
+      </DocSection>
+    </TabsContent>
+  </Tabs>
+</DocPage>

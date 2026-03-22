@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Alert from '../../../../../../components/Alert/Alert';
 import Form from 'react-bootstrap/Form';
-import Switch from '../../../../../forms/Switch';
-import Checkbox from '../../../../../forms/Checkbox';
-import Select from '../../../../../forms/Select';
+import Switch from '@/forms/Switch';
+import Checkbox from '@/forms/Checkbox';
+import Select from '@/forms/Select';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Toggle Organism',

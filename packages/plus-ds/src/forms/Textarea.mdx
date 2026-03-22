@@ -1,0 +1,69 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TextareaStories from './Textarea.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TextareaStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Placeholder vs value and optional visible label.</>}>
+    <Canvas of={TextareaStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Visible height via the <code>rows</code> prop (2, 3, and 5).</>}>
+    <Canvas of={TextareaStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sizes
+
+<DocsCanvasShell description={<>Small, medium, and large.</>}>
+    <Canvas of={TextareaStories.Sizes} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interaction states
+
+<DocsCanvasShell description={<>Default, focus, disabled, and read-only.</>}>
+    <Canvas of={TextareaStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={TextareaStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

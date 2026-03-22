@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from './Button';
+import { ButtonSizesFilledRowContainer } from './button-segmented-demos.jsx';
 
 const icons = {
     'none': null,
@@ -17,7 +18,15 @@ const icons = {
 export default {
     title: 'Components/Button',
     component: Button,
-    tags: ['autodocs'],
+    /** Hide CSF stories from the sidebar; docs live on Button.mdx (Canvas still embeds them). */
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            toc: {
+                title: 'On this page'
+            }
+        }
+    },
     argTypes: {
         // CONTENT
         text: {
@@ -128,69 +137,10 @@ export default {
     }
 };
 
-/**
- * Overview
- * Matrix of all Styles x Fills, plus Size and layout examples.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-
-        {/* Metric Matrix */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '24px' }}>Styles & Variants</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                {['filled', 'tonal', 'outline', 'ghost'].map(fill => (
-                    <div key={fill}>
-                        <p className="plus-body-2" style={{ marginBottom: '12px', textTransform: 'capitalize', color: 'var(--color-neutral-text)' }}>{fill}</p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                            {['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger'].map(style => (
-                                <Button
-                                    key={style}
-                                    text={style.charAt(0).toUpperCase() + style.slice(1)}
-                                    style={style}
-                                    fill={fill}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-
-        {/* Sizes */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes (Filled Style)</h6>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <Button text="Small" size="small" style="primary" fill="filled" />
-                <Button text="Medium" size="medium" style="primary" fill="filled" />
-                <Button text="Large" size="large" style="primary" fill="filled" />
-            </div>
-        </section>
-
-        {/* States / Layouts */}
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>States & Layouts</h6>
-            <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <p className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Status</p>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                        <Button text="Disabled" disabled style="primary" />
-                        <Button text="Loading" loading style="primary" />
-                        <Button text="Active" active style="secondary" />
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <p className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Block</p>
-                    <div style={{ width: '300px' }}>
-                        <Button text="Block Button" block style="primary" fill="outline" />
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-);
+/** Docs-only embed for Button.mdx (`Canvas`); sidebar hidden via meta `!dev`. */
+export const SizesFilledRow = {
+    render: () => <ButtonSizesFilledRowContainer />
+};
 
 /**
  * Interactive Playground
@@ -207,5 +157,6 @@ export const Interactive = {
         active: false,
         loading: false,
         block: false
-    }
+    },
+    render: args => <Button {...args} />
 };

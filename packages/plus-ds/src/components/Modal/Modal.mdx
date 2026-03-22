@@ -1,0 +1,59 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ModalStories from './Modal.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ModalStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
+    <Canvas of={ModalStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Header-only versus header with a primary and secondary action row.</>}>
+    <Canvas of={ModalStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Types
+
+<DocsCanvasShell description={<>Scrollable body with decorative scrollbar affordances for long content.</>}>
+    <Canvas of={ModalStories.Types} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={ModalStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

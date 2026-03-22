@@ -1,0 +1,59 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as DividerStories from './Divider.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DividerStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Light and dark styles, plus the subtle opacity variant.</>}>
+    <Canvas of={DividerStories.Variants} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sizes
+
+<DocsCanvasShell description={<>Thickness tokens from small through extra large.</>}>
+    <Canvas of={DividerStories.Sizes} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Custom widths and a typical stacked content pattern.</>}>
+    <Canvas of={DividerStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={DividerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

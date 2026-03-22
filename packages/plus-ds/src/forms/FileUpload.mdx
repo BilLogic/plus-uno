@@ -1,0 +1,59 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as FileUploadStories from './FileUpload.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FileUploadStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Label, formats list, and primary action.</>}>
+    <Canvas of={FileUploadStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Invalid and success validation treatment.</>}>
+    <Canvas of={FileUploadStories.Variants} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interaction states
+
+<DocsCanvasShell description={<>Default, focus, and disabled.</>}>
+    <Canvas of={FileUploadStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={FileUploadStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

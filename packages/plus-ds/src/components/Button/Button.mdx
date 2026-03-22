@@ -1,0 +1,88 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ButtonStories from './Button.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    StylesSection,
+    VariantsSection,
+    InteractionStatesSection,
+    ButtonContentSection,
+    LayoutSection,
+    SizesDocDescription
+} from './button-segmented-demos.jsx';
+
+<Meta of={ButtonStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<ButtonContentSection />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Styles
+
+<StylesSection />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<VariantsSection />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sizes
+
+<DocsCanvasShell description={<SizesDocDescription />}>
+    <Canvas of={ButtonStories.SizesFilledRow} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interaction states
+
+<InteractionStatesSection />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<LayoutSection />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={ButtonStories.Interactive}
+    description={
+        <>
+            Use the table in the panel below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> so clicks and focus work while you scroll
+            the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

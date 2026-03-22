@@ -4,7 +4,7 @@ import Pagination from './Pagination';
 export default {
     title: 'Components/Pagination',
     component: Pagination,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -43,13 +43,10 @@ const Template = (args) => {
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
-/**
- * Overview - All variants matching Figma design exactly
- * Shows all 6 variants stacked vertically as in Figma
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '32px', backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)' }}>
-        {/* Icon Type Variants - matching Figma design exactly */}
+const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: '32px', padding: '32px', backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)' };
+
+function PaginationIconTypeDemos() {
+    return (
         <section>
             <h5 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>Icon Type</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -85,8 +82,11 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* Text Type Variants - matching Figma design exactly */}
+function PaginationTextTypeDemos() {
+    return (
         <section>
             <h5 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>Text Type</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -128,8 +128,11 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* States - Disabled Examples */}
+function PaginationStatesDemos() {
+    return (
         <section>
             <h5 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>States</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -165,6 +168,32 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
+
+export const IconType = () => (
+    <div style={paginationCanvas}>
+        <PaginationIconTypeDemos />
+    </div>
+);
+
+export const TextType = () => (
+    <div style={paginationCanvas}>
+        <PaginationTextTypeDemos />
+    </div>
+);
+
+export const States = () => (
+    <div style={paginationCanvas}>
+        <PaginationStatesDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={paginationCanvas}>
+        <PaginationIconTypeDemos />
+        <PaginationTextTypeDemos />
+        <PaginationStatesDemos />
     </div>
 );
 

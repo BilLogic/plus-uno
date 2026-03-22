@@ -1,0 +1,79 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as DropdownStories from './Dropdown.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DropdownStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Menu items, dividers, icons, selection, and multi-select.</>}>
+    <Canvas of={DropdownStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Styles
+
+<DocsCanvasShell description={<>Fill treatments: filled, tonal, outline, and ghost.</>}>
+    <Canvas of={DropdownStories.Styles} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Semantic styles on the dropdown trigger.</>}>
+    <Canvas of={DropdownStories.Variants} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sizes
+
+<DocsCanvasShell description={<>Small, default, and large triggers.</>}>
+    <Canvas of={DropdownStories.Sizes} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Split button and menu opening direction.</>}>
+    <Canvas of={DropdownStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={DropdownStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

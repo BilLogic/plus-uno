@@ -1,0 +1,64 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AlertStories from './Alert.stories.jsx';
+import * as AlertSubStories from './Alert.Subcomponents.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AlertStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Title optional, dismissible toggle, and rich body content.</>}>
+    <Canvas of={AlertStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Semantic styles with title and dismissible chrome.</>}>
+    <Canvas of={AlertStories.Variants} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell description={<>Internal title and message layout inside the alert shell.</>}>
+    <Canvas of={AlertSubStories.ContentStructure} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss control.</>}>
+    <Canvas of={AlertSubStories.DismissButton} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={AlertStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

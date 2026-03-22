@@ -4,44 +4,44 @@ import Cascader from './Cascader';
 export default {
     title: 'Forms/Cascader',
     component: Cascader,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: 'Cascader component allows hierarchical selection through multiple levels. When opened, it displays columns horizontally - each column represents a level in the hierarchy. Selecting an option with children opens a new column to the right.'
-            }
-        }
+                component:
+                    'Cascader component allows hierarchical selection through multiple levels. When opened, it displays columns horizontally - each column represents a level in the hierarchy. Selecting an option with children opens a new column to the right.',
+            },
+        },
     },
     argTypes: {
         value: {
             control: 'object',
             description: 'Array of selected values representing the current path',
-            table: { category: 'Content' }
+            table: { category: 'Content' },
         },
         options: {
             control: 'object',
             description: 'Hierarchical options structure with children arrays',
-            table: { category: 'Content' }
+            table: { category: 'Content' },
         },
         disabled: {
             control: 'boolean',
             description: 'Disable the cascader component',
-            table: { category: 'Behavior' }
+            table: { category: 'Behavior' },
         },
         onChange: {
             action: 'changed',
             description: 'Callback function when selection changes',
-            table: { category: 'Behavior' }
+            table: { category: 'Behavior' },
         },
         placeholder: {
             control: 'text',
             description: 'Placeholder text when no options are available',
-            table: { category: 'Content' }
-        }
-    }
+            table: { category: 'Content' },
+        },
+    },
 };
 
-// Sample hierarchical data
 const sampleOptions = [
     {
         text: 'Zhejiang',
@@ -52,18 +52,18 @@ const sampleOptions = [
                 value: 'hangzhou',
                 children: [
                     { text: 'WestLake', value: 'westlake' },
-                    { text: 'Xihu', value: 'xihu' }
-                ]
+                    { text: 'Xihu', value: 'xihu' },
+                ],
             },
             {
                 text: 'Ningbo',
                 value: 'ningbo',
                 children: [
                     { text: 'Jiangbei', value: 'jiangbei' },
-                    { text: 'Haishu', value: 'haishu' }
-                ]
-            }
-        ]
+                    { text: 'Haishu', value: 'haishu' },
+                ],
+            },
+        ],
     },
     {
         text: 'Jiangsu',
@@ -74,74 +74,62 @@ const sampleOptions = [
                 value: 'nanjing',
                 children: [
                     { text: 'Xuanwu', value: 'xuanwu' },
-                    { text: 'Qinhuai', value: 'qinhuai' }
-                ]
-            }
-        ]
-    }
+                    { text: 'Qinhuai', value: 'qinhuai' },
+                ],
+            },
+        ],
+    },
 ];
 
-/**
- * Overview
- * Comprehensive view of Cascader configurations.
- */
-export const Overview = () => {
+export const Content = () => {
     const [value1, setValue1] = useState([]);
     const [value2, setValue2] = useState(['zhejiang', 'hangzhou', 'westlake']);
-    const [value3, setValue3] = useState([]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
-            {/* Basic Usage */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Basic Usage</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Cascader allows users to navigate through hierarchical options. Click the input field to open the dropdown. Selecting an option with children opens a new column to the right. The selected path is displayed in the input field.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
+            <div>
+                <h6 className="h6 mb-2">Empty selection</h6>
+                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    Opens the menu and builds a path from the hierarchy.
                 </p>
-                <Cascader
-                    id="cascader-basic"
-                    value={value1}
-                    options={sampleOptions}
-                    onChange={setValue1}
-                />
-            </section>
-
-            {/* With Pre-selected Path */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Pre-selected Path</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    The cascader can be initialized with a pre-selected path. When opened, it will show all columns up to the selected level.
+                <Cascader id="cascader-basic" value={value1} options={sampleOptions} onChange={setValue1} />
+            </div>
+            <div>
+                <h6 className="h6 mb-2">Pre-selected path</h6>
+                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    Value shown in the field; opening reveals columns up to the current level.
                 </p>
-                <Cascader
-                    id="cascader-preselected"
-                    value={value2}
-                    options={sampleOptions}
-                    onChange={setValue2}
-                />
-            </section>
-
-            {/* Disabled State */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Disabled State</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    The cascader can be disabled, preventing all interactions with the input field and dropdown menu.
-                </p>
-                <Cascader
-                    id="cascader-disabled"
-                    value={value3}
-                    options={sampleOptions}
-                    onChange={setValue3}
-                    disabled
-                />
-            </section>
+                <Cascader id="cascader-preselected" value={value2} options={sampleOptions} onChange={setValue2} />
+            </div>
         </div>
     );
 };
 
-/**
- * Interactive Playground
- * Customize the Cascader attributes in real-time.
- */
+export const Layout = () => (
+    <div style={{ maxWidth: '800px' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            Each level opens as an additional column to the right of the previous one.
+        </p>
+        <Cascader id="cascader-layout" value={[]} options={sampleOptions} onChange={() => {}} />
+    </div>
+);
+
+export const InteractionStates = () => {
+    const [value3, setValue3] = useState([]);
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <Cascader
+                id="cascader-disabled"
+                value={value3}
+                options={sampleOptions}
+                onChange={setValue3}
+                disabled
+            />
+        </div>
+    );
+};
+
 export const Interactive = (args) => {
     const [value, setValue] = useState(args.value || []);
 
@@ -173,6 +161,5 @@ Interactive.args = {
     value: [],
     options: sampleOptions,
     disabled: false,
-    placeholder: 'Please select'
+    placeholder: 'Please select',
 };
-

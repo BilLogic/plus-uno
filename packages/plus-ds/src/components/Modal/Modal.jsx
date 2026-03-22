@@ -20,6 +20,13 @@ const Modal = ({
     secondaryButton,
     show = false,
     onClose,
+    /** When set, modal + backdrop render inside this node (use in docs to avoid full-page overlays). */
+    container,
+    /** Override react-bootstrap modal stack manager (e.g. disable body scroll lock in Storybook). */
+    manager,
+    enforceFocus = true,
+    autoFocus = true,
+    restoreFocus = true,
     backdrop = true,
     keyboard = true,
     centered = true,
@@ -59,6 +66,11 @@ const Modal = ({
         <BootstrapModal
             show={show}
             onHide={onClose}
+            container={container}
+            manager={manager}
+            enforceFocus={enforceFocus}
+            autoFocus={autoFocus}
+            restoreFocus={restoreFocus}
             backdrop={backdrop}
             keyboard={keyboard}
             centered={centered}
@@ -145,6 +157,11 @@ Modal.propTypes = {
     type: PropTypes.oneOf(['default', 'scrollable']),
     showBottomButtons: PropTypes.bool,
     show: PropTypes.bool,
+    container: PropTypes.oneOfType([PropTypes.any]),
+    manager: PropTypes.object,
+    enforceFocus: PropTypes.bool,
+    autoFocus: PropTypes.bool,
+    restoreFocus: PropTypes.bool,
     backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     keyboard: PropTypes.bool,
     centered: PropTypes.bool,

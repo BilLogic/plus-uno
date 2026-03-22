@@ -1,0 +1,89 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as NavPillsStories from './NavPills.stories.jsx';
+import * as NavPillsSubStories from './NavPills.Subcomponents.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={NavPillsStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Horizontal pill group with a disabled item and a dropdown pill.</>}>
+    <Canvas of={NavPillsStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interaction states
+
+<DocsCanvasShell description={<>Default, selected, and disabled single pills (subcomponents).</>}>
+    <Canvas of={NavPillsSubStories.NavPillsItemStates} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Vertical stack of pills.</>}>
+    <Canvas of={NavPillsStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Pill group
+
+<DocsCanvasShell description={<>Controlled group with multiple pills.</>}>
+    <Canvas of={NavPillsSubStories.NavPillsSubPillGroup} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Dropdown pills
+
+<DocsCanvasShell description={<>Dropdown pill and a disabled dropdown.</>}>
+    <Canvas of={NavPillsSubStories.NavPillsSubPillDropdowns} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={NavPillsStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+<DocsInteractivePlayground
+    of={NavPillsSubStories.NavPillsItemInteractive}
+    description={
+        <>
+            <strong className="text-foreground">NavPills.Item</strong> — single pill props and states.
+        </>
+    }
+/>
+
+</div>
+
+</div>

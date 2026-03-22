@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TextareaVer2 from '../../../../../forms/TextareaVer2';
+import TextareaVer2 from '@/forms/TextareaVer2';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Supervisor Decision Rationale Text Input',

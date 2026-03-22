@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '../../../../../components/Modal';
-import Select from '../../../../../forms/Select';
-import { Label } from '../../../../../forms/LabelAndCaption.stories';
+import Select from '@/forms/Select';
+import { Label } from '@/forms/LabelAndCaption.stories';
 import { SessionDateInput } from '../../elements/NewFormDateInput.stories';
 import { SessionTimeInput } from '../../elements/NewFormTimeInput.stories';
 import { Stepper } from '../../elements/Steppers.stories';

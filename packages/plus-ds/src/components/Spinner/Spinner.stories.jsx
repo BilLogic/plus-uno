@@ -4,11 +4,12 @@ import Spinner from './Spinner';
 export default {
     title: 'Components/Loading',
     component: Spinner,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: 'Loading indicators for asynchronous operations. Supports standard Bootstrap spinners (border, grow) and custom animated variants (growing, rotating, stacking).'
+                component:
+                    'Loading indicators for asynchronous operations. Standard Bootstrap spinners (border, grow) and custom variants (growing, rotating, stacking) all use the neutral on-surface-variant color token.'
             }
         }
     },
@@ -18,12 +19,6 @@ export default {
             options: ['border', 'grow', 'growing', 'rotating', 'stacking'],
             description: 'Animation variant type',
             table: { category: 'Design', defaultValue: { summary: 'border' } }
-        },
-        color: {
-            control: 'select',
-            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'],
-            description: 'Color theme (for border/grow variants)',
-            table: { category: 'Design', defaultValue: { summary: 'primary' } }
         },
         size: {
             control: 'select',
@@ -39,13 +34,10 @@ export default {
     }
 };
 
-/**
- * Overview
- * Comprehensive view of all Loading spinner configurations.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
-        {/* All Variants */}
+const col = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' };
+
+function SpinnerVariantsDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Variants</h6>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
@@ -53,11 +45,11 @@ export const Overview = () => (
             </p>
             <div style={{ display: 'flex', gap: '32px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="border" color="primary" />
+                    <Spinner variant="border" />
                     <p style={{ marginTop: '8px', fontSize: '12px' }}>Border</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="grow" color="primary" />
+                    <Spinner variant="grow" />
                     <p style={{ marginTop: '8px', fontSize: '12px' }}>Grow</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
@@ -74,58 +66,89 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* Colors */}
+function SpinnerStylesDemos() {
+    return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Colors</h6>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Color</h6>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Color variations for standard spinners.
+                All loading indicators use the neutral token <code className="text-foreground">--color-on-surface-variant</code>{' '}
+                (border, grow, and custom animations).
             </p>
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-                {['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'].map(color => (
-                    <div key={color} style={{ textAlign: 'center' }}>
-                        <Spinner variant="border" color={color} />
-                        <p style={{ marginTop: '8px', fontSize: '12px' }}>{color}</p>
-                    </div>
-                ))}
+            <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <Spinner variant="border" />
+                    <p style={{ marginTop: '8px', fontSize: '12px' }}>Border</p>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <Spinner variant="grow" />
+                    <p style={{ marginTop: '8px', fontSize: '12px' }}>Grow</p>
+                </div>
             </div>
         </section>
+    );
+}
 
-        {/* Sizes */}
+function SpinnerSizesDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Size variations for spinners.
+                Default and small border spinner.
             </p>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="border" color="primary" />
+                    <Spinner variant="border" />
                     <p style={{ marginTop: '8px', fontSize: '12px' }}>Default</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="border" color="primary" size="sm" />
+                    <Spinner variant="border" size="sm" />
                     <p style={{ marginTop: '8px', fontSize: '12px' }}>Small (sm)</p>
                 </div>
             </div>
         </section>
+    );
+}
+
+export const Variants = () => (
+    <div style={col}>
+        <SpinnerVariantsDemos />
     </div>
 );
+
+export const Styles = () => (
+    <div style={col}>
+        <SpinnerStylesDemos />
+    </div>
+);
+
+export const Sizes = () => (
+    <div style={col}>
+        <SpinnerSizesDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={col}>
+        <SpinnerVariantsDemos />
+        <SpinnerStylesDemos />
+        <SpinnerSizesDemos />
+    </div>
+);
+
 Overview.parameters = {
     docs: {
         description: {
-            story: 'Comprehensive view of all Loading spinner variants, colors, and sizes.'
+            story: 'Comprehensive view of all Loading spinner variants and sizes (single neutral color).'
         }
     }
 };
 
-/**
- * Interactive
- * Playground with controls for customizing spinner props.
- */
 export const Interactive = (args) => <Spinner {...args} />;
 Interactive.args = {
     variant: 'border',
-    color: 'primary',
     size: null
 };
 Interactive.parameters = {

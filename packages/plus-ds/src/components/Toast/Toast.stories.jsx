@@ -5,7 +5,7 @@ import Button from '@/components/Button/Button';
 export default {
     title: 'Components/Toast',
     component: Toast,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -27,9 +27,8 @@ export default {
     }
 };
 
-
-export const Overview = () => (
-    <div className="d-flex flex-column gap-3">
+function ToastVariantsDemos() {
+    return (
         <ToastContainer className="p-3" style={{ position: 'static' }}>
             <Toast title="Primary Toast" style="primary" timestamp="Just now">
                 This is a primary toast.
@@ -50,14 +49,24 @@ export const Overview = () => (
                 Here is some information.
             </Toast>
         </ToastContainer>
+    );
+}
+
+export const Variants = () => (
+    <div className="d-flex flex-column gap-3">
+        <ToastVariantsDemos />
     </div>
 );
 
-// Wrapper to handle state
+export const Overview = () => (
+    <div className="d-flex flex-column gap-3">
+        <ToastVariantsDemos />
+    </div>
+);
+
 const ToastInteractiveWrapper = ({ style, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);
 
-    // Update isOpen when args.show changes (optional, but good for controls)
     React.useEffect(() => {
         setIsOpen(show);
     }, [show]);
@@ -95,4 +104,3 @@ Interactive.args = {
     autohide: false,
     delay: 3000
 };
-

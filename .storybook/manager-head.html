@@ -1,61 +1,66 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-  /* Hide icons only for group/component nodes (main component dropdowns)
-     Keep icons for leaf nodes (stories/docs like "Docs", "Overview", "Interactive")
-  */
-  
-  /* Target ALL icons in group nodes - comprehensive selectors */
-  .sidebar-container button[data-nodetype="group"] svg[viewBox="0 0 14 14"],
-  .sidebar-container button[data-nodetype="group"] [class*="TypeIcon"],
-  .sidebar-container button[data-nodetype="group"] [class*="TypeIcon"] svg,
-  .sidebar-container button[data-nodetype="group"] [class*="Wrapper"] svg[viewBox="0 0 14 14"],
-  .sidebar-container button[class*="GroupNode"] svg[viewBox="0 0 14 14"],
-  .sidebar-container button[class*="BranchNode"][class*="GroupNode"] svg[viewBox="0 0 14 14"] {
-    display: none !important;
+  /* Active story/docs row: PLUS primary (theme colorPrimary is blue; enforce for sidebar tree) */
+  .sidebar-container a[data-selected='true'],
+  .sidebar-container button[data-selected='true'] {
+    border-radius: 0.375rem;
+    background-color: #0472a8 !important;
+    color: #ffffff !important;
+  }
+
+  .sidebar-container a[data-selected='true'] svg,
+  .sidebar-container button[data-selected='true'] svg {
+    color: #ffffff !important;
+    opacity: 0.95;
+  }
+
+  .sidebar-container a[href]:hover,
+  .sidebar-container button[role='treeitem']:hover {
+    border-radius: 0.25rem;
+  }
+
+  /*
+   * Remove Storybook TypeIcons (14×14) from layout, not just visibility — otherwise
+   * Wrapper5 flex + gap:6 leaves an empty column for docs/story rows under folders.
+   * Chevron lives in a sibling wrapper; it keeps normal flow.
+   */
+  .sidebar-container .sidebar-item
+    :is(
+      button,
+      a[rel='canonical']:is(
+        [href*='path=/story'],
+        [href*='path=/docs'],
+        [href*='path=/test']
+      )
+    )
+    > div:first-child {
+    position: relative;
+  }
+
+  .sidebar-container .sidebar-item
+    :is(
+      button,
+      a[rel='canonical']:is(
+        [href*='path=/story'],
+        [href*='path=/docs'],
+        [href*='path=/test']
+      )
+    )
+    svg[viewBox='0 0 14 14'] {
+    position: absolute !important;
+    left: 0;
+    top: 0;
     width: 0 !important;
     height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    visibility: hidden !important;
-  }
-  
-  /* Hide icon wrapper containers for group nodes */
-  .sidebar-container button[data-nodetype="group"] [class*="Wrapper"]:has(svg[viewBox="0 0 14 14"]),
-  .sidebar-container button[class*="GroupNode"] [class*="Wrapper"]:has(svg[viewBox="0 0 14 14"]) {
-    display: none !important;
-    width: 0 !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    flex: 0 0 0 !important;
-  }
-  
-  /* Remove gap from flex containers for group nodes */
-  .sidebar-container button[data-nodetype="group"],
-  .sidebar-container button[class*="GroupNode"] {
-    gap: 0 !important;
-  }
-  
-  /* Keep chevron/collapse icons visible (6x6 viewBox) - they're needed for expand/collapse */
-  .sidebar-container button [class*="Collapse"],
-  .sidebar-container button [class*="Collapse"] svg,
-  .sidebar-container button svg[viewBox="0 0 6 6"] {
-    display: revert !important;
-    width: revert !important;
-    height: revert !important;
-    visibility: revert !important;
-  }
-  
-  /* Leaf nodes (stories/docs) keep their icons - explicitly allow them */
-  .sidebar-container a[data-nodetype="story"] svg,
-  .sidebar-container a[data-nodetype="document"] svg,
-  .sidebar-container button[data-nodetype="story"] svg,
-  .sidebar-container button[data-nodetype="document"] svg,
-  .sidebar-container a[class*="LeafNode"] svg,
-  .sidebar-container a[class*="StoryNode"] svg,
-  .sidebar-container a[class*="DocumentNode"] svg {
-    display: revert !important;
-    width: revert !important;
-    height: revert !important;
+    border: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 </style>
 
@@ -87,141 +92,4 @@
       originalError(...args);
     };
   })();
-
-  // Hide icons for group nodes only, keep icons for leaf nodes
-  function hideGroupNodeIcons() {
-    const sidebar = document.querySelector('.sidebar-container');
-    if (!sidebar) return;
-    
-    // Find group nodes - try multiple selectors to catch all cases
-    const groupNodes = sidebar.querySelectorAll(
-      'button[data-nodetype="group"], ' +
-      'button[class*="BranchNode"][class*="GroupNode"], ' +
-      'button[class*="GroupNode"], ' +
-      // Also target buttons that are expandable (have collapse/chevron icons)
-      'button:has([class*="Collapse"]):not([data-nodetype="story"]):not([data-nodetype="document"])'
-    );
-    
-    groupNodes.forEach(item => {
-      // Find all SVG icons except collapse/chevron icons
-      const allSvgs = item.querySelectorAll('svg');
-      allSvgs.forEach(svg => {
-        // Check if this is a collapse/chevron icon - keep those visible
-        const isCollapseIcon = svg.closest('[class*="Collapse"]') || 
-                              svg.parentElement?.classList.toString().includes('Collapse') ||
-                              svg.getAttribute('viewBox') === '0 0 6 6'; // Chevron icons are 6x6
-        
-        if (!isCollapseIcon) {
-          // Hide TypeIcons (grid, folder icons) but keep collapse icons
-          svg.style.display = 'none';
-          svg.style.width = '0';
-          svg.style.height = '0';
-          svg.style.margin = '0';
-          svg.style.padding = '0';
-          svg.style.visibility = 'hidden';
-        }
-      });
-      
-      // Hide TypeIcon and Wrapper elements (but not collapse wrappers)
-      const typeIcons = item.querySelectorAll('[class*="TypeIcon"]:not([class*="Collapse"])');
-      typeIcons.forEach(icon => {
-        icon.style.display = 'none';
-        icon.style.width = '0';
-        icon.style.height = '0';
-        icon.style.visibility = 'hidden';
-      });
-      
-      // Hide wrapper containers (but not collapse wrappers)
-      const wrappers = item.querySelectorAll('[class*="Wrapper"]:not([class*="Collapse"])');
-      wrappers.forEach(wrapper => {
-        // Only hide if it contains a TypeIcon, not if it's a collapse wrapper
-        const hasTypeIcon = wrapper.querySelector('[class*="TypeIcon"]');
-        const isCollapseWrapper = wrapper.classList.toString().includes('Collapse');
-        if (hasTypeIcon && !isCollapseWrapper) {
-          wrapper.style.display = 'none';
-          wrapper.style.width = '0';
-          wrapper.style.minWidth = '0';
-          wrapper.style.margin = '0';
-          wrapper.style.padding = '0';
-          wrapper.style.flex = '0 0 0';
-        }
-      });
-    });
-    
-    // Ensure leaf nodes (stories/docs) keep their icons visible
-    const leafNodes = sidebar.querySelectorAll(
-      'a[data-nodetype="story"], ' +
-      'a[data-nodetype="document"], ' +
-      'button[data-nodetype="story"], ' +
-      'button[data-nodetype="document"], ' +
-      'a[class*="LeafNode"], ' +
-      'a[class*="StoryNode"], ' +
-      'a[class*="DocumentNode"]'
-    );
-    
-    leafNodes.forEach(item => {
-      const icons = item.querySelectorAll('svg, [class*="TypeIcon"]');
-      icons.forEach(icon => {
-        icon.style.display = '';
-        icon.style.width = '';
-        icon.style.height = '';
-        icon.style.visibility = '';
-        icon.style.margin = '';
-        icon.style.padding = '';
-      });
-    });
-  }
-  
-  // Run immediately and on load
-  hideGroupNodeIcons();
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', hideGroupNodeIcons);
-  }
-  
-  // Run multiple times to catch dynamically loaded content
-  setTimeout(hideGroupNodeIcons, 100);
-  setTimeout(hideGroupNodeIcons, 500);
-  setTimeout(hideGroupNodeIcons, 1000);
-  
-  // Watch for sidebar updates
-  const observer = new MutationObserver(() => {
-    setTimeout(hideGroupNodeIcons, 50); // Small delay to let DOM settle
-  });
-  
-  // Observe sidebar container for changes
-  const sidebarContainer = document.querySelector('.sidebar-container');
-  if (sidebarContainer) {
-    observer.observe(sidebarContainer, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['style', 'data-nodetype', 'class']
-    });
-  }
-  
-  // Also observe the entire document for Storybook's React updates
-  const docObserver = new MutationObserver(() => {
-    const sidebar = document.querySelector('.sidebar-container');
-    if (sidebar) {
-      setTimeout(hideGroupNodeIcons, 50);
-    }
-  });
-
-  // manager-head.html runs in <head>. In some loads, `document.body` isn't ready yet.
-  // Guard to avoid: "Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'."
-  function startDocObserverWhenReady() {
-    if (!document.body) return false;
-    docObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-    return true;
-  }
-
-  if (!startDocObserverWhenReady()) {
-    document.addEventListener('DOMContentLoaded', startDocObserverWhenReady, { once: true });
-  }
 </script>
-
-

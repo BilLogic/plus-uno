@@ -11,7 +11,7 @@ import { Modal, Table, Form } from 'react-bootstrap';
 import Button from '../../../../../components/Button/Button';
 import Badge from '../../../../../components/Badge/Badge';
 import Pagination from '../../../../../components/Pagination/Pagination';
-import Switch from '../../../../../forms/Switch';
+import Switch from '@/forms/Switch';
 import './StudentModal.scss';
 
 const StudentModal = ({

@@ -4,7 +4,7 @@ import Alert from './Alert';
 export default {
     title: 'Components/Alert',
     component: Alert,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         layout: 'padded',
         docs: {
@@ -57,13 +57,10 @@ Supports multiple styles and optional title.
     },
 };
 
-/**
- * Overview
- * Shows all alert variants: styles and content configurations.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        {/* All Styles with Title */}
+const alertCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
+
+function AlertVariantsDemos() {
+    return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <h6 className="h6">All Styles (With Title, Dismissible)</h6>
             {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(style => (
@@ -72,32 +69,46 @@ export const Overview = () => (
                 </Alert>
             ))}
         </div>
+    );
+}
 
-        {/* Content Variants */}
+function AlertContentDemos() {
+    return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <h6 className="h6">Content Variants (Primary Style)</h6>
-
-            {/* With Title */}
             <Alert style="primary" title="With Title" dismissable>
                 Alert with title and message text.
             </Alert>
-
-            {/* Without Title */}
             <Alert style="primary" dismissable>
                 Alert without title — message only. Dismiss button adapts to body text size.
             </Alert>
-
-            {/* Non-dismissible */}
             <Alert style="primary" title="Non-dismissible Alert" dismissable={false}>
                 This alert cannot be dismissed.
             </Alert>
-
-            {/* Rich Content */}
             <Alert style="info" title="Rich Content">
                 <strong>Note:</strong> You can include <em>rich HTML content</em> and even{' '}
                 <a href="#">links</a> inside alerts.
             </Alert>
         </div>
+    );
+}
+
+export const Variants = () => (
+    <div style={alertCol}>
+        <AlertVariantsDemos />
+    </div>
+);
+
+export const Content = () => (
+    <div style={alertCol}>
+        <AlertContentDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={alertCol}>
+        <AlertVariantsDemos />
+        <AlertContentDemos />
     </div>
 );
 

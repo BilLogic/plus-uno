@@ -1,10 +1,10 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+// Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../packages/plus-ds/src/styles/main.scss';
+// Docs-only Tailwind + shadcn (no Preflight; see storybook-tailwind.css)
+import '../packages/plus-ds/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
-// Load design system styles so stories that import components directly (e.g. @/components/Modal)
-// still get .plus-modal, tokens, and other global styles from main.scss
-import '../packages/plus-ds/src/styles/main.scss';
 
 /**
  * Storybook preview configuration for PLUS Design System
@@ -58,6 +58,19 @@ const cleanupFunctions = {
 const preview = {
   parameters: {
     docs: {
+      toc: {
+        title: 'On this page',
+        /**
+         * Storybook’s TOC uses Tocbot, which scrolls via `window.scrollTo` + `getBoundingClientRect`.
+         * That path ignores CSS `scroll-padding-top` (see storybook-overrides.css). Defaults (±40px)
+         * are too small for the preview chrome, so “Layout” stops mid-viewport and scrollspy
+         * still marks the previous section active. Match our scroll-padding (6rem ≥768px; 5rem below).
+         */
+        unsafeTocbotOptions: {
+          headingsOffset: 96,
+          scrollSmoothOffset: -96,
+        },
+      },
       source: {
         type: 'code',
       },
@@ -65,11 +78,63 @@ const preview = {
     options: {
       storySort: {
         order: [
+          'PLUS Docs',
+          ['Introduction', 'Components', 'Guidelines', 'Tokens'],
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           'Forms',
+          [
+            'Label and Caption',
+            'Input',
+            'Textarea',
+            'Textarea ver 2',
+            'Number Input',
+            'Select',
+            'Cascader',
+            'Checkbox',
+            'Radio',
+            'Switch',
+            'Range',
+            'Multiple Choice',
+            'Choice Grid',
+            'File Upload',
+            'Date Picker',
+            'Time Picker',
+            'Rating',
+            'Input Group',
+            'Scale',
+          ],
           'Components',
+          [
+            'Accordion',
+            'Alert',
+            'Badge',
+            'Breadcrumb',
+            'Button',
+            'ButtonGroup',
+            'Card',
+            'Carousel',
+            'Collapse',
+            'Divider',
+            'Dropdown',
+            'Jumbotron',
+            'ListGroup',
+            'Loading',
+            'MediaObject',
+            'Modal',
+            'NavPills',
+            'NavTabs',
+            'Pagination',
+            'Popover',
+            'Progress',
+            'RichTextEditor',
+            'Scrollspy',
+            'SidebarTab',
+            'SuperCompPill',
+            'Toast',
+            'Tooltip',
+          ],
           'Data Visualizations',
           'Specs',
           [

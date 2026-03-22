@@ -8,7 +8,8 @@ import Alert from './Alert'; // We import the main component to extract/mock sub
  * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=4215-23104&m=dev
  */
 export default {
-    title: 'Components/Alert/Subcomponents',
+    title: 'Components/Alert',
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {

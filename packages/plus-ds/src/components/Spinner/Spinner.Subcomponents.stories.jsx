@@ -2,8 +2,9 @@ import React from 'react';
 import Spinner from './Spinner';
 
 export default {
-    title: 'Components/Loading/Subcomponents',
+    title: 'Components/Loading',
     component: Spinner,
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -21,11 +22,11 @@ export const SpinnerStates = () => (
             <h4 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>Standard Spinners</h4>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="border" color="primary" />
+                    <Spinner variant="border" />
                     <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Border (Default)</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="grow" color="primary" />
+                    <Spinner variant="grow" />
                     <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Grow</p>
                 </div>
             </div>
@@ -55,11 +56,11 @@ export const SpinnerStates = () => (
             <h4 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>Size Variants</h4>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-end' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="border" color="primary" />
+                    <Spinner variant="border" />
                     <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Default (48px)</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <Spinner variant="border" color="primary" size="sm" />
+                    <Spinner variant="border" size="sm" />
                     <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Small (24px)</p>
                 </div>
             </div>
@@ -75,22 +76,6 @@ SpinnerStates.parameters = {
     }
 };
 
-// Color Variants
-export const ColorVariants = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h4 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>Color Options</h4>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-            {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(color => (
-                <div key={color} style={{ textAlign: 'center', minWidth: '60px' }}>
-                    <Spinner variant="border" color={color} size="sm" />
-                    <p style={{ marginTop: '4px', fontSize: '10px', textTransform: 'capitalize' }}>{color}</p>
-                </div>
-            ))}
-        </div>
-    </div>
-);
-ColorVariants.storyName = 'Color Variants';
-
 // Interactive Loading Button Example
 export const LoadingButtonExample = () => {
     const [loading, setLoading] = React.useState(false);
@@ -104,6 +89,7 @@ export const LoadingButtonExample = () => {
         <div>
             <h4 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>Usage Example: Loading Button</h4>
             <button
+                type="button"
                 onClick={handleClick}
                 disabled={loading}
                 style={{
@@ -111,14 +97,15 @@ export const LoadingButtonExample = () => {
                     alignItems: 'center',
                     gap: '8px',
                     padding: '8px 16px',
-                    backgroundColor: loading ? '#ccc' : '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: loading ? 'not-allowed' : 'pointer'
+                    backgroundColor: 'var(--color-surface-container)',
+                    color: 'var(--color-on-surface)',
+                    border: '1px solid var(--color-outline-variant)',
+                    borderRadius: 'var(--size-element-radius-md, 8px)',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontFamily: 'var(--font-family-body, inherit)',
                 }}
             >
-                {loading && <Spinner variant="border" color="light" size="sm" />}
+                {loading && <Spinner variant="border" size="sm" />}
                 {loading ? 'Loading...' : 'Click to Load'}
             </button>
         </div>

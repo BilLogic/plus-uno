@@ -4,7 +4,7 @@ import Jumbotron from './Jumbotron';
 export default {
     title: 'Components/Jumbotron',
     component: Jumbotron,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -37,8 +37,10 @@ export default {
 
 const Template = (args) => <Jumbotron {...args} />;
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+const col = { display: 'flex', flexDirection: 'column', gap: '48px' };
+
+function JumbotronBasicDemo() {
+    return (
         <section>
             <h5>Basic</h5>
             <Jumbotron
@@ -46,18 +48,26 @@ export const Overview = () => (
                 children="This is a simple hero unit."
             />
         </section>
+    );
+}
 
+function JumbotronActionsDemo() {
+    return (
         <section>
             <h5>With Actions</h5>
             <Jumbotron
                 title="Marketing Hero"
                 subtitle="Subtitle text goes here"
                 children="This is a hero unit with call to action buttons."
-                primaryButton={{ text: "Learn More", onClick: () => console.log('Primary clicked') }}
-                secondaryButton={{ text: "Contact Us", onClick: () => console.log('Secondary clicked') }}
+                primaryButton={{ text: 'Learn More', onClick: () => console.log('Primary clicked') }}
+                secondaryButton={{ text: 'Contact Us', onClick: () => console.log('Secondary clicked') }}
             />
         </section>
+    );
+}
 
+function JumbotronSizesDemo() {
+    return (
         <section>
             <h5>Sizes (Small, default, Large padding)</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -73,6 +83,32 @@ export const Overview = () => (
                 />
             </div>
         </section>
+    );
+}
+
+export const Basic = () => (
+    <div style={col}>
+        <JumbotronBasicDemo />
+    </div>
+);
+
+export const WithActions = () => (
+    <div style={col}>
+        <JumbotronActionsDemo />
+    </div>
+);
+
+export const Sizes = () => (
+    <div style={col}>
+        <JumbotronSizesDemo />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={col}>
+        <JumbotronBasicDemo />
+        <JumbotronActionsDemo />
+        <JumbotronSizesDemo />
     </div>
 );
 
@@ -81,8 +117,8 @@ Interactive.args = {
     title: 'Hello, world!',
     subtitle: 'It uses utility classes for typography and spacing.',
     children: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
-    primaryButton: { text: "Learn more", style: "primary", fill: "filled" },
-    secondaryButton: { text: "Get started", style: "secondary", fill: "outline" },
+    primaryButton: { text: 'Learn more', style: 'primary', fill: 'filled' },
+    secondaryButton: { text: 'Get started', style: 'secondary', fill: 'outline' },
     fluid: false,
     paddingSize: 'md',
     gapSize: 'md',

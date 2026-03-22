@@ -1,0 +1,68 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as BadgeStories from './Badge.stories.jsx';
+import * as BadgeSubStories from './Badge.Subcomponents.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BadgeStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Leading icons, counters, and dismissible patterns.</>}>
+    <Canvas of={BadgeStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Label, leading icon, and trailing icon composition.</>}>
+    <Canvas of={BadgeSubStories.BadgeContent} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Semantic and curriculum color themes.</>}>
+    <Canvas of={BadgeStories.Variants} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Numeric counter treatment.</>}>
+    <Canvas of={BadgeSubStories.Counter} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sizes
+
+<DocsCanvasShell description={<>Header and body typography scales.</>}>
+    <Canvas of={BadgeStories.Sizes} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={BadgeStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
