@@ -2,17 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "marketplace",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite"],
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": true
-    },
-    {
-      "name": "storybook",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["storybook", "dev", "-p", "6006", "--host", "0.0.0.0", "--config-dir", ".storybook"],
-      "port": 6006
     },
     {
       "name": "home-redesign",
