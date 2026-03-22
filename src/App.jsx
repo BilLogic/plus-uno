@@ -28,13 +28,13 @@ function StorybookEmbed() {
 
 // Map prototype IDs to their internal route within the home-redesign shell
 const HOME_SHELL_ROUTES = {
-  'redesigned-homepage': '/home',
-  'tutor-admin': '/admin',
-  'sessions-prototype': '/sessions',
-  'session-reflection': '/reflection',
-  'lessons-simulator': '/lessons/supporting-growth-mindset',
-  'research-assistant-chat': '/research-assistant',
-  'monthly-report': '/monthly-reports',
+  '1001': '/home',           // Redesigned Homepage
+  '1002': '/admin',          // Tutor Admin
+  '1003': '/sessions',       // Sessions
+  '1004': '/reflection',     // Session Reflection
+  '1005': '/lessons/supporting-growth-mindset', // Lessons Simulator
+  '1006': '/research-assistant', // Research Assistant Chat
+  '1008': '/monthly-reports',   // Monthly Report
 };
 
 function PrototypeRouter() {
@@ -47,7 +47,7 @@ function PrototypeRouter() {
   }
 
   // Standalone embedded prototypes
-  if (prototypeId === 'sidebar-iteration') {
+  if (prototypeId === '1014') { // Sidebar Iteration
     return <SidebarIterationApp />;
   }
 

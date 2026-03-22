@@ -38,7 +38,7 @@ export const PILLAR_META = {
 
 export const prototypes = [
   {
-    id: 'redesigned-homepage',
+    id: '1001',
     title: 'Redesigned Homepage',
     description:
       'The new student dashboard with progress cards, tutoring performance radar, weekly load donut, student momentum charts, and personalized training carousel.',
@@ -50,11 +50,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'home',
-    localPath: '/redesigned-homepage',
+    localPath: '/1001',
     repoPath: 'playground/home-redesign/',
   },
   {
-    id: 'tutor-admin',
+    id: '1002',
     title: 'Tutor Admin',
     description:
       'Admin view for managing tutors and training progress, with compliance monitoring and performance tables.',
@@ -66,11 +66,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/tutor-admin',
+    localPath: '/1002',
     repoPath: 'playground/home-redesign/',
   },
   {
-    id: 'sessions-prototype',
+    id: '1003',
     title: 'Sessions',
     description:
       'In-session view with student cards, assignment management, chat tools, and real-time engagement tracking.',
@@ -82,11 +82,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/sessions-prototype',
+    localPath: '/1003',
     repoPath: 'playground/home-redesign/',
   },
   {
-    id: 'session-reflection',
+    id: '1004',
     title: 'Session Reflection',
     description:
       'Post-session reflection assistant with AI-guided prompts, student progress review, and strategy recommendations.',
@@ -98,11 +98,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/session-reflection',
+    localPath: '/1004',
     repoPath: 'playground/home-redesign/',
   },
   {
-    id: 'lessons-simulator',
+    id: '1005',
     title: 'Lessons Simulator',
     description:
       'A growth mindset simulation game where tutors practice responding to challenging student scenarios.',
@@ -114,11 +114,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'training',
-    localPath: '/lessons-simulator',
+    localPath: '/1005',
     repoPath: 'playground/home-redesign/',
   },
   {
-    id: 'research-assistant-chat',
+    id: '1006',
     title: 'Research Assistant Chat',
     description:
       'AI-powered research assistant for tutors using @assistant-ui/react with strategy heatmaps, training progress, and chat interface.',
@@ -130,11 +130,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/research-assistant-chat',
+    localPath: '/1006',
     repoPath: 'playground/research-assistant-chat/',
   },
   {
-    id: 'in-session-ux',
+    id: '1007',
     title: 'In-Session & Reflection',
     description:
       'In-session view with student management, reflection assistant, and manage-assignment modal.',
@@ -146,11 +146,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/in-session-ux',
+    localPath: '/1007',
     repoPath: 'playground/in-session-ux/',
   },
   {
-    id: 'monthly-report',
+    id: '1008',
     title: 'Monthly Reports',
     description:
       'Tutor monthly performance reports list and detail view with metrics and progress indicators.',
@@ -162,11 +162,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/monthly-report',
+    localPath: '/1008',
     repoPath: 'playground/monthly-report/',
   },
   {
-    id: 'weekly-report-demo',
+    id: '1009',
     title: 'Weekly Report Demo',
     description:
       'Weekly report page and list view for tutor performance summaries.',
@@ -178,11 +178,11 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/weekly-report-demo',
+    localPath: '/1009',
     repoPath: 'playground/weekly-report-demo/',
   },
   {
-    id: 'session-management',
+    id: '1010',
     title: 'Sessions Management',
     description:
       'Sessions page with session cards, attendance modal with attended/absent badges, and edit session modal with tutor/student rosters.',
@@ -194,11 +194,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: '/session-management',
+    localPath: '/1010',
     repoPath: 'playground/session-management/',
   },
   {
-    id: 'tutor-performance',
+    id: '1011',
     title: 'Tutor Performance',
     description:
       'Tutor Admin performance page with attendance/sign-up donut charts, sortable tutor table, and click-to-open attendance modal.',
@@ -210,11 +210,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: '/tutor-performance',
+    localPath: '/1011',
     repoPath: 'playground/tutor-performance/',
   },
   {
-    id: 'training-progress',
+    id: '1012',
     title: 'Training Progress',
     description:
       'Tutor Admin training progress page with completion/accuracy metrics, tutor table with progress rings, and lesson details modal.',
@@ -226,11 +226,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'training',
-    localPath: '/training-progress',
+    localPath: '/1012',
     repoPath: 'playground/training-progress/',
   },
   {
-    id: 'fill-in-flow',
+    id: '1013',
     title: 'Fill-In Flow',
     description:
       'Session fill-in request and approval flow for covering open session slots.',
@@ -242,11 +242,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: '/fill-in-flow',
+    localPath: '/1013',
     repoPath: 'playground/fill-in-flow/',
   },
   {
-    id: 'sidebar-iteration',
+    id: '1014',
     title: 'Sidebar Iteration',
     description:
       'Navigation sidebar redesign iterations for the toolkit section IA revision.',
@@ -258,11 +258,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'universal',
-    localPath: '/sidebar-iteration',
+    localPath: '/1014',
     repoPath: 'playground/sidebar-iteration/',
   },
   {
-    id: 'group-modal',
+    id: '1015',
     title: 'Group Modal',
     description:
       'Group Admin modal for adding/editing a group with name, school select, multi-select tutors, and group size fields.',
@@ -274,11 +274,11 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: '/group-modal',
+    localPath: '/1015',
     repoPath: 'playground/group-modal/',
   },
   {
-    id: 'group-performance-v2',
+    id: '1016',
     title: 'Group Performance v2',
     description:
       'Group Admin performance page with attendance pie chart, session distribution stacked bar, tutor table with color-coded badges, and pagination.',
@@ -290,11 +290,11 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: '/group-performance-v2',
+    localPath: '/1016',
     repoPath: 'playground/group-performance-v2/',
   },
   {
-    id: 'tutor-risk-interventions',
+    id: '1017',
     title: 'Tutor Risk & Interventions',
     description:
       'Tutor Admin risk page with at-risk stats, trend line chart, interventions bar chart, filter controls, and 20-row data table.',
@@ -306,11 +306,11 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: '/tutor-risk-interventions',
+    localPath: '/1017',
     repoPath: 'playground/tutor-risk-interventions/',
   },
   {
-    id: 'tutor-reflection-form',
+    id: '1018',
     title: 'Tutor Reflection Form',
     description:
       'Redesigned post-session reflection form with one-form-per-session flow, adaptive branching, student deep dive, strategy effectiveness ratings, and escalation tracking.',
@@ -322,11 +322,11 @@ export const prototypes = [
     creators: ['Bryan'],
     contributors: ['Bryan'],
     productPillar: 'toolkit',
-    localPath: '/tutor-reflection-form',
+    localPath: '/1018',
     repoPath: 'playground/tutor-reflection-form/',
   },
   {
-    id: 'storybook-ai-agent',
+    id: '1019',
     title: 'Storybook AI Agent',
     description:
       'AI-powered Storybook automation agent for component documentation and testing.',
@@ -338,11 +338,11 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'universal',
-    localPath: '/storybook-ai-agent',
+    localPath: '/1019',
     repoPath: 'playground/storybook-ai-agent/',
   },
   {
-    id: 'group-info',
+    id: '1020',
     title: 'Group Info',
     description:
       'Group information display and management interface.',
@@ -354,11 +354,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: '/group-info',
+    localPath: '/1020',
     repoPath: 'playground/group-info/',
   },
   {
-    id: 'help-request-flow',
+    id: '1021',
     title: 'Help Request Flow',
     description:
       'Student help request submission and tutor notification flow.',
@@ -370,11 +370,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: '/help-request-flow',
+    localPath: '/1021',
     repoPath: 'playground/help-request-flow/',
   },
   {
-    id: 'recommend-sessions',
+    id: '1022',
     title: 'Recommend Sessions',
     description:
       'Session recommendation interface with tutor matching and session modal.',
@@ -386,11 +386,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: '/recommend-sessions',
+    localPath: '/1022',
     repoPath: 'playground/recommend-sessions/',
   },
   {
-    id: 'starter',
+    id: '1023',
     title: 'Starter Template',
     description:
       'Minimal starter template for new playground prototypes with PLUS DS integration.',
@@ -402,11 +402,11 @@ export const prototypes = [
     creators: ['Bryan'],
     contributors: ['Bryan'],
     productPillar: 'universal',
-    localPath: '/starter',
+    localPath: '/1023',
     repoPath: 'playground/starter/',
   },
   {
-    id: 'student-goal-dashboard-flow',
+    id: '1024',
     title: 'Student Goal Dashboard',
     description:
       'Session admin dashboard with student goals, session breakdown modal, and student assignment modal.',
@@ -418,11 +418,11 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: '/student-goal-dashboard-flow',
+    localPath: '/1024',
     repoPath: 'playground/student-goal-dashboard-flow/',
   },
   {
-    id: 'student-onboarding-wizard',
+    id: '1025',
     title: 'Student Onboarding Wizard',
     description:
       'Multi-step student onboarding wizard with baseline assessment, schedule selection, and goal setting.',
@@ -434,7 +434,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'training',
-    localPath: '/student-onboarding-wizard',
+    localPath: '/1025',
     repoPath: 'playground/student-onboarding-wizard/',
   },
 ];
