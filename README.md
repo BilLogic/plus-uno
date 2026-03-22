@@ -82,7 +82,7 @@ Platform-specific pointer files route each agent into `.agent/SKILL.md`:
 | Claude Code | `CLAUDE.md` |
 | Windsurf | `.windsurfrules` |
 
-For other tools, paste the relevant SKILL.md content into your prompt. See `.agent/references/platform-integration.md` for details.
+For other tools, paste the relevant SKILL.md content into your prompt. See `docs/design-system/platform-integration.md` for details.
 
 ## Design System Principles
 
@@ -155,10 +155,10 @@ For AI coding agents:
 
 Core references:
 
-- `.agent/references/index.md`
-- `.agent/references/tokens-guide.md`
-- `.agent/references/components-guide.md`
-- `.agent/references/patterns-guide.md`
+- `docs/design-system/ (consolidated)`
+- `docs/design-system/tokens.md`
+- `docs/design-system/components.md`
+- `docs/design-system/ (consolidated)`
 
 ### For Designers: When to Start a New Chat
 

@@ -5,14 +5,14 @@ Workspace for prototype exploration and reusable templates.
 ## Structure
 
 - `playground/templates/` — reusable starter templates by product area
-- `playground/prototyping/` — designer/feature-specific experiments
+- `playground/` — designer/feature-specific experiments
 
 ## Runtime
 
 Use Vite-based prototype apps and run them from their own folder:
 
 ```bash
-cd playground/prototyping/{name}/{project}
+cd playground/{project}
 npm install
 npm run dev
 ```

@@ -29,7 +29,7 @@ From the **project root** (so design system paths resolve):
 1. Install dependencies (once):
 
    ```bash
-   cd playground/prototyping/victor/training-progress
+   cd playground/training-progress
    npm install
    ```
 

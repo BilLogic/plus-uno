@@ -2,7 +2,7 @@
 
 A blank playground project scaffolded with the PLUS design system.
 
-- **Location**: `playground/prototyping/Bryan/starter/`
+- **Location**: `playground/starter/`
 - **Port**: 3020 (default)
 
 ## Run locally
@@ -10,7 +10,7 @@ A blank playground project scaffolded with the PLUS design system.
 From the **project root**:
 
 ```bash
-npx vite --config playground/prototyping/Bryan/starter/vite.config.js
+npx vite --config playground/starter/vite.config.js
 ```
 
 Or from this folder:
@@ -40,7 +40,7 @@ Design tokens are available as CSS variables (`--color-primary`, `--size-section
 To start a new prototype, duplicate this `starter` folder and rename it:
 
 ```
-playground/prototyping/Bryan/
+playground/
 ├── starter/          ← this template
 ├── my-new-prototype/ ← copy starter, rename, and start building
 └── ...

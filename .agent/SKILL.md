@@ -28,7 +28,7 @@ This repository includes:
 - Design system docs: `design-system/guidelines`
 - Storybook config: `.storybook`
 - Token sync and generation scripts: `scripts/sync-figma-tokens.js`, `scripts/generate-all-tokens.js`
-- Existing agent guidance: `.agent/AGENT.md`, `.agent/references/*`, `.agent/assets/*`
+- Existing agent guidance: `.agent/AGENT.md`, `docs/design-system/*`, `.agent/assets/*`
 - Validation scripts: `.agent/scripts/*`
 
 Integrations available in this repo workflow:

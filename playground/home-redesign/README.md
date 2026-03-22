@@ -3,7 +3,7 @@
 Homepage redesign based on **Figma APPLICATION-PROTOTYPES**, node **158-21725**. All prototype files for this design live under this folder.
 
 - **Figma**: [APPLICATION-PROTOTYPES](https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725)
-- **Location**: `playground/prototyping/bill/home-redesign/`
+- **Location**: `playground/home-redesign/`
 
 ## Using Figma MCP
 

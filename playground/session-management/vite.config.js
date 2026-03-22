@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// Repo root: four levels up from playground/prototyping/victor/sessions
+// Repo root: four levels up from playground/sessions
 const root = path.resolve(__dirname, '../../../..');
 
 export default defineConfig({

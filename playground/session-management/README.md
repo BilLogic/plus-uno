@@ -1,6 +1,6 @@
 # Sessions Prototype
 
-This prototype implements the sessions management interface based on the provided wireframes. It lives under **playground/prototyping/{your-name}/{prototype-name}/** per the prototyping docs — here: `playground/prototyping/victor/sessions/`.
+This prototype implements the sessions management interface based on the provided wireframes. It lives under **playground/{your-name}/{prototype-name}/** per the prototyping docs — here: `playground/sessions/`.
 
 ## Features
 
@@ -26,7 +26,7 @@ This prototype is a React + Vite app. Run it from the **project root** (so paths
 
 1. **Install dependencies** (only needed once):
    ```bash
-   cd playground/prototyping/victor/sessions
+   cd playground/sessions
    npm install
    ```
 
@@ -60,7 +60,7 @@ This prototype is a React + Vite app. Run it from the **project root** (so paths
 ## File Structure
 
 ```
-playground/prototyping/victor/sessions/
+playground/sessions/
 ├── SessionsPage.jsx       # Main sessions page (cards + modals)
 ├── AttendanceModal.jsx    # Modal: assigned sessions with Attended/Absent badges
 ├── EditSessionModal.jsx   # Edit session modal with tabs

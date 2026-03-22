@@ -92,11 +92,11 @@ Load docs on-demand based on what comes up in conversation:
 |---------|------|
 | Building UI, using components or tokens | `.agent/assets/PLUS_CHEAT_SHEET.md` (MANDATORY) |
 | Building new pages, dashboards, layouts | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` (MANDATORY) |
-| Figma link or MCP tools mentioned | `.agent/references/integrations-guide.md` |
-| Component architecture questions | `.agent/references/components-guide.md` |
-| Build, preview, or deployment | `.agent/references/local-preview-runbook.md` |
+| Figma link or MCP tools mentioned | `docs/design-system/integrations.md` |
+| Component architecture questions | `docs/design-system/components.md` |
+| Build, preview, or deployment | `docs/design-system/guides/local-preview.md` |
 | Exact file paths or env vars needed | Relevant `.agent/assets/*-index.json` |
-| Token sync or repo scripts | `.agent/references/script-inventory.md` |
+| Token sync or repo scripts | `docs/design-system/maintenance/scripts.md` |
 | Product context, users, or domain terms | `docs/project/plus-app*.md` |
 
 Keep context lean: load mode file first, then only 2-3 needed guides (~2,000-2,500 tokens). Avoid full load (~5,500 tokens).
