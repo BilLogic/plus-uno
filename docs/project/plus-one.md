@@ -17,7 +17,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 | React | 19.2.1 | UI framework |
 | React-Bootstrap | 2.10.10 | Component primitives |
 | Bootstrap | 5.3.3 | CSS foundation |
-| Vite | 6.4.1 | Build + dev server |
+| Vite | 8.0.1 | Build + dev server (Rolldown-powered) |
 | Storybook | 10.2.7 | Component documentation |
 | SASS | 1.77.8 | CSS preprocessing |
 | Highcharts | 12.5.0 | Data visualization |

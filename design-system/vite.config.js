@@ -29,7 +29,7 @@ export default defineConfig({
             formats: ['es', 'cjs'],
             fileName: (format) => format === 'es' ? 'index.esm.js' : 'index.js'
         },
-        rollupOptions: {
+        rolldownOptions: {
             // Externalize peer dependencies - consumers provide these
             // NOTE: prop-types and classnames are NOT externalized - they are bundled
             // because ESM consumers cannot resolve external globals like UMD can

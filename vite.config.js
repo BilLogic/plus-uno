@@ -41,12 +41,13 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     chunkSizeWarningLimit: 1200,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
+        // Vendor splitting to avoid a single oversized app chunk.
+        // manualChunks is deprecated in Vite 8 — migrate to codeSplitting when stable.
         manualChunks(id) {
           if (!id) return undefined;
 
-          // Vendor splitting to avoid a single oversized app chunk.
           if (id.includes('node_modules')) {
             if (id.includes('/framer-motion/')) {
               return 'vendor-motion';

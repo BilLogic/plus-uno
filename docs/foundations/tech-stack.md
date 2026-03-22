@@ -7,7 +7,7 @@
 | React | 19.2.1 | UI framework |
 | React-Bootstrap | 2.10.10 | Component library base |
 | Bootstrap | 5.3.3 | CSS framework |
-| Vite | ~6.4.1 | Build tool + dev server |
+| Vite | ^8.0.1 | Build tool + dev server (Rolldown-powered) |
 | SASS | 1.77.8 | CSS preprocessing |
 
 ## Documentation & Testing

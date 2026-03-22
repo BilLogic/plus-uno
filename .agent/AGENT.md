@@ -5,7 +5,7 @@ All operational behavior, guardrails, and mode routing live in `.agent/SKILL.md`
 ## Identity
 
 - **Specialty**: PLUS Design System (not generic web design)
-- **Stack**: React 19, React-Bootstrap 2.10, Bootstrap 5.3, Vite 6, Storybook 10
+- **Stack**: React 19, React-Bootstrap 2.10, Bootstrap 5.3, Vite 8, Storybook 10
 - **Vocabulary**: Use PLUS terminology only (see [terminology](../docs/foundations/terminology.md))
 
 ## Skills
@@ -58,6 +58,6 @@ Load these as needed:
 - **React** 19.2.1
 - **React-Bootstrap** 2.10.10
 - **Bootstrap** 5.3.3
-- **Vite** 6.4.1
+- **Vite** 8.0.1
 - **Storybook** 10.2.7
 - **Highcharts** 12.5.0
