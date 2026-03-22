@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Select from '@/forms/Select';
 import PrototypeCard from './PrototypeCard';
 import {
@@ -17,6 +17,16 @@ const PrototypeMarket = () => {
   const [search, setSearch] = useState('');
   const [selectedStages, setSelectedStages] = useState([]);
   const [selectedPillars, setSelectedPillars] = useState([]);
+
+  // Break out of demo frame when marketplace is active
+  useEffect(() => {
+    document.documentElement.classList.add('market-active');
+    document.body.classList.add('market-active');
+    return () => {
+      document.documentElement.classList.remove('market-active');
+      document.body.classList.remove('market-active');
+    };
+  }, []);
 
   const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || search;
 

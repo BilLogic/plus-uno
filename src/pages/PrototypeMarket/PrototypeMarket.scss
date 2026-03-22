@@ -1,14 +1,37 @@
+// Break out of the demo frame — marketplace needs full viewport
+// Uses html.market-active for highest specificity over index.css rules
+html.market-active,
+html.market-active body {
+  background-color: var(--color-surface, #fff) !important;
+  display: block !important;
+  justify-content: initial !important;
+  align-items: initial !important;
+}
+
+html.market-active #root {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  aspect-ratio: unset !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
 .prototype-market {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--size-section-pad-y-lg, 32px) var(--size-section-pad-x-lg, 32px);
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 48px;
   font-family: var(--font-family-body, sans-serif);
   display: flex;
   flex-direction: column;
   gap: var(--size-section-gap-md, 20px);
-  min-height: 0; // Allow flex child to shrink so overflow can scroll
-  overflow-y: auto;
-  flex: 1;
+  background: var(--color-surface, #fff);
+  box-sizing: border-box;
 
   // ── Header ──────────────────────────────────
   &__header {
