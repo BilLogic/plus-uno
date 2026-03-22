@@ -2,11 +2,12 @@
   position: fixed;
   bottom: var(--size-section-gap-sm, 24px);
   left: var(--size-section-gap-sm, 24px);
-  z-index: 1000;
+  z-index: 1100;
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
   gap: var(--size-element-gap-md, 10px);
+  width: fit-content !important;
 
   &__trigger {
     width: 48px;

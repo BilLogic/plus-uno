@@ -17,10 +17,15 @@ import './PrototypeMarket.scss';
 const stageOptions = STAGES.map((s) => ({ value: s, label: STAGE_META[s].label }));
 const pillarOptions = PRODUCT_PILLARS.map((p) => ({ value: p, label: PILLAR_META[p].label }));
 
+// Derive unique creators from data
+const CREATORS = [...new Set(prototypes.flatMap((p) => p.creators))].sort();
+const creatorOptions = CREATORS.map((c) => ({ value: c, label: c }));
+
 const PrototypeMarket = () => {
   const [search, setSearch] = useState('');
   const [selectedStages, setSelectedStages] = useState([]);
   const [selectedPillars, setSelectedPillars] = useState([]);
+  const [selectedCreators, setSelectedCreators] = useState([]);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
   // Break out of demo frame when marketplace is active
@@ -33,13 +38,14 @@ const PrototypeMarket = () => {
     };
   }, []);
 
-  const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || search;
+  const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || selectedCreators.length > 0 || search;
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return prototypes.filter((p) => {
       if (selectedStages.length > 0 && !selectedStages.includes(p.stage)) return false;
       if (selectedPillars.length > 0 && !selectedPillars.includes(p.productPillar)) return false;
+      if (selectedCreators.length > 0 && !p.creators.some((c) => selectedCreators.includes(c))) return false;
       if (q) {
         const haystack = [
           p.title,
@@ -54,7 +60,7 @@ const PrototypeMarket = () => {
       }
       return true;
     });
-  }, [search, selectedStages, selectedPillars]);
+  }, [search, selectedStages, selectedPillars, selectedCreators]);
 
   return (
     <div className="prototype-market">
@@ -105,6 +111,19 @@ const PrototypeMarket = () => {
             size="medium"
           />
         </div>
+
+        <div className="prototype-market__filter-group">
+          <label className="prototype-market__filter-label body3-txt">Creator</label>
+          <Select
+            id="market-creator-filter"
+            mode="multi"
+            options={creatorOptions}
+            value={selectedCreators}
+            onChange={setSelectedCreators}
+            placeholder="All creators"
+            size="medium"
+          />
+        </div>
       </div>
 
       {/* Result count + view toggle */}
@@ -120,6 +139,7 @@ const PrototypeMarket = () => {
               onClick={() => {
                 setSelectedStages([]);
                 setSelectedPillars([]);
+                setSelectedCreators([]);
                 setSearch('');
               }}
             />
