@@ -14,7 +14,7 @@ import TutorAdminContent from '../../research-assistant-chat/src/views/TutorAdmi
 import MonthlyReportsListContent from '../../monthly-report/src/MonthlyReportsListContent';
 import MonthlyReportContent from '../../monthly-report/src/MonthlyReportContent';
 
-import DevIndexPage from './components/DevIndexPage';
+// DevIndexPage removed — marketplace handles prototype navigation now
 
 import StudentInsightsModal from '../../in-session-ux/StudentInsightsModal';
 
@@ -226,8 +226,8 @@ const ReflectionContent = () => {
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<DevIndexPage />} />
             <Route element={<ShellLayout />}>
+                <Route index element={<HomeContent />} />
                 <Route path="/home" element={<HomeContent />} />
                 <Route path="/reflection" element={<ReflectionContent />} />
                 <Route path="/sessions" element={<InSessionContent />} />

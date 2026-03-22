@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Select from '@/forms/Select';
+import Badge from '@/components/Badge';
 import PrototypeCard from './PrototypeCard';
 import {
   prototypes,
@@ -17,6 +18,7 @@ const PrototypeMarket = () => {
   const [search, setSearch] = useState('');
   const [selectedStages, setSelectedStages] = useState([]);
   const [selectedPillars, setSelectedPillars] = useState([]);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
   // Break out of demo frame when marketplace is active
   useEffect(() => {
@@ -113,30 +115,94 @@ const PrototypeMarket = () => {
         </div>
       </div>
 
-      {/* Result count */}
-      <div className="prototype-market__count body2-txt">
-        {filtered.length} {filtered.length === 1 ? 'prototype' : 'prototypes'}
-        {hasFilters && (
+      {/* Result count + view toggle */}
+      <div className="prototype-market__toolbar">
+        <div className="prototype-market__count body2-txt">
+          {filtered.length} {filtered.length === 1 ? 'prototype' : 'prototypes'}
+          {hasFilters && (
+            <button
+              className="prototype-market__clear-filters body3-txt"
+              onClick={() => {
+                setSelectedStages([]);
+                setSelectedPillars([]);
+                setSearch('');
+              }}
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+        <div className="prototype-market__view-toggle">
           <button
-            className="prototype-market__clear-filters body3-txt"
-            onClick={() => {
-              setSelectedStages([]);
-              setSelectedPillars([]);
-              setSearch('');
-            }}
+            className={`prototype-market__view-btn ${viewMode === 'grid' ? 'prototype-market__view-btn--active' : ''}`}
+            onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
+            title="Grid view"
           >
-            Clear filters
+            <i className="fa-solid fa-grid-2" />
           </button>
-        )}
+          <button
+            className={`prototype-market__view-btn ${viewMode === 'list' ? 'prototype-market__view-btn--active' : ''}`}
+            onClick={() => setViewMode('list')}
+            aria-label="List view"
+            title="List view"
+          >
+            <i className="fa-solid fa-list" />
+          </button>
+        </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid or List */}
       {filtered.length > 0 ? (
-        <div className="prototype-market__grid">
-          {filtered.map((proto) => (
-            <PrototypeCard key={proto.id} {...proto} />
-          ))}
-        </div>
+        viewMode === 'grid' ? (
+          <div className="prototype-market__grid">
+            {filtered.map((proto) => (
+              <PrototypeCard key={proto.id} {...proto} />
+            ))}
+          </div>
+        ) : (
+          <div className="prototype-market__list">
+            <div className="prototype-market__list-header body3-txt">
+              <span className="prototype-market__list-col--name">Name</span>
+              <span className="prototype-market__list-col--pillar">Pillar</span>
+              <span className="prototype-market__list-col--stage">Stage</span>
+              <span className="prototype-market__list-col--creator">Creator</span>
+              <span className="prototype-market__list-col--date">Updated</span>
+              <span className="prototype-market__list-col--link">Link</span>
+            </div>
+            {filtered.map((proto) => {
+              const stageMeta = STAGE_META[proto.stage] || STAGE_META.low;
+              const pillarMeta = PILLAR_META[proto.productPillar] || PILLAR_META.universal;
+              const link = proto.deploymentUrl || proto.localPath;
+              return (
+                <a
+                  key={proto.id}
+                  href={link || '#'}
+                  className="prototype-market__list-row body2-txt"
+                  target={proto.deploymentUrl ? '_blank' : undefined}
+                  rel={proto.deploymentUrl ? 'noopener noreferrer' : undefined}
+                  onClick={!link ? (e) => e.preventDefault() : undefined}
+                >
+                  <span className="prototype-market__list-col--name">
+                    <strong>{proto.title}</strong>
+                    <span className="prototype-market__list-desc">{proto.description}</span>
+                  </span>
+                  <span className="prototype-market__list-col--pillar">
+                    <Badge style={pillarMeta.badgeStyle} size="b3">{pillarMeta.label}</Badge>
+                  </span>
+                  <span className="prototype-market__list-col--stage">
+                    <Badge style={stageMeta.badgeStyle} size="b3">{stageMeta.label}</Badge>
+                  </span>
+                  <span className="prototype-market__list-col--creator">{proto.creators?.join(', ')}</span>
+                  <span className="prototype-market__list-col--date">{proto.lastUpdated}</span>
+                  <span className="prototype-market__list-col--link">
+                    {link ? <i className="fa-solid fa-arrow-up-right-from-square" /> : <i className="fa-solid fa-circle-minus" style={{ opacity: 0.3 }} />}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        )
       ) : (
         <div className="prototype-market__empty">
           <i className="fa-regular fa-folder-open prototype-market__empty-icon" />

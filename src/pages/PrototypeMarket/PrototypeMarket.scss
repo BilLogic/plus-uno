@@ -128,7 +128,13 @@ html.market-active #root {
     letter-spacing: 0.04em;
   }
 
-  // ── Result count ────────────────────────────
+  // ── Toolbar (count + view toggle) ──────────
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   &__count {
     color: var(--color-on-surface-variant, #666);
     display: flex;
@@ -150,6 +156,40 @@ html.market-active #root {
     }
   }
 
+  &__view-toggle {
+    display: flex;
+    gap: 2px;
+    background: var(--color-surface-container-low, #f3f3f3);
+    border-radius: 6px;
+    padding: 2px;
+  }
+
+  &__view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--color-on-surface-variant, #666);
+    font-size: 14px;
+    transition: all 0.15s ease;
+
+    &:hover {
+      color: var(--color-on-surface, #333);
+      background: var(--color-surface-container, #e8e8e8);
+    }
+
+    &--active {
+      background: var(--color-surface, #fff);
+      color: var(--color-on-surface, #1a1a1a);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  }
+
   // ── Card grid ───────────────────────────────
   &__grid {
     display: grid;
@@ -162,6 +202,87 @@ html.market-active #root {
 
     @media (max-width: 640px) {
       grid-template-columns: 1fr;
+    }
+  }
+
+  // ── List view ──────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-outline-variant, #e0e0e0);
+    border-radius: var(--size-surface-radius, 8px);
+    overflow: hidden;
+  }
+
+  &__list-header {
+    display: grid;
+    grid-template-columns: 2fr 100px 80px 80px 100px 40px;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--color-surface-container-low, #f5f5f5);
+    border-bottom: 1px solid var(--color-outline-variant, #e0e0e0);
+    color: var(--color-on-surface-variant, #666);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    align-items: center;
+  }
+
+  &__list-row {
+    display: grid;
+    grid-template-columns: 2fr 100px 80px 80px 100px 40px;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-outline-variant, #eee);
+    text-decoration: none;
+    color: var(--color-on-surface, #1a1a1a);
+    align-items: center;
+    transition: background 0.1s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--color-surface-container-lowest, #f9f9f9);
+    }
+
+    strong {
+      display: block;
+      font-weight: 600;
+    }
+  }
+
+  &__list-desc {
+    display: block;
+    font-size: 12px;
+    color: var(--color-on-surface-variant, #888);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__list-col--name {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &__list-col--link {
+    text-align: center;
+    color: var(--color-on-surface-variant, #888);
+  }
+
+  @media (max-width: 768px) {
+    &__list-header,
+    &__list-row {
+      grid-template-columns: 1fr 80px 70px;
+    }
+
+    &__list-col--creator,
+    &__list-col--date,
+    &__list-col--link {
+      display: none;
     }
   }
 
