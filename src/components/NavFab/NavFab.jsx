@@ -8,7 +8,7 @@ const NAV_ITEMS = [
     id: 'storybook',
     label: 'Storybook',
     icon: 'fa-solid fa-book-open',
-    href: '/storybook',
+    href: 'http://localhost:6006',
     external: true
   },
   {
@@ -62,6 +62,8 @@ export default function NavFab() {
               <motion.a
                 className="nav-fab__action"
                 href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
                 role="menuitem"
                 aria-label={`Open ${item.label}`}
                 whileHover={{ scale: 1.08 }}
