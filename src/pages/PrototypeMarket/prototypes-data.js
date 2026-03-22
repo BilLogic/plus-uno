@@ -50,7 +50,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'home',
-    localPath: '/home',
+    localPath: '/redesigned-homepage',
     repoPath: 'playground/home-redesign/',
   },
   {
@@ -66,7 +66,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/home/admin',
+    localPath: '/tutor-admin',
     repoPath: 'playground/home-redesign/',
   },
   {
@@ -82,7 +82,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/home/sessions',
+    localPath: '/sessions-prototype',
     repoPath: 'playground/home-redesign/',
   },
   {
@@ -98,7 +98,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/home/reflection',
+    localPath: '/session-reflection',
     repoPath: 'playground/home-redesign/',
   },
   {
@@ -114,7 +114,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'training',
-    localPath: '/home/lessons/supporting-growth-mindset',
+    localPath: '/lessons-simulator',
     repoPath: 'playground/home-redesign/',
   },
   {
@@ -130,7 +130,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/research-assistant',
+    localPath: '/research-assistant-chat',
     repoPath: 'playground/research-assistant-chat/',
   },
   {
@@ -146,7 +146,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/sessions',
+    localPath: '/in-session-ux',
     repoPath: 'playground/in-session-ux/',
   },
   {
@@ -162,7 +162,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: '/monthly-reports',
+    localPath: '/monthly-report',
     repoPath: 'playground/monthly-report/',
   },
   {
@@ -178,7 +178,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/weekly-report-demo',
     repoPath: 'playground/weekly-report-demo/',
   },
   {
@@ -194,7 +194,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: null,
+    localPath: '/session-management',
     repoPath: 'playground/session-management/',
   },
   {
@@ -210,7 +210,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/tutor-performance',
     repoPath: 'playground/tutor-performance/',
   },
   {
@@ -226,7 +226,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'training',
-    localPath: null,
+    localPath: '/training-progress',
     repoPath: 'playground/training-progress/',
   },
   {
@@ -242,7 +242,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: null,
+    localPath: '/fill-in-flow',
     repoPath: 'playground/fill-in-flow/',
   },
   {
@@ -258,7 +258,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'universal',
-    localPath: null,
+    localPath: '/sidebar-iteration',
     repoPath: 'playground/sidebar-iteration/',
   },
   {
@@ -274,7 +274,7 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/group-modal',
     repoPath: 'playground/group-modal/',
   },
   {
@@ -290,7 +290,7 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/group-performance-v2',
     repoPath: 'playground/group-performance-v2/',
   },
   {
@@ -306,7 +306,7 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/tutor-risk-interventions',
     repoPath: 'playground/tutor-risk-interventions/',
   },
   {
@@ -322,7 +322,7 @@ export const prototypes = [
     creators: ['Bryan'],
     contributors: ['Bryan'],
     productPillar: 'toolkit',
-    localPath: null,
+    localPath: '/tutor-reflection-form',
     repoPath: 'playground/tutor-reflection-form/',
   },
   {
@@ -338,7 +338,7 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'universal',
-    localPath: null,
+    localPath: '/storybook-ai-agent',
     repoPath: 'playground/storybook-ai-agent/',
   },
   {
@@ -354,7 +354,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/group-info',
     repoPath: 'playground/group-info/',
   },
   {
@@ -370,7 +370,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: null,
+    localPath: '/help-request-flow',
     repoPath: 'playground/help-request-flow/',
   },
   {
@@ -386,7 +386,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: null,
+    localPath: '/recommend-sessions',
     repoPath: 'playground/recommend-sessions/',
   },
   {
@@ -402,7 +402,7 @@ export const prototypes = [
     creators: ['Bryan'],
     contributors: ['Bryan'],
     productPillar: 'universal',
-    localPath: null,
+    localPath: '/starter',
     repoPath: 'playground/starter/',
   },
   {
@@ -418,7 +418,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: null,
+    localPath: '/student-goal-dashboard-flow',
     repoPath: 'playground/student-goal-dashboard-flow/',
   },
   {
@@ -434,7 +434,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'training',
-    localPath: null,
+    localPath: '/student-onboarding-wizard',
     repoPath: 'playground/student-onboarding-wizard/',
   },
 ];
