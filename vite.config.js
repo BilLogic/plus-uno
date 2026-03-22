@@ -35,7 +35,20 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    strictPort: false
+    strictPort: false,
+    proxy: {
+      '/storybook': {
+        target: 'http://localhost:6006',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/storybook/, ''),
+        configure: (proxy) => {
+          proxy.on('error', (_err, _req, res) => {
+            res.writeHead(503, { 'Content-Type': 'text/html' });
+            res.end('<html><body style="font-family:sans-serif;padding:40px;text-align:center"><h2>Storybook is not running</h2><p>Start it with: <code>npm run storybook</code></p><p><a href="/">Back to Marketplace</a></p></body></html>');
+          });
+        }
+      }
+    }
   },
   build: {
     outDir: 'dist',

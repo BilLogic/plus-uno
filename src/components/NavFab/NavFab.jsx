@@ -8,7 +8,7 @@ const NAV_ITEMS = [
     id: 'storybook',
     label: 'Storybook',
     icon: 'fa-solid fa-book-open',
-    href: 'http://localhost:6006',
+    href: '/storybook',
     external: true
   },
   {
