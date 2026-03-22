@@ -87,11 +87,10 @@ const config = {
     // Configure Vite to resolve modules from project root
     config.resolve.preserveSymlinks = false;
 
-    // Ensure story files are treated as ES modules
+    // Ensure story files are treated as ES modules (Vite 8 / Rolldown)
     config.optimizeDeps = config.optimizeDeps || {};
-    config.optimizeDeps.esbuildOptions = config.optimizeDeps.esbuildOptions || {};
-    config.optimizeDeps.esbuildOptions.loader = config.optimizeDeps.esbuildOptions.loader || {};
-    config.optimizeDeps.esbuildOptions.loader['.js'] = 'jsx';
+    config.optimizeDeps.rolldownOptions = config.optimizeDeps.rolldownOptions || {};
+    config.optimizeDeps.rolldownOptions.moduleTypes = { '.js': 'jsx' };
 
     // Ensure proper ES module handling
     config.optimizeDeps.include = config.optimizeDeps.include || [];
