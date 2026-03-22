@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Tooltip from '@/components/Tooltip';
 import './NavFab.scss';
 
-const HIDDEN_PATHS = ['/', '/market', '/prototypes'];
+const MARKETPLACE_PATHS = ['/', '/market', '/prototypes'];
 
-const NAV_ITEMS = [
+const ALL_ITEMS = [
   {
     id: 'storybook',
     label: 'Storybook',
@@ -27,7 +27,10 @@ export default function NavFab() {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (HIDDEN_PATHS.includes(pathname)) return null;
+  const isOnMarketplace = MARKETPLACE_PATHS.includes(pathname);
+  const items = isOnMarketplace
+    ? ALL_ITEMS.filter(item => item.id !== 'marketplace')
+    : ALL_ITEMS;
 
   return (
     <div
@@ -36,7 +39,7 @@ export default function NavFab() {
       onMouseLeave={() => setIsOpen(false)}
     >
       <AnimatePresence>
-        {isOpen && NAV_ITEMS.map((item, index) => (
+        {isOpen && items.map((item, index) => (
           <motion.div
             key={item.id}
             className="nav-fab__item-wrapper"
