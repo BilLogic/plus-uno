@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/Card';
 import Badge from '@/components/Badge';
-import { STAGE_META, PILLAR_META } from './prototypes-data';
+import { STAGES, PRODUCT_PILLARS, STAGE_META, PILLAR_META } from './prototypes-data';
 import './PrototypeCard.scss';
 
 function formatDate(dateStr) {
@@ -46,6 +46,10 @@ const PrototypeCard = ({
       gapSize="md"
       radiusSize="sm"
       onClick={isClickable ? handleCardClick : undefined}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(); } } : undefined}
+      aria-label={isClickable ? `Open ${title}` : undefined}
     >
       {/* Badges row */}
       <div className="prototype-card__badges">
@@ -125,8 +129,8 @@ const PrototypeCard = ({
 PrototypeCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  stage: PropTypes.oneOf(['low', 'mid', 'high']).isRequired,
-  productPillar: PropTypes.string.isRequired,
+  stage: PropTypes.oneOf(STAGES).isRequired,
+  productPillar: PropTypes.oneOf(PRODUCT_PILLARS).isRequired,
   creators: PropTypes.arrayOf(PropTypes.string),
   contributors: PropTypes.arrayOf(PropTypes.string),
   lastUpdated: PropTypes.string,

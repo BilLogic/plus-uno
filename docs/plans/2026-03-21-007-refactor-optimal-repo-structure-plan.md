@@ -1,7 +1,7 @@
 ---
 title: "refactor: Optimal repo structure — flatten packages, consolidate docs, complete restructure"
 type: refactor
-status: active
+status: completed
 date: 2026-03-21
 supersedes:
   - docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan.md

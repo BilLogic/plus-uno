@@ -18,8 +18,8 @@
     "build:netlify": "npm run build:all",
     "build:all": "npm run build && npm run build-storybook",
     "preview:react": "vite preview",
-    "dev:home-redesign": "vite --config playground/prototyping/bill/home-redesign/vite.config.js",
-    "dev:monthly-report": "vite --config playground/prototyping/bill/monthly-report/vite.config.js"
+    "dev:home-redesign": "vite --config playground/home-redesign/vite.config.js",
+    "dev:monthly-report": "vite --config playground/monthly-report/vite.config.js"
   },
   "keywords": [
     "plus",

@@ -43,9 +43,9 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - Existing `*.stories.jsx` colocation patterns
 
 3. Documentation patterns
-- `design-system/guidelines/*`
-- `design-system/guidelines/guides/Storybook.md`
-- `design-system/guidelines/guides/figma-workflow.md`
+- `docs/design-system/*`
+- `docs/design-system/guides/storybook.md`
+- `docs/design-system/guides/figma-workflow.md`
 
 4. Integration setup
 - Storybook configuration: `.storybook/main.js`, `.storybook/preview.jsx`

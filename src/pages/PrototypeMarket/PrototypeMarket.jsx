@@ -169,14 +169,17 @@ const PrototypeMarket = () => {
               const stageMeta = STAGE_META[proto.stage] || STAGE_META.low;
               const pillarMeta = PILLAR_META[proto.productPillar] || PILLAR_META.universal;
               const link = proto.deploymentUrl || proto.localPath;
+              const RowTag = link ? 'a' : 'div';
+              const rowProps = link ? {
+                href: link,
+                target: proto.deploymentUrl ? '_blank' : undefined,
+                rel: proto.deploymentUrl ? 'noopener noreferrer' : undefined,
+              } : {};
               return (
-                <a
+                <RowTag
                   key={proto.id}
-                  href={link || '#'}
                   className="prototype-market__list-row body2-txt"
-                  target={proto.deploymentUrl ? '_blank' : undefined}
-                  rel={proto.deploymentUrl ? 'noopener noreferrer' : undefined}
-                  onClick={!link ? (e) => e.preventDefault() : undefined}
+                  {...rowProps}
                 >
                   <span className="prototype-market__list-col--name">
                     <strong>{proto.title}</strong>
@@ -191,16 +194,16 @@ const PrototypeMarket = () => {
                   <span className="prototype-market__list-col--creator">{proto.creators?.join(', ')}</span>
                   <span className="prototype-market__list-col--date">{proto.lastUpdated}</span>
                   <span className="prototype-market__list-col--link">
-                    {link ? <i className="fa-solid fa-arrow-up-right-from-square" /> : <i className="fa-solid fa-circle-minus" style={{ opacity: 0.3 }} />}
+                    {link ? <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> : <i className="fa-solid fa-circle-minus" aria-hidden="true" style={{ opacity: 0.3 }} />}
                   </span>
-                </a>
+                </RowTag>
               );
             })}
           </div>
         )
       ) : (
         <div className="prototype-market__empty">
-          <i className="fa-regular fa-folder-open prototype-market__empty-icon" />
+          <i className="fa-regular fa-folder-open prototype-market__empty-icon" aria-hidden="true" />
           <p className="body1-txt">No prototypes match your filters.</p>
         </div>
       )}

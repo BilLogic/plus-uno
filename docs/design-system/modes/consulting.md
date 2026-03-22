@@ -23,7 +23,7 @@
 For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
 
 1. Layout and structural patterns
-- `design-system/guidelines/layout-grid.md`
+- `docs/design-system/layout-grid.md`
 - `design-system/src/specs/**`
 
 2. Spacing and hierarchy tokens
@@ -32,10 +32,10 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 3. Typography hierarchy
 - `design-system/src/tokens/_fonts.scss`
-- `design-system/guidelines/design-tokens/typography.md`
+- `docs/design-system/tokens.mdtypography.md`
 
 4. Structural examples
-- `playground/templates/**/STRUCTURE.md`
+- `playground/**/STRUCTURE.md`
 - `references/implementation-guide.md`
 
 5. Wireframe tooling (critical when available)

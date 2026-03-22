@@ -35,7 +35,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 
 3. Multi-approach examples
 - Story variants in `*.stories.jsx`
-- Playground prototypes in `playground/prototyping/**`
+- Playground prototypes in `playground/**`
 
 4. Composition examples
 - `references/implementation-guide.md`

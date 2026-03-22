@@ -24,7 +24,7 @@ The plus-one repo had grown organically with several structural issues:
 1. **No cross-agent entry point** — platform files (CLAUDE.md, .windsurfrules, cursorrules.md) pointed directly to `.agent/SKILL.md`, which only covers design system routing. Non-DS tasks had no agent guidance.
 2. **DS docs in 3 places** — `.agent/references/` (16 agent-optimized guides), `packages/plus-ds/guidelines/` (16 human-readable docs), and no product-level context anywhere.
 3. **Unnecessary npm package wrapper** — `packages/plus-ds/` structured for publishing but never published. Added needless nesting.
-4. **Creator-grouped playground** — `playground/prototyping/{owner}/{name}/` didn't scale, caused naming collisions (both bill and victor had `sessions/`), and made marketplace integration awkward.
+4. **Creator-grouped playground** — `playground/{owner}/{name}/` didn't scale, caused naming collisions (both bill and victor had `sessions/`), and made marketplace integration awkward.
 5. **No compound loop** — learnings from bugs and gotchas weren't captured between sessions.
 6. **Phantom skill references** — AGENT.md listed 4 skills (learn-plus, design-consulting, building, maintaining) that had no SKILL.md files.
 7. **No product context** — agents had no knowledge of the PLUS tutoring platform, its users, features, or flows.
@@ -43,10 +43,10 @@ The plus-one repo had grown organically with several structural issues:
 - Fixed 2 pre-existing bugs found during migration (FillInWithModals import path, SessionFillIns export name mismatch)
 
 ### Phase 2: Flatten playground
-- Moved 21 prototypes from `playground/prototyping/{owner}/{name}/` to `playground/{name}/`
+- Moved 21 prototypes from `playground/{owner}/{name}/` to `playground/{name}/`
 - Renamed collisions: `bill/sessions` → `in-session-ux`, `victor/sessions` → `session-management`
 - Removed `playground/Bill/` (confirmed duplicate), `playground/Ashley/` (storybook-ai-agent moved first)
-- Removed `playground/templates/` (redundant with specs + Storybook)
+- Removed `design-system/src/specs/` (redundant with specs + Storybook)
 - Removed playground stories from Storybook (prototypes live in marketplace only)
 - Updated marketplace data with all 21 prototypes + 4 new split entries from home-redesign
 
@@ -56,7 +56,7 @@ The plus-one repo had grown organically with several structural issues:
 
 ### Phase 4: Project docs + foundations
 - `docs/project/` — plus-one.md (repo), conventions.md, setup-guide.md
-- `docs/foundations/` — terminology.md, tech-stack.md, context-levels.md (replaces phantom `develop/foundations/`)
+- `docs/foundations/` — terminology.md, tech-stack.md, context-levels.md (replaces phantom `docs/foundations/`)
 - `docs/solutions/README.md` — compound loop template
 
 ### Phase 5: Merge DS docs
@@ -69,7 +69,7 @@ The plus-one repo had grown organically with several structural issues:
 - Each with SKILL.md + subdirectory structure
 
 ### Phase 7: Cleanup
-- Removed `.agent/references/` (17 files) and `design-system/guidelines/` (16 files)
+- Removed `.agent/references/` (17 files) and `docs/design-system/` (16 files)
 - Updated AGENT.md, SKILL.md, all asset JSON files with new paths
 - Grepped and fixed all stale path references
 
@@ -89,7 +89,7 @@ The plus-one repo had grown organically with several structural issues:
 
 1. **AGENTS.md is the single entry point** — never put agent instructions only in platform-specific files. All platforms point to AGENTS.md.
 2. **Skills go under `.agent/skills/`** — not `.claude/skills/`. Must be agent-agnostic.
-3. **All docs under `docs/`** — no separate `guidelines/`, `references/`, or `develop/` directories. One home for documentation.
+3. **All docs under `docs/`** — no separate `guidelines/`, `references/`, or `docs/` directories. One home for documentation.
 4. **Flat playground** — project-oriented, not creator-oriented. Creator info is metadata, not directory structure.
 5. **FA Free only** — no Pro icons (fa-light, fa-thin, fa-sharp, fa-duotone, fa-grid-2). Use fa-solid, fa-regular, fa-brands.
 6. **Use DS components** — never raw HTML when a PLUS component exists. Check PLUS_CHEAT_SHEET.md first.
@@ -101,7 +101,7 @@ The plus-one repo had grown organically with several structural issues:
 |--------|-------|-------------|
 | Created | 40+ | AGENTS.md, docs/project/*, docs/foundations/*, docs/design-system/*, .agent/skills/*, docs/solutions/* |
 | Modified | 90+ | vite configs, storybook, scripts, agent docs, asset JSONs, marketplace, App.jsx |
-| Deleted | 33 | .agent/references/*, design-system/guidelines/*, playground/templates/*, playground/Bill/* |
+| Deleted | 33 | .agent/references/*, docs/design-system/*, design-system/src/specs/*, playground/Bill/* |
 | Moved | 1100+ | packages/plus-ds → design-system (git mv), playground flatten |
 
 ## Commits

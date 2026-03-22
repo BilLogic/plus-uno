@@ -20,7 +20,7 @@ This directory contains all static image assets for the PLUS Design System, orga
 All images should be referenced using relative paths from the component or template location:
 
 ```javascript
-// From playground/templates/login/
+// From design-system/src/specs/login/
 const cleverImage = "../../../design-system/src/assets/images/auth-providers/clever-image.png";
 ```
 

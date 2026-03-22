@@ -3,9 +3,9 @@
   "updated_for_branch": "main",
   "example_story_globs": [
     "design-system/src/**/*.stories.jsx",
-    "playground/prototyping/**/*.stories.{js,jsx,ts,tsx}",
-    "playground/Ashley/**/*.stories.{js,jsx,ts,tsx}",
-    "playground/Bill/**/*.stories.{js,jsx,ts,tsx}"
+    "playground/**/*.stories.{js,jsx,ts,tsx}",
+    "playground/**/*.stories.{js,jsx,ts,tsx}",
+    "playground/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "spec_roots": [
     "design-system/src/specs/Login",

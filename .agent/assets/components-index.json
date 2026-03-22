@@ -14,9 +14,9 @@
   ],
   "storybook_story_globs": [
     "../design-system/src/**/*.stories.{js,jsx,ts,tsx}",
-    "../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}",
-    "../playground/Ashley/**/*.stories.{js,jsx,ts,tsx}",
-    "../playground/Bill/**/*.stories.{js,jsx,ts,tsx}"
+    "../playground/**/*.stories.{js,jsx,ts,tsx}",
+    "../playground/**/*.stories.{js,jsx,ts,tsx}",
+    "../playground/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [
     "docs/design-system/overview-components.md",

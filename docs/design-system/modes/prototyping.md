@@ -35,7 +35,7 @@
 - **Foundation First (Figma / Screenshots):** When provided with a Figma link or a screenshot, you MUST completely build the foundational static layout first. Ensure the structure, spacing, typography, and visual components match the reference perfectly in a static state before attempting to implement complex React state, interactivity, or modals. Do not jump straight into building interactive pieces if the base layout is not complete.
 - **Data**: Mock/Hardcoded data is acceptable and encouraged for speed.
 - **State**: Happy path only. Complex loading/error states are optional unless being tested.
-- **Location**: Must be built in `playground/prototyping/` (never `design-system`).
+- **Location**: Must be built in `playground/` (never `design-system`).
 - **NEVER BUILD CUSTOM REPLICAS OF EXISTING SPEC COMPONENTS:** If a component already exists in `design-system/src/specs/`, you MUST import and use it directly — even in prototyping mode. Do NOT recreate it as a custom file in your prototype. This applies to all spec-level components, including but not limited to:
   - `SideNavBar` (`specs/Toolkit/post-session/sections/SideNavBar/SideNavBar.jsx`)
   - `FormFeedback` (`specs/Toolkit/post-session/sections/FormFeedback/FormFeedback.jsx`)
@@ -62,8 +62,8 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - `design-system/src/specs/**`
 
 3. Prototyping Playground
-- `playground/prototyping/README.md`
-- `playground/prototyping/[user-name]/**`
+- `playground/README.md`
+- `playground/[user-name]/**`
 
 ## How to Respond in Prototyping Mode
 
@@ -86,7 +86,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - **No Accessibility Deep-Dive**: Basic semantic HTML is enough; skip complex ARIA management unless specifically requested.
 
 3. **Isolate the Code**
-- Create a new directory in `playground/prototyping/[user-name]/[feature-name]`.
+- Create a new directory in `playground/[feature-name]`.
 - Do not modify core `design-system` files.
 - Treat this code as "disposable" — it will be rewritten for production.
 
@@ -101,7 +101,7 @@ If not specified in the prompt, ask:
 **Goal**: Test a new "Quick Add" modal.
 
 **Implementation**:
-- Create `playground/prototyping/victor/quick-add/Modal.jsx`.
+- Create `playground/quick-add/Modal.jsx`.
 - Import `Modal`, `Button`, `Input` from `@/components`.
 - Hardcode `const user = { name: "Victor" }`.
 - hardcode `const onSave = () => alert("Saved!")`.

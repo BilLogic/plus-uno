@@ -12,7 +12,7 @@
 - If runtime lacks an MCP, explicitly state the limitation and continue with repo-native stories/specs/scripts.
 
 ## Canonical Repo Docs
-- Figma workflow: `design-system/guidelines/guides/figma-workflow.md`
+- Figma workflow: `docs/design-system/guides/figma-workflow.md`
 - Storybook setup: `.storybook/main.js`, `.storybook/preview.jsx`
 - Token sync CI: `.github/workflows/sync-figma-tokens.yml`
 - Playwright MCP: Global configuration in `.claude.json`

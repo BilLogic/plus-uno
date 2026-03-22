@@ -14,9 +14,9 @@ Agent workflow routing and implementation behavior is now defined in:
 
 ## DS-Specific References
 
-- Components: `design-system/guidelines/overview-components.md`
-- Tokens: `design-system/guidelines/design-tokens/`
-- Figma flow: `design-system/guidelines/guides/figma-workflow.md`
+- Components: `docs/design-system/components.md`
+- Tokens: `docs/design-system/tokens.md`
+- Figma flow: `docs/design-system/guides/figma-workflow.md`
 
 ## Notes
 

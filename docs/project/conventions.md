@@ -64,6 +64,7 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 ## Icons
 
 - **Font Awesome Free only** (v7.2.0 via CDN) — `fa-solid`, `fa-regular`, `fa-brands` prefixes only
+- Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free
 - Never use Pro icons: `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names like `fa-grid-2`
 - Common alternatives: `fa-grip` (grid), `fa-list` (list), `fa-table` (table view)
 - Icon reference: [Font Awesome Free Icons](https://fontawesome.com/search?o=r&m=free)

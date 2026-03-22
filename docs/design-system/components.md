@@ -8,8 +8,8 @@
 
 ## Discovery Workflow
 1. Read component docs first:
-- `design-system/guidelines/overview-components.md`
-- `design-system/guidelines/reference/component-index.md`
+- `docs/design-system/components.md`
+- `docs/design-system/reference/component-index.md`
 2. Inspect implementation triplet for candidate component:
 - `{Component}.jsx`, `{Component}.scss`, `{Component}.stories.jsx`
 3. Confirm composition fit in `design-system/src/specs/**`.

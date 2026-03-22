@@ -18,7 +18,7 @@ export default defineConfig({
         preprocessorOptions: {
             scss: {
                 loadPaths: [
-                    path.resolve(root, 'develop/tokens'),
+                    path.resolve(root, 'design-system/src/tokens'),
                     path.resolve(root, 'design-system/src/styles'),
                 ],
             },

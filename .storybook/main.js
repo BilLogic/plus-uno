@@ -107,7 +107,7 @@ const config = {
     config.css.preprocessorOptions.scss = {
       includePaths: [
         path.resolve(srcPath, 'components'),
-        path.resolve(rootDir, 'develop/tokens'),
+        path.resolve(rootDir, 'design-system/src/tokens'),
         path.resolve(srcPath, 'styles')
       ],
       api: 'modern-compiler',

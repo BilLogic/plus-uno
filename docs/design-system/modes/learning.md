@@ -23,25 +23,25 @@
 For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.json` and the relevant index file(s).
 
 1. Component documentation
-- `design-system/guidelines/overview-components.md`
-- `design-system/guidelines/reference/component-index.md`
+- `docs/design-system/components.md`
+- `docs/design-system/reference/component-index.md`
 
 2. Design token documentation
-- `design-system/guidelines/design-tokens/*.md`
+- `docs/design-system/tokens.md*.md`
 - `design-system/src/tokens/*.scss`
 - `references/tokens-guide.md`
 
 3. Example implementations
 - `design-system/src/**/*.stories.jsx`
-- `playground/templates/**`
-- `playground/prototyping/**`
-- `playground/Ashley/**`
-- `playground/Bill/**`
+- `design-system/src/specs/**`
+- `playground/**`
+- `playground/**`
+- `playground/**`
 
 4. Storybook and tooling
 - `.storybook/main.js`
 - `.storybook/preview.jsx`
-- `design-system/guidelines/guides/Storybook.md`
+- `docs/design-system/guides/storybook.md`
 
 ## How to Respond in Learning Mode
 
@@ -75,7 +75,7 @@ Q: "How do imports work here?"
 A: "Public consumers use `@tutors.plus/design-system`; internal DS source commonly uses alias `@` mapped to `design-system/src` (see `.storybook/main.js` and `design-system/vite.config.js`)."
 
 Q: "Where can I see realistic usage?"
-A: "Check stories under `design-system/src/**/*.stories.jsx`, then compare full-page assemblies in `design-system/src/specs/**`, `playground/prototyping/**`, `playground/Ashley/**`, and `playground/Bill/**`."
+A: "Check stories under `design-system/src/**/*.stories.jsx`, then compare full-page assemblies in `design-system/src/specs/**`, `playground/**`, `playground/**`, and `playground/**`."
 
 Q: "How do I start from a Figma link?"
-A: "Use the flow in `design-system/guidelines/guides/figma-workflow.md`: fetch design context + screenshot first, then map to DS components."
+A: "Use the flow in `docs/design-system/guides/figma-workflow.md`: fetch design context + screenshot first, then map to DS components."

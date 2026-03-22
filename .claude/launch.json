@@ -16,13 +16,13 @@
     {
       "name": "home-redesign",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--config", "playground/prototyping/bill/home-redesign/vite.config.js", "--port", "3001"],
+      "runtimeArgs": ["vite", "--config", "playground/home-redesign/vite.config.js", "--port", "3001"],
       "port": 3001
     },
     {
       "name": "monthly-report",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--config", "playground/prototyping/bill/monthly-report/vite.config.js", "--port", "3002"],
+      "runtimeArgs": ["vite", "--config", "playground/monthly-report/vite.config.js", "--port", "3002"],
       "port": 3002
     }
   ]

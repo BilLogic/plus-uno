@@ -29,11 +29,11 @@ This repository includes:
 - Storybook config: `.storybook`
 - Token sync and generation scripts: `scripts/sync-figma-tokens.js`, `scripts/generate-all-tokens.js`
 - Existing agent guidance: `.agent/AGENT.md`, `docs/design-system/*`, `.agent/assets/*`
-- Validation scripts: `.agent/scripts/*`
+- Validation scripts: `.agent/skills/po-review/scripts/*`
 
 Integrations available in this repo workflow:
 - Figma API token sync via scripts (`FIGMA_FILE_KEY`, `FIGMA_ACCESS_TOKEN`)
-- Figma MCP workflow documented in `design-system/guidelines/guides/figma-workflow.md`
+- Figma MCP workflow documented in `docs/design-system/guides/figma-workflow.md`
 - Stitch MCP workflow for rapid wireframe generation and PRD-to-structure exploration (runtime-dependent)
 - Storybook for component verification (`npm run storybook`)
 - GitHub Action token automation (`.github/workflows/sync-figma-tokens.yml`)
@@ -132,7 +132,7 @@ Common transition paths:
 - If Code Connect mapping exists, use that mapping before guessing component usage.
 
 2. Check component documentation
-- Start with `design-system/guidelines/overview-components.md`
+- Start with `docs/design-system/components.md`
 - Then inspect story files: `design-system/src/**/*.stories.jsx`
 - Use `.storybook/main.js` story globs to locate authoritative examples.
 
@@ -150,8 +150,8 @@ Common transition paths:
 Use repository-established imports:
 
 - Public package usage:
-  - `import '@tutors.plus/design-system/styles'`
-  - `import { Button } from '@tutors.plus/design-system'`
+  - `import '@/styles/main.scss'`
+  - `import Button from '@/components/Button'`
 
 - Internal source usage (inside repo):
   - Alias `@` maps to `design-system/src` in Storybook and DS Vite config.
@@ -196,7 +196,7 @@ Load files in this order, stopping as soon as you have enough context.
 
 | Layer | File(s) | ~Tokens | When to load |
 |-------|---------|---------|--------------|
-| Mode logic | `references/{selected-mode}.md` | 500-900 | Always — first thing after routing |
+| Mode logic | `docs/design-system/modes/{selected-mode}.md` | 500-900 | Always — first thing after routing |
 | Cheat Sheet | `.agent/assets/PLUS_CHEAT_SHEET.md` | 500 | MANDATORY when writing UI code, using components, or applying tokens. |
 | Layout Cheat Sheet | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` | 300 | MANDATORY when building new pages, dashboards, or modals. |
 | Foundations | `../docs/design-system/overview.md` | 150 | Before implementation work |

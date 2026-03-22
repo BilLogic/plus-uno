@@ -22,7 +22,7 @@
     "design_system_docs": "docs/design-system/",
     "storybook_config": ".storybook/",
     "token_scripts": "scripts/",
-    "playground_prototyping": "playground/prototyping/"
+    "playground_prototyping": "playground/"
   },
   "context_levels": [
     {

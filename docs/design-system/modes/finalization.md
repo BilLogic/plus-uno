@@ -47,7 +47,7 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - `design-system/src/**/*.stories.jsx`
 
 4. Design-tool integration
-- `design-system/guidelines/guides/figma-workflow.md`
+- `docs/design-system/guides/figma-workflow.md`
 - `scripts/sync-figma-tokens.js`
 - Figma MCP for design-context extraction (`get_design_context`/`get_screenshot` or runtime equivalents)
 - Code Connect and variable inspection (`get_code_connect_map`, `get_variable_defs`) when available

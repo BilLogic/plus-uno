@@ -44,7 +44,7 @@ If `deploymentUrl` is null, offer to help deploy:
 
 1. Verify the prototype builds:
    ```bash
-   cd playground/prototyping/{name}/{project}
+   cd playground/{project}
    npx vite build
    ```
 2. Guide the designer to deploy via one of:
@@ -82,7 +82,7 @@ I'll add this entry to the Prototype Market:
     contributors: ['Name'],
     productPillar: 'home',
     localPath: '/home',
-    repoPath: 'playground/prototyping/name/project/',
+    repoPath: 'playground/{project}/',
   }
 
 File: src/pages/PrototypeMarket/prototypes-data.js
@@ -104,4 +104,4 @@ After appending:
 
 - Data schema: `src/pages/PrototypeMarket/prototypes-data.js`
 - Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx`
-- Prototyping docs: `playground/prototyping/README.md`
+- Prototyping docs: `playground/README.md`
