@@ -1,11 +1,1 @@
-.back-to-market {
-  position: fixed;
-  bottom: var(--size-section-pad-y-lg, 20px);
-  right: var(--size-section-pad-x-lg, 20px);
-  z-index: 9999;
-}
-
-.storybook-info {
-  padding: var(--size-section-pad-y-lg, 40px);
-  text-align: center;
-}
+/* App-level styles — NavFab styles live in components/NavFab/NavFab.scss */
