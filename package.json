@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run storybook &  vite",
+    "dev": "concurrently --names vite,storybook --prefix-colors blue,magenta \"vite\" \"npm run storybook\"",
     "dev:vite": "vite",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 6006 --host 0.0.0.0 --config-dir .storybook",
@@ -40,6 +40,7 @@
     "@storybook/react-vite": "^10.2.7",
     "@vitest/browser-playwright": "^4.0.15",
     "@vitest/coverage-v8": "^4.0.15",
+    "concurrently": "^9.2.1",
     "dotenv": "^16.4.5",
     "playwright": "^1.58.2",
     "sass": "^1.77.8",
