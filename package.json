@@ -5,10 +5,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently --names vite,storybook --prefix-colors blue,magenta \"vite\" \"npm run storybook\"",
-    "dev:vite": "vite",
+    "dev": "concurrently --names market,storybook --prefix-colors blue,magenta \"vite --port 4100\" \"npm run storybook\"",
+    "dev:vite": "vite --port 4100",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 6006 --host 0.0.0.0 --config-dir .storybook",
+    "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 4200 --host 0.0.0.0 --config-dir .storybook",
     "build-storybook": "storybook build --config-dir .storybook -o storybook-static && rm -rf dist/storybook && mv storybook-static dist/storybook",
     "sync:tokens": "node scripts/sync-figma-tokens.js",
     "generate:tokens": "node scripts/generate-all-tokens.js",

@@ -8,15 +8,13 @@ const NAV_ITEMS = [
     id: 'storybook',
     label: 'Storybook',
     icon: 'fa-solid fa-book-open',
-    href: 'http://localhost:6006',
-    external: true
+    href: 'http://localhost:4200'
   },
   {
     id: 'marketplace',
     label: 'Marketplace',
     icon: 'fa-solid fa-store',
-    href: '/',
-    external: false
+    href: 'http://localhost:4100'
   }
 ];
 
@@ -62,16 +60,10 @@ export default function NavFab() {
               <motion.a
                 className="nav-fab__action"
                 href={item.href}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noopener noreferrer' : undefined}
                 role="menuitem"
                 aria-label={`Open ${item.label}`}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={item.external ? undefined : (e) => {
-                  e.preventDefault();
-                  window.location.href = item.href;
-                }}
               >
                 <i className={item.icon} />
               </motion.a>
