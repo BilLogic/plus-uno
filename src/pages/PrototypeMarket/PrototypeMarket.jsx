@@ -73,7 +73,7 @@ const PrototypeMarket = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         leadingVisual="fa-solid fa-magnifying-glass"
-        size="medium"
+        size="large"
         showLabel={false}
         label="Search prototypes"
       />
