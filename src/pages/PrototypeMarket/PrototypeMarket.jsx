@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Select from '@/forms/Select';
 import Badge from '@/components/Badge';
+import ButtonGroup from '@/components/ButtonGroup';
 import PrototypeCard from './PrototypeCard';
 import {
   prototypes,
@@ -132,24 +133,26 @@ const PrototypeMarket = () => {
             </button>
           )}
         </div>
-        <div className="prototype-market__view-toggle">
-          <button
-            className={`prototype-market__view-btn ${viewMode === 'grid' ? 'prototype-market__view-btn--active' : ''}`}
-            onClick={() => setViewMode('grid')}
-            aria-label="Grid view"
-            title="Grid view"
-          >
-            <i className="fa-solid fa-grid-2" />
-          </button>
-          <button
-            className={`prototype-market__view-btn ${viewMode === 'list' ? 'prototype-market__view-btn--active' : ''}`}
-            onClick={() => setViewMode('list')}
-            aria-label="List view"
-            title="List view"
-          >
-            <i className="fa-solid fa-list" />
-          </button>
-        </div>
+        <ButtonGroup
+          size="small"
+          style="secondary"
+          fill="outline"
+          ariaLabel="View mode"
+          buttons={[
+            {
+              id: 'grid-view',
+              leadingVisual: 'grip',
+              active: viewMode === 'grid',
+              onClick: () => setViewMode('grid'),
+            },
+            {
+              id: 'list-view',
+              leadingVisual: 'list',
+              active: viewMode === 'list',
+              onClick: () => setViewMode('list'),
+            },
+          ]}
+        />
       </div>
 
       {/* Grid or List */}
