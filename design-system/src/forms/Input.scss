@@ -143,8 +143,9 @@
 }
 
 // Adjust input padding when leading visual exists
+// Icon is at left:pad-x, icon width ~14px, then gap before text
 .plus-input-container:has(.plus-input-leading-visual) .plus-input {
-    padding-left: calc(var(--size-element-pad-x-md, 10px) + var(--size-element-gap-md, 10px));
+    padding-left: calc(var(--size-element-pad-x-md, 10px) + 14px + var(--size-element-gap-sm, 8px));
 }
 
 // Trailing visual (icon or dropdown arrow on the right)
@@ -227,7 +228,7 @@
 }
 
 .plus-input-container:has(.plus-input-small):has(.plus-input-leading-visual) .plus-input {
-    padding-left: calc(var(--size-element-pad-x-sm, 8px) + var(--size-element-gap-sm, 8px));
+    padding-left: calc(var(--size-element-pad-x-sm, 8px) + 10px + var(--size-element-gap-xs, 4px));
 }
 
 .plus-input-container:has(.plus-input-small) .plus-input-trailing-visual {
@@ -263,7 +264,7 @@
 }
 
 .plus-input-container:has(.plus-input-large):has(.plus-input-leading-visual) .plus-input {
-    padding-left: calc(var(--size-element-pad-x-lg, 16px) + var(--size-element-gap-lg, 12px));
+    padding-left: calc(var(--size-element-pad-x-lg, 16px) + 16px + var(--size-element-gap-sm, 8px));
 }
 
 .plus-input-container:has(.plus-input-large) .plus-input-trailing-visual {
