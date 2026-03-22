@@ -46,6 +46,7 @@ Read `docs/project/conventions.md` for file naming, imports, git conventions, an
 10. Never deep-import from `design-system/src/` — use barrel exports from `@` alias.
 11. Never create components that duplicate existing ones — check `.agent/assets/components-index.json` first.
 12. Never edit generated token files directly — run `npm run generate:tokens` after changes.
+15. Never use Font Awesome Pro icons — only FA Free (fa-solid, fa-regular, fa-brands). No fa-light, fa-thin, fa-sharp, fa-duotone, fa-grid-2, or other Pro-only icons.
 13. Always validate in Storybook when component behavior is touched.
 14. Confirm implementation plan and touched files before large or risky edits.
 

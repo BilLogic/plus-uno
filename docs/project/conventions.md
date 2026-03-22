@@ -61,6 +61,13 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 - Always run `generate:tokens` after `sync:tokens`
 - Token source is Figma, not the SCSS files
 
+## Icons
+
+- **Font Awesome Free only** (v7.2.0 via CDN) — `fa-solid`, `fa-regular`, `fa-brands` prefixes only
+- Never use Pro icons: `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names like `fa-grid-2`
+- Common alternatives: `fa-grip` (grid), `fa-list` (list), `fa-table` (table view)
+- Icon reference: [Font Awesome Free Icons](https://fontawesome.com/search?o=r&m=free)
+
 ## Known Gotchas
 
 | Gotcha | What Happens | Fix |
@@ -69,3 +76,5 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 | Token generation must follow sync | Generated files overwrite manual edits | Always run sync first, then generate |
 | `design-system/src/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
 | Storybook uses autodocs | Missing JSDoc = empty docs page | Add JSDoc to component exports |
+| FA Pro icons don't render | Icon shows as empty square | Use FA Free alternatives (fa-grip not fa-grid-2) |
+| Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, Input, Badge, Card, Select |

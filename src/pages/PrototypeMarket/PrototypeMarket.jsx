@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Select from '@/forms/Select';
+import Input from '@/forms/Input';
 import Badge from '@/components/Badge';
+import Button from '@/components/Button';
 import ButtonGroup from '@/components/ButtonGroup';
 import PrototypeCard from './PrototypeCard';
 import {
@@ -64,28 +66,17 @@ const PrototypeMarket = () => {
         </p>
       </header>
 
-      {/* Search */}
-      <div className="prototype-market__search">
-        <div className="prototype-market__search-field">
-          <i className="fa-solid fa-magnifying-glass prototype-market__search-icon" />
-          <input
-            type="text"
-            className="prototype-market__search-input body2-txt"
-            placeholder="Search prototypes..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          {search && (
-            <button
-              className="prototype-market__search-clear"
-              onClick={() => setSearch('')}
-              aria-label="Clear search"
-            >
-              <i className="fa-solid fa-xmark" />
-            </button>
-          )}
-        </div>
-      </div>
+      {/* Search — using DS Input component */}
+      <Input
+        id="market-search"
+        placeholder="Search prototypes..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        leadingVisual="fa-solid fa-magnifying-glass"
+        size="medium"
+        showLabel={false}
+        label="Search prototypes"
+      />
 
       {/* Filters */}
       <div className="prototype-market__filters">
@@ -121,16 +112,17 @@ const PrototypeMarket = () => {
         <div className="prototype-market__count body2-txt">
           {filtered.length} {filtered.length === 1 ? 'prototype' : 'prototypes'}
           {hasFilters && (
-            <button
-              className="prototype-market__clear-filters body3-txt"
+            <Button
+              text="Clear filters"
+              style="tertiary"
+              fill="ghost"
+              size="small"
               onClick={() => {
                 setSelectedStages([]);
                 setSelectedPillars([]);
                 setSearch('');
               }}
-            >
-              Clear filters
-            </button>
+            />
           )}
         </div>
         <ButtonGroup
