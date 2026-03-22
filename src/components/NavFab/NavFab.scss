@@ -14,8 +14,8 @@
     height: 44px;
     border-radius: var(--size-border-radius-radius-300, 50%);
     border: none;
-    background: var(--color-primary-container, #d3e3fd);
-    color: var(--color-on-primary-container, #041e49);
+    background: var(--color-primary-state-08);
+    color: var(--color-primary-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -24,7 +24,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 
     &:hover {
-      filter: brightness(0.95);
+      background: color-mix(in srgb, var(--color-primary-state-08), black 8%);
     }
 
     &:focus-visible {
