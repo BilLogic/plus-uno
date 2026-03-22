@@ -21,6 +21,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--size-card-gap-sm, 8px);
+    flex: 1;
   }
 
   &__badges {
@@ -50,6 +51,7 @@
     gap: var(--size-element-gap-md, 16px);
     padding-top: var(--size-element-gap-sm, 8px);
     border-top: 1px solid var(--color-outline-variant, #e0e0e0);
+    margin-top: auto;
   }
 
   &__meta-item {
