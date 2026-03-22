@@ -7,16 +7,16 @@ import './App.css';
 import { ShellContext } from './context/ShellContext';
 
 // Import other prototypes (content only, no PageLayout)
-import InSessionContent from '../../sessions/InSessionContent';
+import InSessionContent from '../../in-session-ux/InSessionContent';
 import { LessonsContent } from './components/LessonsContent';
-import { ReflectionAssistantChat as ReflectionPage } from '../../sessions/ReflectionAssistant/ReflectionAssistantChat';
+import { ReflectionAssistantChat as ReflectionPage } from '../../in-session-ux/ReflectionAssistant/ReflectionAssistantChat';
 import TutorAdminContent from '../../research-assistant-chat/src/views/TutorAdminContent';
 import MonthlyReportsListContent from '../../monthly-report/src/MonthlyReportsListContent';
 import MonthlyReportContent from '../../monthly-report/src/MonthlyReportContent';
 
 import DevIndexPage from './components/DevIndexPage';
 
-import StudentInsightsModal from '../../sessions/StudentInsightsModal';
+import StudentInsightsModal from '../../in-session-ux/StudentInsightsModal';
 
 // Map URL paths to sidebar tab IDs
 const pathToTab = {
