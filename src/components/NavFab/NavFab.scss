@@ -4,24 +4,28 @@
   left: var(--size-section-gap-sm, 24px);
   z-index: 1100;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column-reverse; // trigger at bottom, items expand upward
   align-items: center;
-  gap: var(--size-element-gap-md, 10px);
-  width: fit-content !important;
+  gap: var(--size-element-gap-sm, 8px);
+  width: fit-content !important; // override #root > * { width: 100% }
 
   &__trigger {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: var(--size-border-radius-radius-300, 50%);
-    border: none;
-    background: var(--color-primary, #1a73e8);
-    color: var(--color-on-primary, #fff);
+    border: 1px solid var(--color-outline-variant, #c4c4c4);
+    background: var(--color-surface-container-high, #e8e8e8);
+    color: var(--color-on-surface, #1a1a1a);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 1.25rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background: var(--color-surface-container-highest, #ddd);
+    }
 
     &:focus-visible {
       outline: 2px solid var(--color-primary, #1a73e8);
@@ -33,19 +37,19 @@
     width: 40px;
     height: 40px;
     border-radius: var(--size-border-radius-radius-300, 50%);
-    border: none;
-    background: var(--color-surface-container-high, #e8e8e8);
+    border: 1px solid var(--color-outline-variant, #c4c4c4);
+    background: var(--color-surface-container, #f0f0f0);
     color: var(--color-on-surface, #1a1a1a);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-decoration: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 
     &:hover {
-      background: var(--color-surface-container-highest, #ddd);
+      background: var(--color-surface-container-high, #e8e8e8);
       color: var(--color-on-surface, #1a1a1a);
     }
 

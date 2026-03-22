@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tooltip from '@/components/Tooltip';
 import './NavFab.scss';
 
-const MARKETPLACE_PATHS = ['/', '/market', '/prototypes'];
-
-const ALL_ITEMS = [
+const NAV_ITEMS = [
   {
     id: 'storybook',
     label: 'Storybook',
@@ -24,13 +21,7 @@ const ALL_ITEMS = [
 ];
 
 export default function NavFab() {
-  const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-
-  const isOnMarketplace = MARKETPLACE_PATHS.includes(pathname);
-  const items = isOnMarketplace
-    ? ALL_ITEMS.filter(item => item.id !== 'marketplace')
-    : ALL_ITEMS;
 
   return (
     <div
@@ -39,13 +30,13 @@ export default function NavFab() {
       onMouseLeave={() => setIsOpen(false)}
     >
       <AnimatePresence>
-        {isOpen && items.map((item, index) => (
+        {isOpen && NAV_ITEMS.map((item, index) => (
           <motion.div
             key={item.id}
             className="nav-fab__item-wrapper"
-            initial={{ opacity: 0, y: 16, scale: 0.8 }}
+            initial={{ opacity: 0, y: 8, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.8 }}
+            exit={{ opacity: 0, y: 8, scale: 0.85 }}
             transition={{ delay: index * 0.05, type: 'spring', stiffness: 400, damping: 25 }}
           >
             <Tooltip text={item.label} placement="right">
@@ -69,20 +60,22 @@ export default function NavFab() {
       </AnimatePresence>
 
       <Tooltip text="Navigation" placement="right">
-        <motion.button
+        <motion.div
           className="nav-fab__trigger"
+          role="button"
+          tabIndex={0}
           aria-label="Navigation menu"
           aria-expanded={isOpen}
           aria-haspopup="true"
-          onClick={() => setIsOpen(!isOpen)}
           onKeyDown={(e) => {
             if (e.key === 'Escape') setIsOpen(false);
+            if (e.key === 'Enter' || e.key === ' ') setIsOpen(!isOpen);
           }}
-          whileHover={{ scale: 1.08 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <i className={`fa-solid ${isOpen ? 'fa-xmark' : 'fa-compass'}`} />
-        </motion.button>
+          <i className="fa-solid fa-compass" />
+        </motion.div>
       </Tooltip>
     </div>
   );
