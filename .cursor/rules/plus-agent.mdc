@@ -1,10 +1,9 @@
 ---
-description: Routes all design-system work to the PLUS agent system
+description: Routes all work to the PLUS agent system via AGENTS.md
 alwaysApply: true
 ---
 
-# PLUS Design Agent
+# PLUS Agent
 
-Read and follow `.agent/SKILL.md` for mode routing, guardrails, and all operational behavior.
-Refer to `.agent/AGENT.md` for identity, skills, and grounding rules as needed.
-Do not proceed without determining the correct Mode.
+Read `AGENTS.md` at the project root as the entry point for all agent instructions.
+It covers product context, design system modes, forbidden patterns, skills, and conventions.

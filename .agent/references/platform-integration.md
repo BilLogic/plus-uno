@@ -2,34 +2,36 @@
 
 # Platform Integration Guide
 
-This `.agent/` system is agent-agnostic. Each coding agent platform has its own entry-point file that routes into `.agent/SKILL.md` (mode routing and guardrails), with `.agent/AGENT.md` available as supporting context (identity, skills, grounding rules).
+The plus-one project uses `AGENTS.md` at the project root as the canonical cross-agent entry point. All platform-specific files point to `AGENTS.md`. Design system routing and guardrails live in `.agent/SKILL.md`, referenced from `AGENTS.md`.
 
 ## Current Platform Files
 
-| Platform | File | Status |
-|----------|------|--------|
-| Cursor (primary) | `.cursor/rules/plus-agent.mdc` | Always-apply rule |
-| Cursor (legacy fallback) | `cursorrules.md` | Root-level pointer |
-| Claude Code | `CLAUDE.md` | Root-level pointer |
-| Windsurf | `.windsurfrules` | Root-level pointer |
+| Platform | File | Points To |
+|----------|------|-----------|
+| Claude Code | `CLAUDE.md` | `@AGENTS.md` (import syntax) |
+| Cursor (native rules) | `.cursor/rules/plus-agent.mdc` | `AGENTS.md` |
+| Cursor (legacy) | `cursorrules.md` | `AGENTS.md` |
+| Windsurf | `.windsurfrules` | `AGENTS.md` |
 
-All platform files point to `.agent/SKILL.md` as the primary entry point. `.agent/AGENT.md` is referenced as supporting context for identity and grounding rules.
+## Architecture
+
+```
+AGENTS.md (cross-agent entry point — product context, forbidden patterns, skills, commands)
+    ↓
+.agent/SKILL.md (design system routing — 6 modes, component discovery, critical rules)
+    ↓
+.agent/AGENT.md (identity, skills table, grounding rules, foundations)
+    ↓
+.agent/references/* and .agent/assets/* (progressive loading)
+```
 
 ## Adding a New Platform
 
-Point the agent's project-level instruction file to `.agent/SKILL.md` as the canonical entry point. Include these three directives:
-
-1. Read `.agent/SKILL.md` for mode routing, guardrails, and all operational behavior.
-2. Refer to `.agent/AGENT.md` for identity, skills, and grounding rules as needed.
-3. Do not proceed without determining the correct Mode.
-
-No platform-specific logic lives inside `.agent/` — all routing, modes, and references are portable.
-
-## Cursor-Specific Notes
-
-The `.cursor/` directory is gitignored except for `.cursor/rules/`, which is committed and shared with the team. The `cursorrules.md` file at the project root serves as a legacy fallback for environments that do not read `.cursor/rules/`.
+Point the agent's project-level instruction file to `AGENTS.md` as the canonical entry point. One-liner pointer is sufficient — all context is in AGENTS.md.
 
 ## What NOT to Duplicate
-- Do not copy guardrails or rules into platform files. They live in SKILL.md.
+
+- Do not copy forbidden patterns or rules into platform files. They live in AGENTS.md.
+- Do not copy mode routing into platform files. It lives in .agent/SKILL.md.
 - Do not add platform-specific behavior inside `.agent/`. Keep it agent-agnostic.
 - Platform files should be a one-liner pointer, not a second source of truth.
