@@ -9,4 +9,4 @@ Allowed here:
 Not allowed here:
 - Narrative reference guidance markdown (except this policy file).
 
-Guidance and workflow docs belong in `.agent/references/`.
+Guidance and workflow docs belong in `docs/design-system/`.

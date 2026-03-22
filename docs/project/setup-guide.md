@@ -63,7 +63,7 @@ Legacy fallback: `cursorrules.md` at root.
 `.windsurfrules` at project root points to `AGENTS.md`.
 
 ### Other Agents
-Point the agent's instruction file to `AGENTS.md` at the project root. See `.agent/references/platform-integration.md` for details.
+Point the agent's instruction file to `AGENTS.md` at the project root. See `docs/design-system/platform-integration.md` for details.
 
 ## Project Structure
 

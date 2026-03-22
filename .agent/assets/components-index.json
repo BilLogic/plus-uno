@@ -19,7 +19,7 @@
     "../playground/Bill/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [
-    "design-system/guidelines/overview-components.md",
-    "design-system/guidelines/reference/component-index.md"
+    "docs/design-system/overview-components.md",
+    "docs/design-system/reference/component-index.md"
   ]
 }

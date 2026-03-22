@@ -19,7 +19,7 @@
   "key_paths": {
     "agent_system": ".agent/",
     "design_system_source": "design-system/src/",
-    "design_system_docs": "design-system/guidelines/",
+    "design_system_docs": "docs/design-system/",
     "storybook_config": ".storybook/",
     "token_scripts": "scripts/",
     "playground_prototyping": "playground/prototyping/"

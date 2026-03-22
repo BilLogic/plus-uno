@@ -7,8 +7,8 @@ This workflow document is maintained for compatibility.
 Design-system maintenance behavior is now defined in:
 
 - `.agent/SKILL.md`
-- `.agent/references/maintaining.md`
-- `.agent/references/tokens.md`
+- `docs/design-system/modes/maintaining.md`
+- `docs/design-system/tokens.md`
 - `.agent/scripts/maintenance.md`
 
 ## Current Verification Commands

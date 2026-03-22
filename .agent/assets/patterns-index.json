@@ -22,14 +22,14 @@
       "name": "story_driven_verification",
       "rule": "Update and validate stories for behavior/state changes.",
       "references": [
-        "design-system/guidelines/guides/Storybook.md"
+        "docs/design-system/guides/Storybook.md"
       ]
     },
     {
       "name": "figma_to_code",
       "rule": "Fetch design context/screenshot first, then map to DS components/specs.",
       "references": [
-        "design-system/guidelines/guides/figma-workflow.md"
+        "docs/design-system/guides/figma-workflow.md"
       ]
     },
     {

@@ -12,7 +12,7 @@ Use this checklist to prevent `.agent` guidance from going stale.
 
 ## B. Path Accuracy
 
-- [ ] Every path referenced in `.agent/references/*.md` exists.
+- [ ] Every path referenced in `docs/design-system/` exists.
 - [ ] Every path referenced in nested reference files (for example mode references and core references) exists.
 - [ ] `.agent/assets/` contains only output artifacts/templates plus `README.md` policy file.
 - [ ] Import conventions still match `design-system/src` and Storybook alias config.

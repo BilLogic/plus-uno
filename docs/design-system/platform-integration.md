@@ -22,7 +22,7 @@ AGENTS.md (cross-agent entry point — product context, forbidden patterns, skil
     ↓
 .agent/AGENT.md (identity, skills table, grounding rules, foundations)
     ↓
-.agent/references/* and .agent/assets/* (progressive loading)
+docs/design-system/* and .agent/assets/* (progressive loading)
 ```
 
 ## Adding a New Platform

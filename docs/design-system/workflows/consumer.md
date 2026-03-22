@@ -7,10 +7,10 @@ This workflow document is maintained for compatibility.
 Agent workflow routing and implementation behavior is now defined in:
 
 - `.agent/SKILL.md`
-- `.agent/references/finalization.md`
-- `.agent/references/iteration.md`
-- `.agent/references/consulting.md`
-- `.agent/references/learning.md`
+- `docs/design-system/modes/finalization.md`
+- `docs/design-system/modes/iteration.md`
+- `docs/design-system/modes/consulting.md`
+- `docs/design-system/modes/learning.md`
 
 ## DS-Specific References
 

@@ -60,27 +60,27 @@ Fallback behavior:
 Choose exactly one mode per request:
 
 1. Learning Mode
-- Reference: `references/learning.md`
+- Reference: `../docs/design-system/modes/learning.md`
 - Summary: Understand what exists and how it works.
 
 2. Maintaining Mode
-- Reference: `references/maintaining.md`
+- Reference: `../docs/design-system/modes/maintaining.md`
 - Summary: Update the design system itself (not feature-only product work).
 
 3. Consulting Mode
-- Reference: `references/consulting.md`
+- Reference: `../docs/design-system/modes/consulting.md`
 - Summary: Early structure-first concepting and wireframes.
 
 4. Iteration Mode
-- Reference: `references/iteration.md`
+- Reference: `../docs/design-system/modes/iteration.md`
 - Summary: Generate 3-5 variations with tradeoffs.
 
 74. Prototyping Mode
-- Reference: `references/prototyping.md`
+- Reference: `../docs/design-system/modes/prototyping.md`
 - Summary: Build high-fidelity, low-rigor proof-of-concepts (disposable code).
 
 5. Finalization Mode
-- Reference: `references/finalization.md`
+- Reference: `../docs/design-system/modes/finalization.md`
 - Summary: Production-ready implementation with all states and accessibility.
 
 ## Critical Routing Behavior
@@ -199,14 +199,14 @@ Load files in this order, stopping as soon as you have enough context.
 | Mode logic | `references/{selected-mode}.md` | 500-900 | Always — first thing after routing |
 | Cheat Sheet | `.agent/assets/PLUS_CHEAT_SHEET.md` | 500 | MANDATORY when writing UI code, using components, or applying tokens. |
 | Layout Cheat Sheet | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` | 300 | MANDATORY when building new pages, dashboards, or modals. |
-| Foundations | `references/foundations-guide.md` | 150 | Before implementation work |
-| Tokens | `references/tokens-guide.md` | 350 | For advanced token architecture (use Cheat Sheet for daily use) |
-| Integrations | `references/integrations-guide.md` | 120 | When using Figma/Stitch MCP |
-| Components | `references/components-guide.md` | 140 | When selecting DS components |
-| Implementation | `references/implementation-guide.md` | 200 | When choosing implementation approach or example |
+| Foundations | `../docs/design-system/overview.md` | 150 | Before implementation work |
+| Tokens | `../docs/design-system/tokens.md` | 350 | For advanced token architecture (use Cheat Sheet for daily use) |
+| Integrations | `../docs/design-system/integrations.md` | 120 | When using Figma/Stitch MCP |
+| Components | `../docs/design-system/components.md` | 140 | When selecting DS components |
+| Implementation | `../docs/design-system/guides/implementation.md` | 200 | When choosing implementation approach or example |
 | JSON indexes | `assets/*.json` | 150-500 each | Only for exhaustive path/glob lookup |
-| Runbooks | `references/local-preview-runbook.md` | 180 | When building or previewing |
-| Maintenance | `references/maintenance.md`, `references/script-inventory.md`, `references/sync-checklist.md` | 300-350 each | When maintaining agent docs |
+| Runbooks | `../docs/design-system/guides/local-preview.md` | 180 | When building or previewing |
+| Maintenance | `../docs/design-system/maintenance/runbook.md`, `../docs/design-system/maintenance/scripts.md`, `../docs/design-system/maintenance/sync-checklist.md` | 300-350 each | When maintaining agent docs |
 
 **Typical task budget:** ~2,000-2,500 tokens (mode + 2-3 guides).
 **Worst-case full load:** ~5,500 tokens (all files). Avoid this.
@@ -219,12 +219,12 @@ Load additional references reactively based on what comes up in conversation:
 |---------|------|
 | User asks to build UI, or mentions tokens, colors, spacing, components, or UI | `.agent/assets/PLUS_CHEAT_SHEET.md` |
 | User asks to build a new page, screen, dashboard, or layout | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` |
-| User provides a Figma link or mentions MCP tools | `references/integrations-guide.md` |
-| User explicitly asks for component architecture rules | `references/components-guide.md` |
-| User asks about build, preview, or deployment | `references/local-preview-runbook.md` |
+| User provides a Figma link or mentions MCP tools | `../docs/design-system/integrations.md` |
+| User explicitly asks for component architecture rules | `../docs/design-system/components.md` |
+| User asks about build, preview, or deployment | `../docs/design-system/guides/local-preview.md` |
 | Agent needs exact file paths, globs, or env vars | Relevant `assets/*-index.json` |
-| User asks about repo scripts or token sync | `references/script-inventory.md` |
-| Agent is checking for stale docs or maintaining `.agent/` | `references/sync-checklist.md` |
+| User asks about repo scripts or token sync | `../docs/design-system/maintenance/scripts.md` |
+| Agent is checking for stale docs or maintaining `.agent/` | `../docs/design-system/maintenance/sync-checklist.md` |
 
 ## Progressive Loading Rule
 

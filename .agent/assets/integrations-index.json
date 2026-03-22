@@ -18,8 +18,8 @@
     }
   ],
   "design_workflow_docs": [
-    "design-system/guidelines/guides/figma-workflow.md",
-    ".agent/references/integrations-guide.md"
+    "docs/design-system/guides/figma-workflow.md",
+    "docs/design-system/integrations-guide.md"
   ],
   "storybook": {
     "command": "npm run storybook",
