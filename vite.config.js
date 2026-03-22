@@ -35,14 +35,7 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    strictPort: false,
-    proxy: {
-      '/storybook': {
-        target: 'http://localhost:6006',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/storybook/, '')
-      }
-    }
+    strictPort: false
   },
   build: {
     outDir: 'dist',

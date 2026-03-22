@@ -8,7 +8,7 @@ const NAV_ITEMS = [
     id: 'storybook',
     label: 'Storybook',
     icon: 'fa-solid fa-book-open',
-    href: '/storybook',
+    href: 'http://localhost:6006',
     external: true
   },
   {
@@ -58,7 +58,7 @@ export default function NavFab() {
             exit={{ opacity: 0, y: 10, scale: 0.85 }}
             transition={{ delay: index * 0.04, type: 'spring', stiffness: 500, damping: 28 }}
           >
-            <Tooltip text={item.label} placement="right">
+            <Tooltip text={item.label} placement="left">
               <motion.a
                 className="nav-fab__action"
                 href={item.href}
