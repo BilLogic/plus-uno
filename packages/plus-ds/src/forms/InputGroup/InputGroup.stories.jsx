@@ -4,7 +4,7 @@ import InputGroup from './InputGroup';
 export default {
     title: 'Forms/Input Group',
     component: InputGroup,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -224,37 +224,5 @@ export const Overview = () => {
             </section>
         </div>
     );
-};
-
-/**
- * Interactive Playground
- * Customize the Input Group attributes in real-time.
- */
-export const Interactive = (args) => {
-    const [value, setValue] = useState(args.value || '');
-
-    return (
-        <div style={{ maxWidth: '600px' }}>
-            <InputGroup
-                placeholder={args.placeholder}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                size={args.size}
-                disabled={args.disabled}
-                readonly={args.readonly}
-                leadingVisual={args.leadingVisual ? { type: args.leadingVisual } : undefined}
-                trailingVisual={args.trailingVisual ? { type: args.trailingVisual } : undefined}
-            />
-        </div>
-    );
-};
-
-Interactive.args = {
-    placeholder: 'Placeholder',
-    size: 'medium',
-    disabled: false,
-    readonly: false,
-    leadingVisual: undefined,
-    trailingVisual: undefined
 };
 

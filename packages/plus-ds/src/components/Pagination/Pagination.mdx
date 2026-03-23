@@ -12,30 +12,30 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <div className="sb-ds-doc-section">
 
-### Icon type
+### Content
 
-<DocsCanvasShell description={<>Chevron prev/next with small, default, and large sizes.</>}>
-    <Canvas of={PaginationStories.IconType} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Navigation content patterns: icon controls vs text controls.</>}>
+    <Canvas of={PaginationStories.Content} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Text type
+### Sizes
 
-<DocsCanvasShell description={<>Previous / Next labels across sizes.</>}>
-    <Canvas of={PaginationStories.TextType} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Small, default, and large sizes across icon and text types.</>}>
+    <Canvas of={PaginationStories.Sizes} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### States
+### Interaction States
 
-<DocsCanvasShell description={<>Disabled controls on the first page, last page, and middle.</>}>
-    <Canvas of={PaginationStories.States} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Disabled controls on first/last page and enabled controls in middle pages.</>}>
+    <Canvas of={PaginationStories.InteractionStates} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>

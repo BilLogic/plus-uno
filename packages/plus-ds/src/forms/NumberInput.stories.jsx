@@ -87,7 +87,7 @@ export const Content = () => {
     );
 };
 
-export const Variants = () => {
+export const Styles = () => {
     const [v1, setV1] = useState('');
     const [v2, setV2] = useState('');
 

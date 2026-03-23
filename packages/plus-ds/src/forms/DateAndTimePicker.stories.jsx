@@ -79,22 +79,33 @@ export default {
     },
 };
 
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
+
 export const Content = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
-        <div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
+        <section>
             <h6 className="h6 mb-2">Without section labels</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)', marginBottom: '12px' }}>
                 Compact row: date and time only.
             </p>
-            <DateAndTimePicker id="datetime-content-nolabel" label="Month" required showSectionLabels={false} />
-        </div>
-        <div>
+            <div style={contentVariantCard}>
+                <DateAndTimePicker id="datetime-content-nolabel" label="Month" required showSectionLabels={false} />
+            </div>
+        </section>
+        <section>
             <h6 className="h6 mb-2">With section labels</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)', marginBottom: '12px' }}>
                 “Date” and “Time” captions above each control.
             </p>
-            <DateAndTimePicker id="datetime-content-labels" label="Month" required showSectionLabels />
-        </div>
+            <div style={contentVariantCard}>
+                <DateAndTimePicker id="datetime-content-labels" label="Month" required showSectionLabels />
+            </div>
+        </section>
     </div>
 );
 
@@ -106,7 +117,7 @@ export const Sizes = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <DateAndTimePicker
             id="datetime-error"

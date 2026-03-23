@@ -39,17 +39,41 @@ const sampleOptions = [
     { value: 'honeydew', label: 'Honeydew' },
 ];
 
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
+
 export const Content = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-            Placeholder and selection display for single-select mode.
-        </p>
-        <Select options={sampleOptions} placeholder="Select a fruit..." />
-        <Select options={sampleOptions} placeholder="Pre-selected" defaultValue="cherry" />
+        <section>
+            <h6 className="h6" style={{ marginBottom: '8px' }}>
+                Placeholder state
+            </h6>
+            <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                Empty field with instructional placeholder for single select.
+            </p>
+            <div style={contentVariantCard}>
+                <Select options={sampleOptions} placeholder="Select a fruit..." />
+            </div>
+        </section>
+        <section>
+            <h6 className="h6" style={{ marginBottom: '8px' }}>
+                Pre-selected value
+            </h6>
+            <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                Default selection shown when an initial value is provided.
+            </p>
+            <div style={contentVariantCard}>
+                <Select options={sampleOptions} placeholder="Pre-selected" defaultValue="cherry" />
+            </div>
+        </section>
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' }}>
         <section>
             <h6 className="h6" style={{ marginBottom: '12px' }}>

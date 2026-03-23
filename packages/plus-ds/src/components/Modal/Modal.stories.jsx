@@ -38,6 +38,12 @@ export default {
 };
 
 const col = { display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'flex-start' };
+const contentVariantGrid = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+    gap: '24px',
+    width: '100%',
+};
 
 const scrollableBody = `${'Long body copy. '.repeat(24)}Use a scrollable modal when content exceeds the viewport.`;
 
@@ -73,53 +79,108 @@ function InlineModalCanvas({ minHeight = 400, modal }) {
     );
 }
 
+function ContentVariantCanvas({ title, description, minHeight, modal }) {
+    return (
+        <section>
+            <h6 className="h6" style={{ marginBottom: '8px' }}>
+                {title}
+            </h6>
+            <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                {description}
+            </p>
+            <InlineModalCanvas minHeight={minHeight} modal={modal} />
+        </section>
+    );
+}
+
 function ModalContentDemos() {
     return (
-        <>
-            <InlineModalCanvas
-                minHeight={300}
-                modal={
-                    <Modal
-                        show
-                        title="Delete item?"
-                        body="This action cannot be undone."
-                        type="default"
-                        showBottomButtons={false}
-                        onClose={() => console.log('Close clicked')}
-                    />
-                }
-            />
-            <InlineModalCanvas
-                minHeight={360}
-                modal={
-                    <Modal
-                        show
-                        title="More context"
-                        body="Use the body prop for string copy. Split longer explanations into short paragraphs so the modal stays readable."
-                        type="default"
-                        showBottomButtons={false}
-                        onClose={() => console.log('Close clicked')}
-                    />
-                }
-            />
-            <InlineModalCanvas
+        <div style={contentVariantGrid}>
+            <ContentVariantCanvas
+                title="Default + Buttons"
+                description="Use for short confirmation content with primary and secondary actions."
                 minHeight={320}
                 modal={
                     <Modal
                         show
-                        title="Custom body"
+                        title="Modal title"
+                        body="Modal body text goes here."
+                        type="default"
+                        showBottomButtons
+                        primaryButton={{
+                            text: 'Primary',
+                            style: 'primary',
+                            fill: 'filled',
+                            onClick: () => console.log('Primary clicked'),
+                        }}
+                        secondaryButton={{
+                            text: 'Secondary',
+                            style: 'secondary',
+                            fill: 'tonal',
+                            onClick: () => console.log('Secondary clicked'),
+                        }}
+                        onClose={() => console.log('Close clicked')}
+                    />
+                }
+            />
+            <ContentVariantCanvas
+                title="Scrollable + Buttons"
+                description="Use for longer content that still needs explicit footer actions."
+                minHeight={340}
+                modal={
+                    <Modal
+                        show
+                        title="Modal title"
+                        body={scrollableBody}
+                        type="scrollable"
+                        showBottomButtons
+                        primaryButton={{
+                            text: 'Primary',
+                            style: 'primary',
+                            fill: 'filled',
+                            onClick: () => console.log('Primary clicked'),
+                        }}
+                        secondaryButton={{
+                            text: 'Secondary',
+                            style: 'secondary',
+                            fill: 'tonal',
+                            onClick: () => console.log('Secondary clicked'),
+                        }}
+                        onClose={() => console.log('Close clicked')}
+                    />
+                }
+            />
+            <ContentVariantCanvas
+                title="Default + No Buttons"
+                description="Use for informational content where closing from the header is sufficient."
+                minHeight={320}
+                modal={
+                    <Modal
+                        show
+                        title="Modal title"
+                        body="Modal body text goes here."
                         type="default"
                         showBottomButtons={false}
                         onClose={() => console.log('Close clicked')}
-                    >
-                        <ul className="body2-txt" style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                            <li>Pass JSX as children for lists, links, or formatted content.</li>
-                            <li>You can still use captions or secondary text inside the body region.</li>
-                        </ul>
-                    </Modal>
+                    />
                 }
             />
-        </>
+            <ContentVariantCanvas
+                title="Scrollable + No Buttons"
+                description="Use for long read-only content without footer actions."
+                minHeight={360}
+                modal={
+                    <Modal
+                        show
+                        title="Modal title"
+                        body={scrollableBody}
+                        type="scrollable"
+                        showBottomButtons={false}
+                        onClose={() => console.log('Close clicked')}
+                    />
+                }
+            />
+        </div>
     );
 }
 

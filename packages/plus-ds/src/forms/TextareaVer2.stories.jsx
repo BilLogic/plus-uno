@@ -29,7 +29,7 @@ export default {
     },
 };
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px' }}>
         <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
             Long (boxed) vs short (underlined) at default state.

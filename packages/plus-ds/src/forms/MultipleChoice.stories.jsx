@@ -62,7 +62,14 @@ const longRadioOptions = Array.from({ length: 27 }, (_, i) => ({
     label: 'Text',
 }));
 
-export const Variants = () => {
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
+
+export const Styles = () => {
     const [radioValue, setRadioValue] = useState(null);
     const [checkboxValues, setCheckboxValues] = useState([]);
 
@@ -95,36 +102,51 @@ export const Variants = () => {
 };
 
 export const Content = () => (
-    <div style={{ maxWidth: '800px' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-            Long vertical list (radio) and pre-selected values.
-        </p>
-        <MultipleChoice
-            id="multiple-choice-radio-long"
-            name="multiple-choice-radio-long"
-            type="radio"
-            options={longRadioOptions}
-        />
-        <div className="mt-8">
+    <div style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <section>
+            <h6 className="h6 mb-2">Long list (radio)</h6>
+            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Long vertical option set for single-selection flows.
+            </p>
+            <div style={contentVariantCard}>
+                <MultipleChoice
+                    id="multiple-choice-radio-long"
+                    name="multiple-choice-radio-long"
+                    type="radio"
+                    options={longRadioOptions}
+                />
+            </div>
+        </section>
+        <section>
             <h6 className="h6 mb-2">Radio — with selection</h6>
-            <MultipleChoice
-                id="multiple-choice-radio-selected"
-                name="multiple-choice-radio-selected"
-                type="radio"
-                options={shortRadioOptions}
-                defaultValue="option-2"
-            />
-        </div>
-        <div className="mt-8">
+            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Pre-selected item in a single-select list.
+            </p>
+            <div style={contentVariantCard}>
+                <MultipleChoice
+                    id="multiple-choice-radio-selected"
+                    name="multiple-choice-radio-selected"
+                    type="radio"
+                    options={shortRadioOptions}
+                    defaultValue="option-2"
+                />
+            </div>
+        </section>
+        <section>
             <h6 className="h6 mb-2">Checkbox — with selections</h6>
-            <MultipleChoice
-                id="multiple-choice-checkbox-selected"
-                name="multiple-choice-checkbox-selected"
-                type="checkbox"
-                options={shortCheckboxOptions}
-                defaultValue={['option-1', 'option-3']}
-            />
-        </div>
+            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Pre-selected values for multi-select behavior.
+            </p>
+            <div style={contentVariantCard}>
+                <MultipleChoice
+                    id="multiple-choice-checkbox-selected"
+                    name="multiple-choice-checkbox-selected"
+                    type="checkbox"
+                    options={shortCheckboxOptions}
+                    defaultValue={['option-1', 'option-3']}
+                />
+            </div>
+        </section>
     </div>
 );
 

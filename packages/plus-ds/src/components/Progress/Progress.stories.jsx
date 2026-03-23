@@ -54,7 +54,7 @@ function ProgressSizesDemos() {
     );
 }
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={col}>
         <ProgressVariantsDemos />
     </div>

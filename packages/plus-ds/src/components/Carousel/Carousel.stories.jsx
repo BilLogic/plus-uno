@@ -244,7 +244,7 @@ export const Layout = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={carouselCol}>
         <CarouselFadeDemo />
     </div>

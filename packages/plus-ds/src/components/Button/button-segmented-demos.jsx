@@ -32,8 +32,8 @@ export function ButtonSizesFilledRowContainer() {
     );
 }
 
-/** Semantic styles (primary, secondary, …) at default filled weight. */
-export function StylesSection() {
+/** Intent options (primary, secondary, …) at default filled weight. */
+export function IntentSection() {
     return (
         <DocsDemoBlock
             description={
@@ -57,8 +57,8 @@ export function StylesSection() {
     );
 }
 
-/** Fill variants (filled, tonal, outline, ghost) on primary. */
-export function VariantsSection() {
+/** Appearance options (filled, tonal, outline, ghost) on primary. */
+export function AppearanceSection() {
     return (
         <DocsDemoBlock
             description={

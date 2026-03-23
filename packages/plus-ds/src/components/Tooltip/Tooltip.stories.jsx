@@ -58,7 +58,7 @@ function TooltipSizesDemos() {
     );
 }
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={row}>
         <TooltipVariantsDemos />
     </div>

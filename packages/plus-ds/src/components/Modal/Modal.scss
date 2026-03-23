@@ -14,6 +14,10 @@
     max-height: calc(100vh - 40px);
 }
 
+.plus-modal-scrollable {
+    height: 226px;
+}
+
 .plus-modal-header {
     display: flex;
     align-items: center;
@@ -70,8 +74,8 @@
 }
 
 .plus-modal-body-scrollable {
-    display: flex;
-    gap: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 .plus-modal-content {
@@ -99,16 +103,6 @@
 
 .plus-modal-gap-lg .plus-modal-content {
     gap: var(--size-modal-gap-lg);
-}
-
-.plus-modal-scrollbar {
-    flex-shrink: 0;
-    padding: var(--size-element-pad-y-sm);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--size-element-gap-xs);
-    color: var(--color-on-surface-variant);
 }
 
 .plus-modal-footer {

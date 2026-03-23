@@ -97,19 +97,6 @@ const Modal = ({
                         {body && (typeof body === 'string' ? <div className="body1-txt">{body}</div> : body)}
                         {children}
                     </div>
-                    {type === 'scrollable' && (
-                        <div className="plus-modal-scrollbar">
-                            <div className="plus-modal-scrollbar-icon">
-                                <i className="fas fa-caret-up" />
-                            </div>
-                            <div className="plus-modal-scrollbar-track">
-                                <div className="plus-modal-scrollbar-bar" />
-                            </div>
-                            <div className="plus-modal-scrollbar-icon">
-                                <i className="fas fa-caret-down" />
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 {showBottomButtons && (primaryButton || secondaryButton) && (

@@ -133,7 +133,7 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={col}>
         <ListGroupVariantsDemo />
     </div>

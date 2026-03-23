@@ -85,7 +85,7 @@ export const Content = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <FileUpload
             id="file-upload-error"

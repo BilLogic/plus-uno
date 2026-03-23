@@ -90,6 +90,12 @@ const itemsWithSelection = [
 ];
 
 const dropdownCol = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '700px' };
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
 
 function DropdownContentDemos() {
     const [multiSelectItems, setMultiSelectItems] = useState([
@@ -109,45 +115,55 @@ function DropdownContentDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Basic</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Basic</h6>
+                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                     Standard dropdown with simple text items.
                 </p>
-                <Dropdown buttonText="Dropdown" items={basicItems} />
+                <div style={contentVariantCard}>
+                    <Dropdown buttonText="Dropdown" items={basicItems} />
+                </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With dividers</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>With dividers</h6>
+                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                     Group related items using dividers.
                 </p>
-                <Dropdown buttonText="Actions" items={itemsWithDivider} />
+                <div style={contentVariantCard}>
+                    <Dropdown buttonText="Actions" items={itemsWithDivider} />
+                </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With icons</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>With icons</h6>
+                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                     Leading and trailing icons on items.
                 </p>
-                <Dropdown buttonText="Edit Menu" items={itemsWithIcons} />
+                <div style={contentVariantCard}>
+                    <Dropdown buttonText="Edit Menu" items={itemsWithIcons} />
+                </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Selection indicator</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Selection indicator</h6>
+                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                     Currently selected item with a checkmark.
                 </p>
-                <Dropdown buttonText="Select Option" items={itemsWithSelection} />
+                <div style={contentVariantCard}>
+                    <Dropdown buttonText="Select Option" items={itemsWithSelection} />
+                </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Multi-select</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Multi-select</h6>
+                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                     Multiple selections with checkboxes.
                 </p>
-                <Dropdown
-                    buttonText="Filter"
-                    items={multiSelectItems.map((item, index) => ({
-                        ...item,
-                        onClick: () => toggleMultiSelect(index)
-                    }))}
-                />
+                <div style={contentVariantCard}>
+                    <Dropdown
+                        buttonText="Filter"
+                        items={multiSelectItems.map((item, index) => ({
+                            ...item,
+                            onClick: () => toggleMultiSelect(index)
+                        }))}
+                    />
+                </div>
             </section>
         </>
     );
@@ -240,7 +256,7 @@ export const Content = () => (
     </div>
 );
 
-export const Variants = () => (
+export const StyleVariants = () => (
     <div style={dropdownCol}>
         <DropdownVariantsDemos />
     </div>

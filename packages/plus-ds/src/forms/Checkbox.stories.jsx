@@ -49,16 +49,43 @@ export default {
 };
 
 const pageWrap = { maxWidth: '600px' };
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
 
 function CheckboxContentDemos() {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Label copy and the required marker are configurable.
-            </p>
-            <Checkbox id="cb-content-short" name="cb-content-short" label="Short label" defaultChecked />
-            <Checkbox id="cb-content-long" name="cb-content-long" label="Longer label text used in forms and filters" />
-            <Checkbox id="cb-content-required" name="cb-content-required" label="Required field" required />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Short label</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Compact label copy for dense forms.
+                </p>
+                <div style={contentVariantCard}>
+                    <Checkbox id="cb-content-short" name="cb-content-short" label="Short label" defaultChecked />
+                </div>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Long label</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Longer descriptive copy used in forms and filters.
+                </p>
+                <div style={contentVariantCard}>
+                    <Checkbox id="cb-content-long" name="cb-content-long" label="Longer label text used in forms and filters" />
+                </div>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Required indicator</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Adds a required marker next to the label.
+                </p>
+                <div style={contentVariantCard}>
+                    <Checkbox id="cb-content-required" name="cb-content-required" label="Required field" required />
+                </div>
+            </section>
         </div>
     );
 }

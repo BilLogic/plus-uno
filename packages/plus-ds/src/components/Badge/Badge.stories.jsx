@@ -108,6 +108,13 @@ export default {
 };
 
 const badgeGalleryCol = { display: 'flex', flexDirection: 'column', gap: '40px' };
+const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
 
 function BadgeSizesDemos() {
     return (
@@ -157,28 +164,56 @@ function BadgeContentDemos() {
     return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Recommended Combinations</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check"></i>} />
-                    <Badge text="Warning" style="warning" leadingVisual={<i className="fa-solid fa-triangle-exclamation"></i>} />
-                    <Badge text="Error" style="danger" leadingVisual={<i className="fa-solid fa-circle-exclamation"></i>} />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Status Indicators (Text + Leading Visual)</span>
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="New Feature" style="info" size="b3" />
-                    <Badge text="Beta" style="tertiary" size="b3" />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Labels & Categories (Small size)</span>
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="Inbox" style="primary" counter="12" />
-                    <Badge text="Messages" style="secondary" counter="99+" />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Counts (Text + Counter)</span>
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="Filter: Active" style="primary" dismissible />
-                    <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Filters & Selections (Dismissible)</span>
-                </div>
+            <div style={contentVariantCol}>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Status Indicators</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Text + leading icon for success, warning, and error semantics.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check"></i>} />
+                            <Badge text="Warning" style="warning" leadingVisual={<i className="fa-solid fa-triangle-exclamation"></i>} />
+                            <Badge text="Error" style="danger" leadingVisual={<i className="fa-solid fa-circle-exclamation"></i>} />
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Labels & Categories</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Compact badges in smaller size for metadata and labels.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="New Feature" style="info" size="b3" />
+                            <Badge text="Beta" style="tertiary" size="b3" />
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Counts</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Text + counter for inbox/message counts and similar tallies.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Inbox" style="primary" counter="12" />
+                            <Badge text="Messages" style="secondary" counter="99+" />
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Filters & Selections</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Dismissible badges for active filters and selected entities.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Filter: Active" style="primary" dismissible />
+                            <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
+                        </div>
+                    </div>
+                </section>
             </div>
         </section>
     );
@@ -190,7 +225,7 @@ export const Sizes = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={badgeGalleryCol}>
         <BadgeVariantsDemos />
     </div>

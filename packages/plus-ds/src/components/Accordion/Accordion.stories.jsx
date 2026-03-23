@@ -173,7 +173,7 @@ function AccordionContentDemos() {
     );
 }
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={accordionPage}>
         <AccordionVariantsDemos />
     </div>

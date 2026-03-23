@@ -52,7 +52,7 @@ function ToastVariantsDemos() {
     );
 }
 
-export const Variants = () => (
+export const Styles = () => (
     <div className="d-flex flex-column gap-3">
         <ToastVariantsDemos />
     </div>

@@ -112,7 +112,7 @@ function SpinnerSizesDemos() {
     );
 }
 
-export const Variants = () => (
+export const StyleVariants = () => (
     <div style={col}>
         <SpinnerVariantsDemos />
     </div>

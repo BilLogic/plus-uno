@@ -92,6 +92,12 @@ export default {
 };
 
 const pageWrap = { maxWidth: '1200px' };
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
 
 function InputContentDemos() {
     const [value5, setValue5] = useState('');
@@ -99,121 +105,129 @@ function InputContentDemos() {
     const [value12, setValue12] = useState('');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>
                     Input
                 </h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Placeholder versus filled value: lighter treatment for empty placeholder state, darker for value.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-placeholder-style"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            value={value5}
-                            onChange={(e) => setValue5(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-value-style"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            value={value6}
-                            onChange={(e) => setValue6(e.target.value)}
-                            trailingVisual="fa-solid fa-icons"
-                        />
+                <div style={contentVariantCard}>
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1', minWidth: '200px' }}>
+                            <Input
+                                id="input-placeholder-style"
+                                label="Label"
+                                required
+                                placeholder="Placeholder"
+                                value={value5}
+                                onChange={(e) => setValue5(e.target.value)}
+                                trailingVisual="fa-solid fa-icons"
+                            />
+                        </div>
+                        <div style={{ flex: '1', minWidth: '200px' }}>
+                            <Input
+                                id="input-value-style"
+                                label="Label"
+                                required
+                                placeholder="Placeholder"
+                                value={value6}
+                                onChange={(e) => setValue6(e.target.value)}
+                                trailingVisual="fa-solid fa-icons"
+                            />
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>
                     Label
                 </h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Show or hide the visible label while keeping the field usable.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-with-label"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            showLabel
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-without-label"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            showLabel={false}
-                            trailingVisual="fa-solid fa-icons"
-                        />
+                <div style={contentVariantCard}>
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1', minWidth: '200px' }}>
+                            <Input
+                                id="input-with-label"
+                                label="Label"
+                                required
+                                placeholder="Placeholder"
+                                showLabel
+                                trailingVisual="fa-solid fa-icons"
+                            />
+                        </div>
+                        <div style={{ flex: '1', minWidth: '200px' }}>
+                            <Input
+                                id="input-without-label"
+                                label="Label"
+                                required
+                                placeholder="Placeholder"
+                                showLabel={false}
+                                trailingVisual="fa-solid fa-icons"
+                            />
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>
                     Required
                 </h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Optional required indicator next to the label.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-required"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            trailingVisual="fa-solid fa-icons"
-                        />
-                    </div>
-                    <div style={{ flex: '1', minWidth: '200px' }}>
-                        <Input
-                            id="input-not-required"
-                            label="Label"
-                            required={false}
-                            placeholder="Placeholder"
-                            trailingVisual="fa-solid fa-icons"
-                        />
+                <div style={contentVariantCard}>
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1', minWidth: '200px' }}>
+                            <Input
+                                id="input-required"
+                                label="Label"
+                                required
+                                placeholder="Placeholder"
+                                trailingVisual="fa-solid fa-icons"
+                            />
+                        </div>
+                        <div style={{ flex: '1', minWidth: '200px' }}>
+                            <Input
+                                id="input-not-required"
+                                label="Label"
+                                required={false}
+                                placeholder="Placeholder"
+                                trailingVisual="fa-solid fa-icons"
+                            />
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>
                     Leading and trailing visuals
                 </h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Leading visual is an icon; trailing can be an icon or a dropdown affordance. Match trailing size to
                     field size.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1', minWidth: '300px' }}>
-                        <Input
-                            id="input-with-visuals"
-                            label="Label"
-                            required
-                            placeholder="Placeholder"
-                            leadingVisual="fa-solid fa-network-wired"
-                            trailingVisual="dropdown"
-                            size="large"
-                            value={value12}
-                            onChange={(e) => setValue12(e.target.value)}
-                        />
+                <div style={contentVariantCard}>
+                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1', minWidth: '300px' }}>
+                            <Input
+                                id="input-with-visuals"
+                                label="Label"
+                                required
+                                placeholder="Placeholder"
+                                leadingVisual="fa-solid fa-network-wired"
+                                trailingVisual="dropdown"
+                                size="large"
+                                value={value12}
+                                onChange={(e) => setValue12(e.target.value)}
+                            />
+                        </div>
                     </div>
                 </div>
             </section>
@@ -439,7 +453,7 @@ export const Content = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={pageWrap}>
         <InputVariantsDemos />
     </div>

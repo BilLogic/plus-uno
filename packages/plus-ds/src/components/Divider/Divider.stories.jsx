@@ -162,7 +162,7 @@ export const Sizes = () => (
     </div>
 );
 
-export const Variants = () => (
+export const Styles = () => (
     <div style={dividerCol}>
         <DividerVariantsDemos />
     </div>

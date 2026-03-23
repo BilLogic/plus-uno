@@ -3,7 +3,7 @@ import Scale from './RadioButtonGroup';
 
 export default {
     title: 'Forms/Scale',
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {

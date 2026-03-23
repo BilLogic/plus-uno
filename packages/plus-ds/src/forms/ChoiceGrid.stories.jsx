@@ -53,7 +53,7 @@ const columns = [
 
 const singleRow = [{ id: 'row-1', label: 'Row 1' }];
 
-export const Variants = () => {
+export const Styles = () => {
     const [radioValues, setRadioValues] = useState({ 'row-1': 'col-2' });
     const [checkboxValues, setCheckboxValues] = useState({
         'row-1': { 'col-1': true, 'col-3': true },
