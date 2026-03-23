@@ -62,7 +62,32 @@ html.market-active #root {
     display: flex;
     flex-direction: column;
     gap: var(--size-element-gap-xs, 4px);
-    min-width: 200px;
+    // Keep filter controls at a fixed width and prevent growth from selected values.
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+    flex: 0 0 300px;
+    min-inline-size: 0;
+  }
+
+  &__filter-group .plus-select-wrapper,
+  &__filter-group .plus-select-trigger,
+  &__filter-group .plus-select-badges {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  // Keep Select chevron inline with selected chips and let field height
+  // grow/shrink naturally as chip rows change.
+  &__filter-group .plus-select-trigger {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  &__filter-group .plus-select-badges {
+    flex: 1 1 auto;
+    max-width: none;
   }
 
   &__filter-label {
@@ -85,6 +110,16 @@ html.market-active #root {
     align-items: flex-end;
     gap: var(--size-element-gap-sm, 8px);
     min-height: 100%;
+  }
+
+  @media (max-width: 1200px) {
+    &__sorts {
+      // When filter row wraps, move sort buttons to a new left-aligned row.
+      margin-left: 0;
+      flex-basis: 100%;
+      justify-content: flex-start;
+      align-items: center;
+    }
   }
 
   &__sort-btn {
@@ -137,6 +172,11 @@ html.market-active #root {
     display: flex;
     align-items: center;
     gap: var(--size-element-gap-sm, 8px);
+  }
+
+  &__count-emphasis {
+    color: var(--color-on-surface, #1a1a1a);
+    font-weight: 700;
   }
 
 

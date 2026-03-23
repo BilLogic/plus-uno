@@ -391,6 +391,7 @@
 
     .plus-list-option.plus-select-option-item {
         padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
+        margin: 0 !important;
         box-sizing: border-box;
         background-color: var(--color-surface);
         font-family: var(--font-family-body);
@@ -417,6 +418,9 @@
             /* Override OptionList active background to match single-select selected */
             background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08)) !important;
             font-weight: var(--font-weight-light) !important;
+            padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
+            margin: 0 !important;
+            gap: var(--size-element-gap-md, 10px) !important;
             border: none !important;
             box-shadow: none !important;
 
@@ -438,6 +442,11 @@
             border: none !important;
             box-shadow: none !important;
         }
+    }
+
+    // Prevent Bootstrap active adjacency rule from shifting selected rows.
+    .plus-list-option.plus-select-option-item + .plus-list-option.plus-select-option-item.active {
+        margin-top: 0 !important;
     }
 }
 

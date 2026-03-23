@@ -41,7 +41,8 @@ const PrototypeMarket = () => {
     };
   }, []);
 
-  const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || selectedCreators.length > 0 || search;
+  const normalizedSearch = search.trim();
+  const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || selectedCreators.length > 0 || normalizedSearch;
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -63,6 +64,7 @@ const PrototypeMarket = () => {
       }
       return true;
     });
+    return base;
   }, [search, selectedStages, selectedPillars, selectedCreators]);
 
   const sorted = useMemo(() => {
@@ -143,6 +145,20 @@ const PrototypeMarket = () => {
             size="medium"
           />
         </div>
+
+        <div className="prototype-market__filter-group">
+          <label className="prototype-market__filter-label body3-txt">Creator</label>
+          <Select
+            id="market-creator-filter"
+            mode="multi"
+            options={creatorOptions}
+            value={selectedCreators}
+            onChange={setSelectedCreators}
+            placeholder="All creators"
+            size="medium"
+          />
+        </div>
+
         <div className="prototype-market__sorts" aria-label="Sort controls">
           <button
             type="button"
@@ -163,28 +179,26 @@ const PrototypeMarket = () => {
             <i className={`fa-solid ${sortBy === 'fidelity' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />
           </button>
         </div>
-
-        <div className="prototype-market__filter-group">
-          <label className="prototype-market__filter-label body3-txt">Creator</label>
-          <Select
-            id="market-creator-filter"
-            mode="multi"
-            options={creatorOptions}
-            value={selectedCreators}
-            onChange={setSelectedCreators}
-            placeholder="All creators"
-            size="medium"
-          />
-        </div>
       </div>
 
       {/* Result count + view toggle */}
       <div className="prototype-market__toolbar">
         <div className="prototype-market__count body2-txt">
-          {sorted.length} {sorted.length === 1 ? 'prototype' : 'prototypes'}
+          {normalizedSearch ? (
+            <>
+              Search result:{' '}
+              <span className="prototype-market__count-emphasis">{sorted.length}</span>{' '}
+              {sorted.length === 1 ? 'prototype' : 'prototypes'} for{' '}
+              <span className="prototype-market__count-emphasis">{normalizedSearch}</span>
+            </>
+          ) : (
+            <>
+              {sorted.length} {sorted.length === 1 ? 'prototype' : 'prototypes'}
+            </>
+          )}
           {hasFilters && (
             <Button
-              text="Clear filters"
+              text="Clear filter"
               style="tertiary"
               fill="ghost"
               size="small"

@@ -175,6 +175,16 @@ const Select = ({
     // Intentionally do not auto-focus search on open.
     // Users should click into the search field if they want to type.
 
+    // Keep dropdown menu anchored to trigger when trigger height changes
+    // (e.g. multi-select chips wrap/unwrap while menu is open).
+    useEffect(() => {
+        if (!isOpen) return;
+        const notifyLayoutChange = () => window.dispatchEvent(new Event('resize'));
+        notifyLayoutChange();
+        const rafId = requestAnimationFrame(notifyLayoutChange);
+        return () => cancelAnimationFrame(rafId);
+    }, [isOpen, selectedValues]);
+
     // Size classes
     const sizeClass = size === 'small' ? 'plus-select-sm' :
         size === 'large' ? 'plus-select-lg' : 'plus-select-md';
@@ -233,7 +243,10 @@ const Select = ({
                     </span>
                 )}
 
-                <i className="fa-solid fa-caret-down plus-select-chevron" aria-hidden="true" />
+                <i
+                    className={`fa-solid ${isOpen ? 'fa-caret-up' : 'fa-caret-down'} plus-select-chevron`}
+                    aria-hidden="true"
+                />
             </Dropdown.Toggle>
 
             {/* Dropdown Menu */}
