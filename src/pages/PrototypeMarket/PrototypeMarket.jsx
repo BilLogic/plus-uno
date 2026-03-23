@@ -12,18 +12,21 @@ import './PrototypeMarket.scss';
 
 const stageOptions = STAGES.map((s) => ({ value: s, label: STAGE_META[s].label }));
 const pillarOptions = PRODUCT_PILLARS.map((p) => ({ value: p, label: PILLAR_META[p].label }));
+const fidelityRank = { low: 1, mid: 2, high: 3 };
 
 const PrototypeMarket = () => {
   const [search, setSearch] = useState('');
   const [selectedStages, setSelectedStages] = useState([]);
   const [selectedPillars, setSelectedPillars] = useState([]);
+  const [sortBy, setSortBy] = useState('time');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const normalizedSearch = search.trim();
   const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || normalizedSearch;
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
-    return prototypes.filter((p) => {
+    const base = prototypes.filter((p) => {
       if (selectedStages.length > 0 && !selectedStages.includes(p.stage)) return false;
       if (selectedPillars.length > 0 && !selectedPillars.includes(p.productPillar)) return false;
       if (q) {
@@ -40,7 +43,37 @@ const PrototypeMarket = () => {
       }
       return true;
     });
+    return base;
   }, [search, selectedStages, selectedPillars]);
+
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'fidelity') {
+        const rankDelta = fidelityRank[a.stage] - fidelityRank[b.stage];
+        if (rankDelta !== 0) {
+          return sortDirection === 'asc' ? rankDelta : -rankDelta;
+        }
+        const dateDelta = new Date(a.lastUpdated) - new Date(b.lastUpdated);
+        return sortDirection === 'asc' ? dateDelta : -dateDelta;
+      }
+
+      const dateDelta = new Date(a.lastUpdated) - new Date(b.lastUpdated);
+      if (dateDelta !== 0) {
+        return sortDirection === 'asc' ? dateDelta : -dateDelta;
+      }
+      const rankDelta = fidelityRank[a.stage] - fidelityRank[b.stage];
+      return sortDirection === 'asc' ? rankDelta : -rankDelta;
+    });
+  }, [filtered, sortBy, sortDirection]);
+
+  const handleSortClick = (nextSortBy) => {
+    if (sortBy === nextSortBy) {
+      setSortDirection((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+      return;
+    }
+    setSortBy(nextSortBy);
+    setSortDirection('desc');
+  };
 
   return (
     <div className="prototype-market">
@@ -102,6 +135,26 @@ const PrototypeMarket = () => {
             size="medium"
           />
         </div>
+        <div className="prototype-market__sorts" aria-label="Sort controls">
+          <button
+            type="button"
+            className={`prototype-market__sort-btn body3-txt ${sortBy === 'time' ? 'is-active' : ''}`}
+            onClick={() => handleSortClick('time')}
+            aria-pressed={sortBy === 'time'}
+          >
+            <span>Time</span>
+            <i className={`fa-solid ${sortBy === 'time' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />
+          </button>
+          <button
+            type="button"
+            className={`prototype-market__sort-btn body3-txt ${sortBy === 'fidelity' ? 'is-active' : ''}`}
+            onClick={() => handleSortClick('fidelity')}
+            aria-pressed={sortBy === 'fidelity'}
+          >
+            <span>Fidelity</span>
+            <i className={`fa-solid ${sortBy === 'fidelity' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />
+          </button>
+        </div>
       </div>
 
       {/* Result count */}
@@ -109,13 +162,13 @@ const PrototypeMarket = () => {
         {normalizedSearch ? (
           <>
             Search result:{' '}
-            <span className="prototype-market__count-emphasis">{filtered.length}</span>{' '}
-            {filtered.length === 1 ? 'prototype' : 'prototypes'} for{' '}
+            <span className="prototype-market__count-emphasis">{sorted.length}</span>{' '}
+            {sorted.length === 1 ? 'prototype' : 'prototypes'} for{' '}
             <span className="prototype-market__count-emphasis">{normalizedSearch}</span>
           </>
         ) : (
           <>
-            {filtered.length} {filtered.length === 1 ? 'prototype' : 'prototypes'}
+            {sorted.length} {sorted.length === 1 ? 'prototype' : 'prototypes'}
           </>
         )}
         {hasFilters && (
@@ -135,7 +188,7 @@ const PrototypeMarket = () => {
       {/* Grid */}
       {filtered.length > 0 ? (
         <div className="prototype-market__grid">
-          {filtered.map((proto) => (
+          {sorted.map((proto) => (
             <PrototypeCard key={proto.id} {...proto} />
           ))}
         </div>
