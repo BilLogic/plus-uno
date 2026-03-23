@@ -12,6 +12,7 @@
     "build-storybook": "storybook build --config-dir .storybook -o storybook-static && rm -rf dist/storybook && mv storybook-static dist/storybook",
     "sync:tokens": "node scripts/sync-figma-tokens.js",
     "generate:tokens": "node scripts/generate-all-tokens.js",
+    "generate:previews": "node scripts/generate-prototype-previews.js",
     "start": "vite",
     "dev:react": "vite",
     "build:react": "vite build",

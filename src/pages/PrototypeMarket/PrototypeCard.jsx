@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/Card';
 import Badge from '@/components/Badge';
+import Button from '@/components/Button';
 import { STAGES, PRODUCT_PILLARS, STAGE_META, PILLAR_META } from './prototypes-data';
 import './PrototypeCard.scss';
 
@@ -23,6 +24,10 @@ const PrototypeCard = ({
   notionCardUrl,
   notionCardId,
   localPath,
+  upvoteCount = 0,
+  isUpvoted = false,
+  onToggleUpvote,
+  onOpenDetails,
 }) => {
   const stageMeta  = STAGE_META[stage]  || STAGE_META.low;
   const pillarMeta = PILLAR_META[productPillar] || PILLAR_META.universal;
@@ -30,14 +35,10 @@ const PrototypeCard = ({
   const allPeople = [...new Set([...creators, ...contributors])];
 
   const handleCardClick = () => {
-    if (deploymentUrl) {
-      window.open(deploymentUrl, '_blank', 'noopener');
-    } else if (localPath) {
-      window.location.href = localPath;
-    }
+    if (onOpenDetails) onOpenDetails();
   };
 
-  const isClickable = !!(deploymentUrl || localPath);
+  const isClickable = true;
   const isNotDeployed = !deploymentUrl && !localPath;
 
   return (
@@ -53,18 +54,22 @@ const PrototypeCard = ({
       aria-label={isClickable ? `Open ${title}` : undefined}
       aria-disabled={isNotDeployed ? true : undefined}
     >
-      {/* Badges row */}
-      <div className="prototype-card__badges">
-        <Badge style={stageMeta.badgeStyle} size="b3">
-          {stageMeta.label}
-        </Badge>
-        <Badge style={pillarMeta.badgeStyle} size="b3">
-          {pillarMeta.label}
-        </Badge>
-      </div>
+      <div className="prototype-card__head">
+        <div className="prototype-card__head-main">
+          {/* Badges row */}
+          <div className="prototype-card__badges">
+            <Badge style={stageMeta.badgeStyle} size="b3">
+              {stageMeta.label}
+            </Badge>
+            <Badge style={pillarMeta.badgeStyle} size="b3">
+              {pillarMeta.label}
+            </Badge>
+          </div>
 
-      {/* Title */}
-      <div className="prototype-card__title h5">{title}</div>
+          {/* Title */}
+          <div className="prototype-card__title h5">{title}</div>
+        </div>
+      </div>
 
       {/* Description */}
       <p className="prototype-card__desc body2-txt">{description}</p>
@@ -123,6 +128,22 @@ const PrototypeCard = ({
             Not deployed
           </span>
         )}
+        <div className="prototype-card__upvote-wrap">
+          <Button
+          className="prototype-card__upvote-btn"
+          style="secondary"
+          fill="tonal"
+          active={isUpvoted}
+          size="small"
+          leadingVisual={<i className={`${isUpvoted ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`} />}
+          text={upvoteCount > 0 ? String(upvoteCount) : undefined}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onToggleUpvote) onToggleUpvote();
+          }}
+            aria-label={isUpvoted ? 'Remove upvote' : 'Upvote'}
+          />
+        </div>
       </div>
     </Card>
   );
@@ -140,6 +161,10 @@ PrototypeCard.propTypes = {
   notionCardUrl: PropTypes.string,
   notionCardId: PropTypes.string,
   localPath: PropTypes.string,
+  upvoteCount: PropTypes.number,
+  isUpvoted: PropTypes.bool,
+  onToggleUpvote: PropTypes.func,
+  onOpenDetails: PropTypes.func,
 };
 
 export default PrototypeCard;
