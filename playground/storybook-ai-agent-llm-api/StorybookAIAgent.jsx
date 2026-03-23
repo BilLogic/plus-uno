@@ -881,9 +881,9 @@ EXAMPLES:
 User: "go to button" → {"intent": "navigate", "target": "button"}
 User: "show me modal" → {"intent": "navigate", "target": "modal"}
 User: "where are the cards" → {"intent": "navigate", "target": "cards"}` : 
-`You are an expert design system AI assistant for the PLUS ONE design system, built on React Bootstrap.
+`You are an expert design system AI assistant for the PLUS UNO design system, built on React Bootstrap.
 
-The PLUS ONE design system includes all standard Bootstrap components plus custom PLUS-specific components:
+The PLUS UNO design system includes all standard Bootstrap components plus custom PLUS-specific components:
 Modal, Card, Button, Badge, Alert, Accordion, Breadcrumb, Dropdown, NavTabs, Pagination, Progress, Tooltip,
 Popover, ListGroup, Spinner, Form, Input, Table, Tabs, Offcanvas, Toast, Collapse, Carousel, ButtonGroup,
 OverviewCard, TutorsTrainingProgressTable, ExportSearchFilterBar, SidebarTab, NavBar, and more.
@@ -916,7 +916,7 @@ For "screen_explain" feature, return:
   "components_used": ["Button", "Table", "Badge", "NavTabs", "Pagination"]
 }
 
-IMPORTANT: Even if you don't know the exact PLUS ONE variant, provide your best design-system guidance based on React Bootstrap conventions. Never return an error, always return a helpful JSON response.`;
+IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best design-system guidance based on React Bootstrap conventions. Never return an error, always return a helpful JSON response.`;
 
             const userMessage = isNavigation
                 ? userInput
@@ -1182,7 +1182,7 @@ IMPORTANT: Even if you don't know the exact PLUS ONE variant, provide your best 
                 query: componentQuery,
                 parsed,
                 pageContext,
-                designSystem: 'PLUS ONE Design System (React Bootstrap)'
+                designSystem: 'PLUS UNO Design System (React Bootstrap)'
             });
             return;
         }
@@ -1296,7 +1296,7 @@ IMPORTANT: Even if you don't know the exact PLUS ONE variant, provide your best 
                                 <div className="sb-ai-agent__welcome-msg">
                                     <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
                                     <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
-                                        Welcome to PLUS ONE Inline Agent. How can I assist you today?
+                                        Welcome to PLUS UNO Inline Agent. How can I assist you today?
                                     </div>
                                 </div>
                                 <p className="sb-ai-agent__tip">

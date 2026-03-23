@@ -4,7 +4,7 @@ import TutorTrainingProgressPage from '../../../../packages/plus-ds/src/specs/Ad
 import ResponsiveFrame from '../../../../packages/plus-ds/src/specs/Universal/ResponsiveFrame';
 
 export default {
-    title: 'Playground/Ashley/PLUS ONE Inline AI Agent',
+    title: 'Playground/Ashley/PLUS UNO Inline AI Agent',
     component: StorybookAIAgent,
     parameters: {
         layout: 'fullscreen',
