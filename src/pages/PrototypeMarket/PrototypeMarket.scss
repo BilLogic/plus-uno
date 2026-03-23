@@ -79,6 +79,59 @@ html.market-active #root {
     justify-content: space-between;
   }
 
+  &__sorts {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--size-element-gap-sm, 8px);
+    min-height: 100%;
+  }
+
+  &__sort-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-sm, 8px);
+    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-md, 10px);
+    border-radius: var(--size-element-radius-md, 4px);
+    border: 1px solid var(--color-outline-variant, #bec8ca);
+    background: var(--color-surface-container-lowest, #fff);
+    color: var(--color-on-surface, #191c1e);
+    font-family: var(--font-family-body, 'Merriweather Sans'), sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.667;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+    i {
+      font-size: 10px;
+      line-height: 2;
+      color: var(--color-outline-variant, #bec8ca);
+    }
+
+    &:hover {
+      background: var(--color-on-surface-state-08, rgba(0, 0, 0, 0.08));
+      border-color: var(--color-outline, #70787d);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(68, 92, 106, 0.2);
+    }
+
+    &.is-active {
+      color: var(--secondary-secondary-text, #3b525f);
+      border-color: var(--secondary-secondary, #445c6a);
+
+      i {
+        color: var(--secondary-secondary, #445c6a);
+      }
+    }
+  }
+
+  // ── Result count ────────────────────────────
   &__count {
     color: var(--color-on-surface-variant, #666);
     display: flex;

@@ -4,6 +4,40 @@
   height: 100%;
   transition: box-shadow 0.2s ease, transform 0.15s ease;
 
+  // Matches Input disabled + wrapper disabled (packages/plus-ds/src/forms/Input.scss)
+  &--not-deployed.plus-card {
+    cursor: not-allowed;
+    opacity: 0.38;
+    background-color: var(--color-surface) !important;
+    border: 0.8px solid var(--color-outline-variant) !important;
+    box-shadow: none !important;
+
+    .prototype-card__title {
+      color: var(--color-on-surface-variant);
+    }
+
+    .prototype-card__desc {
+      color: var(--color-on-surface-variant);
+    }
+
+    .prototype-card__meta {
+      border-top-color: var(--color-outline-variant);
+    }
+
+    .prototype-card__meta-item {
+      color: var(--color-on-surface-variant);
+    }
+
+    .prototype-card__link:not(.prototype-card__link--disabled) {
+      color: var(--color-on-surface-variant);
+
+      &:hover {
+        color: var(--color-on-surface-variant);
+        text-decoration: none;
+      }
+    }
+  }
+
   &--clickable {
     cursor: pointer;
 

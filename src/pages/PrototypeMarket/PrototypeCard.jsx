@@ -38,10 +38,11 @@ const PrototypeCard = ({
   };
 
   const isClickable = !!(deploymentUrl || localPath);
+  const isNotDeployed = !deploymentUrl && !localPath;
 
   return (
     <Card
-      className={`prototype-card ${isClickable ? 'prototype-card--clickable' : ''}`}
+      className={`prototype-card ${isClickable ? 'prototype-card--clickable' : ''} ${isNotDeployed ? 'prototype-card--not-deployed' : ''}`}
       paddingSize="md"
       gapSize="md"
       radiusSize="sm"
@@ -50,6 +51,7 @@ const PrototypeCard = ({
       tabIndex={isClickable ? 0 : undefined}
       onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(); } } : undefined}
       aria-label={isClickable ? `Open ${title}` : undefined}
+      aria-disabled={isNotDeployed ? true : undefined}
     >
       {/* Badges row */}
       <div className="prototype-card__badges">
