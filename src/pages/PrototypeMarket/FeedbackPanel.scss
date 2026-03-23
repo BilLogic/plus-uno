@@ -1,0 +1,149 @@
+.feedback-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-modal-gap-md, 12px);
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm, 8px);
+  }
+
+  &__section-label {
+    color: var(--color-on-surface, #191c1e);
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    margin: 0;
+
+    i {
+      font-size: var(--font-size-body3, 12px);
+    }
+  }
+
+  // ── Reactions ──────────────────────────
+  &__reactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 8px);
+  }
+
+  &__reaction-btn {
+    border-radius: var(--size-element-radius-full, 9999px);
+  }
+
+  &__reaction-emoji {
+    font-size: var(--font-size-body1, 18px);
+    line-height: 1;
+  }
+
+  // ── Figma ─────────────────────────────
+  &__figma {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md, 16px);
+  }
+
+  &__figma-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    color: var(--color-primary, #1a73e8);
+    text-decoration: none;
+    font-weight: var(--font-weight-body2-semibold, 500);
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    i {
+      font-size: var(--font-size-body3, 12px);
+    }
+  }
+
+  &__figma-hint {
+    color: var(--color-on-surface-variant, #3f484a);
+    font-style: italic;
+  }
+
+  // ── Loom Embed ────────────────────────
+  &__loom-embed {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; // 16:9
+    border-radius: var(--size-element-radius-md, 4px);
+    overflow: hidden;
+    background: var(--color-surface-container-low, #f5f5f5);
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    &--comment {
+      margin-top: var(--size-element-gap-xs, 4px);
+    }
+  }
+
+  // ── Comments ──────────────────────────
+  &__comments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm, 8px);
+    max-height: var(--size-spacing-xlarge-space-5000, 400px);
+    overflow-y: auto;
+  }
+
+  &__comment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs, 4px);
+    padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 6px);
+    border-left: var(--size-element-stroke-lg, 3px) solid var(--color-outline-variant, #e0e0e0);
+    padding-left: var(--size-element-pad-x-md, 10px);
+  }
+
+  &__comment-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--size-element-gap-sm, 8px);
+  }
+
+  &__comment-author {
+    font-weight: var(--font-weight-body2-semibold, 600);
+    color: var(--color-on-surface, #191c1e);
+  }
+
+  &__comment-time {
+    color: var(--color-on-surface-variant, #3f484a);
+  }
+
+  &__comment-text {
+    color: var(--color-on-surface, #191c1e);
+    white-space: pre-wrap;
+  }
+
+  &__empty {
+    color: var(--color-on-surface-variant, #3f484a);
+    padding: var(--size-element-pad-y-sm, 4px) 0;
+    text-align: center;
+  }
+
+  // ── Add Comment Form ──────────────────
+  &__form {
+    gap: var(--size-element-gap-sm, 8px);
+  }
+
+  // ── Footer (matches UserFeedbackModal pattern) ─
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-modal-gap-md, 12px);
+    padding-top: var(--size-element-pad-y-sm, 4px);
+  }
+}

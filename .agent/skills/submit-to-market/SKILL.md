@@ -37,6 +37,8 @@ Gather the required fields. Use smart defaults where possible.
 | `productPillar` | enum | Ask user (choice): `admin`, `home`, `login`, `profile`, `toolkit`, `training`, `universal` |
 | `localPath` | string or null | Ask user; null if not wired into root app |
 | `repoPath` | string | Auto-detect or ask |
+| `figmaFileUrl` | string or null | Ask user; Figma design file URL for feedback/MCP integration |
+| `loomVideoUrl` | string or null | Ask user; Loom walkthrough video URL (share link) |
 
 ### Phase 2: Deployment Help (optional)
 
@@ -83,6 +85,8 @@ I'll add this entry to the Prototype Market:
     productPillar: 'home',
     localPath: '/home',
     repoPath: 'playground/{project}/',
+    figmaFileUrl: null,
+    loomVideoUrl: null,
   }
 
 File: src/pages/PrototypeMarket/prototypes-data.js

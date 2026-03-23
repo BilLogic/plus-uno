@@ -208,7 +208,7 @@ html.market-active #root {
 
   &__list-header {
     display: grid;
-    grid-template-columns: 2fr 100px 80px 80px 100px 40px;
+    grid-template-columns: 2fr 100px 80px 80px 100px 60px 40px;
     gap: 12px;
     padding: 10px 16px;
     background: var(--color-surface-container-low, #f5f5f5);
@@ -222,7 +222,7 @@ html.market-active #root {
 
   &__list-row {
     display: grid;
-    grid-template-columns: 2fr 100px 80px 80px 100px 40px;
+    grid-template-columns: 2fr 100px 80px 80px 100px 60px 40px;
     gap: 12px;
     padding: 12px 16px;
     border-bottom: 1px solid var(--color-outline-variant, #eee);
@@ -265,6 +265,10 @@ html.market-active #root {
     color: var(--color-on-surface-variant, #666);
   }
 
+  &__list-col--feedback {
+    text-align: center;
+  }
+
   @media (max-width: 768px) {
     &__list-header,
     &__list-row {
@@ -273,6 +277,7 @@ html.market-active #root {
 
     &__list-col--creator,
     &__list-col--date,
+    &__list-col--feedback,
     &__list-col--link {
       display: none;
     }

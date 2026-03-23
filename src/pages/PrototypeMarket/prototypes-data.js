@@ -52,6 +52,8 @@ export const prototypes = [
     productPillar: 'home',
     localPath: '/1001',
     repoPath: 'playground/home-redesign/',
+    figmaFileUrl: 'https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs',
+    loomVideoUrl: null,
   },
   {
     id: '1002',

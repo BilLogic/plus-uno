@@ -5,6 +5,8 @@ import Badge from '@/components/Badge';
 import Button from '@/components/Button';
 import ButtonGroup from '@/components/ButtonGroup';
 import PrototypeCard from './PrototypeCard';
+import FeedbackPanel from './FeedbackPanel';
+import { getReactions, REACTION_EMOJIS } from './feedback-store';
 import {
   prototypes,
   STAGES,
@@ -13,6 +15,38 @@ import {
   PILLAR_META,
 } from './prototypes-data';
 import './PrototypeMarket.scss';
+
+/** Tiny helper: total reaction count for a prototype */
+function totalReactions(prototypeId) {
+  const r = getReactions(prototypeId);
+  return Object.values(r).reduce((sum, arr) => sum + arr.length, 0);
+}
+
+/** List-row feedback button that opens the FeedbackPanel modal */
+function ListFeedbackBtn({ proto }) {
+  const [show, setShow] = useState(false);
+  const count = totalReactions(proto.id);
+  return (
+    <>
+      <Button
+        text={count > 0 ? `${count}` : ''}
+        style="tertiary"
+        fill="ghost"
+        size="small"
+        leadingVisual="comment"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShow(true); }}
+      />
+      <FeedbackPanel
+        show={show}
+        onClose={() => setShow(false)}
+        prototypeId={proto.id}
+        prototypeTitle={proto.title}
+        figmaFileUrl={proto.figmaFileUrl}
+        loomVideoUrl={proto.loomVideoUrl}
+      />
+    </>
+  );
+}
 
 const stageOptions = STAGES.map((s) => ({ value: s, label: STAGE_META[s].label }));
 const pillarOptions = PRODUCT_PILLARS.map((p) => ({ value: p, label: PILLAR_META[p].label }));
@@ -249,6 +283,7 @@ const PrototypeMarket = () => {
               <span className="prototype-market__list-col--stage">Stage</span>
               <span className="prototype-market__list-col--creator">Creator</span>
               <span className="prototype-market__list-col--date">Updated</span>
+              <span className="prototype-market__list-col--feedback">Feedback</span>
               <span className="prototype-market__list-col--link">Link</span>
             </div>
             {sorted.map((proto) => {
@@ -279,6 +314,9 @@ const PrototypeMarket = () => {
                   </span>
                   <span className="prototype-market__list-col--creator">{proto.creators?.join(', ')}</span>
                   <span className="prototype-market__list-col--date">{proto.lastUpdated}</span>
+                  <span className="prototype-market__list-col--feedback">
+                    <ListFeedbackBtn proto={proto} />
+                  </span>
                   <span className="prototype-market__list-col--link">
                     {link ? <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" /> : <i className="fa-solid fa-circle-minus" aria-hidden="true" style={{ opacity: 0.3 }} />}
                   </span>

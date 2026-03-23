@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/Card';
 import Badge from '@/components/Badge';
+import Button from '@/components/Button';
 import { STAGES, PRODUCT_PILLARS, STAGE_META, PILLAR_META } from './prototypes-data';
+import ReactionBar from './ReactionBar';
+import FeedbackPanel from './FeedbackPanel';
 import './PrototypeCard.scss';
 
 function formatDate(dateStr) {
@@ -12,6 +15,7 @@ function formatDate(dateStr) {
 }
 
 const PrototypeCard = ({
+  id,
   title,
   description,
   stage,
@@ -23,13 +27,17 @@ const PrototypeCard = ({
   notionCardUrl,
   notionCardId,
   localPath,
+  figmaFileUrl,
+  loomVideoUrl,
 }) => {
+  const [showFeedback, setShowFeedback] = useState(false);
   const stageMeta  = STAGE_META[stage]  || STAGE_META.low;
   const pillarMeta = PILLAR_META[productPillar] || PILLAR_META.universal;
 
   const allPeople = [...new Set([...creators, ...contributors])];
 
   const handleCardClick = () => {
+    if (showFeedback) return;
     if (deploymentUrl) {
       window.open(deploymentUrl, '_blank', 'noopener');
     } else if (localPath) {
@@ -41,94 +49,121 @@ const PrototypeCard = ({
   const isNotDeployed = !deploymentUrl && !localPath;
 
   return (
-    <Card
-      className={`prototype-card ${isClickable ? 'prototype-card--clickable' : ''} ${isNotDeployed ? 'prototype-card--not-deployed' : ''}`}
-      paddingSize="md"
-      gapSize="md"
-      radiusSize="sm"
-      onClick={isClickable ? handleCardClick : undefined}
-      role={isClickable ? 'button' : undefined}
-      tabIndex={isClickable ? 0 : undefined}
-      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(); } } : undefined}
-      aria-label={isClickable ? `Open ${title}` : undefined}
-      aria-disabled={isNotDeployed ? true : undefined}
-    >
-      {/* Badges row */}
-      <div className="prototype-card__badges">
-        <Badge style={stageMeta.badgeStyle} size="b3">
-          {stageMeta.label}
-        </Badge>
-        <Badge style={pillarMeta.badgeStyle} size="b3">
-          {pillarMeta.label}
-        </Badge>
-      </div>
-
-      {/* Title */}
-      <div className="prototype-card__title h5">{title}</div>
-
-      {/* Description */}
-      <p className="prototype-card__desc body2-txt">{description}</p>
-
-      {/* Meta row */}
-      <div className="prototype-card__meta">
-        <div className="prototype-card__meta-item body2-txt">
-          <i className="fa-regular fa-user" />
-          <span>{allPeople.join(', ')}</span>
+    <>
+      <Card
+        className={`prototype-card ${isClickable ? 'prototype-card--clickable' : ''} ${isNotDeployed ? 'prototype-card--not-deployed' : ''}`}
+        paddingSize="md"
+        gapSize="md"
+        radiusSize="sm"
+        onClick={isClickable && !showFeedback ? handleCardClick : undefined}
+        role={isClickable ? 'button' : undefined}
+        tabIndex={isClickable && !showFeedback ? 0 : -1}
+        onKeyDown={isClickable && !showFeedback ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(); } } : undefined}
+        aria-label={isClickable ? `Open ${title}` : undefined}
+        aria-disabled={isNotDeployed ? true : undefined}
+        style={showFeedback ? { pointerEvents: 'none' } : undefined}
+      >
+        {/* Badges row */}
+        <div className="prototype-card__badges">
+          <Badge style={stageMeta.badgeStyle} size="b3">
+            {stageMeta.label}
+          </Badge>
+          <Badge style={pillarMeta.badgeStyle} size="b3">
+            {pillarMeta.label}
+          </Badge>
         </div>
-        <div className="prototype-card__meta-item body2-txt">
-          <i className="fa-regular fa-calendar" />
-          <span>{formatDate(lastUpdated)}</span>
-        </div>
-      </div>
 
-      {/* Links row */}
-      <div className="prototype-card__links">
-        {deploymentUrl && (
-          <a
-            href={deploymentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="prototype-card__link body2-txt"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <i className="fa-solid fa-arrow-up-right-from-square" />
-            Live
-          </a>
-        )}
-        {localPath && !deploymentUrl && (
-          <a
-            href={localPath}
-            className="prototype-card__link body2-txt"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <i className="fa-solid fa-laptop" />
-            Local
-          </a>
-        )}
-        {notionCardUrl && (
-          <a
-            href={notionCardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="prototype-card__link body2-txt"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <i className="fa-brands fa-notion" />
-            {notionCardId || 'Notion'}
-          </a>
-        )}
-        {!deploymentUrl && !localPath && (
-          <span className="prototype-card__link prototype-card__link--disabled body2-txt">
-            <i className="fa-solid fa-circle-minus" />
-            Not deployed
-          </span>
-        )}
-      </div>
-    </Card>
+        {/* Title */}
+        <div className="prototype-card__title h5">{title}</div>
+
+        {/* Description */}
+        <p className="prototype-card__desc body2-txt">{description}</p>
+
+        {/* Meta row */}
+        <div className="prototype-card__meta">
+          <div className="prototype-card__meta-item body2-txt">
+            <i className="fa-regular fa-user" />
+            <span>{allPeople.join(', ')}</span>
+          </div>
+          <div className="prototype-card__meta-item body2-txt">
+            <i className="fa-regular fa-calendar" />
+            <span>{formatDate(lastUpdated)}</span>
+          </div>
+        </div>
+
+        {/* Links row */}
+        <div className="prototype-card__links">
+          {deploymentUrl && (
+            <a
+              href={deploymentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="prototype-card__link body2-txt"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <i className="fa-solid fa-arrow-up-right-from-square" />
+              Live
+            </a>
+          )}
+          {localPath && !deploymentUrl && (
+            <a
+              href={localPath}
+              className="prototype-card__link body2-txt"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <i className="fa-solid fa-laptop" />
+              Local
+            </a>
+          )}
+          {notionCardUrl && (
+            <a
+              href={notionCardUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="prototype-card__link body2-txt"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <i className="fa-brands fa-notion" />
+              {notionCardId || 'Notion'}
+            </a>
+          )}
+          {!deploymentUrl && !localPath && (
+            <span className="prototype-card__link prototype-card__link--disabled body2-txt">
+              <i className="fa-solid fa-circle-minus" />
+              Not deployed
+            </span>
+          )}
+        </div>
+
+        {/* Reactions + Feedback */}
+        <ReactionBar prototypeId={id} />
+        <div className="prototype-card__feedback" onClick={(e) => e.stopPropagation()}>
+          <Button
+            text="Feedback"
+            style="tertiary"
+            fill="ghost"
+            size="medium"
+            leadingVisual="comment"
+            onClick={(e) => { e.stopPropagation(); setShowFeedback(true); }}
+          />
+        </div>
+      </Card>
+
+      {/* Feedback Modal — rendered outside Card to prevent click-through */}
+      <FeedbackPanel
+        show={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        prototypeId={id}
+        prototypeTitle={title}
+        figmaFileUrl={figmaFileUrl}
+        loomVideoUrl={loomVideoUrl}
+      />
+    </>
   );
 };
 
 PrototypeCard.propTypes = {
+  id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   stage: PropTypes.oneOf(STAGES).isRequired,
@@ -140,6 +175,8 @@ PrototypeCard.propTypes = {
   notionCardUrl: PropTypes.string,
   notionCardId: PropTypes.string,
   localPath: PropTypes.string,
+  figmaFileUrl: PropTypes.string,
+  loomVideoUrl: PropTypes.string,
 };
 
 export default PrototypeCard;

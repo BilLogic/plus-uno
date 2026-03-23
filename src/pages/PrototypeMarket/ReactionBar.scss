@@ -1,0 +1,34 @@
+.reaction-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-xs, 4px);
+  padding-top: var(--size-element-gap-xs, 4px);
+
+  &__btn {
+    border-radius: var(--size-element-radius-full, 9999px);
+  }
+
+  &__emoji {
+    font-size: var(--font-size-body2, 14px);
+    line-height: 1;
+  }
+
+  &__picker-wrap {
+    position: relative;
+  }
+
+  &__picker {
+    position: absolute;
+    bottom: calc(100% + var(--size-element-gap-xs, 4px));
+    left: 0;
+    display: flex;
+    gap: var(--size-element-gap-xs, 4px);
+    padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 6px);
+    background: var(--color-surface-container-lowest, #fff);
+    border: var(--size-element-border, 1px) solid var(--color-outline-variant, #e0e0e0);
+    border-radius: var(--size-element-radius-md, 4px);
+    box-shadow: var(--elevation-1, 0 1px 3px rgba(0, 0, 0, 0.12));
+    z-index: 10;
+  }
+}

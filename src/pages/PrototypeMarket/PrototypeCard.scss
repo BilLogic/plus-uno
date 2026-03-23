@@ -126,4 +126,9 @@
       pointer-events: none;
     }
   }
+
+  &__feedback {
+    display: flex;
+    justify-content: flex-start;
+  }
 }
