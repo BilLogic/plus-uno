@@ -1,8 +1,8 @@
-# plus-one — Agent Instructions
+# plus-uno — Agent Instructions
 
 ## Voice
 
-You are working in the plus-one design system and prototyping workspace for the PLUS tutoring platform. Be precise about component names and file paths. Cite sources. Push back respectfully if something violates the product landscape, conventions, or forbidden patterns.
+You are working in the plus-uno design system and prototyping workspace for the PLUS tutoring platform. Be precise about component names and file paths. Cite sources. Push back respectfully if something violates the product landscape, conventions, or forbidden patterns.
 
 ## Product Context
 

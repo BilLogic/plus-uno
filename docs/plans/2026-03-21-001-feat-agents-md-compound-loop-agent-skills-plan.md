@@ -1,5 +1,5 @@
 ---
-title: "feat: Add AGENTS.md entry point, consolidated docs, compound loop, and skills for plus-one"
+title: "feat: Add AGENTS.md entry point, consolidated docs, compound loop, and skills for plus-uno"
 type: feat
 status: active
 date: 2026-03-21
@@ -9,7 +9,7 @@ date: 2026-03-21
 
 ## Overview
 
-The plus-one project has agent guidance split across `.agent/AGENT.md`, `.agent/SKILL.md`, and 16 reference files in `.agent/references/` — but no cross-agent entry point, no compound loop, and no user-invocable skills. This plan consolidates all documentation under `docs/`, establishes AGENTS.md as the single entry point, and introduces `/po:xxx` skills.
+The plus-uno project has agent guidance split across `.agent/AGENT.md`, `.agent/SKILL.md`, and 16 reference files in `.agent/references/` — but no cross-agent entry point, no compound loop, and no user-invocable skills. This plan consolidates all documentation under `docs/`, establishes AGENTS.md as the single entry point, and introduces `/po:xxx` skills.
 
 ## Problem Statement / Motivation
 
@@ -140,7 +140,7 @@ Platform pointers (all point to AGENTS.md):
 **Tasks:**
 
 - [ ] Create `docs/agent-context/product-landscape.md` (~50 lines):
-  - What is plus-one, tech stack, DS inventory, token system, playground, deployment, integrations
+  - What is plus-uno, tech stack, DS inventory, token system, playground, deployment, integrations
 - [ ] Create `docs/agent-context/conventions.md` (~40 lines):
   - File naming, import patterns, playground structure, git conventions, docs pipeline, token workflow, known gotchas
 - [ ] Create `docs/agent-context/setup-guide.md` (~50 lines):
@@ -177,7 +177,7 @@ Create 4 skills with full directory structure. Each skill has SKILL.md + referen
 **Tasks:**
 
 - [ ] Create `MEMORY.md` index, `user_bill.md`, `project_plus_one.md`, `feedback_agent_architecture.md`
-- [ ] Feedback memory captures: AGENTS.md is THE entry point, all docs under `docs/`, `.agent/` is skills + assets only, project name is "plus-one"
+- [ ] Feedback memory captures: AGENTS.md is THE entry point, all docs under `docs/`, `.agent/` is skills + assets only, project name is "plus-uno"
 
 ## Acceptance Criteria
 

@@ -20,7 +20,7 @@ root_cause: "Multiple iterations needed to find the right architecture — proxy
 
 ## Problem
 
-The plus-one workspace has two main surfaces (Marketplace + Storybook) and 25 prototype listings. Users needed seamless navigation between all of them. Multiple approaches were tried before landing on the right architecture.
+The plus-uno workspace has two main surfaces (Marketplace + Storybook) and 25 prototype listings. Users needed seamless navigation between all of them. Multiple approaches were tried before landing on the right architecture.
 
 ## Approaches Tried and Why They Failed
 

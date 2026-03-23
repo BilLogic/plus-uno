@@ -2,7 +2,7 @@
 
 # Platform Integration Guide
 
-The plus-one project uses `AGENTS.md` at the project root as the canonical cross-agent entry point. All platform-specific files point to `AGENTS.md`. Design system routing and guardrails live in `.agent/SKILL.md`, referenced from `AGENTS.md`.
+The plus-uno project uses `AGENTS.md` at the project root as the canonical cross-agent entry point. All platform-specific files point to `AGENTS.md`. Design system routing and guardrails live in `.agent/SKILL.md`, referenced from `AGENTS.md`.
 
 ## Current Platform Files
 

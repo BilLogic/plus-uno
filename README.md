@@ -1,4 +1,4 @@
-# plus-one
+# plus-uno
 
 Design system, prototyping workspace, and agent infrastructure for the [PLUS tutoring platform](https://tutors.plus/).
 
@@ -51,7 +51,7 @@ React 19 · React-Bootstrap 2.10 · Bootstrap 5.3 · Vite 6 · Storybook 10 · S
 ## Documentation
 
 - `docs/project/plus-app.md` — PLUS product landscape (mission, users, features, flows)
-- `docs/project/plus-one.md` — This repo's structure and inventory
+- `docs/project/plus-uno.md` — This repo's structure and inventory
 - `docs/project/conventions.md` — File naming, imports, git, gotchas
 - `docs/design-system/` — 23 consolidated DS docs (overview, components, tokens, modes, guides)
 - `docs/foundations/` — PLUS terminology, tech stack, context levels

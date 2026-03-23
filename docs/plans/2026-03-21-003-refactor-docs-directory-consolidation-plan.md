@@ -26,7 +26,7 @@ The docs/ section of plan 001 proposed 5 subdirectories (`agent-context/`, `desi
 ```
 docs/
 ├── guides/                         (everything an agent or human needs to reference)
-│   ├── product-landscape.md        (what is plus-one, stack, inventory, team)
+│   ├── product-landscape.md        (what is plus-uno, stack, inventory, team)
 │   ├── conventions.md              (file naming, imports, git, gotchas)
 │   ├── setup.md                    (CE skills, MCP servers, platform config — absorbs platform-integration.md)
 │   └── design-system/              (agent workflow guides — moved from .agent/references/)

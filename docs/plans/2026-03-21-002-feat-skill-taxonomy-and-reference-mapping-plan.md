@@ -1,5 +1,5 @@
 ---
-title: "feat: Design /po:xxx skill taxonomy with reference mapping for plus-one"
+title: "feat: Design /po:xxx skill taxonomy with reference mapping for plus-uno"
 type: feat
 status: active
 date: 2026-03-21
@@ -10,7 +10,7 @@ origin: docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan
 
 ## Overview
 
-This plan designs the 4 `/po:xxx` skills for plus-one: their purpose, phases, directory structure, references, and validation gates. Each skill is a user-invocable workflow triggered with `/po:xxx`, orthogonal to the DS mode router (`docs/design-system/router.md`).
+This plan designs the 4 `/po:xxx` skills for plus-uno: their purpose, phases, directory structure, references, and validation gates. Each skill is a user-invocable workflow triggered with `/po:xxx`, orthogonal to the DS mode router (`docs/design-system/router.md`).
 
 **Key architectural insight:**
 - **Modes** (`docs/design-system/router.md`) = HOW to approach work (learning, maintaining, consulting, iteration, finalization)
@@ -75,7 +75,7 @@ Every skill follows the same structure:
 ---
 name: po-prototype
 description: >
-  Scaffold and build a new playground prototype using the plus-one design system.
+  Scaffold and build a new playground prototype using the plus-uno design system.
   Guides you through template selection, tool choices, DS component integration,
   and validation. Use when creating new feature prototypes or experiments.
 argument-hint: [owner/feature-name]
@@ -217,7 +217,7 @@ root_cause: "Why it happened"
 ---
 name: po-review
 description: >
-  Quality validation gate for plus-one. Reviews recent work against conventions,
+  Quality validation gate for plus-uno. Reviews recent work against conventions,
   forbidden patterns, and design system rules. Run after completing implementation
   work or before shipping. Catches drift before it compounds.
 argument-hint: [file-or-directory-to-review]
@@ -269,7 +269,7 @@ git diff HEAD package.json | grep '^\+'
 
 ## Skill 4: `/po:post`
 
-**Purpose:** Package and post a completed project to the plus-one marketplace for displaying all projects. Handles screenshots, metadata, and publishing.
+**Purpose:** Package and post a completed project to the plus-uno marketplace for displaying all projects. Handles screenshots, metadata, and publishing.
 
 ### Directory Structure
 
@@ -290,7 +290,7 @@ git diff HEAD package.json | grep '^\+'
 ---
 name: po-post
 description: >
-  Package and post a completed project to the plus-one marketplace.
+  Package and post a completed project to the plus-uno marketplace.
   Handles screenshots, metadata formatting, and publishing. Use after
   completing a prototype or significant feature work.
 argument-hint: [project-path-or-name]

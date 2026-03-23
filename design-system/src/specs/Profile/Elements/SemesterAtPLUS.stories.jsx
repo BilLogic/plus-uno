@@ -129,7 +129,7 @@ export const SemesterAtPLUSStory = () => {
                 >
                     <Label text="Semester Tutored at PLUS" required={false} />
                     <Select
-                        id="semester-plus-one"
+                        id="semester-plus-uno"
                         mode="multi"
                         options={semesterOptions}
                         defaultValue={['fall-2024']}

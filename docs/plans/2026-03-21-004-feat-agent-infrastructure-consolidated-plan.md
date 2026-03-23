@@ -9,7 +9,7 @@ supersedes:
   - docs/plans/2026-03-21-003-refactor-docs-directory-consolidation-plan.md
 ---
 
-# Consolidated Agent Infrastructure for plus-one
+# Consolidated Agent Infrastructure for plus-uno
 
 ## Overview
 

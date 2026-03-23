@@ -19,7 +19,7 @@ root_cause: "Organic growth created fragmentation: .agent/references/ (16 files)
 
 ## Problem
 
-The plus-one repo had grown organically with several structural issues:
+The plus-uno repo had grown organically with several structural issues:
 
 1. **No cross-agent entry point** — platform files (CLAUDE.md, .windsurfrules, cursorrules.md) pointed directly to `.agent/SKILL.md`, which only covers design system routing. Non-DS tasks had no agent guidance.
 2. **DS docs in 3 places** — `.agent/references/` (16 agent-optimized guides), `packages/plus-ds/guidelines/` (16 human-readable docs), and no product-level context anywhere.
@@ -55,7 +55,7 @@ The plus-one repo had grown organically with several structural issues:
 - Rewired CLAUDE.md → `@AGENTS.md`, .windsurfrules, cursorrules.md, .cursor/rules/plus-agent.mdc
 
 ### Phase 4: Project docs + foundations
-- `docs/project/` — plus-one.md (repo), conventions.md, setup-guide.md
+- `docs/project/` — plus-uno.md (repo), conventions.md, setup-guide.md
 - `docs/foundations/` — terminology.md, tech-stack.md, context-levels.md (replaces phantom `docs/foundations/`)
 - `docs/solutions/README.md` — compound loop template
 

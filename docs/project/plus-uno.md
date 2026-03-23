@@ -1,4 +1,4 @@
-# plus-one — Repository Overview
+# plus-uno — Repository Overview
 
 This repo is the design system, prototyping workspace, and agent infrastructure for the PLUS tutoring platform.
 

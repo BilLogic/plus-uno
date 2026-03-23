@@ -8,21 +8,21 @@ tags:
   - next-js
   - framework-decision
 module: build-tooling
-symptom: "Should plus-one migrate to Next.js for production features?"
-root_cause: "plus-one is a prototype builder, not a production app — Vite is the right tool"
+symptom: "Should plus-uno migrate to Next.js for production features?"
+root_cause: "plus-uno is a prototype builder, not a production app — Vite is the right tool"
 ---
 
 # Vite 8 Upgrade and Framework Decision
 
 ## Problem
 
-Considered migrating plus-one from Vite to Next.js for production features (auth, API routes, SSR, server components). Initial analysis incorrectly assessed plus-one as needing production capabilities.
+Considered migrating plus-uno from Vite to Next.js for production features (auth, API routes, SSR, server components). Initial analysis incorrectly assessed plus-uno as needing production capabilities.
 
 ## Decision
 
 **Stay on Vite. Upgrade to Vite 8 (Rolldown-powered).**
 
-plus-one is a **prototype builder and design system workspace**, not the production tutoring platform. Production concerns (auth, API routes, SSR, AI server-side calls) belong in a future separate app that consumes this design system.
+plus-uno is a **prototype builder and design system workspace**, not the production tutoring platform. Production concerns (auth, API routes, SSR, AI server-side calls) belong in a future separate app that consumes this design system.
 
 ### Why not Next.js
 

@@ -12,7 +12,7 @@ supersedes:
   - docs/plans/2026-03-21-006-refactor-strip-npm-publishing-simplify-package-plan.md
 ---
 
-# Optimal Repo Structure for plus-one
+# Optimal Repo Structure for plus-uno
 
 **This is the FINAL consolidated plan.** It supersedes all previous plans (001-006) and incorporates every decision, review finding, and user correction from this planning session.
 
@@ -20,7 +20,7 @@ supersedes:
 
 ## Overview
 
-Restructure the entire plus-one repo for clarity: flatten `packages/plus-ds/` to `design-system/`, consolidate all docs under `docs/`, create AGENTS.md, add skills, and establish the compound loop. Update all 99 references. No half-measures.
+Restructure the entire plus-uno repo for clarity: flatten `packages/plus-ds/` to `design-system/`, consolidate all docs under `docs/`, create AGENTS.md, add skills, and establish the compound loop. Update all 99 references. No half-measures.
 
 ## Target Structure
 
@@ -54,7 +54,7 @@ plus-vibe-coding-starting-kit/             (repo: github.com/BilLogic/plus-vibe-
 │
 ├── docs/
 │   ├── project/                           PROJECT CONTEXT
-│   │   ├── plus-one.md                    This repo: DS, prototyping, agent infra, team, stack
+│   │   ├── plus-uno.md                    This repo: DS, prototyping, agent infra, team, stack
 │   │   ├── plus-app.md                    The PLUS product: users, features, flows, domain terms
 │   │   ├── conventions.md                 File naming, imports, git, gotchas
 │   │   └── setup-guide.md                 Onboarding: CE skills, MCP setup, platform config
@@ -192,7 +192,7 @@ plus-vibe-coding-starting-kit/             (repo: github.com/BilLogic/plus-vibe-
 | `AGENTS.md` | Cross-agent entry point |
 | `CLAUDE.md` | `@AGENTS.md` pointer |
 | `.windsurfrules` | AGENTS.md pointer |
-| `docs/project/plus-one.md` | This repo: DS, prototyping, agent infra |
+| `docs/project/plus-uno.md` | This repo: DS, prototyping, agent infra |
 | `docs/project/plus-app.md` | PLUS product: users, features, flows, domain terms (from Notion Phase 0) |
 | `docs/project/conventions.md` | File naming, imports, git, gotchas |
 | `docs/project/setup-guide.md` | CE skills, MCP setup, platform config |
@@ -301,7 +301,7 @@ Storybook sidebar mirrors this exactly via story `title` fields (e.g., `Specs/Ad
 ~100-120 lines. Sections:
 
 1. **Voice** — cite sources, push back on violations, be precise about file paths
-2. **Product Context** — points to `docs/project/plus-app.md` for the tutoring platform, `docs/project/plus-one.md` for this repo
+2. **Product Context** — points to `docs/project/plus-app.md` for the tutoring platform, `docs/project/plus-uno.md` for this repo
 3. **Design System** — 5 modes with inference signals, points to `docs/design-system/` for details
 4. **Conventions** — points to `docs/project/conventions.md`
 5. **Forbidden Patterns** (11 rules from SKILL.md):
@@ -324,8 +324,8 @@ Storybook sidebar mirrors this exactly via story `title` fields (e.g., `Specs/Ad
 
 ## docs/project/ — Two Product Docs
 
-### `plus-one.md` — This Repo
-- What plus-one is: design system + prototyping workspace + agent infrastructure
+### `plus-uno.md` — This Repo
+- What plus-uno is: design system + prototyping workspace + agent infrastructure
 - Tech stack: React 19, Bootstrap 5, Vite 6, Storybook 10, SASS
 - Team: Bill, Ashley, Victor
 - Directory layout overview
@@ -384,7 +384,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 1. Flatten `packages/plus-ds/` → `design-system/` (not done)
 2. Reorganize playground to flat/project-oriented (not done — includes Bryan prototype we missed)
 3. Create `AGENTS.md` and rewire CLAUDE.md/.windsurfrules/cursorrules.md to point to it (updating what exists)
-4. Create `docs/project/plus-one.md` and `docs/project/plus-app.md` (not done)
+4. Create `docs/project/plus-uno.md` and `docs/project/plus-app.md` (not done)
 5. Create `docs/project/conventions.md` and `docs/project/setup-guide.md` (not done)
 6. Merge DS docs into `docs/design-system/` (not done)
 7. Create compound loop `docs/solutions/` (not done)
@@ -521,7 +521,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 
 > `docs/foundations/` replaces the phantom `develop/foundations/` that AGENT.md references but doesn't exist.
 
-31. Create `docs/project/plus-one.md` (this repo)
+31. Create `docs/project/plus-uno.md` (this repo)
 32. Create `docs/project/plus-app.md` (the product — from Phase 0 or placeholder)
 33. Create `docs/project/conventions.md`
 34. Create `docs/project/setup-guide.md`
@@ -646,7 +646,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 - [ ] `.windsurfrules` → AGENTS.md
 
 ### Docs
-- [ ] `docs/project/plus-one.md` — repo context (DS, prototyping, agent infra)
+- [ ] `docs/project/plus-uno.md` — repo context (DS, prototyping, agent infra)
 - [ ] `docs/project/plus-app.md` — product context (users, features, flows, terms)
 - [ ] `docs/project/conventions.md` — project conventions
 - [ ] `docs/project/setup-guide.md` — onboarding

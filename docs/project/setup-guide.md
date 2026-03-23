@@ -1,12 +1,12 @@
 # Setup Guide
 
-Getting started with plus-one for new team members and coding agents.
+Getting started with plus-uno for new team members and coding agents.
 
 ## Quick Start
 
 ```bash
 # Clone and install
-git clone https://github.com/BilLogic/plus-one.git
+git clone https://github.com/BilLogic/plus-uno.git
 cd plus-vibe-coding-starting-kit
 npm install
 
@@ -17,7 +17,7 @@ npm run dev          # Vite app on port 3000
 
 ## Recommended Compound Engineering Skills
 
-Install these CE skills for the best workflow. They integrate with the plus-one agent system:
+Install these CE skills for the best workflow. They integrate with the plus-uno agent system:
 
 | Skill | Command | Purpose |
 |-------|---------|---------|
@@ -67,7 +67,7 @@ Point the agent's instruction file to `AGENTS.md` at the project root. See `docs
 
 ## Project Structure
 
-See `docs/project/plus-one.md` for the full directory layout and tech stack.
+See `docs/project/plus-uno.md` for the full directory layout and tech stack.
 
 ## Key Files for Agents
 
