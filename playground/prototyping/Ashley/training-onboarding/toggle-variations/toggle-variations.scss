@@ -1,0 +1,310 @@
+/**
+ * toggle-variations.scss
+ * Shared structural styles for all 4 toggle placement variations (T1–T4).
+ *
+ * WIREFRAME ONLY — layout, legibility, and structural clarity.
+ * All values use CSS custom properties from the PLUS DS token set.
+ */
+
+// ─── Base: .tv wrapper ────────────────────────────────────────────────────────
+
+.tv {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+
+    // ── Hero header ──────────────────────────────────────────────────────────
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 20px;
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    // T4-specific hero: progress + pills share the bottom row
+    &__header-bottom {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+
+        &--t4 {
+            justify-content: space-between;
+        }
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__subtitle {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // ── Content section ───────────────────────────────────────────────────────
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        // T3: no gap at the top — tabs sit flush against section edge
+        &--t3 {
+            gap: 0;
+        }
+    }
+
+    &__section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    &__section-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    // ── T2: strip between hero and content ────────────────────────────────────
+    &__toggle-strip {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+
+        &--t2 {
+            justify-content: flex-start;
+            padding: 12px 16px;
+            background-color: var(--color-surface, #ffffff);
+            border-radius: var(--size-section-radius-sm, 8px);
+            border: 1px solid var(--color-outline-variant, #e2e2e5);
+        }
+    }
+
+    &__toggle-hint {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-style: italic;
+        flex: 1 1 200px;
+    }
+
+    // T2: make ButtonGroup fill horizontal space proportionally
+    &__segmented-group {
+        display: flex;
+        gap: 0;
+    }
+
+    // ── T3: NavTabs styling overrides ─────────────────────────────────────────
+    &__nav-tabs {
+        margin-bottom: 0;
+    }
+
+    &__tab-panel {
+        padding-top: 16px;
+    }
+
+    // ── T4: NavPills in the hero row ──────────────────────────────────────────
+    &__pills {
+        flex-shrink: 0;
+    }
+
+    // ── Shared progress strip ─────────────────────────────────────────────────
+    &__progress-label {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: var(--color-surface-variant, #dde3ea);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    &__progress-fill {
+        height: 100%;
+        background-color: var(--color-primary, #006492);
+        border-radius: 4px;
+        transition: width 0.4s ease;
+    }
+
+    .toggle-shell__progress {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1 1 200px;
+        min-width: 160px;
+    }
+
+    .toggle-shell__progress-label {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    .toggle-shell__progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: var(--color-surface-variant, #dde3ea);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .toggle-shell__progress-fill {
+        height: 100%;
+        background-color: var(--color-primary, #006492);
+        border-radius: 4px;
+        transition: width 0.4s ease;
+    }
+}
+
+// ─── Card / Gallery grid ──────────────────────────────────────────────────────
+
+.toggle-shell__card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.toggle-shell__card-item {
+    display: flex;
+
+    // Ensure OnboardingModuleCard fills the grid cell
+    .onboarding-module-card {
+        width: 100%;
+    }
+}
+
+// ─── List / Stepper rows ──────────────────────────────────────────────────────
+
+.toggle-shell__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--color-outline-variant, #e2e2e5);
+    border-radius: var(--size-section-radius-sm, 8px);
+    overflow: hidden;
+}
+
+.toggle-shell__list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background-color: var(--color-surface, #ffffff);
+    border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+    transition: background-color 0.15s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    // Step number (far left)
+    .toggle-shell__list-number {
+        width: 20px;
+        min-width: 20px;
+        text-align: center;
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    // Status icon bubble
+    .toggle-shell__list-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--color-outline-variant, #c0c8cc);
+        font-size: 12px;
+        font-weight: 700;
+
+        &--completed {
+            background-color: var(--color-primary, #006492);
+            border-color: var(--color-primary, #006492);
+            color: #ffffff;
+        }
+
+        &--in-progress {
+            border-color: var(--color-primary, #006492);
+            color: var(--color-primary, #006492);
+        }
+
+        &--not-started {
+            border-color: var(--color-outline-variant, #c0c8cc);
+            color: var(--color-outline-variant, #c0c8cc);
+        }
+    }
+
+    // Title + duration block
+    .toggle-shell__list-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+    }
+
+    .toggle-shell__list-title {
+        color: var(--color-on-surface, #191c1e);
+        font-weight: 600;
+    }
+
+    .toggle-shell__list-duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // Status badge (right)
+    .toggle-shell__list-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 40px;
+        font-weight: 600;
+
+        &--completed {
+            background-color: var(--color-primary-container, #dce9f2);
+            color: var(--color-on-primary-container, #003550);
+        }
+
+        &--in-progress {
+            background-color: var(--color-secondary-container, #cde5f0);
+            color: var(--color-on-secondary-container, #0a3040);
+        }
+
+        &--not-started {
+            background-color: var(--color-surface-variant, #e8eef0);
+            color: var(--color-on-surface-variant, #5a5a5a);
+        }
+    }
+
+    // Active row highlight
+    &--active,
+    &--in-progress {
+        background-color: var(--color-primary-container, #e3f2fd);
+    }
+
+    &--completed {
+        opacity: 0.75;
+    }
+
+    &--not-started {
+        opacity: 0.55;
+    }
+}

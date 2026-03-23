@@ -1,0 +1,661 @@
+/* ─────────────────────────────────────────────────
+   Storybook AI Agent – PIXEL-PERFECT SCSS
+   Exact replication of Figma design 177:41543
+   ───────────────────────────────────────────────── */
+
+/* ── Root ── */
+/* Use absolute so the agent stays at bottom-right of the responsive frame (simulated screen), not the Storybook canvas */
+.sb-ai-agent {
+  position: fixed; /* Changed from absolute to fixed to prevent cutoff by #root overflow:hidden */
+  bottom: 16px;
+  right: 16px;
+  z-index: 9999;
+  font-family: var(--font-family-body);
+  /* Soften saturation by ~6% so token colors feel slightly muted */
+  filter: saturate(0.94);
+}
+
+/* ── Main Floating Interface Container ── */
+.sb-ai-agent__container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* ── Assistant Panel ── */
+.sb-ai-agent__panel {
+  position: relative;
+  min-width: 320px;
+  max-width: 1555px;
+  min-height: 480px;
+  max-height: 822px;
+  background: var(--color-surface-container-lowest);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--color-outline);
+  border-radius: 24px;
+  box-shadow: var(--elevation-light-4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 1px;
+  /* width and height set via inline style for resize */
+
+  /* Closed state — 200ms smooth panel transition */
+  opacity: 0;
+  transform: scale(0.92) translateY(16px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s 0.2s;
+
+  &--open {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &--open {
+      transition: none;
+    }
+  }
+}
+
+/* ── Resize handle (top-left corner) ── */
+.sb-ai-agent__resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  cursor: nwse-resize;
+  user-select: none;
+  border-radius: 24px 0 0 0;
+
+  &:hover {
+    background: var(--color-surface-state-08);
+  }
+}
+
+/* ── Header ── */
+.sb-ai-agent__header {
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid var(--color-outline);
+  padding: 20px 20px 21px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.sb-ai-agent__header-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sb-ai-agent__logo-container {
+  position: relative;
+  border-radius: 179.437px;
+  background: var(--color-surface-state-08);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sb-ai-agent__logo-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.sb-ai-agent__logo-icon {
+  position: relative;
+  z-index: 1;
+  width: 45%;
+  height: 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.sb-ai-agent__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sb-ai-agent__header-name {
+  margin: 0;
+  font-family: var(--font-family-body);
+  font-weight: 700;
+  font-size: 13.5px;
+  line-height: 20px;
+  letter-spacing: -0.35px;
+  color: var(--color-on-surface);
+}
+
+.sb-ai-agent__header-sub {
+  font-family: var(--font-family-body);
+  font-weight: 500;
+  font-size: 9.8px;
+  line-height: 15px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+.sb-ai-agent__header-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.sb-ai-agent__header-btn {
+  padding: 8px 8px 14px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  color: var(--color-on-surface-variant);
+
+  &:hover {
+    background: var(--color-surface-container-state-12);
+    color: var(--color-on-surface);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ── Main - Scrollable Body ── */
+.sb-ai-agent__body {
+  flex: 1;
+  min-height: 0; /* Fix flexbox scrolling issue */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-outline-state-12);
+    border-radius: 4px;
+  }
+}
+
+/* ── Welcome Message ── */
+.sb-ai-agent__welcome-msg {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.sb-ai-agent__logo-container--message {
+  margin-top: 0;
+}
+
+/* ── Tip below welcome (muted, not dominant) ── */
+.sb-ai-agent__tip {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-on-surface-variant);
+  margin: -16px 0 0 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+/* ── Quick Actions ── */
+.sb-ai-agent__quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sb-ai-agent__quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: var(--elevation-light-1);
+  text-align: left;
+  min-height: 46px;
+
+  &:hover {
+    border-color: var(--color-outline);
+    box-shadow: var(--elevation-light-2);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.sb-ai-agent__quick-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.sb-ai-agent__quick-label {
+  font-family: var(--font-family-body);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.25;
+  letter-spacing: -0.275px;
+  color: var(--color-on-surface);
+  text-align: left;
+  flex: 1;
+}
+
+/* ── Smart Navigation intro (subtle fade, respect reduced motion) ── */
+.sb-ai-agent__smart-nav-intro {
+  animation: sb-ai-agent-intro-fade 0.25s ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes sb-ai-agent-intro-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Keyboard shortcuts help block ── */
+.sb-ai-agent__shortcuts-block {
+  padding: 4px 0 0 0;
+}
+
+.sb-ai-agent__shortcuts-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.sb-ai-agent__shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  td {
+    padding: 6px 12px 6px 0;
+    vertical-align: baseline;
+    border-bottom: 1px solid var(--color-outline);
+
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.sb-ai-agent__shortcuts-key {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  width: 1%;
+}
+
+/* ── Smart Navigation match list ── */
+.sb-ai-agent__nav-matches {
+  .sb-ai-agent__nav-match-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    text-align: left;
+    border: 1px solid var(--color-outline);
+    border-radius: 8px;
+    background: var(--color-surface-container-lowest);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+
+    &:hover {
+      background: var(--color-surface-container);
+      border-color: var(--color-outline);
+    }
+
+    &--selected {
+      border-color: var(--color-warning);
+      background: var(--color-warning-container);
+    }
+  }
+}
+
+/* ── Message List ── */
+.sb-ai-agent__message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.sb-ai-agent__msg {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: fadeSlideUp 0.3s ease both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+
+  &--bot {
+    flex-direction: row;
+  }
+
+  &--user {
+    flex-direction: row;
+    align-self: flex-end;
+    gap: 12px;
+  }
+}
+
+.sb-ai-agent__bubble {
+  max-width: 415.3949890136719px;
+  padding: 14px;
+  font-family: var(--font-family-body);
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 22.75px;
+  flex-shrink: 1;
+
+  &--bot {
+    background: var(--color-surface-container);
+    color: var(--color-on-surface);
+    border-radius: 0 16px 16px 16px;
+  }
+
+  &--user {
+    background: var(--color-inverse-surface);
+    color: var(--color-inverse-on-surface);
+    border-radius: 16px 0 16px 16px;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  ul {
+    margin: 4px 0 0 20px;
+    padding: 0;
+
+    li {
+      margin-bottom: 3px;
+    }
+  }
+
+  code {
+    background: var(--color-surface-container);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+}
+
+.sb-ai-agent__user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 1332px;
+  background: var(--color-primary-state-08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Merriweather Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18.667px;
+  line-height: 1.571;
+  color: var(--color-primary-text);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── Typing indicator (Bot Message Loading) ── */
+.sb-ai-agent__typing {
+  display: flex;
+  gap: 4px;
+  padding: 14px;
+  background: var(--color-surface-container);
+  border-radius: 0 16px 16px 16px;
+
+  span {
+    width: 6px;
+    height: 6px;
+    background: var(--color-on-surface-variant);
+    border-radius: 9999px;
+    animation: typingDot 1.2s infinite ease-in-out both;
+
+    &:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    &:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+  }
+}
+
+/* ── Footer / Input ── */
+.sb-ai-agent__footer {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  flex-shrink: 0;
+}
+
+.sb-ai-agent__input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.sb-ai-agent__input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-outline);
+  border-radius: 16px;
+  padding: 13.5px 17px;
+  position: relative;
+}
+
+.sb-ai-agent__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-family-body);
+  font-weight: 400;
+  font-size: 13px;
+  line-height: normal;
+  color: var(--color-on-surface);
+  padding: 0;
+  padding-right: 49px;
+
+  &::placeholder {
+    color: var(--color-on-surface-variant);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.sb-ai-agent__send {
+  position: absolute;
+  right: 8px;
+  top: 7px;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  background: var(--color-inverse-surface);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-inverse-on-surface);
+  box-shadow: var(--elevation-light-2);
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: var(--color-inverse-surface-state-12);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ── Floating Trigger Button ── */
+.sb-ai-agent__fab-wrapper {
+  padding-top: 24px;
+  width: 64px;
+  height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sb-ai-agent__fab {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 360px;
+  background: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: none;
+  cursor: pointer;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  box-shadow: var(--elevation-light-4);
+
+  &:hover {
+    transform: scale(1.08);
+    box-shadow: var(--elevation-light-5);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  .sb-ai-agent__logo-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Figma 177-41530: icon on FAB is white on gradient */
+  .sb-ai-agent__logo-icon {
+    color: #FFFFFF;
+  }
+}
+
+/* ── Keyframes ── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typingDot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.4);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
