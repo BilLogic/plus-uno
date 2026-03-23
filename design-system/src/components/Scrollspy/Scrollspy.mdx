@@ -1,0 +1,38 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ScrollspyStories from './Scrollspy.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ScrollspyStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Navbar linked to scrollable sections; active item follows scroll position.</>}>
+    <Canvas of={ScrollspyStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={ScrollspyStories.Interactive}
+    description={
+        <>
+            Scroll the preview to see the nav highlight update. This demo mirrors the layout example.
+        </>
+    }
+/>
+
+</div>
+
+</div>

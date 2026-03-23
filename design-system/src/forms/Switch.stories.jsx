@@ -4,44 +4,69 @@ import Switch from './Switch';
 export default {
     title: 'Forms/Switch',
     component: Switch,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: 'Switch component for toggling between two states (on/off). Similar to a checkbox but with a sliding toggle visual.'
-            }
-        }
+                component:
+                    'Switch component for toggling between two states (on/off). Similar to a checkbox but with a sliding toggle visual.',
+            },
+        },
     },
     argTypes: {
         label: {
             control: 'text',
             description: 'Label text for the switch',
-            table: { category: 'Content' }
+            table: { category: 'Content' },
         },
         checked: {
             control: 'boolean',
             description: 'Controlled checked state',
-            table: { category: 'State' }
+            table: { category: 'State' },
+        },
+        size: {
+            control: 'select',
+            options: ['small', 'medium', 'large'],
+            description: 'Size variant',
+            table: { category: 'Design' },
         },
         disabled: {
             control: 'boolean',
             description: 'Disable the switch',
-            table: { category: 'Behavior' }
-        }
-    }
+            table: { category: 'Behavior' },
+        },
+    },
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '600px' }}>
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>States</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <Switch id="switch-off" name="switch-off" label="Off" defaultChecked={false} />
-                <Switch id="switch-on" name="switch-on" label="On" defaultChecked={true} />
-                <Switch id="switch-disabled" name="switch-disabled" label="Disabled" disabled />
-                <Switch id="switch-disabled-on" name="switch-disabled-on" label="Disabled (On)" disabled defaultChecked />
-            </div>
-        </section>
+export const Content = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px' }}>
+        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+            Short and long label text.
+        </p>
+        <Switch id="switch-short" name="switch-short" label="Wi‑Fi" defaultChecked />
+        <Switch
+            id="switch-long"
+            name="switch-long"
+            label="Enable email notifications for all activity"
+            defaultChecked={false}
+        />
+    </div>
+);
+
+export const Sizes = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
+        <Switch id="switch-small" name="switch-small" label="Small" size="small" defaultChecked />
+        <Switch id="switch-medium" name="switch-medium" label="Medium (Default)" size="medium" defaultChecked />
+        <Switch id="switch-large" name="switch-large" label="Large" size="large" defaultChecked />
+    </div>
+);
+
+export const InteractionStates = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
+        <Switch id="switch-off" name="switch-off" label="Off" defaultChecked={false} />
+        <Switch id="switch-on" name="switch-on" label="On" defaultChecked />
+        <Switch id="switch-disabled" name="switch-disabled" label="Disabled" disabled />
+        <Switch id="switch-disabled-on" name="switch-disabled-on" label="Disabled (On)" disabled defaultChecked />
     </div>
 );
 
@@ -63,5 +88,6 @@ export const Interactive = (args) => {
 Interactive.args = {
     label: 'Toggle Switch',
     checked: false,
-    disabled: false
+    size: 'medium',
+    disabled: false,
 };

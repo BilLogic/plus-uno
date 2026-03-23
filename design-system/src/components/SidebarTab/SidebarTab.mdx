@@ -1,0 +1,65 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SidebarTabStories from './SidebarTab.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SidebarTabStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Default chrome, optional trailing icon, and icon-only label.</>}>
+    <Canvas of={SidebarTabStories.Default} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell>
+    <Canvas of={SidebarTabStories.NoIcon} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell>
+    <Canvas of={SidebarTabStories.WithTrailingIcon} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interaction states
+
+<DocsCanvasShell description={<>Selected, hover, and disabled presentation.</>}>
+    <Canvas of={SidebarTabStories.Selected} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell>
+    <Canvas of={SidebarTabStories.Hover} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell>
+    <Canvas of={SidebarTabStories.Disabled} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={SidebarTabStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

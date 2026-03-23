@@ -11,7 +11,7 @@ const sampleItems = [
 export default {
     title: 'Components/Breadcrumb',
     component: Breadcrumb,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         layout: 'padded',
         docs: {
@@ -44,29 +44,46 @@ export default {
     },
 };
 
-/**
- * Overview
- * Shows common breadcrumb configurations.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg, 48px)' }}>
-        {/* Standard Breadcrumb */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md, 24px)' }}>
+const breadcrumbCol = { display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg, 48px)' };
+const breadcrumbBlock = { display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md, 24px)' };
+
+function BreadcrumbStandardDemo() {
+    return (
+        <div style={breadcrumbBlock}>
             <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-sm, 12px)' }}>Standard Breadcrumb</h6>
             <Breadcrumb items={sampleItems} />
         </div>
+    );
+}
 
-        {/* Short Breadcrumb */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md, 24px)' }}>
+function BreadcrumbShortDemo() {
+    return (
+        <div style={breadcrumbBlock}>
             <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-sm, 12px)' }}>Short Breadcrumb (2 Levels)</h6>
             <Breadcrumb items={[
                 { text: 'Home', href: '/' },
                 { text: 'Current Page' }
             ]} />
         </div>
+    );
+}
 
-        {/* Custom Separator (Simulated via Prop/CSS Variable override check) */}
-        {/* Note: Provide mechanism to verify separator overrides if needed in future */}
+export const Standard = () => (
+    <div style={breadcrumbCol}>
+        <BreadcrumbStandardDemo />
+    </div>
+);
+
+export const Short = () => (
+    <div style={breadcrumbCol}>
+        <BreadcrumbShortDemo />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={breadcrumbCol}>
+        <BreadcrumbStandardDemo />
+        <BreadcrumbShortDemo />
     </div>
 );
 

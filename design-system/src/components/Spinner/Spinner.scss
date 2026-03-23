@@ -3,9 +3,10 @@
  * Includes default Bootstrap spinner overrides and Custom Figma Variants (Growing, Rotating, etc.)
  */
 
-// Default Spinner
-.spinner-border {
-    color: var(--color-primary);
+// Bootstrap border/grow spinners: single neutral color (matches custom block spinners).
+.plus-spinner.spinner-border,
+.plus-spinner.spinner-grow {
+    color: var(--color-on-surface-variant);
 }
 
 // Custom Spinner Container - provides the base sizing for all custom variants

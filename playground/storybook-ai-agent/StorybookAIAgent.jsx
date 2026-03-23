@@ -471,7 +471,7 @@ function matchUsageGuide(text) {
 /* ─── Smart Navigation: index (storyId, storyName, category, search terms + synonyms) ─── */
 const NAV_SYNONYMS = { popup: 'modal', modals: 'modal', dialog: 'modal', tokens: 'token', spacing: 'spacing tokens', colors: 'colors', typography: 'typography' };
 const NAV_INDEX = [
-    { storyId: 'Components/Button', storyName: 'Overview', category: 'Component', label: 'Button', terms: ['button', 'buttons'] },
+    { storyId: 'Components/Button', storyName: 'Docs', category: 'Component', label: 'Button', terms: ['button', 'buttons'] },
     { storyId: 'Components/Badge', storyName: 'Overview', category: 'Component', label: 'Badge', terms: ['badge', 'badges', 'success', 'warning'] },
     { storyId: 'Components/Card', storyName: 'Overview', category: 'Component', label: 'Card', terms: ['card', 'cards'] },
     { storyId: 'Components/Modal', storyName: 'Overview', category: 'Component', label: 'Modal', terms: ['modal', 'modals'] },
