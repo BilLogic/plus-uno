@@ -214,39 +214,42 @@ const Select = ({
             >
                 {/* Trigger / Input Field */}
                 <Dropdown.Toggle as={CustomSelectToggle} id={id} disabled={disabled || readonly}>
-                {showBadgesInTrigger && (
-                    <div className="plus-select-badges">
-                        {selectedValues.map((val) => {
-                            const opt = allOptions.find(o => o.value === val);
-                            const label = opt ? (opt.label || opt.text || opt.value) : val;
-                            return (
-                                <Badge
-                                    key={val}
-                                    text={label}
-                                    dismissible={badgesDismissible}
-                                    onDismiss={(e) => {
-                                        // Stop propagation to prevent toggling dropdown when dismissing badge
-                                        e && e.stopPropagation && e.stopPropagation();
-                                        handleBadgeDismiss(val);
-                                    }}
-                                    size="b2"
-                                    style="secondary"
-                                />
-                            );
-                        })}
-                    </div>
-                )}
+                <div className="plus-select-value">
+                    {showBadgesInTrigger && (
+                        <div className="plus-select-badges">
+                            {selectedValues.map((val) => {
+                                const opt = allOptions.find(o => o.value === val);
+                                const label = opt ? (opt.label || opt.text || opt.value) : val;
+                                return (
+                                    <Badge
+                                        key={val}
+                                        text={label}
+                                        dismissible={badgesDismissible}
+                                        onDismiss={(e) => {
+                                            // Stop propagation to prevent toggling dropdown when dismissing badge
+                                            e && e.stopPropagation && e.stopPropagation();
+                                            handleBadgeDismiss(val);
+                                        }}
+                                        size="b2"
+                                        style="secondary"
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
 
-                {!showBadgesInTrigger && (
-                    <span className={`plus-select-text ${!selectedValues || (Array.isArray(selectedValues) && selectedValues.length === 0) ? 'plus-select-placeholder' : ''}`}>
-                        {getDisplayText()}
-                    </span>
-                )}
+                    {!showBadgesInTrigger && (
+                        <span className={`plus-select-text ${!selectedValues || (Array.isArray(selectedValues) && selectedValues.length === 0) ? 'plus-select-placeholder' : ''}`}>
+                            {getDisplayText()}
+                        </span>
+                    )}
+                </div>
 
-                <i
-                    className={`fa-solid ${isOpen ? 'fa-caret-up' : 'fa-caret-down'} plus-select-chevron`}
-                    aria-hidden="true"
-                />
+                <div className="plus-select-icon" aria-hidden="true">
+                    <i
+                        className={`fa-solid ${isOpen ? 'fa-caret-up' : 'fa-caret-down'} plus-select-chevron`}
+                    />
+                </div>
             </Dropdown.Toggle>
 
             {/* Dropdown Menu */}

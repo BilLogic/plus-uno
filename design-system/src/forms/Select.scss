@@ -46,8 +46,8 @@
 // ===== TRIGGER / INPUT FIELD =====
 .plus-select-trigger {
     display: flex;
-    align-items: flex-start; // Allow badges to wrap from top (multi)
-    flex-wrap: wrap;
+    align-items: center;
+    flex-wrap: nowrap;
     gap: var(--size-element-gap-md, 10px); // Figma: element/gap-md
     width: 100%;
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
@@ -70,6 +70,21 @@
         box-shadow: none !important;
         border-color: var(--color-outline-variant) !important;
     }
+}
+
+.plus-select-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+.plus-select-icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
 }
 
 .plus-select-open .plus-select-trigger {
@@ -100,9 +115,9 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-element-gap-sm, 6px);
-    flex: 1 1 100%; // Take full width
+    flex: 1 1 100%;
     min-width: 0; // Allow shrinking
-    max-width: calc(100% - 24px); // Leave room for chevron
+    max-width: 100%;
 
     .plus-badge {
         flex-shrink: 0;
@@ -170,7 +185,7 @@
 
 // ===== TEXT DISPLAY =====
 .plus-select-text {
-    flex: 1;
+    flex: 1 1 auto;
     font-family: var(--font-family-body);
     font-size: inherit;
     font-weight: var(--font-weight-light);
