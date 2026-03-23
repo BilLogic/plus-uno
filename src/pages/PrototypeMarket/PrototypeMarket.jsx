@@ -18,7 +18,8 @@ const PrototypeMarket = () => {
   const [selectedStages, setSelectedStages] = useState([]);
   const [selectedPillars, setSelectedPillars] = useState([]);
 
-  const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || search;
+  const normalizedSearch = search.trim();
+  const hasFilters = selectedStages.length > 0 || selectedPillars.length > 0 || normalizedSearch;
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -105,7 +106,18 @@ const PrototypeMarket = () => {
 
       {/* Result count */}
       <div className="prototype-market__count body2-txt">
-        {filtered.length} {filtered.length === 1 ? 'prototype' : 'prototypes'}
+        {normalizedSearch ? (
+          <>
+            Search result:{' '}
+            <span className="prototype-market__count-emphasis">{filtered.length}</span>{' '}
+            {filtered.length === 1 ? 'prototype' : 'prototypes'} for{' '}
+            <span className="prototype-market__count-emphasis">{normalizedSearch}</span>
+          </>
+        ) : (
+          <>
+            {filtered.length} {filtered.length === 1 ? 'prototype' : 'prototypes'}
+          </>
+        )}
         {hasFilters && (
           <button
             className="prototype-market__clear-filters body3-txt"

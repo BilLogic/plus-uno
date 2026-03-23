@@ -16,7 +16,7 @@ import {
 } from '../../elements/CTA Sign-Up Related Buttons/index.jsx';
 import { TableRow, TableHeaderRow } from '../../tables/FillInSchedule.stories';
 import { TableHeaderRow as MySessionsTableHeaderRow, TableRow as MySessionsTableRow } from '../../tables/MySessions.stories';
-import { FillInsTableHeaderRow, FillInsTableRow } from '../../tables/FillInTable.stories';
+import { FillInTableHeaderRow, FillInTableRow } from '../../tables/FillInTable.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Session Fill-ins',
@@ -446,7 +446,7 @@ const cellStyle = {
 /**
  * Confirmation
  * Confirm fill-in step: warning alert, session list (pre-session/tables/Fill Ins), Back + Confirm fill-in.
- * Reuses: Alert, BackButton, Button, close icon; pre-session/tables/Fill Ins (FillInsTableHeaderRow, FillInsTableRow).
+ * Reuses: Alert, BackButton, Button, close icon; pre-session/tables/Fill Ins (FillInTableHeaderRow, FillInTableRow).
  */
 export const Confirmation = () => {
     const confirmationSessions = [
@@ -488,9 +488,9 @@ export const Confirmation = () => {
                         </Alert>
                         {/* Session table: pre-session/tables/Fill Ins */}
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <FillInsTableHeaderRow />
+                            <FillInTableHeaderRow />
                             {confirmationSessions.map((s, i) => (
-                                <FillInsTableRow
+                                <FillInTableRow
                                     key={i}
                                     date={s.date}
                                     timeRange={s.timeRange}

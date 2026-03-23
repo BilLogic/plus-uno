@@ -113,6 +113,11 @@
     gap: var(--size-element-gap-sm, 8px);
   }
 
+  &__count-emphasis {
+    color: var(--color-on-surface, #1a1a1a);
+    font-weight: 700;
+  }
+
   &__clear-filters {
     background: none;
     border: none;
