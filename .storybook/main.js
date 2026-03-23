@@ -8,19 +8,14 @@ const __dirname = path.dirname(__filename);
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    // Prefer brace expansion here (more consistently supported across globbers than extglob @())
-    '../packages/plus-ds/src/**/*.stories.{js,jsx,ts,tsx}',
-    // '../packages/plus-ds/src/**/*.mdx',
+    // design-system is the source of truth (includes specs; design-system/specs excluded to avoid duplicate story IDs with Toolkit)
+    '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
-    // Source of truth in this repo (legacy but still actively used)
-    '../design-system/specs/**/*.stories.{js,jsx,ts,tsx}',
-    // '../design-system/specs/**/*.mdx',
-
-    // Playground prototypes
-    '../playground/prototyping/**/*.stories.{js,jsx,ts,tsx}',
+    // Playground prototypes are displayed in the Marketplace, not Storybook
   ],
   addons: [
     '@storybook/addon-links',
+    '@storybook/addon-docs',
   ],
   framework: {
     name: '@storybook/react-vite',
@@ -39,14 +34,14 @@ const config = {
     autodocs: true,
   },
   server: {
-    host: '127.0.0.1',
+    host: '0.0.0.0',
     port: 6006,
   },
   staticDirs: (() => {
     const staticDirs = [];
     const rootDistPath = path.resolve(__dirname, '../dist');
-    const distPath = path.resolve(__dirname, '../packages/plus-ds/dist');
-    const assetsPath = path.resolve(__dirname, '../packages/plus-ds/src/assets');
+    const distPath = path.resolve(__dirname, '../design-system/dist');
+    const assetsPath = path.resolve(__dirname, '../design-system/src/assets');
 
     // Include root dist directory for CSS files
     if (fs.existsSync(rootDistPath)) {
@@ -65,7 +60,7 @@ const config = {
   viteFinal: async (config) => {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
-    const srcPath = path.resolve(rootDir, 'packages/plus-ds/src');
+    const srcPath = path.resolve(rootDir, 'design-system/src');
 
     // Set Vite root to project root for proper path resolution
     config.root = rootDir;
@@ -92,11 +87,10 @@ const config = {
     // Configure Vite to resolve modules from project root
     config.resolve.preserveSymlinks = false;
 
-    // Ensure story files are treated as ES modules
+    // Ensure story files are treated as ES modules (Vite 8 / Rolldown)
     config.optimizeDeps = config.optimizeDeps || {};
-    config.optimizeDeps.esbuildOptions = config.optimizeDeps.esbuildOptions || {};
-    config.optimizeDeps.esbuildOptions.loader = config.optimizeDeps.esbuildOptions.loader || {};
-    config.optimizeDeps.esbuildOptions.loader['.js'] = 'jsx';
+    config.optimizeDeps.rolldownOptions = config.optimizeDeps.rolldownOptions || {};
+    config.optimizeDeps.rolldownOptions.moduleTypes = { '.js': 'jsx' };
 
     // Ensure proper ES module handling
     config.optimizeDeps.include = config.optimizeDeps.include || [];
@@ -112,7 +106,7 @@ const config = {
     config.css.preprocessorOptions.scss = {
       includePaths: [
         path.resolve(srcPath, 'components'),
-        path.resolve(rootDir, 'develop/tokens'),
+        path.resolve(rootDir, 'design-system/src/tokens'),
         path.resolve(srcPath, 'styles')
       ],
       api: 'modern-compiler',
@@ -132,8 +126,8 @@ const config = {
       rootDir,
       srcPath
     ];
-    // Allow 127.0.0.1 hostname for Vite
-    config.server.allowedHosts = ['127.0.0.1', 'localhost'];
+    // Allow all hosts so Storybook works at 127.0.0.1 or localhost (dev only)
+    config.server.allowedHosts = true;
 
     // Improve HMR stability
     config.server.hmr = config.server.hmr || {};

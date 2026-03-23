@@ -341,7 +341,7 @@ neutralGroups.forEach(group => {
 
 scss += `}\n`;
 
-fs.writeFileSync('develop/tokens/_colors.scss', scss);
+fs.writeFileSync('design-system/src/tokens/_colors.scss', scss);
 console.log('✅ Regenerated colors SCSS file with all M3 color roles');
 console.log(`   Total colors: ${Object.keys(colorMap).length}`);
 

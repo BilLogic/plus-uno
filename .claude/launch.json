@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 4100
+    },
+    {
+      "name": "home-redesign",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "playground/home-redesign/vite.config.js", "--port", "4101"],
+      "port": 4101
+    },
+    {
+      "name": "monthly-report",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "playground/monthly-report/vite.config.js", "--port", "4102"],
+      "port": 4102
+    }
+  ]
+}

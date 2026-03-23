@@ -3,7 +3,7 @@ const path = require('path');
 
 // 1. Read Codebase Tokens (SCSS)
 // We'll parse the SCSS files to extract variable names and values
-const tokenDir = '/Users/billguo/Library/CloudStorage/Box-Box/plus-vibe-coding-starting-kit/plus-vibe-coding-starting-kit/develop/tokens';
+const tokenDir = '/Users/billguo/Library/CloudStorage/Box-Box/plus-vibe-coding-starting-kit/plus-vibe-coding-starting-kit/design-system/src/tokens';
 const files = ['_colors.scss', '_fonts.scss', '_layout.scss', '_spacing_semantics.scss', '_primitives.scss'];
 
 let codebaseTokens = {};
@@ -96,7 +96,7 @@ Object.keys(exportTokens).forEach(key => {
 
 // Generate Report
 let report = `# Token Update Analysis
-Compared \`develop/tokens/*.scss\` with \`figma-export.css\`
+Compared \`design-system/src/tokens/*.scss\` with \`figma-export.css\`
 
 ## Summary
 - **Codebase Tokens**: ${Object.keys(codebaseTokens).length}

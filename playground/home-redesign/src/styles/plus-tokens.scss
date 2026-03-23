@@ -1,0 +1,10 @@
+/**
+ * PLUS design tokens for Home Redesign (same as reference).
+ * Loads token files from plus-ds so var(--color-*), var(--font-*) are available.
+ */
+@use '../../../../design-system/src/tokens/colors' as *;
+@use '../../../../design-system/src/tokens/primitives' as *;
+@use '../../../../design-system/src/tokens/spacing_semantics' as *;
+@use '../../../../design-system/src/tokens/layout' as *;
+@use '../../../../design-system/src/tokens/fonts' as *;
+@use '../../../../design-system/src/tokens/elevation' as *;

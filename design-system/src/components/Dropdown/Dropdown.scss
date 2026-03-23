@@ -1,0 +1,548 @@
+/*
+ * Dropdown Component Styles
+ * Uses context-aware M3 color roles and Button-matching fill variants.
+ * Filled: --color-X bg → --color-on-X text
+ * Tonal/Outline/Ghost: --color-X-text for accessible text on surface
+ */
+
+@use "sass:map";
+@use "sass:list";
+
+@use "sass:string";
+
+// --- COLOR THEMES (mirrors Button.scss) ---
+$dropdown-themes: (
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text'),
+    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text'),
+    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text'),
+    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral-state-08', '--color-neutral-text')
+);
+
+// =============================================================================
+// BASE .pdropdown CONTAINER
+// =============================================================================
+.pdropdown {
+    position: relative;
+    display: inline-flex;
+
+    // --- TOGGLE BUTTON BASE ---
+    .pdropdown-toggle,
+    .pdropdown-default-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--size-element-gap-sm);
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body1);
+        font-weight: var(--font-weight-semibold-1);
+        line-height: var(--font-line-height-body1);
+        border: var(--size-element-stroke-sm) solid transparent;
+        border-radius: var(--size-element-radius-md);
+        cursor: pointer;
+        transition: background-color 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease;
+
+        // Caret icon - inherits color from parent to match text
+        &::after {
+            // Reset Bootstrap caret borders to prevent "double icon" effect (triangle + font icon)
+            border: none !important;
+
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            content: '\f0d7'; // fa-caret-down
+            font-size: var(--font-size-fa-body2-solid);
+            color: inherit;
+            // Ensure display is correct for font icon
+            display: inline-block;
+            margin-left: 0; // Reset bootstrap margin
+            vertical-align: middle;
+        }
+    }
+
+    // --- CARET DIRECTIONS ---
+    .pdropdown-caret-up::after {
+        content: '\f0d8';
+    }
+
+    .pdropdown-caret-left::after {
+        content: '\f0d9';
+    }
+
+    .pdropdown-caret-right::after {
+        content: '\f0da';
+    }
+
+    // --- DROPDOWN MENU ---
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        min-width: 200px;
+        max-width: 320px;
+        padding: var(--size-element-pad-y-sm) 0;
+        background-color: var(--color-surface);
+        border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+        border-radius: var(--size-element-radius-md);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+        display: none;
+
+        &.show {
+            display: block;
+        }
+    }
+
+    // --- DROPDOWN ITEM ---
+    .dropdown-item,
+    .pdropdown-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: var(--size-element-gap-md);
+        width: 100%;
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        background-color: var(--color-surface);
+        border: none;
+        color: var(--color-on-surface);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);        // Body/B2
+        font-weight: var(--font-weight-light);    // Regular
+        line-height: var(--font-line-height-body2);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        // Hover state
+        &:hover {
+            background-color: var(--color-on-surface-state-08);
+            color: var(--color-on-surface);
+        }
+
+        // Focus-visible state
+        &:focus-visible {
+            outline: 2px solid var(--color-focus-ring);
+            outline-offset: -2px;
+            background-color: var(--color-on-surface-state-08);
+        }
+
+        // Pressed state
+        &:active {
+            background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+        }
+
+        // Selected state (JSX uses 'selected' class)
+        &.selected,
+        &.active {
+            position: relative;
+            background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08));
+            color: var(--color-on-surface);
+
+            // Left selection rail (4px)
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background-color: var(--color-primary-container);
+            }
+
+            .selected-icon {
+                opacity: 1 !important;
+                color: var(--color-primary);
+            }
+        }
+
+        &.disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        // Icon/Badge styling
+        i {
+            font-size: var(--font-size-fa-body1-solid);
+            color: var(--color-on-surface-variant);
+        }
+
+        .badge {
+            margin-left: auto;
+        }
+    }
+
+    // --- DROPDOWN HEADER/DIVIDER ---
+    .dropdown-header,
+    .pdropdown-header {
+        display: block;
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+        color: var(--color-on-surface-variant);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3);
+        font-weight: var(--font-weight-semibold-1);
+        white-space: nowrap;
+        pointer-events: none;
+        padding-top: var(--size-element-pad-y-md);
+    }
+
+    .dropdown-item-inner {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-md);
+        width: 100%;
+    }
+
+    // --- COUNTER BADGE ---
+    .pdropdown-counter {
+        background-color: var(--color-on-surface-state-16);
+        border-radius: var(--size-element-radius-full);
+        padding: 0 var(--size-element-pad-x-sm);
+        height: var(--size-element-gap-lg);
+        display: flex;
+        align-items: center;
+        font-size: var(--font-size-body3);
+        font-weight: var(--font-weight-semibold-1);
+    }
+
+    // --- DIVIDER ---
+    .pdropdown-divider {
+        height: var(--size-element-stroke-sm);
+        background-color: var(--color-outline-variant);
+        margin: 0;
+    }
+
+    // --- DIRECTION VARIANTS ---
+    &.dropup .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+    }
+
+    &.dropleft .dropdown-menu {
+        top: 0;
+        left: auto;
+        right: 100%;
+    }
+
+    &.dropright .dropdown-menu {
+        top: 0;
+        left: 100%;
+    }
+
+    // --- SIZE VARIANTS ---
+    &.small {
+
+        .pdropdown-toggle,
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            font-size: var(--font-size-body3);
+            line-height: var(--font-line-height-body3);
+
+            &::after {
+                font-size: var(--font-size-fa-body3-solid);
+            }
+        }
+    }
+
+    &.large {
+
+        .pdropdown-toggle,
+        .pdropdown-default-toggle,
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+            font-size: var(--font-size-h6);
+            line-height: var(--font-line-height-h6);
+
+            &::after {
+                font-size: var(--font-size-fa-h6-solid);
+            }
+        }
+    }
+}
+
+// =============================================================================
+// SPLIT BUTTON BASE STYLING (inside .pdropdown)
+// =============================================================================
+.pdropdown.pdropdown-split-dropdown {
+    display: inline-flex;
+    position: relative;
+
+    // Text button (left side)
+    .pdropdown-split-text-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body1);
+        font-weight: var(--font-weight-semibold-1);
+        line-height: var(--font-line-height-body1);
+        border: var(--size-element-stroke-sm) solid transparent;
+        border-radius: var(--size-element-radius-md) 0 0 var(--size-element-radius-md);
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    // Toggle button (right side with caret) - MUST have ::after for caret
+    .pdropdown-split-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-sm);
+        border: var(--size-element-stroke-sm) solid transparent;
+        border-radius: 0 var(--size-element-radius-md) var(--size-element-radius-md) 0;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        border-left-color: rgba(255, 255, 255, 0.3);
+
+        // CRITICAL: Caret icon for split toggle
+        &::after {
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            content: '\f0d7'; // fa-caret-down
+            font-size: var(--font-size-fa-body2-solid);
+            color: inherit;
+        }
+    }
+}
+
+// =============================================================================
+// THEME VARIANTS - Regular Dropdowns (COMPOUND SELECTORS)
+// =============================================================================
+@each $theme, $config in $dropdown-themes {
+    $col-main: string.unquote(list.nth($config, 1));
+    $col-on-main: string.unquote(list.nth($config, 2));
+    $col-state: string.unquote(list.nth($config, 3));
+    $col-text: string.unquote(list.nth($config, 4));
+
+    // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-#{$theme}
+    .pdropdown.pdropdown-#{$theme} {
+
+        // FILLED (default)
+        .pdropdown-toggle,
+        .pdropdown-default-toggle {
+            background-color: var($col-main);
+            color: var($col-on-main);
+
+
+            // CRITICAL: Explicitly set caret color for filled variants
+            &::after {
+                color: var($col-on-main) !important;
+            }
+
+            &:hover {
+                // Use color-mix instead of filter to avoid affecting icon colors
+                background-color: color-mix(in srgb, var($col-main), black 8%);
+            }
+
+            // PRESSED/ACTIVE STATE: Only background changes, NOT icon color
+            &:active,
+            &.active {
+                background-color: color-mix(in srgb, var($col-main), black 12%);
+
+                // Ensure icon color stays the same on pressed
+                &::after {
+                    color: var($col-on-main) !important;
+                }
+            }
+        }
+
+        // TONAL
+        &.pdropdown-tonal {
+
+            .pdropdown-toggle,
+            .pdropdown-default-toggle {
+                background-color: var($col-state);
+                color: var($col-text);
+                border-color: transparent;
+
+                // CRITICAL: Tonal variant caret uses text color (not on-main)
+                &::after {
+                    color: var($col-text) !important;
+                }
+
+                &:hover {
+                    background-color: color-mix(in srgb, var($col-state), black 12%);
+                }
+
+                // PRESSED/ACTIVE: Only background changes
+                &:active,
+                &.active {
+                    background-color: color-mix(in srgb, var($col-state), black 16%);
+                }
+            }
+        }
+
+        // OUTLINE
+        &.pdropdown-outline {
+
+            .pdropdown-toggle,
+            .pdropdown-default-toggle {
+                background-color: transparent;
+                border-color: var($col-main);
+                color: var($col-text);
+
+                // CRITICAL: Outline variant caret uses text color
+                &::after {
+                    color: var($col-text) !important;
+                }
+
+                &:hover {
+                    background-color: var($col-state);
+                }
+
+                // PRESSED/ACTIVE: Only background changes
+                &:active,
+                &.active {
+                    background-color: color-mix(in srgb, var($col-state), black 8%);
+                }
+            }
+        }
+
+        // GHOST
+        &.pdropdown-ghost {
+
+            .pdropdown-toggle,
+            .pdropdown-default-toggle {
+                background-color: transparent;
+                border-color: transparent;
+                color: var($col-text);
+
+                // CRITICAL: Ghost variant caret uses text color
+                &::after {
+                    color: var($col-text) !important;
+                }
+
+                &:hover {
+                    background-color: var($col-state);
+                }
+
+                // PRESSED/ACTIVE: Only background changes
+                &:active,
+                &.active {
+                    background-color: color-mix(in srgb, var($col-state), black 8%);
+                }
+            }
+        }
+    }
+
+    // =============================================================================
+    // THEME VARIANTS - Split Button Dropdowns (COMPOUND SELECTORS)
+    // =============================================================================
+    .pdropdown.pdropdown-#{$theme}.pdropdown-split-dropdown {
+
+        // FILLED (default)
+        .pdropdown-split-text-btn,
+        .pdropdown-split-toggle-btn {
+            background-color: var($col-main);
+            color: var($col-on-main);
+
+            &:hover {
+                // Use color-mix instead of filter to avoid affecting icon colors
+                background-color: color-mix(in srgb, var($col-main), black 8%);
+            }
+
+            // PRESSED/ACTIVE: Only background changes, NOT icon color
+            &:active,
+            &.active {
+                background-color: color-mix(in srgb, var($col-main), black 12%);
+            }
+        }
+
+        .pdropdown-split-toggle-btn {
+            border-left-color: rgba(255, 255, 255, 0.3);
+
+            // Ensure caret stays same color on hover/active
+            &::after {
+                color: var($col-on-main) !important;
+            }
+        }
+
+        // TONAL
+        &.pdropdown-tonal {
+
+            .pdropdown-split-text-btn,
+            .pdropdown-split-toggle-btn {
+                background-color: var($col-state);
+                color: var($col-text);
+                border-color: transparent;
+
+                &:hover {
+                    background-color: color-mix(in srgb, var($col-state), black 12%);
+                }
+            }
+
+            .pdropdown-split-toggle-btn {
+                border-left-color: var($col-main);
+
+                // CRITICAL: Tonal split caret uses text color
+                &::after {
+                    color: var($col-text) !important;
+                }
+            }
+        }
+
+        // OUTLINE
+        &.pdropdown-outline {
+            .pdropdown-split-text-btn {
+                background-color: transparent;
+                border-color: var($col-main);
+                border-right-color: transparent;
+                color: var($col-text);
+
+                &:hover {
+                    background-color: var($col-state);
+                }
+            }
+
+            .pdropdown-split-toggle-btn {
+                background-color: transparent;
+                border-color: var($col-main);
+                color: var($col-text);
+
+                // CRITICAL: Outline split caret uses text color
+                &::after {
+                    color: var($col-text) !important;
+                }
+
+                &:hover {
+                    background-color: var($col-state);
+                }
+            }
+        }
+
+        // GHOST
+        &.pdropdown-ghost {
+
+            .pdropdown-split-text-btn,
+            .pdropdown-split-toggle-btn {
+                background-color: transparent;
+                border-color: transparent;
+                color: var($col-text);
+
+                &:hover {
+                    background-color: var($col-state);
+                }
+            }
+
+            .pdropdown-split-toggle-btn {
+                border-left-color: var($col-text);
+
+                // CRITICAL: Ghost split caret uses text color
+                &::after {
+                    color: var($col-text) !important;
+                }
+            }
+        }
+    }
+}

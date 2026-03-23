@@ -1,68 +1,40 @@
 ---
 name: design-consulting
-description: Provides design consultation and planning support. Use when the user asks to "brainstorm", "plan", "review my approach", "what do you think about...", or wants feedback on design decisions before coding.
+description: >
+  Early structure-first concepting, wireframes, and design exploration.
+  Use for "Brainstorm", "Plan", "What do you think...", "Show me options", "Compare approaches".
+  Covers both Consulting mode (structure) and Iteration mode (variations).
 ---
 
 # Design Consulting
 
-Early-stage consultation before prototyping or building.
+Help users explore design direction — from early structure to multi-variant comparison.
 
-## What You Can Do
+## Prerequisites
 
-- **Brainstorm**: Explore design approaches
-- **Plan**: Create planning documents
-- **Review**: Provide feedback on design choices
-- **Recommend**: Suggest appropriate patterns/components
-- **Clarify**: Help translate requirements to PLUS patterns
+- `docs/design-system/modes/consulting.md` — structure-first concepting workflow
+- `docs/design-system/modes/iteration.md` — generating 3-5 variations with tradeoffs
+- `docs/design-system/components.md` — what components exist to work with
+- `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` — official page structural formulas
 
-## Protocol
+## Two Sub-Modes
 
-1. Engage in verbal discussion using PLUS terminology
-2. Ask clarifying questions before giving advice
-3. Reference existing patterns when applicable
-4. Create planning docs if requested (markdown format)
-5. **Never write code** — only consult
+### Consulting (Structure First)
+- Focus on layout, information architecture, and content hierarchy
+- Use Stitch MCP for wireframe generation when available
+- Output structure decisions, not styled implementations
+- **Gate**: Present structure plan, get approval before moving to implementation
 
-## Example Interactions
+### Iteration (Styled Variations)
+- Generate 3-5 variations of the approved structure
+- Each variation should have clear tradeoffs documented
+- Use PLUS components and tokens for all variations
+- **Gate**: User selects preferred variation before finalizing
 
-**User**: "I need to show a list of tutors with their status. What pattern should I use?"
-**Agent**: "For a list of entities with status, I'd recommend the **Table** pattern with Status Badges. Questions:
-- How many tutors typically? (affects pagination needs)
-- What actions do users take? (affects column layout)
-- Is filtering/search needed?
+## Workflow
 
-Based on your answers, I can draft a component specification."
-
-**User**: "Help me plan the compliance dashboard"
-**Agent**: "I'll create a planning document. First, let me understand:
-1. What key metrics need to be visible at a glance?
-2. What drill-down actions do supervisors take?
-3. Any existing Figma designs, or starting from scratch?"
-
-## Planning Document Template
-
-When creating planning docs, use this structure:
-
-```markdown
-# [Feature Name] Plan
-
-## Objective
-What problem does this solve?
-
-## Proposed Pattern
-- Context Level: [Element/Card/Section/Table/Modal/Page]
-- Key Components: [list]
-- Tokens: [relevant tokens]
-
-## Open Questions
-- [questions for designer]
-
-## Next Steps
-- [ ] Confirm approach with designer
-- [ ] [Prototype/Build] using [skill name]
-```
-
-## References
-
-- [Context Levels](../../develop/foundations/context-levels.md)
-- [Terminology](../../develop/foundations/terminology.md)
+1. Clarify scope — what area? what fidelity? structure only or styled?
+2. Check existing specs — does a relevant spec already exist in `design-system/src/specs/`?
+3. If consulting: propose structure using context levels (Element → Card → Section → Page)
+4. If iterating: generate variations with documented tradeoffs
+5. Present for approval before any implementation

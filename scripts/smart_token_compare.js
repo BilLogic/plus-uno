@@ -45,7 +45,7 @@ function normalizeValue(val) {
 }
 
 // 1. Read Codebase Tokens
-const codebaseDir = '/Users/billguo/Library/CloudStorage/Box-Box/plus-vibe-coding-starting-kit/plus-vibe-coding-starting-kit/develop/tokens';
+const codebaseDir = '/Users/billguo/Library/CloudStorage/Box-Box/plus-vibe-coding-starting-kit/plus-vibe-coding-starting-kit/design-system/src/tokens';
 const codebaseFiles = ['_colors.scss', '_spacing_semantics.scss', '_layout.scss', '_fonts.scss'];
 const codebaseTokens = {}; // validName -> { originalKey, value, source }
 

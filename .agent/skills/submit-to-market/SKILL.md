@@ -19,12 +19,12 @@ Walk a designer through registering their prototype in the Prototype Market so i
 
 Gather the required fields. Use smart defaults where possible.
 
-1. **Detect `repoPath`** — infer from the user's open files or current directory. Must be a path under `playground/prototyping/{name}/{project}/`.
-2. **Ask the user** for the fields below. Present `stage` and `productPillar` as constrained choices (use AskQuestion if available). Auto-fill `lastUpdated` with today's date and auto-generate `id` from `{creator}-{project}`.
+1. **Detect `repoPath`** — infer from the user's open files or current directory. Must be a path under `playground/{project}/`.
+2. **Ask the user** for the fields below. Present `stage` and `productPillar` as constrained choices (use AskQuestion if available). Auto-fill `lastUpdated` with today's date and auto-generate `id` from the project folder name.
 
 | Field | Type | How to get |
 |-------|------|------------|
-| `id` | string | Auto: `{lowercase-creator}-{project-folder}` |
+| `id` | string | Auto: `{project-folder-name}` |
 | `title` | string | Ask user |
 | `description` | string | Ask user (1-2 sentences) |
 | `deploymentUrl` | string or null | Ask user; null if not deployed |
@@ -44,7 +44,7 @@ If `deploymentUrl` is null, offer to help deploy:
 
 1. Verify the prototype builds:
    ```bash
-   cd playground/prototyping/{name}/{project}
+   cd playground/{project}
    npx vite build
    ```
 2. Guide the designer to deploy via one of:
@@ -82,7 +82,7 @@ I'll add this entry to the Prototype Market:
     contributors: ['Name'],
     productPillar: 'home',
     localPath: '/home',
-    repoPath: 'playground/prototyping/name/project/',
+    repoPath: 'playground/{project}/',
   }
 
 File: src/pages/PrototypeMarket/prototypes-data.js
@@ -104,4 +104,4 @@ After appending:
 
 - Data schema: `src/pages/PrototypeMarket/prototypes-data.js`
 - Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx`
-- Prototyping docs: `playground/prototyping/README.md`
+- Prototyping docs: `playground/README.md`

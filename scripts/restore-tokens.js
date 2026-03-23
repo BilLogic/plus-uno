@@ -12,8 +12,8 @@ if (!fs.existsSync(extractedPath)) {
 const extracted = JSON.parse(fs.readFileSync(extractedPath, 'utf8'));
 
 // 2. Read existing SCSS files (Source for Primitives and Semantics)
-const primitivesScssPath = path.join(process.cwd(), 'packages/plus-ds/src/tokens/_primitives.scss');
-const semanticsScssPath = path.join(process.cwd(), 'packages/plus-ds/src/tokens/_spacing_semantics.scss');
+const primitivesScssPath = path.join(process.cwd(), 'design-system/src/tokens/_primitives.scss');
+const semanticsScssPath = path.join(process.cwd(), 'design-system/src/tokens/_spacing_semantics.scss');
 
 let primitivesMap = {}; // cssVarName -> number value
 

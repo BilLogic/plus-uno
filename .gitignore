@@ -3,7 +3,6 @@ storybook-static/
 storybook_*.txt
 # Dependencies
 node_modules/
-package-lock.json
 
 # Build output
 dist/
@@ -11,6 +10,8 @@ dist/
 # IDE
 .vscode/
 .idea/
+.cursor/*
+!.cursor/rules/
 *.swp
 *.swo
 *~
@@ -26,6 +27,7 @@ npm-debug.log*
 # Temporary files
 *.tmp
 *.temp
+.sass-cache/
 
 # Environment
 .env

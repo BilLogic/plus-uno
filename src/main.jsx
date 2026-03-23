@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/main.scss';
-import '../playground/prototyping/bill/home-redesign/src/styles/plus-tokens.scss';
-import '../playground/prototyping/bill/research-assistant-chat/src/styles/plus-tokens.scss';
-import '../playground/prototyping/bill/research-assistant-chat/src/index.css';
+import '../playground/home-redesign/src/styles/plus-tokens.scss';
+import '../playground/research-assistant-chat/src/styles/plus-tokens.scss';
+import '../playground/research-assistant-chat/src/index.css';
 import App from './App';
 import './index.css';
 

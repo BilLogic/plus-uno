@@ -4,6 +4,40 @@
   height: 100%;
   transition: box-shadow 0.2s ease, transform 0.15s ease;
 
+  // Matches Input disabled + wrapper disabled (packages/plus-ds/src/forms/Input.scss)
+  &--not-deployed.plus-card {
+    cursor: not-allowed;
+    opacity: 0.38;
+    background-color: var(--color-surface) !important;
+    border: 0.8px solid var(--color-outline-variant) !important;
+    box-shadow: none !important;
+
+    .prototype-card__title {
+      color: var(--color-on-surface-variant);
+    }
+
+    .prototype-card__desc {
+      color: var(--color-on-surface-variant);
+    }
+
+    .prototype-card__meta {
+      border-top-color: var(--color-outline-variant);
+    }
+
+    .prototype-card__meta-item {
+      color: var(--color-on-surface-variant);
+    }
+
+    .prototype-card__link:not(.prototype-card__link--disabled) {
+      color: var(--color-on-surface-variant);
+
+      &:hover {
+        color: var(--color-on-surface-variant);
+        text-decoration: none;
+      }
+    }
+  }
+
   &--clickable {
     cursor: pointer;
 
@@ -21,11 +55,27 @@
     display: flex;
     flex-direction: column;
     gap: var(--size-card-gap-sm, 8px);
+    flex: 1;
   }
 
   &__badges {
     display: flex;
     flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 8px);
+  }
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
+  }
+
+  &__head-main {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
     gap: var(--size-element-gap-sm, 8px);
   }
 
@@ -41,7 +91,7 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    flex: 1;
+    min-height: calc(3 * 1.5em);
   }
 
   &__meta {
@@ -50,6 +100,7 @@
     gap: var(--size-element-gap-md, 16px);
     padding-top: var(--size-element-gap-sm, 8px);
     border-top: 1px solid var(--color-outline-variant, #e0e0e0);
+    margin-top: auto;
   }
 
   &__meta-item {
@@ -67,6 +118,24 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-element-gap-sm, 8px);
+    align-items: center;
+  }
+
+  &__upvote-wrap {
+    margin-left: auto;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__upvote-btn.plus-btn {
+    height: 28px;
+    min-height: 28px;
+    box-sizing: border-box;
+  }
+
+  &__upvote-btn.plus-btn.plus-btn--icon-only {
+    width: 28px;
   }
 
   &__link {
@@ -86,7 +155,7 @@
     }
 
     &--disabled {
-      color: var(--color-on-surface-variant, #999);
+      color: var(--color-on-surface-variant, #666);
       pointer-events: none;
     }
   }

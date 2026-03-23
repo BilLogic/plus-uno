@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const primitivesPath = 'develop/tokens/_primitives.scss';
-const semanticsPath = 'develop/tokens/_spacing_semantics.scss';
+const primitivesPath = 'design-system/src/tokens/_primitives.scss';
+const semanticsPath = 'design-system/src/tokens/_spacing_semantics.scss';
 
 // 1. Parse Primitives
 const primitivesContent = fs.readFileSync(primitivesPath, 'utf8');

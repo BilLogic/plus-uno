@@ -1,40 +1,32 @@
 ---
 name: learn-plus
-description: Teaches designers about the PLUS Design System. Use when the user asks "how do I...", "what is...", "where can I find...", "help me understand...", or needs guidance on tokens, components, or best practices.
+description: >
+  Understand what exists in the PLUS design system and how it works.
+  Use when the user asks "How do I...", "What is...", "Where is...", or has questions about the DS.
 ---
 
 # Learn PLUS
 
-Help designers understand the PLUS Design System.
+Help users understand the design system — components, tokens, patterns, and architecture.
 
-## What You Can Explain
+## Prerequisites
 
-- **Tokens**: Which color/spacing/typography token to use
-- **Components**: What components exist and their props
-- **Context Levels**: Elements vs Cards vs Sections vs Pages
-- **Best Practices**: When to use which pattern
-- **Tool Usage**: How the agent works with Figma, Storybook
-- **File Locations**: Where to find specific code
+Read these before answering:
+- `docs/design-system/overview.md` — what the DS is, foundations, setup
+- `docs/design-system/components.md` — component inventory and discovery
+- `docs/foundations/context-levels.md` — Element → Card → Section → Page hierarchy
+- `docs/foundations/terminology.md` — PLUS vocabulary
 
-## Protocol
+## Approach
 
-1. Answer questions in clear, educational language
-2. Reference specific files in the codebase
-3. Use PLUS terminology (see [terminology.md](../foundations/terminology.md))
-4. Suggest related topics the designer might want to learn
-5. **Never write code** — only explain
+1. **Identify what the user wants to learn** — a specific component? a pattern? how something works?
+2. **Find the source** — check component source (`design-system/src/`), stories (`.stories.jsx`), and styles (`.scss`)
+3. **Read before answering** — always read the actual source code, not just docs. Cite file paths.
+4. **Explain in PLUS terms** — use terminology from `docs/foundations/terminology.md`
+5. **Show, don't just tell** — reference specific Storybook stories the user can view
 
-## Example Interactions
+## What NOT to Do
 
-**User**: "Which token should I use for this card background?"
-**Agent**: "For card backgrounds, use `--color-surface-container`. This is the standard surface token for elevated containers. You can see it in action in `new-ds/styles/_surfaces.scss`."
-
-**User**: "What's the difference between primary and tertiary buttons?"
-**Agent**: "Primary buttons (`style='primary'`) are for main actions—the single most important action on a page. Tertiary (`style='tertiary'`) uses teal accent color for secondary-emphasis actions that still need visibility."
-
-## References
-
-- [Context Levels](../../develop/foundations/context-levels.md)
-- [Terminology](../../develop/foundations/terminology.md)
-- [Tokens](../../packages/plus-ds/guidelines/design-tokens/colors.md)
-- [Tech Stack](../../develop/foundations/tech-stack.md)
+- Don't guess about component props — read the source
+- Don't use generic React/Bootstrap terminology — use PLUS terms
+- Don't recommend components that don't exist in the DS

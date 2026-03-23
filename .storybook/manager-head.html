@@ -1,3 +1,79 @@
+<!-- NavFab: navigate back to Marketplace -->
+<style>
+  .sb-nav-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+  }
+  .sb-nav-fab__trigger {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #61b5cf;
+    color: #001e2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease;
+    text-decoration: none;
+  }
+  .sb-nav-fab__trigger:hover {
+    transform: scale(1.08);
+    filter: brightness(0.94);
+  }
+  .sb-nav-fab__action {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #c4c4c4;
+    background: #f0f0f0;
+    color: #1a1a1a;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .sb-nav-fab__action:hover {
+    background: #e8e8e8;
+    transform: scale(1.08);
+  }
+  .sb-nav-fab:hover .sb-nav-fab__action {
+    display: flex;
+  }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const fab = document.createElement('div');
+    fab.className = 'sb-nav-fab';
+    fab.innerHTML = `
+      <a class="sb-nav-fab__trigger" href="http://localhost:4100" title="Back to Marketplace">
+        <i class="fa-solid fa-compass"></i>
+      </a>
+      <a class="sb-nav-fab__action" href="http://localhost:4100" title="Marketplace">
+        <i class="fa-solid fa-store"></i>
+      </a>
+    `;
+    document.body.appendChild(fab);
+  });
+</script>
+
 <style>
   /* Hide icons only for group/component nodes (main component dropdowns)
      Keep icons for leaf nodes (stories/docs like "Docs", "Overview", "Interactive")

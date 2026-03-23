@@ -27,13 +27,13 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom', 'framer-motion'],
     alias: {
-      '@': path.resolve(__dirname, './packages/plus-ds/src'),
-      '@plus-ds': path.resolve(__dirname, './packages/plus-ds/src'),
+      '@': path.resolve(__dirname, './design-system/src'),
+      '@plus-ds': path.resolve(__dirname, './design-system/src'),
       '~': path.resolve(__dirname, './node_modules')
     }
   },
   server: {
-    port: 3000,
+    port: 4100,
     open: true,
     strictPort: false
   },
@@ -41,12 +41,13 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     chunkSizeWarningLimit: 1200,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
+        // Vendor splitting to avoid a single oversized app chunk.
+        // manualChunks is deprecated in Vite 8 — migrate to codeSplitting when stable.
         manualChunks(id) {
           if (!id) return undefined;
 
-          // Vendor splitting to avoid a single oversized app chunk.
           if (id.includes('node_modules')) {
             if (id.includes('/framer-motion/')) {
               return 'vendor-motion';
@@ -69,9 +70,9 @@ export default defineConfig({
       scss: {
         api: 'modern-compiler',
         loadPaths: [
-          path.resolve(dirname, 'packages/plus-ds/src/tokens'),
-          path.resolve(dirname, 'packages/plus-ds/src/styles'),
-          path.resolve(dirname, 'packages/plus-ds/src/forms')
+          path.resolve(dirname, 'design-system/src/tokens'),
+          path.resolve(dirname, 'design-system/src/styles'),
+          path.resolve(dirname, 'design-system/src/forms')
         ],
         silenceDeprecations: ['import', 'legacy-js-api']
       }

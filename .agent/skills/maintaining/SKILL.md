@@ -1,74 +1,43 @@
 ---
 name: maintaining
-description: Updates, fixes, and syncs existing PLUS components with Figma designs. Use when the user asks to "update", "fix", "modify", "sync", "refactor", "this doesn't match Figma", or needs to improve existing code.
+description: >
+  Update, fix, or sync the design system itself.
+  Use for "Update", "Fix", "Sync", existing code modifications, token updates, bug fixes.
 ---
 
 # Maintaining
 
-Keep codebase in sync with Figma designs.
+Update the design system — fix bugs, sync tokens, update components, maintain docs.
 
-## When to Use
+## Prerequisites
 
-- Fixing bugs in existing components
-- Syncing code with updated Figma designs
-- Refactoring for better patterns
-- Resolving inconsistencies between code and design
+- `docs/design-system/modes/maintaining.md` — maintaining workflow
+- `docs/design-system/maintenance/runbook.md` — maintenance procedures
+- `docs/design-system/maintenance/sync-checklist.md` — token sync verification
+- `docs/design-system/maintenance/scripts.md` — available scripts
 
-For creating **new** patterns, use [building](../building/SKILL.md) instead.
+## Scope
 
-## Protocol
+This skill covers changes to the design system itself (`design-system/src/`), NOT product features or prototypes. Use for:
+- Component bug fixes
+- Token sync and generation
+- Style updates
+- Storybook story updates
+- DS documentation updates
+- Agent doc maintenance (`.agent/` files)
 
-1. Identify affected files
-2. If Figma provided: Compare codebase vs design
-3. List specific changes in PLUS terminology
-4. **WAIT for confirmation before editing**
-5. Apply changes
-6. Verify in Storybook
+## Workflow
 
-## Confirmation Template
+1. **Understand the issue** — what's broken or needs updating?
+2. **Read the source** — component source, styles, stories
+3. **Fix or update** — follow existing patterns exactly
+4. **Token workflow** — if touching tokens: `npm run sync:tokens` → `npm run generate:tokens`
+5. **Validate in Storybook** — `npm run storybook` and check affected stories
+6. **Update docs if needed** — STRUCTURE.md, component docs, cheat sheets
 
-Before editing code, describe the changes:
+## Rules
 
-```
-I'll update **[Component/File]** with these changes:
-
-Current State:
-- [describe what exists]
-
-Proposed Changes:
-- [specific change 1]
-- [specific change 2]
-
-Files to modify:
-- `[file path 1]`
-- `[file path 2]`
-
-Do you want me to proceed?
-```
-
-## Figma Comparison
-
-When syncing with Figma:
-
-1. Use MCP to get current design
-2. Compare against existing implementation
-3. Document differences:
-   - Color mismatches
-   - Spacing differences
-   - Missing/extra elements
-   - Prop value changes
-
-## Verification
-
-After making changes:
-
-1. Run Storybook: `npm run storybook`
-2. Navigate to the modified component
-3. Verify visual appearance matches Figma
-4. Check all variants/states
-
-## References
-
-- [Context Levels](../../develop/foundations/context-levels.md)
-- [Terminology](../../develop/foundations/terminology.md)
-- [Tech Stack](../../develop/foundations/tech-stack.md)
+- Always read component source + story + styles before modifying
+- Run `npm run generate:tokens` after any token source changes
+- Validate in Storybook after component behavior changes
+- Update `.agent/assets/PLUS_CHEAT_SHEET.md` if component API changes
