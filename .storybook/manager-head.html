@@ -59,6 +59,51 @@
   .sb-nav-fab:hover .sb-nav-fab__action {
     display: flex;
   }
+  .sb-nav-fab__action--ai {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .sb-nav-fab__action--ai:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background: transparent;
+  }
+  .sb-nav-fab:hover .sb-nav-fab__action--ai {
+    display: flex;
+  }
+  .sb-nav-fab__ai-logo {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .sb-nav-fab__ai-logo-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .sb-nav-fab__ai-logo-icon {
+    position: relative;
+    z-index: 1;
+    width: 45%;
+    height: 45%;
+  }
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -74,8 +119,53 @@
       <a class="sb-nav-fab__action" href="http://localhost:4100" title="Marketplace">
         <i class="fa-solid fa-store"></i>
       </a>
+      <button class="sb-nav-fab__action sb-nav-fab__action--ai" title="PLUS AI Agent (⌘+/)">
+        <div class="sb-nav-fab__ai-logo">
+          <svg class="sb-nav-fab__ai-logo-bg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <filter id="sb-nf-f0" x="-30%" y="-8%" width="160%" height="116%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f1" x="-30%" y="-8%" width="160%" height="116%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f2" x="-57%" y="-60%" width="215%" height="220%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f3" x="-6%" y="-9%" width="212%" height="212%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f4" x="-58%" y="-19%" width="216%" height="216%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f5" x="-9%" y="-67%" width="220%" height="234%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+            </defs>
+            <g filter="url(#sb-nf-f0)"><path d="M49.5538 36.9968C59.1224 46.5652 59.1224 62.079 49.5538 71.6475C39.9853 81.2161 24.4715 81.2161 14.903 71.6475C5.3344 62.079 5.3344 46.5652 14.903 36.9968C24.4715 27.4282 39.9853 27.4282 49.5538 36.9968Z" fill="#FFDEA0"/></g>
+            <g filter="url(#sb-nf-f1)"><path d="M49.5538 36.9968C59.1224 46.5652 59.1224 62.079 49.5538 71.6475C39.9853 81.2161 24.4715 81.2161 14.903 71.6475C5.3344 62.079 5.3344 46.5652 14.903 36.9968C24.4715 27.4282 39.9853 27.4282 49.5538 36.9968Z" fill="#FFE17A"/></g>
+            <g filter="url(#sb-nf-f2)"><path d="M31.1452 -13.1547C42.6472 -1.65267 42.6472 16.9958 31.1452 28.4978C19.6432 39.9998 0.994739 39.9998 -10.5073 28.4978C-22.0093 16.9958 -22.0093 -1.65269 -10.5073 -13.1547C0.994739 -24.6568 19.6432 -24.6568 31.1452 -13.1547Z" fill="#FFE17A"/></g>
+            <g filter="url(#sb-nf-f3)"><path d="M79.2166 76.03C89.9725 65.2741 89.9725 47.8353 79.2166 37.0793C68.4606 26.3234 51.0218 26.3234 40.2659 37.0793C29.5099 47.8353 29.5099 65.2741 40.2659 76.03C51.0218 86.786 68.4606 86.786 79.2166 76.03Z" fill="#B3F1BF"/></g>
+            <g filter="url(#sb-nf-f4)"><path d="M36.6739 28.5701C49.6059 41.5021 49.6059 62.469 36.6739 75.401C23.742 88.3331 2.77499 88.3331 -10.157 75.401C-23.089 62.469 -23.089 41.5021 -10.157 28.5701C2.77499 15.6381 23.742 15.6381 36.6739 28.5701Z" fill="#FFD9E4"/></g>
+            <g filter="url(#sb-nf-f5)"><path d="M79.9752 22.6619C91.7259 10.9112 91.6755 -8.19088 79.8626 -20.0038C68.0497 -31.8167 48.9476 -31.8671 37.1969 -20.1164C25.4462 -8.36568 25.4967 10.7364 37.3096 22.5493C49.1224 34.3622 68.2245 34.4126 79.9752 22.6619Z" fill="#84CFFF"/></g>
+          </svg>
+          <svg class="sb-nav-fab__ai-logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 29" fill="none">
+            <path d="M12.5784 2.3592C12.632 2.06289 12.7841 1.79528 13.0086 1.60269C13.233 1.41011 13.5155 1.30469 13.8072 1.30469C14.0989 1.30469 14.3814 1.41011 14.6058 1.60269C14.8302 1.79528 14.9824 2.06289 15.0359 2.3592L16.3497 9.53828C16.443 10.0487 16.683 10.5182 17.0385 10.8855C17.3939 11.2527 17.8482 11.5008 18.3422 11.5972L25.2897 12.9547C25.5764 13.0101 25.8354 13.1673 26.0218 13.3992C26.2081 13.6311 26.3102 13.923 26.3102 14.2244C26.3102 14.5259 26.2081 14.8178 26.0218 15.0497C25.8354 15.2816 25.5764 15.4388 25.2897 15.4942L18.3422 16.8517C17.8482 16.9481 17.3939 17.1962 17.0385 17.5634C16.683 17.9307 16.443 18.4002 16.3497 18.9106L15.0359 26.0897C14.9824 26.386 14.8302 26.6536 14.6058 26.8462C14.3814 27.0388 14.0989 27.1442 13.8072 27.1442C13.5155 27.1442 13.233 27.0388 13.0086 26.8462C12.7841 26.6536 12.632 26.386 12.5784 26.0897L11.2647 18.9106C11.1714 18.4002 10.9313 17.9307 10.5759 17.5634C10.2205 17.1962 9.76612 16.9481 9.27218 16.8517L2.32469 15.4942C2.03795 15.4388 1.77896 15.2816 1.59259 15.0497C1.40622 14.8178 1.3042 14.5259 1.3042 14.2244C1.3042 13.923 1.40622 13.6311 1.59259 13.3992C1.77896 13.0101 2.03795 13.0101 2.32469 12.9547L9.27218 11.5972C9.76612 11.5008 10.2205 11.2527 10.5759 10.8855C10.9313 10.5182 11.1714 10.0487 11.2647 9.53828L12.5784 2.3592Z" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </button>
     `;
     document.body.appendChild(fab);
+
+    // Wire AI sparkle button: dispatch Cmd+/ into the Storybook preview iframe
+    const aiBtn = fab.querySelector('.sb-nav-fab__action--ai');
+    aiBtn.addEventListener('click', () => {
+      // Try to find the preview iframe and fire the keyboard shortcut into it
+      const previewIframe =
+        document.querySelector('#storybook-preview-iframe') ||
+        document.querySelector('iframe[title="storybook-preview-iframe"]') ||
+        document.querySelector('iframe');
+
+      if (previewIframe && previewIframe.contentWindow) {
+        previewIframe.contentWindow.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: '/',
+            metaKey: true,
+            ctrlKey: false,
+            bubbles: true,
+            cancelable: true,
+          })
+        );
+      }
+    });
   });
 </script>
 

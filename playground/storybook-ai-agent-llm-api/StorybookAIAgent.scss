@@ -7,7 +7,7 @@
 /* Use absolute so the agent stays at bottom-right of the responsive frame (simulated screen), not the Storybook canvas */
 .sb-ai-agent {
   position: fixed; /* Changed from absolute to fixed to prevent cutoff by #root overflow:hidden */
-  bottom: 16px;
+  bottom: 92px; /* Lifted up to prevent overlapping over the NavFab compass button */
   right: 16px;
   z-index: 9999;
   font-family: var(--font-family-body);
@@ -244,8 +244,9 @@
 
 /* ── Quick Actions ── */
 .sb-ai-agent__quick-actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   position: relative;
   flex-shrink: 0;
