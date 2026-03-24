@@ -730,6 +730,7 @@ const buildResponse = (actionId, pageContext) => {
                         <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path=".agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
                         <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/project/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
                         <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/project/conventions.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                        <OnboardingLinkItem num="5" title={<span>⚙️ <strong>Setup Guide</strong></span>} desc="Agent setup & local onboarding" path="docs/project/setup-guide.md" bg="var(--color-secondary-container)" fg="var(--color-on-secondary-container)" />
                     </ul>
                 </div>
             );
