@@ -17,6 +17,13 @@
     width: fit-content;
     position: relative;
 
+    // RBButton always adds `.btn` (Bootstrap uses display: inline-block). Keep flex layout.
+    &.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     // Default Shape & Typography
     // Consistent height with Outline (borders on all variants, transparent by default)
     border: var(--size-element-border) solid transparent;
@@ -104,7 +111,8 @@
     );
 
 @each $size, $config in $btn-sizes {
-    &--#{$size} {
+    // RBButton adds `.btn` — include it so padding always wins over Bootstrap’s `.btn` rule.
+    &.plus-btn--#{$size}.btn {
         // Unquote variable names for var()
         padding: var(string.unquote(list.nth($config, 1))) var(string.unquote(list.nth($config, 2)));
         border-radius: var(string.unquote(list.nth($config, 3)));
@@ -117,7 +125,7 @@
 }
 
 // --- ICON ONLY ---
-&--icon-only {
+&.plus-btn--icon-only.btn {
     padding: 0;
 
     // Explicit square sizing based on size map roughly (overriding padding)
@@ -274,7 +282,7 @@ $btn-themes: (
 
 
 // --- VERTICAL LAYOUT ---
-&--vertical {
+&.plus-btn--vertical.btn {
     flex-direction: column;
     gap: var(--size-element-gap-md);
 
@@ -291,11 +299,19 @@ $btn-themes: (
     align-items: center;
     justify-content: center;
     line-height: 1;
+    flex-shrink: 0;
 
     // Icon should not carry extra width from FA defaults
     i {
         width: auto;
         line-height: inherit;
+    }
+
+    // Spacing comes from `.plus-btn` flex `gap` (per size); avoid doubling with margins.
+    &--leading,
+    &--trailing {
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 }

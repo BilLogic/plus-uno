@@ -54,19 +54,15 @@ Read `docs/project/conventions.md` for file naming, imports, git conventions, an
 
 | Skill | Trigger | Location |
 |-------|---------|----------|
-| learn-plus | "How do I...", questions | `.agent/skills/learn-plus/SKILL.md` |
-| design-consulting | "Brainstorm", "Plan" | `.agent/skills/design-consulting/SKILL.md` |
-| building | "Build", "Create", Figma links | `.agent/skills/building/SKILL.md` |
-| maintaining | "Update", "Fix", "Sync" | `.agent/skills/maintaining/SKILL.md` |
-| submit-to-market | "Submit", "Publish" | `.agent/skills/submit-to-market/SKILL.md` |
-| po-prototype | Scaffold playground prototype | `.agent/skills/po-prototype/SKILL.md` |
-| po-compound | Document learnings | `.agent/skills/po-compound/SKILL.md` |
-| po-review | Quality gate before shipping | `.agent/skills/po-review/SKILL.md` |
+| uno-post | "Submit", "Publish" | `.agent/skills/uno-post/SKILL.md` |
+| uno-prototype | Scaffold playground prototype | `.agent/skills/uno-prototype/SKILL.md` |
+| uno-compound | Document learnings | `.agent/skills/uno-compound/SKILL.md` |
+| uno-review | Quality gate before shipping | `.agent/skills/uno-review/SKILL.md` |
 
 ## Learnings
 
 Check `docs/solutions/` before starting work — past solutions may apply.
-After completing significant work, document learnings there via `/po:compound`.
+After completing significant work, document learnings there via `/uno:compound`.
 
 ## Setup
 

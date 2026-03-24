@@ -1,0 +1,69 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/storybook-docs/ui/card';
+import { DocHero, DocPage, DocSection } from '@/storybook-docs/doc-layout';
+
+<Meta
+  title="PLUS Docs/Introduction"
+  parameters={{
+    docs: {
+      description: {
+        story: 'Start here for how this Storybook is organized and how to review components.',
+      },
+    },
+  }}
+/>
+
+<DocPage width="narrow">
+  <DocHero
+    title="Introduction"
+    lead="This Storybook documents the PLUS design system: tokens, patterns, shared components, and
+      product specs. Documentation pages use a neutral layout for reading; the canvas still renders
+      real components with Bootstrap and design-system styles."
+  />
+
+  <div className="grid gap-4 md:grid-cols-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>Open the canvas</CardTitle>
+        <CardDescription>Inspect states, controls, and viewports.</CardDescription>
+      </CardHeader>
+      <CardContent className="text-sm text-muted-foreground">
+        Use the toolbar to change background, viewport, and globals. Controls map to component props
+        where stories define <code className="rounded bg-muted px-1 py-0.5 text-xs">argTypes</code>
+        .
+      </CardContent>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>Read the docs tab</CardTitle>
+        <CardDescription>Usage notes and autodocs where enabled.</CardDescription>
+      </CardHeader>
+      <CardContent className="text-sm text-muted-foreground">
+        Each story file can ship markdown descriptions; many components use autodocs for props and
+        snippets. Long pages show a table of contents on the right when headings are present.
+      </CardContent>
+    </Card>
+  </div>
+
+  <DocSection title="Who this is for">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>Designers reviewing visual and interaction patterns</li>
+      <li>Engineers implementing or extending shared UI</li>
+      <li>PMs and partners orienting to what the system already provides</li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Where to go next">
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      Jump to <strong className="text-foreground">PLUS Docs / Components</strong> for a compact index
+      of entry points into the library, or browse the sidebar groups (Styles, Components, Forms,
+      Specs, and more).
+    </p>
+  </DocSection>
+</DocPage>

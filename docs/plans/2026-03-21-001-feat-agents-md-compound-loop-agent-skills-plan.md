@@ -9,7 +9,7 @@ date: 2026-03-21
 
 ## Overview
 
-The plus-uno project has agent guidance split across `.agent/AGENT.md`, `.agent/SKILL.md`, and 16 reference files in `.agent/references/` — but no cross-agent entry point, no compound loop, and no user-invocable skills. This plan consolidates all documentation under `docs/`, establishes AGENTS.md as the single entry point, and introduces `/po:xxx` skills.
+The plus-uno project has agent guidance split across `.agent/AGENT.md`, `.agent/SKILL.md`, and 16 reference files in `.agent/references/` — but no cross-agent entry point, no compound loop, and no user-invocable skills. This plan consolidates all documentation under `docs/`, establishes AGENTS.md as the single entry point, and introduces `/uno:xxx` skills.
 
 ## Problem Statement / Motivation
 
@@ -17,7 +17,7 @@ The plus-uno project has agent guidance split across `.agent/AGENT.md`, `.agent/
 2. **Docs split across two locations** — `.agent/references/` and `docs/` create confusion about where things live
 3. **Redundant files** — `.agent/AGENT.md` and `.agent/SKILL.md` are two files that should be one, and shouldn't coexist alongside a root AGENTS.md
 4. **No compound loop** — Learnings lost between sessions
-5. **No user-invocable skills** — Repeatable workflows aren't codified as `/po:xxx` commands
+5. **No user-invocable skills** — Repeatable workflows aren't codified as `/uno:xxx` commands
 6. **No setup guide** — New contributors don't know which CE skills and MCP servers to install
 
 ## Proposed Solution
@@ -57,23 +57,23 @@ AGENTS.md (THE entry point, ~80 lines — one file, all agents read it)
 │   ├── plans/                            (EXISTING, unchanged)
 │   └── ideation/                         (EXISTING, unchanged)
 ├── .agent/
-│   ├── skills/                           (/po:xxx user-invocable workflows)
-│   │   ├── po-prototype/
+│   ├── skills/                           (/uno:xxx user-invocable workflows)
+│   │   ├── uno-prototype/
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   ├── examples/
 │   │   │   └── scripts/
-│   │   ├── po-compound/
+│   │   ├── uno-compound/
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   ├── examples/
 │   │   │   └── scripts/
-│   │   ├── po-review/
+│   │   ├── uno-review/
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   ├── examples/
 │   │   │   └── scripts/
-│   │   └── po-post/
+│   │   └── uno-post/
 │   │       ├── SKILL.md
 │   │       ├── references/
 │   │       ├── examples/
@@ -110,7 +110,7 @@ Platform pointers (all point to AGENTS.md):
   - Conventions → `docs/agent-context/conventions.md`
   - Setup → `docs/agent-context/setup-guide.md`
   - Forbidden patterns (6 rules, extracted from current SKILL.md Critical Rules)
-  - Skills section listing `/po:prototype`, `/po:compound`, `/po:review`, `/po:post`
+  - Skills section listing `/uno:prototype`, `/uno:compound`, `/uno:review`, `/uno:post`
   - Learnings → `docs/solutions/`
   - Commands table
 - [ ] Create `CLAUDE.md`: single line `@AGENTS.md`

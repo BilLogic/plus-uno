@@ -7,6 +7,14 @@ import { createRequire } from 'module';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
+// Conditionally load Tailwind CSS vite plugin (used by Storybook docs, not required for prototype app)
+let tailwindcss;
+try {
+  tailwindcss = require('@tailwindcss/vite').default;
+} catch (e) {
+  tailwindcss = null;
+}
+
 // Conditionally load vitest plugins only when the packages are available
 // This allows Storybook to load vite.config.js without requiring vitest addon
 let storybookTest, playwright;
@@ -23,7 +31,7 @@ try {
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-  plugins: [react()],
+  plugins: [tailwindcss ? tailwindcss() : null, react()].filter(Boolean),
   resolve: {
     dedupe: ['react', 'react-dom', 'framer-motion'],
     alias: {

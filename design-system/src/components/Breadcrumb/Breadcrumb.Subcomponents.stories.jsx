@@ -9,7 +9,8 @@ import './Breadcrumb.scss';
  * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=27-499&m=dev
  */
 export default {
-    title: 'Components/Breadcrumb/Subcomponents',
+    title: 'Components/Breadcrumb',
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {

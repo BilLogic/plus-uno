@@ -4,7 +4,7 @@ import Scrollspy, { ScrollspyContent } from './Scrollspy';
 export default {
     title: 'Components/Scrollspy',
     component: Scrollspy,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -14,21 +14,21 @@ export default {
     }
 };
 
-export const Overview = () => {
-    const items = [
-        { text: '@fat', href: '#fat', isDropdown: false },
-        { text: '@mdo', href: '#mdo', isDropdown: false },
-        { text: 'Dropdown', href: '#one', isDropdown: true }
-    ];
+const items = [
+    { text: '@fat', href: '#fat', isDropdown: false },
+    { text: '@mdo', href: '#mdo', isDropdown: false },
+    { text: 'Dropdown', href: '#one', isDropdown: true }
+];
 
-    const generateContent = (count) => {
-        return Array(count).fill(0).map((_, i) => (
-            <p key={i} className="body1-txt" style={{ marginTop: '16px' }}>
-                Additional content paragraph {i + 1}. This content ensures the section is tall enough for scrollspy to detect scroll position changes. Keep scrolling to see the active nav item update automatically.
-            </p>
-        ));
-    };
+function generateContent(count) {
+    return Array(count).fill(0).map((_, i) => (
+        <p key={i} className="body1-txt" style={{ marginTop: '16px' }}>
+            Additional content paragraph {i + 1}. This content ensures the section is tall enough for scrollspy to detect scroll position changes. Keep scrolling to see the active nav item update automatically.
+        </p>
+    ));
+}
 
+function ScrollspyLayoutDemo() {
     return (
         <div style={{
             backgroundColor: 'var(--color-surface)',
@@ -40,29 +40,26 @@ export const Overview = () => {
             border: '1px solid var(--color-outline-variant)'
         }}>
             <Scrollspy
-                id="scrollspy-nav-overview"
+                id="scrollspy-nav-docs"
                 brand="Navbar"
                 items={items}
-                contentId="scrollspy-content-overview"
+                contentId="scrollspy-content-docs"
                 offset={10}
             />
-
             <ScrollspyContent
-                id="scrollspy-content-overview"
+                id="scrollspy-content-docs"
                 height="500px"
             >
                 <section id="fat" className="plus-scrollspy-section">
                     <h4 className="h4">@fat</h4>
-                    <p className="body1-txt">Placeholder content for the scrollspy example. You got the finest architecture. Passport stamps, she's cosmopolitan.</p>
+                    <p className="body1-txt">Placeholder content for the scrollspy example. You got the finest architecture. Passport stamps, she is cosmopolitan.</p>
                     {generateContent(5)}
                 </section>
-
                 <section id="mdo" className="plus-scrollspy-section">
                     <h4 className="h4">@mdo</h4>
-                    <p className="body1-txt">Placeholder content for the scrollspy example. 'Cause she's the muse and the artist.</p>
+                    <p className="body1-txt">Placeholder content for the scrollspy example. Cause she is the muse and the artist.</p>
                     {generateContent(5)}
                 </section>
-
                 <section id="one" className="plus-scrollspy-section">
                     <h4 className="h4">one</h4>
                     <p className="body1-txt">Placeholder content for the scrollspy example. Takes you miles high, so high.</p>
@@ -71,10 +68,10 @@ export const Overview = () => {
             </ScrollspyContent>
         </div>
     );
-};
+}
 
-export const Interactive = () => {
-    // Same as overview but can be played with controls if needed, 
-    // simply duplicating for now as the component relies on specific DOM structure
-    return <Overview />;
-};
+export const Layout = () => <ScrollspyLayoutDemo />;
+
+export const Overview = () => <ScrollspyLayoutDemo />;
+
+export const Interactive = () => <ScrollspyLayoutDemo />;

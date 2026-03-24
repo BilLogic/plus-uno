@@ -2,6 +2,16 @@
   command = "npm run build:all"
   publish = "dist"
 
+[build.environment]
+  VITE_STORYBOOK_URL = "https://plus-uno.netlify.app/storybook/"
+
+# Storybook static files — serve as-is (must come BEFORE the SPA catch-all)
+[[redirects]]
+  from = "/storybook/*"
+  to = "/storybook/:splat"
+  status = 200
+
+# SPA catch-all for the React app
 [[redirects]]
   from = "/*"
   to = "/index.html"

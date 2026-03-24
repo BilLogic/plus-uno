@@ -48,6 +48,44 @@ body,
     font-family: var(--font-family-code, 'Source Code Pro', monospace) !important;
 }
 
+/*
+ * Docs TOC / hash links: scroll-padding nudges native scroll-into-view below the toolbar.
+ * TOC link clicks use Tocbot’s smooth scroll (`window.scrollTo`), which does not read this property;
+ * keep `docs.toc.unsafeTocbotOptions` in preview.jsx aligned with these values.
+ * Do NOT set scroll-margin on headings — Tocbot’s scrollspy uses heading geometry; extra
+ * scroll-margin shifts which heading is “current” and makes the right-rail highlight lag the viewport.
+ */
+html {
+    scroll-padding-top: 5rem;
+}
+
+@media (min-width: 768px) {
+    html {
+        scroll-padding-top: 6rem;
+    }
+}
+
+/*
+ * Docs panel often scrolls this wrapper instead of the document.
+ * Horizontal padding + max-width: inset from iframe edges (sidebar seam / scrollbar) and narrow measure.
+ */
+.sbdocs-wrapper {
+    scroll-padding-top: 5rem;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 82rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: clamp(1.5rem, 3vw, 2.75rem) !important;
+    padding-right: clamp(1.5rem, 3vw, 2.75rem) !important;
+}
+
+@media (min-width: 768px) {
+    .sbdocs-wrapper {
+        scroll-padding-top: 6rem;
+    }
+}
+
 /* Links - using primary-text for accessibility */
 .sbdocs a,
 a.sbdocs-a {
@@ -56,6 +94,127 @@ a.sbdocs-a {
 
 .sbdocs a:hover {
     color: var(--color-primary, #0472a8) !important;
+}
+
+/* MDX pages that wrap content in .sb-doc-shadcn (shadcn-style docs): let Tailwind control type scale and color */
+.sbdocs .sb-doc-shadcn,
+.sbdocs .sb-doc-shadcn h1,
+.sbdocs .sb-doc-shadcn h2,
+.sbdocs .sb-doc-shadcn h3,
+.sbdocs .sb-doc-shadcn h4,
+.sbdocs .sb-doc-shadcn p,
+.sbdocs .sb-doc-shadcn li {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif !important;
+    color: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    font-weight: inherit !important;
+}
+
+.sbdocs .sb-doc-shadcn a {
+    color: inherit !important;
+}
+
+.sbdocs .sb-doc-shadcn a:hover {
+    color: inherit !important;
+}
+
+/*
+ * Component MDX (Button + shared Components/* pages): section rhythm without relying on Tailwind
+ * in MDX. `.sb-button-*` aliases match `.sb-ds-*` for backward compatibility.
+ */
+.sbdocs .sb-ds-component-docs.sb-ds-component-docs--page,
+.sbdocs .sb-button-docs.sb-button-docs--page {
+  margin-top: 4rem;
+}
+
+@media (min-width: 768px) {
+  .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page,
+  .sbdocs .sb-button-docs.sb-button-docs--page {
+    margin-top: 6rem;
+  }
+}
+
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section,
+.sbdocs .sb-button-docs .sb-button-doc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: clamp(4.5rem, 12vw, 11rem);
+}
+
+@media (min-width: 768px) {
+  .sbdocs .sb-ds-component-docs .sb-ds-doc-section,
+  .sbdocs .sb-button-docs .sb-button-doc-section {
+    gap: 0.625rem;
+    margin-bottom: clamp(6rem, 14vw, 14rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sbdocs .sb-ds-component-docs .sb-ds-doc-section,
+  .sbdocs .sb-button-docs .sb-button-doc-section {
+    margin-bottom: clamp(7rem, 12vw, 16rem);
+  }
+}
+
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section:last-child,
+.sbdocs .sb-button-docs .sb-button-doc-section:last-child {
+  margin-bottom: 0;
+}
+
+/*
+ * Preview well: flatten inner Storybook Canvas chrome; outer card only.
+ */
+.sbdocs .sb-ds-docs-preview-well .sbdocs.sbdocs-preview,
+.sbdocs .sb-button-docs-preview-well .sbdocs.sbdocs-preview {
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.sbdocs .sb-ds-docs-preview-well .docs-story,
+.sbdocs .sb-button-docs-preview-well .docs-story {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+}
+
+.sbdocs .sb-ds-docs-preview-well .docs-story > div:first-child,
+.sbdocs .sb-button-docs-preview-well .docs-story > div:first-child {
+  padding: 0 !important;
+}
+
+.sbdocs .sb-ds-docs-preview-well .innerZoomElementWrapper > *,
+.sbdocs .sb-button-docs-preview-well .innerZoomElementWrapper > * {
+  border-width: 0 !important;
+}
+
+.sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable,
+.sbdocs .sb-button-interactive-panel__controls .docblock-argstable {
+  margin: 0 !important;
+}
+
+.sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable-head th,
+.sbdocs .sb-button-interactive-panel__controls .docblock-argstable-head th {
+  font-weight: 600 !important;
+}
+
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section > h3,
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section .sbdocs-h3,
+.sbdocs .sb-button-docs .sb-button-doc-section > h3,
+.sbdocs .sb-button-docs .sb-button-doc-section .sbdocs-h3 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/*
+ * Default autodocs pages (no .sb-doc-shadcn): slightly calmer lead under the title.
+ * Does not affect Canvas.
+ */
+.sbdocs .sbdocs-subtitle {
+  opacity: 0.92;
 }
 
 /* Hide scrollbar while maintaining scroll functionality */

@@ -5,7 +5,7 @@ import Rating from './Rating';
 export default {
     title: 'Forms/Rating',
     component: Rating,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -225,35 +225,5 @@ export const Overview = () => {
             </section>
         </div>
     );
-};
-
-/**
- * Interactive Playground
- * Customize the Rating attributes in real-time.
- */
-export const Interactive = (args) => {
-    const [rating, setRating] = useState(args.value || 0);
-
-    return (
-        <div style={{ maxWidth: '600px' }}>
-            <Rating
-                id="rating-interactive"
-                value={rating}
-                onChange={setRating}
-                variant={args.variant}
-                disabled={args.disabled}
-                label={args.label}
-                required={args.required}
-            />
-        </div>
-    );
-};
-
-Interactive.args = {
-    value: 0,
-    variant: 'comments',
-    disabled: false,
-    label: 'Rating',
-    required: false
 };
 

@@ -35,7 +35,7 @@ Key overlaps:
 Additionally:
 - No AGENTS.md cross-agent entry point
 - No compound loop (no `docs/solutions/`)
-- No invocable skills (no `/po:xxx` commands)
+- No invocable skills (no `/uno:xxx` commands)
 - No memory system
 - `.agent/AGENT.md` and `.agent/SKILL.md` are separate files that should be one
 - **No product landscape documentation** — agents have zero context about PLUS users (tutors, students, supervisors), features (sessions, reflections, training, admin dashboards), user flows, or domain terminology. This is critical for making good naming, structure, and UX decisions.
@@ -86,22 +86,22 @@ docs/
 
 .agent/
 ├── skills/                         (agent-agnostic invocable skills)
-│   ├── po-prototype/
+│   ├── uno-prototype/
 │   │   ├── SKILL.md
 │   │   ├── references/
 │   │   ├── examples/
 │   │   └── scripts/
-│   ├── po-compound/
+│   ├── uno-compound/
 │   │   ├── SKILL.md
 │   │   ├── references/
 │   │   ├── examples/
 │   │   └── scripts/
-│   ├── po-review/
+│   ├── uno-review/
 │   │   ├── SKILL.md
 │   │   ├── references/
 │   │   ├── examples/
 │   │   └── scripts/
-│   └── po-post/
+│   └── uno-post/
 │       ├── SKILL.md
 │       ├── references/
 │       ├── examples/
@@ -177,7 +177,7 @@ docs/
    - Never edit generated token files — run `npm run generate:tokens` after changes
    - Never skip Storybook validation when component behavior is touched
    - Always confirm implementation plan before large or risky edits
-6. **Skills** — table of `/po:xxx` skills with descriptions
+6. **Skills** — table of `/uno:xxx` skills with descriptions
 7. **Learnings** — check `docs/solutions/` before work, document after
 8. **Recommended Setup** — points to `docs/project/setup-guide.md`
 9. **Commands** — table of npm scripts:
@@ -214,7 +214,7 @@ AGENTS.md includes a loading order table (adapted from current SKILL.md):
 
 ## Skills Design
 
-### `/po:prototype` — Scaffold and build a playground prototype
+### `/uno:prototype` — Scaffold and build a playground prototype
 
 **When to use**: Creating new feature prototypes or experiments in `playground/`
 
@@ -236,7 +236,7 @@ AGENTS.md includes a loading order table (adapted from current SKILL.md):
 4. **Validate** — Imports resolve? Tokens used? No hardcoded values? Storybook preview works?
 5. **Document** — Update prototype registry
 
-### `/po:compound` — Document learnings after work
+### `/uno:compound` — Document learnings after work
 
 **When to use**: After fixing bugs, discovering gotchas, or completing significant work
 
@@ -253,7 +253,7 @@ AGENTS.md includes a loading order table (adapted from current SKILL.md):
 3. **Escalate** — Check if learning warrants updating AGENTS.md or conventions.md
 4. **Update** — Apply escalations if warranted
 
-### `/po:review` — Review work against DS conventions
+### `/uno:review` — Review work against DS conventions
 
 **When to use**: Before shipping, as a quality gate
 
@@ -269,7 +269,7 @@ AGENTS.md includes a loading order table (adapted from current SKILL.md):
 3. **Report** — Pass/fail with specific line references
 4. **Fix** — Auto-fix what's possible, escalate what isn't
 
-### `/po:post` — Post project to marketplace
+### `/uno:post` — Post project to marketplace
 
 **When to use**: After completing a prototype or feature, post it to the marketplace for team visibility
 
@@ -429,10 +429,10 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
 9. Move mode files to `docs/design-system/modes/`
 
 ### Phase 3: Create skills
-10. Create `.agent/skills/po-prototype/` with full structure
-11. Create `.agent/skills/po-compound/` with full structure
-12. Create `.agent/skills/po-review/` with full structure
-13. Create `.agent/skills/po-post/` with full structure
+10. Create `.agent/skills/uno-prototype/` with full structure
+11. Create `.agent/skills/uno-compound/` with full structure
+12. Create `.agent/skills/uno-review/` with full structure
+13. Create `.agent/skills/uno-post/` with full structure
 
 ### Phase 4: Clean up and rewire
 14. Remove `.agent/AGENT.md`
@@ -470,10 +470,10 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
 - [ ] `docs/project/setup-guide.md` covers CE skills, MCP setup, platform config
 
 ### Skills
-- [ ] `.agent/skills/po-prototype/` has SKILL.md + references/ + examples/ + scripts/
-- [ ] `.agent/skills/po-compound/` has SKILL.md + references/ + examples/ + scripts/
-- [ ] `.agent/skills/po-review/` has SKILL.md + references/ + examples/ + scripts/
-- [ ] `.agent/skills/po-post/` has SKILL.md + references/ + examples/ + scripts/
+- [ ] `.agent/skills/uno-prototype/` has SKILL.md + references/ + examples/ + scripts/
+- [ ] `.agent/skills/uno-compound/` has SKILL.md + references/ + examples/ + scripts/
+- [ ] `.agent/skills/uno-review/` has SKILL.md + references/ + examples/ + scripts/
+- [ ] `.agent/skills/uno-post/` has SKILL.md + references/ + examples/ + scripts/
 
 ### Compound Loop
 - [ ] `docs/solutions/README.md` documents template, categories, escalation rules
@@ -486,7 +486,7 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
 
 ### Verification
 - [ ] Fresh Claude Code session auto-loads CLAUDE.md → AGENTS.md with correct context
-- [ ] `/po:prototype` skill is invocable
+- [ ] `/uno:prototype` skill is invocable
 - [ ] Mode routing still works (ask "help me learn about Button component" → Learning mode)
 - [ ] Progressive loading works (token questions load tokens.md, not everything)
 
@@ -551,7 +551,7 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
 
 ### Open Questions for Implementation
 
-1. **Skill naming convention**: Should skills use hyphens (`po-prototype`) or colons (`po:prototype`) in the `name:` frontmatter? Colons match the `/ce:plan` convention but may have filesystem implications for the directory name. Directory should use hyphens; YAML `name:` field can use colons.
+1. **Skill naming convention**: Should skills use hyphens (`uno-prototype`) or colons (`po:prototype`) in the `name:` frontmatter? Colons match the `/ce:plan` convention but may have filesystem implications for the directory name. Directory should use hyphens; YAML `name:` field can use colons.
 
 2. **`references/index.md` replacement**: The current index.md is a TOC of all references. After migration, do we need an equivalent `docs/design-system/index.md`? Recommended: yes, create one as a loading guide for agents.
 

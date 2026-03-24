@@ -4,7 +4,7 @@ import MediaObject from './MediaObject';
 export default {
     title: 'Components/MediaObject',
     component: MediaObject,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -42,42 +42,48 @@ const PlaceholderMedia = ({ size = '64px', text = '64' }) => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-        <section>
-            <h5>Left Alignment (Default)</h5>
-            <MediaObject
-                media={<PlaceholderMedia />}
-                heading="Media heading"
-            >
-                Will you do the same for me? It's time to face the music.
-            </MediaObject>
-        </section>
+const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
 
-        <section>
-            <h5>Right Alignment</h5>
-            <MediaObject
-                media={<PlaceholderMedia />}
-                heading="Media heading"
-                alignment="right"
-            >
-                Will you do the same for me? It's time to face the music.
-            </MediaObject>
-        </section>
+function MediaObjectLayoutDemos() {
+    return (
+        <>
+            <section>
+                <h5>Left alignment (default)</h5>
+                <MediaObject
+                    media={<PlaceholderMedia />}
+                    heading="Media heading"
+                >
+                    Will you do the same for me? It's time to face the music.
+                </MediaObject>
+            </section>
+            <section>
+                <h5>Right alignment</h5>
+                <MediaObject
+                    media={<PlaceholderMedia />}
+                    heading="Media heading"
+                    alignment="right"
+                >
+                    Will you do the same for me? It's time to face the music.
+                </MediaObject>
+            </section>
+            <section>
+                <h5>Center vertical alignment</h5>
+                <MediaObject
+                    media={<PlaceholderMedia />}
+                    heading="Center Aligned"
+                    alignment="left-center"
+                >
+                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                </MediaObject>
+            </section>
+        </>
+    );
+}
 
+function MediaObjectSizesDemos() {
+    return (
         <section>
-            <h5>Center Vertical Alignment</h5>
-            <MediaObject
-                media={<PlaceholderMedia />}
-                heading="Center Aligned"
-                alignment="left-center"
-            >
-                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-            </MediaObject>
-        </section>
-
-        <section>
-            <h5>Media Sizes</h5>
+            <h5>Media sizes</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <MediaObject
                     media={<PlaceholderMedia size="48px" text="48" />}
@@ -102,9 +108,13 @@ export const Overview = () => (
                 </MediaObject>
             </div>
         </section>
+    );
+}
 
+function MediaObjectContentNestedDemo() {
+    return (
         <section>
-            <h5>Nested Media</h5>
+            <h5>Nested media</h5>
             <MediaObject
                 media={<PlaceholderMedia />}
                 heading="Parent Media"
@@ -120,6 +130,32 @@ export const Overview = () => (
                 </MediaObject>
             </MediaObject>
         </section>
+    );
+}
+
+export const Layout = () => (
+    <div style={col}>
+        <MediaObjectLayoutDemos />
+    </div>
+);
+
+export const Sizes = () => (
+    <div style={col}>
+        <MediaObjectSizesDemos />
+    </div>
+);
+
+export const Content = () => (
+    <div style={col}>
+        <MediaObjectContentNestedDemo />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={col}>
+        <MediaObjectLayoutDemos />
+        <MediaObjectSizesDemos />
+        <MediaObjectContentNestedDemo />
     </div>
 );
 

@@ -4,82 +4,63 @@ import Range from './Range';
 export default {
     title: 'Forms/Range',
     component: Range,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: 'Range input controls allow users to select a numeric value within a specified range by dragging a slider. The range input provides visual feedback with a filled track indicating the current value position.'
-            }
-        }
+                component:
+                    'Range input controls allow users to select a numeric value within a specified range by dragging a slider. The range input provides visual feedback with a filled track indicating the current value position.',
+            },
+        },
     },
     argTypes: {
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
             description: 'Available in 3 sizes: small, medium (default), large.',
-            table: { category: 'Design' }
-        }
-    }
+            table: { category: 'Design' },
+        },
+    },
 };
 
-/**
- * Overview
- * Comprehensive view of Range configurations matching Figma specifications.
- */
-export const Overview = () => {
+export const Sizes = () => {
     const [value1, setValue1] = useState(50);
     const [value2, setValue2] = useState(50);
     const [value3, setValue3] = useState(50);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '1200px' }}>
-            {/* Size Section */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Size</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Available in 3 sizes: small, medium (default), large.
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <div style={{ flex: '1' }}>
-                        <Range
-                            id="range-small"
-                            min={0}
-                            max={100}
-                            value={value1}
-                            onChange={(e) => setValue1(parseFloat(e.target.value))}
-                            size="small"
-                        />
-                    </div>
-                    <div style={{ flex: '1' }}>
-                        <Range
-                            id="range-medium"
-                            min={0}
-                            max={100}
-                            value={value2}
-                            onChange={(e) => setValue2(parseFloat(e.target.value))}
-                            size="medium"
-                        />
-                    </div>
-                    <div style={{ flex: '1' }}>
-                        <Range
-                            id="range-large"
-                            min={0}
-                            max={100}
-                            value={value3}
-                            onChange={(e) => setValue3(parseFloat(e.target.value))}
-                            size="large"
-                        />
-                    </div>
-                </div>
-            </section>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px' }}>
+            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Small, medium (default), and large track and thumb.
+            </p>
+            <Range
+                id="range-small"
+                min={0}
+                max={100}
+                value={value1}
+                onChange={(e) => setValue1(parseFloat(e.target.value))}
+                size="small"
+            />
+            <Range
+                id="range-medium"
+                min={0}
+                max={100}
+                value={value2}
+                onChange={(e) => setValue2(parseFloat(e.target.value))}
+                size="medium"
+            />
+            <Range
+                id="range-large"
+                min={0}
+                max={100}
+                value={value3}
+                onChange={(e) => setValue3(parseFloat(e.target.value))}
+                size="large"
+            />
         </div>
     );
 };
 
-/**
- * Interactive Playground
- * Customize the Range attributes in real-time.
- */
 export const Interactive = (args) => {
     const [value, setValue] = useState(50);
 
@@ -98,6 +79,5 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    size: 'medium'
+    size: 'medium',
 };
-

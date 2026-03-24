@@ -167,7 +167,7 @@ AGENTS.md (THE entry point)
 │   ├── plans/                      (ideation + plans consolidated)
 │   └── solutions/                  (compound loop)
 ├── .agent/
-│   ├── skills/                     (/po:xxx with full dir structure)
+│   ├── skills/                     (/uno:xxx with full dir structure)
 │   └── assets/                     (JSON indexes)
 ├── packages/plus-ds/guidelines/    (DS source documentation — UNCHANGED, stays co-located)
 ```

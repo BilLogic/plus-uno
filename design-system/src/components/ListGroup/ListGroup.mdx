@@ -1,0 +1,110 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ListGroupStories from './ListGroup.stories.jsx';
+import * as ListGroupItemStories from './ListGroup.Subcomponents.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ListGroupStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Plain list, actionable items, and rows with badges.</>}>
+    <Canvas of={ListGroupStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### List item — Content
+
+<DocsCanvasShell description={<>Navigation-style rows with icon, label, badge, and disabled state.</>}>
+    <Canvas of={ListGroupItemStories.ListItemContent} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### List item — Variants
+
+<DocsCanvasShell description={<>Single- and multi-select modes.</>}>
+    <Canvas of={ListGroupItemStories.ListItemSelectionModes} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### List item — Sizes
+
+<DocsCanvasShell description={<>Body scale tokens b1, b2, and b3.</>}>
+    <Canvas of={ListGroupItemStories.ListItemSizes} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Styles
+
+<DocsCanvasShell description={<>Semantic color styles on items.</>}>
+    <Canvas of={ListGroupStories.Styles} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interaction states
+
+<DocsCanvasShell description={<>Normal, active, and disabled items.</>}>
+    <Canvas of={ListGroupStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Flush list and horizontal arrangement.</>}>
+    <Canvas of={ListGroupStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={ListGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+<DocsInteractivePlayground
+    of={ListGroupItemStories.ListItemInteractive}
+    description={
+        <>
+            <strong className="text-foreground">ListGroup.Item</strong> — navigation, selection modes, and
+            visuals.
+        </>
+    }
+/>
+
+</div>
+
+</div>

@@ -5,7 +5,7 @@ import Button from '@/components/Button/Button';
 export default {
     title: 'Components/ButtonGroup',
     component: ButtonGroup,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -71,14 +71,10 @@ export default {
     }
 };
 
-/**
- * Overview
- * Comprehensive view of Button Group sizes, styles, fills, and alignments.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+const bgCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
 
-        {/* 1. Sizes */}
+function ButtonGroupSizesDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -108,8 +104,11 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* 2. Styles & Fills */}
+function ButtonGroupStylesAndFillsDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Styles & Fills</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -117,7 +116,6 @@ export const Overview = () => (
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {/* Tonal (Default) */}
                 <div>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Tonal (Default)</p>
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -135,7 +133,6 @@ export const Overview = () => (
                     </div>
                 </div>
 
-                {/* Filled */}
                 <div>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Filled</p>
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -153,7 +150,6 @@ export const Overview = () => (
                     </div>
                 </div>
 
-                {/* Outline */}
                 <div>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Outline</p>
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -171,7 +167,6 @@ export const Overview = () => (
                     </div>
                 </div>
 
-                {/* Ghost */}
                 <div>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Ghost</p>
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -190,8 +185,11 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* 3. Alignments */}
+function ButtonGroupLayoutDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Alignments</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -213,8 +211,11 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* 4. Button Counts */}
+function ButtonGroupCountsDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Button Counts</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -239,13 +240,15 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* 5. Use Cases */}
+function ButtonGroupUseCasesDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Common Use Cases</h6>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-                {/* Pagination-style */}
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <ButtonGroup
                         style="secondary"
@@ -261,7 +264,6 @@ export const Overview = () => (
                     <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Pagination Controls</span>
                 </div>
 
-                {/* Toolbar-style */}
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <ButtonGroup
                         style="tertiary"
@@ -275,7 +277,6 @@ export const Overview = () => (
                     <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Text Formatting Toolbar</span>
                 </div>
 
-                {/* Toggle-style */}
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <ButtonGroup
                         style="primary"
@@ -289,8 +290,11 @@ export const Overview = () => (
                 </div>
             </div>
         </section>
+    );
+}
 
-        {/* 6. Using Children */}
+function ButtonGroupChildrenDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Using Children (Alternative Pattern)</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -302,6 +306,53 @@ export const Overview = () => (
                 <Button text="Children" trailingVisual="arrow-right" />
             </ButtonGroup>
         </section>
+    );
+}
+
+export const Sizes = () => (
+    <div style={bgCol}>
+        <ButtonGroupSizesDemos />
+    </div>
+);
+
+export const StylesAndFills = () => (
+    <div style={bgCol}>
+        <ButtonGroupStylesAndFillsDemos />
+    </div>
+);
+
+export const Layout = () => (
+    <div style={bgCol}>
+        <ButtonGroupLayoutDemos />
+    </div>
+);
+
+export const Counts = () => (
+    <div style={bgCol}>
+        <ButtonGroupCountsDemos />
+    </div>
+);
+
+export const UseCases = () => (
+    <div style={bgCol}>
+        <ButtonGroupUseCasesDemos />
+    </div>
+);
+
+export const Children = () => (
+    <div style={bgCol}>
+        <ButtonGroupChildrenDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={bgCol}>
+        <ButtonGroupSizesDemos />
+        <ButtonGroupStylesAndFillsDemos />
+        <ButtonGroupLayoutDemos />
+        <ButtonGroupCountsDemos />
+        <ButtonGroupUseCasesDemos />
+        <ButtonGroupChildrenDemos />
     </div>
 );
 
@@ -310,7 +361,6 @@ export const Overview = () => (
  * Customize the button group attributes in real-time.
  */
 export const Interactive = (args) => {
-    // Generate buttons based on buttonCount
     const buttonLabels = ['Left', 'Center', 'Right', 'Fourth', 'Fifth'];
     const buttons = Array.from({ length: args.buttonCount || 3 }, (_, i) => ({
         text: buttonLabels[i] || `Button ${i + 1}`
