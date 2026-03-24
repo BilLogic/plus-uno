@@ -221,3 +221,8 @@ a.sbdocs-a {
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
+/* Hide the AI agent's own floating button in Storybook preview because we use the NavFab */
+.sb-ai-agent__fab-wrapper {
+  display: none !important;
+}

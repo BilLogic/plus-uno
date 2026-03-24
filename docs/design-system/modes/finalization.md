@@ -1,4 +1,4 @@
-<!-- ~900 tokens | Load for: production-ready implementation with all states and accessibility -->
+i <!-- ~900 tokens | Load for: production-ready implementation with all states and accessibility -->
 
 # Finalization Mode Reference
 

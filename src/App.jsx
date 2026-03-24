@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Routes, Route, useParams, Navigate } from 'react-router-dom';
+import { Routes, Route, useParams, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import NavFab from './components/NavFab/NavFab';
 import HomeRedesignApp from '../playground/home-redesign/src/App';
@@ -126,9 +126,12 @@ function PrototypeRouter() {
 }
 
 function App() {
+  const location = useLocation();
+  const isStorybook = location.pathname.startsWith('/storybook');
+
   return (
     <ThemeProvider>
-      <NavFab />
+      {!isStorybook && <NavFab />}
       <Routes>
         {/* Marketplace is the landing page */}
         <Route path="/" element={<PrototypeMarket />} />
