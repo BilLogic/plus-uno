@@ -3,12 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Tooltip from '@/components/Tooltip';
 import './NavFab.scss';
 
+const STORYBOOK_URL = import.meta.env.VITE_STORYBOOK_URL || '/storybook';
+
 const NAV_ITEMS = [
   {
     id: 'storybook',
     label: 'Storybook',
     icon: 'fa-solid fa-book-open',
-    href: '/storybook'
+    href: STORYBOOK_URL,
+    external: STORYBOOK_URL.startsWith('http'),
   },
   {
     id: 'marketplace',
@@ -60,6 +63,8 @@ export default function NavFab() {
               <motion.a
                 className="nav-fab__action"
                 href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
                 role="menuitem"
                 aria-label={`Open ${item.label}`}
                 whileHover={{ scale: 1.08 }}

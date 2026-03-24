@@ -223,21 +223,38 @@ const ReflectionContent = () => {
     return <ReflectionPage />;
 };
 
-function App() {
+// Content lookup for embedded mounting (when parent route strips the prefix)
+const CONTENT_MAP = {
+    'home': HomeContent,
+    'admin': TutorAdminContent,
+    'sessions': InSessionContent,
+    'reflection': ReflectionContent,
+    'lessons': LessonsContent,
+    'research-assistant': TutorAdminContent,
+    'monthly-reports': MonthlyReportsListContent,
+    'monthly-report': MonthlyReportContent,
+};
+
+function App({ contentKey }) {
+    // When rendered inside a parent <Route path="/monthly-reports/*">,
+    // React Router strips the prefix and descendant Routes sees "/".
+    // The contentKey prop tells us which content to show at index.
+    const IndexContent = (contentKey && CONTENT_MAP[contentKey]) || HomeContent;
+
     return (
         <Routes>
             <Route element={<ShellLayout />}>
-                <Route index element={<HomeContent />} />
-                <Route path="/home" element={<HomeContent />} />
-                <Route path="/reflection" element={<ReflectionContent />} />
-                <Route path="/sessions" element={<InSessionContent />} />
-                <Route path="/lessons" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
-                <Route path="/lessons/*" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
-                <Route path="/lessons/supporting-growth-mindset" element={<LessonsContent />} />
-                <Route path="/admin" element={<TutorAdminContent />} />
-                <Route path="/research-assistant" element={<TutorAdminContent />} />
-                <Route path="/monthly-reports" element={<MonthlyReportsListContent />} />
-                <Route path="/monthly-report" element={<MonthlyReportContent />} />
+                <Route index element={<IndexContent />} />
+                <Route path="home" element={<HomeContent />} />
+                <Route path="reflection" element={<ReflectionContent />} />
+                <Route path="sessions" element={<InSessionContent />} />
+                <Route path="lessons" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
+                <Route path="lessons/*" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
+                <Route path="lessons/supporting-growth-mindset" element={<LessonsContent />} />
+                <Route path="admin" element={<TutorAdminContent />} />
+                <Route path="research-assistant" element={<TutorAdminContent />} />
+                <Route path="monthly-reports" element={<MonthlyReportsListContent />} />
+                <Route path="monthly-report" element={<MonthlyReportContent />} />
                 <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
         </Routes>

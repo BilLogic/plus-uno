@@ -39,7 +39,5 @@ reference/production/
 # Playground directories (opt-in to commit)
 prototyping/playground/*/
 !prototyping/playground/README.md
-.vercel
-
 # Local Netlify folder
 .netlify

@@ -1,6 +1,8 @@
 ---
-name: submit-to-market
+name: uno-post
 description: Guides designers through submitting a prototype to the Prototype Market. Use when the user asks to "submit", "publish", "add to market", "list my prototype", or wants to deploy and register a prototype in the market index.
+user-invocable: true
+argument-hint: [prototype-name]
 ---
 
 # Submit to Market

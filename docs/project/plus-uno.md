@@ -71,8 +71,18 @@ plus-vibe-coding-starting-kit/
 
 ## Deployment
 
-- **Storybook** → Netlify (static site)
-- **Prototypes** → Per-prototype Netlify deploys (optional)
+All deployments use **Netlify** exclusively. No other hosting providers (Vercel, etc.) are used.
+
+| Target | URL | Config |
+|--------|-----|--------|
+| **Prototype Marketplace** | https://plus-uno.netlify.app | `netlify.toml` — builds `dist/` via `npm run build:all` |
+| **Storybook** | https://plus-uno.netlify.app/storybook/ | Static build at `dist/storybook/` via `build:all` |
+| **Standalone prototypes** | Per-prototype Netlify deploys (optional) | Individual `dist/` folders via Netlify CLI |
+
+**Environment variables (Netlify dashboard):**
+| Variable | Purpose |
+|----------|---------|
+| `VITE_STORYBOOK_URL` | Deployed Storybook URL for FAB nav and StorybookEmbed |
 
 ## Integrations
 

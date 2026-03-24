@@ -1,5 +1,5 @@
 ---
-name: po-review
+name: uno-review
 description: >
   Quality gate before shipping. Reviews work against PLUS conventions,
   forbidden patterns, and design system rules.

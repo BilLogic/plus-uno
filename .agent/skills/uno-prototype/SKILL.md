@@ -1,5 +1,5 @@
 ---
-name: po-prototype
+name: uno-prototype
 description: >
   Scaffold and build a new playground prototype using the PLUS design system.
   Use when creating new feature prototypes, experiments, or proof-of-concepts.
@@ -65,4 +65,4 @@ Create a new playground prototype project with proper DS integration.
 ## Phase 5: Register
 
 1. Add entry to `src/pages/PrototypeMarket/prototypes-data.js`
-2. Or use `/submit-to-market` skill for guided submission
+2. Or use `/uno:post` skill for guided submission

@@ -2,7 +2,7 @@
  * Root app – shared body and prototype frame so all pages (home, admin, sessions) look consistent.
  */
 :root {
-  --demo-frame-width: 1200px;
+  --demo-frame-width: 1280px;
   --demo-frame-height: 800px;
 }
 

@@ -114,20 +114,20 @@ plus-vibe-coding-starting-kit/             (repo: github.com/BilLogic/plus-vibe-
 │   │   │   └── references/
 │   │   │
 │   │   │  ── WORKFLOW SKILLS (project-wide processes)
-│   │   ├── po-prototype/                  Scaffold new playground prototype
+│   │   ├── uno-prototype/                  Scaffold new playground prototype
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   ├── examples/
 │   │   │   └── scripts/
-│   │   ├── po-compound/                   Document learnings (compound loop)
+│   │   ├── uno-compound/                   Document learnings (compound loop)
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   └── examples/
-│   │   ├── po-review/                     Quality gate before shipping
+│   │   ├── uno-review/                     Quality gate before shipping
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   └── scripts/
-│   │   └── submit-to-market/              Post to marketplace (EXISTS — update paths)
+│   │   └── uno-post/              Post to marketplace (EXISTS — update paths)
 │   │       └── SKILL.md
 │   │
 │   └── assets/                            JSON INDEXES (paths updated)
@@ -316,7 +316,7 @@ Storybook sidebar mirrors this exactly via story `title` fields (e.g., `Specs/Ad
    - Never edit generated token files — run `npm run generate:tokens`
    - Never skip Storybook validation when component behavior is touched
    - Always confirm plan before large or risky edits
-6. **Skills** — table of /po:xxx with descriptions
+6. **Skills** — table of /uno:xxx with descriptions
 7. **Learnings** — check `docs/solutions/` before work, document after
 8. **Setup** — points to `docs/project/setup-guide.md`
 9. **Commands** — npm scripts table
@@ -351,7 +351,7 @@ The marketplace (PrototypeMarket) **exists** at `src/pages/PrototypeMarket/` wit
 - `PrototypeMarket.jsx` — main page with search + filters
 - `PrototypeCard.jsx` + `.scss` — card component
 - `prototypes-data.js` — static data store
-- `.agent/skills/submit-to-market/SKILL.md` — agent skill for guided submission
+- `.agent/skills/uno-post/SKILL.md` — agent skill for guided submission
 
 The marketplace is functional. Phase 2 (playground reorg) affects it since prototypes move from `playground/prototyping/{owner}/{name}` to `playground/{name}`. The `prototypes-data.js` file will need path and metadata updates to reflect the flat structure with project identifiers instead of creator groupings.
 
@@ -371,7 +371,7 @@ After `git pull`, these items from the original plan are already implemented:
 | `PLUS_LAYOUT_CHEAT_SHEET.md` | Done | New asset — mandatory for page layouts |
 | `references/prototyping.md` | Done | New mode reference |
 | Marketplace | Done | `src/pages/PrototypeMarket/` exists with components + data |
-| `/submit-to-market` skill | Done | `.agent/skills/submit-to-market/SKILL.md` |
+| `/uno-post` skill | Done | `.agent/skills/uno-post/SKILL.md` |
 
 ### Key Architecture Difference from Our Plan
 
@@ -390,7 +390,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 7. Create compound loop `docs/solutions/` (not done)
 8. **Reconcile skills architecture** — AGENT.md lists 4 phantom skills (learn-plus, design-consulting, building, maintaining) that have no SKILL.md files. Our plan adds 3 po- skills. Both need to be created.
 9. Create `docs/foundations/` to replace phantom `develop/` references in AGENT.md
-10. Update marketplace `prototypes-data.js` and `submit-to-market` skill after playground reorg
+10. Update marketplace `prototypes-data.js` and `uno-post` skill after playground reorg
 11. Update Storybook globs (explicitly reference `playground/Ashley/**` and `playground/Bill/**`)
 12. Clean up old files after migration (not done)
 13. Initialize memory system (not done)
@@ -404,7 +404,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 | AGENT.md repo structure table | Lists `develop/` and `packages/plus-ds/` | Update after restructure |
 | CLAUDE.md / .windsurfrules | Point to `.agent/SKILL.md` (not AGENTS.md) | Rewire in Phase 3 |
 | `prototypes-data.js` | All `repoPath` values use `playground/prototyping/{owner}/{name}/` | Update to `playground/{name}/` in Phase 2 |
-| `submit-to-market` SKILL.md | Hardcodes `playground/prototyping/{name}/{project}/` | Update to `playground/{project}/` in Phase 2 |
+| `uno-post` SKILL.md | Hardcodes `playground/prototyping/{name}/{project}/` | Update to `playground/{project}/` in Phase 2 |
 | Storybook main.js | 3 explicit globs for `playground/prototyping/**`, `playground/Ashley/**`, `playground/Bill/**` | Simplify to single `playground/**` glob in Phase 2 |
 | Bryan prototype | `playground/prototyping/Bryan/` has `tutor-reflection-form/` and `starter/` — not in our reorg plan | Include in Phase 2 flatten |
 
@@ -478,7 +478,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
     - All `repoPath` values: `playground/prototyping/{owner}/{name}/` → `playground/{name}/`
     - All `id` values: remove creator prefix (e.g., `bill-home-redesign` → `home-redesign`)
     - Update renamed projects: `bill-sessions` → `in-session-ux`, `victor-sessions` → `session-management`
-23. Update `.agent/skills/submit-to-market/SKILL.md`:
+23. Update `.agent/skills/uno-post/SKILL.md`:
     - Phase 1 path: `playground/prototyping/{name}/{project}/` → `playground/{project}/`
     - Auto-generate `id` from project folder name (not `{creator}-{project}`)
     - Confirmation template: update `repoPath` example
@@ -550,18 +550,14 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 
 ### Phase 6: Create ALL skills + compound loop — MEDIUM RISK
 
-> Two tiers of skills: **mode skills** (fix 4 phantom refs in AGENT.md) + **workflow skills** (new project processes). `submit-to-market` already exists but was updated in Phase 2.
+> Two tiers of skills: **mode skills** (fix 4 phantom refs in AGENT.md) + **workflow skills** (new project processes). `uno-post` already exists but was updated in Phase 2.
 
-**Mode skills** (each wraps a DS mode from SKILL.md — these files are referenced in AGENT.md but don't exist):
-46. Create `.agent/skills/learn-plus/SKILL.md` — wraps Learning mode, references `docs/design-system/modes/learning.md`
-47. Create `.agent/skills/design-consulting/SKILL.md` — wraps Consulting + Iteration modes
-48. Create `.agent/skills/building/SKILL.md` — wraps Prototyping + Finalization modes
-49. Create `.agent/skills/maintaining/SKILL.md` — wraps Maintaining mode
+**Mode skills** — DELETED. The mode routing in `.agent/SKILL.md` handles learn-plus, design-consulting, building, and maintaining directly by pointing to `docs/design-system/modes/`. Separate skill wrappers were redundant.
 
 **Workflow skills** (project-wide processes):
-50. Create `.agent/skills/po-prototype/` with full structure (SKILL.md + references/ + examples/ + scripts/)
-51. Create `.agent/skills/po-compound/` with full structure
-52. Create `.agent/skills/po-review/` with full structure
+50. Create `.agent/skills/uno-prototype/` with full structure (SKILL.md + references/ + examples/ + scripts/)
+51. Create `.agent/skills/uno-compound/` with full structure
+52. Create `.agent/skills/uno-review/` with full structure
 
 **Compound loop**:
 53. Create `docs/solutions/README.md` (template + categories)
@@ -656,7 +652,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 
 ### Skills
 - [ ] 4 skills with full directory structure (SKILL.md + references/ + examples/ + scripts/)
-- [ ] `/po:post` marked blocked pending marketplace rebuild
+- [ ] `/uno:post` marked blocked pending marketplace rebuild
 
 ### Marketplace
 - [ ] `marketplace/README.md` exists as placeholder

@@ -1,5 +1,5 @@
 ---
-name: po-compound
+name: uno-compound
 description: >
   Document a solution or learning from work just completed. Creates a searchable
   solution doc in docs/solutions/ and updates agent-context docs if patterns emerge.

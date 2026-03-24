@@ -1,12 +1,21 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelectStories from './Select.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsDemoBlock, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import Select from './Select';
 
 <Meta of={SelectStories} />
 
 <Title />
 <Description />
+
+export const sampleOptions = [
+    { value: 'option-1', label: 'Option #1' },
+    { value: 'option-2', label: 'Option #2' },
+    { value: 'option-3', label: 'Option #3' },
+    { value: 'option-4', label: 'Option #4' },
+    { value: 'option-5', label: 'Option #5' },
+];
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
@@ -14,9 +23,18 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Content
 
-<DocsCanvasShell description={<>Placeholder and value display in single-select mode.</>}>
-    <Canvas of={SelectStories.Content} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
+<DocsDemoBlock description={<>Placeholder and value display in single-select mode.</>}>
+    <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Empty</div>
+            <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Filled</div>
+            <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+        </div>
+    </div>
+</DocsDemoBlock>
 
 </div>
 
@@ -24,9 +42,22 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Styles
 
-<DocsCanvasShell description={<>Multi-select, searchable, and creatable behaviors.</>}>
-    <Canvas of={SelectStories.Styles} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
+<DocsDemoBlock description={<>Multi-select, searchable, and creatable behaviors.</>}>
+    <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Multi-select</div>
+            <Select mode="multi" options={sampleOptions} placeholder="Select {value(s)} from below" />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Searchable</div>
+            <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Creatable</div>
+            <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
+        </div>
+    </div>
+</DocsDemoBlock>
 
 </div>
 
@@ -34,9 +65,22 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Sizes
 
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={SelectStories.Sizes} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
+<DocsDemoBlock description={<>Small, medium, and large.</>}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Small</div>
+            <Select size="small" options={sampleOptions} placeholder="Select..." />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Medium (default)</div>
+            <Select size="medium" options={sampleOptions} placeholder="Select..." />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Large</div>
+            <Select size="large" options={sampleOptions} placeholder="Select..." />
+        </div>
+    </div>
+</DocsDemoBlock>
 
 </div>
 
@@ -44,9 +88,22 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Interaction states
 
-<DocsCanvasShell description={<>Enabled and disabled.</>}>
-    <Canvas of={SelectStories.InteractionStates} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
+<DocsDemoBlock description={<>Enabled and disabled.</>}>
+    <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Enabled</div>
+            <Select defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled</div>
+            <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+        </div>
+        <div>
+            <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only</div>
+            <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+        </div>
+    </div>
+</DocsDemoBlock>
 
 </div>
 
