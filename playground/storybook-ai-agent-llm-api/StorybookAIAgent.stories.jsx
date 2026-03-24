@@ -1,7 +1,7 @@
 import React from 'react';
 import StorybookAIAgent from './StorybookAIAgent';
-import TutorTrainingProgressPage from '../../../../packages/plus-ds/src/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
-import ResponsiveFrame from '../../../../packages/plus-ds/src/specs/Universal/ResponsiveFrame';
+import TutorTrainingProgressPage from '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 
 export default {
     title: 'Playground/Ashley/PLUS UNO Inline AI Agent',

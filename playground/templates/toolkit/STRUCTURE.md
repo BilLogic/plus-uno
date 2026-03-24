@@ -6,9 +6,9 @@ This template contains complete page implementations for sessions, sign-ups, cal
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Documentation**: `../../../packages/plus-ds/specs/Toolkit/STRUCTURE.md`
-- **Specs Overview**: `../../../packages/plus-ds/specs/Toolkit/Toolkit.stories.js`
-- **Component Library**: `../../../packages/plus-ds/components/`
+- **Specs Documentation**: `../../../design-system/src/specs/Toolkit/STRUCTURE.md`
+- **Specs Overview**: `../../../design-system/src/specs/Toolkit/Toolkit.stories.js`
+- **Component Library**: `../../../design-system/src/components/`
 
 ## Template Structure
 
@@ -89,8 +89,8 @@ playground/templates/toolkit/
 
 ## Implementation Guidelines
 
-1. **Reference Specs First**: Always check `../../../packages/plus-ds/specs/Toolkit/STRUCTURE.md` for detailed component breakdowns
-2. **Use Design Tokens**: Always use semantic design tokens from `../../../packages/plus-ds/styles/`
+1. **Reference Specs First**: Always check `../../../design-system/src/specs/Toolkit/STRUCTURE.md` for detailed component breakdowns
+2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/src/styles/`
 3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations
@@ -103,5 +103,5 @@ playground/templates/toolkit/
 - Follow coding standards from `../../../.agent/SKILL.md`
 - Include proper accessibility attributes
 - Ensure responsive design
-- Reference: `../../../packages/plus-ds/specs/Toolkit/STRUCTURE.md` for complete component breakdown
+- Reference: `../../../design-system/src/specs/Toolkit/STRUCTURE.md` for complete component breakdown
 

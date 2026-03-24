@@ -6,9 +6,9 @@ This template contains complete page implementations for admin-related interface
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Documentation**: `../../../packages/plus-ds/specs/Admin/STRUCTURE.md` (if available)
-- **Specs Overview**: `../../../packages/plus-ds/specs/Admin/Admin.stories.js`
-- **Component Library**: `../../../packages/plus-ds/components/`
+- **Specs Documentation**: `../../../design-system/src/specs/Admin/STRUCTURE.md` (if available)
+- **Specs Overview**: `../../../design-system/src/specs/Admin/Admin.stories.js`
+- **Component Library**: `../../../design-system/src/components/`
 
 ## Template Structure
 
@@ -26,32 +26,32 @@ Based on the Admin specs, templates should implement components from these categ
 
 ### Elements
 - Individual form elements and UI components specific to admin interfaces
-- Reference: `../../../packages/plus-ds/specs/Admin/Elements/`
+- Reference: `../../../design-system/src/specs/Admin/Elements/`
 
 ### Cards
 - Card components for admin interfaces
-- Reference: `../../../packages/plus-ds/specs/Admin/Cards/`
+- Reference: `../../../design-system/src/specs/Admin/Cards/`
 
 ### Tables
 - Table components for admin data display
-- Reference: `../../../packages/plus-ds/specs/Admin/Tables/`
+- Reference: `../../../design-system/src/specs/Admin/Tables/`
 
 ### Modals
 - Modal dialogs for admin workflows
-- Reference: `../../../packages/plus-ds/specs/Admin/Modals/`
+- Reference: `../../../design-system/src/specs/Admin/Modals/`
 
 ### Sections
 - Section-level components for admin pages
-- Reference: `../../../packages/plus-ds/specs/Admin/Sections/`
+- Reference: `../../../design-system/src/specs/Admin/Sections/`
 
 ### Pages
 - Complete page-level implementations
-- Reference: `../../../packages/plus-ds/specs/Admin/Pages/`
+- Reference: `../../../design-system/src/specs/Admin/Pages/`
 
 ## Implementation Guidelines
 
-1. **Reference Specs First**: Always check `../../../packages/plus-ds/specs/Admin/` for component specifications
-2. **Use Design Tokens**: Always use semantic design tokens from `../../../packages/plus-ds/styles/`
+1. **Reference Specs First**: Always check `../../../design-system/src/specs/Admin/` for component specifications
+2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/src/styles/`
 3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations

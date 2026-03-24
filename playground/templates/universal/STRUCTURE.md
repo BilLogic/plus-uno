@@ -6,8 +6,8 @@ This template contains complete page implementations for universal/shared compon
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Overview**: `../../../packages/plus-ds/specs/Universal/Universal.stories.js`
-- **Component Library**: `../../../packages/plus-ds/components/`
+- **Specs Overview**: `../../../design-system/src/specs/Universal/Universal.stories.js`
+- **Component Library**: `../../../design-system/src/components/`
 
 ## Template Structure
 
@@ -35,8 +35,8 @@ playground/templates/universal/
 
 ## Implementation Guidelines
 
-1. **Reference Specs First**: Always check `../../../packages/plus-ds/specs/Universal/` for component specifications
-2. **Use Design Tokens**: Always use semantic design tokens from `../../../packages/plus-ds/styles/`
+1. **Reference Specs First**: Always check `../../../design-system/src/specs/Universal/` for component specifications
+2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/src/styles/`
 3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations

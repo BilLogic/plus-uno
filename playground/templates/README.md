@@ -13,8 +13,8 @@ Reusable prototype starters organized by product area.
 - Agent router: `.agent/SKILL.md`
 - Mode references: `.agent/references/*.md`
 - Token reference: `.agent/references/tokens.md`
-- DS component docs: `packages/plus-ds/guidelines/overview-components.md`
-- DS token docs: `packages/plus-ds/guidelines/design-tokens/`
+- DS component docs: `design-system/src/guidelines/overview-components.md`
+- DS token docs: `design-system/src/guidelines/design-tokens/`
 
 ## Authoring Rules
 
@@ -29,3 +29,9 @@ Reusable prototype starters organized by product area.
 - [ ] Token and component usage follows DS guidance
 - [ ] References point to existing files only
 - [ ] Included files run locally with documented steps
+
+## Important Note
+
+These are **static HTML reference templates** that predate the React + DS prototyping workflow. They use Bootstrap CDN and raw HTML — they are NOT DS-compliant prototypes.
+
+For creating new React prototypes using the PLUS Design System, use the `/uno:prototype` skill which scaffolds from `playground/starter/`.
