@@ -429,7 +429,6 @@ const PrototypeMarket = () => {
                   <Button
                     className="prototype-market__modal-open-prototype"
                     style="primary"
-                    fill="outline"
                     size="medium"
                     text="Open prototype"
                     trailingVisual={<i className="fa-solid fa-arrow-up-right-from-square" />}
@@ -486,6 +485,7 @@ const PrototypeMarket = () => {
             <div className="prototype-market__modal-feedback-row">
               <Input
                 id="prototype-comment-input"
+                className="prototype-market__modal-feedback-input"
                 placeholder="Share your feedback"
                 showLabel={false}
                 label="Share your feedback"
@@ -499,15 +499,15 @@ const PrototypeMarket = () => {
                   }
                 }}
               />
-              <button
-                type="button"
+              <Button
                 className="prototype-market__modal-send"
+                style="primary"
+                size="medium"
+                leadingVisual="paper-plane"
                 onClick={submitComment}
                 disabled={!pendingComment.trim()}
                 aria-label="Send comment"
-              >
-                <i className="fa-solid fa-paper-plane" />
-              </button>
+              />
             </div>
             <hr />
             <h5 className="prototype-market__modal-section h5">Preview</h5>
