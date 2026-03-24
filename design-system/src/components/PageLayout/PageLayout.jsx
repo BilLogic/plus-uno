@@ -161,19 +161,26 @@ const PageLayout = ({
                     flexDirection: 'column',
                     padding: 'var(--size-surface-pad-y, 24px) var(--size-surface-pad-x, 32px)',
                     gap: 'var(--size-surface-gap-md, 24px)',
-                    flex: '1 0 0',
+                    flex: '1 1 0',
                     alignItems: 'flex-start',
                     minWidth: 0,
+                    minHeight: 0,
                     height: '100%',
-                    overflowY: 'auto',
+                    overflow: 'hidden',
                     backgroundColor: 'var(--color-surface, #f9f9fc)',
                     borderRadius: 'var(--size-surface-radius, 16px)'
                 }}>
                     <main className="plus-page-main" style={{
-                        flex: 1,
+                        flex: '1 1 0',
+                        minHeight: 0,
                         padding: 0,
                         width: '100%',
-                        boxSizing: 'border-box'
+                        height: '100%',
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'auto',
+                        position: 'relative'
                     }}>
                         {children}
                     </main>

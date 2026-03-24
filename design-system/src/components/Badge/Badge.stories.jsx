@@ -13,7 +13,7 @@ const icons = {
 export default {
     title: 'Components/Badge',
     component: Badge,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     // Define argTypes to create the custom controls user requested
     argTypes: {
         // Content
@@ -107,21 +107,22 @@ export default {
     },
 };
 
-/**
- * Overview
- * comprehensive view of Badge styles, sizes, and recommended usage patterns.
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+const badgeGalleryCol = { display: 'flex', flexDirection: 'column', gap: '40px' };
+const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
 
-        {/* 1. All Sizes */}
+function BadgeSizesDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>All Sizes</h6>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Badges are available in both Header (Lato) and Body (Merriweather Sans) scales.
             </p>
-
-            {/* Headers */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
                 <Badge text="Headline 1" size="h1" style="primary" />
                 <Badge text="Headline 2" size="h2" style="primary" />
@@ -132,16 +133,17 @@ export const Overview = () => (
                 <Badge text="Title H5" size="h5" style="secondary" />
                 <Badge text="Title H6" size="h6" style="secondary" />
             </div>
-
-            {/* Body */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                 <Badge text="Body 1" size="b1" style="tertiary" />
                 <Badge text="Body 2 (Default)" size="b2" style="tertiary" />
                 <Badge text="Body 3" size="b3" style="tertiary" />
             </div>
         </section>
+    );
+}
 
-        {/* 2. All Color Themes */}
+function BadgeVariantsDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>All Color Themes</h6>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
@@ -155,42 +157,92 @@ export const Overview = () => (
                 ))}
             </div>
         </section>
+    );
+}
 
-        {/* 3. Recommended Combinations */}
+function BadgeContentDemos() {
+    return (
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Recommended Combinations</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-                {/* Status Indicators */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check"></i>} />
-                    <Badge text="Warning" style="warning" leadingVisual={<i className="fa-solid fa-triangle-exclamation"></i>} />
-                    <Badge text="Error" style="danger" leadingVisual={<i className="fa-solid fa-circle-exclamation"></i>} />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Status Indicators (Text + Leading Visual)</span>
-                </div>
-
-                {/* Labels/Categories */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="New Feature" style="info" size="b3" />
-                    <Badge text="Beta" style="tertiary" size="b3" />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Labels & Categories (Small size)</span>
-                </div>
-
-                {/* Counts */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="Inbox" style="primary" counter="12" />
-                    <Badge text="Messages" style="secondary" counter="99+" />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Counts (Text + Counter)</span>
-                </div>
-
-                {/* Dismissible / Filters */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <Badge text="Filter: Active" style="primary" dismissible />
-                    <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Filters & Selections (Dismissible)</span>
-                </div>
+            <div style={contentVariantCol}>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Status Indicators</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Text + leading icon for success, warning, and error semantics.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check"></i>} />
+                            <Badge text="Warning" style="warning" leadingVisual={<i className="fa-solid fa-triangle-exclamation"></i>} />
+                            <Badge text="Error" style="danger" leadingVisual={<i className="fa-solid fa-circle-exclamation"></i>} />
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Labels & Categories</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Compact badges in smaller size for metadata and labels.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="New Feature" style="info" size="b3" />
+                            <Badge text="Beta" style="tertiary" size="b3" />
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Counts</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Text + counter for inbox/message counts and similar tallies.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Inbox" style="primary" counter="12" />
+                            <Badge text="Messages" style="secondary" counter="99+" />
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h6 className="h6" style={{ marginBottom: '8px' }}>Filters & Selections</h6>
+                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                        Dismissible badges for active filters and selected entities.
+                    </p>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Filter: Active" style="primary" dismissible />
+                            <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
+                        </div>
+                    </div>
+                </section>
             </div>
         </section>
+    );
+}
+
+export const Sizes = () => (
+    <div style={badgeGalleryCol}>
+        <BadgeSizesDemos />
+    </div>
+);
+
+export const Styles = () => (
+    <div style={badgeGalleryCol}>
+        <BadgeVariantsDemos />
+    </div>
+);
+
+/** Icons, counter, dismissible — content & behavior patterns */
+export const Content = () => (
+    <div style={badgeGalleryCol}>
+        <BadgeContentDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={badgeGalleryCol}>
+        <BadgeSizesDemos />
+        <BadgeVariantsDemos />
+        <BadgeContentDemos />
     </div>
 );
 

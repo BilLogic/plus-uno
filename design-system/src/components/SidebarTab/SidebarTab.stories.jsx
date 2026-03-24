@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SidebarTab from '@/components/SidebarTab';
 
 export default {
     title: 'Components/SidebarTab',
     component: SidebarTab,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     argTypes: {
         state: {
             control: { type: 'select' },
             options: ['enabled', 'hover', 'selected', 'disabled', 'focus']
         },
         icon: { control: 'text' },
+        text: { control: 'text' },
+        leadingVisual: { control: 'boolean' },
+        trailingVisual: { control: 'boolean' },
     },
     // Add gap to decorator for better spacing in list
     decorators: [
@@ -20,6 +23,41 @@ export default {
             </div>
         )
     ]
+};
+
+const sidebarSurface = {
+    display: 'inline-flex',
+    backgroundColor: 'var(--color-surface-container)',
+    padding: '12px',
+    borderRadius: '12px',
+    border: '1px solid var(--color-outline-variant)',
+};
+
+export const InSidebar = () => {
+    const [selected, setSelected] = useState('dashboard');
+    const items = [
+        { id: 'dashboard', text: 'Dashboard', icon: 'home' },
+        { id: 'reports', text: 'Reports', icon: 'chart-bar' },
+        { id: 'settings', text: 'Settings', icon: 'cog' },
+    ];
+    return (
+        <div style={sidebarSurface}>
+            <nav
+                aria-label="Example sidebar navigation"
+                style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}
+            >
+                {items.map((item) => (
+                    <SidebarTab
+                        key={item.id}
+                        text={item.text}
+                        icon={item.icon}
+                        state={selected === item.id ? 'selected' : 'enabled'}
+                        onClick={() => setSelected(item.id)}
+                    />
+                ))}
+            </nav>
+        </div>
+    );
 };
 
 export const Default = {
@@ -67,4 +105,15 @@ export const WithTrailingIcon = {
         icon: 'external-link-alt',
         trailingVisual: true,
     },
+};
+
+export const Interactive = {
+    args: {
+        text: 'Dashboard',
+        icon: 'home',
+        state: 'enabled',
+        leadingVisual: true,
+        trailingVisual: false,
+    },
+    render: (args) => <SidebarTab {...args} />,
 };

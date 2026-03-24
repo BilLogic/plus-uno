@@ -65,7 +65,7 @@ The plus-uno repo had grown organically with several structural issues:
 
 ### Phase 6: Create 7 new skills
 - Mode skills: learn-plus, design-consulting, building, maintaining (fix phantom refs)
-- Workflow skills: po-prototype, po-compound, po-review
+- Workflow skills: uno-prototype, uno-compound, uno-review
 - Each with SKILL.md + subdirectory structure
 
 ### Phase 7: Cleanup

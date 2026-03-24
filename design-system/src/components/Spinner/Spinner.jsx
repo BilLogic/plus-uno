@@ -5,12 +5,13 @@ import './Spinner.scss';
 
 const Spinner = ({
     variant = 'border', // 'border', 'grow', 'growing', 'rotating', 'stacking'
-    color = 'primary',
     size, // 'sm' or null
     className = '',
     role = 'status',
     ...props
 }) => {
+    const { color: _legacyColor, ...restProps } = props;
+
     // Custom Variants handled via CSS/Divs
     if (['growing', 'rotating', 'stacking'].includes(variant)) {
         const blocks = {
@@ -24,7 +25,7 @@ const Spinner = ({
                 className={`plus-spinner-custom plus-spinner-${variant} ${size ? `plus-spinner-${size}` : ''} ${className}`}
                 role={role}
                 aria-label="Loading"
-                {...props}
+                {...restProps}
             >
                 {Array.from({ length: blocks }).map((_, i) => (
                     <div key={i} className="spinner-block"></div>
@@ -33,15 +34,14 @@ const Spinner = ({
         );
     }
 
-    // Simple Bootstrap Mappings ('border', 'grow')
+    // Simple Bootstrap Mappings ('border', 'grow') — color is always neutral (see Spinner.scss).
     return (
         <BootstrapSpinner
             animation={variant === 'default' ? 'border' : variant}
-            variant={color}
             size={size}
             className={`plus-spinner ${className}`}
             role={role}
-            {...props}
+            {...restProps}
         >
             <span className="visually-hidden">Loading...</span>
         </BootstrapSpinner>
@@ -50,7 +50,6 @@ const Spinner = ({
 
 Spinner.propTypes = {
     variant: PropTypes.oneOf(['border', 'grow', 'growing', 'rotating', 'stacking', 'default']),
-    color: PropTypes.string,
     size: PropTypes.string,
     className: PropTypes.string,
     role: PropTypes.string

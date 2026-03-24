@@ -2,8 +2,9 @@ import React from 'react';
 import Badge from './Badge';
 
 export default {
-    title: 'Components/Badge/Subcomponents',
+    title: 'Components/Badge',
     component: Badge,
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {

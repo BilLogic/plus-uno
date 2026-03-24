@@ -7,10 +7,10 @@ import Col from 'react-bootstrap/Col';
 import Card from '../../../../../components/Card';
 import Button from '../../../../../components/Button';
 import Dropdown from '../../../../../components/Dropdown';
-import Switch from '../../../../../forms/Switch';
-import Input from '../../../../../forms/Input';
-import Checkbox from '../../../../../forms/Checkbox';
-import Textarea from '../../../../../forms/Textarea';
+import Switch from '@/forms/Switch';
+import Input from '@/forms/Input';
+import Checkbox from '@/forms/Checkbox';
+import Textarea from '@/forms/Textarea';
 
 /**
  * SessionInformationForm

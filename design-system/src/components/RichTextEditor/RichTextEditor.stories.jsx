@@ -4,7 +4,7 @@ import RichTextEditor from './RichTextEditor';
 export default {
     title: 'Components/RichTextEditor',
     component: RichTextEditor,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -29,39 +29,87 @@ export default {
     }
 };
 
-const Template = (args) => <RichTextEditor {...args} />;
+const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
 
-export const Overview = () => {
+function RichTextEditorContentDemo() {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <section>
-                <h5>Default (Medium)</h5>
-                <RichTextEditor
-                    placeholder="Type something..."
-                    minHeight={150}
-                />
-            </section>
-
-            <section>
-                <h5>Sizes</h5>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <RichTextEditor
-                        size="small"
-                        placeholder="Small editor..."
-                        defaultValue="<p>Small editor content</p>"
-                        minHeight={100}
-                    />
-                    <RichTextEditor
-                        size="large"
-                        placeholder="Large editor..."
-                        defaultValue="<p>Large editor content</p>"
-                        minHeight={200}
-                    />
-                </div>
-            </section>
-        </div>
+        <section>
+            <h5>Default (medium)</h5>
+            <RichTextEditor
+                placeholder="Type something..."
+                minHeight={150}
+            />
+        </section>
     );
-};
+}
+
+function RichTextEditorSizesDemos() {
+    return (
+        <section>
+            <h5>Sizes</h5>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <RichTextEditor
+                    size="small"
+                    placeholder="Small editor..."
+                    defaultValue="<p>Small editor content</p>"
+                    minHeight={100}
+                />
+                <RichTextEditor
+                    size="large"
+                    placeholder="Large editor..."
+                    defaultValue="<p>Large editor content</p>"
+                    minHeight={200}
+                />
+            </div>
+        </section>
+    );
+}
+
+function RichTextEditorInteractionStatesDemos() {
+    return (
+        <section>
+            <h5>Read-only and disabled</h5>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <RichTextEditor
+                    readOnly
+                    defaultValue="<p>Read-only content cannot be edited.</p>"
+                    minHeight={120}
+                />
+                <RichTextEditor
+                    disabled
+                    placeholder="Disabled editor"
+                    minHeight={120}
+                />
+            </div>
+        </section>
+    );
+}
+
+export const Content = () => (
+    <div style={col}>
+        <RichTextEditorContentDemo />
+    </div>
+);
+
+export const Sizes = () => (
+    <div style={col}>
+        <RichTextEditorSizesDemos />
+    </div>
+);
+
+export const InteractionStates = () => (
+    <div style={col}>
+        <RichTextEditorInteractionStatesDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={col}>
+        <RichTextEditorContentDemo />
+        <RichTextEditorSizesDemos />
+        <RichTextEditorInteractionStatesDemos />
+    </div>
+);
 
 export const Interactive = () => {
     const [content, setContent] = useState('<p>Initial content...</p>');
@@ -74,7 +122,6 @@ export const Interactive = () => {
                 placeholder="Interactive editor..."
                 minHeight={200}
             />
-
             <div style={{ padding: '16px', background: '#f5f5f5', borderRadius: '4px' }}>
                 <h6>Current Content:</h6>
                 <pre style={{ whiteSpace: 'pre-wrap' }}>{content}</pre>

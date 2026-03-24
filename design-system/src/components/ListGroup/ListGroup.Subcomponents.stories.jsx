@@ -2,20 +2,10 @@ import React, { useState } from 'react';
 import ListGroup from './ListGroup';
 import Badge from '../Badge/Badge';
 
-/**
- * ListGroup.Item Component
- * 
- * A unified list item supporting three modes:
- * - **selectable="none"**: Regular clickable/static item (default)
- * - **selectable="single"**: Radio button selection
- * - **selectable="multi"**: Checkbox selection
- * 
- * All modes support size (b1, b2, b3) and state options.
- */
 export default {
-    title: 'Components/ListGroup/ListItem',
+    title: 'Components/ListGroup',
     component: ListGroup.Item,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -36,103 +26,124 @@ export default {
     }
 };
 
-/**
- * Overview
- * Shows all modes and size variants
- */
-export const Overview = {
-    render: () => {
-        const [singleValue, setSingleValue] = useState('opt1');
-        const [multiValues, setMultiValues] = useState(['opt1', 'opt3']);
+const col = { display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' };
 
-        const handleMultiToggle = (value) => {
-            setMultiValues(prev =>
-                prev.includes(value)
-                    ? prev.filter(v => v !== value)
-                    : [...prev, value]
-            );
-        };
+function ListGroupItemContentDemo() {
+    return (
+        <section>
+            <h6 className="h6" style={{ marginBottom: '12px' }}>Navigation layout</h6>
+            <ListGroup>
+                <ListGroup.Item action>
+                    <i className="fas fa-home me-3" style={{ color: 'var(--color-primary)' }} />
+                    <span className="flex-grow-1">Home</span>
+                </ListGroup.Item>
+                <ListGroup.Item action active>
+                    <i className="fas fa-user me-3" style={{ color: 'var(--color-primary)' }} />
+                    <span className="flex-grow-1">Profile</span>
+                    <Badge style="primary" size="b3">New</Badge>
+                </ListGroup.Item>
+                <ListGroup.Item action disabled>
+                    <i className="fas fa-lock me-3" />
+                    <span className="flex-grow-1">Disabled</span>
+                </ListGroup.Item>
+            </ListGroup>
+        </section>
+    );
+}
 
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' }}>
-                {/* Default Mode */}
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '12px' }}>Default Mode (Navigation)</h6>
-                    <ListGroup>
-                        <ListGroup.Item action>
-                            <i className="fas fa-home me-3" style={{ color: 'var(--color-primary)' }} />
-                            <span className="flex-grow-1">Home</span>
-                        </ListGroup.Item>
-                        <ListGroup.Item action active>
-                            <i className="fas fa-user me-3" style={{ color: 'var(--color-primary)' }} />
-                            <span className="flex-grow-1">Profile</span>
-                            <Badge style="primary" size="b3">New</Badge>
-                        </ListGroup.Item>
-                        <ListGroup.Item action disabled>
-                            <i className="fas fa-lock me-3" />
-                            <span className="flex-grow-1">Disabled</span>
-                        </ListGroup.Item>
-                    </ListGroup>
-                </section>
+function ListGroupItemVariantsDemos() {
+    const [singleValue, setSingleValue] = useState('opt1');
+    const [multiValues, setMultiValues] = useState(['opt1', 'opt3']);
 
-                {/* Single Select Mode */}
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '12px' }}>Single Select</h6>
-                    <ListGroup>
-                        {['opt1', 'opt2', 'opt3'].map((value, i) => (
-                            <ListGroup.Item
-                                key={value}
-                                value={value}
-                                label={`Option ${i + 1}`}
-                                selectable="single"
-                                name="single-demo"
-                                selected={singleValue === value}
-                                onClick={() => setSingleValue(value)}
-                            />
-                        ))}
-                    </ListGroup>
-                </section>
-
-                {/* Multi Select Mode */}
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '12px' }}>Multi Select</h6>
-                    <ListGroup>
-                        {['opt1', 'opt2', 'opt3'].map((value, i) => (
-                            <ListGroup.Item
-                                key={value}
-                                value={value}
-                                label={`Option ${i + 1}`}
-                                selectable="multi"
-                                selected={multiValues.includes(value)}
-                                onClick={() => handleMultiToggle(value)}
-                            />
-                        ))}
-                    </ListGroup>
-                </section>
-
-                {/* Size Variants */}
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '12px' }}>Sizes</h6>
-                    <ListGroup>
-                        <ListGroup.Item action size="b1">Size B1 (Large)</ListGroup.Item>
-                        <ListGroup.Item action size="b2">Size B2 (Default)</ListGroup.Item>
-                        <ListGroup.Item action size="b3">Size B3 (Small)</ListGroup.Item>
-                    </ListGroup>
-                </section>
-            </div>
+    const handleMultiToggle = (value) => {
+        setMultiValues(prev =>
+            prev.includes(value)
+                ? prev.filter(v => v !== value)
+                : [...prev, value]
         );
-    }
-};
+    };
 
-/**
- * Interactive
- * Full playground with controls
- */
-export const Interactive = {
+    return (
+        <>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '12px' }}>Single select</h6>
+                <ListGroup>
+                    {['opt1', 'opt2', 'opt3'].map((value, i) => (
+                        <ListGroup.Item
+                            key={value}
+                            value={value}
+                            label={`Option ${i + 1}`}
+                            selectable="single"
+                            name="single-demo-docs"
+                            selected={singleValue === value}
+                            onClick={() => setSingleValue(value)}
+                        />
+                    ))}
+                </ListGroup>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '12px' }}>Multi select</h6>
+                <ListGroup>
+                    {['opt1', 'opt2', 'opt3'].map((value, i) => (
+                        <ListGroup.Item
+                            key={value}
+                            value={value}
+                            label={`Option ${i + 1}`}
+                            selectable="multi"
+                            selected={multiValues.includes(value)}
+                            onClick={() => handleMultiToggle(value)}
+                        />
+                    ))}
+                </ListGroup>
+            </section>
+        </>
+    );
+}
+
+function ListGroupItemSizesDemo() {
+    return (
+        <section>
+            <h6 className="h6" style={{ marginBottom: '12px' }}>Sizes</h6>
+            <ListGroup>
+                <ListGroup.Item action size="b1">Size B1 (Large)</ListGroup.Item>
+                <ListGroup.Item action size="b2">Size B2 (Default)</ListGroup.Item>
+                <ListGroup.Item action size="b3">Size B3 (Small)</ListGroup.Item>
+            </ListGroup>
+        </section>
+    );
+}
+
+export const ListItemContent = () => (
+    <div style={col}>
+        <ListGroupItemContentDemo />
+    </div>
+);
+
+export const ListItemSelectionModes = () => (
+    <div style={col}>
+        <ListGroupItemVariantsDemos />
+    </div>
+);
+
+export const ListItemSizes = () => (
+    <div style={col}>
+        <ListGroupItemSizesDemo />
+    </div>
+);
+
+export const ListItemOverview = () => (
+    <div style={col}>
+        <ListGroupItemContentDemo />
+        <ListGroupItemVariantsDemos />
+        <ListGroupItemSizesDemo />
+    </div>
+);
+
+export const ListItemInteractive = {
     render: (args) => {
         const [selected, setSelected] = useState(args.selected);
 
-        const handleClick = (val) => {
+        const handleClick = () => {
             if (args.selectable !== 'none') {
                 setSelected(!selected);
             }
@@ -177,7 +188,6 @@ export const Interactive = {
         counterStyle: 'primary'
     },
     argTypes: {
-        // Design
         size: {
             control: { type: 'select' },
             options: ['b1', 'b2', 'b3'],
@@ -189,14 +199,11 @@ export const Interactive = {
             description: 'Selection mode',
             table: { category: 'Design' }
         },
-
-        // Content (default mode)
         text: {
             control: 'text',
             if: { arg: 'selectable', eq: 'none' },
             table: { category: 'Content' }
         },
-        // Content (selectable mode)
         label: {
             control: 'text',
             if: { arg: 'selectable', neq: 'none' },
@@ -207,8 +214,6 @@ export const Interactive = {
             if: { arg: 'selectable', neq: 'none' },
             table: { category: 'Content' }
         },
-
-        // State
         active: {
             control: 'boolean',
             if: { arg: 'selectable', eq: 'none' },
@@ -228,8 +233,6 @@ export const Interactive = {
             if: { arg: 'selectable', eq: 'none' },
             table: { category: 'Behavior' }
         },
-
-        // Visuals
         showLeadingIcon: {
             control: 'boolean',
             if: { arg: 'selectable', eq: 'none' },

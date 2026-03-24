@@ -2,22 +2,46 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "name": "Marketplace",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "4100"],
       "port": 4100
     },
     {
-      "name": "home-redesign",
+      "name": "Storybook",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--config", "playground/home-redesign/vite.config.js", "--port", "4101"],
-      "port": 4101
+      "runtimeArgs": ["storybook", "dev", "-p", "4200", "--host", "0.0.0.0", "--config-dir", ".storybook"],
+      "port": 4200
     },
     {
-      "name": "monthly-report",
+      "name": "Home Redesign",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--config", "playground/monthly-report/vite.config.js", "--port", "4102"],
-      "port": 4102
+      "runtimeArgs": ["vite", "--config", "playground/home-redesign/vite.config.js"],
+      "port": 3010
+    },
+    {
+      "name": "Monthly Report",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "playground/monthly-report/vite.config.js"],
+      "port": 3008
+    },
+    {
+      "name": "In-Session UX",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "playground/in-session-ux/vite.config.js"],
+      "port": 3007
+    },
+    {
+      "name": "Tutor Reflection Form",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "playground/tutor-reflection-form/vite.config.js"],
+      "port": 3021
+    },
+    {
+      "name": "Student Onboarding Wizard",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "playground/student-onboarding-wizard/vite.config.js"],
+      "port": 3000
     }
   ]
 }

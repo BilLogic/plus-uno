@@ -6,7 +6,7 @@ import Button from '@/components/Button/Button';
 export default {
     title: 'Components/Collapse',
     component: Collapse,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -86,19 +86,11 @@ export default {
     }
 };
 
-/**
- * Overview
- * Comprehensive view of Collapse configurations and use cases.
- */
-export const Overview = () => {
-    const [controlledOpen, setControlledOpen] = useState(false);
-    const [open1, setOpen1] = useState(false);
-    const [open2, setOpen2] = useState(false);
+const collapseCol = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '700px' };
 
+function CollapseBasicsDemos() {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '700px' }}>
-
-            {/* 1. Default Uncontrolled */}
+        <>
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Default (Uncontrolled)</h6>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -118,7 +110,6 @@ export const Overview = () => {
                 </Collapse>
             </section>
 
-            {/* 2. Initially Open */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Initially Open</h6>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -137,35 +128,47 @@ export const Overview = () => {
                     />
                 </Collapse>
             </section>
+        </>
+    );
+}
 
-            {/* 3. With Icons */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With Icons</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                    Collapse triggers can include icons positioned left or right.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <Collapse
-                        trigger="Icon Left"
-                        triggerClass="btn btn-outline-primary"
-                        icon="chevron-down"
-                        iconPosition="left"
-                    >
-                        <Card body="Content with left icon trigger." className="mt-2" showBorder />
-                    </Collapse>
+function CollapseIconsDemos() {
+    return (
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>With Icons</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Collapse triggers can include icons positioned left or right.
+            </p>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <Collapse
+                    trigger="Icon Left"
+                    triggerClass="btn btn-outline-primary"
+                    icon="chevron-down"
+                    iconPosition="left"
+                >
+                    <Card body="Content with left icon trigger." className="mt-2" showBorder />
+                </Collapse>
 
-                    <Collapse
-                        trigger="Icon Right"
-                        triggerClass="btn btn-outline-primary"
-                        icon="caret-down"
-                        iconPosition="right"
-                    >
-                        <Card body="Content with right icon trigger." className="mt-2" showBorder />
-                    </Collapse>
-                </div>
-            </section>
+                <Collapse
+                    trigger="Icon Right"
+                    triggerClass="btn btn-outline-primary"
+                    icon="caret-down"
+                    iconPosition="right"
+                >
+                    <Card body="Content with right icon trigger." className="mt-2" showBorder />
+                </Collapse>
+            </div>
+        </section>
+    );
+}
 
-            {/* 4. Controlled Mode */}
+function CollapseStateDemos() {
+    const [controlledOpen, setControlledOpen] = useState(false);
+    const [open1, setOpen1] = useState(false);
+    const [open2, setOpen2] = useState(false);
+
+    return (
+        <>
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Controlled Mode</h6>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -181,7 +184,6 @@ export const Overview = () => {
                 </div>
             </section>
 
-            {/* 5. Multiple Targets */}
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Multiple Targets</h6>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
@@ -192,7 +194,6 @@ export const Overview = () => {
                     <Button onClick={() => setOpen2(!open2)} text="Toggle Second" size="sm" />
                     <Button onClick={() => { setOpen1(true); setOpen2(true); }} text="Open Both" size="sm" style="secondary" />
                 </div>
-                {/* Panels stack vertically and take full width */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
                     <div className={`collapse ${open1 ? 'show' : ''}`} style={{ width: '100%' }}>
                         <Card body="First panel content." showBorder />
@@ -202,26 +203,62 @@ export const Overview = () => {
                     </div>
                 </div>
             </section>
-
-            {/* 6. Link Trigger */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Link Trigger</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                    Use an anchor tag as the trigger instead of a button.
-                </p>
-                <Collapse
-                    trigger="Click this link to expand"
-                    triggerTag="a"
-                    triggerClass="text-primary"
-                    icon="angle-down"
-                    iconPosition="right"
-                >
-                    <Card body="Content revealed by clicking the link." className="mt-2" showBorder />
-                </Collapse>
-            </section>
-        </div>
+        </>
     );
-};
+}
+
+function CollapseLinkDemos() {
+    return (
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Link Trigger</h6>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                Use an anchor tag as the trigger instead of a button.
+            </p>
+            <Collapse
+                trigger="Click this link to expand"
+                triggerTag="a"
+                triggerClass="text-primary"
+                icon="angle-down"
+                iconPosition="right"
+            >
+                <Card body="Content revealed by clicking the link." className="mt-2" showBorder />
+            </Collapse>
+        </section>
+    );
+}
+
+export const Content = () => (
+    <div style={collapseCol}>
+        <CollapseBasicsDemos />
+    </div>
+);
+
+export const Icons = () => (
+    <div style={collapseCol}>
+        <CollapseIconsDemos />
+    </div>
+);
+
+export const StatePatterns = () => (
+    <div style={collapseCol}>
+        <CollapseStateDemos />
+    </div>
+);
+
+export const LinkTrigger = () => (
+    <div style={collapseCol}>
+        <CollapseLinkDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={collapseCol}>
+        <CollapseBasicsDemos />
+        <CollapseIconsDemos />
+        <CollapseStateDemos />
+        <CollapseLinkDemos />
+    </div>
+);
 
 /**
  * Interactive Playground

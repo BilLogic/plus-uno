@@ -4,7 +4,7 @@ import Pagination from './Pagination';
 export default {
     title: 'Components/Pagination',
     component: Pagination,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
@@ -43,70 +43,41 @@ const Template = (args) => {
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
-/**
- * Overview - All variants matching Figma design exactly
- * Shows all 6 variants stacked vertically as in Figma
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', padding: '32px', backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)' }}>
-        {/* Icon Type Variants - matching Figma design exactly */}
-        <section>
-            <h5 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>Icon Type</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Small</h6>
-                    <Pagination
-                        currentPage={1}
-                        totalPages={10}
-                        type="icon"
-                        size="small"
-                        onPageChange={(p) => console.log('Page:', p)}
-                    />
-                </div>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Medium (Default)</h6>
-                    <Pagination
-                        currentPage={1}
-                        totalPages={10}
-                        type="icon"
-                        size="default"
-                        onPageChange={(p) => console.log('Page:', p)}
-                    />
-                </div>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Large</h6>
-                    <Pagination
-                        currentPage={1}
-                        totalPages={10}
-                        type="icon"
-                        size="large"
-                        onPageChange={(p) => console.log('Page:', p)}
-                    />
-                </div>
-            </div>
-        </section>
+const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px', backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)' };
+const contentVariantCard = {
+    padding: '12px',
+    border: '1px solid var(--color-outline-variant)',
+    borderRadius: '12px',
+    background: 'var(--color-surface-container-low)',
+};
 
-        {/* Text Type Variants - matching Figma design exactly */}
-        <section>
-            <h5 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>Text Type</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Small</h6>
+function PaginationContentDemos() {
+    return (
+        <>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Icon type</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Chevron-only previous/next controls with numeric page items.
+                </p>
+                <div style={contentVariantCard}>
                     <Pagination
-                        currentPage={1}
-                        totalPages={10}
-                        type="text"
-                        size="small"
-                        prevText="Previous"
-                        nextText="Next"
+                        currentPage={5}
+                        totalPages={20}
+                        type="icon"
+                        size="default"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Medium (Default)</h6>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Text type</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Uses explicit Previous/Next labels for stronger textual affordance.
+                </p>
+                <div style={contentVariantCard}>
                     <Pagination
-                        currentPage={1}
-                        totalPages={10}
+                        currentPage={5}
+                        totalPages={20}
                         type="text"
                         size="default"
                         prevText="Previous"
@@ -114,27 +85,53 @@ export const Overview = () => (
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Large</h6>
-                    <Pagination
-                        currentPage={1}
-                        totalPages={10}
-                        type="text"
-                        size="large"
-                        prevText="Previous"
-                        nextText="Next"
-                        onPageChange={(p) => console.log('Page:', p)}
-                    />
-                </div>
-            </div>
-        </section>
+            </section>
+        </>
+    );
+}
 
-        {/* States - Disabled Examples */}
-        <section>
-            <h5 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>States</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>First Page (Previous Disabled)</h6>
+function PaginationSizesDemos() {
+    return (
+        <>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Icon type sizes</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Small, default, and large icon pagination.
+                </p>
+                <div style={contentVariantCard}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <Pagination currentPage={1} totalPages={10} type="icon" size="small" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="icon" size="default" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="icon" size="large" onPageChange={(p) => console.log('Page:', p)} />
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Text type sizes</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Small, default, and large text pagination with Previous/Next labels.
+                </p>
+                <div style={contentVariantCard}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <Pagination currentPage={1} totalPages={10} type="text" size="small" prevText="Previous" nextText="Next" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="text" size="default" prevText="Previous" nextText="Next" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="text" size="large" prevText="Previous" nextText="Next" onPageChange={(p) => console.log('Page:', p)} />
+                    </div>
+                </div>
+            </section>
+        </>
+    );
+}
+
+function PaginationInteractionStatesDemos() {
+    return (
+        <>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>First page</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Previous control is disabled at the first page.
+                </p>
+                <div style={contentVariantCard}>
                     <Pagination
                         currentPage={1}
                         totalPages={10}
@@ -143,8 +140,13 @@ export const Overview = () => (
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Last Page (Next Disabled)</h6>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Last page</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Next control is disabled at the last page.
+                </p>
+                <div style={contentVariantCard}>
                     <Pagination
                         currentPage={10}
                         totalPages={10}
@@ -153,8 +155,13 @@ export const Overview = () => (
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
-                <div>
-                    <h6 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 400, color: 'var(--color-on-surface)' }}>Middle Page (Both Enabled)</h6>
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '8px' }}>Middle page</h6>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                    Both previous and next controls are enabled.
+                </p>
+                <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
                         totalPages={10}
@@ -163,8 +170,34 @@ export const Overview = () => (
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
+    );
+}
+
+export const Content = () => (
+    <div style={paginationCanvas}>
+        <PaginationContentDemos />
+    </div>
+);
+
+export const Sizes = () => (
+    <div style={paginationCanvas}>
+        <PaginationSizesDemos />
+    </div>
+);
+
+export const InteractionStates = () => (
+    <div style={paginationCanvas}>
+        <PaginationInteractionStatesDemos />
+    </div>
+);
+
+export const Overview = () => (
+    <div style={paginationCanvas}>
+        <PaginationContentDemos />
+        <PaginationSizesDemos />
+        <PaginationInteractionStatesDemos />
     </div>
 );
 

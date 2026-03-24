@@ -2,7 +2,7 @@
  * Prototype Market catalog data.
  *
  * Each entry represents one deployed (or deployable) prototype.
- * Designers add their own entry via the /po:post skill or manually here.
+ * Designers add their own entry via the /uno:post skill or manually here.
  *
  * PRODUCT_PILLARS and STAGES are the canonical filter value sets;
  * keep card data consistent with these.
@@ -146,7 +146,7 @@ export const prototypes = [
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'toolkit',
-    localPath: '/1007',
+    localPath: null,
     repoPath: 'playground/in-session-ux/',
   },
   {
@@ -274,7 +274,7 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'admin',
-    localPath: '/1015',
+    localPath: null,
     repoPath: 'playground/group-modal/',
   },
   {
@@ -338,7 +338,7 @@ export const prototypes = [
     creators: ['Ashley'],
     contributors: ['Ashley'],
     productPillar: 'universal',
-    localPath: '/1019',
+    localPath: null,
     repoPath: 'playground/storybook-ai-agent/',
   },
   {
@@ -354,7 +354,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'admin',
-    localPath: '/1020',
+    localPath: null,
     repoPath: 'playground/group-info/',
   },
   {
@@ -370,7 +370,7 @@ export const prototypes = [
     creators: ['Victor'],
     contributors: ['Victor'],
     productPillar: 'toolkit',
-    localPath: '/1021',
+    localPath: null,
     repoPath: 'playground/help-request-flow/',
   },
   {

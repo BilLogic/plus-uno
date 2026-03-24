@@ -1,0 +1,978 @@
+/**
+ * variations.scss — Shared structural styles for all 4 layout variations
+ *
+ * WIREFRAME ONLY — layout and legibility, not visual design.
+ * Token-driven, no hardcoded brand colours (use CSS vars throughout).
+ */
+
+// ════════════════════════════════════════════════════════════════════════════
+// SHARED UTILITIES (used across all variations)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Shared progress bar
+%progress-bar-base {
+    width: 100%;
+    height: 8px;
+    background-color: var(--color-surface-variant, #dde3ea);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+%progress-fill-base {
+    height: 100%;
+    background-color: var(--color-primary, #006492);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+%supplemental-toggle {
+    background: none;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    color: var(--color-on-surface-variant, #5a5a5a);
+    text-decoration: underline;
+    font-family: inherit;
+
+    &:hover {
+        color: var(--color-primary, #006492);
+    }
+}
+
+%supplemental-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    margin: 8px 0 0;
+    list-style: none;
+    background-color: var(--color-surface-container-low, #f4f8f9);
+    border-radius: var(--size-section-radius-sm, 8px);
+    border: 1px solid var(--color-outline-variant, #e2e2e5);
+}
+
+%status-badge-base {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 40px;
+    font-weight: 600;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// V1 — LINEAR STEPPER  (two-column: stepper left, detail right)
+// ════════════════════════════════════════════════════════════════════════════
+
+.v1 {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 20px;
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__welcome {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__welcome-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__welcome-sub {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__progress-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__progress-label {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__progress-bar {
+        @extend %progress-bar-base;
+    }
+
+    &__progress-fill {
+        @extend %progress-fill-base;
+    }
+
+    // Two-column body
+    &__body {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    // LEFT: Stepper
+    &__stepper {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        border-right: 1px solid var(--color-outline-variant, #e2e2e5);
+        padding-right: 24px;
+    }
+
+    &__stepper-title {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin: 0 0 16px;
+    }
+
+    &__step-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    // RIGHT: Detail panel
+    &__detail {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    &__detail-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px;
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 2px solid var(--color-primary, #006492);
+        background-color: var(--color-surface, #ffffff);
+    }
+
+    &__detail-context {
+        color: var(--color-primary, #006492);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    &__detail-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__detail-desc {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__detail-duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__detail-cta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 8px;
+    }
+
+    &__detail-locked {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-style: italic;
+    }
+
+    &__supplemental {}
+
+    &__supplemental-toggle {
+        @extend %supplemental-toggle;
+    }
+
+    &__supplemental-list {
+        @extend %supplemental-list;
+    }
+}
+
+// V1 step node
+.v1-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0 10px 4px;
+    position: relative;
+    cursor: default;
+
+    &__connector {
+        position: absolute;
+        left: 15px; // aligns under node centre
+        top: 38px;
+        width: 2px;
+        height: calc(100% - 4px);
+        background-color: var(--color-outline-variant, #e2e2e5);
+        z-index: 0;
+    }
+
+    &__node {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 700;
+        border: 2px solid var(--color-outline-variant, #c0c8cc);
+        background-color: var(--color-surface, #ffffff);
+        color: var(--color-on-surface-variant, #5a5a5a);
+        z-index: 1;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    &__label {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+        padding-top: 2px;
+    }
+
+    &__title {
+        color: var(--color-on-surface, #191c1e);
+        font-weight: 500;
+    }
+
+    &__duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // Status modifiers
+    &--completed {
+        cursor: pointer;
+
+        .v1-step__node {
+            background-color: var(--color-primary-container, #dce9f2);
+            border-color: var(--color-primary, #006492);
+            color: var(--color-primary, #006492);
+        }
+
+        .v1-step__connector {
+            background-color: var(--color-primary, #006492);
+        }
+    }
+
+    &--in-progress {
+        cursor: pointer;
+
+        .v1-step__node {
+            background-color: var(--color-primary, #006492);
+            border-color: var(--color-primary, #006492);
+            color: #ffffff;
+        }
+    }
+
+    &--locked {
+        opacity: 0.45;
+    }
+
+    &--focused {
+        .v1-step__title {
+            color: var(--color-primary, #006492);
+            font-weight: 700;
+        }
+    }
+}
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// V2 — DASHBOARD PROGRESS  (stat tiles + hero CTA + compact path)
+// ════════════════════════════════════════════════════════════════════════════
+
+.v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__subtitle {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__overall-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 220px;
+        flex: 1 1 220px;
+    }
+
+    &__progress-bar {
+        @extend %progress-bar-base;
+    }
+
+    &__progress-fill {
+        @extend %progress-fill-base;
+    }
+
+    // Stat tiles row
+    &__stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    // Lower zone
+    &__lower {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    // CTA hero
+    &__cta-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 24px;
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 2px solid var(--color-primary, #006492);
+        background-color: var(--color-surface, #ffffff);
+    }
+
+    &__cta-eyebrow {
+        color: var(--color-primary, #006492);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    &__cta-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__cta-desc {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__cta-meta {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // Path summary
+    &__path-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+        border-radius: var(--size-section-radius-sm, 8px);
+        overflow: hidden;
+    }
+
+    &__path-title {
+        padding: 10px 16px;
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin: 0;
+        border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__path-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__supplemental {}
+
+    &__supplemental-toggle {
+        @extend %supplemental-toggle;
+    }
+
+    &__supplemental-list {
+        @extend %supplemental-list;
+    }
+}
+
+// Stat tile
+.v2-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 20px;
+    border: 1px solid var(--color-outline-variant, #e2e2e5);
+    border-radius: var(--size-section-radius-sm, 8px);
+    background-color: var(--color-surface, #ffffff);
+
+    &__value {
+        color: var(--color-on-surface, #191c1e);
+        margin: 0;
+        display: block;
+    }
+
+    &__label {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+}
+
+// Path list item
+.v2-path-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &__node {
+        width: 22px;
+        min-width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        border: 2px solid var(--color-outline-variant, #c0c8cc);
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__title {
+        flex: 1;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        flex-shrink: 0;
+    }
+
+    &--completed {
+        .v2-path-item__node {
+            background-color: var(--color-primary-container, #dce9f2);
+            border-color: var(--color-primary, #006492);
+            color: var(--color-primary, #006492);
+        }
+    }
+
+    &--in-progress {
+        background-color: var(--color-primary-container, #e3f2fd);
+
+        .v2-path-item__node {
+            background-color: var(--color-primary, #006492);
+            border-color: var(--color-primary, #006492);
+            color: #ffffff;
+        }
+    }
+
+    &--locked {
+        opacity: 0.5;
+    }
+}
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// V3 — CARD JOURNEY  (horizontal card pipeline + detail panel below)
+// ════════════════════════════════════════════════════════════════════════════
+
+.v3 {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 20px;
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__welcome {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__welcome-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__welcome-sub {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__progress-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__progress-bar {
+        @extend %progress-bar-base;
+    }
+
+    &__progress-fill {
+        @extend %progress-fill-base;
+    }
+
+    // Pipeline
+    &__pipeline {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__pipeline-title {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    // Horizontal card row
+    &__card-row {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: var(--color-surface-variant, #dde3ea);
+            border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--color-outline-variant, #bec8ca);
+            border-radius: 2px;
+        }
+    }
+
+    // Detail panel
+    &__detail {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        flex-wrap: wrap;
+        padding: 20px 24px;
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 2px solid var(--color-primary, #006492);
+        background-color: var(--color-surface, #ffffff);
+    }
+
+    &__detail-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1 1 280px;
+    }
+
+    &__detail-label {
+        color: var(--color-primary, #006492);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    &__detail-title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__detail-desc {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__detail-duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__detail-cta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    &__detail-locked {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-style: italic;
+        font-size: 12px;
+        max-width: 180px;
+    }
+
+    &__supplemental {}
+
+    &__supplemental-toggle {
+        @extend %supplemental-toggle;
+    }
+
+    &__supplemental-list {
+        @extend %supplemental-list;
+    }
+}
+
+// V3 step card
+.v3-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    min-width: 150px;
+    max-width: 200px;
+    border-radius: var(--size-section-radius-sm, 8px);
+    border: 1px solid var(--color-outline-variant, #e2e2e5);
+    background-color: var(--color-surface, #ffffff);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:hover {
+        border-color: var(--color-primary, #006492);
+    }
+
+    &__step-number {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    &__icon {
+        font-size: 20px;
+
+        &--done {
+            color: var(--color-primary, #006492);
+        }
+
+        &--active {
+            color: var(--color-secondary, #4f7b8c);
+        }
+
+        &--locked {
+            color: var(--color-outline, #c0c8cc);
+        }
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    &__duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    &__status {
+        font-weight: 600;
+
+        &--completed {
+            color: var(--color-primary, #006492);
+        }
+
+        &--in-progress {
+            color: var(--color-secondary, #4f7b8c);
+        }
+
+        &--locked {
+            color: var(--color-outline, #c0c8cc);
+        }
+    }
+
+    // Active (focused) card
+    &--active {
+        border-color: var(--color-primary, #006492);
+        border-width: 2px;
+        background-color: var(--color-primary-container, #e3f2fd);
+        box-shadow: 0 2px 8px rgba(0, 100, 146, 0.14);
+    }
+
+    // Status-based dimming
+    &--locked {
+        opacity: 0.5;
+    }
+
+    &--completed {
+        opacity: 0.8;
+    }
+}
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// V4 — CHECKLIST COMPLETION  (progress ring + checklist with inline CTA)
+// ════════════════════════════════════════════════════════════════════════════
+
+.v4 {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    &__header {
+        padding: 16px 20px;
+        background-color: var(--color-surface-container-low, #f4f8f9);
+        border-radius: var(--size-section-radius-sm, 8px);
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+    }
+
+    &__header-ring-zone {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    &__ring-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface, #191c1e);
+    }
+
+    &__subtitle {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // Checklist section
+    &__checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__checklist-title {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin: 0;
+    }
+
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        border: 1px solid var(--color-outline-variant, #e2e2e5);
+        border-radius: var(--size-section-radius-sm, 8px);
+        overflow: hidden;
+    }
+
+    &__supplemental {}
+
+    &__supplemental-toggle {
+        @extend %supplemental-toggle;
+    }
+
+    &__supplemental-list {
+        @extend %supplemental-list;
+    }
+}
+
+// V4 checklist item
+.v4-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+    background-color: var(--color-surface, #ffffff);
+    transition: background-color 0.15s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    // Checkbox indicator
+    &__check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        margin-top: 1px;
+        border-radius: 4px;
+        border: 2px solid var(--color-outline-variant, #c0c8cc);
+        font-size: 14px;
+        font-weight: 700;
+
+        &--completed {
+            background-color: var(--color-primary, #006492);
+            border-color: var(--color-primary, #006492);
+            color: #ffffff;
+        }
+
+        &--in-progress {
+            border-color: var(--color-primary, #006492);
+            color: var(--color-primary, #006492);
+        }
+
+        &--locked {
+            border-color: var(--color-outline-variant, #c0c8cc);
+            color: var(--color-outline-variant, #c0c8cc);
+        }
+    }
+
+    // Body content
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+    }
+
+    &__title-row {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+    }
+
+    &__title {
+        font-weight: 600;
+        color: var(--color-on-surface, #191c1e);
+        flex: 1;
+
+        &--done {
+            text-decoration: line-through;
+            color: var(--color-on-surface-variant, #5a5a5a);
+        }
+    }
+
+    &__duration {
+        color: var(--color-on-surface-variant, #5a5a5a);
+        flex-shrink: 0;
+    }
+
+    // Active zone — description + inline CTA
+    &__active-zone {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 4px;
+    }
+
+    &__desc {
+        margin: 0;
+        color: var(--color-on-surface-variant, #5a5a5a);
+    }
+
+    // Status badge (right column)
+    &__badge-wrap {
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    &__badge {
+        @extend %status-badge-base;
+
+        &--done {
+            background-color: var(--color-primary-container, #dce9f2);
+            color: var(--color-on-primary-container, #003550);
+        }
+
+        &--active {
+            background-color: var(--color-secondary-container, #cde5f0);
+            color: var(--color-on-secondary-container, #0a3040);
+        }
+
+        &--locked {
+            background-color: var(--color-surface-variant, #e8eef0);
+            color: var(--color-on-surface-variant, #5a5a5a);
+        }
+    }
+
+    // State-based row styling
+    &--in-progress,
+    &--active {
+        background-color: var(--color-primary-container, #e3f2fd);
+    }
+
+    &--locked {
+        opacity: 0.5;
+    }
+}
+
+// V4 progress ring
+.v4-ring {
+    flex-shrink: 0;
+
+    &__track {
+        stroke: var(--color-surface-variant, #dde3ea);
+    }
+
+    &__fill {
+        stroke: var(--color-primary, #006492);
+    }
+
+    &__label {
+        font-family: 'Lato', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        fill: var(--color-on-surface, #191c1e);
+    }
+}

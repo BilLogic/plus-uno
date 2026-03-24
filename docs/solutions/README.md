@@ -6,7 +6,7 @@ Each file documents a problem encountered, its root cause, the solution applied,
 
 ```
 Agent uses docs → does work → learns something →
-  /po:compound → writes solution doc → updates AGENTS.md or conventions →
+  /uno:compound → writes solution doc → updates AGENTS.md or conventions →
     next agent session benefits
 ```
 
@@ -50,4 +50,4 @@ How to avoid this in the future.
 
 - After non-trivial fixes or discoveries, add a solution doc
 - Periodically extract patterns from solutions into `AGENTS.md` forbidden patterns and `docs/project/conventions.md` gotchas
-- Use `/po:compound` skill to create solution docs interactively
+- Use `/uno:compound` skill to create solution docs interactively

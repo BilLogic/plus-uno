@@ -1,0 +1,43 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
+import { DocsCanvasShell } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={LabelAndCaptionStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Label copy and optional required asterisk.</>}>
+    <Canvas of={LabelAndCaptionStories.LabelContent} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Caption semantic styles: default, success, danger, warning, disabled.</>}>
+    <Canvas of={LabelAndCaptionStories.CaptionVariants} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout
+
+<DocsCanvasShell description={<>Label, native input, and caption stacked as a field.</>}>
+    <Canvas of={LabelAndCaptionStories.Layout} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

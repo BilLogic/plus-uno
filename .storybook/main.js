@@ -1,6 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import tailwindcss from '@tailwindcss/vite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,6 +9,7 @@ const __dirname = path.dirname(__filename);
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
+    '../design-system/src/**/*.mdx',
     // design-system is the source of truth (includes specs; design-system/specs excluded to avoid duplicate story IDs with Toolkit)
     '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
@@ -81,7 +83,9 @@ const config = {
 
     // Ensure proper resolution of .js files
     if (!config.resolve.extensions) {
-      config.resolve.extensions = ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'];
+      config.resolve.extensions = ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.mdx'];
+    } else if (!config.resolve.extensions.includes('.mdx')) {
+      config.resolve.extensions.push('.mdx');
     }
 
     // Configure Vite to resolve modules from project root
@@ -99,6 +103,15 @@ const config = {
     // Deduplicate React to avoid invalid hook call errors
     config.resolve.dedupe = config.resolve.dedupe || [];
     config.resolve.dedupe.push('react', 'react-dom');
+
+    // Tailwind (shadcn doc chrome + MDX); must run before other CSS transforms
+    const plugins = config.plugins ?? [];
+    const hasTailwind = plugins.some(
+      (p) => p && (p.name === '@tailwindcss/vite' || p.name === 'tailwindcss')
+    );
+    if (!hasTailwind) {
+      config.plugins = [tailwindcss(), ...plugins];
+    }
 
     // Config css
     config.css = config.css || {};

@@ -10,7 +10,7 @@ import Select from './Select';
 export default {
     title: 'Forms/Select',
     component: Select,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {

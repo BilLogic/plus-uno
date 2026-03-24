@@ -1,0 +1,69 @@
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as CollapseStories from './Collapse.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={CollapseStories} />
+
+<Title />
+<Description />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Uncontrolled usage and an initially expanded panel via <code>defaultOpen</code>.</>}>
+    <Canvas of={CollapseStories.Content} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Icons
+
+<DocsCanvasShell description={<>Optional trigger icons on the left or right.</>}>
+    <Canvas of={CollapseStories.Icons} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### State patterns
+
+<DocsCanvasShell description={<>External open state and multiple independent panels.</>}>
+    <Canvas of={CollapseStories.StatePatterns} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Link trigger
+
+<DocsCanvasShell description={<>Anchor trigger with <code>triggerTag=&quot;a&quot;</code>.</>}>
+    <Canvas of={CollapseStories.LinkTrigger} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={CollapseStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
