@@ -13,8 +13,8 @@
     flex: 1;
     background-color: var(--color-surface-container-low);
     border-radius: var(--size-border-radius-radius-100);
-    padding: var(--size-spacing-within-component-spacer-5) var(--size-spacing-between-sections-spacer-3-base);
-    padding-bottom: var(--size-spacing-between-sections-spacer-4);
+    padding: var(--size-card-pad-x-md) var(--size-section-gap-lg);
+    padding-bottom: var(--size-section-pad-y-lg);
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -44,8 +44,8 @@
     flex: 1;
     background-color: var(--color-surface-container-low);
     border-radius: var(--size-border-radius-radius-100);
-    padding: var(--size-spacing-within-component-spacer-5) var(--size-spacing-between-sections-spacer-3-base);
-    padding-bottom: var(--size-spacing-between-sections-spacer-4);
+    padding: var(--size-card-pad-x-md) var(--size-section-gap-lg);
+    padding-bottom: var(--size-section-pad-y-lg);
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -181,7 +181,7 @@
 .plus-overview-card-smart-bar {
     display: flex;
     flex-direction: column;
-    gap: var(--size-spacing-within-component-spacer-2);
+    gap: var(--size-element-gap-xs);
     align-items: center;
 }
 
@@ -215,7 +215,7 @@
 
 .plus-students-table-header {
     display: flex;
-    gap: var(--size-spacing-within-component-spacer-3-5);
+    gap: var(--size-element-gap-md);
     align-items: center;
 }
 

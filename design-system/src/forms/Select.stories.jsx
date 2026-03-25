@@ -36,9 +36,85 @@ const sampleOptions = [
     { value: 'option-5', label: 'Option #5' },
 ];
 
+/** Content — Placeholder and value display in single-select mode. */
+export const Content = {
+    render: () => (
+        <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Empty</div>
+                <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Filled</div>
+                <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            </div>
+        </div>
+    )
+};
+
+/** Styles — Multi-select, searchable, and creatable behaviors. */
+export const Styles = {
+    render: () => (
+        <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Multi-select</div>
+                <Select mode="multi" options={sampleOptions} placeholder="Select {value(s)} from below" />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Searchable</div>
+                <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Creatable</div>
+                <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
+            </div>
+        </div>
+    )
+};
+
+/** Sizes — Small, medium, and large. */
+export const Sizes = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Small</div>
+                <Select size="small" options={sampleOptions} placeholder="Select..." />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Medium (default)</div>
+                <Select size="medium" options={sampleOptions} placeholder="Select..." />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Large</div>
+                <Select size="large" options={sampleOptions} placeholder="Select..." />
+            </div>
+        </div>
+    )
+};
+
+/** InteractionStates — Enabled, disabled, and read-only. */
+export const InteractionStates = {
+    render: () => (
+        <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Enabled</div>
+                <Select defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled</div>
+                <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+            </div>
+            <div>
+                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only</div>
+                <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+            </div>
+        </div>
+    )
+};
+
 /**
  * Overview
- * Matches Figma content/copy, using the standard Forms overview vertical layout.
+ * Full component showcase with all use cases.
  */
 export const Overview = {
     render: () => (

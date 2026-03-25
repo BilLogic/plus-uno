@@ -11,7 +11,8 @@ Load files in this order, stopping as soon as you have enough context.
 | Layout Cheat Sheet | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` | 300 | MANDATORY when building new pages, dashboards, or modals. |
 | Foundations | `../docs/design-system/overview.md` | 150 | Before implementation work |
 | Tokens | `../docs/design-system/tokens.md` | 350 | For advanced token architecture (use Cheat Sheet for daily use) |
-| Integrations | `../docs/design-system/integrations.md` | 120 | When using Figma/Stitch MCP |
+| Figma MCP | `references/figma-mcp-guide.md` | 400 | When Figma link provided or implement-design workflow |
+| Integrations | `../docs/design-system/integrations.md` | 120 | When deciding which MCP/integration path to use |
 | Components | `../docs/design-system/components.md` | 140 | When selecting DS components |
 | Implementation | `../docs/design-system/guides/implementation.md` | 200 | When choosing implementation approach or example |
 | JSON indexes | `assets/*.json` | 150-500 each | Only for exhaustive path/glob lookup |
@@ -29,7 +30,7 @@ Load additional references reactively based on what comes up in conversation:
 |---------|------|
 | User asks to build UI, or mentions tokens, colors, spacing, components, or UI | `.agent/assets/PLUS_CHEAT_SHEET.md` |
 | User asks to build a new page, screen, dashboard, or layout | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` |
-| User provides a Figma link or mentions MCP tools | `../docs/design-system/integrations.md` |
+| User provides a Figma link or mentions MCP tools | `references/figma-mcp-guide.md` (PRIMARY), then `../docs/design-system/integrations.md` if routing needed |
 | User explicitly asks for component architecture rules | `../docs/design-system/components.md` |
 | User asks about build, preview, or deployment | `../docs/design-system/guides/local-preview.md` |
 | Agent needs exact file paths, globs, or env vars | Relevant `assets/*-index.json` |

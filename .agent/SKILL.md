@@ -44,7 +44,7 @@ If ambiguous, ask: which mode, design-tool or scratch, and what fidelity.
 
 ## Grounding Rules
 
-0. **Figma link → fetch design first**: Use Figma MCP to get design context and screenshot before implementing.
+0. **Figma link → full implement-design workflow**: Load `references/figma-mcp-guide.md` and follow all 7 steps. Do not skip asset download, convention translation, or visual validation.
 1. Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
 2. **THE CHEAT SHEET IS LAW:** Before writing any React component or CSS token, read `.agent/assets/PLUS_CHEAT_SHEET.md`.
 3. **NEVER HALLUCINATE LAYOUTS:** Read `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` before building pages.
@@ -61,6 +61,8 @@ Load these as needed — do not bulk-load:
 - [Import Conventions](references/import-conventions.md) — Alias usage, barrel exports, entry points
 - [Component Discovery](references/component-discovery.md) — How to find existing components before building new ones
 - [Loading Order](references/loading-order.md) — Progressive loading rules, triggers table, context budget
+- [Figma MCP Guide](references/figma-mcp-guide.md) — All Figma MCP tools, implement-design workflow, token mapping
+- [Figma Token Mapping](references/figma-token-mapping.md) — Figma variable → PLUS CSS token mapping for `create_design_system_rules`
 
 ## Scope and Integrations
 
