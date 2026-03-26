@@ -340,6 +340,15 @@ html.market-active #root {
   &__modal-open-prototype.plus-btn {
     min-width: 152px;
     justify-content: center;
+
+    .plus-btn-text {
+      color: inherit;
+    }
+
+    .plus-btn-visual--trailing,
+    .plus-btn-visual--trailing i {
+      color: inherit;
+    }
   }
 
   &__modal-links {
