@@ -23,6 +23,7 @@ const TutorPerformancePage = React.lazy(() => import('../playground/tutor-perfor
 const TrainingProgressPage = React.lazy(() => import('../playground/training-progress/TrainingProgressPage'));
 const GroupPerformanceV2Page = React.lazy(() => import('../playground/group-performance-v2/GroupPerformanceV2Page'));
 const TutorRiskInterventionsPage = React.lazy(() => import('../playground/tutor-risk-interventions/TutorRiskInterventionsPage'));
+const TrainingOnboardingClickthrough = React.lazy(() => import('../playground/training-onboarding/TrainingOnboardingClickthrough'));
 
 function StorybookEmbed() {
   const storyBookUrl = import.meta.env.VITE_STORYBOOK_URL || 'http://localhost:4200';
@@ -93,6 +94,7 @@ function PrototypeRouter() {
     '1023': StarterApp,
     '1024': StudentGoalDashboardApp,
     '1025': StudentOnboardingWizardApp,
+    '1026': TrainingOnboardingClickthrough,
   };
 
   const LazyComponent = STANDALONE_ROUTES[prototypeId];

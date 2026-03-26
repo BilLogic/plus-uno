@@ -347,7 +347,9 @@ const ModuleCardItem = ({ module, onCta }) => {
                 module.stage === 'in progress' && 'oob-hifi__card-item--active',
             ].filter(Boolean).join(' ')}
             aria-label={`Module: ${module.title} — ${module.stage}`}
-            tabIndex={0}
+            tabIndex={isLocked ? -1 : 0}
+            onClick={() => !isLocked && onCta && onCta(module)}
+            style={{ cursor: isLocked ? 'default' : 'pointer' }}
         >
             {/* Description overlay — appears on hover/focus over the image area */}
             <div className="oob-hifi__card-desc-overlay" aria-hidden="true">
@@ -372,7 +374,10 @@ const ModuleCardItem = ({ module, onCta }) => {
                     ) : (
                         <CtaButtons
                             state={module.stage}
-                            onClick={() => onCta && onCta(module)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onCta && onCta(module);
+                            }}
                         />
                     )
                 }
