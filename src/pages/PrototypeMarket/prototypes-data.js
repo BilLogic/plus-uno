@@ -52,6 +52,7 @@ export const prototypes = [
     productPillar: 'home',
     localPath: '/1001',
     repoPath: 'playground/home-redesign/',
+    loomVideoUrl: 'https://www.loom.com/share/example123',
   },
   {
     id: '1002',
@@ -310,22 +311,6 @@ export const prototypes = [
     repoPath: 'playground/tutor-risk-interventions/',
   },
   {
-    id: '1018',
-    title: 'Tutor Reflection Form',
-    description:
-      'Redesigned post-session reflection form with one-form-per-session flow, adaptive branching, student deep dive, strategy effectiveness ratings, and escalation tracking.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'mid',
-    lastUpdated: '2026-03-19',
-    creators: ['Bryan'],
-    contributors: ['Bryan'],
-    productPillar: 'toolkit',
-    localPath: '/1018',
-    repoPath: 'playground/tutor-reflection-form/',
-  },
-  {
     id: '1019',
     title: 'Storybook AI Agent',
     description:
@@ -388,22 +373,6 @@ export const prototypes = [
     productPillar: 'toolkit',
     localPath: '/1022',
     repoPath: 'playground/recommend-sessions/',
-  },
-  {
-    id: '1023',
-    title: 'Starter Template',
-    description:
-      'Minimal starter template for new playground prototypes with PLUS DS integration.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'low',
-    lastUpdated: '2026-03-15',
-    creators: ['Bryan'],
-    contributors: ['Bryan'],
-    productPillar: 'universal',
-    localPath: '/1023',
-    repoPath: 'playground/starter/',
   },
   {
     id: '1024',

@@ -39,6 +39,8 @@ Gather the required fields. Use smart defaults where possible.
 | `productPillar` | enum | Ask user (choice): `admin`, `home`, `login`, `profile`, `toolkit`, `training`, `universal` |
 | `localPath` | string or null | Ask user; null if not wired into root app |
 | `repoPath` | string | Auto-detect or ask |
+| `loomVideoUrl` | string or null | Ask user; Loom share URL for walkthrough video (e.g. `https://www.loom.com/share/abc123`). Shown as embedded video in the popup detail modal. null if none |
+| `upvotes` | number | Auto: `0` (managed in-app; do not ask user) |
 
 ### Phase 2: Deployment Help (optional)
 
@@ -85,6 +87,7 @@ I'll add this entry to the Prototype Market:
     productPillar: 'home',
     localPath: '/home',
     repoPath: 'playground/{project}/',
+    loomVideoUrl: null,
   }
 
 File: src/pages/PrototypeMarket/prototypes-data.js
@@ -100,10 +103,14 @@ After appending:
 - [ ] `/market` page loads and shows the new card
 - [ ] Filters (stage, pillar) include the new entry
 - [ ] Deployment link works (if provided)
+- [ ] Click the card to open the popup detail modal — verify title, badges, description, links render correctly
+- [ ] Loom walkthrough video embeds correctly in popup detail modal (if `loomVideoUrl` provided)
+- [ ] Preview image loads in popup detail modal (run `npm run generate:previews` if missing)
 - [ ] Optionally commit the change
 
 ## References
 
 - Data schema: `src/pages/PrototypeMarket/prototypes-data.js`
-- Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx`
+- Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx` (includes popup detail modal with Loom embed, comments, preview image, upvotes)
+- Card component: `src/pages/PrototypeMarket/PrototypeCard.jsx`
 - Prototyping docs: `playground/README.md`

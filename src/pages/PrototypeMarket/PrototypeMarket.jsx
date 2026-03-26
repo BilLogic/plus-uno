@@ -4,6 +4,7 @@ import Input from '@/forms/Input';
 import Badge from '@/components/Badge';
 import Button from '@/components/Button';
 import ButtonGroup from '@/components/ButtonGroup';
+import Divider from '@/components/Divider';
 import PrototypeCard from './PrototypeCard';
 import {
   prototypes,
@@ -21,6 +22,18 @@ const fidelityRank = { low: 1, mid: 2, high: 3 };
 // Derive unique creators from data
 const CREATORS = [...new Set(prototypes.flatMap((p) => p.creators))].sort();
 const creatorOptions = CREATORS.map((c) => ({ value: c, label: c }));
+
+/**
+ * Parse a Loom share URL into an embed URL.
+ * https://www.loom.com/share/abc123 → https://www.loom.com/embed/abc123
+ */
+function toLoomEmbed(url) {
+  if (!url) return null;
+  const match = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+  if (match) return `https://www.loom.com/embed/${match[1]}`;
+  if (url.includes('loom.com/embed/')) return url;
+  return null;
+}
 
 function formatDate(dateStr) {
   if (!dateStr) return '—';
@@ -252,24 +265,28 @@ const PrototypeMarket = () => {
         </div>
 
         <div className="prototype-market__sorts" aria-label="Sort controls">
-          <button
-            type="button"
-            className={`prototype-market__sort-btn body3-txt ${sortBy === 'time' ? 'is-active' : ''}`}
+          <Button
+            text="Time"
+            style="secondary"
+            fill="outline"
+            size="small"
+            active={sortBy === 'time'}
+            trailingVisual={<i className={`fa-solid ${sortBy === 'time' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />}
             onClick={() => handleSortClick('time')}
             aria-pressed={sortBy === 'time'}
-          >
-            <span>Time</span>
-            <i className={`fa-solid ${sortBy === 'time' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />
-          </button>
-          <button
-            type="button"
-            className={`prototype-market__sort-btn body3-txt ${sortBy === 'fidelity' ? 'is-active' : ''}`}
+            className="prototype-market__sort-btn"
+          />
+          <Button
+            text="Fidelity"
+            style="secondary"
+            fill="outline"
+            size="small"
+            active={sortBy === 'fidelity'}
+            trailingVisual={<i className={`fa-solid ${sortBy === 'fidelity' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />}
             onClick={() => handleSortClick('fidelity')}
             aria-pressed={sortBy === 'fidelity'}
-          >
-            <span>Fidelity</span>
-            <i className={`fa-solid ${sortBy === 'fidelity' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />
-          </button>
+            className="prototype-market__sort-btn"
+          />
         </div>
       </div>
 
@@ -402,14 +419,15 @@ const PrototypeMarket = () => {
             aria-label={`${activePrototype.title} details`}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
+            <Button
               className="prototype-market__modal-close"
+              style="secondary"
+              fill="ghost"
+              size="medium"
+              leadingVisual="xmark"
               onClick={() => setActivePrototype(null)}
               aria-label="Close details"
-            >
-              <i className="fa-solid fa-xmark" />
-            </button>
+            />
 
             <div className="prototype-market__modal-top">
               <div className="prototype-market__modal-header-main">
@@ -462,15 +480,29 @@ const PrototypeMarket = () => {
                   <i className="fa-brands fa-notion" /> {activePrototype.notionCardId || 'Notion'}
                 </a>
               )}
-              {activePrototype.deploymentUrl && (
-                <a href={activePrototype.deploymentUrl} target="_blank" rel="noopener noreferrer">
-                  <i className="fa-solid fa-file-video" /> Loom Video
+              {activePrototype.loomVideoUrl && (
+                <a href={activePrototype.loomVideoUrl} target="_blank" rel="noopener noreferrer">
+                  <i className="fa-solid fa-video" /> Loom Walkthrough
                 </a>
               )}
             </div>
 
             <p className="prototype-market__modal-desc body1-txt">{activePrototype.description}</p>
-            <hr />
+
+            {toLoomEmbed(activePrototype.loomVideoUrl) && (
+              <>
+                <h5 className="prototype-market__modal-section h5">Walkthrough</h5>
+                <div className="prototype-market__modal-loom">
+                  <iframe
+                    src={toLoomEmbed(activePrototype.loomVideoUrl)}
+                    frameBorder="0"
+                    allowFullScreen
+                    title={`${activePrototype.title} walkthrough video`}
+                  />
+                </div>
+              </>
+            )}
+            <Divider size="1px" style="dark" opacity10={true} />
             <h5 className="prototype-market__modal-section h5">Comments</h5>
             <div className="prototype-market__modal-comments">
               {(commentsById[activePrototype.id] || []).map((comment, idx) => (
@@ -509,14 +541,16 @@ const PrototypeMarket = () => {
                 aria-label="Send comment"
               />
             </div>
-            <hr />
+            <Divider size="1px" style="dark" opacity10={true} />
             <h5 className="prototype-market__modal-section h5">Preview</h5>
             <div className="prototype-market__modal-preview">
               {getPrototypeOpenUrl(activePrototype) ? (
-                <button
-                  type="button"
+                <div
                   className="prototype-market__modal-preview-link"
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => openPrototypeInNewTab(activePrototype, e)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPrototypeInNewTab(activePrototype, e); } }}
                 >
                   {missingPreviews.has(activePrototype.id) ? (
                     <div className="prototype-market__modal-preview-fallback body2-txt">
@@ -537,7 +571,7 @@ const PrototypeMarket = () => {
                       }}
                     />
                   )}
-                </button>
+                </div>
               ) : (
                 <div className="prototype-market__modal-preview-fallback body2-txt">
                   No prototype link available for preview.
