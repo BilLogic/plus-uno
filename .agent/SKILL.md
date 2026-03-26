@@ -13,12 +13,16 @@ description: Cross-agent router for working in the PLUS design system repository
 
 ## Skills
 
-| Skill | Trigger | Codes? |
-|-------|---------|--------|
-| [uno-post](skills/uno-post/SKILL.md) | "Submit", "Publish", "Add to market" | Yes |
-| [uno-prototype](skills/uno-prototype/SKILL.md) | Scaffold new playground prototype | Yes |
-| [uno-compound](skills/uno-compound/SKILL.md) | Document learnings after work | No |
-| [uno-review](skills/uno-review/SKILL.md) | Quality gate before shipping | No |
+| Skill | Trigger | Auto-Suggest When | Next Step | Side Effects |
+|-------|---------|-------------------|-----------|--------------|
+| [uno-prototype](skills/uno-prototype/SKILL.md) | "scaffold", "new prototype", "create playground" | User describes a new feature idea without existing prototype | → uno-review | Creates files in playground/ |
+| [uno-review](skills/uno-review/SKILL.md) | "review", "check", "validate", "quality check" | Before commit, before uno-post, user says "done" or "ready" | → uno-post (pass) / fix then uno-compound (fail) | Read-only |
+| [uno-post](skills/uno-post/SKILL.md) | "submit", "publish", "add to market" | After uno-review passes | → uno-compound | Writes marketplace data file |
+| [uno-compound](skills/uno-compound/SKILL.md) | "document", "write up", "compound", "save learning" | After significant work, after bug fix, session ending | Terminal | Writes solution doc, may propose instruction edits |
+
+**Pipeline:** `uno-prototype → uno-review → uno-post → uno-compound`
+
+Each skill's `## Auto-Suggest` and `## Next Step` sections contain the full conditions. The pipeline is a recommendation, not a requirement — users may skip steps.
 
 ## Mode Routing (Mutually Exclusive)
 
