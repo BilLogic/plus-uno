@@ -155,13 +155,12 @@ export const Breakpoints = () => (
             headers={['Token Name', 'Value', 'Description']}
             rows={[
                 { token: '--breakpoint-md-min', value: '768px', description: 'Minimum width for medium screens (tablets)' },
-                { token: '--breakpoint-md-max', value: '991.98px', description: 'Maximum width for medium screens' },
-                { token: '--breakpoint-lg-min', value: '992px', description: 'Minimum width for large screens (desktops)' },
-                { token: '--breakpoint-lg-max', value: '1199.98px', description: 'Maximum width for large screens' },
-                { token: '--breakpoint-xl-min', value: '1200px', description: 'Minimum width for extra large screens' },
-                { token: '--breakpoint-xl-max', value: '1399.98px', description: 'Maximum width for extra large screens' },
-                { token: '--breakpoint-xxl-min', value: '1400px', description: 'Minimum width for 2x large screens' },
-                { token: '--breakpoint-xxl-max', value: '1800px', description: 'Maximum width for 2x large screens' },
+                { token: '--breakpoint-md-max', value: '1023.98px', description: 'Maximum width for medium screens' },
+                { token: '--breakpoint-lg-min', value: '1024px', description: 'Minimum width for large screens (desktops)' },
+                { token: '--breakpoint-lg-max', value: '1439.98px', description: 'Maximum width for large screens' },
+                { token: '--breakpoint-xl-min', value: '1440px', description: 'Minimum width for extra large screens (HD)' },
+                { token: '--breakpoint-xl-max', value: '1919.98px', description: 'Maximum width for extra large screens' },
+                { token: '--breakpoint-xxl-min', value: '1920px', description: 'Minimum width for 2x large screens' },
             ]}
         />
     </div>
@@ -176,7 +175,7 @@ export const ElementSpacings = () => (
             headers={['Token', 'Value', 'Description']}
             rows={[
                 { token: '--size-element-pad-x-lg', value: '16px', description: 'Large horizontal padding' },
-                { token: '--size-element-pad-x-md', value: '10px', description: 'Medium horizontal padding' },
+                { token: '--size-element-pad-x-md', value: '12px', description: 'Medium horizontal padding' },
                 { token: '--size-element-pad-x-sm', value: '8px', description: 'Small horizontal padding' },
                 { token: '--size-element-pad-y-lg', value: '8px', description: 'Large vertical padding' },
                 { token: '--size-element-pad-y-md', value: '6px', description: 'Medium vertical padding' },
@@ -199,10 +198,10 @@ export const ElementSpacings = () => (
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
-                { token: '--size-element-radius-sm', value: '4px', description: 'Small radius' },
-                { token: '--size-element-radius-md', value: '4px', description: 'Medium radius' },
-                { token: '--size-element-radius-lg', value: '4px', description: 'Large radius' },
-                { token: '--size-element-radius-pill', value: '999px', description: 'Pill shape' },
+                { token: '--size-element-radius-sm', value: '4px', description: 'Small radius (radius-100)' },
+                { token: '--size-element-radius-md', value: '4px', description: 'Medium radius (radius-100)' },
+                { token: '--size-element-radius-lg', value: '8px', description: 'Large radius (radius-200)' },
+                { token: '--size-element-radius-full', value: '999px', description: 'Pill shape (radius-1000)' },
             ]}
         />
     </div>
@@ -250,7 +249,7 @@ export const SectionSpacings = () => (
                 { token: '--size-section-gap-md', value: '16px', description: 'Medium gap' },
                 { token: '--size-section-gap-sm', value: '8px', description: 'Small gap' },
                 { token: '--size-section-radius-sm', value: '8px', description: 'Small border radius' },
-                { token: '--size-section-radius-md', value: '8px', description: 'Medium border radius' },
+                { token: '--size-section-radius-md', value: '12px', description: 'Medium border radius (radius-300)' },
                 { token: '--size-section-radius-lg', value: '16px', description: 'Large border radius' },
             ]}
         />

@@ -101,7 +101,7 @@ export const StatusColors = () => (
                 { token: '--color-success', value: '#3e691a', description: 'Main success color' },
                 { token: '--color-success-text', value: '#2c5609', description: 'Success text color' },
                 { token: '--color-on-success', value: '#ffffff', description: 'Content color on success' },
-                { token: '--color-success-container', value: '#a1eb83', description: 'Success container background' },
+                { token: '--color-success-container', value: '#bdf292', description: 'Success container background' },
                 { token: '--color-on-success-container', value: '#0c2000', description: 'Content color on success container' },
             ]}
         />

@@ -2,7 +2,9 @@
 name: uno-compound
 description: >
   Document a solution or learning from work just completed. Creates a searchable
-  solution doc in docs/solutions/ and updates agent-context docs if patterns emerge.
+  solution doc in docs/solutions/. Use when the user says "document this",
+  "write it up", "save this learning", "compound", or after fixing a non-trivial
+  bug, discovering a gotcha, or making a design decision worth preserving.
 user-invocable: true
 argument-hint: [brief-description]
 ---
@@ -18,6 +20,17 @@ Capture what was learned during recent work so future agent sessions benefit.
 - After a design decision that others should know about
 - After any work where you learned something not obvious from the code
 
+## Auto-Suggest
+
+Proactively suggest this skill when:
+- The conversation involved debugging or fixing an error
+- The user discovered a gotcha or unintuitive behavior
+- Significant code changes were made (3+ files modified)
+- The session is ending after non-trivial work
+- `/uno:review` found violations that were then fixed (the fix is worth documenting)
+
+Suggest once at the end of a work session — do not interrupt mid-task.
+
 ## Steps
 
 ### 1. Summarize
@@ -26,46 +39,21 @@ What was done? What broke? What was the root cause? What was the fix?
 
 ### 2. Create Solution Doc
 
-Write to `docs/solutions/{category}/` using this template:
+Write to `docs/solutions/{category}/` using the template in `examples/solution-doc-template.md`. Categories: `ui-bugs`, `integration-issues`, `agent-infrastructure`, `token-issues`.
 
-```markdown
----
-title: "Description of what was solved"
-category: ui-bugs | integration-issues | agent-infrastructure | token-issues
-date: YYYY-MM-DD
-tags: [relevant, tags]
-symptom: "What the user/agent saw"
-root_cause: "Why it happened"
----
-
-# Title
-
-## Problem
-What went wrong.
-
-## Solution
-How it was fixed (with code examples if applicable).
-
-## Prevention
-How to avoid this in the future.
-
-## Files Modified
-| File | Change |
-|------|--------|
-| path/to/file | What changed |
-```
+For the full schema and field descriptions, see `references/solution-schema.md`.
 
 ### 3. Check for Pattern Escalation
 
-Ask: Should this learning update broader docs?
+Ask: Should this learning update broader docs? See `references/escalation-rules.md` for the full decision table.
 
-| If... | Then update... |
-|-------|---------------|
-| New forbidden pattern discovered | `AGENTS.md` forbidden patterns section |
-| New gotcha found | `docs/project/conventions.md` gotchas table |
-| New terminology confusion | `docs/foundations/terminology.md` |
-| Component API surprise | `.agent/assets/PLUS_CHEAT_SHEET.md` |
+### 4. Update if Warranted (Requires Approval)
 
-### 4. Update if Warranted
+**GATE:** Show the proposed change to the user and wait for explicit approval before modifying any agent instruction file. These files govern agent behavior across all future sessions on all platforms — changes must be intentional.
 
-Make the update, citing the solution doc as the source.
+If approved, make the update and cite the solution doc as the source.
+
+## Next Step
+
+This is the terminal skill in the pipeline. No further skill follows.
+Optionally suggest committing the solution doc and any updated instruction files.

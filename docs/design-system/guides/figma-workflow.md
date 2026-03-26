@@ -11,11 +11,15 @@
 
 ### Using Figma MCP (required when user provides a Figma link)
 
-**When the user provides a Figma link**, always start by using Figma MCP—do not build or prototype from the link without fetching design data first:
+**When the user provides a Figma link**, follow the full implement-design workflow. See `.agent/references/figma-mcp-guide.md` for the complete 7-step workflow and all available MCP tools.
 
+Quick reference (minimum required steps):
 1.  **Get design context**: Extract component designs and specifications for the selected node/frame.
 2.  **Get screenshot**: Capture the design so layout and visuals can be matched.
 3.  **Get metadata** (as needed): Understand component structure and file organization.
+4.  **Download assets**: Retrieve images/icons/SVGs from the MCP assets endpoint.
+5.  **Translate to PLUS conventions**: Map to PLUS tokens and components (see `.agent/references/figma-token-mapping.md`).
+6.  **Validate**: Compare implementation against the captured screenshot.
 
 If Figma MCP is unavailable, say so and ask for a screenshot or export.
 

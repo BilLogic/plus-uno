@@ -38,8 +38,8 @@ const PrototypeCard = ({
     if (onOpenDetails) onOpenDetails();
   };
 
-  const isClickable = true;
   const isNotDeployed = !deploymentUrl && !localPath;
+  const isClickable = !isNotDeployed;
 
   return (
     <Card
@@ -135,6 +135,7 @@ const PrototypeCard = ({
           fill="tonal"
           active={isUpvoted}
           size="small"
+          disabled={isNotDeployed}
           leadingVisual={<i className={`${isUpvoted ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`} />}
           text={upvoteCount > 0 ? String(upvoteCount) : undefined}
           onClick={(e) => {

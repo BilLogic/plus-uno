@@ -40,7 +40,7 @@ Read `docs/project/conventions.md` for file naming, imports, git conventions, an
 4. **Never hallucinate props**: Always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
 5. Never skip reading component source + story + styles before using unfamiliar components.
 6. Use PLUS components first — only fall back to generic React-Bootstrap when no PLUS equivalent exists.
-7. When Figma design input exists, fetch design context and screenshot via Figma MCP before implementing.
+7. When Figma design input exists, follow the full implement-design workflow (see `.agent/references/figma-mcp-guide.md`): extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
 8. Never install new packages without explicit user approval.
 9. Never introduce non-Bootstrap UI frameworks (no Material UI, no Ant Design, no Tailwind).
 10. Never deep-import from `design-system/src/` — use barrel exports from `@` alias.
@@ -89,7 +89,7 @@ Load docs on-demand based on what comes up in conversation:
 |---------|------|
 | Building UI, using components or tokens | `.agent/assets/PLUS_CHEAT_SHEET.md` (MANDATORY) |
 | Building new pages, dashboards, layouts | `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` (MANDATORY) |
-| Figma link or MCP tools mentioned | `docs/design-system/integrations.md` |
+| Figma link or implement-design workflow | `.agent/references/figma-mcp-guide.md` (PRIMARY), `docs/design-system/integrations.md` |
 | Component architecture questions | `docs/design-system/components.md` |
 | Build, preview, or deployment | `docs/design-system/guides/local-preview.md` |
 | Exact file paths or env vars needed | Relevant `.agent/assets/*-index.json` |

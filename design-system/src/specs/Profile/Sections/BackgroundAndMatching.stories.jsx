@@ -37,8 +37,8 @@
  * - Card padding: var(--size-section-pad-x-md, 24px) / var(--size-section-pad-y-md, 24px)
  * - Card gap: var(--size-section-gap-md, 16px)
  * - Card border-radius: var(--size-section-radius-md, 12px)
- * - Row gap: var(--size-spacing-between-components-spacer-2, 8px)
- * - Row-to-row gap: var(--size-spacing-between-components-spacer-3, 16px)
+ * - Row gap: var(--size-element-gap-sm)
+ * - Row-to-row gap: var(--size-section-gap-md) (16px)
  * 
  * Width: ~896px (from Figma)
  * 
@@ -178,7 +178,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                 <div
                     style={{
                         display: 'flex',
-                        gap: 'var(--size-spacing-between-components-spacer-2, 8px)',
+                        gap: 'var(--size-element-gap-sm)',
                         width: '100%',
                     }}
                 >
@@ -223,7 +223,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                 <div
                     style={{
                         display: 'flex',
-                        gap: 'var(--size-spacing-between-components-spacer-2, 8px)',
+                        gap: 'var(--size-element-gap-sm)',
                         width: '100%',
                     }}
                 >

@@ -47,10 +47,12 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 - `design-system/src/**/*.stories.jsx`
 
 4. Design-tool integration
-- `docs/design-system/guides/figma-workflow.md`
+- `.agent/references/figma-mcp-guide.md` — full Figma MCP tool reference and implement-design 7-step workflow
+- `docs/design-system/guides/figma-workflow.md` — token sync, extraction process, Figma-to-CSS mapping
 - `scripts/sync-figma-tokens.js`
-- Figma MCP for design-context extraction (`get_design_context`/`get_screenshot` or runtime equivalents)
-- Code Connect and variable inspection (`get_code_connect_map`, `get_variable_defs`) when available
+- Figma MCP tools: `get_design_context`, `get_screenshot`, `get_variable_defs`, `search_design_system`
+- `get_variable_defs` for real-time token verification during implementation (complements daily sync)
+- Code Connect not yet available — fall back to `.agent/assets/components-index.json` for component discovery
 - Stitch MCP for early wireframe handoff context when finalization follows consulting/iteration
 
 5. Accessibility expectations
@@ -60,8 +62,9 @@ For exhaustive lookup paths/globs/commands, load `.agent/assets/index-manifest.j
 ## How to Respond in Finalization Mode
 
 1. Extract Complete Design
-- If design tool input exists and Figma MCP is available, fetch context + screenshot first.
+- If a Figma link is provided, follow the full implement-design workflow in `.agent/references/figma-mcp-guide.md` (7 steps: extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS conventions → achieve visual parity → validate).
 - Capture spacing, typography, color, dimensions, states, and responsive expectations.
+- Use `get_variable_defs` to verify token values match the latest Figma variables.
 - If finalization follows Stitch-assisted exploration, carry forward selected wireframe structure as the implementation baseline.
 
 2. Map to DS Components

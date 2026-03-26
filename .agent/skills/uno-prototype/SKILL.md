@@ -1,8 +1,10 @@
 ---
 name: uno-prototype
 description: >
-  Scaffold and build a new playground prototype using the PLUS design system.
-  Use when creating new feature prototypes, experiments, or proof-of-concepts.
+  Scaffold a new playground prototype with proper PLUS design system integration.
+  Use when the user asks to "create a prototype", "scaffold a new project",
+  "set up a playground", "start a new experiment", "build a proof-of-concept",
+  or needs a standalone prototype for user testing.
 user-invocable: true
 argument-hint: [project-name]
 ---
@@ -16,6 +18,15 @@ Create a new playground prototype project with proper DS integration.
 - Designer wants to explore a new feature idea
 - Need a standalone prototype for user testing
 - Building a proof-of-concept for a product pillar
+
+## Auto-Suggest
+
+Proactively suggest this skill when:
+- The user describes a new feature idea that doesn't have an existing prototype
+- The user wants to explore or validate a concept visually
+- A new `playground/` project needs to be set up from scratch
+
+Do not suggest if the user is working on an existing prototype (use the appropriate mode instead).
 
 ## Prerequisites
 
@@ -66,3 +77,10 @@ Create a new playground prototype project with proper DS integration.
 
 1. Add entry to `src/pages/PrototypeMarket/prototypes-data.js`
 2. Or use `/uno:post` skill for guided submission
+
+## Next Step
+
+After completing the prototype:
+→ Suggest `/uno:review` to check DS compliance before shipping. Pass the prototype's directory path as the argument.
+
+These are suggestions — the user may choose to skip steps.

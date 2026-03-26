@@ -15,6 +15,14 @@ Walk a designer through registering their prototype in the Prototype Market so i
 - Designer deployed to Netlify and wants to add the link
 - Designer asks to "submit to market", "publish my prototype", or "add to the index"
 
+## Auto-Suggest
+
+Proactively suggest this skill when:
+- `/uno:review` returned PASS on a prototype
+- The user completed a prototype and hasn't registered it in the marketplace yet
+
+**Never auto-invoke this skill.** Always require the user to explicitly request publishing. This skill writes to the marketplace data file — it must be intentional.
+
 ## Protocol
 
 ### Phase 1: Collect Metadata
@@ -39,23 +47,12 @@ Gather the required fields. Use smart defaults where possible.
 | `productPillar` | enum | Ask user (choice): `admin`, `home`, `login`, `profile`, `toolkit`, `training`, `universal` |
 | `localPath` | string or null | Ask user; null if not wired into root app |
 | `repoPath` | string | Auto-detect or ask |
+| `loomVideoUrl` | string or null | Ask user; Loom share URL for walkthrough video (e.g. `https://www.loom.com/share/abc123`). Shown as embedded video in the popup detail modal. null if none |
+| `upvotes` | number | Auto: `0` (managed in-app; do not ask user) |
 
 ### Phase 2: Deployment Help (optional)
 
-If `deploymentUrl` is null, offer to help deploy:
-
-1. Verify the prototype builds:
-   ```bash
-   cd playground/{project}
-   npx vite build
-   ```
-2. Guide the designer to deploy via one of:
-   - **Netlify CLI**: `npx netlify deploy --prod --dir dist`
-   - **Netlify UI**: Drag-and-drop the `dist/` folder at app.netlify.com
-3. Wait for the designer to provide the resulting URL.
-4. Record it as `deploymentUrl`.
-
-Do **not** auto-deploy. Only provide guidance and wait for the URL.
+If `deploymentUrl` is null, follow `references/deployment-guide.md` to help the designer deploy. Do **not** auto-deploy.
 
 ### Phase 3: Submit
 
@@ -64,33 +61,9 @@ Do **not** auto-deploy. Only provide guidance and wait for the URL.
 3. Append the entry to the `prototypes` array in `src/pages/PrototypeMarket/prototypes-data.js`.
 4. Suggest verifying at `http://localhost:3000/market`.
 
-## Confirmation Template
+## Confirmation
 
-Before writing to the file, show the designer the entry:
-
-```
-I'll add this entry to the Prototype Market:
-
-  {
-    id: 'creator-project-name',
-    title: 'Short Title',
-    description: 'One or two sentence summary.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'high',
-    lastUpdated: 'YYYY-MM-DD',
-    creators: ['Name'],
-    contributors: ['Name'],
-    productPillar: 'home',
-    localPath: '/home',
-    repoPath: 'playground/{project}/',
-  }
-
-File: src/pages/PrototypeMarket/prototypes-data.js
-
-Proceed?
-```
+Before writing to the file, show the designer the generated entry object and the target file path. See `examples/marketplace-entry-example.md` for the expected format. **Wait for explicit confirmation before writing.**
 
 ## Post-Submit Checklist
 
@@ -100,10 +73,21 @@ After appending:
 - [ ] `/market` page loads and shows the new card
 - [ ] Filters (stage, pillar) include the new entry
 - [ ] Deployment link works (if provided)
+- [ ] Click the card to open the popup detail modal — verify title, badges, description, links render correctly
+- [ ] Loom walkthrough video embeds correctly in popup detail modal (if `loomVideoUrl` provided)
+- [ ] Preview image loads in popup detail modal (run `npm run generate:previews` if missing)
 - [ ] Optionally commit the change
+
+## Next Step
+
+After publishing:
+→ Suggest `/uno:compound` if anything non-trivial was learned during the build or publishing process.
+
+These are suggestions — the user may choose to skip.
 
 ## References
 
 - Data schema: `src/pages/PrototypeMarket/prototypes-data.js`
-- Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx`
+- Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx` (includes popup detail modal with Loom embed, comments, preview image, upvotes)
+- Card component: `src/pages/PrototypeMarket/PrototypeCard.jsx`
 - Prototyping docs: `playground/README.md`
