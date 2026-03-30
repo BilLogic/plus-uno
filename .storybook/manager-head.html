@@ -59,6 +59,51 @@
   .sb-nav-fab:hover .sb-nav-fab__action {
     display: flex;
   }
+  .sb-nav-fab__action--ai {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .sb-nav-fab__action--ai:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background: transparent;
+  }
+  .sb-nav-fab:hover .sb-nav-fab__action--ai {
+    display: flex;
+  }
+  .sb-nav-fab__ai-logo {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .sb-nav-fab__ai-logo-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .sb-nav-fab__ai-logo-icon {
+    position: relative;
+    z-index: 1;
+    width: 45%;
+    height: 45%;
+  }
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -74,8 +119,56 @@
       <a class="sb-nav-fab__action" href="http://localhost:4100" title="Marketplace">
         <i class="fa-solid fa-store"></i>
       </a>
+      <button class="sb-nav-fab__action sb-nav-fab__action--ai" title="PLUS AI Agent (⌘+/)">
+        <div class="sb-nav-fab__ai-logo">
+          <svg class="sb-nav-fab__ai-logo-bg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <filter id="sb-nf-f0" x="-30%" y="-8%" width="160%" height="116%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f1" x="-30%" y="-8%" width="160%" height="116%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f2" x="-57%" y="-60%" width="215%" height="220%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f3" x="-6%" y="-9%" width="212%" height="212%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f4" x="-58%" y="-19%" width="216%" height="216%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+              <filter id="sb-nf-f5" x="-9%" y="-67%" width="220%" height="234%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="19.2" result="effect1"/></filter>
+            </defs>
+            <g filter="url(#sb-nf-f0)"><path d="M49.5538 36.9968C59.1224 46.5652 59.1224 62.079 49.5538 71.6475C39.9853 81.2161 24.4715 81.2161 14.903 71.6475C5.3344 62.079 5.3344 46.5652 14.903 36.9968C24.4715 27.4282 39.9853 27.4282 49.5538 36.9968Z" fill="#FFDEA0"/></g>
+            <g filter="url(#sb-nf-f1)"><path d="M49.5538 36.9968C59.1224 46.5652 59.1224 62.079 49.5538 71.6475C39.9853 81.2161 24.4715 81.2161 14.903 71.6475C5.3344 62.079 5.3344 46.5652 14.903 36.9968C24.4715 27.4282 39.9853 27.4282 49.5538 36.9968Z" fill="#FFE17A"/></g>
+            <g filter="url(#sb-nf-f2)"><path d="M31.1452 -13.1547C42.6472 -1.65267 42.6472 16.9958 31.1452 28.4978C19.6432 39.9998 0.994739 39.9998 -10.5073 28.4978C-22.0093 16.9958 -22.0093 -1.65269 -10.5073 -13.1547C0.994739 -24.6568 19.6432 -24.6568 31.1452 -13.1547Z" fill="#FFE17A"/></g>
+            <g filter="url(#sb-nf-f3)"><path d="M79.2166 76.03C89.9725 65.2741 89.9725 47.8353 79.2166 37.0793C68.4606 26.3234 51.0218 26.3234 40.2659 37.0793C29.5099 47.8353 29.5099 65.2741 40.2659 76.03C51.0218 86.786 68.4606 86.786 79.2166 76.03Z" fill="#B3F1BF"/></g>
+            <g filter="url(#sb-nf-f4)"><path d="M36.6739 28.5701C49.6059 41.5021 49.6059 62.469 36.6739 75.401C23.742 88.3331 2.77499 88.3331 -10.157 75.401C-23.089 62.469 -23.089 41.5021 -10.157 28.5701C2.77499 15.6381 23.742 15.6381 36.6739 28.5701Z" fill="#FFD9E4"/></g>
+            <g filter="url(#sb-nf-f5)"><path d="M79.9752 22.6619C91.7259 10.9112 91.6755 -8.19088 79.8626 -20.0038C68.0497 -31.8167 48.9476 -31.8671 37.1969 -20.1164C25.4462 -8.36568 25.4967 10.7364 37.3096 22.5493C49.1224 34.3622 68.2245 34.4126 79.9752 22.6619Z" fill="#84CFFF"/></g>
+          </svg>
+          <svg class="sb-nav-fab__ai-logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 31" fill="none">
+            <path d="M13.7713 3.63654C13.8249 3.34024 13.977 3.07262 14.2014 2.88004C14.4258 2.68745 14.7083 2.58203 15.0001 2.58203C15.2918 2.58203 15.5743 2.68745 15.7987 2.88004C16.0231 3.07262 16.1752 3.34024 16.2288 3.63654L17.5425 10.8156C17.6359 11.326 17.8759 11.7955 18.2313 12.1628C18.5868 12.5301 19.0411 12.7781 19.535 12.8745L26.4825 14.2321C26.7693 14.2874 27.0283 14.4447 27.2146 14.6765C27.401 14.9084 27.503 15.2004 27.503 15.5018C27.503 15.8032 27.401 16.0952 27.2146 16.327C27.0283 16.5589 26.7693 16.7162 26.4825 16.7715L19.535 18.129C19.0411 18.2255 18.5868 18.4735 18.2313 18.8408C17.8759 19.2081 17.6359 19.6776 17.5425 20.188L16.2288 27.367C16.1752 27.6633 16.0231 27.931 15.7987 28.1235C15.5743 28.3161 15.2918 28.4215 15.0001 28.4215C14.7083 28.4215 14.4258 28.3161 14.2014 28.1235C13.977 27.931 13.8249 27.6633 13.7713 27.367L12.4576 20.188C12.3642 19.6776 12.1242 19.2081 11.7688 18.8408C11.4133 18.4735 10.959 18.2255 10.4651 18.129L3.51756 16.7715C3.23082 16.7162 2.97183 16.5589 2.78546 16.327C2.59909 16.0952 2.49707 15.8032 2.49707 15.5018C2.49707 15.2004 2.59909 14.9084 2.78546 14.6765C2.97183 14.4447 3.23082 14.2874 3.51756 14.2321L10.4651 12.8745C10.959 12.7781 11.4133 12.5301 11.7688 12.1628C12.1242 11.7955 12.3642 11.326 12.4576 10.8156L13.7713 3.63654Z" stroke="white" stroke-width="2.60823" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M25 2.58203V7.7487" stroke="white" stroke-width="2.60823" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M27.5 5.16797H22.5" stroke="white" stroke-width="2.60823" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 28.4167C6.38071 28.4167 7.49999 27.2601 7.49999 25.8333C7.49999 24.4066 6.38071 23.25 5 23.25C3.61929 23.25 2.5 24.4066 2.5 25.8333C2.5 27.2601 3.61929 28.4167 5 28.4167Z" stroke="white" stroke-width="2.60823" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+      </button>
     `;
     document.body.appendChild(fab);
+
+    // Wire AI sparkle button: dispatch Cmd+/ into the Storybook preview iframe
+    const aiBtn = fab.querySelector('.sb-nav-fab__action--ai');
+    aiBtn.addEventListener('click', () => {
+      // Try to find the preview iframe and fire the keyboard shortcut into it
+      const previewIframe =
+        document.querySelector('#storybook-preview-iframe') ||
+        document.querySelector('iframe[title="storybook-preview-iframe"]') ||
+        document.querySelector('iframe');
+
+      if (previewIframe && previewIframe.contentWindow) {
+        previewIframe.contentWindow.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: '/',
+            metaKey: true,
+            ctrlKey: false,
+            bubbles: true,
+            cancelable: true,
+          })
+        );
+      }
+    });
   });
 </script>
 

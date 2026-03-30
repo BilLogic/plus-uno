@@ -280,7 +280,7 @@
 }
 
 %default-font-color {
-    color: var(--color-neutral-on-surface);
+    color: var(--color-on-surface);
 }
 
 /** set default text styles **/
@@ -314,8 +314,6 @@ body,
     font-size: var(--font-size-display1);
     line-height: var(--font-line-height-display1);
     letter-spacing: var(--font-letter-spacing-display1);
-    padding-top: var(--size-spacing-between-components-5);
-    padding-bottom: var(--size-spacing-within-component-4-5);
 }
 
 .display2-txt {
@@ -324,9 +322,6 @@ body,
     font-size: var(--font-size-display2);
     line-height: var(--font-line-height-display2);
     letter-spacing: var(--font-letter-spacing-display2);
-    padding-top: var(--size-spacing-between-components-4);
-    padding-bottom: var(--size-spacing-within-component-4);
-
 }
 
 .display3-txt {
@@ -335,8 +330,6 @@ body,
     font-size: var(--font-size-display3);
     line-height: var(--font-line-height-display3);
     letter-spacing: var(--font-letter-spacing-display3);
-    padding-top: var(--size-spacing-within-component-4-5);
-    padding-bottom: var(--size-spacing-within-component-3);
 }
 
 .display4-txt {
@@ -345,8 +338,6 @@ body,
     font-size: var(--font-size-display4);
     line-height: var(--font-line-height-display4);
     letter-spacing: var(--font-letter-spacing-display4);
-    padding-top: var(--size-spacing-within-component-4-5);
-    padding-bottom: var(--size-spacing-within-component-3);
 }
 
 /* rules for headlines (h1,h2,h3) */
@@ -384,7 +375,7 @@ h3,
     line-height: var(--font-line-height-h3);
 
 
-    @include fa-icon-size(var(--font-size-fa-h1), var(--font-line-height-fa-h1));
+    @include fa-icon-size(var(--font-size-fa-h3), var(--font-line-height-fa-h3));
 }
 
 /* rules for titles (h4,h5,h6) */

@@ -7,8 +7,8 @@
 - For concrete scripts/env vars/commands/calls, load `.agent/assets/integrations-index.json` and `.agent/assets/tokens-index.json`.
 
 ## Integration Routing Rules
-- Figma MCP: primary for design-tool-driven implementation (context + screenshot + mapping/variables).
-- Stitch MCP: primary for consulting/iteration wireframe generation.
+- **Figma MCP**: primary for design-tool-driven implementation. Full tool reference: `.agent/references/figma-mcp-guide.md`. Key tools: `get_design_context`, `get_screenshot`, `get_metadata`, `get_variable_defs`, `search_design_system`, `create_design_system_rules`, `create_new_file` (canvas write-back).
+- **Stitch MCP**: primary for consulting/iteration wireframe generation.
 - If runtime lacks an MCP, explicitly state the limitation and continue with repo-native stories/specs/scripts.
 
 ## Canonical Repo Docs

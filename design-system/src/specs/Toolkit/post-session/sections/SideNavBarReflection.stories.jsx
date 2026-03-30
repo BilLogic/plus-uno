@@ -193,7 +193,7 @@ const SideNavBar = ({
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-spacing-between-components-spacer-2, 8px)',
+                    gap: 'var(--size-element-gap-sm)',
                     alignItems: 'flex-start',
                     width: '100%',
                 }}

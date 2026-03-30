@@ -52,7 +52,17 @@ const Icons = {
     ),
     Skills: () => (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="5" /><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2" />
+            <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
+        </svg>
+    ),
+    Onboarding: () => (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+    ),
+    Tour: () => (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
         </svg>
     ),
     /* FAB when panel is closed: star + badge lines + dot */
@@ -158,10 +168,11 @@ const LogoContainer = ({ size = 'default', className = '', variant = 'default' }
 
 /* ─── Quick action definitions ─── */
 const QUICK_ACTIONS = [
+    { id: 'onboarding', label: 'New Starter Kit', aliases: ['onboarding', 'new starter kit', 'getting started', 'setup'], Icon: Icons.Onboarding, color: 'var(--color-relationship-text)', bg: 'var(--color-relationship-container)' },
     { id: 'usage', label: 'Component Usage Guide', aliases: ['usage guide', 'component usage guide'], Icon: Icons.Analyze, color: 'var(--color-primary-text)', bg: 'var(--color-primary-container)' },
     { id: 'explain', label: 'Explain This Screen', aliases: ['explain this screen', 'explain the screen', 'explain screen'], Icon: Icons.Explain, color: 'var(--color-mastering-content-text)', bg: 'var(--color-mastering-content-container)' },
     { id: 'find', label: 'Smart Navigation', aliases: ['smart navigation'], Icon: Icons.Navigate, color: 'var(--color-warning-text)', bg: 'var(--color-warning-container)' },
-    { id: 'skills', label: 'Agent Modes', aliases: ['agent modes'], Icon: Icons.Skills, color: 'var(--color-advocacy-text)', bg: 'var(--color-advocacy-container)' },
+    { id: 'skills', label: 'Mode Routing', aliases: ['agent modes', 'mode routing', 'modes'], Icon: Icons.Skills, color: 'var(--color-advocacy-text)', bg: 'var(--color-advocacy-container)' }
 ];
 
 /* Levenshtein distance for typo-tolerant keyword match (max length ~20). */
@@ -567,7 +578,6 @@ const ShortcutsHelpContent = () => (
         <table className="sb-ai-agent__shortcuts-table">
             <tbody>
                 <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + /</td><td>Toggle/Close AI Agent</td></tr>
-                <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + Shift + /</td><td>Hide AI (Focus Mode)</td></tr>
                 <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + s</td><td>Reset AI Agent Configuration</td></tr>
             </tbody>
         </table>
@@ -581,7 +591,6 @@ const SmartNavIntroMessage = () => (
         <p style={{ marginBottom: 6, fontSize: 13 }}>Examples:</p>
         <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13 }}>
             <li>“Where are the cards?”</li>
-            <li>“Open destructive modal”</li>
             <li>“Go to Training Progress page”</li>
             <li>“Buttons”</li>
         </ul>
@@ -666,35 +675,131 @@ const buildResponse = (actionId, pageContext) => {
                 </div>
             );
 
-        case 'skills':
+        case 'onboarding':
+            const copyOnboardingPath = async (path, e) => {
+                e.preventDefault();
+                const target = e.currentTarget;
+                const originalText = target.innerHTML;
+                try {
+                    await navigator.clipboard.writeText(path);
+                } catch (err) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = path;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (err2) {}
+                    document.body.removeChild(textArea);
+                }
+                target.innerHTML = '✅ Copied!';
+                target.style.color = 'var(--color-success, #2e7d32)';
+                setTimeout(() => {
+                    target.innerHTML = originalText;
+                    target.style.color = 'var(--color-primary)';
+                }, 1500);
+            };
+
+            const OnboardingLinkItem = ({ num, title, desc, path, bg, fg }) => (
+                <li style={{ marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ background: bg, color: fg, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>{num}</span>
+                        <span>{title} — {desc}</span>
+                    </div>
+                    <button 
+                        onClick={(e) => copyOnboardingPath(path, e)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 32, fontSize: 11, marginTop: 4, color: 'var(--color-primary)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
+                        title="Click to copy path"
+                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                    >
+                        <i className="fa-regular fa-copy" style={{ fontSize: 11 }}></i> {path}
+                    </button>
+                </li>
+            );
+
             return (
                 <div>
-                    <p style={{ fontWeight: 600, marginBottom: 8 }}>🎯 The 6 Main Modes</p>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-primary-container)', color: 'var(--color-on-primary-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>1</span>
-                            📚 <strong>Learning</strong> — Understand what exists and how it works
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-warning-container)', color: 'var(--color-on-warning-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>2</span>
-                            🔧 <strong>Maintaining</strong> — Update the design system itself
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-relationship-container)', color: 'var(--color-on-relationship-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>3</span>
-                            💡 <strong>Consulting</strong> — Early structure-first concepting
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-advocacy-container)', color: 'var(--color-on-advocacy-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>4</span>
-                            🔄 <strong>Iteration</strong> — Explore 3-5 distinct options
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-technology-tools-container)', color: 'var(--color-on-technology-tools-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>5</span>
-                            🎨 <strong>Prototyping</strong> — High-fidelity exploratory prototypes
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-secondary-container)', color: 'var(--color-on-secondary-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>6</span>
-                            🏗️ <strong>Finalization</strong> — Production-ready code
-                        </li>
+                    <p style={{ fontWeight: 600, marginBottom: 8, fontSize: '14px' }}>🎒 New Starter Kit</p>
+                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--color-on-surface-variant)', background: 'var(--color-surface-container-high)', padding: '6px 10px', borderRadius: '6px' }}>
+                        💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
+                    </p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
+                        <OnboardingLinkItem num="1" title={<span>🎨 <strong>Cheat Sheet</strong></span>} desc="Design Tokens & Component Props" path=".agent/assets/PLUS_CHEAT_SHEET.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
+                        <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path=".agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
+                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/project/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
+                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/project/conventions.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                    </ul>
+                </div>
+            );
+
+        case 'skills':
+            const copyPath = async (path, e) => {
+                e.preventDefault();
+                const target = e.currentTarget;
+                const originalText = target.innerHTML;
+
+                try {
+                    // Try modern fast clipboard access
+                    await navigator.clipboard.writeText(path);
+                } catch (err) {
+                    // Fallback for iframe/HTTP restrictions
+                    const textArea = document.createElement('textarea');
+                    textArea.value = path;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                    } catch (err2) {
+                        console.error('Copy fallback failed', err2);
+                    }
+                    document.body.removeChild(textArea);
+                }
+
+                target.innerHTML = '✅ Copied to clipboard!';
+                target.style.color = 'var(--color-success, #2e7d32)';
+                setTimeout(() => {
+                    target.innerHTML = originalText;
+                    target.style.color = 'var(--color-primary)';
+                }, 1500);
+            };
+
+            const LinkItem = ({ num, title, desc, path, bg, fg }) => (
+                <li style={{ marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ background: bg, color: fg, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>{num}</span>
+                        <span>{title} — {desc}</span>
+                    </div>
+                    <button 
+                        onClick={(e) => copyPath(path, e)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 32, fontSize: 11, marginTop: 4, color: 'var(--color-primary)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
+                        title="Click to copy path"
+                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                    >
+                        <i className="fa-regular fa-copy" style={{ fontSize: 11 }}></i> {path}
+                    </button>
+                </li>
+            );
+
+            return (
+                <div>
+                    <p style={{ fontWeight: 600, marginBottom: 4, fontSize: '14px' }}>🎯 Mode Routing (Mutually Exclusive)</p>
+                    <p style={{ marginBottom: 8, fontSize: '13px' }}>Choose exactly one mode per request:</p>
+                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--color-on-surface-variant)', background: 'var(--color-surface-container-high)', padding: '6px 10px', borderRadius: '6px' }}>
+                        💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
+                    </p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
+                        <LinkItem num="1" title={<span>📚 <strong>Learning</strong></span>} desc="Understand what exists" path="docs/design-system/modes/learning.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
+                        <LinkItem num="2" title={<span>🔧 <strong>Maintaining</strong></span>} desc="Update the DS itself" path="docs/design-system/modes/maintaining.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
+                        <LinkItem num="3" title={<span>💡 <strong>Consulting</strong></span>} desc="Structure-first concepting" path="docs/design-system/modes/consulting.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
+                        <LinkItem num="4" title={<span>🔄 <strong>Iteration</strong></span>} desc="Generate 3-5 variations" path="docs/design-system/modes/iteration.md" bg="var(--color-advocacy-container)" fg="var(--color-on-advocacy-container)" />
+                        <LinkItem num="5" title={<span>🎨 <strong>Prototyping</strong></span>} desc="High-fi, low-rigor PoCs" path="docs/design-system/modes/prototyping.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                        <LinkItem num="6" title={<span>🏗️ <strong>Finalization</strong></span>} desc="Production-ready code" path="docs/design-system/modes/finalization.md" bg="var(--color-secondary-container)" fg="var(--color-on-secondary-container)" />
                     </ul>
                 </div>
             );
@@ -764,12 +869,6 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
             }
 
             if (e.key !== '/') return;
-            if (e.shiftKey) {
-                e.preventDefault();
-                setIsHidden(true);
-                setIsOpen(false);
-                return;
-            }
             e.preventDefault();
             if (isHidden) {
                 setIsHidden(false);
@@ -1112,6 +1211,37 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                 const storyId = getCurrentStoryId();
                 fetchAIResponse('screen_explain', 'Explain this screen', { storyId, pageContext });
             }
+        } else if (actionId === 'tour') {
+            setMessages(p => [...p, { role: 'user', content: action.label }]);
+            
+            const TourStepButton = ({ title, desc, keyword, category, bg, fg, emoji }) => (
+                <button 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        let entry = findBestMatch(keyword, storyIndex).find(m => m.entry.category?.includes(category) || m.entry.category?.includes('Docs'))?.entry;
+                        if (!entry) entry = findBestMatch(keyword, storyIndex)[0]?.entry;
+                        if (entry) navigateToEntry(entry);
+                    }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: bg, color: fg, padding: 12, borderRadius: 8, fontSize: 13, border: '1px solid var(--color-outline-variant)', cursor: 'pointer', marginBottom: 8 }}
+                    onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(0.95)'}
+                    onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
+                >
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>{emoji} {title}</div>
+                    <div style={{ fontSize: 12, opacity: 0.9 }}>{desc}</div>
+                </button>
+            );
+
+            setMessages(p => [...p, { role: 'bot', content: (
+                <div>
+                    <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>🚀 Interactive System Tour</p>
+                    <p style={{ marginBottom: 12, fontSize: 13, lineHeight: 1.4 }}>Click each step below to jump through the system and see how tokens become full pages:</p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        <li><TourStepButton title="Colors & Tokens" desc="See where it all begins. A single change here propagates everywhere." keyword="tokens" category="Tokens" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" emoji="🎨" /></li>
+                        <li><TourStepButton title="Components" desc="Look at our Button inheriting those precise tokens and properties." keyword="button" category="Components" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" emoji="🧱" /></li>
+                        <li><TourStepButton title="Pages & Prototypes" desc="Explore how components perfectly assemble into a final layout." keyword="redesign" category="Pages" bg="var(--color-success-container)" fg="var(--color-success)" emoji="✨" /></li>
+                    </ul>
+                </div>
+            ) }]);
         } else {
             setMessages(p => [...p, { role: 'user', content: action.label }]);
             respond(buildResponse(actionId, pageContext));
@@ -1132,6 +1262,33 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             localStorage.removeItem('PLUS_AI_MODE');
             setAiMode(null);
             setMessages([]);
+            return;
+        }
+
+        if (text.toLowerCase() === 'quick action' || text.toLowerCase() === 'quick actions') {
+            setIsTyping(true);
+            setTimeout(() => {
+                setIsTyping(false);
+                setMessages(p => [...p, {
+                    role: 'bot',
+                    noBubble: true,
+                    noLogo: true,
+                    content: (
+                        <div className="sb-ai-agent__quick-actions">
+                            {QUICK_ACTIONS.map(a => (
+                                <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
+                                    <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
+                                        <span style={{ color: a.color }}>
+                                            <a.Icon />
+                                        </span>
+                                    </div>
+                                    <span className="sb-ai-agent__quick-label">{a.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )
+                }]);
+            }, 900);
             return;
         }
 
@@ -1234,8 +1391,8 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                         <div className="sb-ai-agent__header-container">
                             <LogoContainer size="default" />
                             <div className="sb-ai-agent__header-text">
-                                <h3 className="sb-ai-agent__header-name">Hi, {userName}</h3>
-                                <span className="sb-ai-agent__header-sub">WELCOME BACK</span>
+                                <h3 className="sb-ai-agent__header-name">PLUS UNO</h3>
+                                <span className="sb-ai-agent__header-sub">INLINE AI AGENT</span>
                             </div>
                         </div>
                         <div className="sb-ai-agent__header-actions">
@@ -1320,24 +1477,28 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 {/* Message List */}
                                 <div className="sb-ai-agent__message-list">
                                     {messages.map((m, i) => (
-                                        <div key={i} className={`sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
-                                            {m.role === 'bot' && (
+                                        <div key={i} className={m.noBubble ? '' : `sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
+                                            {!m.noLogo && m.role === 'bot' && (
                                                 <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
                                             )}
-                                            <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
-                                                {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
-                                                    <>
-                                                        <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
-                                                        {navMatches.length > 0 && (
-                                                            <NavMatchList
-                                                                matches={navMatches}
-                                                                selectedIndex={selectedNavIndex}
-                                                                onSelect={navigateToEntry}
-                                                            />
-                                                        )}
-                                                    </>
-                                                ) : m.content}
-                                            </div>
+                                            {m.noBubble ? (
+                                                m.content
+                                            ) : (
+                                                <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
+                                                    {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
+                                                        <>
+                                                            <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
+                                                            {navMatches.length > 0 && (
+                                                                <NavMatchList
+                                                                    matches={navMatches}
+                                                                    selectedIndex={selectedNavIndex}
+                                                                    onSelect={navigateToEntry}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    ) : m.content}
+                                                </div>
+                                            )}
                                             {m.role === 'user' && (
                                                 <div className="sb-ai-agent__user-avatar">A</div>
                                             )}

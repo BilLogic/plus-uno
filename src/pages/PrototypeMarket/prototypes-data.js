@@ -52,6 +52,7 @@ export const prototypes = [
     productPillar: 'home',
     localPath: '/1001',
     repoPath: 'playground/home-redesign/',
+    loomVideoUrl: 'https://www.loom.com/share/example123',
   },
   {
     id: '1002',
@@ -261,22 +262,7 @@ export const prototypes = [
     localPath: '/1014',
     repoPath: 'playground/sidebar-iteration/',
   },
-  {
-    id: '1015',
-    title: 'Group Modal',
-    description:
-      'Group Admin modal for adding/editing a group with name, school select, multi-select tutors, and group size fields.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'mid',
-    lastUpdated: '2026-02-15',
-    creators: ['Ashley'],
-    contributors: ['Ashley'],
-    productPillar: 'admin',
-    localPath: null,
-    repoPath: 'playground/group-modal/',
-  },
+
   {
     id: '1016',
     title: 'Group Performance v2',
@@ -309,38 +295,7 @@ export const prototypes = [
     localPath: '/1017',
     repoPath: 'playground/tutor-risk-interventions/',
   },
-  {
-    id: '1018',
-    title: 'Tutor Reflection Form',
-    description:
-      'Redesigned post-session reflection form with one-form-per-session flow, adaptive branching, student deep dive, strategy effectiveness ratings, and escalation tracking.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'mid',
-    lastUpdated: '2026-03-19',
-    creators: ['Bryan'],
-    contributors: ['Bryan'],
-    productPillar: 'toolkit',
-    localPath: '/1018',
-    repoPath: 'playground/tutor-reflection-form/',
-  },
-  {
-    id: '1019',
-    title: 'Storybook AI Agent',
-    description:
-      'AI-powered Storybook automation agent for component documentation and testing.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'low',
-    lastUpdated: '2026-02-10',
-    creators: ['Ashley'],
-    contributors: ['Ashley'],
-    productPillar: 'universal',
-    localPath: null,
-    repoPath: 'playground/storybook-ai-agent/',
-  },
+
   {
     id: '1020',
     title: 'Group Info',
@@ -390,22 +345,6 @@ export const prototypes = [
     repoPath: 'playground/recommend-sessions/',
   },
   {
-    id: '1023',
-    title: 'Starter Template',
-    description:
-      'Minimal starter template for new playground prototypes with PLUS DS integration.',
-    deploymentUrl: null,
-    notionCardUrl: null,
-    notionCardId: null,
-    stage: 'low',
-    lastUpdated: '2026-03-15',
-    creators: ['Bryan'],
-    contributors: ['Bryan'],
-    productPillar: 'universal',
-    localPath: '/1023',
-    repoPath: 'playground/starter/',
-  },
-  {
     id: '1024',
     title: 'Student Goal Dashboard',
     description:
@@ -436,5 +375,21 @@ export const prototypes = [
     productPillar: 'training',
     localPath: '/1025',
     repoPath: 'playground/student-onboarding-wizard/',
+  },
+  {
+    id: '1026',
+    title: 'Training Onboarding Redesign',
+    description:
+      'High-fidelity redesign of the tutor training onboarding page with hero progress card, animated SVG progress ring, bubble milestone track, and card/list view toggle.',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'high',
+    lastUpdated: '2026-03-24',
+    creators: ['Ashley'],
+    contributors: ['Ashley'],
+    productPillar: 'training',
+    localPath: '/1026',
+    repoPath: 'playground/training-onboarding/TrainingOnboardingHiFi.stories.jsx',
   },
 ];
