@@ -48,19 +48,15 @@ export default {
 
         // DEVELOPMENT
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         ariaLabel: {
-            control: 'text',
-            description: 'Accessible label for the button group',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         buttons: {
             table: { disable: true, category: 'Development' }
@@ -379,6 +375,5 @@ Interactive.args = {
     style: 'primary',
     fill: 'tonal',
     vertical: false,
-    buttonCount: 3,
-    ariaLabel: 'Interactive button group'
+    buttonCount: 3
 };

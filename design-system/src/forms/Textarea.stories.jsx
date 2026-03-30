@@ -46,9 +46,32 @@ export default {
             table: { category: 'Content' },
         },
         value: {
-            control: 'text',
-            description: 'Textarea value',
-            table: { category: 'Content' },
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        defaultValue: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };

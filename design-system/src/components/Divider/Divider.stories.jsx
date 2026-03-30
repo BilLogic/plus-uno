@@ -39,14 +39,12 @@ export default {
 
         // DEVELOPMENT
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         customStyles: {
             table: { disable: true, category: 'Development' }

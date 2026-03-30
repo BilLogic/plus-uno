@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Pagination from './Pagination';
 
 export default {
@@ -16,30 +16,48 @@ export default {
         type: {
             control: 'select',
             options: ['icon', 'text'],
-            description: 'Pagination type: icon (chevrons) or text (Previous/Next)'
+            description: 'Pagination type: icon (chevrons) or text (Previous/Next)',
+            table: { category: 'Content' }
         },
         size: {
             control: 'select',
             options: ['small', 'default', 'large'],
-            description: 'Pagination size'
+            description: 'Pagination size',
+            table: { category: 'Design' }
         },
         currentPage: {
             control: 'number',
-            description: 'Current active page'
+            description: 'Current active page',
+            table: { category: 'Behavior' }
         },
         totalPages: {
             control: 'number',
-            description: 'Total number of pages'
+            description: 'Total number of pages',
+            table: { category: 'Content' }
         },
         maxVisible: {
             control: 'number',
-            description: 'Maximum number of visible page numbers'
+            description: 'Maximum number of visible page numbers',
+            table: { category: 'Layout' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
 
 const Template = (args) => {
     const [page, setPage] = useState(args.currentPage);
+
+    useEffect(() => {
+        setPage(args.currentPage);
+    }, [args.currentPage]);
+
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
@@ -62,7 +80,7 @@ function PaginationContentDemos() {
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
-                        totalPages={20}
+                        totalPages={10}
                         type="icon"
                         size="default"
                         onPageChange={(p) => console.log('Page:', p)}
@@ -77,7 +95,7 @@ function PaginationContentDemos() {
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
-                        totalPages={20}
+                        totalPages={10}
                         type="text"
                         size="default"
                         prevText="Previous"
@@ -207,7 +225,7 @@ export const Overview = () => (
 export const Interactive = Template.bind({});
 Interactive.args = {
     currentPage: 5,
-    totalPages: 20,
+    totalPages: 10,
     type: 'icon',
     size: 'default',
     maxVisible: 5

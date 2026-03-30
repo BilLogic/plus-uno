@@ -12,6 +12,26 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <div className="sb-ds-doc-section">
 
+### Content
+
+<DocsCanvasShell description={<>Single date selection for a standard one-value field.</>}>
+    <Canvas of={DatePickerStories.PickDate} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Paired pickers for a start and end date range.</>}>
+    <Canvas of={DatePickerStories.PickRange} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
@@ -26,20 +46,6 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <DocsCanvasShell description={<>Default, filled, disabled, and read-only.</>}>
     <Canvas of={DatePickerStories.InteractionStates} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Variants
-
-<DocsCanvasShell description={<>Single date vs paired range pickers.</>}>
-    <Canvas of={DatePickerStories.PickDate} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<></>}>
-    <Canvas of={DatePickerStories.PickRange} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>

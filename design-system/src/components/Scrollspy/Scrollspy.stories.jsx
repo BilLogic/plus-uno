@@ -11,14 +11,39 @@ export default {
                 component: 'Scrollspy component for automatically updating navigation based on scroll position.'
             }
         }
+    },
+    argTypes: {
+        brand: {
+            control: 'text',
+            description: 'Navigation label',
+            table: { category: 'Content' }
+        },
+        sectionCount: {
+            control: { type: 'range', min: 3, max: 5, step: 1 },
+            description: 'Number of sections in the demo content',
+            table: { category: 'Content' }
+        },
+        offset: {
+            control: { type: 'range', min: 0, max: 40, step: 5 },
+            description: 'Scroll offset used for active-section detection',
+            table: { category: 'Behavior' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        items: {
+            table: { disable: true, category: 'Development' }
+        },
+        contentId: {
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        }
     }
 };
-
-const items = [
-    { text: '@fat', href: '#fat', isDropdown: false },
-    { text: '@mdo', href: '#mdo', isDropdown: false },
-    { text: 'Dropdown', href: '#one', isDropdown: true }
-];
 
 function generateContent(count) {
     return Array(count).fill(0).map((_, i) => (
@@ -28,7 +53,21 @@ function generateContent(count) {
     ));
 }
 
-function ScrollspyLayoutDemo() {
+function ScrollspyLayoutDemo({ brand = 'Navbar', offset = 10, sectionCount = 3 }) {
+    const allSections = [
+        { id: 'fat', title: '@fat' },
+        { id: 'mdo', title: '@mdo' },
+        { id: 'one', title: 'one' },
+        { id: 'two', title: 'two' },
+        { id: 'three', title: 'three' }
+    ];
+    const sections = allSections.slice(0, sectionCount);
+    const items = sections.map(section => ({
+        text: section.title,
+        href: `#${section.id}`,
+        isDropdown: false
+    }));
+
     return (
         <div style={{
             backgroundColor: 'var(--color-surface)',
@@ -41,30 +80,25 @@ function ScrollspyLayoutDemo() {
         }}>
             <Scrollspy
                 id="scrollspy-nav-docs"
-                brand="Navbar"
+                brand={brand}
                 items={items}
                 contentId="scrollspy-content-docs"
-                offset={10}
+                offset={offset}
             />
             <ScrollspyContent
                 id="scrollspy-content-docs"
                 height="500px"
             >
-                <section id="fat" className="plus-scrollspy-section">
-                    <h4 className="h4">@fat</h4>
-                    <p className="body1-txt">Placeholder content for the scrollspy example. You got the finest architecture. Passport stamps, she is cosmopolitan.</p>
-                    {generateContent(5)}
-                </section>
-                <section id="mdo" className="plus-scrollspy-section">
-                    <h4 className="h4">@mdo</h4>
-                    <p className="body1-txt">Placeholder content for the scrollspy example. Cause she is the muse and the artist.</p>
-                    {generateContent(5)}
-                </section>
-                <section id="one" className="plus-scrollspy-section">
-                    <h4 className="h4">one</h4>
-                    <p className="body1-txt">Placeholder content for the scrollspy example. Takes you miles high, so high.</p>
-                    {generateContent(5)}
-                </section>
+                {sections.map((section, index) => (
+                    <section key={section.id} id={section.id} className="plus-scrollspy-section">
+                        <h4 className="h4">{section.title}</h4>
+                        <p className="body1-txt">
+                            Placeholder content for section {index + 1}. Scroll through the content area to
+                            see the active nav item update automatically.
+                        </p>
+                        {generateContent(5)}
+                    </section>
+                ))}
             </ScrollspyContent>
         </div>
     );
@@ -74,4 +108,9 @@ export const Layout = () => <ScrollspyLayoutDemo />;
 
 export const Overview = () => <ScrollspyLayoutDemo />;
 
-export const Interactive = () => <ScrollspyLayoutDemo />;
+export const Interactive = (args) => <ScrollspyLayoutDemo {...args} />;
+Interactive.args = {
+    brand: 'Navbar',
+    sectionCount: 3,
+    offset: 10
+};

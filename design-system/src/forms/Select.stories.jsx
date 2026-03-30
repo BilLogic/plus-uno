@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from './Select';
 
 /**
@@ -24,6 +24,92 @@ export default {
 | **Creatable** | Add new values on the fly |
 | **Sizes** | small, medium (default), large |`
             }
+        }
+    },
+    argTypes: {
+        mode: {
+            control: { type: 'select' },
+            options: ['single', 'multi'],
+            table: { category: 'Design' }
+        },
+        size: {
+            control: { type: 'select' },
+            options: ['small', 'medium', 'large'],
+            table: { category: 'Design' }
+        },
+        displayMode: {
+            control: { type: 'select' },
+            options: ['badges', 'text'],
+            table: { category: 'Design' }
+        },
+        placeholder: {
+            control: 'text',
+            table: { category: 'Content' }
+        },
+        searchable: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        creatable: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        disabled: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        readonly: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        required: {
+            table: { disable: true, category: 'Development' }
+        },
+        options: {
+            table: { disable: true, category: 'Development' }
+        },
+        value: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        defaultValue: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onChange: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        defaultOpen: {
+            table: { disable: true, category: 'Development' }
+        },
+        defaultSearchTerm: {
+            table: { disable: true, category: 'Development' }
+        },
+        lineWrap: {
+            table: { disable: true, category: 'Development' }
+        },
+        truncate: {
+            table: { disable: true, category: 'Development' }
+        },
+        open: {
+            table: { disable: true, category: 'Development' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        name: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -165,6 +251,10 @@ export const Interactive = {
     render: (args) => {
         const [value, setValue] = useState(args.mode === 'multi' ? [] : '');
 
+        useEffect(() => {
+            setValue(args.mode === 'multi' ? [] : '');
+        }, [args.mode]);
+
         return (
             <div style={{ maxWidth: '400px' }}>
                 <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -174,7 +264,14 @@ export const Interactive = {
                     }
                 </p>
                 <Select
-                    {...args}
+                    mode={args.mode}
+                    placeholder={args.placeholder}
+                    searchable={args.searchable}
+                    creatable={args.creatable}
+                    displayMode={args.displayMode}
+                    size={args.size}
+                    disabled={args.disabled}
+                    readonly={args.readonly}
                     options={sampleOptions}
                     value={value}
                     onChange={setValue}
@@ -190,40 +287,6 @@ export const Interactive = {
         displayMode: 'badges',
         size: 'medium',
         disabled: false,
-        open: false
-    },
-    argTypes: {
-        mode: {
-            control: { type: 'select' },
-            options: ['single', 'multi'],
-            table: { category: 'Design' }
-        },
-        size: {
-            control: { type: 'select' },
-            options: ['small', 'medium', 'large'],
-            table: { category: 'Design' }
-        },
-        displayMode: {
-            control: { type: 'select' },
-            options: ['badges', 'text'],
-            if: { arg: 'mode', eq: 'multi' },
-            table: { category: 'Design' }
-        },
-        placeholder: {
-            control: 'text',
-            table: { category: 'Content' }
-        },
-        searchable: {
-            control: 'boolean',
-            table: { category: 'Behavior' }
-        },
-        creatable: {
-            control: 'boolean',
-            table: { category: 'Behavior' }
-        },
-        disabled: {
-            control: 'boolean',
-            table: { category: 'State' }
-        }
+        readonly: false
     }
 };

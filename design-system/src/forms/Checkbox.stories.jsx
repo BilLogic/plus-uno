@@ -20,9 +20,7 @@ export default {
             table: { category: 'Content' },
         },
         checked: {
-            control: 'boolean',
-            description: 'Controlled checked state',
-            table: { category: 'State' },
+            table: { disable: true, category: 'Development' },
         },
         indeterminate: {
             control: 'boolean',
@@ -44,6 +42,30 @@ export default {
             control: 'boolean',
             description: 'Show required indicator',
             table: { category: 'Behavior' },
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            table: { disable: true, category: 'Development' },
+        },
+        value: {
+            table: { disable: true, category: 'Development' },
+        },
+        defaultChecked: {
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -165,7 +187,6 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     label: 'Checkbox Label',
-    checked: false,
     indeterminate: false,
     size: 'medium',
     disabled: false,

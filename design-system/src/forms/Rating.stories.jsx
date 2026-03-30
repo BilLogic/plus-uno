@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Rating from './Rating';
 
@@ -15,8 +15,10 @@ export default {
     },
     argTypes: {
         value: {
-            control: { type: 'number', min: 0, max: 5, step: 1 },
-            description: 'Current rating value (0-5)',
+            table: { disable: true, category: 'Development' }
+        },
+        label: {
+            control: 'text',
             table: { category: 'Content' }
         },
         variant: {
@@ -34,8 +36,106 @@ export default {
             control: 'boolean',
             description: 'Show required indicator',
             table: { category: 'Content' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' }
         }
     }
+};
+
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' };
+
+export const Content = () => {
+    const [value, setValue] = useState(3);
+
+    return (
+        <div style={ratingCol}>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Baseline rating</h6>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Labeled comments-style rating with a required indicator.
+                </p>
+                <Rating
+                    id="rating-content"
+                    label="Rating"
+                    required
+                    value={value}
+                    variant="comments"
+                    onChange={setValue}
+                />
+            </section>
+        </div>
+    );
+};
+
+export const Variants = () => {
+    const [commentsValue, setCommentsValue] = useState(2);
+    const [numericValue, setNumericValue] = useState(4);
+
+    return (
+        <div style={ratingCol}>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Comments</h6>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Label appears below the stars for open-ended feedback flows.
+                </p>
+                <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
+            </section>
+            <section>
+                <h6 className="h6" style={{ marginBottom: '16px' }}>Numeric</h6>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                    Numeric labels above each star for more explicit scales.
+                </p>
+                <Rating id="rating-numeric-variant" value={numericValue} variant="numeric" onChange={setNumericValue} />
+            </section>
+        </div>
+    );
+};
+
+export const InteractionStates = () => (
+    <div style={ratingCol}>
+        <section>
+            <h6 className="h6" style={{ marginBottom: '16px' }}>Disabled</h6>
+            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                Disabled ratings remain visible but cannot be changed.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <Rating id="rating-disabled-comments" value={3} variant="comments" disabled />
+                <Rating id="rating-disabled-numeric" value={3} variant="numeric" disabled />
+            </div>
+        </section>
+    </div>
+);
+
+export const Interactive = (args) => {
+    const [value, setValue] = useState(3);
+
+    useEffect(() => {
+        setValue(3);
+    }, [args.variant]);
+
+    return (
+        <div style={{ maxWidth: '400px' }}>
+            <Rating
+                label={args.label}
+                required={args.required}
+                variant={args.variant}
+                disabled={args.disabled}
+                value={value}
+                onChange={setValue}
+            />
+        </div>
+    );
+};
+Interactive.args = {
+    label: 'Rating',
+    required: false,
+    variant: 'comments',
+    disabled: false,
 };
 
 /**

@@ -23,6 +23,24 @@ export default {
 - \`b3\`: Body 3 - smallest`
             }
         }
+    },
+    argTypes: {
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onFocus: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onBlur: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        }
     }
 };
 
@@ -259,6 +277,22 @@ export const ListItemInteractive = {
             options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
             if: { arg: 'showCounter' },
             table: { category: 'Visuals' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onFocus: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onBlur: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };

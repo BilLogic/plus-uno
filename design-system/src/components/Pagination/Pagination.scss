@@ -81,7 +81,7 @@
     /* 1.571 (157.1%) */
 
     /* Text color */
-    color: var(--color-secondary-text);
+    color: var(--color-secondary-text) !important;
     /* #3b525f */
 
     /* Remove Bootstrap defaults */
@@ -120,7 +120,7 @@
 
 .plus-pagination .page-item-icon .page-link {
     /* Icon color - secondary color */
-    color: var(--color-secondary);
+    color: var(--color-secondary) !important;
     /* #445c6a */
 
     /* Icon sizing - default (medium): Fontawesome/Solid/B2 */
@@ -129,7 +129,7 @@
         /* 12px */
         line-height: var(--font-line-height-fa-body2);
         /* 1.833 (183.3%) */
-        color: var(--color-secondary);
+        color: var(--color-secondary) !important;
         font-weight: 900;
         /* Font Awesome Solid */
     }
@@ -182,7 +182,7 @@
 .plus-pagination .page-item:not(.disabled):not(.active) .page-link:hover {
     background-color: var(--color-secondary-state-08);
     /* rgba(68,92,106,0.08) */
-    color: var(--color-secondary-text);
+    color: var(--color-secondary-text) !important;
     z-index: 2;
 }
 
@@ -191,7 +191,7 @@
     outline: none;
     background-color: var(--color-secondary-state-12);
     /* rgba(68,92,106,0.12) */
-    color: var(--color-secondary-text);
+    color: var(--color-secondary-text) !important;
     z-index: 2;
     box-shadow: inset 0 0 0 2px var(--color-outline);
 }
@@ -200,7 +200,7 @@
 .plus-pagination .page-item.active .page-link {
     background-color: var(--color-secondary-state-08);
     /* rgba(68,92,106,0.08) */
-    color: var(--color-secondary-text);
+    color: var(--color-secondary-text) !important;
     /* #3b525f */
     cursor: default;
     font-weight: var(--font-weight-semibold-1);
@@ -211,16 +211,16 @@
 
 /* Active state - icon buttons */
 .plus-pagination .page-item.active.page-item-icon .page-link {
-    color: var(--color-secondary-text);
+    color: var(--color-secondary-text) !important;
 
     i {
-        color: var(--color-secondary-text);
+        color: var(--color-secondary-text) !important;
     }
 }
 
 /* Disabled state - Figma: opacity-40 (40%) */
 .plus-pagination .page-item.disabled .page-link {
-    color: color-mix(in srgb, var(--color-secondary-text) 38%, transparent);
+    color: color-mix(in srgb, var(--color-secondary-text) 38%, transparent) !important;
     background-color: var(--color-surface);
     cursor: not-allowed;
     pointer-events: none;
@@ -230,18 +230,18 @@
 
 /* Disabled state - icon buttons */
 .plus-pagination .page-item.disabled.page-item-icon .page-link {
-    color: color-mix(in srgb, var(--color-secondary) 38%, transparent);
+    color: color-mix(in srgb, var(--color-secondary) 38%, transparent) !important;
     opacity: 0.4;
     /* 40% per Figma */
 
     i {
-        color: color-mix(in srgb, var(--color-secondary) 38%, transparent);
+        color: color-mix(in srgb, var(--color-secondary) 38%, transparent) !important;
     }
 }
 
 /* Ellipsis styling - same as regular segments */
 .plus-pagination .page-item-ellipsis .page-link {
-    color: var(--color-secondary-text);
+    color: var(--color-secondary-text) !important;
     background-color: var(--color-surface);
     cursor: default;
     pointer-events: none;

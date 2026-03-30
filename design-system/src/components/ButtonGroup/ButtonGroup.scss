@@ -12,31 +12,32 @@
     display: inline-flex;
     vertical-align: middle;
     gap: 0;
-    border-radius: var(--size-element-radius-md);
+    --plus-button-group-radius: var(--size-element-radius-md);
+    border-radius: var(--plus-button-group-radius);
     overflow: hidden;
 
     // Direct Button children styling for group context
     >.plus-btn,
     >.btn {
-        border-radius: 0;
+        // Start fully rounded, then "square off" per adjacency rules below.
+        // This matches: has-left-neighbor => no left radii, has-right-neighbor => no right radii.
+        border-radius: var(--plus-button-group-radius);
         border: none;
         margin: 0;
         position: relative;
         box-shadow: none;
         outline: none;
 
-        &:first-child {
-            border-top-left-radius: var(--size-element-radius-md);
-            border-bottom-left-radius: var(--size-element-radius-md);
+        // Has a button to its LEFT => square off left corners
+        &:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
         }
 
-        &:last-child {
-            border-top-right-radius: var(--size-element-radius-md);
-            border-bottom-right-radius: var(--size-element-radius-md);
-        }
-
-        &:only-child {
-            border-radius: var(--size-element-radius-md);
+        // Has a button to its RIGHT => square off right corners
+        &:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
         }
     }
 
@@ -69,22 +70,18 @@
 
         >.plus-btn,
         >.btn {
-            border-radius: 0;
+            border-radius: var(--plus-button-group-radius);
 
-            &:first-child {
-                border-top-left-radius: var(--size-element-radius-md);
-                border-top-right-radius: var(--size-element-radius-md);
-                border-bottom-left-radius: 0;
-            }
-
-            &:last-child {
-                border-bottom-left-radius: var(--size-element-radius-md);
-                border-bottom-right-radius: var(--size-element-radius-md);
+            // Has a button ABOVE => square off top corners
+            &:not(:first-child) {
+                border-top-left-radius: 0;
                 border-top-right-radius: 0;
             }
 
-            &:only-child {
-                border-radius: var(--size-element-radius-md);
+            // Has a button BELOW => square off bottom corners
+            &:not(:last-child) {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
             }
         }
 
@@ -102,46 +99,26 @@
     // --- SIZE VARIANTS ---
 
     &.btn-group-sm {
-        border-radius: var(--size-element-radius-sm);
+        --plus-button-group-radius: var(--size-element-radius-sm);
+        border-radius: var(--plus-button-group-radius);
 
         >.plus-btn,
         >.btn {
-            &:first-child {
-                border-top-left-radius: var(--size-element-radius-sm);
-                border-bottom-left-radius: var(--size-element-radius-sm);
-            }
-
-            &:last-child {
-                border-top-right-radius: var(--size-element-radius-sm);
-                border-bottom-right-radius: var(--size-element-radius-sm);
-            }
-
-            &:only-child {
-                border-radius: var(--size-element-radius-sm);
-            }
+            border-radius: var(--plus-button-group-radius);
         }
 
         &.btn-group-vertical {
 
             >.plus-btn,
             >.btn {
-                &:first-child {
-                    border-top-left-radius: var(--size-element-radius-sm);
-                    border-top-right-radius: var(--size-element-radius-sm);
-                    border-bottom-left-radius: 0;
-                }
-
-                &:last-child {
-                    border-bottom-left-radius: var(--size-element-radius-sm);
-                    border-bottom-right-radius: var(--size-element-radius-sm);
-                    border-top-right-radius: 0;
-                }
+                border-radius: var(--plus-button-group-radius);
             }
         }
     }
 
     &.btn-group-lg {
-        border-radius: var(--size-element-radius-md);
+        --plus-button-group-radius: var(--size-element-radius-md);
+        border-radius: var(--plus-button-group-radius);
     }
 
     &--block {

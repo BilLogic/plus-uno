@@ -45,36 +45,38 @@ export default {
             description: 'Toggle the label? switch to show or hide the label.',
             table: { category: 'Content' }
         },
+        label: {
+            control: 'text',
+            description: 'Visible field label',
+            table: { category: 'Content' }
+        },
         required: {
             control: 'boolean',
             description: 'Toggle the required switch to show or hide a * next to the label to show if the input is required.',
             table: { category: 'Content' }
         },
         leadingVisual: {
-            control: 'text',
-            description: 'Leading visual (icon) displayed on the left side of the input',
+            control: 'select',
+            options: ['none', 'icon'],
+            description: 'Leading visual preset',
             table: { category: 'Content' }
         },
         trailingVisual: {
-            control: 'text',
-            description: 'Trailing visual can be an icon class (e.g., "fa-solid fa-icons") or "dropdown" for a dropdown arrow. Matching the trailingVisual size to the form size.',
+            control: 'select',
+            options: ['none', 'icon', 'dropdown'],
+            description: 'Trailing visual preset',
             table: { category: 'Content' }
         },
         type: {
-            control: 'select',
-            options: ['text', 'password', 'email', 'number', 'tel', 'url', 'search'],
-            description: 'Input type',
-            table: { category: 'Content' }
+            table: { disable: true, category: 'Development' }
         },
         id: {
-            control: 'text',
-            description: 'Input ID',
-            table: { category: 'Content' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         name: {
-            control: 'text',
-            description: 'Input name',
-            table: { category: 'Content' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         placeholder: {
             control: 'text',
@@ -82,9 +84,24 @@ export default {
             table: { category: 'Content' }
         },
         value: {
-            control: 'text',
-            description: 'Input value',
-            table: { category: 'Content' }
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        defaultValue: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onChange: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -254,7 +271,6 @@ export const Interactive = (args) => {
             <Input
                 id={args.id || 'input-interactive'}
                 name={args.name}
-                type={args.type}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 size={args.size}
@@ -266,8 +282,10 @@ export const Interactive = (args) => {
                 required={args.required}
                 label={args.label}
                 placeholder={args.placeholder}
-                leadingVisual={args.leadingVisual || undefined}
-                trailingVisual={args.trailingVisual === 'dropdown' ? 'dropdown' : (args.trailingVisual || undefined)}
+                leadingVisual={args.leadingVisual === 'icon' ? 'fa-solid fa-icons' : undefined}
+                trailingVisual={args.trailingVisual === 'dropdown'
+                    ? 'dropdown'
+                    : (args.trailingVisual === 'icon' ? 'fa-solid fa-icons' : undefined)}
             />
         </div>
     );
@@ -284,9 +302,6 @@ Interactive.args = {
     label: 'Label',
     placeholder: 'Placeholder',
     value: '',
-    leadingVisual: '',
-    trailingVisual: 'fa-solid fa-icons',
-    type: 'text',
-    id: 'input-interactive',
-    name: 'input-interactive'
+    leadingVisual: 'none',
+    trailingVisual: 'icon',
 };

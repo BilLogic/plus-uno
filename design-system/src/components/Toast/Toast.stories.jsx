@@ -17,12 +17,45 @@ export default {
         style: {
             control: 'select',
             options: ['secondary', 'success', 'danger', 'warning', 'info', 'primary'],
-            description: 'Toast style'
+            description: 'Toast style',
+            table: { category: 'Design' }
         },
         position: {
             control: 'select',
-            options: ['top-right', 'top-left', 'bottom-right', 'bottom-left'],
-            description: 'Toast position (for container)'
+            options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
+            description: 'Toast position (for container)',
+            table: { category: 'Layout' }
+        },
+        title: {
+            control: 'text',
+            table: { category: 'Content' }
+        },
+        children: {
+            control: 'text',
+            table: { category: 'Content' }
+        },
+        show: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        autohide: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        delay: {
+            control: 'number',
+            table: { category: 'Behavior' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onClose: {
+            table: { disable: true, category: 'Development' }
         }
     }
 };

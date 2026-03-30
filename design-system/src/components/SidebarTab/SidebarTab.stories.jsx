@@ -8,12 +8,24 @@ export default {
     argTypes: {
         state: {
             control: { type: 'select' },
-            options: ['enabled', 'hover', 'selected', 'disabled', 'focus']
+            options: ['enabled', 'selected', 'disabled'],
+            table: { category: 'Behavior' }
         },
-        icon: { control: 'text' },
-        text: { control: 'text' },
-        leadingVisual: { control: 'boolean' },
-        trailingVisual: { control: 'boolean' },
+        icon: { control: 'text', table: { category: 'Content' } },
+        text: { control: 'text', table: { category: 'Content' } },
+        leadingVisual: { control: 'boolean', table: { category: 'Content' } },
+        trailingVisual: { control: 'boolean', table: { category: 'Content' } },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onClick: {
+            table: { disable: true, category: 'Development' }
+        },
     },
     // Add gap to decorator for better spacing in list
     decorators: [

@@ -23,6 +23,12 @@ const Modal = ({
     backdrop = true,
     keyboard = true,
     centered = true,
+    renderAs = 'modal',
+    container,
+    manager,
+    enforceFocus,
+    autoFocus,
+    restoreFocus,
     paddingSize,
     gapSize,
     radiusSize = 'md',
@@ -131,6 +137,10 @@ const Modal = ({
         </div>
     );
 
+    if (renderAs === 'inline') {
+        return modalContent;
+    }
+
     return (
         <BootstrapModal
             show={show}
@@ -138,6 +148,11 @@ const Modal = ({
             backdrop={backdrop}
             keyboard={keyboard}
             centered={centered}
+            container={container}
+            manager={manager}
+            enforceFocus={enforceFocus}
+            autoFocus={autoFocus}
+            restoreFocus={restoreFocus}
             contentClassName="plus-bootstrap-modal-content-reset"
             dialogClassName="plus-bootstrap-modal-dialog-reset"
         >
@@ -156,6 +171,12 @@ Modal.propTypes = {
     backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     keyboard: PropTypes.bool,
     centered: PropTypes.bool,
+    renderAs: PropTypes.oneOf(['modal', 'inline']),
+    container: PropTypes.any,
+    manager: PropTypes.any,
+    enforceFocus: PropTypes.bool,
+    autoFocus: PropTypes.bool,
+    restoreFocus: PropTypes.bool,
     primaryButton: PropTypes.shape({
         text: PropTypes.string,
         onClick: PropTypes.func,

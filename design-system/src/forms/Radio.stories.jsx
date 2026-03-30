@@ -19,6 +19,16 @@ export default {
             description: 'Label text for the radio',
             table: { category: 'Content' },
         },
+        secondLabel: {
+            control: 'text',
+            description: 'Label text for the second option',
+            table: { category: 'Content' },
+        },
+        thirdLabel: {
+            control: 'text',
+            description: 'Label text for the third option',
+            table: { category: 'Content' },
+        },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -29,6 +39,33 @@ export default {
             control: 'boolean',
             description: 'Disable the radio',
             table: { category: 'Behavior' },
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            table: { disable: true, category: 'Development' },
+        },
+        value: {
+            table: { disable: true, category: 'Development' },
+        },
+        defaultChecked: {
+            table: { disable: true, category: 'Development' },
+        },
+        checked: {
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -161,9 +198,19 @@ export const Interactive = (args) => {
             <Radio
                 id="radio-int-2"
                 name="radio-interactive"
-                label="Option 2"
+                label={args.secondLabel}
                 value="option2"
                 checked={value === 'option2'}
+                size={args.size}
+                disabled={args.disabled}
+                onChange={(e) => setValue(e.target.value)}
+            />
+            <Radio
+                id="radio-int-3"
+                name="radio-interactive"
+                label={args.thirdLabel}
+                value="option3"
+                checked={value === 'option3'}
                 size={args.size}
                 disabled={args.disabled}
                 onChange={(e) => setValue(e.target.value)}
@@ -174,6 +221,8 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     label: 'Option 1',
+    secondLabel: 'Option 2',
+    thirdLabel: 'Option 3',
     size: 'medium',
     disabled: false,
 };

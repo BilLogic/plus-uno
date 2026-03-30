@@ -44,35 +44,24 @@ export default {
             table: { category: 'Behavior' }
         },
         wrap: {
-            control: 'boolean',
-            description: 'Whether to wrap around at the ends',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         pause: {
-            control: 'select',
-            options: ['hover', false],
-            description: 'Pause on hover behavior',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         keyboard: {
-            control: 'boolean',
-            description: 'Enable keyboard navigation',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         activeIndex: {
-            control: { type: 'number' },
-            description: 'Controlled active slide index',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         onSelect: {
             table: { disable: true, category: 'Development' }
@@ -267,7 +256,13 @@ export const Interactive = (args) => {
 
     return (
         <div style={{ maxWidth: '800px' }}>
-            <Carousel {...args} slides={slides} />
+            <Carousel
+                fade={args.fade}
+                controls={args.controls}
+                indicators={args.indicators}
+                interval={args.interval}
+                slides={slides}
+            />
         </div>
     );
 };
@@ -276,9 +271,6 @@ Interactive.args = {
     controls: true,
     indicators: true,
     interval: 5000,
-    wrap: true,
-    pause: 'hover',
-    keyboard: true,
     fade: false,
     slideCount: 3,
     showCaptions: false

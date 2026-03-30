@@ -20,9 +20,7 @@ export default {
             table: { category: 'Content' },
         },
         checked: {
-            control: 'boolean',
-            description: 'Controlled checked state',
-            table: { category: 'State' },
+            table: { disable: true, category: 'Development' },
         },
         size: {
             control: 'select',
@@ -34,6 +32,30 @@ export default {
             control: 'boolean',
             description: 'Disable the switch',
             table: { category: 'Behavior' },
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            table: { disable: true, category: 'Development' },
+        },
+        value: {
+            table: { disable: true, category: 'Development' },
+        },
+        defaultChecked: {
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -79,6 +101,7 @@ export const Interactive = (args) => {
             name="switch-interactive"
             label={args.label}
             checked={checked}
+            size={args.size}
             disabled={args.disabled}
             onChange={(e) => setChecked(e.target.checked)}
         />
@@ -87,7 +110,6 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     label: 'Toggle Switch',
-    checked: false,
     size: 'medium',
     disabled: false,
 };

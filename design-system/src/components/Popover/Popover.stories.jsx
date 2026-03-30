@@ -14,15 +14,43 @@ export default {
         }
     },
     argTypes: {
+        triggerLabel: {
+            control: 'text',
+            description: 'Button label used as the popover trigger',
+            table: { category: 'Content' }
+        },
+        title: {
+            control: 'text',
+            description: 'Popover title',
+            table: { category: 'Content' }
+        },
+        children: {
+            control: 'text',
+            description: 'Popover body content',
+            table: { category: 'Content' }
+        },
         placement: {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
-            description: 'Popover placement'
+            description: 'Popover placement',
+            table: { category: 'Layout' }
         },
         triggerType: {
             control: 'select',
             options: ['click', 'hover', 'focus', ['hover', 'focus']],
-            description: 'Trigger behavior'
+            description: 'Trigger behavior',
+            table: { category: 'Behavior' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        trigger: {
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -136,9 +164,15 @@ export const Overview = () => (
 
 export const Interactive = Template.bind({});
 Interactive.args = {
-    trigger: <Button text="Interactive Trigger" />,
+    triggerLabel: 'Interactive Trigger',
     title: 'Interactive Popover',
     children: 'Change my placement or title in the controls.',
     placement: 'top',
     triggerType: 'click'
 };
+Interactive.render = (args) => (
+    <Popover
+        {...args}
+        trigger={<Button text={args.triggerLabel} />}
+    />
+);

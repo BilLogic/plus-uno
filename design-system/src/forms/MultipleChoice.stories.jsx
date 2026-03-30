@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MultipleChoice from './MultipleChoice';
 
 export default {
@@ -21,8 +21,11 @@ export default {
             table: { category: 'Content' },
         },
         options: {
-            control: 'object',
-            description: 'Array of option objects with id, value, and label properties',
+            table: { disable: true, category: 'Development' },
+        },
+        optionCount: {
+            control: { type: 'range', min: 3, max: 7, step: 1 },
+            description: 'Number of options in the demo list',
             table: { category: 'Content' },
         },
         size: {
@@ -37,9 +40,7 @@ export default {
             table: { category: 'Behavior' },
         },
         value: {
-            control: 'object',
-            description: 'Controlled value (single value for radio, array for checkbox)',
-            table: { category: 'Content' },
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -205,6 +206,19 @@ export const InteractionStates = () => (
 export const Interactive = (args) => {
     const [radioValue, setRadioValue] = useState(args.type === 'radio' ? args.value || null : undefined);
     const [checkboxValues, setCheckboxValues] = useState(args.type === 'checkbox' ? args.value || [] : undefined);
+    const options = Array.from({ length: args.optionCount }, (_, index) => ({
+        id: `option-${index + 1}`,
+        value: `option-${index + 1}`,
+        label: 'Text'
+    }));
+
+    useEffect(() => {
+        if (args.type === 'radio') {
+            setRadioValue(null);
+        } else {
+            setCheckboxValues([]);
+        }
+    }, [args.type, args.optionCount]);
 
     const handleChange = args.type === 'radio' ? setRadioValue : setCheckboxValues;
     const currentValue = args.type === 'radio' ? radioValue : checkboxValues;
@@ -215,7 +229,7 @@ export const Interactive = (args) => {
                 id="multiple-choice-interactive"
                 name="multiple-choice-interactive"
                 type={args.type}
-                options={args.options}
+                options={options}
                 value={currentValue}
                 onChange={handleChange}
                 size={args.size}
@@ -229,12 +243,5 @@ Interactive.args = {
     type: 'radio',
     size: 'medium',
     disabled: false,
-    options: [
-        { id: 'option-1', value: 'option-1', label: 'Text' },
-        { id: 'option-2', value: 'option-2', label: 'Text' },
-        { id: 'option-3', value: 'option-3', label: 'Text' },
-        { id: 'option-4', value: 'option-4', label: 'Text' },
-        { id: 'option-5', value: 'option-5', label: 'Text' },
-    ],
-    value: null,
+    optionCount: 5,
 };

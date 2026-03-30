@@ -62,9 +62,8 @@ export default {
             table: { category: 'Validation' },
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         showSectionLabels: {
             control: 'boolean',
@@ -72,9 +71,8 @@ export default {
             table: { category: 'Content' },
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -155,7 +153,6 @@ export const Interactive = (args) => {
                 {...args}
                 onChange={(data) => {
                     setValue(data);
-                    console.log('Date and Time:', data);
                 }}
             />
             {value && (

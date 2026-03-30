@@ -13,6 +13,17 @@ export default {
         }
     },
     argTypes: {
+        contentPreset: {
+            control: 'select',
+            options: ['tabs-only', 'with-dropdown'],
+            description: 'Preset navigation structure for the interactive demo',
+            table: { category: 'Content' }
+        },
+        showDisabledItem: {
+            control: 'boolean',
+            description: 'Include a disabled pill in the demo',
+            table: { category: 'Behavior' }
+        },
         alignment: {
             control: 'select',
             options: ['left', 'center', 'right'],
@@ -24,6 +35,22 @@ export default {
             options: ['horizontal', 'vertical'],
             description: 'Orientation of the navigation',
             table: { category: 'Layout' }
+        },
+        activeKey: {
+            table: { disable: true, category: 'Development' }
+        },
+        defaultActiveKey: {
+            table: { disable: true, category: 'Development' }
+        },
+        onSelect: {
+            table: { disable: true, category: 'Development' }
+        },
+        children: {
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -105,11 +132,20 @@ export const Interactive = (args) => {
             <NavPills.Item eventKey="1">Tab 1</NavPills.Item>
             <NavPills.Item eventKey="2">Tab 2</NavPills.Item>
             <NavPills.Item eventKey="3">Tab 3</NavPills.Item>
+            {args.showDisabledItem ? <NavPills.Item eventKey="4" disabled>Disabled</NavPills.Item> : null}
+            {args.contentPreset === 'with-dropdown' ? (
+                <NavPills.Dropdown title="More" id="interactive-nav-pills-dropdown">
+                    <NavPills.Dropdown.Item eventKey="action">Action</NavPills.Dropdown.Item>
+                    <NavPills.Dropdown.Item eventKey="another">Another action</NavPills.Dropdown.Item>
+                </NavPills.Dropdown>
+            ) : null}
         </NavPills>
     );
 };
 
 Interactive.args = {
+    contentPreset: 'tabs-only',
+    showDisabledItem: false,
     alignment: 'left',
     direction: 'horizontal'
 };

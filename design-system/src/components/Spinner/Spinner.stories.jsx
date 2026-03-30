@@ -27,9 +27,8 @@ export default {
             table: { category: 'Design', defaultValue: { summary: null } }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };

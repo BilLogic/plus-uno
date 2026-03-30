@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ChoiceGrid from './ChoiceGrid';
 
 export default {
@@ -21,13 +21,19 @@ export default {
             table: { category: 'Content' },
         },
         rows: {
-            control: 'object',
-            description: 'Array of row objects with id and label',
-            table: { category: 'Content' },
+            table: { disable: true, category: 'Development' },
         },
         columns: {
-            control: 'object',
-            description: 'Array of column objects with id and label',
+            table: { disable: true, category: 'Development' },
+        },
+        rowCount: {
+            control: { type: 'range', min: 1, max: 4, step: 1 },
+            description: 'Number of rows in the demo grid',
+            table: { category: 'Content' },
+        },
+        columnCount: {
+            control: { type: 'range', min: 2, max: 4, step: 1 },
+            description: 'Number of columns in the demo grid',
             table: { category: 'Content' },
         },
         size: {
@@ -144,8 +150,16 @@ export const Interactive = (args) => {
         args.type === 'checkbox' ? { 'row-1': { 'col-1': false } } : {},
     );
 
-    const rows = args.rows || singleRow;
-    const cols = args.columns || columns;
+    useEffect(() => {
+        setRadioValues(args.type === 'radio' ? { 'row-1': 'col-1' } : {});
+        setCheckboxValues(args.type === 'checkbox' ? { 'row-1': { 'col-1': false } } : {});
+    }, [args.type, args.rowCount, args.columnCount]);
+
+    const rows = Array.from({ length: args.rowCount || 1 }, (_, index) => ({
+        id: `row-${index + 1}`,
+        label: `Row ${index + 1}`
+    }));
+    const cols = columns.slice(0, args.columnCount || columns.length);
 
     return (
         <div style={{ maxWidth: '800px' }}>
@@ -170,8 +184,8 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     type: 'radio',
-    rows: singleRow,
-    columns,
+    rowCount: singleRow.length,
+    columnCount: columns.length,
     size: 'medium',
     disabled: false,
 };

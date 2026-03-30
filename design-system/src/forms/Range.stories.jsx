@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Range from './Range';
 
 export default {
@@ -19,6 +19,54 @@ export default {
             options: ['small', 'medium', 'large'],
             description: 'Available in 3 sizes: small, medium (default), large.',
             table: { category: 'Design' },
+        },
+        value: {
+            control: { type: 'range', min: 0, max: 100, step: 1 },
+            description: 'Current slider value',
+            table: { category: 'Content' },
+        },
+        min: {
+            control: 'number',
+            description: 'Minimum slider value',
+            table: { category: 'Behavior' },
+        },
+        max: {
+            control: 'number',
+            description: 'Maximum slider value',
+            table: { category: 'Behavior' },
+        },
+        step: {
+            control: 'number',
+            description: 'Slider increment',
+            table: { category: 'Behavior' },
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        defaultValue: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        onInput: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -62,7 +110,11 @@ export const Sizes = () => {
 };
 
 export const Interactive = (args) => {
-    const [value, setValue] = useState(50);
+    const [value, setValue] = useState(args.value);
+
+    useEffect(() => {
+        setValue(args.value);
+    }, [args.value]);
 
     return (
         <div style={{ maxWidth: '600px' }}>
@@ -71,8 +123,9 @@ export const Interactive = (args) => {
                 value={value}
                 onChange={(e) => setValue(parseFloat(e.target.value))}
                 size={args.size}
-                min={0}
-                max={100}
+                min={args.min}
+                max={args.max}
+                step={args.step}
             />
         </div>
     );
@@ -80,4 +133,8 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     size: 'medium',
+    value: 50,
+    min: 0,
+    max: 100,
+    step: 1,
 };

@@ -1,8 +1,8 @@
 /*
  * Dropdown Component Styles
- * Uses context-aware M3 color roles and Button-matching fill variants.
- * Filled: --color-X bg → --color-on-X text
- * Tonal/Outline/Ghost: --color-X-text for accessible text on surface
+ * Uses context-aware color roles with outline as the default treatment.
+ * Outline: colored stroke + text tokens on surface
+ * Filled/Tonal/Ghost: optional alternate treatments
  */
 
 @use "sass:map";
@@ -53,8 +53,8 @@ $dropdown-themes: (
             // Reset Bootstrap caret borders to prevent "double icon" effect (triangle + font icon)
             border: none !important;
 
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+            font-family: 'Font Awesome 7 Free';
+            font-weight: 700;
             content: '\f0d7'; // fa-caret-down
             font-size: var(--font-size-fa-body2-solid);
             color: inherit;
@@ -307,8 +307,8 @@ $dropdown-themes: (
 
         // CRITICAL: Caret icon for split toggle
         &::after {
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+            font-family: 'Font Awesome 7 Free';
+            font-weight: 700;
             content: '\f0d7'; // fa-caret-down
             font-size: var(--font-size-fa-body2-solid);
             color: inherit;
@@ -328,7 +328,7 @@ $dropdown-themes: (
     // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-#{$theme}
     .pdropdown.pdropdown-#{$theme} {
 
-        // FILLED (default)
+        // FILLED
         .pdropdown-toggle,
         .pdropdown-default-toggle {
             background-color: var($col-main);
@@ -441,7 +441,7 @@ $dropdown-themes: (
     // =============================================================================
     .pdropdown.pdropdown-#{$theme}.pdropdown-split-dropdown {
 
-        // FILLED (default)
+        // FILLED
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
             background-color: var($col-main);

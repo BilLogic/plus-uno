@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RichTextEditor from './RichTextEditor';
 
 export default {
@@ -13,18 +13,53 @@ export default {
         }
     },
     argTypes: {
+        placeholder: {
+            control: 'text',
+            description: 'Placeholder text',
+            table: { category: 'Content' }
+        },
+        initialContent: {
+            control: 'text',
+            description: 'Starting editor content',
+            table: { category: 'Content' }
+        },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
-            description: 'Editor size'
+            description: 'Editor size',
+            table: { category: 'Design' }
         },
         readOnly: {
             control: 'boolean',
-            description: 'Read-only state'
+            description: 'Read-only state',
+            table: { category: 'Behavior' }
         },
         disabled: {
             control: 'boolean',
-            description: 'Disabled state'
+            description: 'Disabled state',
+            table: { category: 'Behavior' }
+        },
+        minHeight: {
+            control: 'number',
+            description: 'Minimum editor height',
+            table: { category: 'Layout' }
+        },
+        value: {
+            table: { disable: true, category: 'Development' }
+        },
+        defaultValue: {
+            table: { disable: true, category: 'Development' }
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -111,21 +146,32 @@ export const Overview = () => (
     </div>
 );
 
-export const Interactive = () => {
-    const [content, setContent] = useState('<p>Initial content...</p>');
+export const Interactive = (args) => {
+    const [content, setContent] = useState(args.initialContent);
+
+    useEffect(() => {
+        setContent(args.initialContent);
+    }, [args.initialContent]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ maxWidth: '880px' }}>
             <RichTextEditor
+                size={args.size}
+                readOnly={args.readOnly}
+                disabled={args.disabled}
+                placeholder={args.placeholder}
+                minHeight={args.minHeight}
                 value={content}
                 onChange={setContent}
-                placeholder="Interactive editor..."
-                minHeight={200}
             />
-            <div style={{ padding: '16px', background: '#f5f5f5', borderRadius: '4px' }}>
-                <h6>Current Content:</h6>
-                <pre style={{ whiteSpace: 'pre-wrap' }}>{content}</pre>
-            </div>
         </div>
     );
+};
+Interactive.args = {
+    placeholder: 'Interactive editor...',
+    initialContent: '<p>Initial content...</p>',
+    size: 'medium',
+    readOnly: false,
+    disabled: false,
+    minHeight: 200
 };

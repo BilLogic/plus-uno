@@ -1,0 +1,179 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import { DocHero, DocPage, DocSection } from '@/storybook-docs/doc-layout';
+import { Alert, AlertDescription, AlertTitle } from '@/storybook-docs/ui/alert';
+
+import * as PaginationStories from '@/components/Pagination/Pagination.stories.jsx';
+import * as BadgeStories from '@/components/Badge/Badge.stories.jsx';
+import * as CheckboxStories from '@/forms/Checkbox.stories.jsx';
+
+<Meta
+  title="PLUS Docs/Component Organization"
+  parameters={{
+    docs: {
+      description: {
+        story:
+          'How PLUS component docs are organized in Storybook (taxonomy + exceptions), optimized for designer scanning.',
+      },
+    },
+  }}
+/>
+
+<DocPage width="narrow">
+  <DocHero
+    title="Component organization"
+    lead="A quick guide to where things live in the sidebar and how to classify docs sections. Use this
+      as a mental model while scanning components; the full source of truth lives in the repo guide."
+  />
+
+  <Alert>
+    <AlertTitle>Source of truth</AlertTitle>
+    <AlertDescription>
+      This page is intentionally condensed. For full details, open{' '}
+      <code className="rounded bg-muted px-1 py-0.5 text-xs">
+        docs/design-system/guides/storybook-component-docs.md
+      </code>
+      .
+    </AlertDescription>
+  </Alert>
+
+  <DocSection title="Quick mental model">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        Components and controls live under <strong className="text-foreground">Components</strong> and{' '}
+        <strong className="text-foreground">Forms</strong>.
+      </li>
+      <li>
+        Most entries are <strong className="text-foreground">MDX-first</strong>: the Docs tab is the
+        primary reading surface.
+      </li>
+      <li>
+        The <strong className="text-foreground">Canvas</strong> is where interaction + Controls live.
+      </li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Default section spine (taxonomy)">
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      Use this order whenever it fits. Omit sections that don’t apply—consistency is about scanability,
+      not forcing every page to be the same length.
+    </p>
+
+    <ol className="ml-6 list-decimal space-y-1 text-sm text-muted-foreground">
+      <li>
+        <strong className="text-foreground">Content</strong> — what the component is, contains, and the
+        baseline version a designer recognizes.
+      </li>
+      <li>
+        <strong className="text-foreground">Styles</strong> — visual treatments (color roles, fills,
+        emphasis) that don’t change meaning.
+      </li>
+      <li>
+        <strong className="text-foreground">Sizes</strong> — scale comparisons once the baseline is clear.
+      </li>
+      <li>
+        <strong className="text-foreground">Interaction States</strong> — hover/focus/selected/disabled,
+        validation, loading, etc.
+      </li>
+      <li>
+        <strong className="text-foreground">Layout</strong> — composition rules: rows/stacks/containers,
+        rails, groups, spacing, wrapping.
+      </li>
+      <li>
+        <strong className="text-foreground">Interactive</strong> — the sandbox: a small, curated set of
+        Controls to verify details.
+      </li>
+    </ol>
+  </DocSection>
+
+  <DocSection title="Decision rubric: Content vs Styles vs Layout">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        If meaning or affordance changes → <strong className="text-foreground">Content</strong>
+      </li>
+      <li>
+        If it’s the same thing with a different visual skin → <strong className="text-foreground">Styles</strong>
+      </li>
+      <li>
+        If placement/composition rules change → <strong className="text-foreground">Layout</strong>
+      </li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Content (example)">
+    <div className="text-sm text-muted-foreground">
+      Pagination “icon type vs text type” changes affordance, so it belongs in Content.
+    </div>
+    <div className="mt-2 rounded-xl border bg-background p-4">
+      <PaginationStories.Content />
+    </div>
+  </DocSection>
+
+  <DocSection title="Styles (example)">
+    <div className="text-sm text-muted-foreground">
+      Badge treatments change visual emphasis without changing meaning.
+    </div>
+    <div className="mt-2 rounded-xl border bg-background p-4">
+      <BadgeStories.Styles />
+    </div>
+  </DocSection>
+
+  <DocSection title="Interaction States (example)">
+    <div className="text-sm text-muted-foreground">
+      Checkbox hover/focus/disabled patterns belong in Interaction States.
+    </div>
+    <div className="mt-2 rounded-xl border bg-background p-4">
+      <CheckboxStories.InteractionStates />
+    </div>
+  </DocSection>
+
+  <DocSection title="Naming rules">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        Prefer <strong className="text-foreground">Styles</strong> (not “Variants”) for visual treatments.
+      </li>
+      <li>
+        When “Styles” is too abstract, use a controlled axis label that still maps back to Styles (e.g.{' '}
+        <code className="rounded bg-muted px-1 py-0.5 text-xs">Color styles</code>,{' '}
+        <code className="rounded bg-muted px-1 py-0.5 text-xs">Fill treatments</code>).
+      </li>
+      <li>
+        Keep top-level headings stable; scenario labels usually belong as smaller subsections.
+      </li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Exception policy (keep it rare)">
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      It’s okay to add a top-level section beyond the spine only when it clearly improves understanding.
+    </p>
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        <strong className="text-foreground">Anatomy</strong> — parts/slots matter to composition.
+      </li>
+      <li>
+        <strong className="text-foreground">Behavior</strong> — rules-of-operation matter beyond visuals.
+      </li>
+      <li>
+        <strong className="text-foreground">Types</strong> (rare) — only when it’s true product language.
+      </li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Canvas layout guidance for content variants">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        Put a short subheading + one-line guidance <strong className="text-foreground">outside</strong> the
+        mini demo canvas.
+      </li>
+      <li>
+        Put only the component demo <strong className="text-foreground">inside</strong> the mini canvas.
+      </li>
+      <li>
+        Avoid “double-boxing”: if the component already has a strong container (Alert-like components), don’t
+        wrap each variant in another card/canvas.
+      </li>
+    </ul>
+  </DocSection>
+</DocPage>
+

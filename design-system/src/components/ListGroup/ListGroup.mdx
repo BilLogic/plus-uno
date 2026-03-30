@@ -23,29 +23,17 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <div className="sb-ds-doc-section">
 
-### List item — Content
+### Anatomy
 
-<DocsCanvasShell description={<>Navigation-style rows with icon, label, badge, and disabled state.</>}>
+<DocsCanvasShell description={<>`ListGroup.Item` content patterns such as icon, label, badge, and disabled item rows.</>}>
     <Canvas of={ListGroupItemStories.ListItemContent} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-### List item — Variants
-
-<DocsCanvasShell description={<>Single- and multi-select modes.</>}>
+<DocsCanvasShell description={<>Selection anatomy for single-select and multi-select item modes.</>}>
     <Canvas of={ListGroupItemStories.ListItemSelectionModes} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-### List item — Sizes
-
-<DocsCanvasShell description={<>Body scale tokens b1, b2, and b3.</>}>
+<DocsCanvasShell description={<>Body scale tokens available at the item level: <code>b1</code>, <code>b2</code>, and <code>b3</code>.</>}>
     <Canvas of={ListGroupItemStories.ListItemSizes} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 

@@ -21,25 +21,25 @@ export default {
         },
     },
     argTypes: {
-        items: {
-            control: 'object',
-            description: 'Array of breadcrumb items',
+        pathPreset: {
+            control: 'select',
+            options: ['short', 'standard', 'deep'],
+            description: 'Preset breadcrumb depth for the interactive demo',
             table: { category: 'Content' },
         },
         separator: {
-            control: 'text',
-            description: 'Custom separator character (Note: Default / is styled via CSS)',
-            table: { category: 'Design' },
+            table: { disable: true, category: 'Design' },
         },
         id: {
-            control: 'text',
-            description: 'HTML ID for the last item',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         className: {
-            control: 'text',
-            description: 'Custom CSS classes',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        items: {
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -91,13 +91,25 @@ export const Overview = () => (
  * Interactive Breadcrumb
  * Interactive playground for testing breadcrumb props.
  */
-export const Interactive = (args) => <Breadcrumb {...args} />;
+export const Interactive = (args) => (
+    <Breadcrumb
+        {...args}
+        items={{
+            short: [
+                { text: 'Home', href: '/' },
+                { text: 'Current Page' }
+            ],
+            standard: sampleItems,
+            deep: [
+                { text: 'Home', href: '/' },
+                { text: 'Training', href: '/training' },
+                { text: 'Lessons', href: '/lessons' },
+                { text: 'Module 3', href: '/lessons/module-3' },
+                { text: 'Current Page' }
+            ]
+        }[args.pathPreset] || sampleItems}
+    />
+);
 Interactive.args = {
-    items: [
-        { text: 'Home', href: '/' },
-        { text: 'Section', href: '/section' },
-        { text: 'Subsection', href: '/subsection' },
-        { text: 'Current Page' } // No href for current page
-    ],
-    separator: '/',
+    pathPreset: 'standard',
 };

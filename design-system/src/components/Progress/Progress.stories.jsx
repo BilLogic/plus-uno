@@ -6,20 +6,35 @@ export default {
     component: Progress,
     tags: ['!dev'],
     argTypes: {
-        value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value' },
+        value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value', table: { category: 'Content' } },
         style: {
             control: 'select',
             options: ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'],
             description: 'Progress bar style',
+            table: { category: 'Design' }
         },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
             description: 'Progress bar size',
+            table: { category: 'Design' }
         },
-        striped: { control: 'boolean', description: 'Striped effect' },
-        animated: { control: 'boolean', description: 'Animated stripes' },
-        showLabel: { control: 'boolean', description: 'Show percentage label' },
+        striped: { control: 'boolean', description: 'Striped effect', table: { category: 'Behavior' } },
+        animated: { control: 'boolean', description: 'Animated stripes', table: { category: 'Behavior' } },
+        showLabel: { control: 'boolean', description: 'Show percentage label', table: { category: 'Behavior' } },
+        min: {
+            table: { disable: true, category: 'Development' }
+        },
+        max: {
+            table: { disable: true, category: 'Development' }
+        },
+        label: {
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        }
     },
 };
 

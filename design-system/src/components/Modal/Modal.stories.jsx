@@ -1,39 +1,48 @@
-import React, { useState } from 'react';
-import BootstrapModalManager from 'react-bootstrap/esm/BootstrapModalManager';
+import React from 'react';
 import Modal from '@/components/Modal';
-
-/** Do not set `overflow: hidden` on `document.body` — otherwise Storybook docs cannot scroll. */
-class StorybookDocsModalManager extends BootstrapModalManager {
-    constructor(options = {}) {
-        super({ ...options, handleContainerOverflow: false });
-    }
-}
-
-const storybookDocsModalManager = new StorybookDocsModalManager({ isRTL: false });
 
 export default {
     title: 'Components/Modal',
     component: Modal,
     tags: ['!dev'],
     argTypes: {
+        title: {
+            control: 'text',
+            table: { category: 'Content' },
+        },
+        body: {
+            control: 'text',
+            table: { category: 'Content' },
+        },
         type: {
             control: 'select',
             options: ['default', 'scrollable'],
             description: 'Modal type',
+            table: { category: 'Design' },
         },
         showBottomButtons: {
             control: 'boolean',
             description: 'Show bottom buttons',
+            table: { category: 'Behavior' },
+        },
+        show: {
+            control: 'boolean',
+            table: { category: 'Behavior' },
         },
         width: {
             control: 'number',
             description: 'Modal width',
+            table: { category: 'Layout' },
         },
-        container: { table: { disable: true } },
-        manager: { table: { disable: true } },
-        enforceFocus: { table: { disable: true } },
-        autoFocus: { table: { disable: true } },
-        restoreFocus: { table: { disable: true } },
+        id: { control: false, table: { disable: true, category: 'Development' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
+        enforceFocus: { table: { disable: true, category: 'Development' } },
+        autoFocus: { table: { disable: true, category: 'Development' } },
+        restoreFocus: { table: { disable: true, category: 'Development' } },
+        renderAs: { table: { disable: true, category: 'Development' } },
+        onClose: { table: { disable: true, category: 'Development' } },
+        primaryButton: { table: { disable: true, category: 'Development' } },
+        secondaryButton: { table: { disable: true, category: 'Development' } },
     },
 };
 
@@ -47,10 +56,6 @@ const contentVariantGrid = {
 
 const scrollableBody = `${'Long body copy. '.repeat(24)}Use a scrollable modal when content exceeds the viewport.`;
 
-/**
- * Storybook docs render inline; Bootstrap modals portal to `document.body` by default and cover the page.
- * `transform` creates a containing block so `position: fixed` modal + backdrop stay inside this host.
- */
 const modalDocsHostStyle = {
     position: 'relative',
     width: '100%',
@@ -58,23 +63,14 @@ const modalDocsHostStyle = {
     borderRadius: 12,
     border: '1px solid var(--color-outline-variant)',
     background: 'var(--color-surface-container-low)',
-    transform: 'translateZ(0)',
     overflow: 'hidden',
+    padding: 16,
 };
 
 function InlineModalCanvas({ minHeight = 400, modal }) {
-    const [host, setHost] = useState(null);
     return (
-        <div ref={setHost} style={{ ...modalDocsHostStyle, minHeight }}>
-            {host
-                ? React.cloneElement(modal, {
-                      container: host,
-                      manager: storybookDocsModalManager,
-                      enforceFocus: false,
-                      autoFocus: false,
-                      restoreFocus: false,
-                  })
-                : null}
+        <div style={{ ...modalDocsHostStyle, minHeight }}>
+            {modal}
         </div>
     );
 }
@@ -103,6 +99,7 @@ function ModalContentDemos() {
                 modal={
                     <Modal
                         show
+                        renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
                         type="default"
@@ -119,7 +116,7 @@ function ModalContentDemos() {
                             fill: 'tonal',
                             onClick: () => console.log('Secondary clicked'),
                         }}
-                        onClose={() => console.log('Close clicked')}
+                        onClose={() => {}}
                     />
                 }
             />
@@ -130,6 +127,7 @@ function ModalContentDemos() {
                 modal={
                     <Modal
                         show
+                        renderAs="inline"
                         title="Modal title"
                         body={scrollableBody}
                         type="scrollable"
@@ -146,7 +144,7 @@ function ModalContentDemos() {
                             fill: 'tonal',
                             onClick: () => console.log('Secondary clicked'),
                         }}
-                        onClose={() => console.log('Close clicked')}
+                        onClose={() => {}}
                     />
                 }
             />
@@ -157,11 +155,12 @@ function ModalContentDemos() {
                 modal={
                     <Modal
                         show
+                        renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
                         type="default"
                         showBottomButtons={false}
-                        onClose={() => console.log('Close clicked')}
+                        onClose={() => {}}
                     />
                 }
             />
@@ -172,11 +171,12 @@ function ModalContentDemos() {
                 modal={
                     <Modal
                         show
+                        renderAs="inline"
                         title="Modal title"
                         body={scrollableBody}
                         type="scrollable"
                         showBottomButtons={false}
-                        onClose={() => console.log('Close clicked')}
+                        onClose={() => {}}
                     />
                 }
             />
@@ -192,11 +192,12 @@ function ModalLayoutDemos() {
                 modal={
                     <Modal
                         show
+                        renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
                         type="default"
                         showBottomButtons={false}
-                        onClose={() => console.log('Close clicked')}
+                        onClose={() => {}}
                     />
                 }
             />
@@ -206,6 +207,7 @@ function ModalLayoutDemos() {
                 modal={
                     <Modal
                         show
+                        renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
                         type="default"
@@ -218,7 +220,7 @@ function ModalLayoutDemos() {
                             text: 'Cancel',
                             onClick: () => console.log('Cancel clicked'),
                         }}
-                        onClose={() => console.log('Close clicked')}
+                        onClose={() => {}}
                     />
                 }
             />
@@ -233,6 +235,7 @@ function ModalScrollableDemo() {
             modal={
                 <Modal
                     show
+                    renderAs="inline"
                     title="Scrollable modal"
                     body={scrollableBody}
                     type="scrollable"
@@ -250,7 +253,7 @@ function ModalScrollableDemo() {
                         fill: 'tonal',
                         onClick: () => console.log('Secondary clicked'),
                     }}
-                    onClose={() => console.log('Close clicked')}
+                    onClose={() => {}}
                 />
             }
         />
@@ -294,6 +297,7 @@ export const Interactive = {
             modal={
                 <Modal
                     {...args}
+                    renderAs="inline"
                     primaryButton={
                         args.showBottomButtons
                             ? {
@@ -314,7 +318,7 @@ export const Interactive = {
                               }
                             : null
                     }
-                    onClose={() => console.log('Close clicked')}
+                    onClose={() => {}}
                 />
             }
         />

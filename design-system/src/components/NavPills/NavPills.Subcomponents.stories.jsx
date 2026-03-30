@@ -20,6 +20,14 @@ export default {
             description: 'Unique identifier for the pill item',
             table: { category: 'Behavior' }
         },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
         disabled: {
             control: 'boolean',
             description: 'Disable the pill item',
@@ -52,26 +60,73 @@ function NavPillsSubInteractionStatesDemos() {
         <section>
             <h6 className="h6" style={{ marginBottom: '16px' }}>Pill item states</h6>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Default, selected, and disabled.
+                States below are artificially forced for demonstration.
             </p>
-            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <div>
-                    <p className="body3-txt" style={{ marginBottom: '8px' }}>Default</p>
-                    <NavPills defaultActiveKey="none">
-                        <NavPills.Item eventKey="1">Pill Label</NavPills.Item>
-                    </NavPills>
+                    <p className="body3-txt" style={{ marginBottom: '12px', fontWeight: 'bold' }}>Unselected pill states</p>
+                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Default</p>
+                            <NavPills defaultActiveKey="none">
+                                <NavPills.Item eventKey="1">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Hovered</p>
+                            <NavPills defaultActiveKey="none">
+                                <NavPills.Item eventKey="1" className="pseudo-hover">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Focused</p>
+                            <NavPills defaultActiveKey="none">
+                                <NavPills.Item eventKey="1" className="pseudo-focus">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Pressed</p>
+                            <NavPills defaultActiveKey="none">
+                                <NavPills.Item eventKey="1" className="pseudo-pressed">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                    </div>
                 </div>
+
                 <div>
-                    <p className="body3-txt" style={{ marginBottom: '8px' }}>Selected</p>
-                    <NavPills defaultActiveKey="1">
-                        <NavPills.Item eventKey="1">Pill Label</NavPills.Item>
-                    </NavPills>
-                </div>
-                <div>
-                    <p className="body3-txt" style={{ marginBottom: '8px' }}>Disabled</p>
-                    <NavPills defaultActiveKey="none">
-                        <NavPills.Item eventKey="1" disabled>Pill Label</NavPills.Item>
-                    </NavPills>
+                    <p className="body3-txt" style={{ marginBottom: '12px', fontWeight: 'bold' }}>Selected pill states</p>
+                    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Selected (Default)</p>
+                            <NavPills defaultActiveKey="1">
+                                <NavPills.Item eventKey="1">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Selected (Hovered)</p>
+                            <NavPills defaultActiveKey="1">
+                                <NavPills.Item eventKey="1" className="pseudo-hover">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Selected (Focused)</p>
+                            <NavPills defaultActiveKey="1">
+                                <NavPills.Item eventKey="1" className="pseudo-focus">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Selected (Pressed)</p>
+                            <NavPills defaultActiveKey="1">
+                                <NavPills.Item eventKey="1" className="pseudo-pressed">Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                        <div>
+                            <p className="body3-txt" style={{ marginBottom: '8px' }}>Disabled</p>
+                            <NavPills defaultActiveKey="none">
+                                <NavPills.Item eventKey="1" disabled>Pill</NavPills.Item>
+                            </NavPills>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

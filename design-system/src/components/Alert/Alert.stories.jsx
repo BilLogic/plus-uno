@@ -40,19 +40,15 @@ Supports multiple styles and optional title.
             table: { category: 'Behavior' },
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         className: {
-            control: 'text',
-            description: 'Custom CSS classes',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         onDismiss: {
-            action: 'dismissed',
-            description: 'Dismiss callback',
-            table: { category: 'Development' },
+            table: { disable: true, category: 'Development' },
         },
     },
 };

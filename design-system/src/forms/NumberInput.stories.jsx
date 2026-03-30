@@ -14,6 +14,16 @@ export default {
         },
     },
     argTypes: {
+        label: {
+            control: 'text',
+            description: 'Optional field label',
+            table: { category: 'Content' },
+        },
+        required: {
+            control: 'boolean',
+            description: 'Show required indicator',
+            table: { category: 'Content' },
+        },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -47,9 +57,7 @@ export default {
             table: { category: 'Content' },
         },
         value: {
-            control: 'number',
-            description: 'Current value of the input',
-            table: { category: 'Content' },
+            table: { disable: true, category: 'Development' },
         },
         min: {
             control: 'number',
@@ -65,6 +73,27 @@ export default {
             control: 'number',
             description: 'Step increment/decrement value',
             table: { category: 'Constraints' },
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            table: { disable: true, category: 'Development' },
+        },
+        defaultValue: {
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };

@@ -121,8 +121,8 @@
         // Chevron icon on the RIGHT side using ::after
         &::after {
             background-image: none;
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+            font-family: 'Font Awesome 7 Free';
+            font-weight: 700;
             content: '\f078'; // fa-chevron-down
             font-size: var(--font-size-fa-h6-solid);
             color: var(--color-on-surface-variant);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cascader from './Cascader';
 
 export default {
@@ -14,15 +14,17 @@ export default {
         },
     },
     argTypes: {
-        value: {
-            control: 'object',
-            description: 'Array of selected values representing the current path',
+        contentPreset: {
+            control: 'select',
+            options: ['empty', 'preselected'],
+            description: 'Preset selection state for the interactive demo',
             table: { category: 'Content' },
         },
         options: {
-            control: 'object',
-            description: 'Hierarchical options structure with children arrays',
-            table: { category: 'Content' },
+            table: { disable: true, category: 'Development' },
+        },
+        value: {
+            table: { disable: true, category: 'Development' },
         },
         disabled: {
             control: 'boolean',
@@ -30,9 +32,7 @@ export default {
             table: { category: 'Behavior' },
         },
         onChange: {
-            action: 'changed',
-            description: 'Callback function when selection changes',
-            table: { category: 'Behavior' },
+            table: { disable: true, category: 'Development' },
         },
         placeholder: {
             control: 'text',
@@ -131,19 +131,24 @@ export const InteractionStates = () => {
 };
 
 export const Interactive = (args) => {
-    const [value, setValue] = useState(args.value || []);
+    const [value, setValue] = useState(args.contentPreset === 'preselected'
+        ? ['zhejiang', 'hangzhou', 'westlake']
+        : []);
+
+    useEffect(() => {
+        setValue(args.contentPreset === 'preselected'
+            ? ['zhejiang', 'hangzhou', 'westlake']
+            : []);
+    }, [args.contentPreset]);
 
     return (
         <div style={{ maxWidth: '600px' }}>
             <Cascader
                 id="cascader-interactive"
                 value={value}
-                options={args.options || sampleOptions}
+                options={sampleOptions}
                 onChange={(newValue) => {
                     setValue(newValue);
-                    if (args.onChange) {
-                        args.onChange(newValue);
-                    }
                 }}
                 disabled={args.disabled}
                 placeholder={args.placeholder}
@@ -158,8 +163,7 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    value: [],
-    options: sampleOptions,
+    contentPreset: 'empty',
     disabled: false,
     placeholder: 'Please select',
 };

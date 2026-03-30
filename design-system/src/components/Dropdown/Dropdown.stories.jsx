@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Dropdown from './Dropdown';
 
 export default {
@@ -20,6 +20,12 @@ export default {
         },
         items: {
             table: { disable: true, category: 'Content' }
+        },
+        contentPreset: {
+            control: 'select',
+            options: ['basic', 'with-divider', 'with-icons', 'with-selection'],
+            description: 'Preset menu content for the interactive demo',
+            table: { category: 'Content' }
         },
         style: {
             control: 'select',
@@ -51,14 +57,12 @@ export default {
             table: { category: 'Design' }
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -89,6 +93,12 @@ const itemsWithSelection = [
     { text: 'Option 3' }
 ];
 
+const contentItems = [
+    { text: 'Form', leadingIcon: 'file-lines', counter: 20, dropright: true },
+    { text: 'Form', leadingIcon: 'file-lines', counter: 20, dropright: true },
+    { text: 'Form', leadingIcon: 'file-lines', counter: 20, dropright: true }
+];
+
 const dropdownCol = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '700px' };
 const contentVariantCard = {
     padding: '12px',
@@ -98,74 +108,38 @@ const contentVariantCard = {
 };
 
 function DropdownContentDemos() {
-    const [multiSelectItems, setMultiSelectItems] = useState([
-        { text: 'Option A', multiSelectCheckbox: true, multiSelectChecked: true },
-        { text: 'Option B', multiSelectCheckbox: true, multiSelectChecked: false },
-        { text: 'Option C', multiSelectCheckbox: true, multiSelectChecked: true }
-    ]);
-
-    const toggleMultiSelect = (index) => {
-        setMultiSelectItems(items =>
-            items.map((item, i) =>
-                i === index ? { ...item, multiSelectChecked: !item.multiSelectChecked } : item
-            )
-        );
-    };
-
     return (
-        <>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Basic</h6>
-                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                    Standard dropdown with simple text items.
-                </p>
-                <div style={contentVariantCard}>
-                    <Dropdown buttonText="Dropdown" items={basicItems} />
+        <section>
+            <h6 className="h6" style={{ marginBottom: '8px' }}>Single and split dropdowns</h6>
+            <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
+                Core content states from the design system: closed and open, using both single-button and split-button triggers.
+            </p>
+            <div
+                style={{
+                    ...contentVariantCard,
+                    padding: '28px 48px 164px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, minmax(240px, 1fr))',
+                    columnGap: '96px',
+                    rowGap: '24px',
+                    alignItems: 'start',
+                    overflow: 'visible',
+                }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Dropdown buttonText="Dropdown" style="primary" size="small" items={contentItems} />
                 </div>
-            </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>With dividers</h6>
-                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                    Group related items using dividers.
-                </p>
-                <div style={contentVariantCard}>
-                    <Dropdown buttonText="Actions" items={itemsWithDivider} />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Dropdown buttonText="Split Dropdown" style="primary" size="small" split items={contentItems} />
                 </div>
-            </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>With icons</h6>
-                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                    Leading and trailing icons on items.
-                </p>
-                <div style={contentVariantCard}>
-                    <Dropdown buttonText="Edit Menu" items={itemsWithIcons} />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Dropdown buttonText="Dropdown" style="primary" size="small" items={contentItems} isOpen />
                 </div>
-            </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Selection indicator</h6>
-                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                    Currently selected item with a checkmark.
-                </p>
-                <div style={contentVariantCard}>
-                    <Dropdown buttonText="Select Option" items={itemsWithSelection} />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Dropdown buttonText="Split Dropdown" style="primary" size="small" split items={contentItems} isOpen />
                 </div>
-            </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Multi-select</h6>
-                <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                    Multiple selections with checkboxes.
-                </p>
-                <div style={contentVariantCard}>
-                    <Dropdown
-                        buttonText="Filter"
-                        items={multiSelectItems.map((item, index) => ({
-                            ...item,
-                            onClick: () => toggleMultiSelect(index)
-                        }))}
-                    />
-                </div>
-            </section>
-        </>
+            </div>
+        </section>
     );
 }
 
@@ -294,20 +268,22 @@ export const Interactive = {
     args: {
         buttonText: 'Dropdown',
         style: 'default',
+        fill: 'filled',
         size: 'default',
         direction: 'dropdown',
-        split: false
+        split: false,
+        contentPreset: 'basic'
     },
     render: (args) => (
         <div style={{ padding: '100px 50px' }}>
             <Dropdown
                 {...args}
-                items={[
-                    { text: 'Action 1' },
-                    { text: 'Action 2' },
-                    { text: 'Action 3', divider: true },
-                    { text: 'Separated Action' }
-                ]}
+                items={{
+                    'basic': basicItems,
+                    'with-divider': itemsWithDivider,
+                    'with-icons': itemsWithIcons,
+                    'with-selection': itemsWithSelection
+                }[args.contentPreset] || basicItems}
             />
         </div>
     )

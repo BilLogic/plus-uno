@@ -79,7 +79,7 @@ const preview = {
       storySort: {
         order: [
           'PLUS Docs',
-          ['Introduction', 'Components', 'Guidelines', 'Tokens'],
+          ['Introduction', 'Components', 'Component Organization', 'Tokens'],
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
@@ -131,7 +131,6 @@ const preview = {
             'RichTextEditor',
             'Scrollspy',
             'SidebarTab',
-            'SuperCompPill',
             'Toast',
             'Tooltip',
           ],
@@ -168,6 +167,7 @@ const preview = {
     },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
+      exclude: ['id', 'className', 'name', 'defaultValue', 'onChange', 'onInput', 'onFocus', 'onBlur'],
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,

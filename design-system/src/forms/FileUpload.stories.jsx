@@ -31,9 +31,10 @@ export default {
             description: 'Description text shown below the label',
             table: { category: 'Content' },
         },
-        acceptedFormats: {
-            control: 'object',
-            description: 'Array of accepted file formats (e.g., [".zip", ".mp4"])',
+        formatPreset: {
+            control: 'select',
+            options: ['mixed', 'documents', 'media'],
+            description: 'Preset accepted file formats for the interactive demo',
             table: { category: 'Content' },
         },
         buttonText: {
@@ -58,14 +59,15 @@ export default {
             table: { category: 'Behavior' },
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        acceptedFormats: {
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -123,7 +125,6 @@ export const InteractionStates = () => (
             required
             acceptedFormats={formats}
             buttonText="Choose a file"
-            onFocus={() => {}}
         />
         <FileUpload
             id="file-upload-disabled"
@@ -138,15 +139,21 @@ export const InteractionStates = () => (
 
 export const Interactive = (args) => (
     <div style={{ maxWidth: '600px' }}>
-        <FileUpload {...args} />
+        <FileUpload
+            {...args}
+            acceptedFormats={{
+                mixed: formats,
+                documents: ['.pdf', '.docx', '.txt'],
+                media: ['.mp4', '.mov', '.mp3']
+            }[args.formatPreset] || formats}
+        />
     </div>
 );
 
 Interactive.args = {
-    id: 'file-upload-interactive',
     label: 'Upload files',
     required: true,
-    acceptedFormats: formats,
+    formatPreset: 'mixed',
     buttonText: 'Choose a file',
     disabled: false,
     validation: 'none',

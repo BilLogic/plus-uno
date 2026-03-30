@@ -14,6 +14,21 @@ export default {
         },
     },
     argTypes: {
+        label: {
+            control: 'text',
+            description: 'Field label',
+            table: { category: 'Content' },
+        },
+        placeholder: {
+            control: 'text',
+            description: 'Placeholder text',
+            table: { category: 'Content' },
+        },
+        rows: {
+            control: 'number',
+            description: 'Visible text rows',
+            table: { category: 'Layout' },
+        },
         variant: {
             control: 'radio',
             options: ['long', 'short'],
@@ -24,8 +39,36 @@ export default {
             control: 'select',
             options: ['default', 'focus', 'error', 'read-only', 'disabled'],
             description: 'The visual state of the component',
-            table: { category: 'State' },
+            table: { category: 'Behavior' },
         },
+        value: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        defaultValue: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onChange: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        name: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        style: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        }
     },
 };
 

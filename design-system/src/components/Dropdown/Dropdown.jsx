@@ -8,7 +8,7 @@ const Dropdown = ({
     items = [],
     size = "default",
     style = "default",
-    fill = "filled", // NEW: filled, tonal, outline, ghost
+    fill = "outline",
     split = false,
     direction = "dropdown",
     className = "",
@@ -90,7 +90,7 @@ const Dropdown = ({
     };
 
     const renderSplitButton = () => (
-        <button type="button" className="pdropdown-split-text-btn pdropdown-default-toggle">
+        <button type="button" className="pdropdown-split-text-btn">
             <span>{buttonText}</span>
         </button>
     );

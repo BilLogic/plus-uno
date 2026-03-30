@@ -13,11 +13,33 @@ export default {
         }
     },
     argTypes: {
+        contentPreset: {
+            control: 'select',
+            options: ['tabs-only', 'with-dropdown'],
+            description: 'Preset navigation structure for the interactive demo',
+            table: { category: 'Content' }
+        },
         alignment: {
             control: 'select',
             options: ['left', 'center', 'right', 'justified'],
             description: 'Horizontal alignment of nav items',
             table: { category: 'Layout' }
+        },
+        activeKey: {
+            table: { disable: true, category: 'Development' }
+        },
+        defaultActiveKey: {
+            table: { disable: true, category: 'Development' }
+        },
+        onSelect: {
+            table: { disable: true, category: 'Development' }
+        },
+        children: {
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -136,10 +158,17 @@ export const Interactive = (args) => {
             <NavTabs.Item eventKey="1">Tab 1</NavTabs.Item>
             <NavTabs.Item eventKey="2">Tab 2</NavTabs.Item>
             <NavTabs.Item eventKey="3">Tab 3</NavTabs.Item>
+            {args.contentPreset === 'with-dropdown' ? (
+                <NavTabs.Dropdown title="More" id="interactive-nav-tabs-dropdown">
+                    <NavTabs.Dropdown.Item eventKey="action">Action</NavTabs.Dropdown.Item>
+                    <NavTabs.Dropdown.Item eventKey="another">Another action</NavTabs.Dropdown.Item>
+                </NavTabs.Dropdown>
+            ) : null}
         </NavTabs>
     );
 };
 
 Interactive.args = {
+    contentPreset: 'tabs-only',
     alignment: 'left'
 };

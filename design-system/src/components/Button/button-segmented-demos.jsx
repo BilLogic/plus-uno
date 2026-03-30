@@ -32,8 +32,8 @@ export function ButtonSizesFilledRowContainer() {
     );
 }
 
-/** Intent options (primary, secondary, …) at default filled weight. */
-export function IntentSection() {
+/** Color styles (primary, secondary, ...) at default filled treatment. */
+export function ColorStylesSection() {
     return (
         <DocsDemoBlock
             description={
@@ -57,8 +57,8 @@ export function IntentSection() {
     );
 }
 
-/** Appearance options (filled, tonal, outline, ghost) on primary. */
-export function AppearanceSection() {
+/** Fill treatments (filled, tonal, outline, ghost) on primary. */
+export function FillTreatmentsSection() {
     return (
         <DocsDemoBlock
             description={

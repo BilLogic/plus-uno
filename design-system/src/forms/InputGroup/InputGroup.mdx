@@ -1,9 +1,9 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as TimePickerStories from './DateAndTimePicker.stories.jsx';
+import * as InputGroupStories from './InputGroup.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={TimePickerStories} />
+<Meta of={InputGroupStories} />
 
 <Title />
 <Description />
@@ -14,18 +14,18 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Content
 
-<DocsCanvasShell description={<>Field label and optional Date/Time section labels.</>}>
-    <Canvas of={TimePickerStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Baseline input field with addons on both sides.</>}>
+    <Canvas of={InputGroupStories.Content} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Variants
 
-<DocsCanvasShell description={<>Invalid and success validation.</>}>
-    <Canvas of={TimePickerStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Selection and action addon patterns.</>}>
+    <Canvas of={InputGroupStories.Variants} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
@@ -34,8 +34,8 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Sizes
 
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={TimePickerStories.Sizes} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Small, medium, and large input groups.</>}>
+    <Canvas of={InputGroupStories.Sizes} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
@@ -44,8 +44,8 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Interaction states
 
-<DocsCanvasShell description={<>Default, disabled, and read-only.</>}>
-    <Canvas of={TimePickerStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Default, disabled, and read-only input groups.</>}>
+    <Canvas of={InputGroupStories.InteractionStates} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
@@ -55,7 +55,7 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Interactive
 
 <DocsInteractivePlayground
-    of={TimePickerStories.Interactive}
+    of={InputGroupStories.Interactive}
     description={
         <>
             Use the table below to change props. The preview is rendered{' '}

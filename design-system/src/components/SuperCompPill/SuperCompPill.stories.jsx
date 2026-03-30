@@ -17,8 +17,17 @@ export default {
                 SMART_CONSTANTS.CA_TT,
             ],
             description: 'Competency Area',
+            table: { category: 'Content' }
         },
-        abbreviate: { control: 'boolean', description: 'Abbreviate text' },
+        abbreviate: { control: 'boolean', description: 'Abbreviate text', table: { category: 'Design' } },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        }
     },
 };
 

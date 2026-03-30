@@ -34,7 +34,7 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Behavior
 
-<DocsCanvasShell description={<>Multi-expand (`alwaysOpen`) and fully collapsed initial state.</>}>
+<DocsCanvasShell description={<>Disclosure <strong>model</strong>: multiple panels open at once (`alwaysOpen`) and an initial state where every panel starts collapsed (no default active key).</>}>
     <Canvas of={AccordionStories.Behavior} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
@@ -44,7 +44,7 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Interaction states
 
-<DocsCanvasShell description={<>Disabled items in the list.</>}>
+<DocsCanvasShell description={<>Per-header affordances on the trigger (here: <code>disabled</code>). Expanded vs collapsed is <strong>disclosure state</strong> (which keys are open), separate from disabled, hover, focus, or pressed styling on the header.</>}>
     <Canvas of={AccordionStories.InteractionStates} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 

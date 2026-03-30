@@ -22,6 +22,22 @@ export default {
         text: { control: 'text', description: 'Text content of the item' },
         href: { control: 'text', description: 'URL for the link (if not current)' },
         isCurrent: { control: 'boolean', description: 'Whether this is the current active page' },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onFocus: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onBlur: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
     }
 };
 

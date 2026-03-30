@@ -12,6 +12,40 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <div className="sb-ds-doc-section">
 
+### Content
+
+<DocsCanvasShell description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array when you need more custom content.</>}>
+    <Canvas of={ButtonGroupStories.Children} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Styles
+
+<DocsCanvasShell description={<>Color styles and fill treatments inherited from the Button system.</>}>
+    <Canvas of={ButtonGroupStories.StylesAndFills} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Two through five connected segments.</>}>
+    <Canvas of={ButtonGroupStories.Counts} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Common grouped patterns like pagination controls, toolbars, and segmented toggles.</>}>
+    <Canvas of={ButtonGroupStories.UseCases} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large grouped buttons.</>}>
@@ -22,50 +56,10 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <div className="sb-ds-doc-section">
 
-### Styles and fills
-
-<DocsCanvasShell description={<>Tonal, filled, outline, and ghost across primary-style themes.</>}>
-    <Canvas of={ButtonGroupStories.StylesAndFills} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ### Layout
 
 <DocsCanvasShell description={<>Horizontal default versus vertical stacking.</>}>
     <Canvas of={ButtonGroupStories.Layout} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Counts
-
-<DocsCanvasShell description={<>Two through five segments in one group.</>}>
-    <Canvas of={ButtonGroupStories.Counts} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Use cases
-
-<DocsCanvasShell description={<>Pagination-style controls, icon toolbar, and segmented toggle.</>}>
-    <Canvas of={ButtonGroupStories.UseCases} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Children
-
-<DocsCanvasShell description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array.</>}>
-    <Canvas of={ButtonGroupStories.Children} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>

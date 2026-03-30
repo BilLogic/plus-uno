@@ -14,7 +14,7 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Content
 
-<DocsCanvasShell description={<>Menu items, dividers, icons, selection, and multi-select.</>}>
+<DocsCanvasShell description={<>Closed and open states for single-button and split-button dropdowns, aligned to the core Figma content examples.</>}>
     <Canvas of={DropdownStories.Content} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
@@ -22,20 +22,20 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Color styles
 
-<DocsCanvasShell description={<>Fill treatments: filled, tonal, outline, and ghost.</>}>
-    <Canvas of={DropdownStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Semantic color roles on the dropdown trigger.</>}>
+    <Canvas of={DropdownStories.StyleVariants} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Style Variants
+### Fill treatments
 
-<DocsCanvasShell description={<>Semantic styles on the dropdown trigger.</>}>
-    <Canvas of={DropdownStories.StyleVariants} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Filled, tonal, outline, and ghost treatments on the trigger.</>}>
+    <Canvas of={DropdownStories.Styles} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>

@@ -70,9 +70,7 @@ export default {
             table: { category: 'Design' }
         },
         vertical: {
-            control: 'boolean',
-            description: 'Stack content vertically',
-            table: { category: 'Design' }
+            table: { disable: true, category: 'Design' }
         },
         block: {
             control: 'boolean',
@@ -86,9 +84,7 @@ export default {
             table: { category: 'Behavior' }
         },
         active: {
-            control: 'boolean',
-            description: 'Manually trigger active/pressed state',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         loading: {
             control: 'boolean',
@@ -97,36 +93,29 @@ export default {
         },
         onClick: {
             action: 'clicked',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         href: {
-            control: 'text',
-            description: 'URL (renders as anchor tag)',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         target: {
-            control: 'text',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         type: {
-            control: 'select',
-            options: ['button', 'submit', 'reset'],
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
 
         // DEVELOPMENT
         title: {
-            control: 'text',
-            description: 'HTML Title attribute',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         id: {
-            control: 'text',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         children: {
             table: { disable: true, category: 'Development' }
@@ -154,7 +143,6 @@ export const Interactive = {
         leadingVisual: 'none',
         trailingVisual: 'none',
         disabled: false,
-        active: false,
         loading: false,
         block: false
     },

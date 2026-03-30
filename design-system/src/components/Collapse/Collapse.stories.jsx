@@ -39,10 +39,7 @@ export default {
             table: { category: 'Design' }
         },
         triggerTag: {
-            control: 'select',
-            options: ['button', 'a', 'div'],
-            description: 'HTML element type for the trigger',
-            table: { category: 'Design' }
+            table: { disable: true, category: 'Design' }
         },
 
         // BEHAVIOR
@@ -52,36 +49,26 @@ export default {
             table: { category: 'Behavior' }
         },
         isOpen: {
-            control: 'boolean',
-            description: 'Controlled open state',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         onToggle: {
-            action: 'toggled',
-            description: 'Callback when collapse is toggled',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
 
         // DEVELOPMENT
         id: {
-            control: 'text',
-            description: 'HTML ID attribute (used for accessibility)',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes for wrapper',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         triggerClass: {
-            control: 'text',
-            description: 'CSS classes for the trigger element',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         contentClass: {
-            control: 'text',
-            description: 'CSS classes for the content container',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -266,7 +253,7 @@ export const Overview = () => (
  */
 export const Interactive = (args) => (
     <div style={{ maxWidth: '600px' }}>
-        <Collapse {...args}>
+        <Collapse {...args} triggerClass="btn btn-primary">
             <Card
                 body="This is the collapsible content. It can contain any content including text, images, forms, or other components."
                 showBorder
@@ -278,9 +265,7 @@ export const Interactive = (args) => (
 
 Interactive.args = {
     trigger: 'Toggle Collapse',
-    triggerClass: 'btn btn-primary',
     defaultOpen: false,
     icon: 'chevron-down',
-    iconPosition: 'right',
-    id: 'interactive-collapse'
+    iconPosition: 'right'
 };

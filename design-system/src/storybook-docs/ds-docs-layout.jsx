@@ -9,7 +9,7 @@ import { Canvas, Controls } from '@storybook/addon-docs/blocks';
 /** Muted border + padded inner well — shared by DocsDemoBlock and DocsCanvasShell. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
-        <div className="sb-ds-docs-preview-well overflow-hidden rounded-xl border border-border bg-muted/40 shadow-sm dark:bg-muted/25">
+        <div className="sb-ds-docs-preview-well overflow-visible rounded-xl border border-border bg-muted/40 shadow-sm dark:bg-muted/25">
             <div
                 className={['min-h-[100px] p-10 md:p-12 lg:p-14', innerClassName].filter(Boolean).join(' ')}
             >
@@ -60,7 +60,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
             {description ? (
                 <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
             ) : null}
-            <div className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-hidden rounded-xl border border-border bg-muted/40 shadow-sm dark:bg-muted/25">
+            <div className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible rounded-xl border border-border bg-muted/40 shadow-sm dark:bg-muted/25">
                 <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
                     <Canvas of={ofStory} story={{ inline: true }} sourceState="none" />
                 </div>

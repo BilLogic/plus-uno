@@ -18,20 +18,38 @@ export default {
             control: 'select',
             options: ['small', 'medium', 'large'],
             description: 'Size variant',
-            table: { defaultValue: { summary: 'medium' } },
+            table: { category: 'Design', defaultValue: { summary: 'medium' } },
+        },
+        placeholder: {
+            control: 'text',
+            description: 'Placeholder text',
+            table: { category: 'Content' },
         },
         calendarAlign: {
             control: 'select',
             options: ['left', 'center', 'right'],
             description: 'Calendar dropdown alignment',
+            table: { category: 'Layout' },
         },
         disabled: {
             control: 'boolean',
             description: 'Disable the picker',
+            table: { category: 'Behavior' },
         },
         readOnly: {
             control: 'boolean',
             description: 'Make read-only',
+            table: { category: 'Behavior' },
+        },
+        minDate: {
+            control: 'text',
+            description: 'Optional minimum allowed date',
+            table: { category: 'Behavior' },
+        },
+        maxDate: {
+            control: 'text',
+            description: 'Optional maximum allowed date',
+            table: { category: 'Behavior' },
         },
     },
 };

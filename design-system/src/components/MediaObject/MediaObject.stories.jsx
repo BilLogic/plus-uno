@@ -13,17 +13,48 @@ export default {
         }
     },
     argTypes: {
+        heading: {
+            control: 'text',
+            description: 'Heading text',
+            table: { category: 'Content' }
+        },
+        bodyText: {
+            control: 'text',
+            description: 'Body copy shown beside the media',
+            table: { category: 'Content' }
+        },
+        mediaPreset: {
+            control: 'select',
+            options: ['image', 'icon'],
+            description: 'Preset media content for the interactive demo',
+            table: { category: 'Content' }
+        },
         alignment: {
             control: 'select',
             options: ['left', 'left-center', 'left-bottom', 'right', 'right-center', 'right-bottom'],
-            description: 'Media alignment'
+            description: 'Media alignment',
+            table: { category: 'Layout' }
         },
         mediaSize: {
             control: 'select',
             options: ['small', 'default', 'large'],
-            description: 'Media size'
+            description: 'Media size',
+            table: { category: 'Design' }
         },
-        onClick: { action: 'clicked' }
+        media: {
+            table: { disable: true, category: 'Development' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        onClick: {
+            table: { disable: true, category: 'Development' }
+        }
     }
 };
 
@@ -159,14 +190,42 @@ export const Overview = () => (
     </div>
 );
 
-export const Interactive = (args) => (
-    <MediaObject {...args}>
-        will you do the same for me? It's time to face the music I'm no longer your muse. Heard it's beautiful, be the judge and my girls gonna take a vote.
-    </MediaObject>
-);
+export const Interactive = (args) => {
+    const mediaSizeMap = {
+        small: '48px',
+        default: '64px',
+        large: '96px'
+    };
+
+    return (
+        <MediaObject
+            heading={args.heading}
+            alignment={args.alignment}
+            mediaSize={args.mediaSize}
+            media={
+                args.mediaPreset === 'icon'
+                    ? (
+                        <PlaceholderMedia
+                            size={mediaSizeMap[args.mediaSize] || '64px'}
+                            text="i"
+                        />
+                    )
+                    : (
+                        <PlaceholderMedia
+                            size={mediaSizeMap[args.mediaSize] || '64px'}
+                            text={mediaSizeMap[args.mediaSize] || '64px'}
+                        />
+                    )
+            }
+        >
+            {args.bodyText}
+        </MediaObject>
+    );
+};
 Interactive.args = {
-    media: <PlaceholderMedia />,
     heading: 'Media Heading',
+    bodyText: "Will you do the same for me? It's time to face the music.",
+    mediaPreset: 'image',
     alignment: 'left',
     mediaSize: 'default'
 };

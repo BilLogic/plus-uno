@@ -36,27 +36,21 @@ export default {
 
         // DEVELOPMENT
         defaultActiveKey: {
-            control: 'text',
-            description: 'Initially expanded item key (or comma-separated keys for alwaysOpen)',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         activeKey: {
-            control: 'text',
-            description: 'Controlled active key(s)',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         onSelect: {
             table: { disable: true, category: 'Development' }
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         items: {
             table: { disable: true, category: 'Development' }
@@ -211,24 +205,19 @@ export const Overview = () => (
  * Customize the accordion attributes in real-time.
  */
 export const Interactive = (args) => {
-    // Generate items based on itemCount
     const items = Array.from({ length: args.itemCount || 3 }, (_, i) => ({
         eventKey: String(i),
         header: `Accordion Item #${i + 1}`,
         body: `This is the content for accordion item ${i + 1}. It can contain any content including text, images, or other components.`
     }));
 
-    // Parse defaultActiveKey if it contains comma-separated values
-    const activeKey = args.defaultActiveKey?.includes(',')
-        ? args.defaultActiveKey.split(',').map(k => k.trim())
-        : args.defaultActiveKey;
-
     return (
         <div style={{ maxWidth: '800px' }}>
             <Accordion
-                {...args}
+                flush={args.flush}
+                alwaysOpen={args.alwaysOpen}
                 items={items}
-                defaultActiveKey={activeKey}
+                defaultActiveKey={args.alwaysOpen ? ['0'] : '0'}
             />
         </div>
     );
@@ -237,6 +226,5 @@ export const Interactive = (args) => {
 Interactive.args = {
     flush: false,
     alwaysOpen: false,
-    itemCount: 3,
-    defaultActiveKey: '0'
+    itemCount: 3
 };
