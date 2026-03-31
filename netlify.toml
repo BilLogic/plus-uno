@@ -11,7 +11,7 @@
   to = "/storybook/:splat"
   status = 200
 
-# SPA catch-all for the React app
+# SPA catch-all for the React app (must come AFTER function routes)
 [[redirects]]
   from = "/*"
   to = "/index.html"

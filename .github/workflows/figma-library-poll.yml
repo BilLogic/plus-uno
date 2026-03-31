@@ -1,0 +1,96 @@
+name: Poll Figma Library
+
+on:
+  schedule:
+    # Every 30 minutes during work hours (Mon-Fri, 9am-7pm UTC)
+    - cron: '*/30 13-23 * * 1-5'
+  workflow_dispatch:
+    # Allow manual triggering
+
+jobs:
+  poll-library:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Poll Figma for changes
+        id: poll
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          FIGMA_FILE_KEY: ${{ secrets.FIGMA_FILE_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: node scripts/poll-figma-library.js
+
+      - name: Commit updated snapshot
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add scripts/figma-component-snapshot.json
+          git diff --cached --quiet || git commit -m "chore: update Figma component snapshot [skip ci]"
+          git push || true
+
+      - name: Create GitHub Issue for component changes
+        if: steps.poll.outputs.components_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const changeSummary = JSON.parse('${{ steps.poll.outputs.change_summary }}');
+            const names = [
+              ...changeSummary.created,
+              ...changeSummary.modified,
+              ...changeSummary.deleted
+            ].join(', ');
+
+            let body = '';
+            try {
+              body = fs.readFileSync('.figma-sync-context/issue-body.md', 'utf8');
+            } catch {
+              body = `Figma component changes detected: ${names}`;
+            }
+
+            // Check for existing open issue to avoid duplicates
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'figma-sync'
+            });
+
+            const alreadyExists = existingIssues.data.some(
+              issue => issue.title.includes('Figma DS update')
+            );
+
+            if (!alreadyExists) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `feat: Figma DS update — ${names}`,
+                body: body,
+                labels: ['design-system', 'figma-sync']
+              });
+              console.log('Issue created');
+            } else {
+              console.log('Open figma-sync issue already exists — skipping');
+            }
+
+      - name: Trigger token sync if needed
+        if: steps.poll.outputs.components_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'figma-token-sync'
+            });
+            console.log('Token sync dispatched');

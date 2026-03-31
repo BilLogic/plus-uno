@@ -48,3 +48,6 @@ prototyping/playground/*/
 
 # Local Netlify folder
 .netlify
+
+# Figma automation temp files
+.figma-sync-context/
