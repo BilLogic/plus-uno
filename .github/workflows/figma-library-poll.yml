@@ -2,8 +2,8 @@ name: Poll Figma Library
 
 on:
   schedule:
-    # Every 30 minutes during work hours (Mon-Fri, 9am-7pm UTC)
-    - cron: '*/30 13-23 * * 1-5'
+    # Every hour during work hours (Mon-Fri, 9am-7pm UTC)
+    - cron: '0 13-23 * * 1-5'
   workflow_dispatch:
     # Allow manual triggering
 
