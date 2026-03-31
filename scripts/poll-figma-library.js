@@ -24,9 +24,8 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
-import dotenv from 'dotenv';
-
-dotenv.config();
+// Load .env locally; in CI env vars are injected directly
+try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI — no .env needed */ }
 
 const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN;
 const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;

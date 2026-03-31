@@ -14,9 +14,8 @@
  */
 
 import https from 'https';
-import dotenv from 'dotenv';
-
-dotenv.config();
+// Load .env locally; in CI env vars are injected directly
+try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI — no .env needed */ }
 
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 
