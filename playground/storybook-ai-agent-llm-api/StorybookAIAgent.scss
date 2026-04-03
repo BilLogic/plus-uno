@@ -242,12 +242,12 @@
   flex-shrink: 0;
 }
 
-/* ── Quick Actions ── */
+/* ── Quick Actions (PLUS semantic tokens: spacing, type, color, elevation) ── */
 .sb-ai-agent__quick-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  gap: var(--size-element-gap-md);
   position: relative;
   flex-shrink: 0;
 }
@@ -255,16 +255,15 @@
 .sb-ai-agent__quick-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 13px;
+  gap: var(--size-element-gap-md);
+  padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
   background: var(--color-surface-container-lowest);
-  border: 1px solid var(--color-outline);
-  border-radius: 9999px;
+  border: var(--size-element-border) solid var(--color-outline);
+  border-radius: var(--size-element-radius-full);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
   box-shadow: var(--elevation-light-1);
   text-align: left;
-  min-height: 46px;
 
   &:hover {
     border-color: var(--color-outline);
@@ -278,29 +277,380 @@
 }
 
 .sb-ai-agent__quick-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 9999px;
+  /* 12 + 12 + 4 → 28px circle (element gap tokens) */
+  width: calc(var(--size-element-gap-lg) + var(--size-element-gap-lg) + var(--size-element-gap-xs));
+  height: calc(var(--size-element-gap-lg) + var(--size-element-gap-lg) + var(--size-element-gap-xs));
+  border-radius: var(--size-element-radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: var(--color-on-surface);
 
   svg {
-    width: 14px;
-    height: 14px;
+    /* 10 + 4 → 14px (gap-md + gap-xs) */
+    width: calc(var(--size-element-gap-md) + var(--size-element-gap-xs));
+    height: calc(var(--size-element-gap-md) + var(--size-element-gap-xs));
+  }
+
+  &--onboarding {
+    background: var(--color-relationship-container);
+    color: var(--color-relationship-text);
+  }
+
+  &--usage {
+    background: var(--color-primary-container);
+    color: var(--color-primary-text);
+  }
+
+  &--explain {
+    background: var(--color-mastering-content-container);
+    color: var(--color-mastering-content-text);
+  }
+
+  &--find {
+    background: var(--color-warning-container);
+    color: var(--color-warning-text);
+  }
+
+  &--skills {
+    background: var(--color-advocacy-container);
+    color: var(--color-advocacy-text);
   }
 }
 
 .sb-ai-agent__quick-label {
   font-family: var(--font-family-body);
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 1.25;
-  letter-spacing: -0.275px;
+  font-size: var(--font-size-body3);
+  line-height: var(--font-line-height-body3);
+  font-weight: var(--font-weight-body3-bold);
   color: var(--color-on-surface);
   text-align: left;
   flex: 1;
+}
+
+/* Bot column: text bubble then pill quick actions (not inside the bubble) */
+.sb-ai-agent__bot-message-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--size-element-gap-lg);
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sb-ai-agent__quick-actions--below-bubble {
+  justify-content: center;
+  padding-inline: var(--size-element-gap-xs);
+}
+
+/* ── Skills Router: full-width inside bot bubble (no outer gray canvas) ── */
+.sb-ai-agent__skills-router {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  align-self: stretch;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.sb-ai-agent__skills-router-canvas {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.sb-ai-agent__skills-router-header {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 var(--size-card-gap-sm);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.sb-ai-agent__skills-router-heading {
+  margin: 0;
+  font-family: var(--font-family-body);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.3;
+  color: var(--color-on-surface);
+}
+
+/* Match New Starter Kit tip: same padding, radius, font-size, and line-height as bot bubble (wrapped lines) */
+.sb-ai-agent__skills-router-tip {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 var(--size-card-gap-md);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-surface-container-high);
+  box-shadow: none;
+  font-family: var(--font-family-body);
+  font-size: 11px;
+  /* Same as .sb-ai-agent__bubble line-height so multi-line tip matches New Starter Kit */
+  line-height: 22.75px;
+  color: var(--color-on-surface-variant);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.sb-ai-agent__skills-router-cards {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-card-gap-md);
+  box-sizing: border-box;
+}
+
+/* Bot bubble indents every <ul> for docs lists; Skills Router cards must line up with the tip <p> */
+.sb-ai-agent__bubble .sb-ai-agent__skills-router-cards {
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  /* Space between tip and first card (padding: 0 here used to wipe this — keep top padding only) */
+  padding-top: var(--size-section-gap-lg);
+}
+
+.sb-ai-agent__bubble .sb-ai-agent__skills-router-cards > li.sb-ai-agent__skill-card {
+  margin-left: 0;
+  margin-bottom: 0;
+}
+
+.sb-ai-agent__skills-router-pipeline {
+  width: 100%;
+  max-width: 100%;
+  margin-top: var(--size-card-gap-md);
+  padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+  border-radius: var(--size-element-radius-lg);
+  border: none;
+  background: var(--color-surface-container-high);
+  box-shadow: none;
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-on-surface-variant);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.sb-ai-agent__skills-router-pipeline-title {
+  margin: 0 0 var(--size-element-gap-xs);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-on-surface);
+}
+
+.sb-ai-agent__skills-router-pipeline-flow {
+  margin: 0;
+  word-break: break-word;
+  font-family: var(--font-family-body);
+}
+
+/* ── Skill card (reusable block; theme = prototype | review | post | compound) ── */
+.sb-ai-agent__skill-card {
+  --skill-card-badge-bg: var(--color-primary);
+  --skill-card-badge-fg: var(--color-on-primary);
+  --skill-card-tag-bg: var(--color-primary-container);
+  --skill-card-tag-fg: var(--color-on-primary-container);
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--size-card-radius-md);
+  border: none;
+  box-shadow: var(--elevation-light-1);
+}
+
+.sb-ai-agent__skill-card--prototype {
+  --skill-card-badge-bg: var(--color-primary);
+  --skill-card-badge-fg: var(--color-on-primary);
+  --skill-card-tag-bg: var(--color-primary-container);
+  --skill-card-tag-fg: var(--color-on-primary-container);
+}
+
+.sb-ai-agent__skill-card--review {
+  --skill-card-badge-bg: var(--color-warning);
+  --skill-card-badge-fg: var(--color-on-warning);
+  --skill-card-tag-bg: var(--color-warning-container);
+  --skill-card-tag-fg: var(--color-on-warning-container);
+}
+
+.sb-ai-agent__skill-card--post {
+  --skill-card-badge-bg: var(--color-danger);
+  --skill-card-badge-fg: var(--color-on-danger);
+  --skill-card-tag-bg: var(--color-danger-container);
+  --skill-card-tag-fg: var(--color-on-danger-container);
+}
+
+.sb-ai-agent__skill-card--compound {
+  --skill-card-badge-bg: var(--color-success);
+  --skill-card-badge-fg: var(--color-on-success);
+  --skill-card-tag-bg: var(--color-success-container);
+  --skill-card-tag-fg: var(--color-on-success-container);
+}
+
+.sb-ai-agent__skill-card__row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--size-card-gap-sm);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+}
+
+.sb-ai-agent__skill-card__badge {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--size-element-radius-full);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-family: var(--font-family-body);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  background: var(--skill-card-badge-bg);
+  color: var(--skill-card-badge-fg);
+}
+
+.sb-ai-agent__skill-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+}
+
+.sb-ai-agent__skill-card__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--size-element-gap-xs);
+  margin: 0 0 var(--size-element-gap-sm);
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-on-surface);
+}
+
+.sb-ai-agent__skill-card__name {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--color-on-surface);
+}
+
+.sb-ai-agent__skill-card__path {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 var(--size-card-gap-sm);
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--color-primary);
+
+  &:hover {
+    color: var(--color-primary-text);
+    text-decoration: underline;
+  }
+}
+
+.sb-ai-agent__skill-card__path-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.sb-ai-agent__skill-card__path-label {
+  word-break: break-all;
+  text-align: left;
+  color: inherit;
+}
+
+.sb-ai-agent__skill-card__field {
+  margin-top: var(--size-element-gap-md);
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.sb-ai-agent__skill-card__label {
+  display: block;
+  margin-bottom: var(--size-element-gap-xs);
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-on-surface);
+}
+
+.sb-ai-agent__skill-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-element-gap-sm);
+}
+
+.sb-ai-agent__skill-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+  border-radius: var(--size-element-radius-full);
+  border: none;
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  background: var(--skill-card-tag-bg);
+  color: var(--skill-card-tag-fg);
+}
+
+.sb-ai-agent__skill-card__sideeffects {
+  margin: 0;
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-on-surface-variant);
 }
 
 /* ── Smart Navigation intro (subtle fade, respect reduced motion) ── */
