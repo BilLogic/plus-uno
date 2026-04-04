@@ -168,11 +168,11 @@ const LogoContainer = ({ size = 'default', className = '', variant = 'default' }
 
 /* ─── Quick action definitions ─── */
 const QUICK_ACTIONS = [
-    { id: 'onboarding', label: 'New Starter Kit', aliases: ['onboarding', 'new starter kit', 'getting started', 'setup'], Icon: Icons.Onboarding, color: 'var(--color-relationship-text)', bg: 'var(--color-relationship-container)' },
-    { id: 'usage', label: 'Component Usage Guide', aliases: ['usage guide', 'component usage guide'], Icon: Icons.Analyze, color: 'var(--color-primary-text)', bg: 'var(--color-primary-container)' },
-    { id: 'explain', label: 'Explain This Screen', aliases: ['explain this screen', 'explain the screen', 'explain screen'], Icon: Icons.Explain, color: 'var(--color-mastering-content-text)', bg: 'var(--color-mastering-content-container)' },
-    { id: 'find', label: 'Smart Navigation', aliases: ['smart navigation'], Icon: Icons.Navigate, color: 'var(--color-warning-text)', bg: 'var(--color-warning-container)' },
-    { id: 'skills', label: 'Mode Routing', aliases: ['agent modes', 'mode routing', 'modes'], Icon: Icons.Skills, color: 'var(--color-advocacy-text)', bg: 'var(--color-advocacy-container)' }
+    { id: 'onboarding', label: 'New Starter Kit', aliases: ['onboarding', 'new starter kit', 'getting started', 'setup'], Icon: Icons.Onboarding },
+    { id: 'usage', label: 'Component Usage Guide', aliases: ['usage guide', 'component usage guide'], Icon: Icons.Analyze },
+    { id: 'explain', label: 'Explain This Screen', aliases: ['explain this screen', 'explain the screen', 'explain screen'], Icon: Icons.Explain },
+    { id: 'find', label: 'Smart Navigation', aliases: ['smart navigation'], Icon: Icons.Navigate },
+    { id: 'skills', label: 'Skills Router', aliases: ['skills router', 'skill router', 'agent modes', 'mode routing', 'modes', 'uno skills'], Icon: Icons.Skills }
 ];
 
 /* Levenshtein distance for typo-tolerant keyword match (max length ~20). */
@@ -191,6 +191,20 @@ function levenshtein(a, b) {
         prev = curr;
     }
     return prev[bn];
+}
+
+/** OpenAI-compatible API key: user localStorage override, then Vite env (never commit `.env` with real keys). */
+function getEnvApiKey() {
+    return (import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.VITE_CHATGPT_API_KEY || '').trim();
+}
+
+function getStoredUserApiKey() {
+    if (typeof localStorage === 'undefined') return '';
+    return (localStorage.getItem('PLUS_AI_API_KEY') || '').trim();
+}
+
+function getEffectiveApiKey() {
+    return getStoredUserApiKey() || getEnvApiKey();
 }
 
 /** Match typed text to a quick action by label/aliases; tolerates minor typos. Returns action id or null. */
@@ -249,7 +263,7 @@ function matchQuickActionByKeyword(text) {
     return null;
 }
 
-/* ─── Usage Guide: when to use which component ─── */
+/* ─── Usage Guide: offline / Mode 2 only — full mode always uses ChatGPT API for usage questions ─── */
 const USAGE_GUIDE = [
     {
         queries: ['modal vs cards', 'cards vs modal', 'when do i use modal vs cards', 'when to use modal vs cards', 'modal or cards'],
@@ -609,25 +623,6 @@ const UsageGuideIntroMessage = () => (
     </div>
 );
 
-/* Fallback message with quick action buttons repeated so user can pick without scrolling */
-const FallbackWithQuickActions = ({ text, onQuickAction }) => (
-    <div>
-        <p style={{ marginBottom: 12 }}>I couldn&apos;t understand your request: &quot;<em>{text}</em>&quot;. Try rephrasing or use one of the quick actions below.</p>
-        <div className="sb-ai-agent__quick-actions">
-            {QUICK_ACTIONS.map(a => (
-                <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => onQuickAction(a.id)}>
-                    <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                        <span style={{ color: a.color }}>
-                            <a.Icon />
-                        </span>
-                    </div>
-                    <span className="sb-ai-agent__quick-label">{a.label}</span>
-                </button>
-            ))}
-        </div>
-    </div>
-);
-
 /* Multi-match list: click or keyboard to select */
 const NavMatchList = ({ matches, selectedIndex, onSelect }) => (
     <div className="sb-ai-agent__nav-matches">
@@ -734,17 +729,19 @@ const buildResponse = (actionId, pageContext) => {
                 </div>
             );
 
-        case 'skills':
-            const copyPath = async (path, e) => {
+        case 'skills': {
+            const parseTriggerLabels = (triggerStr) =>
+                triggerStr.split(',').map((s) => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+
+            const copySkillPath = async (path, e) => {
                 e.preventDefault();
-                const target = e.currentTarget;
-                const originalText = target.innerHTML;
+                const btn = e.currentTarget;
+                const labelEl = btn.querySelector('.sb-ai-agent__skill-card__path-label');
+                const prev = labelEl ? labelEl.textContent : path;
 
                 try {
-                    // Try modern fast clipboard access
                     await navigator.clipboard.writeText(path);
                 } catch (err) {
-                    // Fallback for iframe/HTTP restrictions
                     const textArea = document.createElement('textarea');
                     textArea.value = path;
                     textArea.style.position = 'fixed';
@@ -760,49 +757,108 @@ const buildResponse = (actionId, pageContext) => {
                     document.body.removeChild(textArea);
                 }
 
-                target.innerHTML = '✅ Copied to clipboard!';
-                target.style.color = 'var(--color-success, #2e7d32)';
+                if (labelEl) {
+                    labelEl.textContent = '✅ Copied to clipboard!';
+                }
+                btn.style.color = 'var(--color-success-text)';
                 setTimeout(() => {
-                    target.innerHTML = originalText;
-                    target.style.color = 'var(--color-primary)';
+                    if (labelEl) {
+                        labelEl.textContent = prev;
+                    }
+                    btn.style.color = '';
                 }, 1500);
             };
 
-            const LinkItem = ({ num, title, desc, path, bg, fg }) => (
-                <li style={{ marginBottom: 16 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ background: bg, color: fg, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>{num}</span>
-                        <span>{title} — {desc}</span>
-                    </div>
-                    <button 
-                        onClick={(e) => copyPath(path, e)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 32, fontSize: 11, marginTop: 4, color: 'var(--color-primary)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
-                        title="Click to copy path"
-                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-                    >
-                        <i className="fa-regular fa-copy" style={{ fontSize: 11 }}></i> {path}
-                    </button>
-                </li>
-            );
+            const SkillsRouterSkillCard = ({ theme, num, titleLine, path, trigger, sideEffects }) => {
+                const tags = parseTriggerLabels(trigger);
+                return (
+                    <li className={`sb-ai-agent__skill-card sb-ai-agent__skill-card--${theme}`}>
+                        <div className="sb-ai-agent__skill-card__row">
+                            <span className="sb-ai-agent__skill-card__badge">{num}</span>
+                            <div className="sb-ai-agent__skill-card__body">
+                                <p className="sb-ai-agent__skill-card__title">{titleLine}</p>
+                                <button
+                                    type="button"
+                                    className="sb-ai-agent__skill-card__path"
+                                    onClick={(e) => copySkillPath(path, e)}
+                                    title="Click to copy path"
+                                >
+                                    <i className="fa-regular fa-copy sb-ai-agent__skill-card__path-icon" style={{ fontSize: 11 }} aria-hidden />
+                                    <span className="sb-ai-agent__skill-card__path-label">{path}</span>
+                                </button>
+                                <div className="sb-ai-agent__skill-card__field">
+                                    <span className="sb-ai-agent__skill-card__label">Trigger:</span>
+                                    <div className="sb-ai-agent__skill-card__tags">
+                                        {tags.map((label) => (
+                                            <span key={label} className="sb-ai-agent__skill-card__tag">
+                                                {label}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="sb-ai-agent__skill-card__field">
+                                    <span className="sb-ai-agent__skill-card__label">Side Effects:</span>
+                                    <p className="sb-ai-agent__skill-card__sideeffects">{sideEffects}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                );
+            };
 
             return (
-                <div>
-                    <p style={{ fontWeight: 600, marginBottom: 4, fontSize: '14px' }}>🎯 Mode Routing (Mutually Exclusive)</p>
-                    <p style={{ marginBottom: 8, fontSize: '13px' }}>Choose exactly one mode per request:</p>
-                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--color-on-surface-variant)', background: 'var(--color-surface-container-high)', padding: '6px 10px', borderRadius: '6px' }}>
-                        💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
-                    </p>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
-                        <LinkItem num="1" title={<span>📚 <strong>Learning</strong></span>} desc="Understand what exists" path="docs/design-system/modes/learning.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
-                        <LinkItem num="2" title={<span>🔧 <strong>Maintaining</strong></span>} desc="Update the DS itself" path="docs/design-system/modes/maintaining.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
-                        <LinkItem num="3" title={<span>💡 <strong>Consulting</strong></span>} desc="Structure-first concepting" path="docs/design-system/modes/consulting.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
-                        <LinkItem num="4" title={<span>🔄 <strong>Iteration</strong></span>} desc="Generate 3-5 variations" path="docs/design-system/modes/iteration.md" bg="var(--color-advocacy-container)" fg="var(--color-on-advocacy-container)" />
-                        <LinkItem num="5" title={<span>🎨 <strong>Prototyping</strong></span>} desc="High-fi, low-rigor PoCs" path="docs/design-system/modes/prototyping.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
-                        <LinkItem num="6" title={<span>🏗️ <strong>Finalization</strong></span>} desc="Production-ready code" path="docs/design-system/modes/finalization.md" bg="var(--color-secondary-container)" fg="var(--color-on-secondary-container)" />
-                    </ul>
+                <div className="sb-ai-agent__skills-router">
+                    <div className="sb-ai-agent__skills-router-canvas">
+                        <header className="sb-ai-agent__skills-router-header">
+                            <h4 className="sb-ai-agent__skills-router-heading">Skills Router</h4>
+                        </header>
+                        <p className="sb-ai-agent__skills-router-tip">
+                            💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
+                        </p>
+                        <ul className="sb-ai-agent__skills-router-cards">
+                            <SkillsRouterSkillCard
+                                theme="prototype"
+                                num="1"
+                                titleLine={<>🧱 <strong className="sb-ai-agent__skill-card__name">uno-prototype</strong></>}
+                                path=".agent/skills/uno-prototype/SKILL.md"
+                                trigger={'"scaffold", "new prototype", "create playground"'}
+                                sideEffects="Creates files in playground/"
+                            />
+                            <SkillsRouterSkillCard
+                                theme="review"
+                                num="2"
+                                titleLine={<>🔍 <strong className="sb-ai-agent__skill-card__name">uno-review</strong></>}
+                                path=".agent/skills/uno-review/SKILL.md"
+                                trigger={'"review", "check", "validate", "quality check"'}
+                                sideEffects="Read-only"
+                            />
+                            <SkillsRouterSkillCard
+                                theme="post"
+                                num="3"
+                                titleLine={<>🚀 <strong className="sb-ai-agent__skill-card__name">uno-post</strong></>}
+                                path=".agent/skills/uno-post/SKILL.md"
+                                trigger={'"submit", "publish", "add to market"'}
+                                sideEffects="Writes marketplace data file"
+                            />
+                            <SkillsRouterSkillCard
+                                theme="compound"
+                                num="4"
+                                titleLine={<>🧠 <strong className="sb-ai-agent__skill-card__name">uno-compound</strong></>}
+                                path=".agent/skills/uno-compound/SKILL.md"
+                                trigger={'"document", "write up", "compound", "save learning"'}
+                                sideEffects="Writes solution doc, may propose instruction edits"
+                            />
+                        </ul>
+                        <div className="sb-ai-agent__skills-router-pipeline">
+                            <p className="sb-ai-agent__skills-router-pipeline-title">🔁 Pipeline (Recommendation, not a requirement)</p>
+                            <p className="sb-ai-agent__skills-router-pipeline-flow">
+                                uno-prototype → uno-review → uno-post → uno-compound
+                            </p>
+                        </div>
+                    </div>
                 </div>
             );
+        }
 
         default:
             return <p>I'm a demo agent. Try one of the quick actions or ask about a component!</p>;
@@ -824,8 +880,7 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
     const [isOpen, setIsOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
     const [aiMode, setAiMode] = useState(() => localStorage.getItem('PLUS_AI_MODE') || null);
-    const [apiKey, setApiKey] = useState(() => localStorage.getItem('PLUS_AI_API_KEY') || '');
-    const [tempKey, setTempKey] = useState(apiKey);
+    const [tempKey, setTempKey] = useState(() => getStoredUserApiKey());
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -952,6 +1007,7 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
     const fetchAIResponse = async (feature, userInput, context) => {
         setIsTyping(true);
         try {
+            const apiKey = getEffectiveApiKey();
             if (aiMode !== 'full' || !apiKey) {
                 throw new Error("Local mode active or API key missing.");
             }
@@ -1155,13 +1211,13 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                     setMessages(p => [...p, {
                         role: 'bot', content: (
                             <p style={{ color: 'var(--color-error)' }}>
-                                ⚠️ AI server offline. Start the backend with <code>node server/server.js</code> to answer any component question.
+                                ⚠️ Could not reach the AI API. Add a key in Mode 1, set <code>VITE_OPENAI_API_KEY</code> or <code>VITE_CHATGPT_API_KEY</code> in <code>.env</code>, and check your network.
                             </p>
                         )
                     }]);
                 }
             } else {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>⚠️ AI server offline. Make sure the backend is running on port 3001.</p> }]);
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>⚠️ Could not reach the AI API. Check your key, `.env` (<code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code>), and network.</p> }]);
             }
         }
     };
@@ -1277,10 +1333,8 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                         <div className="sb-ai-agent__quick-actions">
                             {QUICK_ACTIONS.map(a => (
                                 <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
-                                    <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                                        <span style={{ color: a.color }}>
-                                            <a.Icon />
-                                        </span>
+                                    <div className={`sb-ai-agent__quick-icon sb-ai-agent__quick-icon--${a.id}`}>
+                                        <a.Icon />
                                     </div>
                                     <span className="sb-ai-agent__quick-label">{a.label}</span>
                                 </button>
@@ -1327,14 +1381,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             // Build a clean query for GPT
             const componentQuery = parsed?.tokens?.join(' vs ') || text;
 
-            // Check local USAGE_GUIDE first for instant known comparisons
-            const usageEntry = matchUsageGuide(text);
-            if (usageEntry && !(parsed?.type === 'single')) {
-                respond(usageEntry.answer);
-                return;
-            }
-
-            // Ask ChatGPT — works for ANY component name
+            // Always use ChatGPT API for usage / comparison questions in full mode (no hardcoded USAGE_GUIDE shortcut)
             fetchAIResponse('component_usage', text, {
                 query: componentQuery,
                 parsed,
@@ -1361,7 +1408,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             if (matches.length > 0 && matches[0].score >= 90) {
                 runSmartNavigation(text);
             } else {
-                respond(<FallbackWithQuickActions text={text} onQuickAction={handleQuickAction} />);
+                respond({ type: 'fallback_clarify', text });
             }
         }
     };
@@ -1414,22 +1461,27 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 
                                 <div style={{ background: 'var(--color-surface-container-high)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
                                     <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 1: Full AI Functionality</p>
+                                    <p style={{ fontSize: 11, color: 'var(--color-on-surface-variant)', marginBottom: 8, lineHeight: 1.4 }}>
+                                        Paste a key below, or define <code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code> in <code>.env</code> and restart Storybook — then you can start Mode 1 without typing it here (localStorage still overrides env if set).
+                                    </p>
                                     <input 
                                         type="password" 
-                                        placeholder="sk-..." 
+                                        placeholder="sk-... (optional if set in .env)" 
                                         value={tempKey} 
                                         onChange={e => setTempKey(e.target.value)} 
                                         style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-outline)', marginBottom: 12, outline: 'none' }}
                                     />
                                     <button 
-                                        disabled={!tempKey.trim()}
+                                        disabled={!tempKey.trim() && !getEnvApiKey()}
                                         onClick={() => {
-                                            localStorage.setItem('PLUS_AI_API_KEY', tempKey.trim());
+                                            const typed = tempKey.trim();
+                                            if (typed) {
+                                                localStorage.setItem('PLUS_AI_API_KEY', typed);
+                                            }
                                             localStorage.setItem('PLUS_AI_MODE', 'full');
-                                            setApiKey(tempKey.trim());
                                             setAiMode('full');
                                         }}
-                                        style={{ background: 'var(--color-primary)', color: 'white', padding: '10px 16px', borderRadius: 8, border: 'none', fontWeight: 600, width: '100%', cursor: tempKey.trim() ? 'pointer' : 'not-allowed', opacity: tempKey.trim() ? 1 : 0.5 }}
+                                        style={{ background: 'var(--color-primary)', color: 'white', padding: '10px 16px', borderRadius: 8, border: 'none', fontWeight: 600, width: '100%', cursor: (tempKey.trim() || getEnvApiKey()) ? 'pointer' : 'not-allowed', opacity: (tempKey.trim() || getEnvApiKey()) ? 1 : 0.5 }}
                                     >Save Key & Start Mode 1</button>
                                 </div>
                                 
@@ -1464,10 +1516,8 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 <div className="sb-ai-agent__quick-actions">
                                     {QUICK_ACTIONS.map(a => (
                                         <button key={a.id} className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
-                                            <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                                                <span style={{ color: a.color }}>
-                                                    <a.Icon />
-                                                </span>
+                                            <div className={`sb-ai-agent__quick-icon sb-ai-agent__quick-icon--${a.id}`}>
+                                                <a.Icon />
                                             </div>
                                             <span className="sb-ai-agent__quick-label">{a.label}</span>
                                         </button>
@@ -1483,6 +1533,24 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                             )}
                                             {m.noBubble ? (
                                                 m.content
+                                            ) : m.role === 'bot' && m.content?.type === 'fallback_clarify' ? (
+                                                <div className="sb-ai-agent__bot-message-stack">
+                                                    <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
+                                                        <p style={{ margin: 0 }}>
+                                                            I couldn&apos;t understand your request: &quot;<em>{m.content.text}</em>&quot;. Try rephrasing or pick a quick action below.
+                                                        </p>
+                                                    </div>
+                                                    <div className="sb-ai-agent__quick-actions sb-ai-agent__quick-actions--below-bubble">
+                                                        {QUICK_ACTIONS.map(a => (
+                                                            <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
+                                                                <div className={`sb-ai-agent__quick-icon sb-ai-agent__quick-icon--${a.id}`}>
+                                                                    <a.Icon />
+                                                                </div>
+                                                                <span className="sb-ai-agent__quick-label">{a.label}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             ) : (
                                                 <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
                                                     {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (

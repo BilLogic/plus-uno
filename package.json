@@ -22,7 +22,13 @@
     "build:all": "npm run build && npm run build-storybook",
     "preview:react": "vite preview",
     "dev:home-redesign": "vite --config playground/home-redesign/vite.config.js",
-    "dev:monthly-report": "vite --config playground/monthly-report/vite.config.js"
+    "dev:monthly-report": "vite --config playground/monthly-report/vite.config.js",
+    "figma:poll": "node scripts/poll-figma-library.js",
+    "figma:poll:init": "node scripts/poll-figma-library.js --init",
+    "figma:fetch-component": "node scripts/fetch-figma-component.js",
+    "figma:write-back": "node scripts/figma-write-back.js",
+    "figma:publish-code-connect": "node scripts/publish-code-connect.js",
+    "notify:slack": "node scripts/notify-slack.js"
   },
   "keywords": [
     "plus",

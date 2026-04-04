@@ -20,11 +20,47 @@ This is a practical inventory of existing repository scripts and when to use the
   - Purpose: Stabilize Storybook startup in environments where `os.networkInterfaces()` fails.
   - Trigger: Automatically used by `npm run storybook`.
 
+## Figma Automation Pipeline
+
+- `scripts/poll-figma-library.js`
+  - Purpose: Poll Figma for component/version changes, diff against snapshot, notify Slack.
+  - Entrypoint: `npm run figma:poll` / `npm run figma:poll:init`
+
+- `scripts/fetch-figma-component.js`
+  - Purpose: Fetch design context (nodes, screenshots, variables) from Figma REST API for CI.
+  - Entrypoint: `npm run figma:fetch-component`
+
+- `scripts/ai-component-sync.js`
+  - Purpose: Call Claude API to generate component code changes from Figma design context.
+  - Used by: `.github/workflows/figma-component-sync.yml`
+
+- `scripts/notify-slack.js`
+  - Purpose: Post design system change notifications to Slack `#ds-sync` via Incoming Webhook.
+  - Entrypoint: `npm run notify:slack`
+
+- `scripts/figma-write-back.js`
+  - Purpose: Post-merge Figma annotations (dev resources, comments).
+  - Entrypoint: `npm run figma:write-back`
+
+- `scripts/publish-code-connect.js`
+  - Purpose: Publish Code Connect mappings to Figma Dev Mode.
+  - Entrypoint: `npm run figma:publish-code-connect`
+
+See `docs/design-system/guides/figma-automation.md` for full setup instructions.
+
 ## Used by CI
+
+- `.github/workflows/figma-library-poll.yml`
+  - Polls Figma every 30 min for component changes.
+  - Posts to Slack, creates GitHub Issues, triggers token sync.
 
 - `.github/workflows/sync-figma-tokens.yml`
   - Scheduled daily token sync and generation.
-  - Commits token changes when detected.
+  - Creates PR with token changes and notifies Slack.
+
+- `.github/workflows/figma-component-sync.yml`
+  - Triggered by `repository_dispatch` from poll workflow.
+  - Fetches Figma design context, runs AI code generation, creates PR.
 
 ## Investigative / Migration Utilities (Use Case Dependent)
 

@@ -23,9 +23,8 @@ A GPT-powered AI assistant embedded in Storybook. Uses a real OpenAI backend for
 - **Floating Assistant**: Always accessible via ⌘+/
 
 ## Setup
-1. Ensure the backend server is running: \`cd server && npm start\`
-2. Add your OpenAI API key to \`server/.env\`
-3. Open this story and click the floating sparkle icon
+1. Add your OpenAI API key: paste it in **Mode 1** in the agent, **or** set \`VITE_OPENAI_API_KEY\` / \`VITE_CHATGPT_API_KEY\` in repo-root \`.env\` and restart Storybook (keys are read client-side via Vite).
+2. Open this story and use the floating sparkle icon (⌘+/).
         `,
             },
         },
