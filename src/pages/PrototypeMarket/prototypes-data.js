@@ -392,4 +392,20 @@ export const prototypes = [
     localPath: '/1026',
     repoPath: 'playground/training-onboarding/TrainingOnboardingHiFi.stories.jsx',
   },
+  {
+    id: '1027',
+    title: 'Toolkit IA — Session-centered',
+    description:
+      'Session-first toolkit layout: PLUS sidebar, sessions accordion rail, multi-session dismissible tabs, and Session / Student / Reflection workspace views (mock data).',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'mid',
+    lastUpdated: '2026-04-05',
+    creators: ['PLUS'],
+    contributors: ['PLUS'],
+    productPillar: 'toolkit',
+    localPath: '/1027',
+    repoPath: 'playground/toolkit-ia-revision/',
+  },
 ];
