@@ -6,6 +6,9 @@ on:
     - cron: '*/30 13-23 * * 1-5'
   workflow_dispatch:
     # Allow manual triggering
+  repository_dispatch:
+    types: [figma-library-publish]
+    # Triggered by Slack Workflow Builder when Figma app posts a publish notification
 
 permissions:
   contents: write
