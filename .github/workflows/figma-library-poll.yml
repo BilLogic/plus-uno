@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   poll-library:
@@ -27,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
 
       - name: Poll Figma for changes
         id: poll
@@ -78,14 +79,34 @@ jobs:
             );
 
             if (!alreadyExists) {
+              const reviewChecklist = [
+                '',
+                '---',
+                '## Review Workflow',
+                '',
+                '### How to implement',
+                '1. Create a branch: `git checkout -b ds-review/' + names.split(',')[0].trim().toLowerCase().replace(/\s+/g, '-') + '`',
+                '2. Implement the changes (manually or via `@codex` / `@claude` in #figma-sync)',
+                '3. Open a PR to `main` and request review from DS managers',
+                '4. DS managers review and approve before merge',
+                '',
+                '### Checklist',
+                '- [ ] Component code updated to match Figma',
+                '- [ ] Storybook stories updated',
+                '- [ ] Visual parity verified against Figma',
+                '- [ ] No regressions in existing components',
+                '- [ ] DS manager approved',
+              ].join('\n');
+
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: `feat: Figma DS update — ${names}`,
-                body: body,
-                labels: ['design-system', 'figma-sync']
+                body: body + reviewChecklist,
+                labels: ['design-system', 'figma-sync'],
+                assignees: []
               });
-              console.log('Issue created');
+              console.log('Issue created with review checklist');
             } else {
               console.log('Open figma-sync issue already exists — skipping');
             }
