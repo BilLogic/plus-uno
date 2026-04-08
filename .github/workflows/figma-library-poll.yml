@@ -46,7 +46,7 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: update Figma component snapshot [skip ci]"
           git push || true
 
-      - name: Create GitHub Issue for component changes
+      - name: Create ds-review branch and draft PR
         if: steps.poll.outputs.components_changed == 'true'
         uses: actions/github-script@v7
         with:
@@ -59,6 +59,11 @@ jobs:
               ...changeSummary.deleted
             ].join(', ');
 
+            // Build branch name from first component
+            const slug = names.split(',')[0].trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const date = new Date().toISOString().slice(0, 10);
+            const branchName = `ds-review/${slug}-${date}`;
+
             let body = '';
             try {
               body = fs.readFileSync('.figma-sync-context/issue-body.md', 'utf8');
@@ -66,48 +71,67 @@ jobs:
               body = `Figma component changes detected: ${names}`;
             }
 
-            // Check for existing open issue to avoid duplicates
-            const existingIssues = await github.rest.issues.listForRepo({
+            const reviewChecklist = [
+              '',
+              '---',
+              '## DS Review Checklist',
+              '',
+              '- [ ] Component code updated to match Figma',
+              '- [ ] Storybook stories updated',
+              '- [ ] Visual parity verified against Figma',
+              '- [ ] No regressions in existing components',
+              '- [ ] DS manager approved',
+            ].join('\n');
+
+            // Check for existing open PR to avoid duplicates
+            const existingPRs = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: 'figma-sync'
+              head: `${context.repo.owner}:ds-review/`
             });
-
-            const alreadyExists = existingIssues.data.some(
-              issue => issue.title.includes('Figma DS update')
+            const alreadyExists = existingPRs.data.some(
+              pr => pr.title.includes('Figma DS update')
             );
 
-            if (!alreadyExists) {
-              const reviewChecklist = [
-                '',
-                '---',
-                '## Review Workflow',
-                '',
-                '### How to implement',
-                '1. Create a branch: `git checkout -b ds-review/' + names.split(',')[0].trim().toLowerCase().replace(/\s+/g, '-') + '`',
-                '2. Implement the changes (manually or via `@codex` / `@claude` in #figma-sync)',
-                '3. Open a PR to `main` and request review from DS managers',
-                '4. DS managers review and approve before merge',
-                '',
-                '### Checklist',
-                '- [ ] Component code updated to match Figma',
-                '- [ ] Storybook stories updated',
-                '- [ ] Visual parity verified against Figma',
-                '- [ ] No regressions in existing components',
-                '- [ ] DS manager approved',
-              ].join('\n');
-
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `feat: Figma DS update — ${names}`,
-                body: body + reviewChecklist,
-                labels: ['design-system', 'figma-sync'],
-                assignees: []
-              });
-              console.log('Issue created with review checklist');
-            } else {
-              console.log('Open figma-sync issue already exists — skipping');
+            if (alreadyExists) {
+              console.log('Open ds-review PR already exists — skipping');
+              return;
             }
+
+            // Get main branch SHA
+            const mainRef = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+
+            // Create branch from main
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/heads/${branchName}`,
+              sha: mainRef.data.object.sha
+            });
+            console.log(`Branch created: ${branchName}`);
+
+            // Create draft PR
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `feat: Figma DS update — ${names}`,
+              head: branchName,
+              base: 'main',
+              body: body + reviewChecklist,
+              draft: true
+            });
+            console.log(`Draft PR created: #${pr.data.number}`);
+
+            // Add labels
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.data.number,
+              labels: ['design-system', 'figma-sync']
+            });
 
