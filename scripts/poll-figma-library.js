@@ -282,6 +282,12 @@ function buildSlackMessage(componentDiff, newVersions) {
         text: { type: 'mrkdwn', text: versionBlock }
       });
     }
+  } else {
+    // No new version but components changed — metadata-only change
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: '_Component metadata changed (no published version detected)_' }
+    });
   }
 
   // Component changes
