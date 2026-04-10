@@ -1,5 +1,5 @@
 {
-  "lastChecked": "2026-04-10T22:56:39.939Z",
+  "lastChecked": "2026-04-10T23:41:40.076Z",
   "components": [
     {
       "key": "519b409ef4fd78c6e5deb10dc32dad90d880d124",
@@ -9174,7 +9174,7 @@
     {
       "key": "7531e8ae30053aa5b57fc862d3a897cc737a6f06",
       "name": "layout-blocks/vertical×4",
-      "description": "�� Vertical Layout Blocks x4",
+      "description": "↓ Vertical Layout Blocks x4",
       "nodeId": "174:16578",
       "containingFrame": ""
     },
