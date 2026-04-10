@@ -43,24 +43,37 @@ function parseArgs() {
 }
 
 /**
- * Figma API GET request
+ * Figma API GET request with retry logic
  */
-function figmaGet(endpoint) {
+function figmaGet(endpoint, retries = 3, delay = 1000) {
   return new Promise((resolve, reject) => {
-    https.get(`https://api.figma.com/v1${endpoint}`, {
-      headers: { 'X-Figma-Token': FIGMA_ACCESS_TOKEN }
-    }, (res) => {
-      let data = '';
-      res.on('data', chunk => { data += chunk; });
-      res.on('end', () => {
-        if (res.statusCode === 200) {
-          try { resolve(JSON.parse(data)); }
-          catch (e) { reject(new Error(`Parse error: ${e.message}`)); }
+    const attempt = (retriesLeft) => {
+      https.get(`https://api.figma.com/v1${endpoint}`, {
+        headers: { 'X-Figma-Token': FIGMA_ACCESS_TOKEN }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => { data += chunk; });
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            try { resolve(JSON.parse(data)); }
+            catch (e) { reject(new Error(`Parse error: ${e.message}`)); }
+          } else if (retriesLeft > 0 && (res.statusCode === 429 || res.statusCode >= 500)) {
+            console.warn(`Figma API ${res.statusCode}, retrying in ${delay}ms... (${retriesLeft} retries left)`);
+            setTimeout(() => attempt(retriesLeft - 1), delay);
+          } else {
+            reject(new Error(`Figma API ${res.statusCode}: ${data.substring(0, 200)}`));
+          }
+        });
+      }).on('error', (err) => {
+        if (retriesLeft > 0) {
+          console.warn(`Network error: ${err.message}, retrying in ${delay}ms... (${retriesLeft} retries left)`);
+          setTimeout(() => attempt(retriesLeft - 1), delay);
         } else {
-          reject(new Error(`Figma API ${res.statusCode}: ${data.substring(0, 200)}`));
+          reject(err);
         }
       });
-    }).on('error', reject);
+    };
+    attempt(retries);
   });
 }
 
@@ -200,10 +213,10 @@ function buildSlackMessage(componentDiff, newVersions) {
   const figmaUrl = `https://www.figma.com/design/${FIGMA_FILE_KEY}`;
 
   // Group variants by parent component name (containingFrame)
-  function groupByComponent(items, getFrame) {
+  function groupByComponent(items, getFrame, getName) {
     const groups = {};
     items.forEach(item => {
-      const frame = getFrame(item) || 'Unknown';
+      const frame = getFrame(item) || getName(item) || 'Unknown';
       if (!groups[frame]) groups[frame] = 0;
       groups[frame]++;
     });
@@ -246,17 +259,17 @@ function buildSlackMessage(componentDiff, newVersions) {
   // Component changes
   const componentLines = [];
   if (componentDiff.created.length) {
-    const names = groupByComponent(componentDiff.created, c => c.containingFrame);
+    const names = groupByComponent(componentDiff.created, c => c.containingFrame, c => c.name);
     const display = names.length > 5 ? names.slice(0, 5).join(', ') + ` (+${names.length - 5} more)` : names.join(', ');
     componentLines.push(`📦  *New:*  ${display}`);
   }
   if (componentDiff.modified.length) {
-    const names = groupByComponent(componentDiff.modified, c => c.new.containingFrame);
+    const names = groupByComponent(componentDiff.modified, c => c.new.containingFrame, c => c.new.name);
     const display = names.length > 5 ? names.slice(0, 5).join(', ') + ` (+${names.length - 5} more)` : names.join(', ');
     componentLines.push(`✏️  *Modified:*  ${display}`);
   }
   if (componentDiff.deleted.length) {
-    const names = groupByComponent(componentDiff.deleted, c => c.containingFrame);
+    const names = groupByComponent(componentDiff.deleted, c => c.containingFrame, c => c.name);
     const display = names.length > 5 ? names.slice(0, 5).join(', ') + ` (+${names.length - 5} more)` : names.join(', ');
     componentLines.push(`🗑️  *Deleted:*  ${display}`);
   }
