@@ -541,20 +541,6 @@
       "containingFrame": "Logo"
     },
     {
-      "key": "3078ddab491892025e1b336791d64727fdb58610",
-      "name": "layout-blocks/horizontal×4-1",
-      "description": "-> Horizontal Layout Blocks x4 - ⭯ Nested 1",
-      "nodeId": "174:16493",
-      "containingFrame": ""
-    },
-    {
-      "key": "6375023ccdd68708978fe0176612b40cf8cbf9fb",
-      "name": "layout-blocks/vertical×2-1",
-      "description": "↓ Vertical Layout Blocks x2 - ⭯ Nested 1",
-      "nodeId": "174:16594",
-      "containingFrame": ""
-    },
-    {
       "key": "5e741257b58e1f871d03a93b4569e4c87c57ff10",
       "name": "state=default, selected=true",
       "description": "",
@@ -693,20 +679,6 @@
       "description": "",
       "nodeId": "13536:9083",
       "containingFrame": "Scale Options"
-    },
-    {
-      "key": "929d91176d5700723de912f4908a3e4be2328916",
-      "name": "_Modal/header",
-      "description": "",
-      "nodeId": "53:20182",
-      "containingFrame": ""
-    },
-    {
-      "key": "084ab34af74aed61f6152fd9bfb5e7d4d92d5bbc",
-      "name": "state=default, check type=check",
-      "description": "",
-      "nodeId": "82:16568",
-      "containingFrame": "_Form Switch Button"
     },
     {
       "key": "d3690a40bbe77a3c36a52ed95392e6c0be8da340",
@@ -884,13 +856,6 @@
       "containingFrame": "Table/Normal Border"
     },
     {
-      "key": "14002165ac008a9596b755995cbec458cdbd5632",
-      "name": "size=large, addon position=both, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6121",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "5199c7c53617d7dd46ce8c4d54fd8ca6de4aeca5",
       "name": "type=input group",
       "description": "",
@@ -912,25 +877,11 @@
       "containingFrame": "Select Menu"
     },
     {
-      "key": "0493279d8f05d6814192c5e1d43605d18573d8b2",
-      "name": "size=medium (default), addon position=prepend, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6196",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "0e3745aa305959638f216111ad3bd0cf2b736ada",
       "name": "state=default, selected=true",
       "description": "",
       "nodeId": "4209:29386",
       "containingFrame": "Tab Dropdown"
-    },
-    {
-      "key": "0df381539d3b656bb68505f8287b864213797664",
-      "name": "size=small, addon position=prepend, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6193",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "33a8b8293204171bd785f3688111842fca88fc4c",
@@ -1437,13 +1388,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "01f494c1a2eed291ef7c1c7d0de396c67edd3388",
-      "name": "state=default",
-      "description": "",
-      "nodeId": "13653:2416",
-      "containingFrame": "draft"
-    },
-    {
       "key": "0d8a4dec8531a006aa645de60ca53a3fe649f905",
       "name": "state=read-only, validation=none",
       "description": "",
@@ -1542,13 +1486,6 @@
       "containingFrame": "Time (no label)"
     },
     {
-      "key": "de504cdb1a365eb7274be27df12eb135136c6bc7",
-      "name": "_Modal/button",
-      "description": "",
-      "nodeId": "53:20199",
-      "containingFrame": ""
-    },
-    {
       "key": "e8f273a69736935fee33585557109673a6beb698",
       "name": "size=medium (default), style=secondary, alignment=horizontal",
       "description": "",
@@ -1577,13 +1514,6 @@
       "containingFrame": "Carousel"
     },
     {
-      "key": "09d22e2e86bc09a14fe9269589e1584dfe78ee1e",
-      "name": "size=small, addon position=append, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6202",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "0fa2cc4d96d28854682a18aa3cc801ac494e733b",
       "name": "style=dark",
       "description": "",
@@ -1596,20 +1526,6 @@
       "description": "",
       "nodeId": "8595:7556",
       "containingFrame": "Select Menu"
-    },
-    {
-      "key": "11dfceb284fac579a8d827d5c44fa8831a161997",
-      "name": "size=small, addon position=both, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6211",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "12315cdc50e3a30f6714b54284814ac976cacf2a",
-      "name": "size=large, addon position=prepend, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6199",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "1231efacd400bbb658f9291e3cd94768bb6a6e98",
@@ -1626,13 +1542,6 @@
       "containingFrame": "Form Short Textarea"
     },
     {
-      "key": "159f8ed0d02a3b5e4659f856a08aaa6b13fa412d",
-      "name": "size=medium (default), addon position=both, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6215",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "16271b1a48f329304a8836969c266c9d6df717ad",
       "name": "select type=single, state=disabled, filled?=true",
       "description": "",
@@ -1645,13 +1554,6 @@
       "description": "",
       "nodeId": "11059:8652",
       "containingFrame": "Select Menu"
-    },
-    {
-      "key": "22f73202a67cfa4a164cfcb59d0aaacc8903492d",
-      "name": "size=small, addon position=prepend, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6223",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "239211f65f1b334d3f1dc5678ef563bb8ee45f6b",
@@ -1780,13 +1682,6 @@
       "containingFrame": "Select Menu"
     },
     {
-      "key": "5b8372055ab7d21c7898eb3d729dd74fd3fbcf8c",
-      "name": "size=large, addon position=append, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6243",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "5de95303c5f6199984ff60b0cf65384782a8d2fb",
       "name": "open?=true, type=footer",
       "description": "",
@@ -1815,20 +1710,6 @@
       "containingFrame": "Select Menu"
     },
     {
-      "key": "78a888e3f9230e91f46a7d266653da65b92d89d4",
-      "name": "size=large, addon position=both, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6259",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "7d8e1453956843160facdeab455e83b086631dbf",
-      "name": "size=medium (default), addon position=prepend, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6227",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "7fca4519a446f57ed1b63fbcf495d8e27fee685b",
       "name": "addon position=append",
       "description": "",
@@ -1850,25 +1731,11 @@
       "containingFrame": "Date Picker"
     },
     {
-      "key": "925e58effcc61b088cc54ed4a7d47a30b172a16e",
-      "name": "size=large, addon position=append, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6208",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "92ef9eda0e9272c8431dde3f7802543d19aa06c8",
       "name": "state=default, check type=check",
       "description": "",
       "nodeId": "42:5856",
       "containingFrame": "Form Checkbox"
-    },
-    {
-      "key": "958103c2a5c3f5949c3315d43bfd998ebf806995",
-      "name": "size=small, addon position=append, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6235",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "997bf412c122146b5427f3da98bf3ddd16b17bde",
@@ -1906,13 +1773,6 @@
       "containingFrame": "Form Checkbox"
     },
     {
-      "key": "b275685917e004ea04c4ec17149e2aadf1bf389a",
-      "name": "size=small, addon position=both, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6247",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "b543dea2bce622c64e567e73b9eb75074139cac9",
       "name": "item=3",
       "description": "",
@@ -1925,13 +1785,6 @@
       "description": "",
       "nodeId": "53:20964",
       "containingFrame": "Input Group old"
-    },
-    {
-      "key": "bdd73eb9c82e3dfce0bf99a2205d518b8d9d0059",
-      "name": "size=medium (default), addon position=both, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6253",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "c08bd6b8ae7686c7b3cc0a410aef2121b5d6daea",
@@ -1997,13 +1850,6 @@
       "containingFrame": "Form Textarea"
     },
     {
-      "key": "da741435a3a54927ac3ed21a96f12df936e92080",
-      "name": "size=medium (default), addon position=append, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6205",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "e0a359aa27cb263220a4dea08abcbf710e7b1fe8",
       "name": "type=with captions",
       "description": "",
@@ -2030,13 +1876,6 @@
       "description": "",
       "nodeId": "13686:6235",
       "containingFrame": "Month (no label)"
-    },
-    {
-      "key": "fc9f00bc842de25c27baed645dfe0dbbdfb8ae5b",
-      "name": "size=large, addon position=both, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6219",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "fe0adf05b77c716748d877c8671c706ca3f7c62b",
@@ -3474,13 +3313,6 @@
       "containingFrame": "Tonal buttons"
     },
     {
-      "key": "096b3788d7ac4556e1f1d9793e0d760eea740372",
-      "name": "size=small, addon position=append, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6076",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "1338aba41603ef399de3c277a51168856d23dbef",
       "name": "size=small, style=warning, state=hover",
       "description": "",
@@ -3577,13 +3409,6 @@
       "description": "",
       "nodeId": "10090:60537",
       "containingFrame": "Tonal buttons"
-    },
-    {
-      "key": "2e77946feb8271e9671ce574bb5aa8c83066304d",
-      "name": "size=medium (default), addon position=append, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6089",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "4087744795cc526e352273b02f6b76eb857960af",
@@ -3712,13 +3537,6 @@
       "containingFrame": "Tonal buttons"
     },
     {
-      "key": "71eff6babae8b986a6216f992b3425953f35acb0",
-      "name": "size=large, addon position=both, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6105",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "76e1d12403d4b358843e173fe054fcd43991ef76",
       "name": "size=small, style=primary, state=pressed",
       "description": "",
@@ -3761,13 +3579,6 @@
       "containingFrame": "Tonal buttons"
     },
     {
-      "key": "8620f7e40b7f131ea9cc52d6c22325f50685624e",
-      "name": "size=large, addon position=append, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6082",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "88e2fdd3514d4eb3782bf91aed37e5b95490f242",
       "name": "size=medium (default), style=secondary, state=pressed",
       "description": "",
@@ -3801,13 +3612,6 @@
       "description": "",
       "nodeId": "979:21028",
       "containingFrame": "Tonal buttons"
-    },
-    {
-      "key": "9240a4c6b173c5f839111c7a4a6bcaa9e077ace8",
-      "name": "size=medium (default), addon position=both, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6101",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "94af63ee6c66a8cfb36a0f7efb2960f8fe406b7a",
@@ -3845,13 +3649,6 @@
       "containingFrame": "Tonal buttons"
     },
     {
-      "key": "a8bf670f2b3ec81a28bbeeeed19bae5a79361eab",
-      "name": "size=large, addon position=append, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6093",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "a9d95847fb439f32f2b6bd0c112bd9394d2b29fc",
       "name": "size=small, style=secondary, state=focus",
       "description": "",
@@ -3859,32 +3656,11 @@
       "containingFrame": "Tonal buttons"
     },
     {
-      "key": "af12a8fba70e013a8b49e20f9ed27529620bfaf8",
-      "name": "size=medium (default), addon position=both, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6115",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "b04e3dac85d5270a5821f7c2af8e42feebb443d7",
-      "name": "size=small, addon position=both, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6109",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "bc579e8e10b39897b68c3555ea08638e77529c0a",
       "name": "size=medium (default), style=primary, state=focus",
       "description": "",
       "nodeId": "3998:69375",
       "containingFrame": "Tonal buttons"
-    },
-    {
-      "key": "ca9764fa686ba5b84e1af4aeea18b4cf9bad7288",
-      "name": "size=large, addon position=prepend, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6061",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "cd666cdb46aa2e4dcaaee6c1cb0851709c765edf",
@@ -3983,13 +3759,6 @@
       "description": "",
       "nodeId": "10091:60613",
       "containingFrame": "Tonal buttons"
-    },
-    {
-      "key": "f4c85b6dd8e38f43a048f1f6371fdb3a0b7c2e50",
-      "name": "size=small, addon position=prepend, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6064",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "f5fa0ba8dd82e5616b55c57d2c2af2f49776ec6e",
@@ -4671,13 +4440,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "108bf7a293fd8ebf0ac05110bf8e2d4132734a6f",
-      "name": "size=large, state=check",
-      "description": "",
-      "nodeId": "13125:6134",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "13dd11ea2df2dda07e89ca3258ceff0b589e9585",
       "name": "size=small, style=secondary, direction=dropdown, split?=false",
       "description": "",
@@ -4699,13 +4461,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "17157187965ba31d66dba35a835e3d06dc662383",
-      "name": "size=medium (default), state=check",
-      "description": "",
-      "nodeId": "13125:6131",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "18bc724fd3011bd36e08641f43b5f94af8affd37",
       "name": "size=medium (default), style=success, direction=dropup, split?=false",
       "description": "",
@@ -4718,13 +4473,6 @@
       "description": "",
       "nodeId": "4172:30437",
       "containingFrame": "Dropdown button"
-    },
-    {
-      "key": "1bf91aeb3ca92b9eea2e77d7d4a6e1edb5e1a84a",
-      "name": "size=large, state=indeterminate",
-      "description": "",
-      "nodeId": "13125:6143",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "204e600696e96e2dca3b78f7eb674d7819347215",
@@ -4753,20 +4501,6 @@
       "description": "",
       "nodeId": "4085:24140",
       "containingFrame": "Dropdown button"
-    },
-    {
-      "key": "24eebb50fad0494146606a20ac6941cd3b925a43",
-      "name": "size=small, state=disabled",
-      "description": "",
-      "nodeId": "13125:6155",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "26a0a409097aa34909cebab5cff0ad9b5bb6ef57",
-      "name": "size=small, state=default",
-      "description": "",
-      "nodeId": "13125:6174",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "2778ac82aab92051f72ea4054a0f1186acd85ed9",
@@ -4879,13 +4613,6 @@
       "description": "",
       "nodeId": "4172:26800",
       "containingFrame": "Dropdown button"
-    },
-    {
-      "key": "404152ca7a87ae4c6d15734c72c2f9fb792cb831",
-      "name": "size=small, state=indeterminate",
-      "description": "",
-      "nodeId": "13125:6137",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "409d961d4d34b3c10176014b76c9415005a915dd",
@@ -5119,13 +4846,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "674a5230e150fcef4822baa0ee5924db9198e8f0",
-      "name": "size=small, state=check",
-      "description": "",
-      "nodeId": "13125:6165",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "690e5da2dff2f478a32c81b96a80ffaf1b24be31",
       "name": "size=large, style=primary, direction=dropup, split?=false",
       "description": "",
@@ -5145,13 +4865,6 @@
       "description": "",
       "nodeId": "4172:24711",
       "containingFrame": "Dropdown button"
-    },
-    {
-      "key": "6bf84d4feeaf362debce93372ab0bbda6e2e97a2",
-      "name": "size=small, state=check",
-      "description": "",
-      "nodeId": "13125:6128",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "6f62a749f82d59ba3f302293f75d42d927607437",
@@ -5406,13 +5119,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "b31c4af8ed2ab0c883ef3fbc8b3c92f1280ec90f",
-      "name": "size=small, state=disabled",
-      "description": "",
-      "nodeId": "13125:6183",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "b4986e4c9d5b66bfdedd42df6f20cefc4976f0cb",
       "name": "size=medium (default), style=primary, direction=dropright, split?=false",
       "description": "",
@@ -5518,13 +5224,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "d611b9508da7e3a01193eac049ce26950698e46f",
-      "name": "size=medium (default), state=disabled",
-      "description": "",
-      "nodeId": "13125:6186",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "d6637de48e677ee19785681533f3e6347a58e137",
       "name": "size=large, style=warning, direction=dropright, split?=true",
       "description": "",
@@ -5602,13 +5301,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "ee54365486f5c64608d1296e98b38933b785342c",
-      "name": "size=large, state=default",
-      "description": "",
-      "nodeId": "13125:6152",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "f0905a5ada901e8788c827ad7c44f57ede22901d",
       "name": "size=large, style=warning, direction=dropleft, split?=false",
       "description": "",
@@ -5623,13 +5315,6 @@
       "containingFrame": "Dropdown button"
     },
     {
-      "key": "f1cf9e90201b814947c79707980bf9d409e8a328",
-      "name": "size=medium (default), state=disabled",
-      "description": "",
-      "nodeId": "13125:6158",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "f33dc0365379782734b5e35b96c0de153f53b977",
       "name": "size=large, style=info, direction=dropdown, split?=true",
       "description": "",
@@ -5642,13 +5327,6 @@
       "description": "",
       "nodeId": "4085:22900",
       "containingFrame": "Dropdown button"
-    },
-    {
-      "key": "f7caf690b7ce73f13b5383747b2fe9c6f1782812",
-      "name": "size=large, state=check",
-      "description": "",
-      "nodeId": "13125:6171",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "f8f15525280e6c38e9b2f7a5a6cb449c22033583",
@@ -5677,20 +5355,6 @@
       "description": "",
       "nodeId": "4085:22514",
       "containingFrame": "Dropdown button"
-    },
-    {
-      "key": "fd6f24be22d7cdd7e8ed92c545f36badc96f51a3",
-      "name": "size=large, state=disabled",
-      "description": "",
-      "nodeId": "13125:6161",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "fe6133c7aefbc723ab6febc4dd7ca41945b6909e",
-      "name": "size=medium (default), state=indeterminate",
-      "description": "",
-      "nodeId": "13125:6140",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "06833b26fe7e1fa574f9995a59da272631af6f13",
@@ -5777,13 +5441,6 @@
       "containingFrame": "Dropdown"
     },
     {
-      "key": "709630535d28e9f681271bc9957a0114ca086859",
-      "name": "_Neutral Colors/Alternatives",
-      "description": "",
-      "nodeId": "10594:12344",
-      "containingFrame": "colors, guidance"
-    },
-    {
       "key": "761be63f020b47327d949586c7878ba1796ff9f1",
       "name": "type=multiple target",
       "description": "",
@@ -5833,13 +5490,6 @@
       "containingFrame": "Dropdown"
     },
     {
-      "key": "b43586240a1225f5cdca8d338bad6c79518dd629",
-      "name": "calender",
-      "description": "",
-      "nodeId": "13230:14667",
-      "containingFrame": "Spacing Token Guidelines"
-    },
-    {
       "key": "b89e6e2020361e8ddc04e44ef3918bc9b8e32245",
       "name": "type=default",
       "description": "",
@@ -5859,20 +5509,6 @@
       "description": "",
       "nodeId": "53:19820",
       "containingFrame": "Pagination"
-    },
-    {
-      "key": "bc1f3e967d4fa292b7623429b7a3d6c19f9ecf59",
-      "name": "Sign-up Portal",
-      "description": "",
-      "nodeId": "10823:81086",
-      "containingFrame": "colors, guidance"
-    },
-    {
-      "key": "bc6c634694cd8ae8a02e5f06c25cc11d6e17749b",
-      "name": "type=header, state=default",
-      "description": "",
-      "nodeId": "11029:34821",
-      "containingFrame": "Surface Color Guidelines"
     },
     {
       "key": "bf9a0bd02cff0cd9d2b64853478d91a4a8c9a7b9",
@@ -5936,13 +5572,6 @@
       "description": "",
       "nodeId": "4587:22228",
       "containingFrame": "Dropdown"
-    },
-    {
-      "key": "fac22e2f5dadf213570804093bfdba2db7d3332f",
-      "name": "Sign-in Portal",
-      "description": "",
-      "nodeId": "10812:14647",
-      "containingFrame": "colors, guidance"
     },
     {
       "key": "621f156d5312373e652b9eddb9d3c572ace5232c",
@@ -6293,13 +5922,6 @@
       "description": "",
       "nodeId": "10:793",
       "containingFrame": "Figure"
-    },
-    {
-      "key": "15e93873ec66ac9863ebdd1ec323503e26697b0e",
-      "name": "type=header, state=default",
-      "description": "",
-      "nodeId": "10812:22412",
-      "containingFrame": "colors, guidance"
     },
     {
       "key": "13ae53c2c87b3a7df33e0c7459e34b50d760b676",
@@ -6757,20 +6379,6 @@
       "containingFrame": "Popovers"
     },
     {
-      "key": "3428ef78ebce93f5a0d3f0472b7bfc40939fe481",
-      "name": "_Neutral Colors/Outline",
-      "description": "",
-      "nodeId": "10594:12331",
-      "containingFrame": "colors, guidance"
-    },
-    {
-      "key": "419d718c4136e296770d4a527ab5292532cd0a17",
-      "name": "_Accent Colors/Schemes8",
-      "description": "",
-      "nodeId": "10588:13223",
-      "containingFrame": "colors, guidance"
-    },
-    {
       "key": "7dce5fb25503c76a3e585d3e6e65935d2007da6f",
       "name": "state=disabled",
       "description": "",
@@ -6783,20 +6391,6 @@
       "description": "",
       "nodeId": "25:635",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "019499a53b05506b521c424dcd59a752251b9e29",
-      "name": "size=medium (default), addon position=append, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6079",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "1294e1c4bd9bae4a36686e0ae3662f31f3df528f",
-      "name": "size=medium (default), state=default",
-      "description": "",
-      "nodeId": "13125:6149",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "171b067f5be6f248bf92916bdd0e955ccfdd7d0a",
@@ -6820,53 +6414,11 @@
       "containingFrame": "Input Group old"
     },
     {
-      "key": "4cb053efa798c383cc627309826548496be4003a",
-      "name": "size=large, state=disabled",
-      "description": "",
-      "nodeId": "13125:6189",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "63555fa6887759ff2329c19dd830759b50e1763f",
-      "name": "size=large, state=default",
-      "description": "",
-      "nodeId": "13125:6180",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "6afd17a1f5e2a401c66c85303dbb1247ae88623b",
-      "name": "size=medium (default), addon position=append, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6239",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "75cf35ba358d077adbbd1f5baf65f0b17d5a4f66",
       "name": "state=default, input=value",
       "description": "",
       "nodeId": "13541:10735",
       "containingFrame": "Form Textarea"
-    },
-    {
-      "key": "830a616661dc31708c200c0fd2b220a66f58a694",
-      "name": "size=medium (default), state=check",
-      "description": "",
-      "nodeId": "13125:6168",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "b9c51f2f6baa9305b4b7f8ab33526b1ddc4935ab",
-      "name": "size=large, addon position=prepend, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6072",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "c2cd27f296841729947fe2bda7ebaa3cc1c78307",
-      "name": "size=small, addon position=both, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6097",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "01dcc9e45c9fbbe53986f6639ec45dbea9f25192",
@@ -6939,46 +6491,11 @@
       "containingFrame": "Dropdown"
     },
     {
-      "key": "0c669ec82374fb91e5e28a232751f179a4d3b3ac",
-      "name": "size=small, addon position=prepend, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6055",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "4b8c5e3cc0a70df1d1da5cec29bff2b4a3b5a4a1",
-      "name": "size=medium (default), addon position=prepend, multiple addons=false",
-      "description": "",
-      "nodeId": "13125:6058",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "6405f9accaebea6f30760d5fdf4a1748b5584b9c",
-      "name": "size=medium (default), state=default",
-      "description": "",
-      "nodeId": "13125:6177",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
-      "key": "68aab38318d94033b758fc775fc6e0e336ca253c",
-      "name": "size=small, addon position=append, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6085",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "89af8dad21010af9f0056d77096239ba285d52b3",
       "name": "state=indeterminate",
       "description": "",
       "nodeId": "53:20956",
       "containingFrame": "Input Group old"
-    },
-    {
-      "key": "de589fc4cb64bc12c5b1156280b9c60086db61b9",
-      "name": "size=large, addon position=prepend, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6231",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "e69bec9ca95372b165af7733fba3a0d61a16f537",
@@ -7016,25 +6533,11 @@
       "containingFrame": "Legacy"
     },
     {
-      "key": "ef99591669abbc4302e0ad327d1448be72d3a504",
-      "name": "size=medium (default), addon position=prepend, multiple addons=true",
-      "description": "",
-      "nodeId": "13125:6068",
-      "containingFrame": "_Obsoleted Input"
-    },
-    {
       "key": "dbb8a22636ea3e3c4297a8044a50b7e64e99f524",
       "name": "state=focus, validation=none",
       "description": "",
       "nodeId": "13662:9128",
       "containingFrame": "Time (no label)"
-    },
-    {
-      "key": "ff2dd85376af907f09acbf8cb332a8d96641995d",
-      "name": "size=small, state=default",
-      "description": "",
-      "nodeId": "13125:6146",
-      "containingFrame": "_Obsoleted Input"
     },
     {
       "key": "0bdfea1c28a4f661acadc5127c698eabeb3fdcfe",
@@ -7063,13 +6566,6 @@
       "description": "",
       "nodeId": "13536:6815",
       "containingFrame": "Scale Radio Button"
-    },
-    {
-      "key": "05321b8a3f8760922abd4beee4b8cb4628745a4b",
-      "name": "state=default, check type=none",
-      "description": "",
-      "nodeId": "82:16564",
-      "containingFrame": "_Form Switch Button"
     },
     {
       "key": "06712143b54b9fe5f0d32f02948224884a4751f8",
@@ -7266,13 +6762,6 @@
       "description": "",
       "nodeId": "13536:98",
       "containingFrame": "Rating Icons"
-    },
-    {
-      "key": "d4b64e49ecc004c8f7acb8e7e82e44db47bb7cb9",
-      "name": "state=disabled, check type=none",
-      "description": "",
-      "nodeId": "82:16566",
-      "containingFrame": "_Form Switch Button"
     },
     {
       "key": "d5d4c122e176822aed423ff573484b22e3245b20",
@@ -7511,27 +7000,6 @@
       "description": "",
       "nodeId": "82:16571",
       "containingFrame": "Form Switch Button"
-    },
-    {
-      "key": "0f9091a9f4423337efa75a7299eed7fd0d277a8b",
-      "name": "layout-blocks/horizontal×10",
-      "description": "-> Horizontal Layout Blocks x10",
-      "nodeId": "174:16442",
-      "containingFrame": ""
-    },
-    {
-      "key": "160f423229c05bac17868be440ea6192eb907a46",
-      "name": "layout-blocks/vertical×7",
-      "description": "↓ Vertical Layout Blocks x7",
-      "nodeId": "174:16552",
-      "containingFrame": ""
-    },
-    {
-      "key": "1accfbbed6f5e8595081e83d3299ef3b770d35f6",
-      "name": "layout-blocks/horizontal×6",
-      "description": "-> Horizontal Layout Blocks x6",
-      "nodeId": "174:16480",
-      "containingFrame": ""
     },
     {
       "key": "1e70d193dd1ebf74aadaac6bc8b45556cf72b8e8",
@@ -8367,13 +7835,6 @@
       "containingFrame": "Logo"
     },
     {
-      "key": "4163818651e15e7288fc16072cdb7d8a94e05744",
-      "name": "type=content, state=default",
-      "description": "",
-      "nodeId": "10812:22417",
-      "containingFrame": "colors, guidance"
-    },
-    {
       "key": "4a81c6aa371a8f58a2e1f6c0703836288c2713b9",
       "name": "Type=Body, Style=Light, Icon=None",
       "description": "",
@@ -8526,13 +7987,6 @@
       "description": "",
       "nodeId": "10:510",
       "containingFrame": "Table/Small Borderless"
-    },
-    {
-      "key": "d934bd68fa4bb0ef2aa4c143c87c6861ce21c409",
-      "name": "type=content, state=hover",
-      "description": "",
-      "nodeId": "10812:22425",
-      "containingFrame": "colors, guidance"
     },
     {
       "key": "ddcf66f62a11013d333299e77e093e88ccfb0979",
@@ -9018,32 +8472,11 @@
       "containingFrame": "Table/Contextual Color"
     },
     {
-      "key": "7c3f1d027b15b1ab368b0acf6746f1079935a72d",
-      "name": "layout-blocks/horizontal×2-2",
-      "description": "-> Horizontal Layout Blocks x2 - ⭯ Nested 2",
-      "nodeId": "174:16511",
-      "containingFrame": ""
-    },
-    {
-      "key": "7d385764737150824df18cab192a402f5ff173fe",
-      "name": "layout-blocks/vertical×8",
-      "description": "↓ Vertical Layout Blocks x8",
-      "nodeId": "174:16543",
-      "containingFrame": ""
-    },
-    {
       "key": "80fcd1e18ff37a91e01ae9fec14ca3e0eb7e7a4a",
       "name": "state=hover, selected=false",
       "description": "",
       "nodeId": "4209:22961",
       "containingFrame": "Tab Item"
-    },
-    {
-      "key": "87d246c8d859325ac88ca039bb633ca5f77a98a3",
-      "name": "type=content, state=hover",
-      "description": "",
-      "nodeId": "11029:34834",
-      "containingFrame": "Surface Color Guidelines"
     },
     {
       "key": "87deff693e92756620ae05ad08e946dc88b89f58",
@@ -9058,13 +8491,6 @@
       "description": "",
       "nodeId": "500:1736",
       "containingFrame": "Table/Contextual Color"
-    },
-    {
-      "key": "91e7b6ca3ed9360350bca3667e64e741cd73507a",
-      "name": "layout-blocks/horizontal×2",
-      "description": "-> Horizontal Layout Blocks x2",
-      "nodeId": "174:16517",
-      "containingFrame": ""
     },
     {
       "key": "9f4dd094a6212ba99bc4a8a671578e6b1a1e81b1",
@@ -9116,20 +8542,6 @@
       "containingFrame": "Pagination"
     },
     {
-      "key": "efc23b8e03c9954be325de327929f706bce667cb",
-      "name": "type=content, state=default",
-      "description": "",
-      "nodeId": "11029:34826",
-      "containingFrame": "Surface Color Guidelines"
-    },
-    {
-      "key": "e9f042c8ae310b21e1e1801c730c2b890eec6bb8",
-      "name": "layout-blocks/horizontal×1",
-      "description": "-> Horizontal Layout Blocks x1",
-      "nodeId": "174:16520",
-      "containingFrame": ""
-    },
-    {
       "key": "f75a06f31ed6e366ad038f3f3b32fef3177f2a55",
       "name": "State=Focused, Style=Success",
       "description": "",
@@ -9151,150 +8563,10 @@
       "containingFrame": "Table/Contextual Color"
     },
     {
-      "key": "385fe28c1b0099fbf48a63b0b1c0a78ecefda36b",
-      "name": "layout-blocks/horizontal×7",
-      "description": "-> Horizontal Layout Blocks x7",
-      "nodeId": "174:16472",
-      "containingFrame": ""
-    },
-    {
-      "key": "4339f5524c2c2ac612a2a58d494f433036534774",
-      "name": "layout-blocks/vertical×5",
-      "description": "↓ Vertical Layout Blocks x5",
-      "nodeId": "174:16567",
-      "containingFrame": ""
-    },
-    {
-      "key": "4a1baa687489d316fb9f8d298736cbe8f0e08e28",
-      "name": "layout-blocks/vertical×10",
-      "description": "↓ Vertical Layout Blocks x10",
-      "nodeId": "174:16522",
-      "containingFrame": ""
-    },
-    {
-      "key": "7531e8ae30053aa5b57fc862d3a897cc737a6f06",
-      "name": "layout-blocks/vertical×4",
-      "description": "↓ Vertical Layout Blocks x4",
-      "nodeId": "174:16578",
-      "containingFrame": ""
-    },
-    {
-      "key": "84d13d26e1e59403b79d5d0d966ba8d718ca4db3",
-      "name": "layout-blocks/vertical×2",
-      "description": "↓ Vertical Layout Blocks x2",
-      "nodeId": "174:16597",
-      "containingFrame": ""
-    },
-    {
-      "key": "88d149f4fcec7abe4bb736f00c5481f08429047f",
-      "name": "layout-blocks/horizontal×3",
-      "description": "-> Horizontal Layout Blocks x3",
-      "nodeId": "174:16507",
-      "containingFrame": ""
-    },
-    {
-      "key": "8ace2b76cb35453527466af0144cbb11ae14b862",
-      "name": "layout-blocks/horizontal×2-1",
-      "description": "-> Horizontal Layout Blocks x2 - ⭯ Nested 1",
-      "nodeId": "174:16514",
-      "containingFrame": ""
-    },
-    {
-      "key": "90146372670ead095da2af2e02e646ced549b38a",
-      "name": "layout-blocks/vertical×3",
-      "description": "↓ Vertical Layout Blocks x3",
-      "nodeId": "174:16587",
-      "containingFrame": ""
-    },
-    {
       "key": "9363b0ee8f4bf39a4470bcb84554ec0f316fc0b5",
       "name": "swap-freesize",
       "description": "This instance used to swap block and also resize block",
       "nodeId": "174:16604",
-      "containingFrame": ""
-    },
-    {
-      "key": "9df41c28d9fa2bada293b90df0a26783a1aa8130",
-      "name": "layout-blocks/base",
-      "description": "⇄ Base Swap Block\n↑ Swap me with another ◇ component instance or ↓ Vertical / -> Horizontal Layout Blocks\n🛈 Tips: To swap this instance to a new one:\n- Open Assets tab or press Shift + i to search for component.\n- Press & Hold: Ctrl + Alt then ⛶ Drag & Drop component instance to this base block to quick replace",
-      "nodeId": "174:16602",
-      "containingFrame": ""
-    },
-    {
-      "key": "a83a610a692d2fb23d42e13fe08a8f32edb200d1",
-      "name": "layout-blocks/horizontal×8",
-      "description": "-> Horizontal Layout Blocks x8",
-      "nodeId": "174:16463",
-      "containingFrame": ""
-    },
-    {
-      "key": "a994f5149478ac721208c059f6a52370a501ebf5",
-      "name": "layout-blocks/horizontal×5",
-      "description": "-> Horizontal Layout Blocks x5",
-      "nodeId": "174:16487",
-      "containingFrame": ""
-    },
-    {
-      "key": "ab30d257bc74753a50acf651b2f3d1e79a45fa5f",
-      "name": "layout-blocks/horizontal×3-1",
-      "description": "-> Horizontal Layout Blocks x3 - ⭯ Nested 1",
-      "nodeId": "174:16503",
-      "containingFrame": ""
-    },
-    {
-      "key": "ac190b1fc0b102013d6f9653a557860b4d6a203d",
-      "name": "layout-blocks/vertical×9",
-      "description": "↓ Vertical Layout Blocks x9",
-      "nodeId": "174:16533",
-      "containingFrame": ""
-    },
-    {
-      "key": "c1daef04fb7ce47b21688fecc26a74ed84c42119",
-      "name": "layout-blocks/vertical×4-1",
-      "description": "↓ Vertical Layout Blocks x4 - ⭯ Nested 1",
-      "nodeId": "174:16573",
-      "containingFrame": ""
-    },
-    {
-      "key": "d20e08cf6345b5a8b06bf53fd36e14d96c640bf6",
-      "name": "layout-blocks/vertical×6",
-      "description": "↓ Vertical Layout Blocks x6",
-      "nodeId": "174:16560",
-      "containingFrame": ""
-    },
-    {
-      "key": "dfee45a3c5cc756c14a4b3c2cc5d2f17a34b158e",
-      "name": "layout-blocks/horizontal×9",
-      "description": "-> Horizontal Layout Blocks x9",
-      "nodeId": "174:16453",
-      "containingFrame": ""
-    },
-    {
-      "key": "e165d2b6bade43da483d0415fbfe1220ae1fda9e",
-      "name": "layout-blocks/horizontal×4",
-      "description": "-> Horizontal Layout Blocks x4",
-      "nodeId": "174:16498",
-      "containingFrame": ""
-    },
-    {
-      "key": "ea5d889ecf1ad3a29e14f072c3b26e46f172d7cd",
-      "name": "layout-blocks/vertical×1",
-      "description": "↓ Vertical Layout Blocks x1",
-      "nodeId": "174:16600",
-      "containingFrame": ""
-    },
-    {
-      "key": "f6acd600a537c99282af73eb95a1033f2d040b3a",
-      "name": "layout-blocks/vertical×3-1",
-      "description": "↓ Vertical Layout Blocks x3 - ⭯ Nested 1",
-      "nodeId": "174:16583",
-      "containingFrame": ""
-    },
-    {
-      "key": "fbc380607b5a0b166ccb6f929001bccb02148202",
-      "name": "layout-blocks/vertical×2-2",
-      "description": "↓ Vertical Layout Blocks x2 - ⭯ Nested 2",
-      "nodeId": "174:16591",
       "containingFrame": ""
     },
     {
@@ -9730,13 +9002,6 @@
       "description": "",
       "nodeId": "72:16179",
       "containingFrame": "Navbar Components"
-    },
-    {
-      "key": "94265d729ecfd22309a073a7ac784ca94698b4de",
-      "name": "Tutor Profile",
-      "description": "",
-      "nodeId": "10812:15359",
-      "containingFrame": "colors, guidance"
     },
     {
       "key": "95fac2f4a5e99012755d050c07800265a6ceca27",

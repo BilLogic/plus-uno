@@ -116,18 +116,46 @@ function postToSlack(blocks, text) {
 }
 
 /**
- * Fetch all components from the Figma file
+ * Non-DS component patterns to ignore.
+ * These are Figma utility frames, documentation, deprecated items, etc.
+ */
+const IGNORED_COMPONENT_PATTERNS = [
+  /^layout-blocks\//i,       // Figma grid helper components
+  /^_/,                       // Internal/deprecated (e.g., _Obsoleted Input)
+  /guidelines$/i,             // Documentation frames (e.g., Spacing Token Guidelines)
+  /^colors,/i,                // Color documentation
+  /^draft$/i,                 // Work-in-progress items
+];
+
+function isIgnoredComponent(component) {
+  const name = component.name || '';
+  const frame = component.containingFrame || '';
+  // Skip components with no containing frame (utility components)
+  if (!frame && !name) return true;
+  // Skip by name pattern
+  if (IGNORED_COMPONENT_PATTERNS.some(p => p.test(name))) return true;
+  // Skip by frame pattern
+  if (IGNORED_COMPONENT_PATTERNS.some(p => p.test(frame))) return true;
+  return false;
+}
+
+/**
+ * Fetch all components from the Figma file (filtered to DS components only)
  */
 async function fetchComponents() {
   const result = await figmaGet(`/files/${FIGMA_FILE_KEY}/components`);
   const components = result.meta?.components || [];
-  return components.map(c => ({
+  const mapped = components.map(c => ({
     key: c.key,
     name: c.name,
     description: c.description || '',
     nodeId: c.node_id,
     containingFrame: c.containing_frame?.name || ''
   }));
+  const filtered = mapped.filter(c => !isIgnoredComponent(c));
+  const ignored = mapped.length - filtered.length;
+  if (ignored > 0) console.log(`Filtered out ${ignored} non-DS components`);
+  return filtered;
 }
 
 /**
