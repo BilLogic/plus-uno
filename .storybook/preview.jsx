@@ -267,6 +267,19 @@ const preview = {
       if (typeof window !== 'undefined' && window.__setAIContext) {
         setTimeout(() => window.__setAIContext(activeContext), 0);
       }
+
+      // Disable state changes/interactivity for all docs examples EXCEPT 'Interactive'
+      if (
+        context.name !== 'Interactive' && 
+        (context.title.startsWith('Components/') || context.title.startsWith('Forms/'))
+      ) {
+         return (
+           <div style={{ pointerEvents: 'none' }}>
+             <Story />
+           </div>
+         );
+      }
+
       return <Story />;
     },
   ],

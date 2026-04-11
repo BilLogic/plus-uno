@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Tooltip as BSTooltip } from 'react-bootstrap';
+import { OverlayTrigger, Overlay, Tooltip as BSTooltip } from 'react-bootstrap';
 import './Tooltip.scss';
 
 const Tooltip = ({
@@ -10,11 +10,15 @@ const Tooltip = ({
     size = 'default',
     children,
     id,
-    className = ''
+    className = '',
+    show
 }) => {
+    const uniqueId = useRef(`tooltip-${Math.random().toString(36).substring(2, 9)}`);
+    const [targetElement, setTargetElement] = useState(null);
+
     const renderTooltip = (props) => (
         <BSTooltip
-            id={id || `tooltip-${placement}`}
+            id={id || uniqueId.current}
             {...props}
             className={`plus-tooltip-${size} ${className}`}
             data-tooltip-size={size}
@@ -22,6 +26,17 @@ const Tooltip = ({
             {text}
         </BSTooltip>
     );
+
+    if (show !== undefined) {
+        return (
+            <>
+                {React.cloneElement(children, { ref: setTargetElement })}
+                <Overlay target={targetElement} show={show} placement={placement}>
+                    {renderTooltip}
+                </Overlay>
+            </>
+        );
+    }
 
     return (
         <OverlayTrigger
@@ -45,7 +60,8 @@ Tooltip.propTypes = {
     size: PropTypes.oneOf(['small', 'default', 'large']),
     children: PropTypes.node.isRequired,
     id: PropTypes.string,
-    className: PropTypes.string
+    className: PropTypes.string,
+    show: PropTypes.bool
 };
 
 export default Tooltip;

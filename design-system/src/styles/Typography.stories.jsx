@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Typography',
-    tags: ['autodocs'],
+    tags: ['!dev'],
 };
 
 const TypeScale = ({ category, description, examples }) => (
@@ -12,7 +12,7 @@ const TypeScale = ({ category, description, examples }) => (
         backgroundColor: 'var(--color-surface-container-low)',
         borderRadius: '8px'
     }}>
-        <h3 className="h4">{category}</h3>
+        <h4 className="h4">{category}</h4>
         <p className="body2-txt" style={{ marginBottom: '16px' }}>{description}</p>
 
         {examples.map((ex, i) => (
@@ -28,10 +28,8 @@ const TypeScale = ({ category, description, examples }) => (
     </div>
 );
 
-export const TypographyScales = () => (
+export const TypographyDisplay = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Typography Scales</h2>
-
         <TypeScale
             category="Display"
             description="Largest text for hero sections"
@@ -42,7 +40,11 @@ export const TypographyScales = () => (
                 { class: 'display4-txt', label: 'Display 4', size: '3.5rem (56px)' },
             ]}
         />
+    </div>
+);
 
+export const TypographyHeadlines = () => (
+    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
         <TypeScale
             category="Headlines"
             description="Main headings for page sections"
@@ -52,7 +54,11 @@ export const TypographyScales = () => (
                 { class: 'h3', label: 'H3', size: '1.75rem (28px)', weight: 'Bold' },
             ]}
         />
+    </div>
+);
 
+export const TypographyTitles = () => (
+    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
         <TypeScale
             category="Titles"
             description="Subheadings and card titles"
@@ -62,7 +68,11 @@ export const TypographyScales = () => (
                 { class: 'h6', label: 'H6', size: '1rem (16px)', weight: 'Semibold' },
             ]}
         />
+    </div>
+);
 
+export const TypographyBody = () => (
+    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
         <TypeScale
             category="Body"
             description="Content text"

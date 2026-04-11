@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Colors',
-    tags: ['autodocs'],
+    tags: ['!dev'],
 };
 
 const ColorRow = ({ token, value, description, color }) => (
@@ -41,7 +41,6 @@ const ColorTable = ({ headers, rows, hasColor = true }) => (
 
 export const Overview = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 className="h1" style={{ marginBottom: '24px' }}>Colors</h1>
         <p className="body1-txt" style={{ marginBottom: '32px' }}>
             PLUS follows Material Design 3 color guidance. All colors follow Material Design 3 roles and are sourced from Figma design system variables.
         </p>
@@ -50,9 +49,7 @@ export const Overview = () => (
 
 export const AccentColors = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Accent Colors</h2>
-
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Primary</h3>
+        <h4 className="h3" style={{ marginBottom: '16px' }}>Primary</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -64,7 +61,7 @@ export const AccentColors = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Secondary</h3>
+        <h4 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Secondary</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -76,7 +73,7 @@ export const AccentColors = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Tertiary</h3>
+        <h4 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Tertiary</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -92,9 +89,7 @@ export const AccentColors = () => (
 
 export const StatusColors = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Status Colors</h2>
-
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Success</h3>
+        <h4 className="h3" style={{ marginBottom: '16px' }}>Success</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -106,7 +101,7 @@ export const StatusColors = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Danger</h3>
+        <h4 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Danger</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -118,7 +113,7 @@ export const StatusColors = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Warning</h3>
+        <h4 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Warning</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -134,9 +129,7 @@ export const StatusColors = () => (
 
 export const NeutralColors = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Neutral Colors</h2>
-
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Text</h3>
+        <h4 className="h3" style={{ marginBottom: '16px' }}>Text</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[
@@ -145,7 +138,7 @@ export const NeutralColors = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Outline</h3>
+        <h4 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Outline</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
             rows={[

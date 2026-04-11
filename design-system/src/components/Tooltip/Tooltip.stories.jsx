@@ -43,63 +43,84 @@ export default {
     },
 };
 
-const row = { display: 'flex', gap: '16px', padding: '50px', flexWrap: 'wrap' };
+const containerStyle = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    padding: '40px 20px',
+    backgroundColor: 'var(--color-surface-container-lowest)',
+    borderRadius: '12px',
+    border: '1px solid var(--color-outline-variant)',
+};
+
+const blockStyle = {
+    margin: '40px 60px',
+};
 
 function TooltipVariantsDemos() {
     return (
-        <>
-            <Tooltip text="Tooltip on top" placement="top">
-                <Button text="Top" />
-            </Tooltip>
-            <Tooltip text="Tooltip on bottom" placement="bottom">
-                <Button text="Bottom" />
-            </Tooltip>
-            <Tooltip text="Tooltip on left" placement="left">
-                <Button text="Left" />
-            </Tooltip>
-            <Tooltip text="Tooltip on right" placement="right">
-                <Button text="Right" />
-            </Tooltip>
-        </>
+        <div style={containerStyle}>
+            <div style={blockStyle}>
+                <Tooltip text="Tooltip on top" placement="top" show={true}>
+                    <Button text="Top" />
+                </Tooltip>
+            </div>
+            <div style={blockStyle}>
+                <Tooltip text="Tooltip on bottom" placement="bottom" show={true}>
+                    <Button text="Bottom" />
+                </Tooltip>
+            </div>
+            <div style={blockStyle}>
+                <Tooltip text="Tooltip on left" placement="left" show={true}>
+                    <Button text="Left" />
+                </Tooltip>
+            </div>
+            <div style={blockStyle}>
+                <Tooltip text="Tooltip on right" placement="right" show={true}>
+                    <Button text="Right" />
+                </Tooltip>
+            </div>
+        </div>
     );
 }
 
 function TooltipSizesDemos() {
     return (
-        <>
-            <Tooltip text="Small tooltip" size="small" placement="top">
-                <Button text="Small" />
-            </Tooltip>
-            <Tooltip text="Default tooltip" size="default" placement="top">
-                <Button text="Default" />
-            </Tooltip>
-            <Tooltip text="Large tooltip" size="large" placement="top">
-                <Button text="Large" />
-            </Tooltip>
-        </>
+        <div style={containerStyle}>
+            <div style={blockStyle}>
+                <Tooltip text="Small tooltip" size="small" placement="top" show={true}>
+                    <Button text="Small" />
+                </Tooltip>
+            </div>
+            <div style={blockStyle}>
+                <Tooltip text="Default tooltip" size="default" placement="top" show={true}>
+                    <Button text="Default" />
+                </Tooltip>
+            </div>
+            <div style={blockStyle}>
+                <Tooltip text="Large tooltip" size="large" placement="top" show={true}>
+                    <Button text="Large" />
+                </Tooltip>
+            </div>
+        </div>
     );
 }
 
 export const Styles = () => (
-    <div style={row}>
+    <div style={{ marginBottom: '60px' }}>
         <TooltipVariantsDemos />
     </div>
 );
 
 export const Sizes = () => (
-    <div style={row}>
+    <div style={{ marginBottom: '60px' }}>
         <TooltipSizesDemos />
     </div>
 );
 
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-        <div style={row}>
-            <TooltipVariantsDemos />
-        </div>
-        <div style={row}>
-            <TooltipSizesDemos />
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
+        <TooltipVariantsDemos />
+        <TooltipSizesDemos />
     </div>
 );
 

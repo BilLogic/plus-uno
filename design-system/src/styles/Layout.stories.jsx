@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Layout',
-    tags: ['autodocs'],
+    tags: ['!dev'],
 };
 
 const TokenTable = ({ headers, rows }) => (
@@ -29,7 +29,6 @@ const TokenTable = ({ headers, rows }) => (
 
 export const Overview = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 className="h1" style={{ marginBottom: '24px' }}>Layout</h1>
         <p className="body1-txt" style={{ marginBottom: '32px' }}>
             Layout tokens define breakpoints, container sizes, and spacing tokens for responsive design.
         </p>
@@ -38,7 +37,6 @@ export const Overview = () => (
 
 export const Columns = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>12-Column Fluid Grid</h2>
         <p className="body1-txt" style={{ marginBottom: '24px' }}>
             The PLUS Design System uses a <strong>fluid 12-column grid</strong> that automatically adapts to the content container width.
         </p>
@@ -67,7 +65,7 @@ export const Columns = () => (
             ))}
         </div>
 
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Key Dimensions</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Key Dimensions</h4>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -78,7 +76,7 @@ export const Columns = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Column Reference Values</h3>
+        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Column Reference Values</h4>
         <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
             Values at the <strong>minimum</strong> of each breakpoint:
         </p>
@@ -122,7 +120,7 @@ export const Columns = () => (
             </tbody>
         </table>
 
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Content Width Calculation</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Content Width Calculation</h4>
         <pre style={{
             backgroundColor: 'var(--color-surface-container-low)',
             padding: '16px',
@@ -135,7 +133,7 @@ Large:   1024 - 32 - 164 (sidebar) - 16 (gap) - 64 = 748px
 X-Large: 1440 - 32 - 164 - 16 - 64 = 1164px`}
         </pre>
 
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Common Column Usage</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Common Column Usage</h4>
         <TokenTable
             headers={['Component', 'Typical Width', 'Notes']}
             rows={[
@@ -150,7 +148,6 @@ X-Large: 1440 - 32 - 164 - 16 - 64 = 1164px`}
 
 export const Breakpoints = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Breakpoints</h2>
         <TokenTable
             headers={['Token Name', 'Value', 'Description']}
             rows={[
@@ -168,9 +165,8 @@ export const Breakpoints = () => (
 
 export const ElementSpacings = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Element Spacings</h2>
 
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Padding</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Padding</h4>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -183,7 +179,7 @@ export const ElementSpacings = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Gap</h3>
+        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Gap</h4>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -194,7 +190,7 @@ export const ElementSpacings = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Radius</h3>
+        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Radius</h4>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -209,7 +205,6 @@ export const ElementSpacings = () => (
 
 export const CardSpacings = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Card Spacings</h2>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -235,7 +230,6 @@ export const CardSpacings = () => (
 
 export const SectionSpacings = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Section Spacings</h2>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -258,7 +252,6 @@ export const SectionSpacings = () => (
 
 export const ModalSpacings = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Modal Spacings</h2>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
@@ -285,12 +278,11 @@ export const ModalSpacings = () => (
 
 export const CornerRadiusApplication = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Corner Radius Application</h2>
         <p className="body1-txt" style={{ marginBottom: '32px' }}>
             Corner radius should match padding/gap size tier.
         </p>
 
-        <h3 className="h3" style={{ marginBottom: '16px' }}>Elements Layer</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Elements Layer</h4>
         <TokenTable
             headers={['Token', 'Value', 'Use With', 'Best For']}
             rows={[
@@ -301,7 +293,7 @@ export const CornerRadiusApplication = () => (
             ]}
         />
 
-        <h3 className="h3" style={{ marginBottom: '16px', marginTop: '32px' }}>Cards Layer</h3>
+        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Cards Layer</h4>
         <TokenTable
             headers={['Token', 'Value', 'Use With', 'Best For']}
             rows={[
@@ -315,7 +307,6 @@ CornerRadiusApplication.storyName = 'Corner Radius Application';
 
 export const PageSpacings = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Page Spacings</h2>
         <TokenTable
             headers={['Token', 'Value', 'Description']}
             rows={[
