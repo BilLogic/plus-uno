@@ -721,10 +721,10 @@ const buildResponse = (actionId, pageContext) => {
                         💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
                     </p>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
-                        <OnboardingLinkItem num="1" title={<span>🎨 <strong>Cheat Sheet</strong></span>} desc="Design Tokens & Component Props" path=".agent/assets/PLUS_CHEAT_SHEET.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
-                        <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path=".agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
-                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/project/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
-                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/project/conventions.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                        <OnboardingLinkItem num="1" title={<span>🎨 <strong>Cheat Sheet</strong></span>} desc="Design Tokens & Component Props" path="docs/context/design-system/components/cheat-sheet.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
+                        <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path="docs/context/design-system/components/layout-cheat-sheet.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
+                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/context/product/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
+                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/context/conventions/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
                     </ul>
                 </div>
             );

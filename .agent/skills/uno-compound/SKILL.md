@@ -2,7 +2,7 @@
 name: uno-compound
 description: >
   Document a solution or learning from work just completed. Creates a searchable
-  solution doc in docs/solutions/. Use when the user says "document this",
+  solution doc in docs/knowledge/lessons/. Use when the user says "document this",
   "write it up", "save this learning", "compound", or after fixing a non-trivial
   bug, discovering a gotcha, or making a design decision worth preserving.
 user-invocable: true
@@ -39,7 +39,7 @@ What was done? What broke? What was the root cause? What was the fix?
 
 ### 2. Create Solution Doc
 
-Write to `docs/solutions/{category}/` using the template in `examples/solution-doc-template.md`. Categories: `ui-bugs`, `integration-issues`, `agent-infrastructure`, `token-issues`.
+Write to `docs/knowledge/lessons/{category}/` using the template in `examples/solution-doc-template.md`. Categories: `ui-bugs`, `integration-issues`, `agent-infrastructure`, `token-issues`.
 
 For the full schema and field descriptions, see `references/solution-schema.md`.
 

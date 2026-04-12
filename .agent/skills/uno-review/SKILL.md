@@ -50,7 +50,7 @@ Suggest once per work session — do not repeat if declined.
 ### Conventions
 
 - [ ] **File naming** — PascalCase components, kebab-case directories
-- [ ] **PLUS terminology** — no generic web terms (see `docs/foundations/terminology.md`)
+- [ ] **PLUS terminology** — no generic web terms (see `docs/context/conventions/terminology.md`)
 - [ ] **Storybook validated** — stories render correctly if component behavior was touched
 - [ ] **No new dependencies** — unless explicitly approved
 

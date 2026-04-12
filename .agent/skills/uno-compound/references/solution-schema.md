@@ -14,7 +14,7 @@ Create a solution doc after:
 Do NOT create a solution doc for:
 
 - Routine changes (updating text, adding a straightforward component)
-- Issues already documented in `docs/project/conventions.md`
+- Issues already documented in `docs/context/conventions/coding.md`
 
 ## What Makes a Good Solution Doc
 
@@ -54,9 +54,9 @@ root_cause: "Why it happened"                        # Optional — string
 
 ## File Location
 
-Solution docs go in `docs/solutions/{category}/` using kebab-case filenames:
+Solution docs go in `docs/knowledge/lessons/{category}/` using kebab-case filenames:
 
 ```
-docs/solutions/ui-bugs/2026-03-23-badge-color-token-mismatch.md
-docs/solutions/build-errors/2026-03-20-vite-scss-deprecation-warning.md
+docs/knowledge/lessons/ui-bugs/2026-03-23-badge-color-token-mismatch.md
+docs/knowledge/lessons/build-errors/2026-03-20-vite-scss-deprecation-warning.md
 ```

@@ -51,3 +51,4 @@ prototyping/playground/*/
 
 # Figma automation temp files
 .figma-sync-context/
+.agent/handoffs/

@@ -25,11 +25,11 @@ npm run dev          # Marketplace app → localhost:3000
 ## Agent Workflow
 
 All coding agents (Claude Code, Cursor, Windsurf) read `AGENTS.md` as the entry point. It covers:
-- Product context → `docs/project/`
+- Product context → `docs/context/product/`
 - Design system modes → `.agent/SKILL.md`
 - Forbidden patterns, skills, commands, progressive loading
 
-See `docs/project/setup-guide.md` for full onboarding.
+See `docs/setup-guide.md` for full onboarding.
 
 ## Tech Stack
 
@@ -50,9 +50,10 @@ React 19 · React-Bootstrap 2.10 · Bootstrap 5.3 · Vite 6 · Storybook 10 · S
 
 ## Documentation
 
-- `docs/project/plus-app.md` — PLUS product landscape (mission, users, features, flows)
-- `docs/project/plus-uno.md` — This repo's structure and inventory
-- `docs/project/conventions.md` — File naming, imports, git, gotchas
-- `docs/design-system/` — 23 consolidated DS docs (overview, components, tokens, modes, guides)
-- `docs/foundations/` — PLUS terminology, tech stack, context levels
-- `docs/solutions/` — Compound loop (documented learnings)
+- `docs/context/product/plus-app.md` — PLUS product landscape (mission, users, features, flows)
+- `docs/context/product/plus-uno.md` — This repo's structure and inventory
+- `docs/context/conventions/coding.md` — File naming, imports, git, gotchas
+- `docs/context/design-system/` — DS foundations, components, styles, conventions
+- `docs/context/conventions/terminology.md` — PLUS terminology
+- `docs/context/conventions/tech-stack.md` — Tech stack
+- `docs/knowledge/lessons/` — Compound loop (documented learnings)
