@@ -1,3 +1,4 @@
+<!-- Tier: 2 -->
 ---
 domain: ui-patterns
 type: lesson

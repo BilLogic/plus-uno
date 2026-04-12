@@ -1,3 +1,4 @@
+<!-- Tier: 2 -->
 ---
 domain: agent-patterns
 type: lesson

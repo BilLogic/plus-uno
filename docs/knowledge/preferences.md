@@ -1,3 +1,4 @@
+<!-- Tier: 2 -->
 ---
 domain: preferences
 type: preference
@@ -36,6 +37,7 @@ tags: [conventions, taste]
 - Use PLUS components first, fall back to generic React-Bootstrap when no PLUS equivalent exists
 - Never introduce non-Bootstrap UI frameworks
 
-## Sentence case for UI labels
-- All UI labels, headings, button text, menu items, and navigation items use sentence case
-- Example: "Session details" not "Session Details", "View all students" not "View All Students"
+## Sentence case for UI labels, title case for page titles
+- UI labels, buttons, and menu items: sentence case ("Session details", "View all students")
+- Page titles and top-level navigation: title case ("Student Overview", "Tutor Dashboard")
+- See `docs/context/design-system/foundations/content-voice.md` for full rules

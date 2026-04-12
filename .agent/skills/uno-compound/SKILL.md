@@ -39,7 +39,16 @@ What was done? What broke? What was the root cause? What was the fix?
 
 ### 2. Create Solution Doc
 
-Write to `docs/knowledge/lessons/{category}/` using the template in `examples/solution-doc-template.md`. Categories: `ui-bugs`, `integration-issues`, `agent-infrastructure`, `token-issues`.
+Append an atomic entry to the appropriate file in `docs/knowledge/lessons/`. Match by domain:
+
+| Domain | File |
+|--------|------|
+| DS compliance, tokens, forbidden patterns | `lessons/ds-compliance.md` |
+| Storybook, Netlify, Figma, MCP | `lessons/integration.md` |
+| Agent infra, skills, context loading | `lessons/agent-patterns.md` |
+| React, Vite, UI architecture | `lessons/ui-patterns.md` |
+
+Use the atomic entry format (YAML frontmatter + markdown body). See `references/solution-schema.md` for field descriptions.
 
 For the full schema and field descriptions, see `references/solution-schema.md`.
 

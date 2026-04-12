@@ -1,3 +1,4 @@
+<!-- Tier: 2 -->
 ---
 domain: decisions
 type: adr
@@ -50,9 +51,10 @@ tags: [architecture, conventions]
 
 ## ADR-007: Agent-agnostic skills under .agent/skills/
 - **Date**: 2026-03-21
-- **Status**: Active
+- **Status**: Amended (2026-04-11)
 - **Context**: Skills in `.claude/commands/` only work in Claude Code. Cursor and Windsurf agents cannot invoke them. Platform-specific frontmatter limits portability.
-- **Decision**: All skills under `.agent/skills/` with platform-agnostic SKILL.md files. Each skill has SKILL.md + references/ + examples/ + scripts/. No Claude-specific frontmatter in shared files.
+- **Decision**: All skills under `.agent/skills/` with platform-agnostic SKILL.md files. Each skill has SKILL.md + references/ + examples/ + scripts/.
+- **Amendment (2026-04-11)**: Skill frontmatter MAY include `allowed-tools`, `context`, `agent`, and `disable-model-invocation` fields. These are treated as hints — Claude Code enforces them natively; other platforms ignore unknown frontmatter gracefully. This is preferred over maintaining separate platform-specific wrappers.
 - **Source**: docs/plans/2026-03-21-004-feat-agent-infrastructure-consolidated-plan.md
 
 ## ADR-008: Compound loop for cross-session learning

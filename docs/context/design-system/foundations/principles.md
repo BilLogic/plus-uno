@@ -1,4 +1,4 @@
-<!-- Tier: 2 -->
+<!-- Tier: 1 -->
 
 # Design Principles
 

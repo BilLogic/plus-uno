@@ -4,19 +4,21 @@ This document defines what loads when, with token budgets and tier membership.
 
 ## Tier 1: Always-Loaded (Session Start)
 
-Loaded via `AGENTS.md` plain "See" references. Target: **under 200 lines resolved**.
+AGENTS.md itself is the always-loaded document: **94 lines, under the 200-line budget.**
 
-| Reference | File | ~Lines | ~Tokens |
-|-----------|------|--------|---------|
-| Identity | `docs/context/agent-persona.md` | 35 | 200 |
-| Product | `docs/context/product/plus-app.md` | 70 | 400 |
-| Conventions | `docs/context/conventions/coding.md` | 100 | 500 |
-| Terminology | `docs/context/conventions/terminology.md` | 40 | 200 |
-| Principles | `docs/context/design-system/foundations/principles.md` | 35 | 200 |
-| Knowledge Index | `docs/knowledge/INDEX.md` | 30 | 150 |
-| **Total** | | **~310** | **~1,650** |
+It contains plain "See" references to these Tier 1 context files. "See" references are **lazy-loaded** — agents read them on first relevant mention, not all at session start. This keeps the initial context small while making authoritative context discoverable.
 
-Note: AGENTS.md itself is ~94 lines. "See" references are lazy-loaded by convention — agents load them as needed, not all at once. The 200-line budget refers to AGENTS.md itself.
+| Reference | File | ~Lines | ~Tokens | Marker |
+|-----------|------|--------|---------|--------|
+| Identity | `docs/context/agent-persona.md` | 35 | 200 | Tier 1 |
+| Product | `docs/context/product/plus-app.md` | 70 | 400 | Tier 1 |
+| Conventions | `docs/context/conventions/coding.md` | 100 | 500 | Tier 1 |
+| Terminology | `docs/context/conventions/terminology.md` | 40 | 200 | Tier 1 |
+| Principles | `docs/context/design-system/foundations/principles.md` | 35 | 200 | Tier 1 |
+| Knowledge Index | `docs/knowledge/INDEX.md` | 30 | 150 | Tier 1 |
+| **Total available** | | **~310** | **~1,650** | |
+
+These files are marked `<!-- Tier: 1 -->` and are the authoritative product/conventions/identity truth. They differ from Tier 2 in that they are referenced from AGENTS.md (always-visible) rather than from skill SKILL.md files (skill-triggered).
 
 ## Tier 2: On-Demand (Skill-Triggered)
 

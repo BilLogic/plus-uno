@@ -1,4 +1,4 @@
-<!-- Tier: 2 -->
+<!-- Tier: 1 -->
 # PLUS Terminology
 
 Use these terms consistently across all design system work, prototypes, and documentation. Do not substitute generic web terms.
