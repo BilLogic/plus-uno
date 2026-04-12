@@ -4,11 +4,11 @@
 
 Use this checklist to prevent `.agent` guidance from going stale.
 
-## A. Mode and Routing Integrity
+## A. Skill Routing Integrity
 
-- [ ] `.agent/SKILL.md` still lists exactly five modes.
-- [ ] Routing questions remain present verbatim.
-- [ ] Each mode file path in `references/` exists.
+- [ ] `.agent/SKILL.md` still lists exactly six skills (research, plan, prototype, review, post, compound).
+- [ ] Routing logic table maps signals to correct skills.
+- [ ] Each skill SKILL.md path in `.agent/skills/*/SKILL.md` exists.
 
 ## B. Path Accuracy
 

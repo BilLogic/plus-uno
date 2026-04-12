@@ -34,7 +34,7 @@ For exhaustive lookup paths/globs/commands, load `docs/context/design-system/ind
 - `scripts/sync-figma-tokens.js`
 - `scripts/generate-all-tokens.js`
 - `package.json` scripts `sync:tokens`, `generate:tokens`
-- `.github/workflows/sync-figma-tokens.yml`
+- CI token sync workflow (planned — not yet created)
 
 2. Component creation/update patterns
 - `design-system/src/components/*`

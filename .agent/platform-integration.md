@@ -16,13 +16,17 @@ The plus-uno project uses `AGENTS.md` at the project root as the canonical cross
 ## Architecture
 
 ```
-AGENTS.md (cross-agent entry point — product context, forbidden patterns, skills, commands)
-    ↓
-.agent/SKILL.md (design system routing — 6 modes, component discovery, critical rules)
-    ↓
-.agent/AGENT.md (identity, skills table, grounding rules, foundations)
-    ↓
-docs/context/design-system/* and skill references/* (progressive loading)
+AGENTS.md (Tier 1 — identity, conventions, principles, forbidden patterns, skills table)
+    ↓ "See" references (lazy-loaded)
+docs/context/* and docs/knowledge/INDEX.md (Tier 1 context files)
+
+.agent/SKILL.md (skill router — 6 skills, Tier 2 loading declarations, routing logic)
+    ↓ skill invocation
+.agent/skills/*/SKILL.md → references/ (Tier 2 on-demand context)
+
+.agent/AGENT.md (pipeline orchestration, compaction protocol, handoff format)
+    ↓ ephemeral bridge
+.agent/handoffs/ (Tier 3 — gitignored, session-only)
 ```
 
 ## Adding a New Platform

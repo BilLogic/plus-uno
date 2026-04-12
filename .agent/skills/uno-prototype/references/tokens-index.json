@@ -18,9 +18,7 @@
     "npm run sync:tokens",
     "npm run generate:tokens"
   ],
-  "ci_workflows": [
-    ".github/workflows/sync-figma-tokens.yml"
-  ],
+  "ci_workflows": [],
   "required_env_vars": [
     "FIGMA_FILE_KEY",
     "FIGMA_ACCESS_TOKEN"

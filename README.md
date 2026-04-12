@@ -33,7 +33,7 @@ See `docs/setup-guide.md` for full onboarding.
 
 ## Tech Stack
 
-React 19 · React-Bootstrap 2.10 · Bootstrap 5.3 · Vite 6 · Storybook 10 · SASS · Highcharts 12 · Font Awesome Free 7.2
+React 19 · React-Bootstrap 2.10 · Bootstrap 5.3 · Vite 8 · Storybook 10 · SASS · Highcharts 12 · Font Awesome Free 7.2
 
 ## Commands
 

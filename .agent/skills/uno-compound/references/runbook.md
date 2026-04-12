@@ -30,8 +30,9 @@ This runbook keeps agent guidance aligned with actual code.
 - Confirm stories resolve under paths configured in `.storybook/main.js`.
 
 4. Verify agent docs still map to reality
-- Check `.agent/SKILL.md` mode routing.
-- Check all files in `.agent/references`, `.agent/assets`, `.agent/scripts` for broken paths.
+- Check `.agent/SKILL.md` skill routing (6 skills).
+- Check all files in `.agent/skills/*/references/`, `docs/context/design-system/`, and `.agent/scripts/` for broken paths.
+- Run `.agent/scripts/validate-doc-links.sh` to verify all references resolve.
 
 ## Trigger Conditions for Updating Agent Docs
 

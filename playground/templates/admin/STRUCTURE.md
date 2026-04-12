@@ -6,8 +6,8 @@ This template contains complete page implementations for admin-related interface
 ## Reference Documentation
 
 For detailed component breakdowns and specifications, see:
-- **Specs Documentation**: `../../../design-system/src/specs/Admin/STRUCTURE.md` (if available)
-- **Specs Overview**: `../../../design-system/src/specs/Admin/Admin.stories.js`
+- **Specs Documentation**: `../../../design-system/src/specs/` (check for Admin specs if available)
+- **Component Inventory**: `../../../docs/context/design-system/components/inventory.md`
 - **Component Library**: `../../../design-system/src/components/`
 
 ## Template Structure
@@ -52,7 +52,7 @@ Based on the Admin specs, templates should implement components from these categ
 
 1. **Reference Specs First**: Always check `../../../design-system/src/specs/Admin/` for component specifications
 2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/src/styles/`
-3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
+3. **Bootstrap Foundation**: Use Bootstrap 5.3 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations
 

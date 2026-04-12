@@ -37,14 +37,17 @@ plus-vibe-coding-starting-kit/
 ├── playground/                21 prototype projects (flat, project-oriented)
 ├── src/                       Vite app entry (App.jsx, main.jsx, index.css)
 ├── docs/
-│   ├── project/               Product landscape, conventions, setup
-│   ├── foundations/            PLUS vocabulary, tech stack, context levels
-│   ├── solutions/             Compound loop (learnings)
+│   ├── context/               Three-tier context (Tier 1 + Tier 2)
+│   │   ├── product/           Product landscape, users, features, flows
+│   │   ├── design-system/     Foundations, styles, components
+│   │   └── conventions/       Coding, terminology, tech stack, integrations
+│   ├── knowledge/             Long-term memory (lessons, decisions, preferences)
 │   ├── plans/                 Implementation plans
-│   └── ideation/              Exploration docs
+│   └── setup-guide.md         Onboarding
 ├── .agent/
-│   ├── skills/                Agent-agnostic skills (mode + workflow)
-│   └── assets/                JSON indexes, cheat sheets
+│   ├── skills/                6 agent-agnostic skills (each owns references/)
+│   ├── handoffs/              Tier 3 bridge (gitignored, ephemeral)
+│   └── scripts/               Cross-cutting validation tools
 ├── .storybook/                Storybook configuration
 ├── scripts/                   Token sync + generation
 └── .claude/                   Claude Code settings
@@ -92,4 +95,4 @@ All deployments use **Netlify** exclusively. No other hosting providers (Vercel,
 | Figma MCP | Design-to-code: `get_design_context`, `get_screenshot`, `get_variable_defs` |
 | Stitch MCP | Wireframe generation for consulting/iteration |
 | Playwright MCP | Browser automation tests |
-| GitHub Actions | Token sync automation (`.github/workflows/sync-figma-tokens.yml`) |
+| GitHub Actions | Token sync automation (planned — not yet created) |

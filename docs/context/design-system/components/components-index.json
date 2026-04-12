@@ -14,8 +14,6 @@
   ],
   "storybook_story_globs": [
     "../design-system/src/**/*.stories.{js,jsx,ts,tsx}",
-    "../playground/**/*.stories.{js,jsx,ts,tsx}",
-    "../playground/**/*.stories.{js,jsx,ts,tsx}",
     "../playground/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [

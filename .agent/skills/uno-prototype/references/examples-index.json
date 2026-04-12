@@ -3,8 +3,6 @@
   "updated_for_branch": "main",
   "example_story_globs": [
     "design-system/src/**/*.stories.jsx",
-    "playground/**/*.stories.{js,jsx,ts,tsx}",
-    "playground/**/*.stories.{js,jsx,ts,tsx}",
     "playground/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "spec_roots": [
