@@ -1,7 +1,7 @@
 ---
 title: "refactor: Three-Tier Context Architecture — Docs, Knowledge, and Agent Infrastructure"
 type: refactor
-status: active
+status: completed
 date: 2026-04-11
 deepened: 2026-04-11
 ---
