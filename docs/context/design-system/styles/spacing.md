@@ -1,5 +1,4 @@
 <!-- Tier: 2 -->
-<!-- Load for: spacing token application, padding/margin/gap decisions, component hierarchy spacing -->
 
 # Spacing Tokens
 

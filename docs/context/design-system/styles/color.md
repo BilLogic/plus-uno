@@ -1,5 +1,4 @@
 <!-- Tier: 2 -->
-<!-- Load for: color token application, semantic color selection, state layers, SMART framework colors -->
 
 # Color Tokens
 

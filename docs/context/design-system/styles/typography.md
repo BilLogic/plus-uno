@@ -1,5 +1,4 @@
 <!-- Tier: 2 -->
-<!-- Load for: typography token application, font families, font weights, heading/body sizing -->
 
 # Typography Tokens
 

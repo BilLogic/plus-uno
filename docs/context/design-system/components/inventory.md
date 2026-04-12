@@ -1,5 +1,4 @@
 <!-- Tier: 2 -->
-<!-- Load for: component selection, props API reference, usage examples, form components, data viz -->
 
 # PLUS Design System Component Guidelines
 

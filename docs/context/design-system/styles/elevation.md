@@ -1,5 +1,4 @@
 <!-- Tier: 2 -->
-<!-- Load for: elevation/shadow token application, visual hierarchy through depth -->
 
 # Elevation Tokens
 
