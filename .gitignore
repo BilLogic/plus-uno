@@ -52,6 +52,9 @@ prototyping/playground/*/
 # Local Netlify folder
 .netlify
 
+# Vercel
+.vercel/
+
 # Figma automation temp files
 .figma-sync-context/
 .agent/handoffs/
