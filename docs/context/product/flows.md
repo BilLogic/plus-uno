@@ -207,3 +207,65 @@ Self-service support for tutors:
    - How to edit a submitted reflection
    - How to handle "no students joined" situations
 6. Time-sensitive questions (co-host, no students) flagged for faster response
+
+---
+
+<!-- Updated from Notion: 2026-04-11 -->
+## Operational Flows (from Notion)
+
+### Tutor-Student Assignment Algorithm
+
+Session assignment is triggered when the lead tutor joins and marks attendance.
+
+**4-Phase Algorithm:**
+1. **Keep Existing Pairs** -- preserve tutor-student pairs from previous sessions for continuity
+2. **Stratified Balancing** -- distribute students across tutors by score tiers (baseline scores) so each tutor gets a balanced mix of struggling and stronger students
+3. **Overflow Balancing** -- assign remaining unmatched students to tutors with available capacity
+4. **Final Pass** -- resolve edge cases; tie-break favors regular tutors before lead tutors
+
+**Key Variables:** school base ratio (e.g., 3:1 students per tutor), history-based tutor matching, student baseline scores.
+
+**Guarantees:** no tutor exceeds max load; pairs persist unless capacity forces a change; score-tier buckets stay balanced across tutors.
+
+### Tutor Onboarding Flow
+
+New tutors complete a structured onboarding before their first session:
+
+1. **Welcome to PLUS** (Module 1) -- mission, team introductions, contribution framing (~15 min)
+2. **Your Role at PLUS** (Module 2) -- tutor expectations, policies, camera/recording requirements
+3. **Tutoring Session Overview** (Module 3) -- session structure and timing
+4. **Session Responsibilities** (Module 4) -- attendance marking, breakout room management, check-ins within 5 min, Zoom recording, engagement monitoring
+5. **Helping Students** (Module 5) -- prioritizing help requests, re-engagement strategies
+6. **Tutoring Tools** (Module 6) -- Zoom, Pencil Spaces, PLUS app features
+7. **PLUS App Overview** (Module 7) -- navigating the platform, student cards, reflections
+8. **Day-to-Day Protocols** (Module 8) -- attendance/call-off procedures, hour logging (per university), communication norms
+9. **Goal-Setting Practices** (Module 9) -- tutor development goals
+
+**Completion requirements:** 10 onboarding modules (~2 hours) + 5 required in-app lessons (~1 hour): Getting to Know Students, Establishing Norms, Using Motivational Strategies, Building Cultural Competence, Generating Trust. Each module ends with a Google Forms quiz linked to the tutor's PLUS account.
+
+### Tutoring Session Protocol
+
+Minute-by-minute session flow (from Tutoring Protocol, Fall 2025):
+
+**Phase 0 -- Pre-Session (before 0 min):**
+- System auto-generates tutor-student assignments from school rosters
+- Tutors see assigned students on their dashboard upon joining
+
+**Phase 1 -- Session Kick-Off (0-5 min):**
+- Lead tutor joins video call and creates breakout rooms based on total attendee count
+- Regular tutors see assigned students on dashboard, find them in Zoom participant list, and move them into breakout rooms quickly
+- Each tutor does a brief check-in per student within 5 minutes of placement
+- All tutors monitor the main room for late joiners throughout the session
+
+**Phase 2 -- Reconciliation (5-15 min):**
+- Lead tutor checks for stragglers in main room (late arrivals, renamed students, unrostered students)
+- Opens Tutor-Student Assignment tool in PLUS app to manually assign unpaired students
+- Informs classroom teacher about absent students
+- PLUS app updates tutor dashboards based on manual reassignments
+
+**Phase 3 -- Main Tutoring Rotation (15-40 min):**
+- Tutors rotate through assigned students following researcher-set sorted order
+- Activities: screen sharing review, problem walkthroughs, motivational check-ins
+- Help requests always take priority over scheduled rotation
+- Live attendance tracking continues; late joiners are placed and checked in
+- Post-session: return to main room, brief debrief with lead tutor, complete reflection form in PLUS app, upload Zoom recording

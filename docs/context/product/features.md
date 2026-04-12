@@ -7,7 +7,7 @@
 |--------|-------------|------------|
 | **Session** | A tutoring slot on Zoom or Pencil Spaces | Date, time, platform (Zoom/Pencil), school/site, tutor assignments, recording, attendance |
 | **Reflection** | Post-session tutor self-report (two tiers) | Student reflection (per student) + Session reflection (overall). Can escalate to supervisors |
-| **Training Module** | Onboarding curriculum unit | Module 1-6+ covering: PLUS background, policies, tools, session responsibilities, scenarios |
+| **Training Module** | Onboarding curriculum unit | 9 modules covering: welcome/mission, role/policies, session overview, session responsibilities, helping students, tutoring tools, PLUS app overview, day-to-day protocols, goal-setting. Each module includes a Google Forms quiz |
 | **Group** | Organizational unit | By university (CMU/Pitt/Duq), team, school site |
 | **Session Sign-Up** | Tutor registers for sessions | One-time or recurring. Supports fill-ins for open slots |
 | **Call-Off** | Tutor cancels a session | Late call-offs (< 24h) tracked. Shift swap requests. Accidental sign-up handling |
@@ -35,6 +35,8 @@ The in-session workspace. What tutors interact with during and around sessions.
 | **Student Insight Panel** | Near hand-off | AI-generated student summaries on student cards |
 | **Mark as Helped** | Concept stage | Track tutor-student help interactions during session |
 | **In-Session Note-Taking** | Design WIP | Lightweight timestamped observations during live sessions |
+| **Post-Session Debrief** | Deployed | Return to main room after session for brief debrief with lead tutor + other tutors |
+| **Zoom Recording Upload** | Deployed | Tutors upload Zoom recording as part of post-session reflection |
 | **Session Escalation** | Deployed (v10.1) | Flag session for supervisor review via reflection checkbox → Slack list |
 | **Session Sign-Up v2** | Deployed | Recurring sessions, fill-ins, call-offs, withdrawal requests |
 | **Session v1.5** | Deployed | Quick fix for accidental registrations ("signed up by mistake") |
@@ -48,7 +50,8 @@ The in-session workspace. What tutors interact with during and around sessions.
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| **Training Modules** | Deployed | 6+ modules: PLUS background, policies, tools, session duties, scenarios, tutoring tools |
+| **Training Modules** | Deployed | 9 modules (welcome, role, session overview, responsibilities, helping students, tools, app overview, protocols, goal-setting) + Google Forms quizzes per module |
+| **In-App Required Lessons** | Deployed | 5 required lessons: Getting to Know Students, Establishing Norms, Motivational Strategies, Cultural Competence, Generating Trust |
 | **Tutor Onboarding Redesign** | Ready for design | Step-by-step checklist + AI-powered practice simulation |
 | **Help Center** | Design WIP | Intercom-based self-service: feature walkthroughs, FAQ by category, video guides |
 | **Lessons Listing Facelift** | Near hand-off | Clearer assigned vs in-progress lesson states |
@@ -107,6 +110,9 @@ The in-session workspace. What tutors interact with during and around sessions.
 | **Affiliation** | University: CMU, Pitt, or Duquesne |
 | **Site** | School location where students are based |
 | **SMART** | PLUS training system for tutor development |
+| **Module Quiz** | Google Forms quiz at end of each onboarding module, linked to tutor's PLUS account |
+| **Required Lessons** | 5 in-app lessons (~1 hour total) tutors must complete alongside the onboarding modules |
+| **Debrief** | Brief post-session conversation in main room between lead tutor and regular tutors |
 | **Breakout Room** | Zoom sub-room where tutor works with assigned students |
 | **Student Card** | UI component showing student info, engagement, and actions during session |
 | **Student Insight** | AI-generated summary of student engagement style and needs |
