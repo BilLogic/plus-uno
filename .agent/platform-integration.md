@@ -10,8 +10,7 @@ The plus-uno project uses `AGENTS.md` at the project root as the canonical cross
 |----------|------|-----------|
 | Claude Code | `CLAUDE.md` | `@AGENTS.md` (import syntax) |
 | Cursor | `.cursor/rules/plus-agent.mdc` | `AGENTS.md` |
-| Windsurf (modern) | `.windsurf/rules/agent.md` | `AGENTS.md` |
-| Windsurf (legacy) | `.windsurfrules` | `AGENTS.md` |
+| Windsurf | `.windsurf/rules/agent.md` | `AGENTS.md` |
 | GitHub Copilot | `.github/copilot-instructions.md` | `AGENTS.md` |
 
 ## Architecture
