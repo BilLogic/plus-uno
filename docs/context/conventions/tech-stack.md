@@ -38,8 +38,9 @@
 
 | Command | What it does |
 |---------|-------------|
-| `npm run dev` | Vite dev server (port 3000) |
-| `npm run storybook` | Storybook (port 6006) |
+| `npm run dev` | Vite + Storybook concurrent (ports 4100 + 4200) |
+| `npm run dev:vite` | Vite only (port 4100) |
+| `npm run storybook` | Storybook only (port 4200) |
 | `npm run build` | Vite production build |
 | `npm run build-storybook` | Storybook static site build |
 | `npm run build:all` | Build app + Storybook |

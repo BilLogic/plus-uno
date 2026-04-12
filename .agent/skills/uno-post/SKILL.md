@@ -59,7 +59,7 @@ If `deploymentUrl` is null, follow `references/deployment-guide.md` to help the 
 1. Generate the entry object (see Confirmation Template below).
 2. Show it to the designer. **Wait for confirmation before writing.**
 3. Append the entry to the `prototypes` array in `src/pages/PrototypeMarket/prototypes-data.js`.
-4. Suggest verifying at `http://localhost:3000/market`.
+4. Suggest verifying at `http://localhost:4100/market`.
 
 ## Confirmation
 

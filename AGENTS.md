@@ -67,8 +67,9 @@ Read `docs/setup-guide.md` for onboarding: recommended CE skills, MCP server con
 
 | Command | What it does |
 |---------|-------------|
-| `npm run dev` | Vite dev server (port 3000) |
-| `npm run storybook` | Storybook (port 6006) |
+| `npm run dev` | Vite + Storybook concurrent (ports 4100 + 4200) |
+| `npm run dev:vite` | Vite only (port 4100) |
+| `npm run storybook` | Storybook only (port 4200) |
 | `npm run build` | Production build |
 | `npm run build-storybook` | Build Storybook static site |
 | `npm run sync:tokens` | Sync tokens from Figma |

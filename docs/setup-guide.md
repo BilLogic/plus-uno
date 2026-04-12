@@ -11,8 +11,9 @@ cd plus-vibe-coding-starting-kit
 npm install
 
 # Start dev servers
-npm run storybook    # Component library on port 6006
-npm run dev          # Vite app on port 3000
+npm run dev          # Vite (4100) + Storybook (4200) concurrent
+npm run dev:vite     # Vite only on port 4100
+npm run storybook    # Storybook only on port 4200
 ```
 
 ## Recommended Compound Engineering Skills

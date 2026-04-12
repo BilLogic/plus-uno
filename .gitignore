@@ -39,9 +39,6 @@ npm-debug.log*
 # Reference files (production repo)
 reference/production/
 
-# Playground directories (opt-in to commit)
-prototyping/playground/*/
-!prototyping/playground/README.md
 # macOS sed backup artifacts
 .!*!*
 
