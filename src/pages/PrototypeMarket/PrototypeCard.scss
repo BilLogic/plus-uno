@@ -4,7 +4,7 @@
   height: 100%;
   transition: box-shadow 0.2s ease, transform 0.15s ease;
 
-  // Matches Input disabled + wrapper disabled (packages/plus-ds/src/forms/Input.scss)
+  // Matches Input disabled + wrapper disabled (design-system/src/forms/Input.scss)
   &--not-deployed.plus-card {
     cursor: not-allowed;
     opacity: 0.38;
