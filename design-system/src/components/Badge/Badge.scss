@@ -20,20 +20,17 @@
     padding-left: var(--size-element-pad-x-lg);
     padding-right: var(--size-element-pad-x-lg);
 
-    // Shape
-    // Figma spec: Badges use pill shape - Border/Radius/radius-1000 (999px)
-    // Using semantic token --size-element-radius-full which maps to --size-border-radius-radius-1000
-    border-radius: var(--size-element-radius-full);
+    // Shape - Updated to match Figma corner radius specs
+    // Default radius for larger badges (h1-h3, b1-b3)
+    border-radius: var(--size-element-radius-sm);
 
     // Default Font (overridden by size classes)
     text-align: center;
     white-space: nowrap;
 
-
-
     // --- SIZES ---
-    // Override padding based on size class
-    // Match both size classes (b2) and typography classes (body2-txt) for compatibility
+    // Override padding and radius based on size class
+    // H4-H6 sizes use smaller padding and radius to match Figma
     &.h4,
     &.h5,
     &.h6,
@@ -42,6 +39,8 @@
     &.h6-txt {
         padding-left: var(--size-element-pad-x-md);
         padding-right: var(--size-element-pad-x-md);
+        // Smaller radius for h4-h6 to match Figma cornerRadius: 6
+        border-radius: var(--size-border-radius-radius-150);
     }
 
     &.b1,
@@ -53,8 +52,21 @@
         padding-left: var(--size-element-pad-x-sm);
         padding-right: var(--size-element-pad-x-sm);
         // Font weight now handled via typography class in JSX (font-weight-semibold)
+        // Use default radius (--size-element-radius-sm = 4px) to match Figma cornerRadius: 8
     }
 
+    // H1-H3 sizes use larger padding and radius
+    &.h1,
+    &.h2,
+    &.h3,
+    &.h1-txt,
+    &.h2-txt,
+    &.h3-txt {
+        padding-left: var(--size-element-pad-x-lg);
+        padding-right: var(--size-element-pad-x-lg);
+        // Use larger radius for h1-h3 to match Figma cornerRadius: 8
+        border-radius: var(--size-element-radius-sm);
+    }
 
     // --- COLOR THEMES ---
     // Mixin to generate color styles
@@ -97,7 +109,6 @@
     @include badge-theme('relationship', --color-relationship-state-08, --color-relationship-text, --color-relationship);
     @include badge-theme('technology-tools', --color-technology-tools-state-08, --color-technology-tools-text, --color-technology-tools);
 
-
     // --- DISMISSIBLE VARIANT ---
     &--dismissible {
         cursor: pointer;
@@ -108,7 +119,6 @@
         border-width: var(--size-element-border);
 
         // Hover logic handled in mixin for background
-
 
         // Action icon (xmark) specific styling
         .plus-badge-visual--trailing {
