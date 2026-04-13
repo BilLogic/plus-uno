@@ -171,11 +171,18 @@ async function getFigmaComponents(componentNames) {
   const matched = [];
   for (const name of componentNames) {
     const nameLower = name.toLowerCase();
-    const found = components.filter(c =>
-      c.name.toLowerCase() === nameLower ||
-      c.name.toLowerCase().startsWith(nameLower + '/') ||
-      c.containing_frame?.name?.toLowerCase() === nameLower
-    );
+    const found = components.filter(c => {
+      const cName = (c.name || '').toLowerCase();
+      const cFrame = (c.containing_frame?.name || '').toLowerCase();
+      return (
+        cName === nameLower ||
+        cName.startsWith(nameLower + '/') ||
+        cFrame === nameLower ||
+        // Partial match: "Badge" matches "Static Badges" or "Dismissible Badges"
+        cFrame.includes(nameLower) ||
+        cName.includes(nameLower)
+      );
+    });
     matched.push({ name, figmaComponents: found });
     if (found.length > 0) {
       console.log(`   ✅ ${name}: found ${found.length} variants in Figma`);
