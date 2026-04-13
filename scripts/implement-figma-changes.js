@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
 import https from 'https';
+import { fetchNotionPRD, updatePRDStatus } from './create-notion-prd.js';
 
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI */ }
@@ -29,6 +30,7 @@ const FIGMA_ACCESS_TOKEN = process.env.FIGMA_ACCESS_TOKEN;
 const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
 const PR_TITLE = process.env.PR_TITLE || '';
 const PR_BODY_FILE = process.env.PR_BODY_FILE;
+const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const COMPONENTS_DIR = resolve('design-system/src/components');
 const TOKENS_DIR = resolve('design-system/src/tokens');
@@ -281,6 +283,34 @@ async function main() {
   const prBody = getPRBody();
   console.log(`🎨 Implementing changes for: ${componentNames.join(', ')}\n`);
 
+  // Fetch Notion PRD context if available
+  let prdContext = '';
+  if (NOTION_PRD_ID) {
+    try {
+      console.log('📋 Fetching Notion PRD context...');
+      const prd = await fetchNotionPRD(NOTION_PRD_ID);
+      if (prd) {
+        const parts = [];
+        if (prd.implementationNotes) {
+          parts.push(`### Implementation Notes (from designer)\n${prd.implementationNotes}`);
+        }
+        if (prd.acceptanceCriteria?.length) {
+          parts.push(`### Acceptance Criteria\n${prd.acceptanceCriteria.map(c => `- [${c.checked ? 'x' : ' '}] ${c.text}`).join('\n')}`);
+        }
+        if (prd.publishedBy) {
+          parts.push(`Published by: ${prd.publishedBy}`);
+        }
+        prdContext = parts.join('\n\n');
+        console.log(`   ✅ PRD loaded: ${prd.title}`);
+
+        // Update PRD status to "In Progress"
+        await updatePRDStatus(NOTION_PRD_ID, 'In Progress');
+      }
+    } catch (e) {
+      console.warn(`   ⚠️  Could not fetch Notion PRD: ${e.message}`);
+    }
+  }
+
   // Fetch Figma data
   const figmaData = await getFigmaComponents(componentNames);
 
@@ -441,6 +471,7 @@ async function main() {
         tokenContext,
         '\n## Change Context\n',
         prBody || 'No additional context provided.',
+        prdContext ? '\n## Notion PRD Context (Designer Review Notes)\n' + prdContext : '',
         `\n## Task\n`,
         `Update the ${name} component files to match the latest Figma design.`,
         'Use the Figma node properties above to map exact colors, spacing, and radius to the closest design tokens.',

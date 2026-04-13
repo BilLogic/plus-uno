@@ -24,6 +24,7 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+import { createNotionPRD } from './create-notion-prd.js';
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI — no .env needed */ }
 
@@ -237,7 +238,7 @@ function diffVersions(oldVersionIds, newVersions) {
 /**
  * Build Slack message for detected changes
  */
-function buildSlackMessage(componentDiff, newVersions) {
+function buildSlackMessage(componentDiff, newVersions, prdResult = null) {
   const figmaUrl = `https://www.figma.com/design/${FIGMA_FILE_KEY}`;
 
   // Group variants by parent component name (containingFrame)
@@ -313,6 +314,18 @@ function buildSlackMessage(componentDiff, newVersions) {
     blocks.push({
       type: 'section',
       text: { type: 'mrkdwn', text: componentLines.join('\n') }
+    });
+  }
+
+  // PRD link (if Notion PRD was created)
+  if (prdResult?.pageUrl) {
+    blocks.push({ type: 'divider' });
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:clipboard: *PRD Created:* <${prdResult.pageUrl}|${prdResult.title}>\nReview the PRD, then type \`/implement ${prdResult.title.replace('DS Update: ', '')}\` in this channel when ready.`
+      }
     });
   }
 
@@ -516,10 +529,25 @@ async function main() {
   fs.mkdirSync(path.join(process.cwd(), '.figma-sync-context'), { recursive: true });
   fs.writeFileSync(path.join(process.cwd(), '.figma-sync-context', 'issue-body.md'), issueBody);
 
+  // Create Notion PRD
+  let prdResult = null;
+  try {
+    console.log('\n📋 Creating Notion PRD...');
+    prdResult = await createNotionPRD(componentDiff, newVersions);
+  } catch (error) {
+    console.error(`\n⚠ Notion PRD creation failed: ${error.message}`);
+  }
+
+  // Write PRD info for GitHub Actions
+  if (prdResult && githubOutput) {
+    fs.appendFileSync(githubOutput, `notion_prd_url=${prdResult.pageUrl}\n`);
+    fs.appendFileSync(githubOutput, `notion_prd_id=${prdResult.pageId}\n`);
+  }
+
   // Post to Slack
   if (SLACK_WEBHOOK_URL) {
     try {
-      const { blocks, text } = buildSlackMessage(componentDiff, newVersions);
+      const { blocks, text } = buildSlackMessage(componentDiff, newVersions, prdResult);
       await postToSlack(blocks, text);
       console.log('\n✅ Slack notification sent');
     } catch (error) {
