@@ -114,12 +114,23 @@ function parseComponentNames() {
   }
 
   // From PR title: "feat: Figma DS update — Badge, Button"
-  const match = PR_TITLE.match(/Figma DS update\s*[—–-]\s*(.+)/i);
-  if (match) {
-    return match[1].split(',').map(s => s.trim());
+  // Also matches: "Figma update - Badge", "DS update: Badge", etc.
+  const patterns = [
+    /Figma\s+DS\s+update\s*[—–:-]\s*(.+)/i,
+    /Figma\s+update\s*[—–:-]\s*(.+)/i,
+    /DS\s+update\s*[—–:-]\s*(.+)/i,
+    /update\s*[—–:-]\s*(.+)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = PR_TITLE.match(pattern);
+    if (match) {
+      return match[1].split(',').map(s => s.trim());
+    }
   }
 
   console.error('❌ No component names found. Use --components "Badge,Button" or set PR_TITLE.');
+  console.error(`   PR_TITLE: "${PR_TITLE}"`);
   process.exit(1);
 }
 
