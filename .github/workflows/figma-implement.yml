@@ -231,14 +231,19 @@ jobs:
             });
 
       - name: Notify Slack
-        if: steps.commit.outputs.changes == 'true'
+        if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           PR_URL="${{ steps.create-pr.outputs.pr_url }}"
           COMPONENT="${{ steps.payload.outputs.component }}"
+          HAS_CHANGES="${{ steps.commit.outputs.changes }}"
 
-          MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
+          if [ "$HAS_CHANGES" = "true" ]; then
+            MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
+          else
+            MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design."
+          fi
 
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
