@@ -7,6 +7,16 @@ on:
     types: [implement-figma-changes]
     # Triggered from Slack via Workflow Builder
     # client_payload: { component: "Badge", notion_prd_id: "...", notion_prd_url: "..." }
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'Component name (e.g., Badge, Button)'
+        required: true
+        type: string
+      notion_prd_id:
+        description: 'Notion PRD page ID (optional)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -103,18 +113,24 @@ jobs:
               body
             });
 
-  # ─── Job 2: Triggered from Slack via repository_dispatch ───
+  # ─── Job 2: Triggered from Slack (/github run) or GitHub UI or repository_dispatch ───
   implement-from-slack:
-    if: github.event_name == 'repository_dispatch'
+    if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Parse dispatch payload
+      - name: Parse inputs
         id: payload
         run: |
-          echo "component=${{ github.event.client_payload.component }}" >> $GITHUB_OUTPUT
-          echo "notion_prd_id=${{ github.event.client_payload.notion_prd_id }}" >> $GITHUB_OUTPUT
-          echo "notion_prd_url=${{ github.event.client_payload.notion_prd_url }}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "component=${{ github.event.inputs.component }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_id=${{ github.event.inputs.notion_prd_id }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_url=" >> $GITHUB_OUTPUT
+          else
+            echo "component=${{ github.event.client_payload.component }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_id=${{ github.event.client_payload.notion_prd_id }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_url=${{ github.event.client_payload.notion_prd_url }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Checkout repository
         uses: actions/checkout@v4
