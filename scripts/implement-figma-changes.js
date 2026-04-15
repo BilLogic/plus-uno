@@ -145,12 +145,28 @@ function getPRBody() {
 
 // ─── Read component files ──────────────────────────────────
 
+function resolveComponentDir(componentName) {
+  // Exact match first
+  const exact = join(COMPONENTS_DIR, componentName);
+  if (existsSync(exact)) return { dir: exact, name: componentName };
+
+  // Case-insensitive match (e.g., "badge" → "Badge")
+  try {
+    const dirs = readdirSync(COMPONENTS_DIR);
+    const match = dirs.find(d => d.toLowerCase() === componentName.toLowerCase());
+    if (match) return { dir: join(COMPONENTS_DIR, match), name: match };
+  } catch { /* */ }
+
+  return null;
+}
+
 function readComponentFiles(componentName) {
-  const dir = join(COMPONENTS_DIR, componentName);
-  if (!existsSync(dir)) {
-    console.warn(`⚠️  Component directory not found: ${dir}`);
+  const resolved = resolveComponentDir(componentName);
+  if (!resolved) {
+    console.warn(`⚠️  Component directory not found for: ${componentName}`);
     return null;
   }
+  const dir = resolved.dir;
 
   const files = readdirSync(dir).filter(f =>
     f.endsWith('.jsx') || f.endsWith('.scss') || f.endsWith('.mdx') || f.endsWith('.stories.jsx')
@@ -347,9 +363,15 @@ async function main() {
     console.log(`\n${'─'.repeat(50)}`);
     console.log(`📦 Processing: ${name}`);
 
+    const resolved = resolveComponentDir(name);
+    if (!resolved) {
+      console.log(`   ⏭️  Skipping — no code directory found`);
+      continue;
+    }
+    const resolvedName = resolved.name; // correctly-cased directory name
     const codeFiles = readComponentFiles(name);
     if (!codeFiles) {
-      console.log(`   ⏭️  Skipping — no code directory found`);
+      console.log(`   ⏭️  Skipping — no readable files found`);
       continue;
     }
 
@@ -514,9 +536,9 @@ async function main() {
     while ((fileMatch = filePattern.exec(response)) !== null) {
       const [, filename, content] = fileMatch;
       const trimmedName = filename.trim();
-      const filePath = join(COMPONENTS_DIR, name, trimmedName);
+      const filePath = join(COMPONENTS_DIR, resolvedName, trimmedName);
 
-      if (!existsSync(join(COMPONENTS_DIR, name))) {
+      if (!existsSync(join(COMPONENTS_DIR, resolvedName))) {
         console.warn(`   ⚠️  Directory doesn't exist for: ${trimmedName}`);
         continue;
       }
