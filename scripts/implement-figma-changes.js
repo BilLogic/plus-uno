@@ -20,7 +20,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
 import https from 'https';
-import { fetchNotionPRD, updatePRDStatus } from './create-notion-prd.js';
+import { fetchNotionPRD, findPRDByComponent, updatePRDStatus } from './create-notion-prd.js';
 
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI */ }
@@ -285,30 +285,44 @@ async function main() {
 
   // Fetch Notion PRD context if available
   let prdContext = '';
-  if (NOTION_PRD_ID) {
-    try {
-      console.log('📋 Fetching Notion PRD context...');
-      const prd = await fetchNotionPRD(NOTION_PRD_ID);
-      if (prd) {
-        const parts = [];
-        if (prd.implementationNotes) {
-          parts.push(`### Implementation Notes (from designer)\n${prd.implementationNotes}`);
+  let prdId = NOTION_PRD_ID;
+  try {
+    let prd = null;
+    if (prdId) {
+      console.log('📋 Fetching Notion PRD by ID...');
+      prd = await fetchNotionPRD(prdId);
+    } else {
+      // Auto-search for the latest PRD matching the component name
+      console.log('📋 Searching Notion for PRD matching components...');
+      for (const name of componentNames) {
+        prd = await findPRDByComponent(name);
+        if (prd) {
+          prdId = prd.pageId;
+          break;
         }
-        if (prd.acceptanceCriteria?.length) {
-          parts.push(`### Acceptance Criteria\n${prd.acceptanceCriteria.map(c => `- [${c.checked ? 'x' : ' '}] ${c.text}`).join('\n')}`);
-        }
-        if (prd.publishedBy) {
-          parts.push(`Published by: ${prd.publishedBy}`);
-        }
-        prdContext = parts.join('\n\n');
-        console.log(`   ✅ PRD loaded: ${prd.title}`);
-
-        // Update PRD status to "In Progress"
-        await updatePRDStatus(NOTION_PRD_ID, 'In Progress');
       }
-    } catch (e) {
-      console.warn(`   ⚠️  Could not fetch Notion PRD: ${e.message}`);
     }
+    if (prd) {
+      const parts = [];
+      if (prd.implementationNotes) {
+        parts.push(`### Implementation Notes (from designer)\n${prd.implementationNotes}`);
+      }
+      if (prd.acceptanceCriteria?.length) {
+        parts.push(`### Acceptance Criteria\n${prd.acceptanceCriteria.map(c => `- [${c.checked ? 'x' : ' '}] ${c.text}`).join('\n')}`);
+      }
+      if (prd.publishedBy) {
+        parts.push(`Published by: ${prd.publishedBy}`);
+      }
+      prdContext = parts.join('\n\n');
+      console.log(`   ✅ PRD loaded: ${prd.title}`);
+
+      // Update PRD status to "In Progress"
+      if (prdId) await updatePRDStatus(prdId, 'In Progress');
+    } else {
+      console.log('   ℹ️  No Notion PRD found — proceeding without designer notes');
+    }
+  } catch (e) {
+    console.warn(`   ⚠️  Could not fetch Notion PRD: ${e.message}`);
   }
 
   // Fetch Figma data

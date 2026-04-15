@@ -587,6 +587,48 @@ export async function fetchNotionPRD(pageId) {
 }
 
 /**
+ * Look up the most recent PRD for a component by querying the Notion database.
+ * This allows the implementation script to find the PRD without needing a PRD ID.
+ *
+ * @param {string} componentName - Component name to search for (e.g., "Badge")
+ * @returns {Object|null} - { pageId, title, ...prdData } or null if not found
+ */
+export async function findPRDByComponent(componentName) {
+  if (!NOTION_API_KEY || !NOTION_DATABASE_ID) {
+    console.warn('NOTION_API_KEY or NOTION_DATABASE_ID not set — cannot search PRDs');
+    return null;
+  }
+
+  const result = await notionRequest('POST', `/databases/${NOTION_DATABASE_ID}/query`, {
+    filter: {
+      or: [
+        {
+          property: 'Component',
+          rich_text: { contains: componentName }
+        },
+        {
+          property: 'Name',
+          title: { contains: componentName }
+        }
+      ]
+    },
+    sorts: [{ property: 'Date', direction: 'descending' }],
+    page_size: 1
+  });
+
+  if (!result.results?.length) {
+    return null;
+  }
+
+  const page = result.results[0];
+  const pageId = page.id;
+
+  // Fetch full PRD content using existing function
+  const prd = await fetchNotionPRD(pageId);
+  return prd ? { ...prd, pageId } : null;
+}
+
+/**
  * Update PRD status in Notion.
  *
  * @param {string} pageId - Notion page ID
