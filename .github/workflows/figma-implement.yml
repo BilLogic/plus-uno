@@ -143,15 +143,16 @@ jobs:
           COMPONENT="${{ steps.payload.outputs.component }}"
           SLUG=$(echo "$COMPONENT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g' | sed 's/^-\|-$//g')
           DATE=$(date +%Y-%m-%d)
-          BRANCH="ds-review/${SLUG}-${DATE}"
+          TIMESTAMP=$(date +%H%M%S)
+          BRANCH="ds-review/${SLUG}-${DATE}-${TIMESTAMP}"
           git checkout -b "$BRANCH"
-          # Create placeholder so branch differs from main
-          mkdir -p .figma-sync-context
-          echo "# Implementation: $COMPONENT" > .figma-sync-context/implement-placeholder.md
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action (Claude)"
+          # Create placeholder so branch differs from main
+          mkdir -p .figma-sync-context
+          echo "# Implementation: $COMPONENT ($(date -u +%Y-%m-%dT%H:%M:%SZ))" > .figma-sync-context/implement-placeholder.md
           git add -A
-          git commit -m "chore: start implementation for $COMPONENT"
+          git diff --cached --quiet || git commit -m "chore: start implementation for $COMPONENT"
           git push -u origin "$BRANCH"
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
@@ -238,11 +239,12 @@ jobs:
           PR_URL="${{ steps.create-pr.outputs.pr_url }}"
           COMPONENT="${{ steps.payload.outputs.component }}"
           HAS_CHANGES="${{ steps.commit.outputs.changes }}"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           if [ "$HAS_CHANGES" = "true" ]; then
-            MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
+            MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
           else
-            MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design."
+            MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design.\n<${RUN_URL}|View action log>"
           fi
 
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
