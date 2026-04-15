@@ -9,6 +9,10 @@ const Sidebar = ({
     onTabClick,
     /** When set, the tab with this id is shown as selected (anchored). e.g. 'sessions' for Sessions page */
     activeTabId,
+    /** Optional content rendered below a nav tab (keyed by tab id, e.g. { sessions: <ActiveList /> }) */
+    tabBelowContent,
+    /** Merged into the tab-below wrapper (e.g. wider panels: { maxWidth: '320px', minWidth: '260px' }) */
+    tabBelowContentStyle,
     visible = true,
     className = '',
     style,
@@ -102,13 +106,28 @@ const Sidebar = ({
                         </p>
                     </div>
                     {category.items.map((item) => (
-                        <SidebarTab
-                            key={item.id}
-                            text={item.text}
-                            icon={item.icon}
-                            state={activeTabId === item.id ? 'selected' : 'enabled'}
-                            onClick={() => handleTabClick(item.id)}
-                        />
+                        <React.Fragment key={item.id}>
+                            <SidebarTab
+                                text={item.text}
+                                icon={item.icon}
+                                state={activeTabId === item.id ? 'selected' : 'enabled'}
+                                onClick={() => handleTabClick(item.id)}
+                            />
+                            {tabBelowContent?.[item.id] != null ? (
+                                <div
+                                    className="plus-sidebar-tab-below"
+                                    style={{
+                                        paddingLeft: 'var(--size-element-pad-x-md)',
+                                        paddingRight: 'var(--size-element-pad-x-sm)',
+                                        maxWidth: '184px',
+                                        boxSizing: 'border-box',
+                                        ...tabBelowContentStyle,
+                                    }}
+                                >
+                                    {tabBelowContent[item.id]}
+                                </div>
+                            ) : null}
+                        </React.Fragment>
                     ))}
                 </div>
             ))}
@@ -122,6 +141,8 @@ Sidebar.propTypes = {
     onTabClick: PropTypes.func,
     /** Id of the tab to show as selected (e.g. 'sessions', 'home') */
     activeTabId: PropTypes.string,
+    tabBelowContent: PropTypes.objectOf(PropTypes.node),
+    tabBelowContentStyle: PropTypes.object,
     visible: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,

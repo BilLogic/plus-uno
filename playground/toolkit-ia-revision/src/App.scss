@@ -8,29 +8,131 @@
     color: var(--color-on-surface);
 }
 
-.ti2-sessions-rail {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    width: min(320px, 36vw);
-    max-width: 360px;
+.ti2-nav-column {
+    flex-shrink: 0;
+    align-self: stretch;
+    max-height: 100vh;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     border-right: 1px solid var(--color-outline-variant);
     background-color: var(--color-surface-container);
 }
 
-.ti2-sessions-rail__header {
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-    border-bottom: 1px solid var(--color-outline-variant);
+.ti2-sidebar-sessions {
+    margin-top: 0;
+    padding-right: 0;
 }
 
-.ti2-accordion-count {
-    margin-left: var(--size-element-gap-sm);
+/* Nested nav under Toolkit → Sessions: flat, not card-like (prototype overrides on DS Accordion) */
+.ti2-sidebar-sessions-nav.plus-accordion {
+    width: 100%;
+    border-radius: 0;
+    background-color: transparent;
 }
 
-.ti2-sessions-rail__scroll {
+.ti2-sidebar-sessions-nav.plus-accordion--flush .accordion-item,
+.ti2-sidebar-sessions-nav.plus-accordion--flush .plus-accordion-item {
+    margin: 0;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+}
+
+.ti2-sidebar-sessions-nav.plus-accordion--flush .accordion-item:last-child {
+    border-bottom: none !important;
+}
+
+.ti2-sidebar-sessions-nav .accordion-collapse {
+    border-radius: 0 !important;
+}
+
+.ti2-sidebar-sessions-nav .accordion-button.accordion-button {
+    padding: var(--size-element-pad-y-xs) var(--size-element-pad-x-xs) !important;
+    min-height: 0;
+    border-radius: var(--size-element-radius-sm) !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    color: var(--color-on-surface-variant) !important;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body3);
+    font-weight: var(--font-weight-title);
+    line-height: var(--font-line-height-body3);
+}
+
+.ti2-sidebar-sessions-nav .accordion-button.collapsed {
+    background-color: transparent !important;
+}
+
+.ti2-sidebar-sessions-nav .accordion-button.collapsed:hover:not(:disabled) {
+    background-color: var(--color-on-surface-state-04) !important;
+    color: var(--color-on-surface) !important;
+}
+
+.ti2-sidebar-sessions-nav .accordion-button:not(.collapsed) {
+    background-color: var(--color-on-surface-state-04) !important;
+    color: var(--color-on-surface) !important;
+}
+
+.ti2-sidebar-sessions-nav .accordion-button:not(.collapsed):hover:not(:disabled) {
+    background-color: var(--color-on-surface-state-08) !important;
+}
+
+.ti2-sidebar-sessions-nav .accordion-button::after {
+    font-size: 10px !important;
+    opacity: 0.75;
+    margin-left: var(--size-element-gap-xs);
+}
+
+.ti2-sidebar-sessions-nav .accordion-body,
+.ti2-sidebar-sessions-nav .plus-accordion-body {
+    padding: var(--size-element-gap-xs) 0 var(--size-element-gap-sm) var(--size-element-pad-x-md) !important;
+    margin: 0;
+    border: none !important;
+    border-top: none !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+}
+
+.ti2-sidebar-sessions-nav__group-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    margin: 0;
+}
+
+.ti2-sidebar-sessions-nav__count {
+    margin-left: 0;
+}
+
+.ti2-session-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    margin: 0;
+    padding: 0;
+}
+
+.ti2-session-list__row {
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+    margin: 0;
+    padding: 0 0 0 var(--size-element-pad-x-sm);
+    border-radius: var(--size-element-radius-sm);
+    border-left: 2px solid transparent;
+    background-color: transparent;
+}
+
+.ti2-session-list__row--active {
+    border-left-color: var(--color-primary);
+    background-color: var(--color-on-surface-state-04);
+}
+
+.ti2-session-list__button {
     flex: 1;
-    overflow: auto;
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    min-width: 0;
 }
 
 .ti2-main {
@@ -38,60 +140,6 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-}
-
-.ti2-tab-strip {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: var(--size-element-gap-xs);
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
-    border-bottom: 1px solid var(--color-outline-variant);
-    background-color: var(--color-surface-container);
-    min-height: 48px;
-}
-
-.ti2-tab {
-    display: inline-flex;
-    align-items: center;
-    max-width: 220px;
-    border-radius: var(--size-element-radius-md) var(--size-element-radius-md) 0 0;
-    border: 1px solid var(--color-outline-variant);
-    border-bottom: none;
-    background-color: var(--color-surface-container-low);
-    overflow: hidden;
-}
-
-.ti2-tab--active {
-    background-color: var(--color-surface-container-high);
-    border-color: var(--color-outline);
-    position: relative;
-    z-index: 1;
-    margin-bottom: -1px;
-    padding-bottom: 1px;
-}
-
-.ti2-tab__main {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    background: transparent;
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
-    text-align: left;
-    cursor: pointer;
-    color: var(--color-on-surface);
-    font: inherit;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ti2-tab__main:hover {
-    background-color: var(--color-on-surface-state-04);
-}
-
-.ti2-tab__close {
-    flex-shrink: 0;
 }
 
 .ti2-workspace {

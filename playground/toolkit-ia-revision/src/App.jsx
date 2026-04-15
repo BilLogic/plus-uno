@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Accordion from '@/components/Accordion/Accordion';
 import Button from '@/components/Button/Button';
@@ -14,54 +14,29 @@ const WORKSPACE_KEYS = {
     reflection: 'reflection',
 };
 
-function tabsReducer(state, action) {
-    const { openTabIds, activeSessionId } = state;
-    switch (action.type) {
-        case 'open': {
-            const id = action.id;
-            const nextOpen = openTabIds.includes(id) ? openTabIds : [...openTabIds, id];
-            return { openTabIds: nextOpen, activeSessionId: id };
-        }
-        case 'close': {
-            const id = action.id;
-            const idx = openTabIds.indexOf(id);
-            const nextOpen = openTabIds.filter((x) => x !== id);
-            let nextActive = activeSessionId;
-            if (activeSessionId === id) {
-                if (nextOpen.length === 0) nextActive = null;
-                else if (idx <= 0) nextActive = nextOpen[0];
-                else nextActive = nextOpen[idx - 1];
-            }
-            return { openTabIds: nextOpen, activeSessionId: nextActive };
-        }
-        case 'activate':
-            return { ...state, activeSessionId: action.id };
-        default:
-            return state;
-    }
-}
-
-function SessionListButtons({ sessions, onOpenSession }) {
+function SessionListRows({ sessions, activeSessionId, onSelectSession }) {
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)',
-            }}
-        >
-            {sessions.map((s) => (
-                <Button
-                    key={s.id}
-                    text={s.shortLabel}
-                    style="secondary"
-                    fill="ghost"
-                    size="small"
-                    block
-                    leadingVisual="calendar-day"
-                    onClick={() => onOpenSession(s.id)}
-                />
-            ))}
+        <div className="ti2-session-list">
+            {sessions.map((s) => {
+                const isActive = s.id === activeSessionId;
+                return (
+                    <div
+                        key={s.id}
+                        className={`ti2-session-list__row${isActive ? ' ti2-session-list__row--active' : ''}`}
+                    >
+                        <Button
+                            className="ti2-session-list__button"
+                            text={s.shortLabel}
+                            style="secondary"
+                            fill="ghost"
+                            size="small"
+                            block
+                            leadingVisual="calendar-day"
+                            onClick={() => onSelectSession(s.id)}
+                        />
+                    </div>
+                );
+            })}
         </div>
     );
 }
@@ -74,9 +49,9 @@ function WorkspaceEmpty() {
                 style={{ fontSize: '2rem', color: 'var(--color-on-surface-variant)' }}
                 aria-hidden
             />
-            <p className="body1-txt" style={{ margin: 0, maxWidth: '360px' }}>
-                Open a session from the sidebar to work in a temporary tab. You can keep multiple sessions
-                open and switch between them.
+            <p className="body1-txt" style={{ margin: 0, maxWidth: '400px' }}>
+                Expand Today or Upcoming under Toolkit → Sessions in the sidebar and choose a session. The
+                workspace updates immediately.
             </p>
         </div>
     );
@@ -191,19 +166,12 @@ function SessionWorkspace({ session, workspaceView, onWorkspaceView }) {
 }
 
 export default function App() {
-    const [{ openTabIds, activeSessionId }, dispatchTabs] = useReducer(tabsReducer, {
-        openTabIds: [],
-        activeSessionId: null,
-    });
+    const [activeSessionId, setActiveSessionId] = useState(null);
     const [workspaceView, setWorkspaceView] = useState(WORKSPACE_KEYS.session);
 
-    const openSession = useCallback((id) => {
-        dispatchTabs({ type: 'open', id });
+    const selectSession = useCallback((id) => {
+        setActiveSessionId(id);
         setWorkspaceView(WORKSPACE_KEYS.session);
-    }, []);
-
-    const closeTab = useCallback((id) => {
-        dispatchTabs({ type: 'close', id });
     }, []);
 
     const todaySessions = useMemo(() => MOCK_SESSIONS.filter((s) => s.group === 'today'), []);
@@ -214,106 +182,83 @@ export default function App() {
             {
                 eventKey: 'today',
                 header: (
-                    <span className="body2-txt font-weight-semibold">
+                    <span className="ti2-sidebar-sessions-nav__group-label">
                         Today
                         <Badge
                             text={String(todaySessions.length)}
                             style="secondary"
                             size="b3"
-                            className="ti2-accordion-count"
+                            className="ti2-sidebar-sessions-nav__count"
                         />
                     </span>
                 ),
-                body: <SessionListButtons sessions={todaySessions} onOpenSession={openSession} />,
+                body: (
+                    <SessionListRows
+                        sessions={todaySessions}
+                        activeSessionId={activeSessionId}
+                        onSelectSession={selectSession}
+                    />
+                ),
             },
             {
                 eventKey: 'upcoming',
-                header: <span className="body2-txt font-weight-semibold">Upcoming</span>,
-                body: <SessionListButtons sessions={upcomingSessions} onOpenSession={openSession} />,
+                header: <span className="ti2-sidebar-sessions-nav__group-label">Upcoming</span>,
+                body: (
+                    <SessionListRows
+                        sessions={upcomingSessions}
+                        activeSessionId={activeSessionId}
+                        onSelectSession={selectSession}
+                    />
+                ),
             },
         ],
-        [openSession, todaySessions, upcomingSessions]
+        [activeSessionId, selectSession, todaySessions, upcomingSessions]
     );
 
-    const activeSession = activeSessionId ? sessionById(activeSessionId) : null;
+    const workspaceSession = activeSessionId ? sessionById(activeSessionId) : null;
 
-    return (
-        <div className="ti2-shell plus-app-shell">
-            <Sidebar
-                user="tutor"
-                activeTabId="sessions"
-                onHomeClick={() => {}}
-                onTabClick={() => {}}
-            />
-
-            <aside className="ti2-sessions-rail" aria-label="Sessions">
-                <div className="ti2-sessions-rail__header">
-                    <p className="h6" style={{ margin: 0 }}>
-                        Sessions
-                    </p>
-                    <p className="body3-txt" style={{ margin: 'var(--size-element-gap-xs) 0 0', color: 'var(--color-on-surface-variant)' }}>
-                        Open sessions as temporary workspace tabs
-                    </p>
-                </div>
-                <div className="ti2-sessions-rail__scroll">
+    const sessionsTabBelow = useMemo(
+        () => ({
+            sessions: (
+                <div className="ti2-sidebar-sessions">
                     <Accordion
                         id="ti2-sessions-accordion"
+                        className="ti2-sidebar-sessions-nav"
                         flush
                         alwaysOpen
                         defaultActiveKey={['today', 'upcoming']}
                         items={accordionItems}
                     />
                 </div>
-            </aside>
+            ),
+        }),
+        [accordionItems]
+    );
+
+    return (
+        <div className="ti2-shell plus-app-shell">
+            <div className="ti2-nav-column">
+                <Sidebar
+                    user="tutor"
+                    activeTabId="sessions"
+                    onHomeClick={() => {}}
+                    onTabClick={() => {}}
+                    tabBelowContent={sessionsTabBelow}
+                    tabBelowContentStyle={{
+                        minWidth: '260px',
+                        maxWidth: 'min(320px, 92vw)',
+                        paddingLeft: 'var(--size-element-pad-x-sm)',
+                        paddingRight: 'var(--size-element-pad-x-xs)',
+                    }}
+                />
+            </div>
 
             <main className="ti2-main">
-                <div className="ti2-tab-strip" role="tablist" aria-label="Open sessions">
-                    {openTabIds.map((id) => {
-                        const session = sessionById(id);
-                        const label = session?.shortLabel ?? id;
-                        const isActive = id === activeSessionId;
-                        return (
-                            <div
-                                key={id}
-                                className={`ti2-tab${isActive ? ' ti2-tab--active' : ''}`}
-                                role="none"
-                            >
-                                <button
-                                    type="button"
-                                    className="ti2-tab__main"
-                                    role="tab"
-                                    aria-selected={isActive}
-                                    onClick={() => {
-                                        dispatchTabs({ type: 'activate', id });
-                                        setWorkspaceView(WORKSPACE_KEYS.session);
-                                    }}
-                                >
-                                    {label}
-                                </button>
-                                <div className="ti2-tab__close">
-                                    <Button
-                                        type="button"
-                                        title="Close tab"
-                                        style="secondary"
-                                        fill="ghost"
-                                        size="small"
-                                        leadingVisual="xmark"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            closeTab(id);
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
                 <div className="ti2-workspace">
-                    {!activeSession && <WorkspaceEmpty />}
-                    {activeSession && (
+                    {!workspaceSession && <WorkspaceEmpty />}
+                    {workspaceSession && (
                         <SessionWorkspace
-                            session={activeSession}
+                            session={workspaceSession}
                             workspaceView={workspaceView}
                             onWorkspaceView={setWorkspaceView}
                         />

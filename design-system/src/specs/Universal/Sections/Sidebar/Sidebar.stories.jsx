@@ -81,3 +81,26 @@ export const Interactive = {
         }
     }
 };
+
+/**
+ * Optional content below a tab (e.g. active sessions under Toolkit → Sessions)
+ */
+export const WithTabBelowContent = {
+    render: () => (
+        <div style={{ backgroundColor: 'var(--color-surface-container)', padding: '16px', borderRadius: '8px' }}>
+            <Sidebar
+                user="tutor"
+                visible
+                activeTabId="sessions"
+                tabBelowContent={{
+                    sessions: (
+                        <p className="body3-txt" style={{ margin: 0, color: 'var(--color-on-surface-variant)' }}>
+                            Example nested content under Sessions
+                        </p>
+                    ),
+                }}
+                tabBelowContentStyle={{ maxWidth: '280px', minWidth: '200px' }}
+            />
+        </div>
+    ),
+};
