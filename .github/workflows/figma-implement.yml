@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [implement-figma-changes]
     # Triggered from Slack via Pipedream
-    # client_payload: { component: "Badge", notion_prd_id: "...", notion_prd_url: "..." }
+    # client_payload: { component: "Badge", thread_ts: "...", notion_prd_id: "...", notion_prd_url: "..." }
   workflow_dispatch:
     inputs:
       component:
@@ -36,6 +36,7 @@ jobs:
             echo "component=${{ github.event.client_payload.component }}" >> $GITHUB_OUTPUT
             echo "notion_prd_id=${{ github.event.client_payload.notion_prd_id }}" >> $GITHUB_OUTPUT
             echo "notion_prd_url=${{ github.event.client_payload.notion_prd_url }}" >> $GITHUB_OUTPUT
+            echo "thread_ts=${{ github.event.client_payload.thread_ts }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout repository
@@ -148,6 +149,7 @@ jobs:
           COMPONENT="${{ steps.payload.outputs.component }}"
           HAS_CHANGES="${{ steps.commit.outputs.changes }}"
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          THREAD_TS="${{ steps.payload.outputs.thread_ts }}"
 
           if [ "$HAS_CHANGES" = "true" ]; then
             MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
@@ -155,6 +157,13 @@ jobs:
             MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design.\n<${RUN_URL}|View action log>"
           fi
 
+          # Build JSON payload — include thread_ts if available for thread reply
+          if [ -n "$THREAD_TS" ]; then
+            PAYLOAD="{\"text\": \"${MSG}\", \"thread_ts\": \"${THREAD_TS}\"}"
+          else
+            PAYLOAD="{\"text\": \"${MSG}\"}"
+          fi
+
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
-            -d "{\"text\": \"${MSG}\"}" || true
+            -d "$PAYLOAD" || true
