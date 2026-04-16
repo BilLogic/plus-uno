@@ -186,13 +186,13 @@ function groupByComponent(items, getFrame, getName) {
  * @param {Array} newVersions - Array of new version objects
  * @returns {Object} - { pageId, pageUrl } or null if skipped
  */
-export async function createNotionPRD(componentDiff, newVersions) {
+export async function createNotionPRD(componentDiff, newVersions, allComponents = []) {
   if (!NOTION_API_KEY || !NOTION_DATABASE_ID) {
     console.log('   NOTION_API_KEY or NOTION_DATABASE_ID not set — skipping PRD creation');
     return null;
   }
 
-  const allChangedItems = [
+  let allChangedItems = [
     ...componentDiff.created,
     ...componentDiff.modified.map(m => m.new),
     ...componentDiff.deleted
@@ -205,8 +205,28 @@ export async function createNotionPRD(componentDiff, newVersions) {
 
   // Group components by parent frame
   const createdGroups = groupByComponent(componentDiff.created, c => c.containingFrame, c => c.name);
-  const modifiedGroups = groupByComponent(componentDiff.modified, c => c.new.containingFrame, c => c.new.name);
+  let modifiedGroups = groupByComponent(componentDiff.modified, c => c.new.containingFrame, c => c.new.name);
   const deletedGroups = groupByComponent(componentDiff.deleted, c => c.containingFrame, c => c.name);
+
+  // When only visual properties changed (version published but no metadata diff),
+  // match version description against known component frames
+  if (!allChangedItems.length && newVersions.length && allComponents.length) {
+    const versionText = newVersions.map(v => `${v.label} ${v.description}`).join(' ').toLowerCase();
+    const frameNames = [...new Set(allComponents.map(c => c.containingFrame).filter(Boolean))];
+    const matchedFrames = frameNames.filter(frame => versionText.includes(frame.toLowerCase()));
+
+    if (matchedFrames.length) {
+      // Build synthetic modified groups from matched frames
+      const matchedComponents = allComponents.filter(c => matchedFrames.includes(c.containingFrame));
+      modifiedGroups = groupByComponent(
+        matchedComponents.map(c => ({ new: c })),
+        c => c.new.containingFrame,
+        c => c.new.name
+      );
+      allChangedItems = matchedComponents;
+      console.log(`   📎 Matched ${matchedFrames.length} component frames from version description: ${matchedFrames.join(', ')}`);
+    }
+  }
 
   // Build PRD title
   const allFrames = new Set([
@@ -216,7 +236,9 @@ export async function createNotionPRD(componentDiff, newVersions) {
   ]);
   const componentNames = [...allFrames].slice(0, 3).join(', ');
   const extra = allFrames.size > 3 ? ` +${allFrames.size - 3} more` : '';
-  const prdTitle = `DS Update: ${componentNames}${extra}`;
+  const prdTitle = allFrames.size
+    ? `DS Update: ${componentNames}${extra}`
+    : `DS Update: ${newVersions.map(v => v.label || v.description || 'Published changes').join(', ')}`;
 
   const figmaUrl = `https://www.figma.com/design/${FIGMA_FILE_KEY}`;
   const date = new Date().toISOString().slice(0, 10);

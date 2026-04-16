@@ -560,7 +560,7 @@ async function main() {
   let prdResult = null;
   try {
     console.log('\n📋 Creating Notion PRD...');
-    prdResult = await createNotionPRD(componentDiff, newVersions);
+    prdResult = await createNotionPRD(componentDiff, newVersions, components);
   } catch (error) {
     console.error(`\n⚠ Notion PRD creation failed: ${error.message}`);
   }
