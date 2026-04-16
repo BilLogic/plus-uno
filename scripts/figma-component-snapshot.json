@@ -1,5 +1,5 @@
 {
-  "lastChecked": "2026-04-16T01:03:45.648Z",
+  "lastChecked": "2026-04-16T01:45:09.493Z",
   "components": [
     {
       "key": "519b409ef4fd78c6e5deb10dc32dad90d880d124",
@@ -8983,6 +8983,27 @@
       "containingFrame": "Static Badges"
     },
     {
+      "key": "cecba819e88b45d3eb836552a8eb230e051a045e",
+      "name": "style=secondary, state=focus",
+      "description": "",
+      "nodeId": "1056:32469",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "f1b646726a83ee372542dcec239e213fd0bd0453",
+      "name": "style=secondary, state=pressed",
+      "description": "",
+      "nodeId": "1056:32525",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "06e06b075d959eda00163debd634e2a062318b33",
+      "name": "style=default, state=disabled",
+      "description": "",
+      "nodeId": "1056:32516",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
       "key": "07ef6e5816bb241e4bbe614c7488e397dd506587",
       "name": "style=danger, state=default",
       "description": "",
@@ -9100,23 +9121,10 @@
       "description": "",
       "nodeId": "1056:32315",
       "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "cecba819e88b45d3eb836552a8eb230e051a045e",
-      "name": "style=secondary, state=focus",
-      "description": "",
-      "nodeId": "1056:32469",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "f1b646726a83ee372542dcec239e213fd0bd0453",
-      "name": "style=secondary, state=pressed",
-      "description": "",
-      "nodeId": "1056:32525",
-      "containingFrame": "Dismissible Badges"
     }
   ],
   "versionIds": [
+    "2342868991370786744",
     "2342829661812636303",
     "2342833647012051388",
     "2342827578733738194",
@@ -9125,8 +9133,7 @@
     "2336930709435004823",
     "2336927908052593208",
     "2336920877728425311",
-    "2336924489807347151",
-    "2336917704297962879"
+    "2336924489807347151"
   ],
   "nodeHashes": {
     "194:16610": "181c6b602af40a7dd9a37fa3eca9c1ac",
