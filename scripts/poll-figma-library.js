@@ -238,7 +238,7 @@ function diffVersions(oldVersionIds, newVersions) {
 /**
  * Build Slack message for detected changes
  */
-function buildSlackMessage(componentDiff, newVersions, prdResult = null) {
+function buildSlackMessage(componentDiff, newVersions, prdResult = null, allComponents = []) {
   const figmaUrl = `https://www.figma.com/design/${FIGMA_FILE_KEY}`;
 
   // Group variants by parent component name (containingFrame)
@@ -310,13 +310,29 @@ function buildSlackMessage(componentDiff, newVersions, prdResult = null) {
   }
 
   // When a version is published but no metadata diff detected (visual-only changes),
-  // extract component names from the version description/label
+  // match the version description against known component frame names
   if (!componentLines.length && newVersions.length) {
-    const versionText = newVersions.map(v => `${v.label} ${v.description}`).join(' ');
-    if (versionText.trim()) {
-      componentLines.push(`✏️  *Updated:*  ${versionText.trim()}`);
+    const versionText = newVersions.map(v => `${v.label} ${v.description}`).join(' ').toLowerCase();
+
+    // Get unique component frame names from the file
+    const frameNames = [...new Set(allComponents.map(c => c.containingFrame).filter(Boolean))];
+
+    // Match frames mentioned in the version description
+    const matchedFrames = frameNames.filter(frame =>
+      versionText.includes(frame.toLowerCase())
+    );
+
+    if (matchedFrames.length) {
+      const display = matchedFrames.length > 5
+        ? matchedFrames.slice(0, 5).join(', ') + ` (+${matchedFrames.length - 5} more)`
+        : matchedFrames.join(', ');
+      componentLines.push(`✏️  *Updated:*  ${display}`);
+    } else if (versionText.trim()) {
+      // No frame match — show the raw description
+      const rawText = newVersions.map(v => [v.label, v.description].filter(Boolean).join(' — ')).join(', ');
+      componentLines.push(`✏️  *Updated:*  ${rawText}`);
     } else {
-      componentLines.push(`✏️  *Updated:*  Visual property changes detected (publish had no description)`);
+      componentLines.push(`✏️  *Updated:*  Visual changes published (no description provided)`);
     }
   }
 
@@ -558,7 +574,7 @@ async function main() {
   // Post to Slack
   if (SLACK_WEBHOOK_URL) {
     try {
-      const { blocks, text } = buildSlackMessage(componentDiff, newVersions, prdResult);
+      const { blocks, text } = buildSlackMessage(componentDiff, newVersions, prdResult, components);
       await postToSlack(blocks, text);
       console.log('\n✅ Slack notification sent');
     } catch (error) {
