@@ -164,7 +164,7 @@ async function fetchComponents() {
  * Fetch node data for a batch of components and return a hash per node.
  * This detects visual property changes that metadata alone misses.
  */
-async function fetchNodeHashes(components) {
+async function fetchNodeHashes(components, version = null) {
   if (!components.length) return {};
 
   // Figma supports batching node IDs in one request (comma-separated)
@@ -175,11 +175,12 @@ async function fetchNodeHashes(components) {
     chunks.push(components.slice(i, i + 50));
   }
 
+  const versionParam = version ? `&version=${version}` : '';
   for (const chunk of chunks) {
     const ids = chunk.map(c => c.nodeId).filter(Boolean).join(',');
     if (!ids) continue;
     try {
-      const result = await figmaGet(`/files/${FIGMA_FILE_KEY}/nodes?ids=${ids}&geometry=paths`);
+      const result = await figmaGet(`/files/${FIGMA_FILE_KEY}/nodes?ids=${ids}&geometry=paths${versionParam}`);
       const nodes = result.nodes || {};
       for (const [nodeId, nodeData] of Object.entries(nodes)) {
         if (nodeData?.document) {
@@ -520,7 +521,14 @@ async function main() {
   if (!hasMetadataChanges && newVersions.length > 0) {
     console.log('\n🔍 New version detected — checking for visual property changes...');
     const newHashes = await fetchNodeHashes(components);
-    const oldHashes = snapshot.nodeHashes || {};
+    let oldHashes = snapshot.nodeHashes || {};
+
+    // If no stored hashes exist, fetch from the previous version for comparison
+    if (!Object.keys(oldHashes).length && snapshot.versionIds?.length) {
+      const prevVersionId = snapshot.versionIds[0]; // most recent previously-known version
+      console.log(`   📦 No stored hashes — fetching baseline from previous version ${prevVersionId}...`);
+      oldHashes = await fetchNodeHashes(components, prevVersionId);
+    }
 
     for (const comp of components) {
       const id = comp.nodeId;
