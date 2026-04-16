@@ -1,5 +1,5 @@
 {
-  "lastChecked": "2026-04-16T00:10:17.219Z",
+  "lastChecked": "2026-04-16T00:28:40.787Z",
   "components": [
     {
       "key": "519b409ef4fd78c6e5deb10dc32dad90d880d124",
@@ -28,13 +28,6 @@
       "description": "",
       "nodeId": "13932:14401",
       "containingFrame": "Jumbotron"
-    },
-    {
-      "key": "91189d701c1ee73efca0241165f0f40397fc6611",
-      "name": "type=h3, style=warning",
-      "description": "",
-      "nodeId": "25:629",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "9871fe7b14446e31ac6e3d5f951bcbeff60443fe",
@@ -1122,25 +1115,11 @@
       "containingFrame": "Input"
     },
     {
-      "key": "a050f6461614250b429dcef0bd5dea34737db28a",
-      "name": "type=h2, style=warning",
-      "description": "",
-      "nodeId": "25:627",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "7d5e803c0e33d98120a10a0bf8c6004c1a8d0a43",
       "name": "type=checkbox",
       "description": "",
       "nodeId": "13671:3217",
       "containingFrame": "Input Group"
-    },
-    {
-      "key": "8e6f86dbf87e7a1767faa5775bfa484d11a44ebe",
-      "name": "type=h1, style=danger",
-      "description": "",
-      "nodeId": "25:611",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "8f56202754b56756c9181570db9c09bd38f60179",
@@ -1164,38 +1143,10 @@
       "containingFrame": "Input Group"
     },
     {
-      "key": "36a315294cc81fe5901acc95816b8b4ca8558fe3",
-      "name": "type=h4, style=tertiary",
-      "description": "",
-      "nodeId": "25:645",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "a98b483665f4f4d38590605f110c593895bcb3dc",
-      "name": "type=h2, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17834",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "ab6894f849575f139aea2362bccb19877821f7d9",
       "name": "type=b3, style=warning",
       "description": "",
       "nodeId": "1250:23659",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "af7ab9d6ab29d2297b11da9d5a4139cee76e6dc8",
-      "name": "type=h1, style=secondary",
-      "description": "",
-      "nodeId": "25:583",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "ba43637c8d12fdd3fa2606c9e9b81c63de366d2a",
-      "name": "type=b2, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18035",
       "containingFrame": "Static Badges"
     },
     {
@@ -1204,13 +1155,6 @@
       "description": "",
       "nodeId": "13671:3219",
       "containingFrame": "Input Group"
-    },
-    {
-      "key": "bf3e04977d0d692393a49b734fb5e47067c7e21d",
-      "name": "type=h1, style=tertiary",
-      "description": "",
-      "nodeId": "25:639",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "ccd3e654bc6fe107e38c940d226eeb981bffa457",
@@ -1232,41 +1176,6 @@
       "description": "",
       "nodeId": "4356:28683",
       "containingFrame": "Input"
-    },
-    {
-      "key": "ddb559583a013c4304f64f5190192a256032f51c",
-      "name": "type=b2, style=primary",
-      "description": "",
-      "nodeId": "1250:23363",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "e2e83c3e43bf497bc2521a9ab2268cfc91f8dcd2",
-      "name": "type=h5, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18029",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "e7154c71778fb4202fe41040ea73fbee207ed636",
-      "name": "type=h5, style=danger",
-      "description": "",
-      "nodeId": "25:619",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "f19a65a4c9d5617139ceadd34014f7d0817c26bf",
-      "name": "type=h3, style=tertiary",
-      "description": "",
-      "nodeId": "25:643",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "fdf15b34e31dea7df81fa072a95477f66b0c1f61",
-      "name": "type=b2, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17639",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "565af7a0364564b7b5c8563f5e4384608c85fe36",
@@ -2858,178 +2767,10 @@
       "containingFrame": "Media Object Alignment"
     },
     {
-      "key": "0541c6b0ed0615c42dbaa88e3067cdd3fa60cb79",
-      "name": "type=h6, style=primary",
-      "description": "",
-      "nodeId": "25:579",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "05ad0ae31993da946852fdfc83ae016063331e50",
-      "name": "type=b1, style=relationships",
-      "description": "",
-      "nodeId": "1970:17970",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "0f0324c10d385477c760f630eae51103ff808f41",
-      "name": "type=b2, style=tertiary",
-      "description": "",
-      "nodeId": "1250:23373",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "1784431bddd111fbb064c4d93288a474873b1359",
-      "name": "type=b1, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17907",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "17b1e4273f05ed4d2f051e99de130d8cbc90f1c2",
-      "name": "type=h6, style=relationships",
-      "description": "",
-      "nodeId": "1970:17968",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "17de6a68db70b809bdcb1ba2fa72cd704fda7511",
-      "name": "type=h4, style=primary",
-      "description": "",
-      "nodeId": "25:575",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "1c6f7b74835b6401ee60ec3e78d5dc5f9e9f8c07",
-      "name": "type=h2, style=secondary",
-      "description": "",
-      "nodeId": "25:585",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "1f4d577e918a4cb2e5bd8e9e4dd39e07d93e6c08",
-      "name": "type=h5, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17840",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "1fda07eb77eaa0eba9ced5a113d1a48f739a1b2d",
-      "name": "type=b3, style=success",
-      "description": "",
-      "nodeId": "1250:23657",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "24c1b30483e8047b8a06b71fac1c4c530f20043d",
-      "name": "type=b2, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17909",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "27c5fe880231369abdee80b4589f12635fbd3676",
-      "name": "type=h6, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18031",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "2bbde359fe2d1932ae8c34fd7cb854763b4a0788",
-      "name": "type=h2, style=tertiary",
-      "description": "",
-      "nodeId": "25:641",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "2c1068303ed35b23f7ae636e964bf4c0ad02dcde",
-      "name": "type=b3, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17641",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "333d84543d60f1698c97f07dae94e657f3202ca6",
-      "name": "type=h5, style=primary",
-      "description": "",
-      "nodeId": "25:577",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "3432e53d0d186c4869ed58d455157b218ca33e27",
-      "name": "type=h4, style=relationships",
-      "description": "",
-      "nodeId": "1970:17964",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "35729e98a9857a50d6cc19c29ad60c5f53a8fbd1",
       "name": "type=h1, style=warning",
       "description": "",
       "nodeId": "25:625",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "361d48e6001698153af18f2aba4f346b92af2d41",
-      "name": "type=h4, style=secondary",
-      "description": "",
-      "nodeId": "25:589",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "384dd2a5b1942ac8f738a79c7f1cebe10799d25f",
-      "name": "type=h5, style=secondary",
-      "description": "",
-      "nodeId": "25:591",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "3b524a5309d3016770d8879f3b1dc84f119314cc",
-      "name": "type=b3, style=danger",
-      "description": "",
-      "nodeId": "1250:23655",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "3b88bb5788e3b4f98bec699ffc2214c199ce8541",
-      "name": "type=h2, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17627",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "3fff988dc66a701e4780587b802ec5de6b482f83",
-      "name": "type=h4, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17838",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "422f06dbfe458b801114e533b61b1fde0373a66a",
-      "name": "type=h6, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17905",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "4230b051702cef4aa432df9ff03e64ebd90c96bc",
-      "name": "type=b1, style=danger",
-      "description": "",
-      "nodeId": "25:623",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "45bb0aafe47a2ad458277ea615ca1be88b7e0209",
-      "name": "type=b2, style=relationships",
-      "description": "",
-      "nodeId": "1970:17972",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "4711df3c25ce0183ad8a6a826d3e88799f19b8b1",
-      "name": "type=h3, style=danger",
-      "description": "",
-      "nodeId": "25:615",
       "containingFrame": "Static Badges"
     },
     {
@@ -3040,262 +2781,10 @@
       "containingFrame": "Media Object Alignment"
     },
     {
-      "key": "4a455eeef1fe3bbad087b7e3763c7aa99543d76a",
-      "name": "type=h2, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17897",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "555975f09a488986ecd83235cad9163fe6d91810",
-      "name": "type=h1, style=relationships",
-      "description": "",
-      "nodeId": "1970:17958",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "5881ec91f8a1f79fa2da88cd4c02eb77dd68fe60",
-      "name": "type=b2, style=warning",
-      "description": "",
-      "nodeId": "1250:23371",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "5f40895c024722bc1d9d9a2437a929b858550c39",
-      "name": "type=h4, style=success",
-      "description": "",
-      "nodeId": "25:603",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "67f165984198e9a60beb8287901ebcbf8fb5dcaf",
-      "name": "type=h5, style=success",
-      "description": "",
-      "nodeId": "25:605",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "6ee10721d522ba1d684eb599264983cddccedb89",
-      "name": "type=b1, style=secondary",
-      "description": "",
-      "nodeId": "25:595",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "701e95362901b799fef22424b9ccbe449a7672bc",
-      "name": "type=h2, style=primary",
-      "description": "",
-      "nodeId": "25:571",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "7194a9b0036f63292bdc6247cdb42e43e34aba59",
-      "name": "type=b1, style=warning",
-      "description": "",
-      "nodeId": "25:637",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "724e2fd80ea993f3df2c8422944128ca22955554",
-      "name": "type=b1, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17637",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "734d1737cd9e46561670d7b24f16f38ddcc70230",
-      "name": "type=h2, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18023",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "791392ff0207ce64fa0ce24b2fd840b75f65116a",
-      "name": "type=b3, style=tertiary",
-      "description": "",
-      "nodeId": "1250:23661",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "7c8124e61ef7ce431268cde54738f4fef1e9f197",
-      "name": "type=b1, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18033",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "7d5038c800f96f3fa98a44a9ac04fcc3d81c723c",
-      "name": "type=h3, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17836",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "830433063b11b82950aecbd2cb481d916cc51616",
       "name": "type=h4, style=warning",
       "description": "",
       "nodeId": "25:631",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "83c7cb4faab405798199bb86b2e281fbf5ebea69",
-      "name": "type=b3, style=relationships",
-      "description": "",
-      "nodeId": "1970:17974",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "85a875fdd78eaf6c64ffcd256858ec3ee1d53375",
-      "name": "type=h5, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17633",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "8c0c13663e79e38c5fa650e2237962c1563b7342",
-      "name": "type=b1, style=tertiary",
-      "description": "",
-      "nodeId": "25:651",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "8cbc6aa50bc9a6b3efb473340c08f34943adb4e6",
-      "name": "type=b3, style=secondary",
-      "description": "",
-      "nodeId": "1250:23653",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "901f2d5cd5c3ecd8c2ca7566053670137174d0ee",
-      "name": "type=h1, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17625",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "930c5dd2802f340aa81fd8def9380985b0f79dbc",
-      "name": "type=h1, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17895",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "99557b91b2d7e55351a3153b66ff718218a67454",
-      "name": "type=h3, style=success",
-      "description": "",
-      "nodeId": "25:601",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "9a7596006b15e45ac0469d8ad7bd40247ccff23e",
-      "name": "type=h4, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17631",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "9fa1628942e708894a66d0872702a60e1f9aaed8",
-      "name": "type=h3, style=secondary",
-      "description": "",
-      "nodeId": "25:587",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "b9ad0ab2de5d0734830086f1e3872d621714ff78",
-      "name": "type=h1, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17832",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "bb005836f1dd0cc374dc280bd91fd0599bee3c1e",
-      "name": "type=b1, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17844",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "bcdb9a14dba16de2368c8abe6ce954ff885b5b42",
-      "name": "type=b3, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17911",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "bf51b0538aa2c83f2a3230b4a8bf2ffc53db6e40",
-      "name": "type=h3, style=primary",
-      "description": "",
-      "nodeId": "25:573",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "c2b6b2eafb3cec4647eec00f9db9535aad5582e9",
-      "name": "type=h5, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17903",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "c5233ba50d6ae4b955a27098b3b2c3197e146cfa",
-      "name": "type=b3, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17848",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "c6e0b8ff24088d634c7d175f4cc23a5b146d250c",
-      "name": "type=b2, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17846",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "c7871e94666b1c8f476ed94d0bcd9bf4ca2b5742",
-      "name": "type=h1, style=primary",
-      "description": "",
-      "nodeId": "25:569",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "c834118f0c5a4fe342b8bc49dc508a5c75c5153a",
-      "name": "type=h4, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18027",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "ccf73b0d0579f56ff2362fb18d0a9b55d4bbba31",
-      "name": "type=h2, style=danger",
-      "description": "",
-      "nodeId": "25:613",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "cd0fd6dbc893a7d1ac9324f8749067c3ae74836a",
-      "name": "type=h5, style=relationships",
-      "description": "",
-      "nodeId": "1970:17966",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "d37e558a32b1aebe895a50ab41552742a1ae8f2e",
-      "name": "type=b2, style=secondary",
-      "description": "",
-      "nodeId": "1250:23365",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "d9db3d35db64edb0880f534922fde38d74862df2",
-      "name": "type=h3, style=technology tools",
-      "description": "",
-      "nodeId": "1970:18025",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "eedd5289fb660b2aa38987e595e99418d56653f7",
-      "name": "type=b3, style=primary",
-      "description": "",
-      "nodeId": "1250:23651",
       "containingFrame": "Static Badges"
     },
     {
@@ -6386,13 +5875,6 @@
       "containingFrame": "Dropdown list Item"
     },
     {
-      "key": "04e4d0744c18f44aff20125474190c45dfaed97c",
-      "name": "type=h6, style=warning",
-      "description": "",
-      "nodeId": "25:635",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "171b067f5be6f248bf92916bdd0e955ccfdd7d0a",
       "name": "state=default, input=value",
       "description": "",
@@ -7527,55 +7009,6 @@
       "containingFrame": "Input Group old"
     },
     {
-      "key": "06e06b075d959eda00163debd634e2a062318b33",
-      "name": "style=default, state=disabled",
-      "description": "",
-      "nodeId": "1056:32516",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "07ef6e5816bb241e4bbe614c7488e397dd506587",
-      "name": "style=danger, state=default",
-      "description": "",
-      "nodeId": "1056:32311",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "0a31baad9f25d10c3352859e65c0ae5face8812c",
-      "name": "style=success, state=default",
-      "description": "",
-      "nodeId": "1056:32313",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "2170771b236854279dae6ee6b3d2e768d96297c1",
-      "name": "style=success, state=hover",
-      "description": "",
-      "nodeId": "1056:32424",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "22cf1d372854adc98a676389a6970520fd17d477",
-      "name": "style=danger, state=hover",
-      "description": "",
-      "nodeId": "1056:32422",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "3462cdd957ec0461f3ea512bfa49307a51da8db6",
-      "name": "style=warning, state=hover",
-      "description": "",
-      "nodeId": "1056:32426",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "38fd12806d34ed7f3262af5fcf896f734627c21b",
-      "name": "style=info, state=focus",
-      "description": "",
-      "nodeId": "1056:32477",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "4a68bb1ef25edb25746db3e83616dfd3096ed2f2",
       "name": "style=success, state=pressed",
       "description": "",
@@ -7597,73 +7030,10 @@
       "containingFrame": "Dismissible Badges"
     },
     {
-      "key": "6198f529827d894cf842ea8dde0ebd2722016e5b",
-      "name": "style=primary, state=default",
-      "description": "",
-      "nodeId": "1056:32307",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "64de0dc8044b028b8ebefcc7ac080c9ada0aa6fd",
-      "name": "style=tertiary, state=pressed",
-      "description": "",
-      "nodeId": "13761:1640",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "6a4fe6b282e5a975809a5bc36721d2b8b7235bc9",
-      "name": "style=warning, state=pressed",
-      "description": "",
-      "nodeId": "1056:32531",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "76130ac7cff2aea29147af9c25617ff13269ffa6",
       "name": "style=secondary, state=hover",
       "description": "",
       "nodeId": "1056:32420",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "7abd0b73ca320f0425e0f312312f80b99b3de4dc",
-      "name": "style=info, state=default",
-      "description": "",
-      "nodeId": "1056:32317",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "7f0530f2a323470fb09e1b1665fff9183fcc5de6",
-      "name": "style=primary, state=hover",
-      "description": "",
-      "nodeId": "1056:32418",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "87dca3f2df910a706e1bd12c5740377614c6da6b",
-      "name": "style=danger, state=pressed",
-      "description": "",
-      "nodeId": "1056:32527",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "941c160082c9288f49ac794abd13a8bb6f4f497e",
-      "name": "style=tertiary, state=focus",
-      "description": "",
-      "nodeId": "13761:1638",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "95d59d1e6d48aeb61354c17cd5a529b82f84ca2b",
-      "name": "style=secondary, state=default",
-      "description": "",
-      "nodeId": "1056:32309",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "998303b7b2749a89123b87ddb06a9e062e35b968",
-      "name": "style=primary, state=pressed",
-      "description": "",
-      "nodeId": "1056:32523",
       "containingFrame": "Dismissible Badges"
     },
     {
@@ -7678,27 +7048,6 @@
       "name": "style=info, state=pressed",
       "description": "",
       "nodeId": "1056:32533",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "cc7111f9b4dabe71fbd427e6bf30cc7984285760",
-      "name": "style=tertiary, state=hover",
-      "description": "",
-      "nodeId": "13761:1636",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "cc71f976374a5866258b70f3e1209e9d44e95c7c",
-      "name": "style=warning, state=default",
-      "description": "",
-      "nodeId": "1056:32315",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "cecba819e88b45d3eb836552a8eb230e051a045e",
-      "name": "style=secondary, state=focus",
-      "description": "",
-      "nodeId": "1056:32469",
       "containingFrame": "Dismissible Badges"
     },
     {
@@ -8043,20 +7392,6 @@
       "description": "",
       "nodeId": "1365:21582",
       "containingFrame": "User Avatar"
-    },
-    {
-      "key": "fb2a839ee1b1780e6b1a8816da981c847ff5fc73",
-      "name": "type=h2, style=success",
-      "description": "",
-      "nodeId": "25:599",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "fb592228a5f29f86c105db4ddf923f7e8c4a3e51",
-      "name": "type=h6, style=mastering content",
-      "description": "",
-      "nodeId": "1970:17842",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "40414b447b69e622d08858abb837736ea481d931",
@@ -8661,18 +7996,18 @@
       "containingFrame": "Text buttons"
     },
     {
-      "key": "197fe926f544191f509bf181428390b9206dfed2",
-      "name": "size=medium (default), style=primary, state=rest (default)",
-      "description": "",
-      "nodeId": "979:19819",
-      "containingFrame": "Text buttons"
-    },
-    {
       "key": "1985b4e590661075f17221d5e6b6d5599a3ce03b",
       "name": "style=warning, state=focus",
       "description": "",
       "nodeId": "1056:32475",
       "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "197fe926f544191f509bf181428390b9206dfed2",
+      "name": "size=medium (default), style=primary, state=rest (default)",
+      "description": "",
+      "nodeId": "979:19819",
+      "containingFrame": "Text buttons"
     },
     {
       "key": "2312ba2873d890e672ad66c2eb51bcfb71af4922",
@@ -8717,18 +8052,18 @@
       "containingFrame": "Text buttons"
     },
     {
-      "key": "6004a305e8f03722f48658647c481182b40ef9be",
-      "name": "size=small, style=primary, state=pressed",
-      "description": "",
-      "nodeId": "979:19911",
-      "containingFrame": "Text buttons"
-    },
-    {
       "key": "5e2f5b38b9917cd72f2a85db582b0374acd82cf5",
       "name": "style=success, state=focus",
       "description": "",
       "nodeId": "1056:32473",
       "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "6004a305e8f03722f48658647c481182b40ef9be",
+      "name": "size=small, style=primary, state=pressed",
+      "description": "",
+      "nodeId": "979:19911",
+      "containingFrame": "Text buttons"
     },
     {
       "key": "67d25eafed59f9ac1a78fbb9964b8de76e6fec97",
@@ -8808,20 +8143,6 @@
       "containingFrame": "Text buttons"
     },
     {
-      "key": "f1b646726a83ee372542dcec239e213fd0bd0453",
-      "name": "style=secondary, state=pressed",
-      "description": "",
-      "nodeId": "1056:32525",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "00d93677d928dff9df471e2ecd503d60574e67dc",
-      "name": "type=h6, style=secondary",
-      "description": "",
-      "nodeId": "25:593",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "0d71ba25f219402f68663e891b2b7e1ff091fdf6",
       "name": "state=pressed, selected=false",
       "description": "",
@@ -8836,13 +8157,6 @@
       "containingFrame": "NavBar Item"
     },
     {
-      "key": "1147efdd5defb3184d558058795c1f53c2dfedd7",
-      "name": "type=h4, style=danger",
-      "description": "",
-      "nodeId": "25:617",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "1a53a79f005d107440c4c228ce5fb0ec9ece153b",
       "name": "open?=True, # of indents=3",
       "description": "",
@@ -8855,13 +8169,6 @@
       "description": "",
       "nodeId": "13584:55801",
       "containingFrame": "Cascade list"
-    },
-    {
-      "key": "1f01fb408b4566c4b5eccd2fd0ad573e590d918e",
-      "name": "type=h3, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17629",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "28b0f228ce07730b0e2802efca861a3fd0747ac8",
@@ -8889,13 +8196,6 @@
       "name": "type=b1, style=primary",
       "description": "",
       "nodeId": "25:581",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "4b3efc831e6f33609858f01ea8759ff0dcb6309e",
-      "name": "type=b2, style=success",
-      "description": "",
-      "nodeId": "1250:23369",
       "containingFrame": "Static Badges"
     },
     {
@@ -8927,20 +8227,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "6146699d54335b776b5e83e2fb38f9b997b98cab",
-      "name": "type=h4, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17901",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "62b9fac8916bd2676252115b8edfc54ea6032bb5",
-      "name": "type=h5, style=tertiary",
-      "description": "",
-      "nodeId": "25:647",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "601e7bb10ba9f5d21f463b4b65107118c8ec2c86",
       "name": "type=forms",
       "description": "",
@@ -8953,20 +8239,6 @@
       "description": "",
       "nodeId": "4209:30088",
       "containingFrame": "NavBar Item"
-    },
-    {
-      "key": "6d5d82d0e54b56eaf8f69bb7e84f93bc2ea8cfdb",
-      "name": "type=h2, style=relationships",
-      "description": "",
-      "nodeId": "1970:17960",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "7823ec6864bec9ee971fd9cde27c66f2eed77c5b",
-      "name": "type=h3, style=relationships",
-      "description": "",
-      "nodeId": "1970:17962",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "742a1eff82ace83d1e821a7aa5f4d77c2a4eedad",
@@ -8983,17 +8255,10 @@
       "containingFrame": "NavBar Item"
     },
     {
-      "key": "8761127beb8b5502defedb70fea005bb64664528",
-      "name": "type=b2, style=danger",
+      "key": "7823ec6864bec9ee971fd9cde27c66f2eed77c5b",
+      "name": "type=h3, style=relationships",
       "description": "",
-      "nodeId": "1250:23367",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "8b8348c1d7d9a1e724e1605cc6c72147f1da3835",
-      "name": "type=h6, style=tertiary",
-      "description": "",
-      "nodeId": "25:649",
+      "nodeId": "1970:17962",
       "containingFrame": "Static Badges"
     },
     {
@@ -9011,13 +8276,6 @@
       "containingFrame": ""
     },
     {
-      "key": "9bda693413ab343d77548b5eb9caeb0c86048912",
-      "name": "type=h5, style=warning",
-      "description": "",
-      "nodeId": "25:633",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "9c952c35ba0b201313f5c383b3a7560920bf9630",
       "name": "type=text",
       "description": "",
@@ -9030,13 +8288,6 @@
       "description": "",
       "nodeId": "4209:30100",
       "containingFrame": "NavBar Item"
-    },
-    {
-      "key": "bbdc70a628d4375f532ad2280086dec8f9130dd6",
-      "name": "type=b1, style=success",
-      "description": "",
-      "nodeId": "25:609",
-      "containingFrame": "Static Badges"
     },
     {
       "key": "be001396a177db670085f34b98b504c3f8a3c0bc",
@@ -9057,13 +8308,6 @@
       "name": "type=h1, style=technology tools",
       "description": "",
       "nodeId": "1970:18021",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "d15ca556d39a34b4c6a56738abbfac1172b331d0",
-      "name": "type=h3, style=advocacy",
-      "description": "",
-      "nodeId": "1970:17899",
       "containingFrame": "Static Badges"
     },
     {
@@ -9088,20 +8332,6 @@
       "containingFrame": "NavBar Item"
     },
     {
-      "key": "e3b45d56c377635a81840553806d3f521287e1f4",
-      "name": "type=h6, style=socio-emotional",
-      "description": "",
-      "nodeId": "1970:17635",
-      "containingFrame": "Static Badges"
-    },
-    {
-      "key": "e7f63845668a5a0cd669e02f2800ce53ac9a53f6",
-      "name": "type=h6, style=success",
-      "description": "",
-      "nodeId": "25:607",
-      "containingFrame": "Static Badges"
-    },
-    {
       "key": "dba988a349fa7bde27a04ab0fc188f7ff944f806",
       "name": "style = primary, open?=true, split?=false, direction=dropdown",
       "description": "",
@@ -9121,9 +8351,780 @@
       "description": "",
       "nodeId": "15685:6234",
       "containingFrame": "Select Menu"
+    },
+    {
+      "key": "00d93677d928dff9df471e2ecd503d60574e67dc",
+      "name": "type=h6, style=secondary",
+      "description": "",
+      "nodeId": "25:593",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "04e4d0744c18f44aff20125474190c45dfaed97c",
+      "name": "type=h6, style=warning",
+      "description": "",
+      "nodeId": "25:635",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "0541c6b0ed0615c42dbaa88e3067cdd3fa60cb79",
+      "name": "type=h6, style=primary",
+      "description": "",
+      "nodeId": "25:579",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "05ad0ae31993da946852fdfc83ae016063331e50",
+      "name": "type=b1, style=relationships",
+      "description": "",
+      "nodeId": "1970:17970",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "06e06b075d959eda00163debd634e2a062318b33",
+      "name": "style=default, state=disabled",
+      "description": "",
+      "nodeId": "1056:32516",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "07ef6e5816bb241e4bbe614c7488e397dd506587",
+      "name": "style=danger, state=default",
+      "description": "",
+      "nodeId": "1056:32311",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "0a31baad9f25d10c3352859e65c0ae5face8812c",
+      "name": "style=success, state=default",
+      "description": "",
+      "nodeId": "1056:32313",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "0f0324c10d385477c760f630eae51103ff808f41",
+      "name": "type=b2, style=tertiary",
+      "description": "",
+      "nodeId": "1250:23373",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "1147efdd5defb3184d558058795c1f53c2dfedd7",
+      "name": "type=h4, style=danger",
+      "description": "",
+      "nodeId": "25:617",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "1784431bddd111fbb064c4d93288a474873b1359",
+      "name": "type=b1, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17907",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "17b1e4273f05ed4d2f051e99de130d8cbc90f1c2",
+      "name": "type=h6, style=relationships",
+      "description": "",
+      "nodeId": "1970:17968",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "17de6a68db70b809bdcb1ba2fa72cd704fda7511",
+      "name": "type=h4, style=primary",
+      "description": "",
+      "nodeId": "25:575",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "1c6f7b74835b6401ee60ec3e78d5dc5f9e9f8c07",
+      "name": "type=h2, style=secondary",
+      "description": "",
+      "nodeId": "25:585",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "1f01fb408b4566c4b5eccd2fd0ad573e590d918e",
+      "name": "type=h3, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17629",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "1f4d577e918a4cb2e5bd8e9e4dd39e07d93e6c08",
+      "name": "type=h5, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17840",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "1fda07eb77eaa0eba9ced5a113d1a48f739a1b2d",
+      "name": "type=b3, style=success",
+      "description": "",
+      "nodeId": "1250:23657",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "2170771b236854279dae6ee6b3d2e768d96297c1",
+      "name": "style=success, state=hover",
+      "description": "",
+      "nodeId": "1056:32424",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "22cf1d372854adc98a676389a6970520fd17d477",
+      "name": "style=danger, state=hover",
+      "description": "",
+      "nodeId": "1056:32422",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "24c1b30483e8047b8a06b71fac1c4c530f20043d",
+      "name": "type=b2, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17909",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "27c5fe880231369abdee80b4589f12635fbd3676",
+      "name": "type=h6, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18031",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "2bbde359fe2d1932ae8c34fd7cb854763b4a0788",
+      "name": "type=h2, style=tertiary",
+      "description": "",
+      "nodeId": "25:641",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "2c1068303ed35b23f7ae636e964bf4c0ad02dcde",
+      "name": "type=b3, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17641",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "333d84543d60f1698c97f07dae94e657f3202ca6",
+      "name": "type=h5, style=primary",
+      "description": "",
+      "nodeId": "25:577",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "3432e53d0d186c4869ed58d455157b218ca33e27",
+      "name": "type=h4, style=relationships",
+      "description": "",
+      "nodeId": "1970:17964",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "3462cdd957ec0461f3ea512bfa49307a51da8db6",
+      "name": "style=warning, state=hover",
+      "description": "",
+      "nodeId": "1056:32426",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "361d48e6001698153af18f2aba4f346b92af2d41",
+      "name": "type=h4, style=secondary",
+      "description": "",
+      "nodeId": "25:589",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "36a315294cc81fe5901acc95816b8b4ca8558fe3",
+      "name": "type=h4, style=tertiary",
+      "description": "",
+      "nodeId": "25:645",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "384dd2a5b1942ac8f738a79c7f1cebe10799d25f",
+      "name": "type=h5, style=secondary",
+      "description": "",
+      "nodeId": "25:591",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "38fd12806d34ed7f3262af5fcf896f734627c21b",
+      "name": "style=info, state=focus",
+      "description": "",
+      "nodeId": "1056:32477",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "3b524a5309d3016770d8879f3b1dc84f119314cc",
+      "name": "type=b3, style=danger",
+      "description": "",
+      "nodeId": "1250:23655",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "3b88bb5788e3b4f98bec699ffc2214c199ce8541",
+      "name": "type=h2, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17627",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "3fff988dc66a701e4780587b802ec5de6b482f83",
+      "name": "type=h4, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17838",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "422f06dbfe458b801114e533b61b1fde0373a66a",
+      "name": "type=h6, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17905",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "4230b051702cef4aa432df9ff03e64ebd90c96bc",
+      "name": "type=b1, style=danger",
+      "description": "",
+      "nodeId": "25:623",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "45bb0aafe47a2ad458277ea615ca1be88b7e0209",
+      "name": "type=b2, style=relationships",
+      "description": "",
+      "nodeId": "1970:17972",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "4711df3c25ce0183ad8a6a826d3e88799f19b8b1",
+      "name": "type=h3, style=danger",
+      "description": "",
+      "nodeId": "25:615",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "4a455eeef1fe3bbad087b7e3763c7aa99543d76a",
+      "name": "type=h2, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17897",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "4b3efc831e6f33609858f01ea8759ff0dcb6309e",
+      "name": "type=b2, style=success",
+      "description": "",
+      "nodeId": "1250:23369",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "555975f09a488986ecd83235cad9163fe6d91810",
+      "name": "type=h1, style=relationships",
+      "description": "",
+      "nodeId": "1970:17958",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "5881ec91f8a1f79fa2da88cd4c02eb77dd68fe60",
+      "name": "type=b2, style=warning",
+      "description": "",
+      "nodeId": "1250:23371",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "5f40895c024722bc1d9d9a2437a929b858550c39",
+      "name": "type=h4, style=success",
+      "description": "",
+      "nodeId": "25:603",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "6146699d54335b776b5e83e2fb38f9b997b98cab",
+      "name": "type=h4, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17901",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "6198f529827d894cf842ea8dde0ebd2722016e5b",
+      "name": "style=primary, state=default",
+      "description": "",
+      "nodeId": "1056:32307",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "62b9fac8916bd2676252115b8edfc54ea6032bb5",
+      "name": "type=h5, style=tertiary",
+      "description": "",
+      "nodeId": "25:647",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "64de0dc8044b028b8ebefcc7ac080c9ada0aa6fd",
+      "name": "style=tertiary, state=pressed",
+      "description": "",
+      "nodeId": "13761:1640",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "67f165984198e9a60beb8287901ebcbf8fb5dcaf",
+      "name": "type=h5, style=success",
+      "description": "",
+      "nodeId": "25:605",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "6a4fe6b282e5a975809a5bc36721d2b8b7235bc9",
+      "name": "style=warning, state=pressed",
+      "description": "",
+      "nodeId": "1056:32531",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "6d5d82d0e54b56eaf8f69bb7e84f93bc2ea8cfdb",
+      "name": "type=h2, style=relationships",
+      "description": "",
+      "nodeId": "1970:17960",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "6ee10721d522ba1d684eb599264983cddccedb89",
+      "name": "type=b1, style=secondary",
+      "description": "",
+      "nodeId": "25:595",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "701e95362901b799fef22424b9ccbe449a7672bc",
+      "name": "type=h2, style=primary",
+      "description": "",
+      "nodeId": "25:571",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "7194a9b0036f63292bdc6247cdb42e43e34aba59",
+      "name": "type=b1, style=warning",
+      "description": "",
+      "nodeId": "25:637",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "724e2fd80ea993f3df2c8422944128ca22955554",
+      "name": "type=b1, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17637",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "734d1737cd9e46561670d7b24f16f38ddcc70230",
+      "name": "type=h2, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18023",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "791392ff0207ce64fa0ce24b2fd840b75f65116a",
+      "name": "type=b3, style=tertiary",
+      "description": "",
+      "nodeId": "1250:23661",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "7abd0b73ca320f0425e0f312312f80b99b3de4dc",
+      "name": "style=info, state=default",
+      "description": "",
+      "nodeId": "1056:32317",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "7c8124e61ef7ce431268cde54738f4fef1e9f197",
+      "name": "type=b1, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18033",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "7d5038c800f96f3fa98a44a9ac04fcc3d81c723c",
+      "name": "type=h3, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17836",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "7f0530f2a323470fb09e1b1665fff9183fcc5de6",
+      "name": "style=primary, state=hover",
+      "description": "",
+      "nodeId": "1056:32418",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "83c7cb4faab405798199bb86b2e281fbf5ebea69",
+      "name": "type=b3, style=relationships",
+      "description": "",
+      "nodeId": "1970:17974",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "85a875fdd78eaf6c64ffcd256858ec3ee1d53375",
+      "name": "type=h5, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17633",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "8761127beb8b5502defedb70fea005bb64664528",
+      "name": "type=b2, style=danger",
+      "description": "",
+      "nodeId": "1250:23367",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "87dca3f2df910a706e1bd12c5740377614c6da6b",
+      "name": "style=danger, state=pressed",
+      "description": "",
+      "nodeId": "1056:32527",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "8b8348c1d7d9a1e724e1605cc6c72147f1da3835",
+      "name": "type=h6, style=tertiary",
+      "description": "",
+      "nodeId": "25:649",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "8c0c13663e79e38c5fa650e2237962c1563b7342",
+      "name": "type=b1, style=tertiary",
+      "description": "",
+      "nodeId": "25:651",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "8cbc6aa50bc9a6b3efb473340c08f34943adb4e6",
+      "name": "type=b3, style=secondary",
+      "description": "",
+      "nodeId": "1250:23653",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "8e6f86dbf87e7a1767faa5775bfa484d11a44ebe",
+      "name": "type=h1, style=danger",
+      "description": "",
+      "nodeId": "25:611",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "901f2d5cd5c3ecd8c2ca7566053670137174d0ee",
+      "name": "type=h1, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17625",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "91189d701c1ee73efca0241165f0f40397fc6611",
+      "name": "type=h3, style=warning",
+      "description": "",
+      "nodeId": "25:629",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "930c5dd2802f340aa81fd8def9380985b0f79dbc",
+      "name": "type=h1, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17895",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "941c160082c9288f49ac794abd13a8bb6f4f497e",
+      "name": "style=tertiary, state=focus",
+      "description": "",
+      "nodeId": "13761:1638",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "95d59d1e6d48aeb61354c17cd5a529b82f84ca2b",
+      "name": "style=secondary, state=default",
+      "description": "",
+      "nodeId": "1056:32309",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "99557b91b2d7e55351a3153b66ff718218a67454",
+      "name": "type=h3, style=success",
+      "description": "",
+      "nodeId": "25:601",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "998303b7b2749a89123b87ddb06a9e062e35b968",
+      "name": "style=primary, state=pressed",
+      "description": "",
+      "nodeId": "1056:32523",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "9a7596006b15e45ac0469d8ad7bd40247ccff23e",
+      "name": "type=h4, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17631",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "9bda693413ab343d77548b5eb9caeb0c86048912",
+      "name": "type=h5, style=warning",
+      "description": "",
+      "nodeId": "25:633",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "9fa1628942e708894a66d0872702a60e1f9aaed8",
+      "name": "type=h3, style=secondary",
+      "description": "",
+      "nodeId": "25:587",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "a050f6461614250b429dcef0bd5dea34737db28a",
+      "name": "type=h2, style=warning",
+      "description": "",
+      "nodeId": "25:627",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "a98b483665f4f4d38590605f110c593895bcb3dc",
+      "name": "type=h2, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17834",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "af7ab9d6ab29d2297b11da9d5a4139cee76e6dc8",
+      "name": "type=h1, style=secondary",
+      "description": "",
+      "nodeId": "25:583",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "b9ad0ab2de5d0734830086f1e3872d621714ff78",
+      "name": "type=h1, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17832",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "ba43637c8d12fdd3fa2606c9e9b81c63de366d2a",
+      "name": "type=b2, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18035",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "bb005836f1dd0cc374dc280bd91fd0599bee3c1e",
+      "name": "type=b1, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17844",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "bbdc70a628d4375f532ad2280086dec8f9130dd6",
+      "name": "type=b1, style=success",
+      "description": "",
+      "nodeId": "25:609",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "bcdb9a14dba16de2368c8abe6ce954ff885b5b42",
+      "name": "type=b3, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17911",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "bf3e04977d0d692393a49b734fb5e47067c7e21d",
+      "name": "type=h1, style=tertiary",
+      "description": "",
+      "nodeId": "25:639",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "bf51b0538aa2c83f2a3230b4a8bf2ffc53db6e40",
+      "name": "type=h3, style=primary",
+      "description": "",
+      "nodeId": "25:573",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "c2b6b2eafb3cec4647eec00f9db9535aad5582e9",
+      "name": "type=h5, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17903",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "c5233ba50d6ae4b955a27098b3b2c3197e146cfa",
+      "name": "type=b3, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17848",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "c6e0b8ff24088d634c7d175f4cc23a5b146d250c",
+      "name": "type=b2, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17846",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "c7871e94666b1c8f476ed94d0bcd9bf4ca2b5742",
+      "name": "type=h1, style=primary",
+      "description": "",
+      "nodeId": "25:569",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "c834118f0c5a4fe342b8bc49dc508a5c75c5153a",
+      "name": "type=h4, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18027",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "cc7111f9b4dabe71fbd427e6bf30cc7984285760",
+      "name": "style=tertiary, state=hover",
+      "description": "",
+      "nodeId": "13761:1636",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "cc71f976374a5866258b70f3e1209e9d44e95c7c",
+      "name": "style=warning, state=default",
+      "description": "",
+      "nodeId": "1056:32315",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "ccf73b0d0579f56ff2362fb18d0a9b55d4bbba31",
+      "name": "type=h2, style=danger",
+      "description": "",
+      "nodeId": "25:613",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "cd0fd6dbc893a7d1ac9324f8749067c3ae74836a",
+      "name": "type=h5, style=relationships",
+      "description": "",
+      "nodeId": "1970:17966",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "cecba819e88b45d3eb836552a8eb230e051a045e",
+      "name": "style=secondary, state=focus",
+      "description": "",
+      "nodeId": "1056:32469",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "d15ca556d39a34b4c6a56738abbfac1172b331d0",
+      "name": "type=h3, style=advocacy",
+      "description": "",
+      "nodeId": "1970:17899",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "d37e558a32b1aebe895a50ab41552742a1ae8f2e",
+      "name": "type=b2, style=secondary",
+      "description": "",
+      "nodeId": "1250:23365",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "d9db3d35db64edb0880f534922fde38d74862df2",
+      "name": "type=h3, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18025",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "ddb559583a013c4304f64f5190192a256032f51c",
+      "name": "type=b2, style=primary",
+      "description": "",
+      "nodeId": "1250:23363",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "e2e83c3e43bf497bc2521a9ab2268cfc91f8dcd2",
+      "name": "type=h5, style=technology tools",
+      "description": "",
+      "nodeId": "1970:18029",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "e3b45d56c377635a81840553806d3f521287e1f4",
+      "name": "type=h6, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17635",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "e7154c71778fb4202fe41040ea73fbee207ed636",
+      "name": "type=h5, style=danger",
+      "description": "",
+      "nodeId": "25:619",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "e7f63845668a5a0cd669e02f2800ce53ac9a53f6",
+      "name": "type=h6, style=success",
+      "description": "",
+      "nodeId": "25:607",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "eedd5289fb660b2aa38987e595e99418d56653f7",
+      "name": "type=b3, style=primary",
+      "description": "",
+      "nodeId": "1250:23651",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "f19a65a4c9d5617139ceadd34014f7d0817c26bf",
+      "name": "type=h3, style=tertiary",
+      "description": "",
+      "nodeId": "25:643",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "f1b646726a83ee372542dcec239e213fd0bd0453",
+      "name": "style=secondary, state=pressed",
+      "description": "",
+      "nodeId": "1056:32525",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "fb2a839ee1b1780e6b1a8816da981c847ff5fc73",
+      "name": "type=h2, style=success",
+      "description": "",
+      "nodeId": "25:599",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "fb592228a5f29f86c105db4ddf923f7e8c4a3e51",
+      "name": "type=h6, style=mastering content",
+      "description": "",
+      "nodeId": "1970:17842",
+      "containingFrame": "Static Badges"
+    },
+    {
+      "key": "fdf15b34e31dea7df81fa072a95477f66b0c1f61",
+      "name": "type=b2, style=socio-emotional",
+      "description": "",
+      "nodeId": "1970:17639",
+      "containingFrame": "Static Badges"
     }
   ],
   "versionIds": [
+    "2342828162861521465",
     "2337170265550305635",
     "2336930709435004823",
     "2336927908052593208",
@@ -9132,7 +9133,6 @@
     "2336917704297962879",
     "2336919417991484604",
     "2336918227729989001",
-    "2335809301580175929",
-    "2335824479958863114"
+    "2335809301580175929"
   ]
 }
