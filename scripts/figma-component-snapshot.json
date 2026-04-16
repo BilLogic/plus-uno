@@ -1,5 +1,5 @@
 {
-  "lastChecked": "2026-04-16T00:58:47.607Z",
+  "lastChecked": "2026-04-16T01:03:45.648Z",
   "components": [
     {
       "key": "519b409ef4fd78c6e5deb10dc32dad90d880d124",
@@ -8052,18 +8052,18 @@
       "containingFrame": "Text buttons"
     },
     {
-      "key": "5e2f5b38b9917cd72f2a85db582b0374acd82cf5",
-      "name": "style=success, state=focus",
-      "description": "",
-      "nodeId": "1056:32473",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "6004a305e8f03722f48658647c481182b40ef9be",
       "name": "size=small, style=primary, state=pressed",
       "description": "",
       "nodeId": "979:19911",
       "containingFrame": "Text buttons"
+    },
+    {
+      "key": "5e2f5b38b9917cd72f2a85db582b0374acd82cf5",
+      "name": "style=success, state=focus",
+      "description": "",
+      "nodeId": "1056:32473",
+      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "67d25eafed59f9ac1a78fbb9964b8de76e6fec97",
@@ -8395,27 +8395,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "06e06b075d959eda00163debd634e2a062318b33",
-      "name": "style=default, state=disabled",
-      "description": "",
-      "nodeId": "1056:32516",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "07ef6e5816bb241e4bbe614c7488e397dd506587",
-      "name": "style=danger, state=default",
-      "description": "",
-      "nodeId": "1056:32311",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "0a31baad9f25d10c3352859e65c0ae5face8812c",
-      "name": "style=success, state=default",
-      "description": "",
-      "nodeId": "1056:32313",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "0f0324c10d385477c760f630eae51103ff808f41",
       "name": "type=b2, style=tertiary",
       "description": "",
@@ -8479,20 +8458,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "2170771b236854279dae6ee6b3d2e768d96297c1",
-      "name": "style=success, state=hover",
-      "description": "",
-      "nodeId": "1056:32424",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "22cf1d372854adc98a676389a6970520fd17d477",
-      "name": "style=danger, state=hover",
-      "description": "",
-      "nodeId": "1056:32422",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "24c1b30483e8047b8a06b71fac1c4c530f20043d",
       "name": "type=b2, style=advocacy",
       "description": "",
@@ -8542,13 +8507,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "3462cdd957ec0461f3ea512bfa49307a51da8db6",
-      "name": "style=warning, state=hover",
-      "description": "",
-      "nodeId": "1056:32426",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "361d48e6001698153af18f2aba4f346b92af2d41",
       "name": "type=h4, style=secondary",
       "description": "",
@@ -8561,13 +8519,6 @@
       "description": "",
       "nodeId": "25:591",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "38fd12806d34ed7f3262af5fcf896f734627c21b",
-      "name": "style=info, state=focus",
-      "description": "",
-      "nodeId": "1056:32477",
-      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "3b524a5309d3016770d8879f3b1dc84f119314cc",
@@ -8661,13 +8612,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "6198f529827d894cf842ea8dde0ebd2722016e5b",
-      "name": "style=primary, state=default",
-      "description": "",
-      "nodeId": "1056:32307",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "62b9fac8916bd2676252115b8edfc54ea6032bb5",
       "name": "type=h5, style=tertiary",
       "description": "",
@@ -8675,25 +8619,11 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "64de0dc8044b028b8ebefcc7ac080c9ada0aa6fd",
-      "name": "style=tertiary, state=pressed",
-      "description": "",
-      "nodeId": "13761:1640",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "67f165984198e9a60beb8287901ebcbf8fb5dcaf",
       "name": "type=h5, style=success",
       "description": "",
       "nodeId": "25:605",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "6a4fe6b282e5a975809a5bc36721d2b8b7235bc9",
-      "name": "style=warning, state=pressed",
-      "description": "",
-      "nodeId": "1056:32531",
-      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "6d5d82d0e54b56eaf8f69bb7e84f93bc2ea8cfdb",
@@ -8745,13 +8675,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "7abd0b73ca320f0425e0f312312f80b99b3de4dc",
-      "name": "style=info, state=default",
-      "description": "",
-      "nodeId": "1056:32317",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "7c8124e61ef7ce431268cde54738f4fef1e9f197",
       "name": "type=b1, style=technology tools",
       "description": "",
@@ -8764,13 +8687,6 @@
       "description": "",
       "nodeId": "1970:17836",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "7f0530f2a323470fb09e1b1665fff9183fcc5de6",
-      "name": "style=primary, state=hover",
-      "description": "",
-      "nodeId": "1056:32418",
-      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "83c7cb4faab405798199bb86b2e281fbf5ebea69",
@@ -8792,13 +8708,6 @@
       "description": "",
       "nodeId": "1250:23367",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "87dca3f2df910a706e1bd12c5740377614c6da6b",
-      "name": "style=danger, state=pressed",
-      "description": "",
-      "nodeId": "1056:32527",
-      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "8b8348c1d7d9a1e724e1605cc6c72147f1da3835",
@@ -8850,32 +8759,11 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "941c160082c9288f49ac794abd13a8bb6f4f497e",
-      "name": "style=tertiary, state=focus",
-      "description": "",
-      "nodeId": "13761:1638",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "95d59d1e6d48aeb61354c17cd5a529b82f84ca2b",
-      "name": "style=secondary, state=default",
-      "description": "",
-      "nodeId": "1056:32309",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "99557b91b2d7e55351a3153b66ff718218a67454",
       "name": "type=h3, style=success",
       "description": "",
       "nodeId": "25:601",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "998303b7b2749a89123b87ddb06a9e062e35b968",
-      "name": "style=primary, state=pressed",
-      "description": "",
-      "nodeId": "1056:32523",
-      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "9a7596006b15e45ac0469d8ad7bd40247ccff23e",
@@ -8997,20 +8885,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "cc7111f9b4dabe71fbd427e6bf30cc7984285760",
-      "name": "style=tertiary, state=hover",
-      "description": "",
-      "nodeId": "13761:1636",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
-      "key": "cc71f976374a5866258b70f3e1209e9d44e95c7c",
-      "name": "style=warning, state=default",
-      "description": "",
-      "nodeId": "1056:32315",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "ccf73b0d0579f56ff2362fb18d0a9b55d4bbba31",
       "name": "type=h2, style=danger",
       "description": "",
@@ -9023,13 +8897,6 @@
       "description": "",
       "nodeId": "1970:17966",
       "containingFrame": "Static Badges"
-    },
-    {
-      "key": "cecba819e88b45d3eb836552a8eb230e051a045e",
-      "name": "style=secondary, state=focus",
-      "description": "",
-      "nodeId": "1056:32469",
-      "containingFrame": "Dismissible Badges"
     },
     {
       "key": "d15ca556d39a34b4c6a56738abbfac1172b331d0",
@@ -9095,13 +8962,6 @@
       "containingFrame": "Static Badges"
     },
     {
-      "key": "f1b646726a83ee372542dcec239e213fd0bd0453",
-      "name": "style=secondary, state=pressed",
-      "description": "",
-      "nodeId": "1056:32525",
-      "containingFrame": "Dismissible Badges"
-    },
-    {
       "key": "fb2a839ee1b1780e6b1a8816da981c847ff5fc73",
       "name": "type=h2, style=success",
       "description": "",
@@ -9121,9 +8981,143 @@
       "description": "",
       "nodeId": "1970:17639",
       "containingFrame": "Static Badges"
+    },
+    {
+      "key": "07ef6e5816bb241e4bbe614c7488e397dd506587",
+      "name": "style=danger, state=default",
+      "description": "",
+      "nodeId": "1056:32311",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "0a31baad9f25d10c3352859e65c0ae5face8812c",
+      "name": "style=success, state=default",
+      "description": "",
+      "nodeId": "1056:32313",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "2170771b236854279dae6ee6b3d2e768d96297c1",
+      "name": "style=success, state=hover",
+      "description": "",
+      "nodeId": "1056:32424",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "22cf1d372854adc98a676389a6970520fd17d477",
+      "name": "style=danger, state=hover",
+      "description": "",
+      "nodeId": "1056:32422",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "3462cdd957ec0461f3ea512bfa49307a51da8db6",
+      "name": "style=warning, state=hover",
+      "description": "",
+      "nodeId": "1056:32426",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "38fd12806d34ed7f3262af5fcf896f734627c21b",
+      "name": "style=info, state=focus",
+      "description": "",
+      "nodeId": "1056:32477",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "6198f529827d894cf842ea8dde0ebd2722016e5b",
+      "name": "style=primary, state=default",
+      "description": "",
+      "nodeId": "1056:32307",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "64de0dc8044b028b8ebefcc7ac080c9ada0aa6fd",
+      "name": "style=tertiary, state=pressed",
+      "description": "",
+      "nodeId": "13761:1640",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "6a4fe6b282e5a975809a5bc36721d2b8b7235bc9",
+      "name": "style=warning, state=pressed",
+      "description": "",
+      "nodeId": "1056:32531",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "7abd0b73ca320f0425e0f312312f80b99b3de4dc",
+      "name": "style=info, state=default",
+      "description": "",
+      "nodeId": "1056:32317",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "7f0530f2a323470fb09e1b1665fff9183fcc5de6",
+      "name": "style=primary, state=hover",
+      "description": "",
+      "nodeId": "1056:32418",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "87dca3f2df910a706e1bd12c5740377614c6da6b",
+      "name": "style=danger, state=pressed",
+      "description": "",
+      "nodeId": "1056:32527",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "941c160082c9288f49ac794abd13a8bb6f4f497e",
+      "name": "style=tertiary, state=focus",
+      "description": "",
+      "nodeId": "13761:1638",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "95d59d1e6d48aeb61354c17cd5a529b82f84ca2b",
+      "name": "style=secondary, state=default",
+      "description": "",
+      "nodeId": "1056:32309",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "998303b7b2749a89123b87ddb06a9e062e35b968",
+      "name": "style=primary, state=pressed",
+      "description": "",
+      "nodeId": "1056:32523",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "cc7111f9b4dabe71fbd427e6bf30cc7984285760",
+      "name": "style=tertiary, state=hover",
+      "description": "",
+      "nodeId": "13761:1636",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "cc71f976374a5866258b70f3e1209e9d44e95c7c",
+      "name": "style=warning, state=default",
+      "description": "",
+      "nodeId": "1056:32315",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "cecba819e88b45d3eb836552a8eb230e051a045e",
+      "name": "style=secondary, state=focus",
+      "description": "",
+      "nodeId": "1056:32469",
+      "containingFrame": "Dismissible Badges"
+    },
+    {
+      "key": "f1b646726a83ee372542dcec239e213fd0bd0453",
+      "name": "style=secondary, state=pressed",
+      "description": "",
+      "nodeId": "1056:32525",
+      "containingFrame": "Dismissible Badges"
     }
   ],
   "versionIds": [
+    "2342829661812636303",
     "2342833647012051388",
     "2342827578733738194",
     "2342828162861521465",
@@ -9132,8 +9126,7 @@
     "2336927908052593208",
     "2336920877728425311",
     "2336924489807347151",
-    "2336917704297962879",
-    "2336919417991484604"
+    "2336917704297962879"
   ],
   "nodeHashes": {
     "194:16610": "181c6b602af40a7dd9a37fa3eca9c1ac",
