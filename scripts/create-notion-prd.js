@@ -208,25 +208,8 @@ export async function createNotionPRD(componentDiff, newVersions, allComponents 
   let modifiedGroups = groupByComponent(componentDiff.modified, c => c.new.containingFrame, c => c.new.name);
   const deletedGroups = groupByComponent(componentDiff.deleted, c => c.containingFrame, c => c.name);
 
-  // When only visual properties changed (version published but no metadata diff),
-  // match version description against known component frames
-  if (!allChangedItems.length && newVersions.length && allComponents.length) {
-    const versionText = newVersions.map(v => `${v.label} ${v.description}`).join(' ').toLowerCase();
-    const frameNames = [...new Set(allComponents.map(c => c.containingFrame).filter(Boolean))];
-    const matchedFrames = frameNames.filter(frame => versionText.includes(frame.toLowerCase()));
-
-    if (matchedFrames.length) {
-      // Build synthetic modified groups from matched frames
-      const matchedComponents = allComponents.filter(c => matchedFrames.includes(c.containingFrame));
-      modifiedGroups = groupByComponent(
-        matchedComponents.map(c => ({ new: c })),
-        c => c.new.containingFrame,
-        c => c.new.name
-      );
-      allChangedItems = matchedComponents;
-      console.log(`   📎 Matched ${matchedFrames.length} component frames from version description: ${matchedFrames.join(', ')}`);
-    }
-  }
+  // Note: visual-only changes are now detected upstream via node hashes
+  // and added to componentDiff.modified before this function is called.
 
   // Build PRD title
   const allFrames = new Set([

@@ -24,6 +24,7 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+import crypto from 'crypto';
 import { createNotionPRD } from './create-notion-prd.js';
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI — no .env needed */ }
@@ -157,6 +158,41 @@ async function fetchComponents() {
   const ignored = mapped.length - filtered.length;
   if (ignored > 0) console.log(`Filtered out ${ignored} non-DS components`);
   return filtered;
+}
+
+/**
+ * Fetch node data for a batch of components and return a hash per node.
+ * This detects visual property changes that metadata alone misses.
+ */
+async function fetchNodeHashes(components) {
+  if (!components.length) return {};
+
+  // Figma supports batching node IDs in one request (comma-separated)
+  // Split into chunks of 50 to stay within URL length limits
+  const hashes = {};
+  const chunks = [];
+  for (let i = 0; i < components.length; i += 50) {
+    chunks.push(components.slice(i, i + 50));
+  }
+
+  for (const chunk of chunks) {
+    const ids = chunk.map(c => c.nodeId).filter(Boolean).join(',');
+    if (!ids) continue;
+    try {
+      const result = await figmaGet(`/files/${FIGMA_FILE_KEY}/nodes?ids=${ids}&geometry=paths`);
+      const nodes = result.nodes || {};
+      for (const [nodeId, nodeData] of Object.entries(nodes)) {
+        if (nodeData?.document) {
+          // Hash the node document (contains all visual properties)
+          const json = JSON.stringify(nodeData.document);
+          hashes[nodeId] = crypto.createHash('md5').update(json).digest('hex');
+        }
+      }
+    } catch (e) {
+      console.warn(`   ⚠️  Failed to fetch node hashes for chunk: ${e.message}`);
+    }
+  }
+  return hashes;
 }
 
 /**
@@ -309,31 +345,11 @@ function buildSlackMessage(componentDiff, newVersions, prdResult = null, allComp
     componentLines.push(`🗑️  *Deleted:*  ${display}`);
   }
 
-  // When a version is published but no metadata diff detected (visual-only changes),
-  // match the version description against known component frame names
+  // Fallback: version published but still no component lines
+  // (node hashes should have caught visual changes, but just in case)
   if (!componentLines.length && newVersions.length) {
-    const versionText = newVersions.map(v => `${v.label} ${v.description}`).join(' ').toLowerCase();
-
-    // Get unique component frame names from the file
-    const frameNames = [...new Set(allComponents.map(c => c.containingFrame).filter(Boolean))];
-
-    // Match frames mentioned in the version description
-    const matchedFrames = frameNames.filter(frame =>
-      versionText.includes(frame.toLowerCase())
-    );
-
-    if (matchedFrames.length) {
-      const display = matchedFrames.length > 5
-        ? matchedFrames.slice(0, 5).join(', ') + ` (+${matchedFrames.length - 5} more)`
-        : matchedFrames.join(', ');
-      componentLines.push(`✏️  *Updated:*  ${display}`);
-    } else if (versionText.trim()) {
-      // No frame match — show the raw description
-      const rawText = newVersions.map(v => [v.label, v.description].filter(Boolean).join(' — ')).join(', ');
-      componentLines.push(`✏️  *Updated:*  ${rawText}`);
-    } else {
-      componentLines.push(`✏️  *Updated:*  Visual changes published (no description provided)`);
-    }
+    const rawText = newVersions.map(v => [v.label, v.description].filter(Boolean).join(' — ')).join(', ');
+    componentLines.push(`✏️  *Updated:*  ${rawText || 'Visual changes published'}`);
   }
 
   if (componentLines.length) {
@@ -460,13 +476,16 @@ async function main() {
 
   // Initialize snapshot mode
   if (args.init) {
+    console.log('\n🔍 Fetching initial node hashes (this may take a moment)...');
+    const initHashes = await fetchNodeHashes(components);
     const snapshot = {
       lastChecked: new Date().toISOString(),
       components,
-      versionIds: versions.map(v => v.id)
+      versionIds: versions.map(v => v.id),
+      nodeHashes: initHashes
     };
     saveSnapshot(snapshot);
-    console.log(`\n✅ Initial snapshot saved with ${components.length} components`);
+    console.log(`\n✅ Initial snapshot saved with ${components.length} components and ${Object.keys(initHashes).length} node hashes`);
     return;
   }
 
@@ -479,10 +498,13 @@ async function main() {
     // Auto-init on first run in CI
     if (process.env.CI) {
       console.log('\nCI detected — auto-creating initial snapshot');
+      console.log('🔍 Fetching initial node hashes...');
+      const initHashes = await fetchNodeHashes(components);
       const newSnapshot = {
         lastChecked: new Date().toISOString(),
         components,
-        versionIds: versions.map(v => v.id)
+        versionIds: versions.map(v => v.id),
+        nodeHashes: initHashes
       };
       saveSnapshot(newSnapshot);
     }
@@ -492,6 +514,33 @@ async function main() {
   // Diff
   const componentDiff = diffComponents(snapshot.components, components);
   const newVersions = diffVersions(snapshot.versionIds, versions);
+
+  // When a new version is published but no metadata diff, check visual changes via node hashes
+  const hasMetadataChanges = componentDiff.created.length || componentDiff.modified.length || componentDiff.deleted.length;
+  if (!hasMetadataChanges && newVersions.length > 0) {
+    console.log('\n🔍 New version detected — checking for visual property changes...');
+    const newHashes = await fetchNodeHashes(components);
+    const oldHashes = snapshot.nodeHashes || {};
+
+    for (const comp of components) {
+      const id = comp.nodeId;
+      if (!id || !newHashes[id]) continue;
+      if (oldHashes[id] && oldHashes[id] !== newHashes[id]) {
+        // Visual change detected — add to modified list
+        const oldComp = snapshot.components.find(c => c.nodeId === id) || comp;
+        componentDiff.modified.push({ old: oldComp, new: comp });
+      }
+    }
+
+    // Store hashes for next comparison
+    snapshot._newNodeHashes = newHashes;
+
+    if (componentDiff.modified.length) {
+      console.log(`   ✅ Found ${componentDiff.modified.length} visually changed components`);
+    } else {
+      console.log('   ℹ️  No visual property changes detected in component nodes');
+    }
+  }
 
   const hasComponentChanges = componentDiff.created.length || componentDiff.modified.length || componentDiff.deleted.length;
   const hasNewVersions = newVersions.length > 0;
@@ -587,7 +636,8 @@ async function main() {
     const newSnapshot = {
       lastChecked: new Date().toISOString(),
       components,
-      versionIds: versions.map(v => v.id)
+      versionIds: versions.map(v => v.id),
+      nodeHashes: snapshot._newNodeHashes || snapshot.nodeHashes || {}
     };
     saveSnapshot(newSnapshot);
     console.log('Snapshot updated');
