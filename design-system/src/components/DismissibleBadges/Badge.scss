@@ -1,0 +1,219 @@
+@use "sass:map";
+
+/* 
+ * Badge Component Styles
+ * Implements Static Badge and Dismissible Badge specs
+ * strictly using Design System tokens.
+ */
+
+.plus-badge {
+    // Layout
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: fit-content;
+
+    // Spacing - Figma spec: horizontal padding only, NO vertical padding (py-0)
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: var(--size-element-pad-x-lg);
+    padding-right: var(--size-element-pad-x-lg);
+
+    // Shape
+    // Figma spec: Badges use pill shape - Border/Radius/radius-1000 (999px)
+    // Using semantic token --size-element-radius-full which maps to --size-border-radius-radius-1000
+    border-radius: var(--size-element-radius-full);
+
+    // Default Font (overridden by size classes)
+    text-align: center;
+    white-space: nowrap;
+
+    // --- SIZES ---
+    // Override padding based on size class
+    // Match both size classes (b2) and typography classes (body2-txt) for compatibility
+    &.h4,
+    &.h5,
+    &.h6,
+    &.h4-txt,
+    &.h5-txt,
+    &.h6-txt {
+        padding-left: var(--size-element-pad-x-md);
+        padding-right: var(--size-element-pad-x-md);
+    }
+
+    &.b1,
+    &.b2,
+    &.b3,
+    &.body1-txt,
+    &.body2-txt,
+    &.body3-txt {
+        padding-left: var(--size-element-pad-x-sm);
+        padding-right: var(--size-element-pad-x-sm);
+        // Font weight now handled via typography class in JSX (font-weight-semibold)
+    }
+
+    // --- COLOR THEMES ---
+    // Mixin to generate color styles
+    // Using state-08 backgrounds for subtle tints (matching legacy-ds/Figma spec)
+    @mixin badge-theme($color-name, $bg-token, $text-token, $main-color-token: null) {
+        &--#{$color-name} {
+            background-color: var($bg-token);
+            color: var($text-token);
+
+            // Styling for icons within the badge to match text color
+            .plus-badge-visual {
+                color: inherit;
+            }
+
+            // Integrated Dismissible Style
+            &.plus-badge--dismissible {
+                border: var(--size-element-border) solid var($main-color-token);
+
+                // Hover state - use 12% opacity for hover (slightly darker)
+                &:hover {
+                    background-color: var(#{$bg-token + '-state-12'}, var($bg-token));
+                }
+
+                // Focus state - use 12% opacity for focus
+                &:focus,
+                &:focus-within {
+                    outline: 2px solid var($main-color-token);
+                    outline-offset: 2px;
+                    background-color: var(#{$bg-token + '-state-12'}, var($bg-token));
+                }
+
+                // Pressed/Active state - use 16% opacity with elevation
+                &:active {
+                    background-color: var(#{$bg-token + '-state-16'}, var($bg-token));
+                    box-shadow: var(--elevation-light-3);
+                }
+            }
+        }
+    }
+
+    // Using state-08 backgrounds for subtle tints (matches Figma and legacy-ds)
+    @include badge-theme('primary', --color-primary-state-08, --color-primary-text, --color-primary);
+    @include badge-theme('secondary', --color-secondary-state-08, --color-secondary-text, --color-secondary);
+    @include badge-theme('tertiary', --color-tertiary-state-08, --color-tertiary-text, --color-tertiary);
+    @include badge-theme('success', --color-success-state-08, --color-success-text, --color-success);
+    @include badge-theme('warning', --color-warning-state-08, --color-warning-text, --color-warning);
+    @include badge-theme('danger', --color-danger-state-08, --color-danger-text, --color-danger);
+    @include badge-theme('info', --color-info-state-08, --color-info-text, --color-info);
+
+    // Extended Palette (SMART framework colors)
+    @include badge-theme('social-emotional', --color-social-emotional-state-08, --color-social-emotional-text, --color-social-emotional);
+    @include badge-theme('mastering-content', --color-mastering-content-state-08, --color-mastering-content-text, --color-mastering-content);
+    @include badge-theme('advocacy', --color-advocacy-state-08, --color-advocacy-text, --color-advocacy);
+    @include badge-theme('relationship', --color-relationship-state-08, --color-relationship-text, --color-relationship);
+    @include badge-theme('technology-tools', --color-technology-tools-state-08, --color-technology-tools-text, --color-technology-tools);
+
+    // --- DISMISSIBLE VARIANT ---
+    &--dismissible {
+        cursor: pointer;
+        // Border and states are handled in the theme mixin above
+
+        // Action icon (xmark) specific styling
+        .plus-badge-visual--trailing {
+            margin-left: var(--size-element-gap-sm);
+        }
+
+        // Keyboard navigation
+        &:focus {
+            outline: none; // Using custom focus in theme mixin
+        }
+
+        // Handle keyboard events
+        &[tabindex]:focus {
+            outline: none; // Using custom focus in theme mixin
+        }
+    }
+
+    // --- DISMISS BUTTON ---
+    &-dismiss-btn {
+        // Reset button styles
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+
+        // Inherit color from parent badge
+        color: inherit;
+
+        // Size and alignment
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1em;
+        height: 1em;
+        font-size: inherit;
+        line-height: 1;
+
+        // Hover state
+        &:hover {
+            opacity: 0.7;
+        }
+
+        &:focus {
+            outline: none; // Parent badge handles focus styling
+        }
+
+        // Ensure icon inherits color
+        i {
+            font-size: inherit;
+            line-height: 1;
+            color: inherit;
+        }
+    }
+
+    // --- ELEMENTS ---
+    &-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        // Constrain icon sizes based on badge size
+        // Use relative sizing so it scales with the badge text (h1-h6, b1-b3)
+        // 0.85em keeps it slightly smaller than text to avoid being "overly big"
+        i,
+        svg {
+            font-size: 0.85em !important;
+        }
+
+        // Icon gap
+        &--leading {
+            margin-right: var(--size-element-gap-sm);
+        }
+
+        &--trailing {
+            margin-left: var(--size-element-gap-sm);
+        }
+    }
+
+    &-text {
+        // Ensure text aligns cleanly
+        display: block;
+    }
+
+    // --- COUNTER ---
+    &-counter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: var(--size-element-gap-sm);
+
+        background-color: var(--color-surface-container-highest); // Contrast bg
+        color: var(--color-on-surface);
+
+        // Counter always uses pill shape (full radius)
+        border-radius: var(--size-element-radius-full);
+        padding: 0 0.4em; // Minimal padding
+        min-width: 1.5em;
+        height: 1.5em;
+
+        font-size: 0.75em; // Smaller than badge text
+        font-weight: var(--font-weight-bold);
+        line-height: 1;
+    }
+}
