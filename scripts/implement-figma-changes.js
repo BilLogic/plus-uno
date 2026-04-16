@@ -17,7 +17,7 @@
  *   PR_BODY_FILE       — Path to file containing PR body text
  */
 
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
 import https from 'https';
 import { fetchNotionPRD, findPRDByComponent, updatePRDStatus } from './create-notion-prd.js';
@@ -144,6 +144,19 @@ function getPRBody() {
 }
 
 // ─── Read component files ──────────────────────────────────
+
+function getReferenceComponent() {
+  // Read Badge component as a reference for new component scaffolding
+  const badgeDir = join(COMPONENTS_DIR, 'Badge');
+  if (!existsSync(badgeDir)) return 'No reference component available.';
+  const files = ['Badge.jsx', 'Badge.scss', 'Badge.stories.jsx', 'index.js'];
+  return files.map(f => {
+    try {
+      const content = readFileSync(join(badgeDir, f), 'utf8');
+      return `### ${f}\n\`\`\`\n${content}\n\`\`\``;
+    } catch { return ''; }
+  }).filter(Boolean).join('\n\n');
+}
 
 function resolveComponentDir(componentName) {
   // Exact match first
@@ -364,18 +377,26 @@ async function main() {
     console.log(`📦 Processing: ${name}`);
 
     const resolved = resolveComponentDir(name);
-    if (!resolved) {
-      console.log(`   ⏭️  Skipping — no code directory found`);
-      continue;
-    }
-    const resolvedName = resolved.name; // correctly-cased directory name
-    const codeFiles = readComponentFiles(name);
-    if (!codeFiles) {
-      console.log(`   ⏭️  Skipping — no readable files found`);
-      continue;
-    }
+    let resolvedName;
+    let codeFiles;
+    let isNewComponent = false;
 
-    console.log(`   📄 Found ${Object.keys(codeFiles).length} files: ${Object.keys(codeFiles).join(', ')}`);
+    if (!resolved) {
+      // New component — Claude will scaffold it from scratch
+      // Normalize name to PascalCase directory (e.g., "Dismissible Badges" → "DismissibleBadges")
+      resolvedName = name.replace(/\s+/g, '');
+      console.log(`   🆕 New component — Claude will scaffold ${resolvedName}/`);
+      isNewComponent = true;
+      codeFiles = {};
+    } else {
+      resolvedName = resolved.name;
+      codeFiles = readComponentFiles(name) || {};
+      if (!Object.keys(codeFiles).length) {
+        console.log(`   ⏭️  Skipping — no readable files found`);
+        continue;
+      }
+      console.log(`   📄 Found ${Object.keys(codeFiles).length} files: ${Object.keys(codeFiles).join(', ')}`);
+    }
 
     // Download images for this component
     const images = [];
@@ -435,7 +456,9 @@ async function main() {
 
     const systemPrompt = [
       'You are a senior React developer working on the PLUS design system.',
-      'Your job is to update React components to match their latest Figma designs.',
+      isNewComponent
+        ? 'Your job is to CREATE a new React component from a Figma design.'
+        : 'Your job is to update React components to match their latest Figma designs.',
       '',
       '## PLUS Design System Conventions',
       '- Components use React-Bootstrap as base (e.g., RBBadge from react-bootstrap/Badge)',
@@ -456,6 +479,17 @@ async function main() {
       '- Map Figma spacing/padding values to the CLOSEST semantic spacing token',
       '- Map Figma corner radius to the CLOSEST radius token',
       '- The design token files are provided below — use ONLY tokens that exist in them',
+      '',
+      isNewComponent ? [
+        '',
+        '## New Component Scaffolding Rules',
+        '- Create these files: ComponentName.jsx, ComponentName.scss, ComponentName.stories.jsx, index.js',
+        '- The .jsx file should export a React component using React-Bootstrap as base where appropriate',
+        '- The .scss file should define all styles using design tokens (var(--color-*), var(--size-*))',
+        '- The .stories.jsx file should export a Storybook story with all variants',
+        '- The index.js file should re-export the component as default and named export',
+        '- Follow the same patterns as existing PLUS components (Badge, Button, etc.)',
+      ].join('\n') : '',
       '',
       'Rules:',
       '- Preserve existing component API (props, exports) unless the design clearly requires changes',
@@ -495,8 +529,11 @@ async function main() {
     userContent.push({
       type: 'text',
       text: [
-        `## Current ${name} Component Code\n`,
-        codeContext,
+        isNewComponent
+          ? `## New Component: ${name}\n\nThis is a NEW component — no existing code. Create all files from scratch based on the Figma design below.\n`
+          : `## Current ${name} Component Code\n`,
+        isNewComponent ? '' : codeContext,
+        isNewComponent ? '\n## Reference Component (Badge) — follow this pattern\n' + getReferenceComponent() : '',
         '\n## Figma Component Metadata\n',
         figmaContext,
         '\n## Figma Node Design Properties (colors, spacing, radius, layout)\n',
@@ -509,11 +546,15 @@ async function main() {
         prBody || 'No additional context provided.',
         prdContext ? '\n## Notion PRD Context (Designer Review Notes)\n' + prdContext : '',
         `\n## Task\n`,
-        `Update the ${name} component files to match the latest Figma design.`,
+        isNewComponent
+          ? `Create a new ${name} component from scratch based on the Figma design above.`
+          : `Update the ${name} component files to match the latest Figma design.`,
         'Use the Figma node properties above to map exact colors, spacing, and radius to the closest design tokens.',
-        'Compare the Figma screenshots with the current code and update any differences.',
+        isNewComponent
+          ? 'Study the reference Badge component patterns and create all files (jsx, scss, stories, index) following the same conventions.'
+          : 'Compare the Figma screenshots with the current code and update any differences.',
         'Follow the existing code patterns exactly.',
-        'Only modify files that need changes.',
+        isNewComponent ? '' : 'Only modify files that need changes.',
         '',
         'Respond with the updated files using the format:',
         '---FILE: filename.ext---',
@@ -536,11 +577,13 @@ async function main() {
     while ((fileMatch = filePattern.exec(response)) !== null) {
       const [, filename, content] = fileMatch;
       const trimmedName = filename.trim();
-      const filePath = join(COMPONENTS_DIR, resolvedName, trimmedName);
+      const componentDir = join(COMPONENTS_DIR, resolvedName);
+      const filePath = join(componentDir, trimmedName);
 
-      if (!existsSync(join(COMPONENTS_DIR, resolvedName))) {
-        console.warn(`   ⚠️  Directory doesn't exist for: ${trimmedName}`);
-        continue;
+      // Create directory if it doesn't exist (new component)
+      if (!existsSync(componentDir)) {
+        mkdirSync(componentDir, { recursive: true });
+        console.log(`   📁 Created directory: ${resolvedName}/`);
       }
 
       writeFileSync(filePath, content.trim() + '\n');
