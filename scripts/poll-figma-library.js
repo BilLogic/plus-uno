@@ -307,7 +307,15 @@ function buildSlackMessage(componentDiff, newVersions, prdResult = null, allComp
   if (newVersions.length) {
     for (const v of newVersions) {
       const publishedBy = `*Published by ${v.user}*`;
-      const label = v.label ? ` · _${v.label}_` : '';
+      // Build a dynamic label based on change types instead of Figma's generic "Components published"
+      const changeVerbs = [];
+      if (componentDiff.created.length) changeVerbs.push('added');
+      if (componentDiff.modified.length) changeVerbs.push('updated');
+      if (componentDiff.deleted.length) changeVerbs.push('deleted');
+      const dynamicLabel = changeVerbs.length
+        ? `Components ${changeVerbs.join(', ')}`
+        : (v.label || 'Components published');
+      const label = ` · _${dynamicLabel}_`;
       const versionUrl = `${figmaUrl}?version-id=${v.id}`;
       let versionBlock = `${publishedBy}${label}\n<${versionUrl}|View this version>`;
 
@@ -368,7 +376,7 @@ function buildSlackMessage(componentDiff, newVersions, prdResult = null, allComp
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `:clipboard: *PRD Created:* <${prdResult.pageUrl}|${prdResult.title}>\nReview the PRD, then type \`/implement ${prdResult.title.replace('DS Update: ', '')}\` in this channel when ready.`
+        text: `:clipboard: *PRD Created:* <${prdResult.pageUrl}|${prdResult.title}>\nReview the PRD, then type \`implement ${prdResult.title.replace('DS Update: ', '')}\` in this channel when ready.`
       }
     });
   }
