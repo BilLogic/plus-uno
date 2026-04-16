@@ -168,6 +168,24 @@ function resolveComponentDir(componentName) {
     const dirs = readdirSync(COMPONENTS_DIR);
     const match = dirs.find(d => d.toLowerCase() === componentName.toLowerCase());
     if (match) return { dir: join(COMPONENTS_DIR, match), name: match };
+
+    // Partial/parent match — "Dismissible Badges" should match "Badge"
+    // Check if any existing directory name is contained in the component name,
+    // or the component name is contained in a directory name
+    const normalised = componentName.toLowerCase().replace(/\s+/g, '');
+    const parentMatch = dirs
+      .filter(d => {
+        const dl = d.toLowerCase();
+        // "dismissiblebadges" contains "badge" → match Badge/
+        // Also handle plurals: "badges" contains "badge"
+        return normalised.includes(dl) || normalised.includes(dl.replace(/s$/, ''))
+          || dl.includes(normalised) || dl.includes(normalised.replace(/s$/, ''));
+      })
+      .sort((a, b) => b.length - a.length)[0]; // prefer longest match
+    if (parentMatch) {
+      console.log(`   📎 Matched "${componentName}" → existing directory "${parentMatch}"`);
+      return { dir: join(COMPONENTS_DIR, parentMatch), name: parentMatch };
+    }
   } catch { /* */ }
 
   return null;
