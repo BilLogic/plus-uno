@@ -309,6 +309,17 @@ function buildSlackMessage(componentDiff, newVersions, prdResult = null) {
     componentLines.push(`🗑️  *Deleted:*  ${display}`);
   }
 
+  // When a version is published but no metadata diff detected (visual-only changes),
+  // extract component names from the version description/label
+  if (!componentLines.length && newVersions.length) {
+    const versionText = newVersions.map(v => `${v.label} ${v.description}`).join(' ');
+    if (versionText.trim()) {
+      componentLines.push(`✏️  *Updated:*  ${versionText.trim()}`);
+    } else {
+      componentLines.push(`✏️  *Updated:*  Visual property changes detected (publish had no description)`);
+    }
+  }
+
   if (componentLines.length) {
     blocks.push({ type: 'divider' });
     blocks.push({
