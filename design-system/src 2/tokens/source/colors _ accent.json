@@ -1,0 +1,562 @@
+{
+  "modes": {
+    "Default": "Default"
+  },
+  "variables": [
+    {
+      "id": "Tag",
+      "name": "ColorsElevations/_Base/Color/Tag",
+      "valuesByMode": {
+        "Default": "#f9f9fc"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9764705882352941,
+          "g": 0.9764705882352941,
+          "b": 0.9882352941176471,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Text",
+      "name": "ColorsElevations/_Base/Color/Text",
+      "valuesByMode": {
+        "Default": "#ffffff"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Name",
+      "name": "ColorsElevations/Text/Name",
+      "valuesByMode": {
+        "Default": "#ffffff"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Light",
+      "name": "ColorsElevations/Light",
+      "valuesByMode": {
+        "Default": "#edeef0"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9294117647058824,
+          "g": 0.9333333333333333,
+          "b": 0.9411764705882353,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Elevation 1",
+      "name": "ColorsElevations/Light/Elevation1",
+      "valuesByMode": {
+        "Default": "#f3f3f6"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9529411764705882,
+          "g": 0.9529411764705882,
+          "b": 0.9647058823529412,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Elevation 2",
+      "name": "ColorsElevations/Light/Elevation2",
+      "valuesByMode": {
+        "Default": "#edeef0"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9294117647058824,
+          "g": 0.9333333333333333,
+          "b": 0.9411764705882353,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Elevation 3",
+      "name": "ColorsElevations/Light/Elevation3",
+      "valuesByMode": {
+        "Default": "#e7e8eb"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9058823529411765,
+          "g": 0.9098039215686274,
+          "b": 0.9215686274509803,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Elevation 4",
+      "name": "ColorsElevations/Light/Elevation4",
+      "valuesByMode": {
+        "Default": "#e7e8eb"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9058823529411765,
+          "g": 0.9098039215686274,
+          "b": 0.9215686274509803,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Elevation 5",
+      "name": "ColorsElevations/Light/Elevation5",
+      "valuesByMode": {
+        "Default": "#e2e2e5"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.8862745098039215,
+          "g": 0.8862745098039215,
+          "b": 0.8980392156862745,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "PLUS Brand colors, updated June 2025",
+      "name": "ColorsElevations/PLUSBrandcolors,updatedJune2025",
+      "valuesByMode": {
+        "Default": "#fbf7ff"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.984313725490196,
+          "g": 0.9686274509803922,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Title",
+      "name": "ColorsElevations/PLUSBrandcolors,updatedJune2025/Title",
+      "valuesByMode": {
+        "Default": "#0472a8"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.01568627450980392,
+          "g": 0.4470588235294118,
+          "b": 0.6588235294117647,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Title",
+      "name": "ColorsElevations/PLUSBrandcolors,updatedJune2025/Title",
+      "valuesByMode": {
+        "Default": "#0472a8"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.01568627450980392,
+          "g": 0.4470588235294118,
+          "b": 0.6588235294117647,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Title",
+      "name": "ColorsElevations/PLUSBrandcolors,updatedJune2025/Title",
+      "valuesByMode": {
+        "Default": "#0472a8"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.01568627450980392,
+          "g": 0.4470588235294118,
+          "b": 0.6588235294117647,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Accent colors are used on components and interaction elements only.",
+      "name": "ColorsElevations/PLUSBrandcolors,updatedJune2025/Accentcolorsareusedoncomponentsandinteractionelementsonly.",
+      "valuesByMode": {
+        "Default": "#3f484a"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.24705882352941178,
+          "g": 0.2823529411764706,
+          "b": 0.2901960784313726,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Extended colors are used for subject-specific branding and learning categorization throughout the platform.",
+      "name": "ColorsElevations/PLUSBrandcolors,updatedJune2025/Extendedcolorsareusedforsubject-specificbrandingandlearningcategorizationthroughouttheplatform.",
+      "valuesByMode": {
+        "Default": "#3f484a"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.24705882352941178,
+          "g": 0.2823529411764706,
+          "b": 0.2901960784313726,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "00",
+      "name": "ColorsElevations/00",
+      "valuesByMode": {
+        "Default": "#ffffff"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "00",
+      "name": "ColorsElevations/00",
+      "valuesByMode": {
+        "Default": "#ffffff"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 1,
+          "g": 1,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "colors, pre april 2025",
+      "name": "ColorsElevations/colors,preapril2025",
+      "valuesByMode": {
+        "Default": "#dfdfdf"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.8745098039215686,
+          "g": 0.8745098039215686,
+          "b": 0.8745098039215686,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "colors: before-after",
+      "name": "ColorsElevations/colors:before-after",
+      "valuesByMode": {
+        "Default": "#dfdfdf"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.8745098039215686,
+          "g": 0.8745098039215686,
+          "b": 0.8745098039215686,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Homepage",
+      "name": "ColorsElevations/colors:before-after/Homepage",
+      "valuesByMode": {
+        "Default": "#edeef0"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9294117647058824,
+          "g": 0.9333333333333333,
+          "b": 0.9411764705882353,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Homepage",
+      "name": "ColorsElevations/colors:before-after/Homepage",
+      "valuesByMode": {
+        "Default": "#edeef0"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9294117647058824,
+          "g": 0.9333333333333333,
+          "b": 0.9411764705882353,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Homepage",
+      "name": "ColorsElevations/colors:before-after/Homepage",
+      "valuesByMode": {
+        "Default": "#edeef0"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.9294117647058824,
+          "g": 0.9333333333333333,
+          "b": 0.9411764705882353,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Old DS",
+      "name": "ColorsElevations/colors:before-after/OldDS",
+      "valuesByMode": {
+        "Default": "#000000"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "NEW DS (No TEXT)",
+      "name": "ColorsElevations/colors:before-after/NEWDS(NoTEXT)",
+      "valuesByMode": {
+        "Default": "#000000"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "colors, guidance",
+      "name": "ColorsElevations/colors,guidance",
+      "valuesByMode": {
+        "Default": "#fbf7ff"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.984313725490196,
+          "g": 0.9686274509803922,
+          "b": 1,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Primary",
+      "name": "ColorsElevations/colors,guidance/Primary",
+      "valuesByMode": {
+        "Default": "#00658e"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0.396078431372549,
+          "b": 0.5568627450980392,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Secondary",
+      "name": "ColorsElevations/colors,guidance/Secondary",
+      "valuesByMode": {
+        "Default": "#445c6a"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.26666666666666666,
+          "g": 0.3607843137254902,
+          "b": 0.41568627450980394,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Tertiary",
+      "name": "ColorsElevations/colors,guidance/Tertiary",
+      "valuesByMode": {
+        "Default": "#0e8175"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.054901960784313725,
+          "g": 0.5058823529411764,
+          "b": 0.4588235294117647,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Material Design - Color Roles",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles",
+      "valuesByMode": {
+        "Default": "#dfdfdf"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.8745098039215686,
+          "g": 0.8745098039215686,
+          "b": 0.8745098039215686,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Primary",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles/Primary",
+      "valuesByMode": {
+        "Default": "#00658e"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0.396078431372549,
+          "b": 0.5568627450980392,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Secondary",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles/Secondary",
+      "valuesByMode": {
+        "Default": "#445c6a"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.26666666666666666,
+          "g": 0.3607843137254902,
+          "b": 0.41568627450980394,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Tertiary",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles/Tertiary",
+      "valuesByMode": {
+        "Default": "#0e8175"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.054901960784313725,
+          "g": 0.5058823529411764,
+          "b": 0.4588235294117647,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Color roles dictate where each color should be used within your interface, ensuring consistency and coherence throughout your design.",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles/Colorrolesdictatewhereeachcolorshouldbeusedwithinyourinterface,ensuringconsistencyandcoherencethroughoutyourdesign.",
+      "valuesByMode": {
+        "Default": "#000000"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Error",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles/Error",
+      "valuesByMode": {
+        "Default": "#be0c16"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.7450980392156863,
+          "g": 0.047058823529411764,
+          "b": 0.08627450980392157,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Add-on",
+      "name": "ColorsElevations/MaterialDesign-ColorRoles/Add-on",
+      "valuesByMode": {
+        "Default": "#167745"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0.08627450980392157,
+          "g": 0.4666666666666667,
+          "b": 0.27058823529411763,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "Before",
+      "name": "ColorsElevations/Before",
+      "valuesByMode": {
+        "Default": "#000000"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      }
+    },
+    {
+      "id": "After",
+      "name": "ColorsElevations/After",
+      "valuesByMode": {
+        "Default": "#000000"
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      }
+    }
+  ]
+}

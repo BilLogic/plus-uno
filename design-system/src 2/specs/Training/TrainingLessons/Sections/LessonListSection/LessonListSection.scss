@@ -1,0 +1,130 @@
+@use 'sass:map';
+
+.lesson-list-section {
+    width: 100%;
+
+    // The main container card
+    &__card {
+        background-color: var(--color-surface); // Pure white fill from Figma
+        border-radius: var(--size-section-radius-md); // 12px
+        border: none; // NO border/stroke as per user request
+        padding: var(--size-spacing-large-space-600, 24px); // Compact padding
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-spacing-small-space-100, 4px); // Minimal gap
+        box-shadow: none; // No shadow in Figma
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--size-spacing-small-space-200, 8px); // Compact spacing
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface);
+        font-weight: 700;
+    }
+
+    &__view-all {
+        padding: 0 !important;
+        background: none !important;
+        border: none !important;
+        font-weight: 600;
+        color: var(--color-primary);
+        font-size: var(--body3-size, 14px); // Ensure link-like size
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: var(--color-primary-variant) !important;
+            background: none !important;
+            text-decoration: underline !important;
+            box-shadow: none !important;
+        }
+    }
+
+    &__table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    &__table {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed; // Ensure column widths are respected
+
+        // Reset Bootstrap
+        --bs-table-bg: transparent;
+        --bs-table-border-color: transparent;
+
+        // Aggressively remove ALL borders
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
+            border: none !important;
+            border-top: none !important;
+            border-bottom: none !important;
+        }
+
+        thead th {
+            padding: var(--size-spacing-small-space-100, 4px) 0 var(--size-spacing-small-space-200, 8px) 0; // Compact header padding
+        }
+    }
+
+    &__th {
+        vertical-align: middle;
+        background-color: transparent !important;
+        padding-right: var(--size-element-gap-lg);
+
+        &-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: var(--body3-size, 12px);
+            font-weight: 600;
+            color: var(--color-on-surface-variant);
+            text-transform: capitalize;
+        }
+    }
+
+    &__sort-icon {
+        font-size: 10px;
+        color: var(--color-on-surface-variant-light, #c4c7c5);
+    }
+
+    &__row {
+        td {
+            padding: var(--size-spacing-small-space-200, 8px) 0; // Compact padding
+            border-top: none; // NO divider lines between rows
+            vertical-align: middle;
+        }
+    }
+
+    &__td {
+
+        // Adjust widths to match Figma visual balance
+        &--name {
+            width: 35%;
+            color: var(--color-on-surface);
+        }
+
+        &--status {
+            width: 30%;
+        }
+
+        &--focus {
+            width: 35%;
+        }
+    }
+
+    &__status-text {
+        color: var(--color-danger) !important; // Red status text
+    }
+}

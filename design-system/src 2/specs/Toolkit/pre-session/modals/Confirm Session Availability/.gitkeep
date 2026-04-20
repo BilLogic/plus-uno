@@ -1,0 +1,23 @@
+# Confirm Session Availability Modals
+
+This section contains modals for tutors to confirm their session availability.
+
+## Modal Types
+
+- **Availability Confirmation**: Modals for tutors to confirm or decline session availability
+- **Recurring Session Options**: Options for confirming availability for recurring sessions
+- **Time Slot Selection**: Modals for selecting preferred time slots
+
+## Design Guidelines
+
+- Use semantic spacing tokens (modal, section, element)
+- Use design system Button components (Available/Unavailable from CTA Tutors Button)
+- Follow consistent modal layout patterns with other pre-session modals
+- Include proper header, content, and button sections
+- Use appropriate color tokens for availability states
+
+## Component Reuse
+
+- `AvailableButton` and `UnavailableButton` from CTA Tutors Button element
+- Standard modal layout patterns from Edit Session/Delete Session modals
+- Design system Alert components for availability status messages

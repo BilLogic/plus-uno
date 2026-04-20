@@ -1,0 +1,102 @@
+/**
+ * Toast Styles
+ * 
+ * Matches Figma design: node-id=63-178085
+ */
+
+.plus-toast {
+    display: flex;
+    flex-direction: column;
+    width: 912px;
+    max-width: 100%;
+    border-radius: var(--size-element-radius-sm, 2px);
+    overflow: hidden;
+    box-shadow: var(--elevation-light-3);
+    /* Stronger shadow for floating element */
+    font-family: var(--font-family-body);
+
+    // Header Section
+    &__header {
+        display: flex;
+        align-items: center;
+        padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-lg, 16px);
+        background-color: var(--color-inverse-surface, #2e3133);
+        color: var(--color-inverse-on-surface, #f0f1f3);
+        gap: var(--size-element-gap-md, 12px);
+    }
+
+    &__icon-badge {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: var(--color-inverse-primary, #84cfff);
+        /* Light blue accent */
+        flex-shrink: 0;
+    }
+
+    &__title {
+        flex: 1;
+        margin: 0;
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body1, 16px);
+        font-weight: var(--font-weight-bold, 700);
+        line-height: var(--font-line-height-body1, 1.5);
+    }
+
+    &__close {
+        background: transparent;
+        border: none;
+        color: inherit;
+        padding: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        i {
+            font-size: 14px;
+        }
+    }
+
+    // Body Section
+    &__body {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 16px);
+        background-color: var(--color-surface-container-lowest, #ffffff);
+        color: var(--color-on-surface, #191c1e);
+        min-height: 52px;
+    }
+
+    &__message {
+        margin: 0;
+        font-size: var(--font-size-body2, 14px);
+        line-height: var(--font-line-height-body2, 1.4);
+    }
+
+    &__action {
+        background: transparent;
+        border: none;
+        color: var(--color-primary, #0472a8);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2, 14px);
+        font-weight: var(--font-weight-bold, 600);
+        cursor: pointer;
+        padding: 4px 8px;
+        margin-left: 16px;
+        white-space: nowrap;
+        border-radius: var(--size-element-radius-sm, 2px);
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: var(--color-primary-state-08);
+        }
+    }
+}

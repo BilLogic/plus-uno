@@ -1,0 +1,141 @@
+/*
+ * NavPills Component Styles
+ * Implements Figma specs for Pills (rounded pill backgrounds)
+ * The active state should show a prominent pill-shaped background
+ */
+
+// Base NavPills container
+.plus-nav-pills,
+.nav-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 8px);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    // NAV ITEM container
+    .nav-item,
+    .plus-nav-item {
+        margin: 0;
+    }
+
+    // NAV LINK - the actual pill
+    .nav-link,
+    .plus-nav-link,
+    .plus-nav-item-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--size-element-gap-md, 10px);
+
+        // Pill shape
+        border: 1px solid transparent;
+        border-radius: var(--Element-radius-md, 4px);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px);
+
+        // Typography
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body1, 16px);
+        font-weight: var(--font-weight-normal, 400);
+        line-height: var(--font-line-height-body1, 1.5);
+        text-decoration: none;
+
+        // Default state - transparent background
+        background-color: transparent;
+        color: var(--color-on-surface);
+
+        // Smooth transitions
+        transition: background-color 0.2s ease, color 0.2s ease;
+        cursor: pointer;
+
+        // Content wrapper
+        .plus-nav-item-content {
+            display: flex;
+            align-items: center;
+            gap: var(--size-element-gap-md, 10px);
+        }
+
+        // HOVER state
+        &:hover:not(.disabled):not(:disabled):not(.active) {
+            background-color: var(--State-layers-on-surface-8, rgba(0, 0, 0, 0.08));
+            color: var(--color-on-surface);
+        }
+
+        // PRESSED state
+        &:active:not(.disabled):not(:disabled):not(.active) {
+            background-color: var(--State-layers-on-surface-16, rgba(0, 0, 0, 0.16));
+        }
+
+        // FOCUS state
+        &:focus-visible:not(.disabled):not(:disabled):not(.active) {
+            background-color: var(--State-layers-on-surface-12, rgba(0, 0, 0, 0.12));
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        // ACTIVE/SELECTED state - PRIMARY PILL OUTLINE
+        &.active {
+            background-color: transparent !important;
+            border: 1px solid var(--color-primary) !important;
+            color: var(--color-primary-text) !important;
+
+            &:hover {
+                background-color: var(--color-primary-state-08) !important;
+            }
+
+            &:active {
+                background-color: var(--color-primary-state-16) !important;
+            }
+
+            &:focus-visible {
+                background-color: var(--color-primary-state-12) !important;
+                outline: 2px solid var(--color-primary);
+                outline-offset: 2px;
+            }
+        }
+
+        // DISABLED state
+        &.disabled,
+        &:disabled {
+            background-color: transparent;
+            color: var(--color-on-surface);
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    }
+
+    // DROPDOWN styling
+    .plus-nav-dropdown,
+    .dropdown {
+        .dropdown-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--size-element-gap-md, 10px);
+            border: 1px solid transparent;
+            border-radius: var(--Element-radius-md, 4px);
+            padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px);
+            background-color: transparent;
+            color: var(--color-on-surface);
+            font-family: var(--font-family-body);
+            font-size: var(--font-size-body1, 16px);
+            font-weight: var(--font-weight-normal, 400);
+
+            &:hover {
+                background-color: var(--State-layers-on-surface-8, rgba(0, 0, 0, 0.08));
+            }
+
+            &:active {
+                background-color: var(--State-layers-on-surface-16, rgba(0, 0, 0, 0.16));
+            }
+
+            &.show,
+            &[aria-expanded="true"] {
+                border-color: var(--color-primary);
+                color: var(--color-primary-text);
+                background-color: var(--color-primary-state-08);
+            }
+        }
+    }
+}

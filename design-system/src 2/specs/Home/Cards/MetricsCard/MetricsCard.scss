@@ -1,0 +1,246 @@
+.plus-metrics-card {
+    width: 100%;
+    min-width: 200px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    // Let inner Card content stretch so metric tiles can equalize heights
+    align-items: stretch;
+    justify-content: flex-start;
+    background-color: var(--color-surface-container-lowest);
+    
+    // Responsive: adjust min dimensions on smaller screens
+    @media (max-width: 768px) {
+        min-width: 100%;
+        min-height: 250px;
+    }
+    
+    // Storybook wrapper for fixed-width display
+    .plus-storybook-constrained & {
+        width: 266.667px;
+        height: 405px;
+    }
+    
+    // Card should clip at edges, but allow content to extend slightly
+    &.card {
+        overflow: hidden;
+    }
+    
+    .plus-card-content {
+        overflow: visible;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 !important; // Remove any default padding from Card.Body
+    }
+    
+    .plus-card-description {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+    
+    .plus-card-body {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 0 !important; // Remove any default padding
+        margin: 0 !important;
+    }
+}
+
+.plus-metrics-card-page {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    overflow: visible;
+}
+
+.plus-metrics-card-progress {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    // Padding handled by outer Card (paddingSize="sm" = 16px); keep inner padding at 0 to avoid double-padding
+    padding: 0;
+    position: relative;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.plus-metrics-card-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.plus-metrics-card-progress-value {
+    // Figma: Headline/H3 = 28px, Lato Bold
+    font-family: var(--font-family-headline);
+    font-weight: var(--font-weight-headline);
+    font-size: var(--font-size-h3);
+    line-height: var(--font-line-height-h3);
+    color: var(--color-on-surface-variant);
+    margin: 0;
+}
+
+.plus-metrics-card-progress-chart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(180px, 80%);
+    height: min(180px, 80%);
+    max-width: 180px;
+    max-height: 180px;
+    pointer-events: none;
+    z-index: 1;
+    
+    // Responsive: scale down on smaller cards
+    @media (max-width: 768px) {
+        width: min(150px, 70%);
+        height: min(150px, 70%);
+    }
+}
+
+.plus-metrics-card-progress-circle {
+    width: 100%;
+    height: 100%;
+}
+
+.plus-metrics-card-progress-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.plus-metrics-card-metrics {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-md);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.plus-metrics-card-item {
+    flex: 1 1 0;
+    width: 100%;
+    background-color: var(--color-surface-container);
+    border: var(--size-card-border-sm) solid var(--color-outline-variant);
+    border-radius: var(--size-border-radius-radius-100);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-card-pad-y-sm) var(--size-spacing-medium-space-200);
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+.plus-metrics-card-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.plus-metrics-card-item-value {
+    font-family: var(--font-family-title);
+    font-weight: var(--font-weight-title);
+    font-size: var(--font-size-h4);
+    line-height: var(--font-line-height-h4);
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+.plus-metrics-card-item-label {
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+// Alternative page: Stacked individual cards
+.plus-metrics-card-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-md, 16px); // 16px gap between stacked metric cards
+    width: 100%;
+    // Outer container background (surrounds the 3 cards) - transparent when in section
+    background-color: transparent;
+    border-radius: 0; // No border radius on container - section handles it
+    padding: 0; // No padding - section handles it
+    box-sizing: border-box;
+}
+
+.plus-metrics-card-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-md);
+    width: 100%;
+}
+
+.plus-metrics-stacked-card {
+    width: 100%;
+    
+    // Individual card background (white/surface-container-lowest)
+    &.card {
+        background-color: var(--color-surface-container-lowest) !important;
+    }
+    
+    .plus-card-content {
+        padding: 0 !important;
+    }
+    
+    .plus-card-body {
+        padding: 0 !important;
+    }
+}
+
+.plus-metrics-stacked-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+}
+
+.plus-metrics-stacked-card-value {
+    // Figma: Headline/H3 = 28px, Lato Bold
+    font-family: var(--font-family-headline);
+    font-weight: var(--font-weight-headline);
+    font-size: var(--font-size-h3);
+    line-height: var(--font-line-height-h3);
+    color: var(--color-on-surface-variant);
+    margin: 0;
+}
+
+.plus-metrics-stacked-card-label {
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+

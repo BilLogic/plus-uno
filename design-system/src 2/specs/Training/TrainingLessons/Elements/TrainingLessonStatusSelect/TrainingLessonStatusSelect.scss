@@ -1,0 +1,173 @@
+/**
+ * TrainingLessonStatusSelect Styles
+ * 
+ * Status filter dropdown styles
+ * Matches Figma design: node-id=779-75384
+ */
+
+.training-lesson-status-select {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+
+    &__button {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm);
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+        min-width: 28px;
+        border: 1px solid var(--color-primary);
+        border-radius: var(--size-element-radius-sm);
+        background-color: transparent;
+        cursor: pointer;
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body3);
+        font-weight: var(--font-weight-semibold-1);
+        line-height: 1.667;
+        color: var(--color-primary-text);
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: var(--color-primary-state-16);
+        }
+
+        &--open {
+            background-color: var(--color-primary-state-16);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        // Hide Bootstrap's default dropdown caret
+        &::after {
+            display: none !important;
+        }
+    }
+
+    &__button-text {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__counter {
+        flex-shrink: 0;
+    }
+
+    &__caret {
+        font-size: var(--font-size-body3);
+        color: var(--color-on-surface-variant);
+        flex-shrink: 0;
+        width: var(--font-size-fa-body3-solid); // 10px
+        text-align: center;
+    }
+
+    &__menu {
+        width: 332px;
+        background-color: var(--color-surface-container-high);
+        border-radius: var(--size-element-radius-sm);
+        box-shadow: var(--elevation-light-2);
+        padding: var(--size-element-gap-xs) 0;
+        margin-top: var(--size-element-gap-xs);
+        border: none;
+    }
+
+    &__item {
+        display: flex;
+        gap: var(--size-element-gap-md);
+        align-items: center;
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        width: 100%;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: var(--color-surface-container-highest);
+        }
+
+        &--selected {
+            background-color: var(--color-surface-container-highest);
+        }
+    }
+
+    &__check {
+        font-size: var(--font-size-body3);
+        color: var(--color-primary);
+        opacity: 0;
+        flex-shrink: 0;
+        width: var(--font-size-fa-body2-solid); // 12px
+        text-align: center;
+        transition: opacity 0.2s ease;
+
+        &--visible {
+            opacity: 1;
+        }
+    }
+
+    &__icon {
+        font-size: var(--font-size-body3);
+        flex-shrink: 0;
+        width: var(--font-size-fa-body2-solid); // 12px
+        text-align: center;
+
+        &--primary {
+            color: var(--color-primary);
+        }
+
+        &--info {
+            color: var(--color-info);
+        }
+
+        &--warning {
+            color: var(--color-warning);
+        }
+
+        &--success {
+            color: var(--color-success);
+        }
+
+        &--danger {
+            color: var(--color-danger);
+        }
+    }
+
+    &__item-text {
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-normal);
+        line-height: 1.571;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &--primary {
+            color: var(--color-primary-text);
+        }
+
+        &--info {
+            color: var(--color-info-text);
+        }
+
+        &--warning {
+            color: var(--color-warning-text);
+        }
+
+        &--success {
+            color: var(--color-success-text);
+        }
+
+        &--danger {
+            color: var(--color-danger-text);
+        }
+    }
+
+    &__item-counter {
+        flex-shrink: 0;
+    }
+}

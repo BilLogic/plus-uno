@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "updated_for_branch": "main",
+  "patterns": [
+    {
+      "name": "tokens_over_literals",
+      "rule": "Use token variables for all visual values.",
+      "references": [
+        "references/tokens-guide.md"
+      ]
+    },
+    {
+      "name": "plus_component_first",
+      "rule": "Prefer PLUS components/forms/specs before generic framework primitives.",
+      "references": [
+        "design-system/src/components",
+        "design-system/src/forms",
+        "design-system/src/specs"
+      ]
+    },
+    {
+      "name": "story_driven_verification",
+      "rule": "Update and validate stories for behavior/state changes.",
+      "references": [
+        "docs/design-system/guides/Storybook.md"
+      ]
+    },
+    {
+      "name": "figma_to_code",
+      "rule": "Fetch design context/screenshot first, then map to DS components/specs.",
+      "references": [
+        "docs/design-system/guides/figma-workflow.md"
+      ]
+    },
+    {
+      "name": "state_completeness",
+      "rule": "Cover default/hover/focus/active/disabled and loading/error where relevant."
+    },
+    {
+      "name": "responsive_verification",
+      "rule": "Use md/lg/xl checks and ResponsiveFrame patterns for page-level UI.",
+      "references": [
+        "design-system/src/specs/Universal/ResponsiveFrame.jsx"
+      ]
+    },
+    {
+      "name": "card_styling_alignment",
+      "rule": "Align section/chart card styling with admin spec patterns.",
+      "references": [
+        "design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss",
+        "design-system/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss",
+        "design-system/src/specs/Admin/Session Admin/Sections/SessionOverviewSection/SessionOverviewSection.scss"
+      ]
+    },
+    {
+      "name": "table_styling_alignment",
+      "rule": "Respect global table behavior and align table SCSS with admin implementations.",
+      "references": [
+        "design-system/src/styles/main.scss",
+        "design-system/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss"
+      ]
+    },
+    {
+      "name": "documentation_coherence",
+      "rule": "Keep docs/examples aligned with exports and remove stale paths."
+    }
+  ]
+}

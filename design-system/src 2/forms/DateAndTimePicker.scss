@@ -1,0 +1,636 @@
+/**
+ * Date and Time Picker Component Styles
+ * Implements date and time picker component with all states, validation, and styling
+ * using Design System tokens to match Figma specifications exactly.
+ */
+
+.plus-datetime-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--size-element-gap-sm);
+}
+
+.plus-datetime-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    
+    .plus-datetime-required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+}
+
+/* ============================================
+   SECTION STRUCTURE
+   ============================================ */
+
+.plus-datetime-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+    margin-bottom: var(--size-element-gap-md);
+    
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.plus-datetime-section-label {
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-medium, 500);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    margin-bottom: var(--size-element-gap-xs);
+}
+
+/* ============================================
+   DATE PICKER SECTION
+   ============================================ */
+
+.plus-datetime-date-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.plus-datetime-date-dropdown {
+    width: 100%;
+}
+
+.plus-datetime-date-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.plus-datetime-date-input {
+    width: 100%;
+    border: 1px solid;
+    border-radius: var(--size-element-radius-md);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+    
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+    }
+    
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    
+    &[readonly] {
+        cursor: default;
+    }
+}
+
+.plus-datetime-calendar-icon {
+    position: absolute;
+    right: var(--size-element-pad-x-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-on-surface-variant);
+    pointer-events: auto;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    
+    i {
+        font-size: var(--font-size-body2);
+    }
+    
+    &:hover {
+        color: var(--color-on-surface);
+    }
+}
+
+/* ============================================
+   TIME PICKER SECTION
+   ============================================ */
+
+.plus-datetime-time-input-group {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    
+    // Remove default InputGroup styling
+    > * {
+        border-radius: 0;
+    }
+    
+    // Ensure input and button have same height
+    .plus-datetime-time-input,
+    .plus-datetime-am-pm-dropdown {
+        display: flex;
+        align-items: stretch;
+    }
+}
+
+.plus-datetime-time-input {
+    flex: 1 1 auto;
+    min-width: 70px;
+    border: 0.8px solid;
+    border-right: none;
+    border-radius: var(--size-element-radius-sm) 0 0 var(--size-element-radius-sm);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    text-align: left;
+    color: var(--color-on-surface-variant);
+    background-color: var(--color-surface);
+    height: auto;
+    min-height: calc(var(--size-element-pad-y-md) * 2 + var(--font-size-body2) * var(--font-line-height-body2));
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    transition: border-color 0.15s ease-in-out, border-width 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+    
+    &:focus {
+        outline: none;
+        border-width: 2px;
+        border-color: var(--color-inverse-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+        z-index: 1;
+    }
+    
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    
+    &[readonly] {
+        cursor: default;
+        background-color: var(--color-surface-container);
+    }
+}
+
+.plus-datetime-am-pm-wrapper {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--color-primary);
+    border-radius: 0 var(--size-element-radius-sm) var(--size-element-radius-sm) 0;
+    overflow: hidden;
+    margin-left: -1px; // Overlap with input border to connect seamlessly
+    
+    // Remove default InputGroup append styling
+    &:not(:first-child) {
+        margin-left: -1px;
+    }
+    
+    // Focus state - update border (when input is focused)
+    .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
+        border-width: 2px;
+        border-color: var(--color-inverse-primary);
+        margin-left: -2px; // Adjust for 2px border
+    }
+    
+    // Active/expanded state
+    .plus-datetime-am-pm-dropdown.show & {
+        border-width: 2px;
+        border-color: var(--color-inverse-primary);
+        margin-left: -2px; // Adjust for 2px border
+    }
+    
+    // Invalid state
+    &.plus-datetime-validation-invalid {
+        border-color: var(--color-danger);
+        
+        // Focus state in invalid
+        .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
+            border-width: 2px;
+            border-color: var(--color-danger);
+            margin-left: -2px;
+        }
+        
+        // Active/expanded state in invalid
+        .plus-datetime-am-pm-dropdown.show & {
+            border-width: 2px;
+            border-color: var(--color-danger);
+            margin-left: -2px;
+        }
+    }
+    
+    // Success state
+    &.plus-datetime-validation-success {
+        border-color: var(--color-success);
+        
+        // Focus state in success
+        .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
+            border-width: 2px;
+            border-color: var(--color-success);
+            margin-left: -2px;
+        }
+        
+        // Active/expanded state in success
+        .plus-datetime-am-pm-dropdown.show & {
+            border-width: 2px;
+            border-color: var(--color-success);
+            margin-left: -2px;
+        }
+    }
+}
+
+.plus-datetime-am-pm-dropdown {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+
+.plus-datetime-am-pm-toggle {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--color-primary-text);
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-semibold-2, 600);
+    font-size: var(--font-size-h6);
+    line-height: var(--font-line-height-h6);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    min-width: 36px;
+    height: 100%;
+    min-height: calc(var(--size-element-pad-y-md) * 2 + var(--font-size-body2) * var(--font-line-height-body2));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-md);
+    transition: border-color 0.15s ease-in-out, border-width 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    cursor: pointer;
+    white-space: nowrap;
+    
+    // Hide Bootstrap's default caret
+    &::after {
+        display: none !important;
+    }
+    
+    // Style the FontAwesome caret icon
+    .fa-caret-down {
+        font-size: var(--font-size-fa-h6-solid);
+        line-height: var(--font-line-height-fa-h6-solid);
+        color: var(--color-primary);
+        flex-shrink: 0;
+    }
+    
+    // Hide caret in read-only state
+    &.plus-datetime-am-pm-toggle-readonly {
+        background-color: var(--color-surface-container);
+        cursor: default;
+        
+        .fa-caret-down {
+            display: none;
+        }
+    }
+    
+    &:hover:not(:disabled) {
+        border-color: var(--color-primary);
+    }
+    
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+        z-index: 1;
+    }
+    
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    
+    &[aria-expanded="true"],
+    &.plus-datetime-am-pm-toggle-active {
+        background-color: var(--color-primary-state-12);
+        color: var(--color-primary-text);
+        
+        .fa-caret-down {
+            color: var(--color-on-surface-variant);
+        }
+    }
+    
+    // Invalid state
+    &.plus-datetime-am-pm-toggle-invalid {
+        color: var(--color-danger-text);
+        
+        .fa-caret-down {
+            color: var(--color-danger);
+        }
+        
+        &:hover:not(:disabled) {
+            border-color: var(--color-danger);
+        }
+        
+        &:focus {
+            box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
+        }
+        
+        &[aria-expanded="true"],
+        &.plus-datetime-am-pm-toggle-active {
+            background-color: var(--color-danger-state-12);
+            color: var(--color-danger-text);
+            
+            .fa-caret-down {
+                color: var(--color-on-surface-variant);
+            }
+        }
+    }
+    
+    // Success state
+    &.plus-datetime-am-pm-toggle-success {
+        color: var(--color-success-text);
+        
+        .fa-caret-down {
+            color: var(--color-success);
+        }
+        
+        &:hover:not(:disabled) {
+            border-color: var(--color-success);
+        }
+        
+        &:focus {
+            box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
+        }
+        
+        &[aria-expanded="true"],
+        &.plus-datetime-am-pm-toggle-active {
+            background-color: var(--color-success-state-12);
+            color: var(--color-success-text);
+            
+            .fa-caret-down {
+                color: var(--color-on-surface-variant);
+            }
+        }
+    }
+}
+
+.plus-datetime-am-pm-dropdown .dropdown-menu {
+    min-width: 80px;
+    padding: var(--size-element-pad-y-sm) 0;
+    border-radius: var(--size-element-radius-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.plus-datetime-am-pm-dropdown .dropdown-item {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+    color: var(--color-on-surface);
+    font-size: var(--font-size-body2);
+    
+    &:hover {
+        background-color: var(--color-primary-state-08);
+        color: var(--color-primary);
+    }
+    
+    &:active {
+        background-color: var(--color-primary-state-12);
+        color: var(--color-primary);
+    }
+}
+
+/* ============================================
+   CALENDAR POPUP
+   ============================================ */
+
+.plus-datetime-calendar.dropdown-menu {
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
+    min-width: 280px;
+    width: auto;
+    border-radius: var(--size-modal-radius-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: var(--size-element-gap-xs);
+}
+
+.plus-datetime-calendar-align-center.dropdown-menu {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+}
+
+.plus-datetime-calendar-align-right.dropdown-menu {
+    left: auto !important;
+    right: 0 !important;
+    transform: none !important;
+}
+
+/* ============================================
+   CALENDAR HEADER
+   ============================================ */
+
+.plus-datetime-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--size-modal-gap-md);
+    padding-bottom: var(--size-modal-gap-sm);
+    border-bottom: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+}
+
+.plus-datetime-calendar-nav {
+    background: none;
+    border: none;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    cursor: pointer;
+    color: var(--color-on-surface);
+    border-radius: var(--size-element-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    
+    i {
+        font-size: var(--font-size-body2);
+    }
+    
+    &:hover:not(:disabled) {
+        background-color: var(--color-primary-state-08);
+        color: var(--color-primary);
+    }
+    
+    &:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+    }
+}
+
+.plus-datetime-calendar-month-year {
+    flex: 1;
+    text-align: center;
+    color: var(--color-on-surface);
+    font-weight: 600;
+}
+
+/* ============================================
+   CALENDAR WEEKDAYS
+   ============================================ */
+
+.plus-datetime-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--size-element-gap-xs);
+    margin-bottom: var(--size-element-gap-sm);
+}
+
+.plus-datetime-calendar-weekday {
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-weight: 400;
+    padding: var(--size-element-pad-y-sm) 0;
+}
+
+/* ============================================
+   CALENDAR DAYS GRID
+   ============================================ */
+
+.plus-datetime-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-datetime-calendar-day {
+    background: none;
+    border: none;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-sm);
+    cursor: pointer;
+    color: var(--color-on-surface);
+    border-radius: var(--size-element-radius-sm);
+    text-align: center;
+    transition: all 0.2s;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover:not(:disabled):not(.plus-datetime-calendar-day-selected) {
+        background-color: var(--color-primary-state-08);
+        color: var(--color-primary);
+    }
+    
+    &.plus-datetime-calendar-day-today {
+        font-weight: 600;
+        border: var(--size-element-stroke-sm) solid var(--color-outline);
+    }
+    
+    &.plus-datetime-calendar-day-selected {
+        background-color: var(--color-primary);
+        color: var(--color-on-primary);
+        font-weight: 600;
+    }
+    
+    &.plus-datetime-calendar-day-selected:hover {
+        background-color: var(--color-primary-state-12);
+    }
+    
+    &.plus-datetime-calendar-day-disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+        color: var(--color-on-surface-variant);
+    }
+    
+    &.plus-datetime-calendar-day-disabled:hover {
+        background: none;
+        color: var(--color-on-surface-variant);
+    }
+    
+    &.plus-datetime-calendar-day-other-month {
+        color: var(--color-on-surface-variant);
+        opacity: 0.5;
+        cursor: default;
+    }
+    
+    &.plus-datetime-calendar-day-other-month:hover {
+        background: none;
+    }
+}
+
+/* ============================================
+   VALIDATION STATES
+   ============================================ */
+
+.plus-datetime-validation {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    margin-top: var(--size-element-gap-xs);
+    
+    i {
+        font-size: var(--font-size-body3);
+        flex-shrink: 0;
+    }
+}
+
+.plus-datetime-validation-invalid {
+    color: var(--color-danger);
+    
+    i {
+        color: var(--color-danger);
+    }
+}
+
+.plus-datetime-validation-success {
+    color: var(--color-success);
+    
+    i {
+        color: var(--color-success);
+    }
+}
+
+.plus-datetime-validation-message {
+    flex: 1;
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+.plus-datetime-date-input.body3-txt,
+.plus-datetime-time-input.body3-txt,
+.plus-datetime-am-pm-toggle.body3-txt {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    min-height: 40px;
+}
+
+.plus-datetime-date-input.body1-txt,
+.plus-datetime-time-input.body1-txt,
+.plus-datetime-am-pm-toggle.body1-txt {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+    min-height: 56px;
+}
+
+/* ============================================
+   DISABLED STATE
+   ============================================ */
+
+.plus-datetime-wrapper:has(.plus-datetime-date-input:disabled) .plus-datetime-label,
+.plus-datetime-wrapper:has(.plus-datetime-time-input:disabled) .plus-datetime-label {
+    color: var(--color-on-surface-variant);
+}

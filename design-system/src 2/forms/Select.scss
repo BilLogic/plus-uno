@@ -1,0 +1,453 @@
+/**
+ * Enhanced Select Component Styles
+ * Custom dropdown using existing DS components:
+ * - Checkbox for multi-select
+ * - Radio for single-select
+ * - Badge for selected values
+ * - Ghost Button for creatable
+ */
+
+// ===== WRAPPER =====
+.plus-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    --bs-dropdown-spacer: 0px;
+
+    &.plus-select-disabled {
+        opacity: 0.38; // Figma disabled
+        pointer-events: none;
+    }
+    
+    &.plus-select-readonly {
+        pointer-events: none;
+        
+        .plus-select-trigger {
+            background-color: var(--color-surface-variant, #dde3ea);
+            cursor: default;
+            border: 0.8px solid var(--color-outline-variant, #bec8ca);
+            
+            &:hover {
+                border-color: var(--color-outline-variant);
+            }
+        }
+
+        .plus-select-chevron {
+            display: none;
+        }
+
+        .plus-select-badges {
+            max-width: 100%;
+            gap: var(--size-element-gap-xs, 4px);
+        }
+    }
+}
+
+// ===== TRIGGER / INPUT FIELD =====
+.plus-select-trigger {
+    display: flex;
+    align-items: flex-start; // Allow badges to wrap from top (multi)
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-md, 10px); // Figma: element/gap-md
+    width: 100%;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+    background-color: var(--color-surface); // Figma: neutral/surface (#f9f9fc)
+    border: 0.8px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm, 2px);
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+
+    &:hover:not([aria-disabled="true"]) {
+        border-color: var(--color-inverse-primary);
+    }
+
+    &:focus,
+    &:focus-visible,
+    &:active {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: var(--color-outline-variant) !important;
+    }
+}
+
+.plus-select-open .plus-select-trigger {
+    border-bottom-left-radius: var(--size-element-radius-sm, 2px);
+    border-bottom-right-radius: var(--size-element-radius-sm, 2px);
+    border-color: var(--color-outline-variant) !important;
+}
+
+.plus-select-open .plus-select-trigger:hover {
+    border-color: var(--color-outline-variant) !important;
+}
+
+// Size variants
+.plus-select-sm .plus-select-trigger {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-select-lg .plus-select-trigger {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    font-size: var(--font-size-body1);
+    line-height: var(--font-line-height-body1);
+}
+
+// ===== BADGES - Full width wrapping =====
+.plus-select-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm, 6px);
+    flex: 1 1 100%; // Take full width
+    min-width: 0; // Allow shrinking
+    max-width: calc(100% - 24px); // Leave room for chevron
+
+    .plus-badge {
+        flex-shrink: 0;
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-normal);
+        line-height: var(--font-line-height-body2);
+        color: var(--secondary-secondary-text, #3B525F);
+        border: none;
+
+        &.plus-badge--dismissible {
+            border: none;
+        }
+    }
+}
+
+// ===== NOWRAP MODE - Single line with overflow =====
+.plus-select-nowrap {
+    .plus-select-trigger {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--color-outline-variant);
+            border-radius: 2px;
+        }
+    }
+
+    .plus-select-badges {
+        flex-wrap: nowrap;
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+}
+
+// ===== TRUNCATE MODE - Show overflow indicator =====
+.plus-select-truncate {
+    .plus-select-trigger {
+        overflow: hidden;
+    }
+
+    .plus-select-badges {
+        position: relative;
+        overflow: hidden;
+
+        // Fade gradient on right edge when truncated
+        &::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 32px;
+            background: linear-gradient(to right, transparent, var(--color-surface-container-lowest));
+            pointer-events: none;
+        }
+    }
+}
+
+// ===== TEXT DISPLAY =====
+.plus-select-text {
+    flex: 1;
+    font-family: var(--font-family-body);
+    font-size: inherit;
+    font-weight: var(--font-weight-light);
+    color: var(--color-on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    align-self: center;
+
+    &.plus-select-placeholder {
+        color: var(--color-on-surface-variant);
+    }
+}
+
+// ===== CHEVRON ICON =====
+.plus-select-chevron {
+    flex-shrink: 0;
+    font-size: var(--font-size-fa-body2-solid, 12px);
+    color: var(--color-on-surface-variant);
+    margin-left: auto;
+    align-self: center;
+}
+
+// ===== DROPDOWN MENU / POPUP =====
+.plus-select-menu {
+    width: 100%;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    z-index: 2000;
+}
+
+// react-bootstrap/Bootstrap applies a spacer via `.dropdown-menu[data-bs-popper]`.
+// Force it to 0 so the menu touches the select field with no visual gap.
+.plus-select-menu[data-bs-popper] {
+    margin-top: 0 !important;
+    --bs-dropdown-spacer: 0px !important;
+}
+
+// When the dropdown opens upwards, reverse corner radii and overlap spacing.
+.plus-select-menu[data-bs-popper][data-popper-placement^="top"] .plus-select-dropdown,
+.plus-select-menu[data-bs-popper][data-popper-placement^="top"] .plus-select-options-list {
+    margin-top: 0;
+    margin-bottom: -2px;
+    border-top-left-radius: var(--size-modal-radius-sm, 4px);
+    border-top-right-radius: var(--size-modal-radius-sm, 4px);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+// Options list container (Search + Add + Options)
+.plus-select-dropdown,
+.plus-select-options-list {
+    background-color: var(--color-surface);
+    border: 0.8px solid var(--color-outline-variant);
+    margin-top: -2px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: var(--size-modal-radius-sm, 4px);
+    border-bottom-right-radius: var(--size-modal-radius-sm, 4px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.plus-select-search {
+    .plus-input {
+        border-radius: 0;
+        border: none;
+        border-bottom: 0.8px solid var(--color-outline-variant);
+        margin-bottom: 0;
+        width: 100%;
+        background-color: var(--color-surface);
+        transition: none !important;
+        color: var(--color-on-surface-variant);
+        font-weight: var(--font-weight-light);
+
+        &::placeholder {
+            color: var(--color-on-surface-variant);
+        }
+
+        &:hover {
+            background-color: var(--color-on-surface-state-08) !important;
+            border-color: var(--color-outline-variant) !important;
+        }
+
+        &:focus,
+        &:focus-visible {
+            border-color: var(--color-outline-variant) !important;
+        }
+    }
+}
+
+.plus-select-add-row {
+    display: flex;
+    min-width: 28px;
+    align-items: center;
+    gap: var(--size-element-gap-md, 10px);
+    flex: 1 0 0;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+    border: none;
+    border-bottom: 0.8px solid var(--color-outline-variant, #BEC8CA);
+    border-radius: 0;
+    background-color: var(--color-surface, #F9F9FC);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    margin-bottom: -0.8px;
+
+    &:hover:not(.disabled) {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    .plus-select-add-icon {
+        font-size: var(--font-size-fa-body2-solid);
+        color: var(--primary-primary-text, #00547E);
+    }
+
+    .plus-select-add-input {
+        flex: 1 0 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--primary-primary-text, #00547E);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-semibold-1);
+        line-height: var(--font-line-height-body2);
+
+        &::placeholder {
+            color: var(--primary-primary-text, #00547E);
+        }
+    }
+}
+
+.plus-select-options {
+    background-color: transparent;
+
+    // Multi-select dropdown should not render row separators/borders.
+    // ListGroup default styles add border-bottom on each item; override here.
+    &.list-group-flush {
+        .plus-list-option.plus-select-option-item {
+            border: none !important;
+            border-bottom: none !important;
+        }
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-md, 10px);
+        width: 100%;
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
+        box-sizing: border-box;
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-light);
+        line-height: var(--font-line-height-body2);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        border: none !important;
+        box-shadow: none !important;
+        transition: background-color 0.15s ease;
+
+        &:hover:not(.disabled) {
+            background-color: var(--color-on-surface-state-08);
+            color: var(--color-on-surface);
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        &:active:not(.disabled) {
+            background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        &.selected {
+            position: relative;
+            background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08));
+            color: var(--color-on-surface);
+            font-weight: var(--font-weight-light) !important;
+            border: none !important;
+            box-shadow: none !important;
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background-color: var(--color-primary-container);
+            }
+        }
+
+        &.disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: not-allowed;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .plus-select-option-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .plus-list-option.plus-select-option-item {
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
+        box-sizing: border-box;
+        background-color: var(--color-surface);
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body2);
+        font-weight: var(--font-weight-light);
+        line-height: var(--font-line-height-body2);
+        gap: var(--size-element-gap-md, 10px);
+        align-items: center;
+        border: none !important;
+        box-shadow: none !important;
+
+        .form-check-label {
+            color: var(--color-on-surface);
+        }
+
+        &:hover:not(.disabled) {
+            background-color: var(--color-on-surface-state-08);
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        &.active {
+            position: relative;
+            /* Override OptionList active background to match single-select selected */
+            background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08)) !important;
+            font-weight: var(--font-weight-light) !important;
+            border: none !important;
+            box-shadow: none !important;
+
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background-color: var(--color-primary-container);
+            }
+        }
+
+        &.disabled {
+            opacity: 0.38;
+            pointer-events: none;
+            cursor: not-allowed;
+            border: none !important;
+            box-shadow: none !important;
+        }
+    }
+}
+
+// Remove the redundant .dropdown-menu .show override at the bottom since we handled it above
+// The .plus-select-wrapper.dropdown block can be removed or simplified if it does nothing else useful.
+// It hid the caret. We should keep that.
+.plus-select-wrapper.dropdown {
+    .dropdown-toggle {
+        &::after {
+            display: none; // Remove default caret
+        }
+    }
+}

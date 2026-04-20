@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "updated_for_branch": "main",
+  "indexes": {
+    "foundations": ".agent/assets/foundations-index.json",
+    "components": ".agent/assets/components-index.json",
+    "patterns": ".agent/assets/patterns-index.json",
+    "tokens": ".agent/assets/tokens-index.json",
+    "examples": ".agent/assets/examples-index.json",
+    "integrations": ".agent/assets/integrations-index.json"
+  },
+  "usage": {
+    "rule": "Load references guides first; load index JSON files only when exhaustive lookup is needed.",
+    "selection_hint": {
+      "foundations": "Shared baseline context: commands, key paths, context levels, terminology.",
+      "patterns": "Implementation patterns, guardrails, and reference paths for consistent coding.",
+      "components": "Component roots, export entrypoints, story globs, discovery docs.",
+      "tokens": "Token files, source JSON, sync scripts, env vars, CI token sync.",
+      "examples": "Story/example globs and prototype/template roots.",
+      "integrations": "Critical MCP integrations and tool entrypoints."
+    }
+  }
+}

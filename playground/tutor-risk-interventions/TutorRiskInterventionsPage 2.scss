@@ -1,0 +1,278 @@
+/**
+ * TutorRiskInterventionsPage Styles
+ * 
+ * High-fidelity prototype following PLUS design system patterns.
+ * Reference patterns: TutorDataCard, TutorsPerformanceTable, TutorCompliance2Page
+ * 
+ * WIREFRAME LAYOUT:
+ * ┌────────────────────────────────────────────────┐
+ * │  XXXX (Tabs - 4 tabs)                          │
+ * ├──────────────┬─────────────────────────────────┤
+ * │  Stat Card   │  Stat Card                      │
+ * ├──────────────┴┬────────────────────────────────┤
+ * │  Line Chart   │  Bar Chart                     │
+ * │               │                                │
+ * ├───────────────┴────────────────────────────────┤
+ * │  XXX Title   [Group] [Risk Level] [Date Range] │
+ * ├────────────────────────────────────────────────┤
+ * │  Table (20 rows)                               │
+ * │  ────────────────────────────────────────────  │
+ * │  Row 1                                         │
+ * │  Row 2                                         │
+ * │  ...                                           │
+ * │  Row 20                                        │
+ * └────────────────────────────────────────────────┘
+ * 
+ * CARD STYLING RULE (PLUS Design System):
+ * - Cards within Sections use surface-container-lowest (white) background
+ * - Reference: TutorDataCard.scss
+ */
+
+// Main Content Container
+.tutor-risk-interventions-page__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-lg, 24px);
+    padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 24px);
+    width: 100%;
+}
+
+// ============================================
+// TABS SECTION - Matches wireframe "XXXX"
+// ============================================
+.tutor-risk-interventions-page__tabs {
+    margin-bottom: var(--size-element-gap-md, 8px);
+    width: 100%;
+}
+
+.tutor-risk-interventions-page__nav-tabs {
+    border-bottom: 1px solid var(--color-outline-variant, #e2e2e5);
+}
+
+// ============================================
+// STATS ROW - Two summary stat cards at top
+// ============================================
+.tutor-risk-interventions-page__stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-section-gap-lg, 24px);
+    width: 100%;
+
+    // Stack on mobile
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Stat Card - Compact summary card
+.tutor-risk-interventions-page__stat-card {
+    // PLUS Pattern: Cards use surface-container-lowest (white) per design system rules
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    border-radius: var(--card-radius-sm, 12px);
+    padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--size-element-gap-sm, 8px);
+    min-height: 100px;
+}
+
+.tutor-risk-interventions-page__stat-value {
+    font-family: 'Lato', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-primary, #006b5e);
+}
+
+.tutor-risk-interventions-page__stat-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-on-surface-variant, #44474a);
+}
+
+// ============================================
+// CHARTS ROW - Two side-by-side cards
+// ============================================
+.tutor-risk-interventions-page__charts-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-section-gap-lg, 24px);
+    width: 100%;
+
+    // Stack on tablet/mobile
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Chart Card - Following TutorDataCard pattern
+.tutor-risk-interventions-page__chart-card {
+    // PLUS Pattern: Cards use surface-container-lowest (white) per design system rules
+    // Reference: design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    border-radius: var(--card-radius-sm, 12px);
+    padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md, 16px);
+    min-height: 376px;
+    flex: 1;
+}
+
+.tutor-risk-interventions-page__chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+
+    .h5 {
+        font-family: 'Lato', sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--color-on-surface, #191c1e);
+        margin: 0;
+    }
+}
+
+// ============================================
+// FILTER BAR - Title left, 3 dropdowns right
+// ============================================
+.tutor-risk-interventions-page__filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--size-element-gap-lg, 24px);
+    padding: var(--size-element-pad-sm, 8px) 0;
+    width: 100%;
+    
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--size-element-gap-md, 16px);
+    }
+}
+
+.tutor-risk-interventions-page__filter-title {
+    display: flex;
+    align-items: center;
+
+    .h5 {
+        font-family: 'Lato', sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--color-on-surface, #191c1e);
+        margin: 0;
+    }
+}
+
+.tutor-risk-interventions-page__filter-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md, 16px);
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.tutor-risk-interventions-page__filter-dropdown {
+    min-width: 140px;
+}
+
+// ============================================
+// TABLE SECTION - Full width data table
+// ============================================
+.tutor-risk-interventions-page__table-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md, 16px);
+    width: 100%;
+}
+
+// Table Wrapper
+.tutor-risk-interventions-page__table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+// Table Styling - Following TutorsPerformanceTable and global PLUS rules
+.tutor-risk-interventions-page__table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: transparent;
+    
+    thead {
+        background-color: transparent !important;
+        
+        tr {
+            background-color: transparent !important;
+        }
+        
+        th {
+            padding: var(--size-element-pad-sm, 12px) var(--size-element-pad-md, 16px);
+            font-weight: 700;
+            color: var(--color-on-surface, #1c1b1f);
+            background-color: transparent !important;
+            border: none;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+    }
+
+    tbody {
+        tr {
+            transition: background-color 0.2s ease;
+            // Override Bootstrap table striping – rows should be transparent by default
+            background-color: transparent !important;
+            border: none;
+            
+            &.tutor-risk-interventions-page__row--clickable {
+                cursor: pointer;
+                
+                &:hover {
+                    // Use the same hover token as TutorsPerformanceTable
+                    background-color: var(--color-on-surface-state-08);
+                }
+            }
+
+            td {
+                padding: var(--size-element-pad-sm, 12px) var(--size-element-pad-md, 16px);
+                color: var(--color-on-surface, #1c1b1f);
+                vertical-align: middle;
+                background-color: transparent !important;
+                border: none;
+            }
+        }
+    }
+}
+
+// ============================================
+// PAGINATION FOOTER
+// ============================================
+.tutor-risk-interventions-page__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-section-gap-md, 16px);
+    padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-md, 8px);
+    
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: var(--size-element-gap-md, 16px);
+    }
+}

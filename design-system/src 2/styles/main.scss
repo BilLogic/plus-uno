@@ -1,0 +1,286 @@
+/**
+ * PLUS Design System Main Stylesheet
+ * 
+ * This is the main entry point for PLUS design system styles.
+ * Import all design tokens and component styles here.
+ */
+
+// Design Tokens
+// Use @use to include :root blocks and CSS rules (modern Sass syntax)
+// Import token files directly to ensure :root blocks are included
+@use "../tokens/colors" as *;
+@use "../tokens/primitives" as *;
+@use "../tokens/spacing_semantics" as *;
+@use "../tokens/layout" as *;
+@use "../tokens/fonts" as *;
+@use "../tokens/elevation" as *;
+
+// Shared skeleton/shimmer loading style (Sidebar, prototypes)
+@import "skeleton";
+
+// Components (using load path - load-path is design-system/components, so imports should be relative to that)
+// Use @import to ensure global scope availability for @extend (e.g. Dropdown extends Checkbox)
+// Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
+// Prototypes and any app that imports main.scss get styles only for uncommented components.
+@import "../components/Button/Button";
+@import "../components/Breadcrumb/Breadcrumb";
+@import "../components/Badge/Badge";
+
+@import "../components/Divider/Divider";
+
+@import "../components/ButtonGroup/ButtonGroup";
+// @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
+@import "../components/Dropdown/Dropdown";
+
+// Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
+// Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
+.plus-card {
+    margin: 0; // Remove any default margin from React Bootstrap Card
+    background-color: var(--color-surface-container-lowest); // Card background color token
+}
+
+.plus-card .plus-card-content {
+    padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
+}
+
+.plus-card-pad-sm {
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+}
+
+.plus-card-pad-md {
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+}
+
+.plus-card-pad-lg {
+    padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
+}
+
+.plus-card-gap-sm {
+    gap: var(--size-card-gap-sm);
+}
+
+.plus-card-gap-md {
+    gap: var(--size-card-gap-md);
+}
+
+.plus-card-gap-lg {
+    gap: var(--size-card-gap-lg);
+}
+
+.plus-card-radius-sm {
+    border-radius: var(--size-card-radius-sm);
+}
+
+.plus-card-radius-md {
+    border-radius: var(--size-card-radius-md);
+}
+
+.plus-card-border-sm {
+    border-width: var(--size-card-border-sm);
+}
+
+.plus-card-border-md {
+    border-width: var(--size-card-border-md);
+}
+
+.plus-card-border-lg {
+    border-width: var(--size-card-border-lg);
+}
+
+@import "../components/Modal/Modal";
+// @import "../components/Navigation/Navigation"; // no Navigation component in components/
+@import "../components/Navbar/Navbar";
+// @import "../components/Form/Form"; // forms live under src/forms/
+// @import "../components/DatePicker/DatePicker"; // no DatePicker in components/
+// @import "../components/Radio/Radio"; // no Radio in components/
+// @import "../components/Switch/Switch"; // no Switch in components/
+// @import "../components/InputGroup/InputGroup"; // no InputGroup in components/
+@import "../components/ListGroup/ListGroup";
+@import "../components/Carousel/Carousel";
+@import "../components/Collapse/Collapse";
+@import "../components/Jumbotron/Jumbotron";
+@import "../components/MediaObject/MediaObject";
+@import "../components/Progress/Progress";
+@import "../components/Spinner/Spinner";
+@import "../components/LoadingGif/LoadingGif";
+@import "../components/Popover/Popover";
+@import "../components/Pagination/Pagination";
+@import "../components/Tooltip/Tooltip";
+@import "../components/Toast/Toast";
+@import "../components/Scrollspy/Scrollspy";
+// @import "../components/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
+@import "../components/Table/Table";
+@import "../components/NavTabs/NavTabs";
+@import "../components/NavPills/NavPills";
+@import "../components/Alert/Alert";
+@import "../components/Accordion/Accordion";
+@import "../components/UserAvatar/UserAvatar";
+@import "../assets/Logo/Logo";
+
+// Base Styles
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-150);
+    color: var(--color-on-surface);
+    background-color: unset;
+    background: unset;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
+
+// Utility Classes
+
+// Color Utility Classes
+.color-primary {
+    color: var(--color-primary) !important;
+}
+
+.color-secondary {
+    color: var(--color-secondary) !important;
+}
+
+.color-tertiary {
+    color: var(--color-tertiary) !important;
+}
+
+.color-success {
+    color: var(--color-success) !important;
+}
+
+.color-danger {
+    color: var(--color-danger) !important;
+}
+
+.color-warning {
+    color: var(--color-warning) !important;
+}
+
+.color-info {
+    color: var(--color-info) !important;
+}
+
+.color-neutral {
+    color: var(--color-on-surface) !important;
+}
+
+.color-error {
+    color: var(--color-danger) !important;
+}
+
+// Background Color Utility Classes
+.bg-color-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-color-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-color-tertiary {
+    background-color: var(--color-tertiary) !important;
+}
+
+.bg-color-success {
+    background-color: var(--color-success) !important;
+}
+
+.bg-color-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.bg-color-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-color-info {
+    background-color: var(--color-info) !important;
+}
+
+// Other Utility Classes
+.shadow-light-2 {
+    box-shadow: var(--elevation-light-2);
+}
+
+.border-none {
+    border: none !important;
+}
+
+.border-outline {
+    border: 1px solid var(--color-outline);
+}
+
+.border-outline-variant {
+    border: 1px solid var(--color-outline-variant);
+}
+
+.border-radius-sm {
+    border-radius: 2px;
+}
+
+// Table Overrides - Match Admin/Training Figma Specs
+// Remove Bootstrap's default table chrome (background colors and row divider lines)
+// This ensures all tables match PLUS design system patterns by default
+.table {
+    // Remove default table background
+    --bs-table-bg: transparent;
+    --bs-table-border-color: transparent;
+    border-color: transparent;
+
+    // Target th & td - remove borders and backgrounds
+    > :not(caption)>*>* {
+        background-color: transparent !important;
+        border-bottom-width: 0 !important;
+        border-top-width: 0 !important;
+    }
+
+    // Remove header background
+    >thead {
+        background-color: transparent !important;
+
+        >tr {
+            background-color: transparent !important;
+
+            >th {
+                background-color: transparent !important;
+                border-bottom-width: 0 !important;
+            }
+        }
+    }
+
+    // Remove row backgrounds and borders
+    >tbody {
+        >tr {
+            background-color: transparent !important;
+            border-bottom-width: 0 !important;
+
+            >td {
+                background-color: transparent !important;
+                border-bottom-width: 0 !important;
+                border-top-width: 0 !important;
+            }
+        }
+    }
+}
+
+// Image Placeholder Utility
+.image-placeholder {
+    background-color: var(--color-surface-container-low, #f3f3f6);
+    border: 1px dashed var(--color-outline-variant, #bec8ca);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-on-surface-variant, #3f484a);
+    font-size: var(--font-size-body3, 10px);
+    box-sizing: border-box;
+}

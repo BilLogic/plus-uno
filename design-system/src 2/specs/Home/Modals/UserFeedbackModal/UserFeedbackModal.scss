@@ -1,0 +1,193 @@
+.plus-user-feedback-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.plus-user-feedback-modal {
+    position: relative;
+    z-index: 1051;
+    max-width: 100%;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    
+    // Ensure the modal itself respects max height
+    .plus-modal {
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+}
+
+.plus-user-feedback-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-modal-gap-md, 12px);
+}
+
+.plus-user-feedback-modal-description {
+    color: var(--color-on-surface-variant, #3f484a);
+    margin: 0;
+}
+
+.plus-user-feedback-modal-type-selection {
+    display: flex;
+    gap: var(--size-spacing-within-component-spacer-4, 12px);
+}
+
+.plus-user-feedback-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-spacing-within-component-spacer-3-base, 8px);
+}
+
+.plus-user-feedback-modal-severity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-small-gap-xs, 4px);
+    width: 100%;
+}
+
+.plus-user-feedback-modal-label {
+    display: flex;
+    gap: var(--size-spacing-small-space-050, 4px);
+    color: var(--color-on-surface, #191c1e);
+    margin: 0;
+}
+
+.plus-user-feedback-modal-required {
+    color: var(--color-danger, #ba1a1a);
+}
+
+.plus-user-feedback-modal-form-row {
+    display: flex;
+    gap: var(--size-spacing-within-component-spacer-3-base, 8px);
+    align-items: flex-start;
+    width: 100%;
+}
+
+.plus-user-feedback-modal-product-area {
+    flex: 0 0 auto;
+    min-width: 218.67px;
+    max-width: 293.33px;
+}
+
+.plus-user-feedback-modal-textarea {
+    flex: 1;
+    min-width: 0;
+}
+
+.plus-user-feedback-modal-add-images {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.plus-user-feedback-modal-add-images-btn {
+    padding: var(--size-spacing-small-space-050, 4px) var(--size-spacing-small-space-100, 8px);
+}
+
+.plus-user-feedback-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-modal-gap-md, 12px);
+    padding-top: var(--size-spacing-small-space-050, 4px);
+}
+
+.plus-user-feedback-modal-footer-text {
+    flex: 1;
+    color: var(--color-on-surface-variant, #3f484a);
+    margin: 0;
+}
+
+.plus-user-feedback-modal-link {
+    color: var(--color-primary-text, #005a50);
+    text-decoration: underline;
+    cursor: pointer;
+    
+    &:hover {
+        color: var(--color-primary, #0472a8);
+    }
+}
+
+// Override Modal styles for this specific use case
+.plus-user-feedback-modal {
+    .plus-modal {
+        // Override title to use h4 (24px) instead of h5
+        .plus-modal-header {
+            .plus-modal-title {
+                font-size: var(--font-size-h4, 24px);
+                line-height: var(--font-line-height-h4, 1.333);
+                font-weight: var(--font-weight-semibold-2, 600);
+            }
+        }
+        
+        // Ensure proper spacing and scrolling
+        .plus-modal-body {
+            overflow-y: auto;
+            max-height: calc(100vh - 200px); // Account for header and footer
+            flex: 1;
+            min-height: 0;
+            
+            .plus-modal-content {
+                padding: 0;
+            }
+        }
+    }
+}
+
+// Severity buttons styling - icon only buttons in a connected group
+.plus-user-feedback-modal-severity-buttons {
+    display: flex;
+    gap: 0;
+    
+    .plus-user-feedback-modal-severity-btn {
+        flex: 1;
+        min-width: 36px;
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        
+        // Hide text, show only icon
+        .plus-btn-text {
+            display: none;
+        }
+        
+        // First button - rounded left
+        &:first-child {
+            border-top-left-radius: var(--size-element-radius-md, 4px);
+            border-bottom-left-radius: var(--size-element-radius-md, 4px);
+            border-top-right-radius: var(--size-border-radius-radius-2, 4px);
+            border-bottom-right-radius: var(--size-border-radius-radius-2, 4px);
+            border-right: none;
+        }
+        
+        // Middle buttons - no rounded corners, no left border
+        &:not(:first-child):not(:last-child) {
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+        }
+        
+        // Last button - rounded right
+        &:last-child {
+            border-top-left-radius: var(--size-border-radius-radius-2, 4px);
+            border-bottom-left-radius: var(--size-border-radius-radius-2, 4px);
+            border-top-right-radius: var(--size-element-radius-md, 4px);
+            border-bottom-right-radius: var(--size-element-radius-md, 4px);
+            border-left: none;
+        }
+    }
+}
+

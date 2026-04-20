@@ -1,0 +1,80 @@
+/**
+ * OptionList Component Styles
+ * Consolidated with ListGroup - uses ListGroup.Option subcomponent
+ * Styling tokens for option list popup behaviors
+ */
+
+.plus-option-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.plus-option-list {
+    // Uses ListGroup base styling - just override specific option list needs
+
+    // Override ListGroup shadow for dropdown/popup usage
+    &.list-group-flush {
+        box-shadow: none;
+        border-radius: 0;
+    }
+}
+
+// ListOption subcomponent styling (used within ListGroup)
+.plus-list-option {
+    cursor: pointer;
+
+    // Hide the default Form.Check container styling since we want seamless integration
+    .form-check {
+        margin-bottom: 0;
+        padding-left: 0;
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-md, 8px);
+        width: 100%;
+        pointer-events: none; // Let parent handle clicks
+    }
+
+    .form-check-input {
+        margin-top: 0;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+
+    .form-check-label {
+        flex: 1;
+        cursor: pointer;
+    }
+
+    // Selected state
+    &.active {
+        background-color: var(--color-primary-08) !important;
+
+        .form-check-label {
+            color: var(--color-primary-text);
+        }
+    }
+
+    // Hover state
+    &:hover:not(.disabled) {
+        background-color: var(--color-neutral-state-08);
+    }
+
+    // Active/pressed
+    &:active:not(.disabled) {
+        background-color: var(--color-neutral-state-12);
+    }
+
+    // Focus state
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+
+    // Disabled state
+    &.disabled {
+        opacity: 0.38;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+}

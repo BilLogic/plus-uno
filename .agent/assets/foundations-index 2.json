@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "updated_for_branch": "main",
+  "runtime_and_tooling": {
+    "framework": "React",
+    "ui_library": "React-Bootstrap",
+    "bundler": "Vite",
+    "storybook": "Storybook"
+  },
+  "canonical_commands": [
+    "npm run dev",
+    "npm run storybook",
+    "npm run build",
+    "npm run build-storybook",
+    "npm run preview:react",
+    "npm run sync:tokens",
+    "npm run generate:tokens"
+  ],
+  "key_paths": {
+    "agent_system": ".agent/",
+    "design_system_source": "design-system/src/",
+    "design_system_docs": "docs/design-system/",
+    "storybook_config": ".storybook/",
+    "token_scripts": "scripts/",
+    "playground_prototyping": "playground/"
+  },
+  "context_levels": [
+    {
+      "name": "element",
+      "token_scope": "--size-element-*",
+      "typical_locations": [
+        "design-system/src/components/",
+        "design-system/src/forms/"
+      ]
+    },
+    {
+      "name": "card",
+      "token_scope": "--size-card-*",
+      "typical_locations": [
+        "design-system/src/specs/*/Cards/"
+      ]
+    },
+    {
+      "name": "section",
+      "token_scope": "--size-section-*",
+      "typical_locations": [
+        "design-system/src/specs/*/Sections/"
+      ]
+    },
+    {
+      "name": "table",
+      "token_scope": "--size-table-*",
+      "typical_locations": [
+        "design-system/src/specs/*/Tables/"
+      ]
+    },
+    {
+      "name": "modal",
+      "token_scope": "--size-modal-*",
+      "typical_locations": [
+        "design-system/src/components/",
+        "design-system/src/specs/*/Modals/"
+      ]
+    },
+    {
+      "name": "page_or_spec",
+      "typical_locations": [
+        "design-system/src/specs/*/Pages/"
+      ]
+    }
+  ],
+  "terminology": {
+    "element": "Small reusable unit (button, input, badge).",
+    "card": "Grouped content container.",
+    "section": "Major page region.",
+    "table": "Structured tabular layout.",
+    "modal": "Overlay dialog surface.",
+    "spec": "Higher-level composition in design-system/src/specs."
+  },
+  "token_prefixes": [
+    "--color-*",
+    "--size-*",
+    "--font-*",
+    "--elevation-*"
+  ]
+}

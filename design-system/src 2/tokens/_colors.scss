@@ -1,0 +1,323 @@
+/**
+ * Material Design 3 Color Tokens
+ * Generated from Figma design system
+ * Follows M3 color role guidance: https://m3.material.io/styles/color/roles
+ */
+
+:root {
+   /* ============================================
+       ACCENT COLORS - Material Design 3 Roles
+       ============================================ */
+
+   /* Primary Colors */
+
+   /* Primary Colors */
+   --color-primary: #0472a8;
+   /* Figma: _Primary/Primary - for borders/backgrounds */
+   --color-primary-text: #00547e;
+   /* Figma: _Primary/Primary (Text) - for text */
+   --color-on-primary: #ffffff;
+   --color-primary-container: #61b5cf;
+   --color-on-primary-container: #001e2e;
+   --color-inverse-primary: #84cfff;
+
+   /* Primary State Layers */
+   /* Using actual primary color #0472a8 = rgb(0, 101, 142) from Figma */
+   --color-primary-state-08: rgba(0, 101, 142, 0.08);
+   --color-primary-state-12: rgba(0, 101, 142, 0.12);
+   --color-primary-state-16: rgba(0, 101, 142, 0.16);
+   --color-primary-container-state-08: rgba(199, 231, 255, 0.08);
+   --color-primary-container-state-12: rgba(199, 231, 255, 0.12);
+   --color-primary-container-state-16: rgba(199, 231, 255, 0.16);
+
+   /* Secondary Colors */
+   --color-secondary: #445c6a;
+   /* Figma: _Secondary/Secondary - for borders/backgrounds */
+   --color-secondary-text: #3b525f;
+   /* Figma: _Secondary/Secondary (Text) - for text */
+   --color-on-secondary: #ffffff;
+   --color-secondary-container: #5e849b;
+   --color-on-secondary-container: #09171f;
+
+   /* Secondary State Layers */
+   --color-secondary-state-08: rgba(68, 92, 106, 0.08);
+   --color-secondary-state-12: rgba(68, 92, 106, 0.12);
+   --color-secondary-state-16: rgba(68, 92, 106, 0.16);
+   --color-secondary-container-state-08: rgba(94, 132, 155, 0.08);
+   --color-secondary-container-state-12: rgba(94, 132, 155, 0.12);
+   --color-secondary-container-state-16: rgba(94, 132, 155, 0.16);
+
+   /* Tertiary Colors */
+   --color-tertiary: #0e8175;
+   --color-tertiary-text: #005a50;
+   /* Figma: _Tertiary/Tertiary (Text) - for text */
+   --color-on-tertiary: #ffffff;
+   --color-tertiary-container: #85ecd5;
+   --color-on-tertiary-container: #005a50;
+
+   /* Tertiary State Layers */
+   --color-tertiary-state-08: rgba(14, 129, 117, 0.08);
+   --color-tertiary-state-12: rgba(14, 129, 117, 0.12);
+   --color-tertiary-state-16: rgba(14, 129, 117, 0.16);
+   --color-tertiary-container-state-08: rgba(133, 236, 213, 0.08);
+   --color-tertiary-container-state-12: rgba(133, 236, 213, 0.12);
+   --color-tertiary-container-state-16: rgba(133, 236, 213, 0.16);
+
+   /* Danger Colors */
+   --color-danger: #ba1a1a;
+   /* Figma: _Danger/Danger - for borders/backgrounds */
+   --color-danger-text: #9b0606;
+   /* Figma: _Danger/Danger (Text) - for text */
+   --color-on-danger: #ffffff;
+   --color-danger-container: #ffdad6;
+   --color-on-danger-container: #410002;
+
+   /* Danger State Layers */
+   /* Using actual danger color from Figma: rgb(190, 12, 22) */
+   --color-danger-state-08: rgba(190, 12, 22, 0.08);
+   --color-danger-state-12: rgba(190, 12, 22, 0.12);
+   --color-danger-state-16: rgba(190, 12, 22, 0.16);
+   --color-danger-container-state-08: rgba(255, 218, 214, 0.08);
+   --color-danger-container-state-12: rgba(255, 218, 214, 0.12);
+   --color-danger-container-state-16: rgba(255, 218, 214, 0.16);
+
+   /* Success Colors */
+   --color-success: #3e691a;
+   /* Figma: _Success/Success - for borders/backgrounds */
+   --color-success-text: #2c5609;
+   /* Figma: _Success/Success (Text) - for text */
+   --color-on-success: #ffffff;
+   --color-success-container: #a1eb83;
+   --color-on-success-container: #0c2000;
+
+   /* Success State Layers */
+   --color-success-state-08: rgba(62, 105, 26, 0.08);
+   --color-success-state-12: rgba(62, 105, 26, 0.12);
+   --color-success-state-16: rgba(62, 105, 26, 0.16);
+   --color-success-container-state-08: rgba(189, 242, 146, 0.08);
+   --color-success-container-state-12: rgba(189, 242, 146, 0.12);
+   --color-success-container-state-16: rgba(189, 242, 146, 0.16);
+
+   /* Warning Colors */
+   --color-warning: #9f8205;
+   /* Figma: _Warning/Warning - for borders/backgrounds */
+   --color-warning-text: #5b4a00;
+   /* Figma: _Warning/Warning (Text) - for text */
+   --color-on-warning: #ffffff;
+   --color-warning-container: #ffe17a;
+   --color-on-warning-container: #231b00;
+
+   /* Warning State Layers */
+   /* Using actual warning color from Figma: rgb(113, 92, 0) */
+   --color-warning-state-08: rgba(113, 92, 0, 0.08);
+   --color-warning-state-12: rgba(113, 92, 0, 0.12);
+   --color-warning-state-16: rgba(113, 92, 0, 0.16);
+   --color-warning-container-state-08: rgba(255, 225, 122, 0.08);
+   --color-warning-container-state-12: rgba(255, 225, 122, 0.12);
+   --color-warning-container-state-16: rgba(255, 225, 122, 0.16);
+
+   /* Info Colors */
+   /* Info aliases to Tertiary */
+   --color-info: var(--color-tertiary);
+   --color-info-text: var(--color-tertiary-text);
+   --color-on-info: var(--color-on-tertiary);
+   --color-info-container: var(--color-tertiary-container);
+   --color-on-info-container: var(--color-on-tertiary-container);
+
+   /* Info State Layers */
+   /* Info aliases to Tertiary */
+   --color-info-state-08: var(--color-tertiary-state-08);
+   --color-info-state-12: var(--color-tertiary-state-12);
+   --color-info-state-16: var(--color-tertiary-state-16);
+   --color-info-container-state-08: var(--color-tertiary-container-state-08);
+   --color-info-container-state-12: var(--color-tertiary-container-state-12);
+   --color-info-container-state-16: var(--color-tertiary-container-state-16);
+
+   /* Social-Emotional Colors */
+   --color-social-emotional: #8c6600;
+   --color-social-emotional-text: #674a00;
+   /* Figma: _Social-Emotional/Social-Emotional (Text) - for text */
+   --color-on-social-emotional: #ffffff;
+   --color-social-emotional-container: #ffdea0;
+   --color-on-social-emotional-container: #5c4300;
+
+   /* Social-Emotional State Layers */
+   --color-social-emotional-state-08: rgba(125, 87, 0, 0.08);
+   --color-social-emotional-state-12: rgba(125, 87, 0, 0.12);
+   --color-social-emotional-state-16: rgba(125, 87, 0, 0.16);
+   --color-social-emotional-container-state-08: rgba(255, 222, 170, 0.08);
+   --color-social-emotional-container-state-12: rgba(255, 222, 170, 0.12);
+   --color-social-emotional-container-state-16: rgba(255, 222, 170, 0.16);
+
+   /* Mastering Content Colors */
+   --color-mastering-content: #8659a9;
+   --color-mastering-content-text: #673a8b;
+   /* Figma: _Mastering-Content/Mastering-Content (Text) - for text */
+   --color-on-mastering-content: #ffffff;
+   --color-mastering-content-container: #f2daff;
+   --color-on-mastering-content-container: #583a6f;
+
+   /* Mastering Content State Layers */
+   --color-mastering-content-state-08: rgba(127, 63, 177, 0.08);
+   --color-mastering-content-state-12: rgba(127, 63, 177, 0.12);
+   --color-mastering-content-state-16: rgba(127, 63, 177, 0.16);
+   --color-mastering-content-container-state-08: rgba(242, 218, 255, 0.08);
+   --color-mastering-content-container-state-12: rgba(242, 218, 255, 0.12);
+   --color-mastering-content-container-state-16: rgba(242, 218, 255, 0.16);
+
+   /* Advocacy Colors */
+   --color-advocacy: #167745;
+   --color-advocacy-text: #00572a;
+   /* Figma: _Advocacy/Advocacy (Text) - for text */
+   --color-on-advocacy: #ffffff;
+   --color-advocacy-container: #b3f1bf;
+   --color-on-advocacy-container: #16512c;
+
+   /* Advocacy State Layers */
+   --color-advocacy-state-08: rgba(22, 119, 69, 0.08);
+   --color-advocacy-state-12: rgba(22, 119, 69, 0.12);
+   --color-advocacy-state-16: rgba(22, 119, 69, 0.16);
+   --color-advocacy-container-state-08: rgba(179, 241, 191, 0.08);
+   --color-advocacy-container-state-12: rgba(179, 241, 191, 0.12);
+   --color-advocacy-container-state-16: rgba(179, 241, 191, 0.16);
+
+   /* Relationship Colors */
+   --color-relationship: #c70b77;
+   --color-relationship-text: #940055;
+   /* Figma: _Relationship/Relationship (Text) - for text */
+   --color-on-relationship: #ffffff;
+   --color-relationship-container: #ffd9e4;
+   --color-on-relationship-container: #3f001b;
+
+   /* Relationship State Layers */
+   --color-relationship-state-08: rgba(199, 11, 119, 0.08);
+   --color-relationship-state-12: rgba(199, 11, 119, 0.12);
+   --color-relationship-state-16: rgba(199, 11, 119, 0.16);
+   --color-relationship-container-state-08: rgba(255, 217, 228, 0.08);
+   --color-relationship-container-state-12: rgba(255, 217, 228, 0.12);
+   --color-relationship-container-state-16: rgba(255, 217, 228, 0.16);
+
+   /* Technology Tools Colors */
+   --color-technology-tools: #005cbd;
+   --color-technology-tools-text: #0b469d;
+   /* Figma: _Technology-Tools/Technology-Tools (Text) - for text */
+   --color-on-technology-tools: #ffffff;
+   --color-technology-tools-container: #d7e2ff;
+   --color-on-technology-tools-container: #001a40;
+
+   /* Technology Tools State Layers */
+   --color-technology-tools-state-08: rgba(0, 92, 189, 0.08);
+   --color-technology-tools-state-12: rgba(0, 92, 189, 0.12);
+   --color-technology-tools-state-16: rgba(0, 92, 189, 0.16);
+   --color-technology-tools-container-state-08: rgba(215, 226, 255, 0.08);
+   --color-technology-tools-container-state-12: rgba(215, 226, 255, 0.12);
+   --color-technology-tools-container-state-16: rgba(215, 226, 255, 0.16);
+
+   /* ============================================
+       NEUTRAL COLORS - Material Design 3
+       ============================================ */
+
+   /* Surface Colors */
+
+   /* Surface */
+   --color-surface: #f9f9fc;
+   --color-on-surface: #191c1e;
+
+   /* Surface Variant */
+   --color-surface-variant: #dde3ea;
+   --color-on-surface-variant: #3f484a;
+
+   /* Outline */
+   --color-outline: #6f797a;
+   --color-outline-variant: #bec8ca;
+
+   /* Surface Containers */
+   --color-surface-container-lowest: #ffffff;
+   --color-surface-container-low: #f3f3f6;
+   --color-surface-container: #edeef0;
+   --color-surface-container-high: #e7e8eb;
+   --color-surface-container-highest: #e2e2e5;
+
+   /* Alternative Surfaces */
+   --color-surface-dim: #d9dadd;
+   --color-surface-bright: #f9f9fc;
+   --color-scrim: rgba(0, 0, 0, 0.38);
+   --color-disabled-opacity: 0.38;
+   --color-inverse-surface: #2e3133;
+   --color-inverse-on-surface: #f0f1f3;
+
+   /* ============================================
+       NEUTRAL STATE LAYERS
+       ============================================ */
+
+   /* Surface State Layers */
+   --color-surface-state-08: rgba(249, 249, 252, 0.08);
+   --color-surface-state-12: rgba(249, 249, 252, 0.12);
+   --color-surface-state-16: rgba(249, 249, 252, 0.16);
+
+   /* Outline State Layers */
+   --color-outline-state-08: rgba(113, 120, 126, 0.08);
+   --color-outline-state-12: rgba(113, 120, 126, 0.12);
+   --color-outline-state-16: rgba(113, 120, 126, 0.16);
+
+   /* Surface Variant State Layers */
+   --color-surface-variant-state-08: rgba(221, 227, 234, 0.08);
+   --color-surface-variant-state-12: rgba(221, 227, 234, 0.12);
+   --color-surface-variant-state-16: rgba(221, 227, 234, 0.16);
+
+   /* Inverse Surface State Layers */
+   --color-inverse-surface-state-08: rgba(46, 49, 51, 0.08);
+   --color-inverse-surface-state-12: rgba(46, 49, 51, 0.12);
+   --color-inverse-surface-state-16: rgba(46, 49, 51, 0.16);
+
+   /* Shadow State Layers */
+   --color-shadow-state-08: rgba(0, 0, 0, 0.08);
+   --color-shadow-state-12: rgba(0, 0, 0, 0.12);
+   --color-shadow-state-16: rgba(0, 0, 0, 0.16);
+
+   /* Outline Variant State Layers */
+   --color-outline-variant-state-08: rgba(193, 199, 206, 0.08);
+   --color-outline-variant-state-12: rgba(193, 199, 206, 0.12);
+   --color-outline-variant-state-16: rgba(193, 199, 206, 0.16);
+
+   /* Surface Container State Layers */
+   --color-surface-container-highest-state-08: rgba(226, 226, 229, 0.08);
+   --color-surface-container-highest-state-12: rgba(226, 226, 229, 0.12);
+   --color-surface-container-highest-state-16: rgba(226, 226, 229, 0.16);
+
+   --color-surface-container-high-state-08: rgba(231, 232, 235, 0.08);
+   --color-surface-container-high-state-12: rgba(231, 232, 235, 0.12);
+   --color-surface-container-high-state-16: rgba(231, 232, 235, 0.16);
+
+   --color-surface-container-state-08: rgba(237, 238, 240, 0.08);
+   --color-surface-container-state-12: rgba(237, 238, 240, 0.12);
+   --color-surface-container-state-16: rgba(237, 238, 240, 0.16);
+
+   --color-surface-container-low-state-08: rgba(243, 243, 246, 0.08);
+   --color-surface-container-low-state-12: rgba(243, 243, 246, 0.12);
+   --color-surface-container-low-state-16: rgba(243, 243, 246, 0.16);
+
+   --color-surface-container-lowest-state-08: rgba(255, 255, 255, 0.08);
+   --color-surface-container-lowest-state-12: rgba(255, 255, 255, 0.12);
+   --color-surface-container-lowest-state-16: rgba(255, 255, 255, 0.16);
+
+   /* Surface Bright State Layers */
+   --color-surface-bright-state-08: rgba(249, 249, 252, 0.08);
+   --color-surface-bright-state-12: rgba(249, 249, 252, 0.12);
+   --color-surface-bright-state-16: rgba(249, 249, 252, 0.16);
+
+   /* Surface Dim State Layers */
+   --color-surface-dim-state-08: rgba(217, 218, 221, 0.08);
+   --color-surface-dim-state-12: rgba(217, 218, 221, 0.12);
+   --color-surface-dim-state-16: rgba(217, 218, 221, 0.16);
+
+   /* On Surface State Layers */
+   --color-on-surface-state-08: rgba(25, 28, 30, 0.08);
+   --color-on-surface-state-12: rgba(25, 28, 30, 0.12);
+   --color-on-surface-state-16: rgba(25, 28, 30, 0.16);
+
+   /* On Surface Variant State Layers */
+   --color-on-surface-variant-state-08: rgba(65, 72, 77, 0.08);
+   --color-on-surface-variant-state-12: rgba(65, 72, 77, 0.12);
+   --color-on-surface-variant-state-16: rgba(65, 72, 77, 0.16);
+}

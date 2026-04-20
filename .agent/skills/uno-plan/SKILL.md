@@ -1,9 +1,10 @@
 ---
 name: uno-plan
 description: >
-  Scope features, plan implementations, and create structured briefs. Use when
-  the user asks "How should we build...", "Plan this...", "Scope this...", or
-  needs a structured implementation plan before prototyping.
+  Scope features, plan implementations, and create structured briefs. This is a
+  planning skill used before implementation and a bridge between idea and
+  prototype. Use when the user asks "How should we build...", "Plan this...",
+  "Scope this...", or needs a structured implementation plan before prototyping.
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Write
 ---
@@ -18,6 +19,12 @@ Create structured implementation plans that bridge research findings to prototyp
 - Feature planning or implementation strategy is needed
 - Translating a product idea into concrete file paths, components, and tokens
 - Preparing a brief for `/uno:prototype` execution
+
+## Not for Use
+
+- Small UI tweaks or single-component changes
+- Direct implementation or coding requests
+- Debugging or fixing issues
 
 ## Auto-Suggest
 
@@ -40,6 +47,7 @@ Load on-demand based on the planning scope:
 | Component selection | `docs/context/design-system/components/inventory.md` |
 | Token selection | `docs/context/design-system/foundations/tokens.md` → `styles/` |
 | Research handoff exists | `.agent/handoffs/briefs/{relevant-brief}.md` |
+| Layout / IA unclear | `references/consulting.md` |
 
 Stay within ~4K tokens of Tier 2 context. Load foundations first, then specifics.
 
@@ -94,6 +102,12 @@ Assemble findings into a structured plan with:
 - Implementation steps in execution order
 - Open questions or decisions that need user input
 
+## Failure Handling
+
+- If research context is missing: proceed with user input and clearly note assumptions.
+- If component inventory is insufficient: flag it as a gap and ask for discussion before finalizing.
+- If token selection is unclear: propose best-fit options and confirm with the user.
+
 ## Output Format
 
 Present the plan as a structured brief:
@@ -105,6 +119,11 @@ Present the plan as a structured brief:
 - {1-2 sentence summary of what will be built}
 - Fidelity: {low / mid / high}
 - Product pillar: {admin / home / toolkit / training / profile / login / universal}
+
+### Assumptions
+- {assumption 1 that affects planning scope}
+- {assumption 2 that affects implementation boundaries}
+- {assumption 3 that should be confirmed before prototype}
 
 ### Components
 | Component | Source | Usage |
