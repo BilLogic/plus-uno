@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from '@/forms/Select';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 import Button from '@/components/Button';
 import Badge from '@/components/Badge';
 
@@ -58,7 +58,7 @@ const ReviewSubmit = ({ state, students, presentStudents, hasEscalations, escala
                     </div>
 
                     <div className="reflection-form__field-group">
-                        <TextareaVer2
+                        <Textarea
                             name="escalation-description"
                             label="Provide additional context for the supervisor"
                             placeholder="What should the supervisor know? What action might be needed?"

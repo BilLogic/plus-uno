@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Switch from '../../../../../forms/Switch';
-import TextareaVer2 from '../../../../../forms/TextareaVer2';
+import Textarea from '../../../../../forms/Textarea';
 
 const defaultReflectionPrompts = [
     {
@@ -55,7 +55,7 @@ const FormReflection = ({ prompts = defaultReflectionPrompts }) => {
                         {prompt.example}
                     </p>
 
-                    <TextareaVer2
+                    <Textarea
                         id={`${prompt.id}-textarea`}
                         name={`${prompt.id}-textarea`}
                         variant="long"

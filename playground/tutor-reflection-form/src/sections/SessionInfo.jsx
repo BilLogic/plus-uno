@@ -2,7 +2,7 @@ import React from 'react';
 import Select from '@/forms/Select';
 import Switch from '@/forms/Switch';
 import FileUpload from '@/forms/FileUpload';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 import MultipleChoice from '@/forms/MultipleChoice';
 import Badge from '@/components/Badge';
 
@@ -88,7 +88,7 @@ const SessionInfo = ({ data, sessions, students, onChange }) => {
                         />
                     </div>
                     <div className="reflection-form__field-group">
-                        <TextareaVer2
+                        <Textarea
                             name="cancel-notes"
                             label="Additional notes"
                             placeholder="Any additional context about the cancellation..."

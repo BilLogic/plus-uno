@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../../../../components/Button/Button';
 import Rating from '../../../../../forms/Rating';
-import TextareaVer2 from '../../../../../forms/TextareaVer2';
+import Textarea from '../../../../../forms/Textarea';
 import { PageLayout } from '../../../../../specs/Universal/Pages';
 import SideNavBar from '../../sections/SideNavBar/SideNavBar';
 
@@ -102,7 +102,7 @@ const FormFeedbackFilled = ({
                                 <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
                                     Were there any questions within the form that you found unclear or unnecessary?
                                 </p>
-                                <TextareaVer2
+                                <Textarea
                                     id="reflection-experience"
                                     name="reflection-experience"
                                     value={reflectionExperience}
@@ -126,7 +126,7 @@ const FormFeedbackFilled = ({
                                 <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
                                     If you have any feedback for the session's teacher, please put it here.
                                 </p>
-                                <TextareaVer2
+                                <Textarea
                                     id="additional-comments"
                                     name="additional-comments"
                                     value={additionalComments}

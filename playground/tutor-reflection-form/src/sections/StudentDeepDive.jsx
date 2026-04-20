@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from '@/forms/Select';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 import Switch from '@/forms/Switch';
 import Alert from '@/components/Alert';
 import Badge from '@/components/Badge';
@@ -74,7 +74,7 @@ const StudentDeepDive = ({ students, lowScoringStudents, data, onChange }) => {
                     </div>
 
                     <div className="reflection-form__field-group">
-                        <TextareaVer2
+                        <Textarea
                             name="key-insight"
                             label="What's one thing another tutor should know about this student? *"
                             placeholder="Share context that would help a fellow tutor work effectively with this student — learning style, interests, challenges, breakthroughs..."
@@ -113,7 +113,7 @@ const StudentDeepDive = ({ students, lowScoringStudents, data, onChange }) => {
                         </div>
                         {data.escalate && (
                             <div className="reflection-form__field-group">
-                                <TextareaVer2
+                                <Textarea
                                     name="escalate-note"
                                     placeholder="Briefly describe the concern..."
                                     variant="short"
