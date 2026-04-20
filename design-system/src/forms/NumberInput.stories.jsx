@@ -14,6 +14,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Optional field label',
@@ -87,11 +90,9 @@ export default {
         onChange: {
             table: { disable: true, category: 'Development' },
         },
+        onIncrement: { table: { disable: true } },
+        onDecrement: { table: { disable: true } },
         className: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        style: {
             control: false,
             table: { disable: true, category: 'Development' },
         },
@@ -161,22 +162,34 @@ export const InteractionStates = () => {
     const [v2, setV2] = useState('42');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '800px' }}>
-            <NumberInput
-                id="number-input-default"
-                placeholder="Number"
-                value={v1}
-                onChange={(e) => setV1(e.target.value)}
-            />
-            <NumberInput
-                id="number-input-focus"
-                placeholder="Number"
-                value={v2}
-                onChange={(e) => setV2(e.target.value)}
-                autoFocus
-            />
-            <NumberInput id="number-input-disabled" placeholder="Number" disabled />
-            <NumberInput id="number-input-readonly" placeholder="Number" value="12" readonly />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+                <NumberInput
+                    id="number-input-default"
+                    placeholder="Number"
+                    value={v1}
+                    onChange={(e) => setV1(e.target.value)}
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS</span>
+                <NumberInput
+                    id="number-input-focus"
+                    placeholder="Number"
+                    value={v2}
+                    onChange={(e) => setV2(e.target.value)}
+                    autoFocus
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <NumberInput id="number-input-disabled" placeholder="Number" disabled />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ-ONLY</span>
+                <NumberInput id="number-input-readonly" placeholder="Number" value="12" readonly />
+            </div>
         </div>
     );
 };

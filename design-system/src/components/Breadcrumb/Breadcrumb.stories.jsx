@@ -21,6 +21,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         pathPreset: {
             control: 'select',
             options: ['short', 'standard', 'deep'],
@@ -50,7 +53,7 @@ const breadcrumbBlock = { display: 'flex', flexDirection: 'column', gap: 'var(--
 function BreadcrumbStandardDemo() {
     return (
         <div style={breadcrumbBlock}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-sm, 12px)' }}>Standard Breadcrumb</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STANDARD BREADCRUMB</span>
             <Breadcrumb items={sampleItems} />
         </div>
     );
@@ -59,7 +62,7 @@ function BreadcrumbStandardDemo() {
 function BreadcrumbShortDemo() {
     return (
         <div style={breadcrumbBlock}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-sm, 12px)' }}>Short Breadcrumb (2 Levels)</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SHORT BREADCRUMB (2 LEVELS)</span>
             <Breadcrumb items={[
                 { text: 'Home', href: '/' },
                 { text: 'Current Page' }

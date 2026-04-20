@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         title: {
             control: 'text',
             description: 'Headline text',
@@ -21,11 +24,6 @@ export default {
         subtitle: {
             control: 'text',
             description: 'Supporting subtitle',
-            table: { category: 'Content' }
-        },
-        children: {
-            control: 'text',
-            description: 'Body copy',
             table: { category: 'Content' }
         },
         actionPreset: {

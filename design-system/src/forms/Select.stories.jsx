@@ -27,6 +27,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         mode: {
             control: { type: 'select' },
             options: ['single', 'multi'],
@@ -106,12 +109,7 @@ export default {
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const sampleOptions = [
@@ -125,13 +123,13 @@ const sampleOptions = [
 /** Content — Placeholder and value display in single-select mode. */
 export const Content = {
     render: () => (
-        <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Empty</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND EMPTY</span>
                 <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Filled</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND FILLED</span>
                 <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
             </div>
         </div>
@@ -141,17 +139,17 @@ export const Content = {
 /** Styles — Multi-select, searchable, and creatable behaviors. */
 export const Styles = {
     render: () => (
-        <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Multi-select</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTI-SELECT</span>
                 <Select mode="multi" options={sampleOptions} placeholder="Select {value(s)} from below" />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Searchable</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SEARCHABLE</span>
                 <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Creatable</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CREATABLE</span>
                 <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
             </div>
         </div>
@@ -161,17 +159,17 @@ export const Styles = {
 /** Sizes — Small, medium, and large. */
 export const Sizes = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", gap: 20 }}>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Small</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
                 <Select size="small" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Medium (default)</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
                 <Select size="medium" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Large</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
                 <Select size="large" options={sampleOptions} placeholder="Select..." />
             </div>
         </div>
@@ -181,17 +179,17 @@ export const Sizes = {
 /** InteractionStates — Enabled, disabled, and read-only. */
 export const InteractionStates = {
     render: () => (
-        <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Enabled</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ENABLED</span>
                 <Select defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
                 <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only</div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
                 <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
             </div>
         </div>
@@ -211,7 +209,7 @@ export const Overview = {
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     There are five types of Select uses: Single-select, Multi-select, Search + Single-select, Search + Multi-select, Add New Value + multi-select.
                 </p>
-                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'flex', justifyContent: 'center' }}>
+                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "flex", justifyContent: "center" }}>
                     <Select
                         mode="multi"
                         searchable
@@ -229,21 +227,21 @@ export const Overview = {
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     When activated, Select has 4 states: closed and empty, open and empty, closed and filled, open and filled.
                 </p>
-                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Empty</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND EMPTY</span>
                         <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
                         <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Closed and Filled</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND FILLED</span>
                         <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
                         <Select defaultValue="option-3" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                 </div>
@@ -254,21 +252,21 @@ export const Overview = {
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     There are 2 additional special states: Read only (display only, no add/delete/edit) and Disabled (cannot be used temporarily).
                 </p>
-                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only: Single-select</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY: SINGLE-SELECT</span>
                         <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Read Only: Multi-select</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY: MULTI-SELECT</span>
                         <Select mode="multi" readonly defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled: Single-select</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED: SINGLE-SELECT</span>
                         <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Disabled: Multi-select</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED: MULTI-SELECT</span>
                         <Select mode="multi" disabled defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
                     </div>
                 </div>
@@ -276,13 +274,13 @@ export const Overview = {
 
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Search + Single-Select</h6>
-                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
                         <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
                         <Select searchable defaultValue="option-3" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
                     </div>
                 </div>
@@ -290,13 +288,13 @@ export const Overview = {
 
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Search + Multi-Select</h6>
-                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
                         <Select mode="multi" searchable options={sampleOptions} placeholder="Select {value(s)} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
                         <Select mode="multi" searchable defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
                     </div>
                 </div>
@@ -304,13 +302,13 @@ export const Overview = {
 
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>Add New Value + Multi-Select</h6>
-                <div style={{ backgroundColor: 'rgba(221, 227, 234, 0.16)', borderRadius: 8, padding: 64, display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Empty</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
                         <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
                     </div>
                     <div>
-                        <div className="body2-txt" style={{ marginBottom: 8, color: 'var(--color-on-surface-variant)' }}>Open and Filled</div>
+                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
                         <Select mode="multi" searchable creatable defaultValue={['option-1', 'option-2', 'option-3', 'option-4']} options={sampleOptions} placeholder="Select {value(s)} from below" />
                     </div>
                 </div>

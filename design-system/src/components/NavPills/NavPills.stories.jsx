@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         contentPreset: {
             control: 'select',
             options: ['tabs-only', 'with-dropdown'],
@@ -45,9 +48,6 @@ export default {
         onSelect: {
             table: { disable: true, category: 'Development' }
         },
-        children: {
-            table: { disable: true, category: 'Development' }
-        },
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -63,7 +63,7 @@ function NavPillsContentDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Horizontal pills</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HORIZONTAL PILLS</span>
                 <NavPills activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
                     <NavPills.Item eventKey="1">Home</NavPills.Item>
                     <NavPills.Item eventKey="2">Profile</NavPills.Item>
@@ -72,7 +72,7 @@ function NavPillsContentDemos() {
                 </NavPills>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With dropdown</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH DROPDOWN</span>
                 <NavPills defaultActiveKey="home">
                     <NavPills.Item eventKey="home">Home</NavPills.Item>
                     <NavPills.Dropdown title="More Options" id="nav-dropdown">
@@ -90,7 +90,7 @@ function NavPillsContentDemos() {
 function NavPillsLayoutDemo() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Vertical pills</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VERTICAL PILLS</span>
             <NavPills direction="vertical" defaultActiveKey="1">
                 <NavPills.Item eventKey="1">Home</NavPills.Item>
                 <NavPills.Item eventKey="2">Profile</NavPills.Item>

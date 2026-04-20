@@ -23,12 +23,9 @@ Supports multiple styles and optional title.
         },
     },
     argTypes: {
-        style: {
-            control: { type: 'select' },
-            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-            description: 'Alert style variant',
-            table: { category: 'Design' },
-        },
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         title: {
             control: 'text',
             description: 'Optional alert title/heading',
@@ -65,7 +62,7 @@ const contentVariantCard = {
 function AlertVariantsDemos() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <h6 className="h6">All Styles (With Title, Dismissible)</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL STYLES (WITH TITLE, DISMISSIBLE)</span>
             {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(style => (
                 <Alert key={style} style={style} title="Title" dismissable>
                     You have a message here — come check it out!
@@ -78,9 +75,9 @@ function AlertVariantsDemos() {
 function AlertContentDemos() {
     return (
         <div style={contentVariantCol}>
-            <h6 className="h6">Content Variants (Primary Style)</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CONTENT VARIANTS (PRIMARY STYLE)</span>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>With title</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH TITLE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Use when the message benefits from a short heading.
                 </p>
@@ -89,7 +86,7 @@ function AlertContentDemos() {
                 </Alert>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Body only</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BODY ONLY</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Use when concise copy does not require a heading.
                 </p>
@@ -98,7 +95,7 @@ function AlertContentDemos() {
                 </Alert>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Non-dismissible</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NON-DISMISSIBLE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Use for critical information that must remain visible.
                 </p>
@@ -107,7 +104,7 @@ function AlertContentDemos() {
                 </Alert>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Rich content</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RICH CONTENT</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Supports inline emphasis and links inside the alert body.
                 </p>

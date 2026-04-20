@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         buttonText: {
             control: 'text',
             description: 'Text displayed on the dropdown toggle button',
@@ -26,12 +29,6 @@ export default {
             options: ['basic', 'with-divider', 'with-icons', 'with-selection'],
             description: 'Preset menu content for the interactive demo',
             table: { category: 'Content' }
-        },
-        style: {
-            control: 'select',
-            options: ['default', 'primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-            description: 'Button style variant',
-            table: { category: 'Design' }
         },
         size: {
             control: 'radio',
@@ -110,7 +107,7 @@ const contentVariantCard = {
 function DropdownContentDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '8px' }}>Single and split dropdowns</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE AND SPLIT DROPDOWNS</span>
             <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                 Core content states from the design system: closed and open, using both single-button and split-button triggers.
             </p>
@@ -146,7 +143,7 @@ function DropdownContentDemos() {
 function DropdownVariantsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Toggle style</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TOGGLE STYLE</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Semantic styles on the dropdown trigger.
             </p>
@@ -163,7 +160,7 @@ function DropdownVariantsDemos() {
 function DropdownStylesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Toggle fill</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TOGGLE FILL</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Filled, tonal, outline, and ghost fills on a primary trigger.
             </p>
@@ -180,7 +177,7 @@ function DropdownStylesDemos() {
 function DropdownSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Small, default, and large triggers.
             </p>
@@ -197,7 +194,7 @@ function DropdownLayoutDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Split button</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SPLIT BUTTON</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Separate primary action from the menu toggle.
                 </p>
@@ -209,7 +206,7 @@ function DropdownLayoutDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Menu direction</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MENU DIRECTION</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Open below, above, or to the sides.
                 </p>

@@ -7,6 +7,9 @@ export default {
     component: Tooltip,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         text: { control: 'text', description: 'Tooltip text', table: { category: 'Content' } },
         placement: {
             control: 'select',
@@ -19,9 +22,6 @@ export default {
             options: ['small', 'default', 'large'],
             description: 'Tooltip size',
             table: { category: 'Design' },
-        },
-        children: {
-            table: { disable: true, category: 'Development' }
         },
         id: {
             control: false,
@@ -60,21 +60,25 @@ function TooltipVariantsDemos() {
     return (
         <div style={containerStyle}>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TOP</span>
                 <Tooltip text="Tooltip on top" placement="top" show={true}>
                     <Button text="Top" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BOTTOM</span>
                 <Tooltip text="Tooltip on bottom" placement="bottom" show={true}>
                     <Button text="Bottom" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LEFT</span>
                 <Tooltip text="Tooltip on left" placement="left" show={true}>
                     <Button text="Left" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RIGHT</span>
                 <Tooltip text="Tooltip on right" placement="right" show={true}>
                     <Button text="Right" />
                 </Tooltip>
@@ -87,16 +91,19 @@ function TooltipSizesDemos() {
     return (
         <div style={containerStyle}>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
                 <Tooltip text="Small tooltip" size="small" placement="top" show={true}>
                     <Button text="Small" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
                 <Tooltip text="Default tooltip" size="default" placement="top" show={true}>
                     <Button text="Default" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
                 <Tooltip text="Large tooltip" size="large" placement="top" show={true}>
                     <Button text="Large" />
                 </Tooltip>

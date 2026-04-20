@@ -15,6 +15,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         eventKey: {
             control: 'text',
             description: 'Unique identifier for the pill item',
@@ -32,13 +35,7 @@ export default {
             control: 'boolean',
             description: 'Disable the pill item',
             table: { category: 'State' }
-        },
-        children: {
-            control: 'text',
-            description: 'Label text for the pill',
-            table: { category: 'Content' }
-        }
-    }
+        },}
 };
 
 const col = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' };
@@ -58,7 +55,7 @@ function PillGroupDemo() {
 function NavPillsSubInteractionStatesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Pill item states</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PILL ITEM STATES</span>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                 States below are artificially forced for demonstration.
             </p>
@@ -136,7 +133,7 @@ function NavPillsSubInteractionStatesDemos() {
 function NavPillsSubContentDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Pill group</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PILL GROUP</span>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                 Controlled group with a disabled item.
             </p>
@@ -149,7 +146,7 @@ function NavPillsSubLayoutDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Dropdown pill</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DROPDOWN PILL</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Nested actions inside a pill dropdown.
                 </p>
@@ -164,7 +161,7 @@ function NavPillsSubLayoutDemos() {
                 </NavPills>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Disabled dropdown</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED DROPDOWN</span>
                 <NavPills defaultActiveKey="home">
                     <NavPills.Item eventKey="home">Home</NavPills.Item>
                     <NavPills.Dropdown title="Disabled" id="pill-disabled-dropdown-docs" disabled>

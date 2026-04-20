@@ -34,7 +34,8 @@ if (!globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__) {
 addons.setConfig({
   theme: create({
     base: 'light',
-    brandTitle: 'PLUS',
+    brandTitle: 'PLUS Storybook',
+    brandImage: '/assets/storybook-brand.svg',
     brandUrl: './',
     /* PLUS design system primary (see Colors / --color-primary) */
     colorPrimary: '#0472a8',

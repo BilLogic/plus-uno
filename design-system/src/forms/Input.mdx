@@ -1,12 +1,18 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputStories from './Input.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={InputStories} />
 
 <Title />
-<Description />
+The labeled text input box allows users to enter textual inputs and receive validation feedback with messages.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 

@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -65,12 +68,7 @@ export default {
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const addonDropdownItems = [
@@ -87,7 +85,7 @@ export const Content = () => {
     return (
         <div style={docsCol}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Baseline input group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Text addon on the left with an icon addon on the right.
                 </p>
@@ -112,7 +110,7 @@ export const Variants = () => {
     return (
         <div style={docsCol}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Selection addons</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SELECTION ADDONS</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <InputGroup
                         placeholder="Checkbox addons"
@@ -131,7 +129,7 @@ export const Variants = () => {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Action addons</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ACTION ADDONS</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <InputGroup
                         placeholder="Button addons"
@@ -156,7 +154,7 @@ export const Variants = () => {
 export const Sizes = () => (
     <div style={docsCol}>
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <InputGroup
                     placeholder="Small"
@@ -184,7 +182,7 @@ export const Sizes = () => (
 export const InteractionStates = () => (
     <div style={docsCol}>
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Interaction states</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INTERACTION STATES</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <InputGroup
                     placeholder="Default"
@@ -270,7 +268,7 @@ export const Overview = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
             {/* Checkbox Input Group */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Checkbox Input Group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with checkbox addons on both sides.
                 </p>
@@ -285,7 +283,7 @@ export const Overview = () => {
 
             {/* Icon Input Group */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Icon Input Group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with plus icon addons on both sides.
                 </p>
@@ -300,7 +298,7 @@ export const Overview = () => {
 
             {/* Radio Input Group */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Radio Input Group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with radio button addons on both sides.
                 </p>
@@ -315,7 +313,7 @@ export const Overview = () => {
 
             {/* Text Input Group */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Text Input Group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with text addons on both sides.
                 </p>
@@ -330,7 +328,7 @@ export const Overview = () => {
 
             {/* Button Input Group */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Button Input Group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BUTTON INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with button addons on both sides.
                 </p>
@@ -345,7 +343,7 @@ export const Overview = () => {
 
             {/* Dropdown Input Group */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Dropdown Input Group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DROPDOWN INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with dropdown addons on both sides.
                 </p>
@@ -360,7 +358,7 @@ export const Overview = () => {
 
             {/* Multiple Addons */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Multiple Addons</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTIPLE ADDONS</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input group with multiple addons on the trailing side.
                 </p>
@@ -374,7 +372,7 @@ export const Overview = () => {
 
             {/* Size Variants */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Size Variants</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZE VARIANTS</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input groups in small, medium, and large sizes.
                 </p>
@@ -402,7 +400,7 @@ export const Overview = () => {
 
             {/* States */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>States</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STATES</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Input groups in different states: default, disabled, and read-only.
                 </p>

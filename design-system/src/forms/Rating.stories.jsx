@@ -14,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         value: {
             table: { disable: true, category: 'Development' }
         },
@@ -55,7 +58,7 @@ export const Content = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Baseline rating</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE RATING</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Labeled comments-style rating with a required indicator.
                 </p>
@@ -79,14 +82,14 @@ export const Variants = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Comments</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMMENTS</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
                 <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Numeric</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NUMERIC</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
@@ -99,7 +102,7 @@ export const Variants = () => {
 export const InteractionStates = () => (
     <div style={ratingCol}>
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Disabled</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
@@ -161,7 +164,7 @@ export const Overview = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
             {/* Comments Variant Section */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Rating - Comments Variant</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RATING - COMMENTS VARIANT</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Rating component with "Comments" label positioned below the stars. Click stars to select rating from 0 to 5.
                 </p>
@@ -225,7 +228,7 @@ export const Overview = () => {
 
             {/* Numeric Variant Section */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Rating - Numeric Variant</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RATING - NUMERIC VARIANT</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Rating component with numeric labels (1-5) positioned above each star. Click stars to select rating from 0 to 5.
                 </p>
@@ -289,7 +292,7 @@ export const Overview = () => {
 
             {/* With Label Section */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Rating - With Label</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RATING - WITH LABEL</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Rating component with form label and optional required indicator.
                 </p>
@@ -304,7 +307,7 @@ export const Overview = () => {
 
             {/* Disabled Section */}
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Rating - Disabled</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RATING - DISABLED</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Disabled state prevents interaction with the rating component.
                 </p>

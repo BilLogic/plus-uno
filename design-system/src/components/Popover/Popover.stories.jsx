@@ -14,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         triggerLabel: {
             control: 'text',
             description: 'Button label used as the popover trigger',
@@ -22,11 +25,6 @@ export default {
         title: {
             control: 'text',
             description: 'Popover title',
-            table: { category: 'Content' }
-        },
-        children: {
-            control: 'text',
-            description: 'Popover body content',
             table: { category: 'Content' }
         },
         placement: {
@@ -97,7 +95,7 @@ function PopoverLayoutDemos() {
 function PopoverContentDemo() {
     return (
         <section>
-            <h5>No title</h5>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NO TITLE</span>
             <Popover
                 trigger={<Button text="Content Only" style="primary" />}
                 placement="right"
@@ -111,7 +109,7 @@ function PopoverContentDemo() {
 function PopoverInteractionStatesDemos() {
     return (
         <section>
-            <h5>Trigger types</h5>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TRIGGER TYPES</span>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <Popover
                     trigger={<Button text="Click (Default)" style="info" />}

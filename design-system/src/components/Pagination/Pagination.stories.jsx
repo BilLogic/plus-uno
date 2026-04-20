@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         type: {
             control: 'select',
             options: ['icon', 'text'],
@@ -73,7 +76,7 @@ function PaginationContentDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Icon type</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON TYPE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Chevron-only previous/next controls with numeric page items.
                 </p>
@@ -88,7 +91,7 @@ function PaginationContentDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Text type</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT TYPE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Uses explicit Previous/Next labels for stronger textual affordance.
                 </p>
@@ -112,7 +115,7 @@ function PaginationSizesDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Icon type sizes</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON TYPE SIZES</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Small, default, and large icon pagination.
                 </p>
@@ -125,7 +128,7 @@ function PaginationSizesDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Text type sizes</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT TYPE SIZES</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Small, default, and large text pagination with Previous/Next labels.
                 </p>
@@ -145,7 +148,7 @@ function PaginationInteractionStatesDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>First page</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Previous control is disabled at the first page.
                 </p>
@@ -160,7 +163,7 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Last page</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Next control is disabled at the last page.
                 </p>
@@ -175,7 +178,7 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Middle page</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Both previous and next controls are enabled.
                 </p>

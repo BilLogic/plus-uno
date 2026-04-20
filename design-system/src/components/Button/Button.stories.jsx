@@ -28,6 +28,8 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
         // CONTENT
         text: {
             control: 'text',
@@ -91,10 +93,6 @@ export default {
             description: 'Show loading spinner',
             table: { category: 'Behavior' }
         },
-        onClick: {
-            action: 'clicked',
-            table: { disable: true, category: 'Behavior' }
-        },
         href: {
             table: { disable: true, category: 'Behavior' }
         },
@@ -115,9 +113,6 @@ export default {
         },
         className: {
             control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        children: {
             table: { disable: true, category: 'Development' }
         },
         as: {

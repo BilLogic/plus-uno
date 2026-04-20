@@ -19,6 +19,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         text: { control: 'text', description: 'Text content of the item' },
         href: { control: 'text', description: 'URL for the link (if not current)' },
         isCurrent: { control: 'boolean', description: 'Whether this is the current active page' },

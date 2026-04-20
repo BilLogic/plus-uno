@@ -14,12 +14,9 @@ export default {
         }
     },
     argTypes: {
-        style: {
-            control: 'select',
-            options: ['secondary', 'success', 'danger', 'warning', 'info', 'primary'],
-            description: 'Toast style',
-            table: { category: 'Design' }
-        },
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         position: {
             control: 'select',
             options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
@@ -27,10 +24,6 @@ export default {
             table: { category: 'Layout' }
         },
         title: {
-            control: 'text',
-            table: { category: 'Content' }
-        },
-        children: {
             control: 'text',
             table: { category: 'Content' }
         },

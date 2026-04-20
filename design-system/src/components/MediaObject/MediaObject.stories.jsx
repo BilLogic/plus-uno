@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         heading: {
             control: 'text',
             description: 'Heading text',
@@ -51,11 +54,7 @@ export default {
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },
-        onClick: {
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const PlaceholderMedia = ({ size = '64px', text = '64' }) => (

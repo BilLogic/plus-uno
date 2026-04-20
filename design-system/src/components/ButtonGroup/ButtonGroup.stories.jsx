@@ -14,17 +14,14 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         // DESIGN
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
             description: 'Size of buttons in the group',
-            table: { category: 'Design' }
-        },
-        style: {
-            control: 'select',
-            options: ['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'],
-            description: 'Color style theme',
             table: { category: 'Design' }
         },
         fill: {
@@ -60,11 +57,7 @@ export default {
         },
         buttons: {
             table: { disable: true, category: 'Development' }
-        },
-        children: {
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const bgCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
@@ -72,7 +65,7 @@ const bgCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
 function ButtonGroupSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Button groups are available in three sizes: Small, Medium (default), and Large.
             </p>
@@ -106,7 +99,7 @@ function ButtonGroupSizesDemos() {
 function ButtonGroupStylesAndFillsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Styles & Fills</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STYLES & FILLS</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Button groups inherit the style system from Button, supporting multiple color themes and fill variants.
             </p>
@@ -187,7 +180,7 @@ function ButtonGroupStylesAndFillsDemos() {
 function ButtonGroupLayoutDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Alignments</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALIGNMENTS</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Button groups can be arranged horizontally (default) or vertically stacked.
             </p>
@@ -213,7 +206,7 @@ function ButtonGroupLayoutDemos() {
 function ButtonGroupCountsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Button Counts</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BUTTON COUNTS</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Button groups can contain 2 to 5 buttons, maintaining consistent connected styling.
             </p>
@@ -242,7 +235,7 @@ function ButtonGroupCountsDemos() {
 function ButtonGroupUseCasesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Common Use Cases</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMMON USE CASES</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -292,7 +285,7 @@ function ButtonGroupUseCasesDemos() {
 function ButtonGroupChildrenDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Using Children (Alternative Pattern)</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USING CHILDREN (ALTERNATIVE PATTERN)</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 ButtonGroup supports both the <code>buttons</code> array prop and direct child Button components for more flexible composition.
             </p>

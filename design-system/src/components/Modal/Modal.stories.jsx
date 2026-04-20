@@ -6,6 +6,9 @@ export default {
     component: Modal,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         title: {
             control: 'text',
             table: { category: 'Content' },
@@ -78,9 +81,9 @@ function InlineModalCanvas({ minHeight = 400, modal }) {
 function ContentVariantCanvas({ title, description, minHeight, modal }) {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '8px' }}>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
                 {title}
-            </h6>
+            </span>
             <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                 {description}
             </p>

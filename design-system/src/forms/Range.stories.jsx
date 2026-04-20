@@ -14,6 +14,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -61,10 +64,6 @@ export default {
             table: { disable: true, category: 'Development' },
         },
         className: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        style: {
             control: false,
             table: { disable: true, category: 'Development' },
         },

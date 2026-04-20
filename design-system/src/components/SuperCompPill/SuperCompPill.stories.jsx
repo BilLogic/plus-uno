@@ -7,6 +7,9 @@ export default {
     component: SuperCompPill,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         competencyArea: {
             control: 'select',
             options: [

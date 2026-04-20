@@ -25,6 +25,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         id: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -49,7 +52,7 @@ const col = { display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '
 function ListGroupItemContentDemo() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '12px' }}>Navigation layout</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NAVIGATION LAYOUT</span>
             <ListGroup>
                 <ListGroup.Item action>
                     <i className="fas fa-home me-3" style={{ color: 'var(--color-primary)' }} />
@@ -84,7 +87,7 @@ function ListGroupItemVariantsDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Single select</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE SELECT</span>
                 <ListGroup>
                     {['opt1', 'opt2', 'opt3'].map((value, i) => (
                         <ListGroup.Item
@@ -100,7 +103,7 @@ function ListGroupItemVariantsDemos() {
                 </ListGroup>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '12px' }}>Multi select</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTI SELECT</span>
                 <ListGroup>
                     {['opt1', 'opt2', 'opt3'].map((value, i) => (
                         <ListGroup.Item
@@ -121,7 +124,7 @@ function ListGroupItemVariantsDemos() {
 function ListGroupItemSizesDemo() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '12px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <ListGroup>
                 <ListGroup.Item action size="b1">Size B1 (Large)</ListGroup.Item>
                 <ListGroup.Item action size="b2">Size B2 (Default)</ListGroup.Item>

@@ -6,13 +6,10 @@ export default {
     component: Progress,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value', table: { category: 'Content' } },
-        style: {
-            control: 'select',
-            options: ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'],
-            description: 'Progress bar style',
-            table: { category: 'Design' }
-        },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],

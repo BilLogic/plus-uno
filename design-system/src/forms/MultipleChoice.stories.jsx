@@ -14,6 +14,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         type: {
             control: 'select',
             options: ['radio', 'checkbox'],
@@ -77,7 +80,7 @@ export const Styles = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <h6 className="h6 mb-2">Radio</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO</span>
                 <MultipleChoice
                     id="multiple-choice-radio-default"
                     name="multiple-choice-radio-default"
@@ -88,7 +91,7 @@ export const Styles = () => {
                 />
             </div>
             <div>
-                <h6 className="h6 mb-2">Checkbox</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX</span>
                 <MultipleChoice
                     id="multiple-choice-checkbox-default"
                     name="multiple-choice-checkbox-default"
@@ -104,20 +107,7 @@ export const Styles = () => {
 
 export const Content = () => (
     <div style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <section>
-            <h6 className="h6 mb-2">Long list (radio)</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Long vertical option set for single-selection flows.
-            </p>
-            <div style={contentVariantCard}>
-                <MultipleChoice
-                    id="multiple-choice-radio-long"
-                    name="multiple-choice-radio-long"
-                    type="radio"
-                    options={longRadioOptions}
-                />
-            </div>
-        </section>
+        
         <section>
             <h6 className="h6 mb-2">Radio — with selection</h6>
             <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -154,7 +144,7 @@ export const Content = () => (
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <h6 className="h6 mb-2">Small</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
             <MultipleChoice
                 id="multiple-choice-radio-small"
                 name="multiple-choice-radio-small"
@@ -164,7 +154,7 @@ export const Sizes = () => (
             />
         </div>
         <div>
-            <h6 className="h6 mb-2">Large</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
             <MultipleChoice
                 id="multiple-choice-radio-large"
                 name="multiple-choice-radio-large"
@@ -179,7 +169,7 @@ export const Sizes = () => (
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <h6 className="h6 mb-2">Radio — disabled</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO — DISABLED</span>
             <MultipleChoice
                 id="multiple-choice-radio-disabled"
                 name="multiple-choice-radio-disabled"
@@ -190,7 +180,7 @@ export const InteractionStates = () => (
             />
         </div>
         <div>
-            <h6 className="h6 mb-2">Checkbox — disabled</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX — DISABLED</span>
             <MultipleChoice
                 id="multiple-choice-checkbox-disabled"
                 name="multiple-choice-checkbox-disabled"

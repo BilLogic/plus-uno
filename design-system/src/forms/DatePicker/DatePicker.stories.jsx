@@ -14,6 +14,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -59,10 +62,19 @@ export const Sizes = () => (
         <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
             Small, medium, and large trigger and calendar.
         </p>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-            <DatePicker size="small" placeholder="Small" />
-            <DatePicker size="medium" placeholder="Medium" />
-            <DatePicker size="large" placeholder="Large" />
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+                <DatePicker size="small" placeholder="Small" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+                <DatePicker size="medium" placeholder="Medium" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+                <DatePicker size="large" placeholder="Large" />
+            </div>
         </div>
     </div>
 );
@@ -72,11 +84,23 @@ export const InteractionStates = () => (
         <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
             Empty, with value, disabled, and read-only.
         </p>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-            <DatePicker placeholder="Default" />
-            <DatePicker value="2023-10-25" placeholder="With Value" />
-            <DatePicker disabled placeholder="Disabled" />
-            <DatePicker readOnly value="2023-10-25" placeholder="Read Only" />
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+                <DatePicker placeholder="Default" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH VALUE</span>
+                <DatePicker value="2023-10-25" placeholder="With Value" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <DatePicker disabled placeholder="Disabled" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+                <DatePicker readOnly value="2023-10-25" placeholder="Read Only" />
+            </div>
         </div>
     </div>
 );

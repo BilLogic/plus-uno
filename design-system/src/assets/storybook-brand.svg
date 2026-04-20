@@ -1,0 +1,26 @@
+<svg width="200" height="24" viewBox="0 0 200 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="scale(0.26) translate(0, 0)">
+    <g clip-path="url(#clip-colored)">
+      <rect width="92" height="92" rx="9.2" fill="#F9F9FC" fill-opacity="0.08" />
+      <g>
+        <g filter="url(#blur-0)"><path d="M71.2335 53.1843C84.9884 66.9389 84.9884 89.24 71.2335 102.995C57.4789 116.75 35.1778 116.75 21.4231 102.995C7.66821 89.24 7.66821 66.9389 21.4231 53.1843C35.1778 39.4294 57.4789 39.4294 71.2335 53.1843Z" fill="#FFDEA0" /></g>
+        <g filter="url(#blur-1)"><path d="M71.2335 53.1843C84.9884 66.9389 84.9884 89.24 71.2335 102.995C57.4789 116.75 35.1778 116.75 21.4231 102.995C7.66821 89.24 7.66821 66.9389 21.4231 53.1843C35.1778 39.4294 57.4789 39.4294 71.2335 53.1843Z" fill="#FFE17A" /></g>
+        <g filter="url(#blur-2)"><path d="M44.7713 -18.9113C61.3054 -2.37711 61.3054 24.43 44.7713 40.9642C28.2371 57.4983 1.42994 57.4983 -15.1042 40.9642C-31.6384 24.43 -31.6384 -2.37713 -15.1042 -18.9113C1.42994 -35.4455 28.2371 -35.4455 44.7713 -18.9113Z" fill="#FFE17A" /></g>
+        <g filter="url(#blur-3)"><path d="M113.874 109.296C129.335 93.834 129.335 68.7657 113.874 53.304C98.412 37.8424 73.3437 37.8424 57.8821 53.304C42.4204 68.7657 42.4204 93.834 57.8821 109.296C73.3437 124.757 98.412 124.757 113.874 109.296Z" fill="#B3F1BF" /></g>
+        <g filter="url(#blur-4)"><path d="M52.7187 41.0705C71.3084 59.6602 71.3084 89.8002 52.7187 108.39C34.1289 126.98 3.98891 126.98 -14.6008 108.39C-33.1905 89.8002 -33.1905 59.6602 -14.6008 41.0705C3.98891 22.4808 34.1289 22.4808 52.7187 41.0705Z" fill="#FFD9E4" /></g>
+        <g filter="url(#blur-5)"><path d="M114.964 32.5756C131.856 15.6839 131.783 -11.7753 114.802 -28.7564C97.8213 -45.7374 70.3621 -45.8099 53.4705 -28.9182C36.5788 -12.0266 36.6513 15.4327 53.6323 32.4137C70.6134 49.3947 98.0726 49.4672 114.964 32.5756Z" fill="#84CFFF" /></g>
+      </g>
+      <path d="M72.7375 9.20002C73.5314 9.20002 74.175 9.84362 74.175 10.6375V17.825H81.3625C82.1564 17.825 82.8 18.4686 82.8 19.2625V22.1375C82.8 22.9314 82.1564 23.575 81.3625 23.575H74.175V30.7625C74.175 31.5564 73.5314 32.2 72.7375 32.2H69.8625C69.0686 32.2 68.425 31.5564 68.425 30.7625V23.575H61.2375C60.4436 23.575 59.8 22.9314 59.8 22.1375V19.2625C59.8 18.4686 60.4436 17.825 61.2375 17.825H68.425V10.6375C68.425 9.84362 69.0686 9.20002 69.8625 9.20002H72.7375Z" fill="#F9F9FC" />
+    </g>
+  </g>
+  <defs>
+    <filter id="blur-0" x="-44.0931" y="-12.3319" width="180.843" height="180.843" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix" /><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /><feGaussianBlur stdDeviation="27.6" result="effect1_foregroundBlur" /></filter>
+    <filter id="blur-1" x="-44.0931" y="-12.3319" width="180.843" height="180.843" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix" /><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /><feGaussianBlur stdDeviation="27.6" result="effect1_foregroundBlur" /></filter>
+    <filter id="blur-2" x="-82.7048" y="-86.5119" width="195.077" height="195.077" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix" /><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /><feGaussianBlur stdDeviation="27.6" result="effect1_foregroundBlur" /></filter>
+    <filter id="blur-3" x="-8.91419" y="-13.4922" width="189.584" height="189.584" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix" /><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /><feGaussianBlur stdDeviation="27.6" result="effect1_foregroundBlur" /></filter>
+    <filter id="blur-4" x="-83.7431" y="-28.0718" width="205.604" height="205.604" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix" /><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /><feGaussianBlur stdDeviation="27.6" result="effect1_foregroundBlur" /></filter>
+    <filter id="blur-5" x="-14.351" y="-96.7397" width="197.137" height="197.137" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix" /><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /><feGaussianBlur stdDeviation="27.6" result="effect1_foregroundBlur" /></filter>
+    <clipPath id="clip-colored"><rect width="92" height="92" rx="9.2" fill="white" /></clipPath>
+  </defs>
+  <text x="32" y="17" fill="#18181b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="700" font-size="16">PLUS Storybook</text>
+</svg>

@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         fade: {
             control: 'boolean',
             description: 'Use fade transition instead of slide',
@@ -68,11 +71,7 @@ export default {
         },
         slides: {
             table: { disable: true, category: 'Development' }
-        },
-        children: {
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const createSlideContent = (text, bgColor) => (
@@ -114,14 +113,14 @@ function CarouselContentDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Slides only</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SLIDES ONLY</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Basic carousel with only slide content, no controls or indicators.
                 </p>
                 <Carousel slides={threeSlides} controls={false} indicators={false} />
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With captions</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH CAPTIONS</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Title and caption text overlaid on slides.
                 </p>
@@ -155,21 +154,21 @@ function CarouselLayoutDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With controls</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH CONTROLS</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Previous/next navigation arrows for manual control.
                 </p>
                 <Carousel slides={threeSlides} controls indicators={false} />
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With indicators</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH INDICATORS</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Pill-style indicators showing current slide position.
                 </p>
                 <Carousel slides={threeSlides} controls={false} indicators />
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Full featured</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FULL FEATURED</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Controls, indicators, and captions together.
                 </p>
@@ -202,7 +201,7 @@ function CarouselLayoutDemos() {
 function CarouselFadeDemo() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Fade transition</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FADE TRANSITION</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Fade effect instead of slide animation.
             </p>

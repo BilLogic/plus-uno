@@ -16,6 +16,9 @@ export default {
     tags: ['!dev'],
     // Define argTypes to create the custom controls user requested
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         // Content
         text: {
             control: 'text',
@@ -56,15 +59,6 @@ export default {
         },
 
         // Design
-        style: {
-            control: 'select',
-            options: [
-                'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger',
-                'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'
-            ],
-            description: 'Color theme of the badge',
-            table: { category: 'Design' }
-        },
         size: {
             control: 'select',
             options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'],
@@ -115,7 +109,7 @@ const contentVariantCard = {
 function BadgeSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>All Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL SIZES</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Badges are available in both Header (Lato) and Body (Merriweather Sans) scales.
             </p>
@@ -141,7 +135,7 @@ function BadgeSizesDemos() {
 function BadgeVariantsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>All Color Themes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL COLOR THEMES</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                 {['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'].map(style => (
                     <Badge key={style} text={style.charAt(0).toUpperCase() + style.slice(1)} style={style} />
@@ -159,10 +153,10 @@ function BadgeVariantsDemos() {
 function BadgeContentDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Recommended Combinations</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RECOMMENDED COMBINATIONS</span>
             <div style={contentVariantCol}>
                 <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Status Indicators</h6>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STATUS INDICATORS</span>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                         Text + leading icon for success, warning, and error semantics.
                     </p>
@@ -175,7 +169,7 @@ function BadgeContentDemos() {
                     </div>
                 </section>
                 <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Labels & Categories</h6>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LABELS & CATEGORIES</span>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                         Compact badges in smaller size for metadata and labels.
                     </p>
@@ -187,7 +181,7 @@ function BadgeContentDemos() {
                     </div>
                 </section>
                 <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Counts</h6>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COUNTS</span>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                         Text + counter for inbox/message counts and similar tallies.
                     </p>
@@ -199,7 +193,7 @@ function BadgeContentDemos() {
                     </div>
                 </section>
                 <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Filters & Selections</h6>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILTERS & SELECTIONS</span>
                     <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
                         Dismissible badges for active filters and selected entities.
                     </p>

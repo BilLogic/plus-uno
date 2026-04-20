@@ -14,6 +14,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         type: {
             control: 'select',
             options: ['radio', 'checkbox'],
@@ -68,7 +71,7 @@ export const Styles = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <h6 className="h6 mb-2">Radio (one per row)</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO (ONE PER ROW)</span>
                 <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Single selection per row.
                 </p>
@@ -85,7 +88,7 @@ export const Styles = () => {
                 />
             </div>
             <div>
-                <h6 className="h6 mb-2">Checkbox (many per row)</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX (MANY PER ROW)</span>
                 <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Multiple selections per row.
                 </p>

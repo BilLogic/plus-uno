@@ -1,41 +1,27 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TextareaStories from './Textarea.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={TextareaStories} />
 
 <Title />
-<Description />
+Use text area for multi-line text input form fields.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13338-2290&p=f"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Styles
 
-<DocsCanvasShell description={<>Placeholder vs value and optional visible label.</>}>
-    <Canvas of={TextareaStories.Content} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Layout
-
-<DocsCanvasShell description={<>Visible height via the <code>rows</code> prop (2, 3, and 5).</>}>
-    <Canvas of={TextareaStories.Layout} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Sizes
-
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={TextareaStories.Sizes} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Long (boxed) and short (underlined) styles.</>}>
+    <Canvas of={TextareaStories.Styles} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>
@@ -44,8 +30,12 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 
 ### Interaction states
 
-<DocsCanvasShell description={<>Default, focus, disabled, and read-only.</>}>
-    <Canvas of={TextareaStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Long form: default, focus, filled, error, disabled, read-only.</>}>
+    <Canvas of={TextareaStories.InteractionStatesLong} story={{ inline: true }} sourceState="none" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Short form: same state matrix.</>}>
+    <Canvas of={TextareaStories.InteractionStatesShort} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
 </div>

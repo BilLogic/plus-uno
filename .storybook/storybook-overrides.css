@@ -15,20 +15,35 @@ body,
 
 /* Headers in Storybook docs */
 .sbdocs h1,
+.sbdocs-title,
+.sbdocs-h1 {
+    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-size: var(--font-size-display4, 56px) !important;
+    font-weight: var(--font-weight-headline, 700) !important;
+    color: var(--color-on-surface, #191c1e) !important;
+}
+
 .sbdocs h2,
+.sbdocs-h2 {
+    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-size: var(--font-size-h2, 32px) !important;
+    font-weight: var(--font-weight-headline, 700) !important;
+    color: var(--color-on-surface, #191c1e) !important;
+    margin-top: var(--size-section-gap-md) !important;
+}
+
 .sbdocs h3,
 .sbdocs h4,
 .sbdocs h5,
 .sbdocs h6,
-.sbdocs-title,
-.sbdocs-h1,
-.sbdocs-h2,
 .sbdocs-h3,
 .sbdocs-h4,
 .sbdocs-h5 {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-size: var(--font-size-h3, 28px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
     color: var(--color-on-surface, #191c1e) !important;
+    margin-top: var(--size-element-gap-md) !important;
 }
 
 /* Body text in docs */
@@ -37,9 +52,18 @@ body,
 .sbdocs td,
 .sbdocs th {
     font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
+    font-size: var(--font-size-body1, 16px) !important;
+    line-height: var(--font-line-height-body1, 150%) !important;
+    font-weight: var(--font-weight-normal, 300) !important;
+}
+
+/* Canvas Descriptions text */
+.sb-ds-canvas-description {
+    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
     font-size: var(--font-size-body2, 14px) !important;
     line-height: var(--font-line-height-body2, 157.1%) !important;
     font-weight: var(--font-weight-normal, 300) !important;
+    color: var(--color-on-surface-variant, #5c5c5c) !important;
 }
 
 /* Code blocks */
@@ -163,6 +187,13 @@ a.sbdocs-a {
   margin-bottom: 0;
 }
 
+/* Space out major sections with macro spacing */
+.sbdocs .sb-ds-doc-section,
+.sbdocs .sb-button-docs .sb-button-doc-section {
+  margin-top: clamp(6rem, 8vw, 8rem) !important;
+  margin-bottom: clamp(6rem, 8vw, 8rem) !important;
+}
+
 /*
  * Preview well: flatten inner Storybook Canvas chrome; outer card only.
  */
@@ -213,8 +244,38 @@ a.sbdocs-a {
  * Default autodocs pages (no .sb-doc-shadcn): slightly calmer lead under the title.
  * Does not affect Canvas.
  */
-.sbdocs .sbdocs-subtitle {
+.sbdocs .sbdocs-subtitle,
+.sbdocs-title + p,
+.sbdocs-h1 + p,
+.sbdocs p.sbdocs-subtitle {
   opacity: 0.92;
+  margin-top: 1.5rem !important;
+  margin-bottom: 4rem !important;
+}
+
+/* Add margin under the main Title */
+.sbdocs h1,
+.sbdocs-title,
+.sbdocs-h1 {
+  margin-bottom: 1rem !important;
+}
+
+/*
+ * TOC "ON THIS PAGE" Heading
+ * Targeting aggressively as Storybook 8 TOC might lack .sbdocs-toc
+ */
+.sbdocs .sbdocs-toc h2,
+.toc-wrapper h2,
+.toc-container h2,
+.sbdocs-wrapper aside h2,
+h2.toc-title {
+  font-size: var(--font-size-body2, 14px) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.5rem !important;
+  color: var(--color-on-surface-variant, #5c5c5c) !important;
 }
 
 /* Hide scrollbar while maintaining scroll functionality */
@@ -225,4 +286,46 @@ a.sbdocs-a {
 /* Hide the AI agent's own floating button in Storybook preview because we use the NavFab */
 .sb-ai-agent__fab-wrapper {
   display: none !important;
+}
+
+/* 
+ * FIX: Tailwind and Bootstrap Class Collision for '.collapse'
+ * Tailwind's `collapse` utility sets `visibility: collapse`, which hides 
+ * Bootstrap components like Accordion when they expand but keep the `.collapse` class.
+ */
+.accordion-collapse.collapse.show,
+.collapse.show {
+    visibility: visible !important;
+}
+
+/* 
+ * Global Fluent-like tweaks for canvas previews in "Forms" and "Components".
+ * Remove outer border, shadow.
+ */
+.sb-ds-docs-preview-well,
+.sb-button-docs-preview-well,
+.sbdocs.sbdocs-preview {
+    box-shadow: none !important;
+}
+
+.sb-ds-docs-preview-well .sbdocs.sbdocs-preview,
+.sb-button-docs-preview-well .sbdocs.sbdocs-preview {
+    background-color: transparent !important;
+    border-radius: 0 !important;
+}
+
+/* 
+ * Variant subheadings design within each story section.
+ * Differentiates from normal headers by using a subtle body-copy typography token feel.
+ */
+.docs-story section > h5,
+.docs-story section > h6 {
+    font-family: var(--font-family-body, 'Merriweather Sans', sans-serif) !important;
+    font-size: var(--font-size-body2, 14px) !important;
+    font-weight: 600 !important;
+    color: var(--color-neutral-text, var(--color-on-surface-variant, #5c5c5c)) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 0.75rem !important;
+    margin-top: 0 !important;
 }

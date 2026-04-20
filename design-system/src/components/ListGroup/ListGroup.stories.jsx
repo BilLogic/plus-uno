@@ -15,6 +15,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         flush: {
             control: 'boolean',
             table: { category: 'Design' }
@@ -30,9 +33,6 @@ export default {
         activeItem: {
             control: { type: 'range', min: 1, max: 5, step: 1 },
             table: { category: 'Behavior' }
-        },
-        children: {
-            table: { disable: true, category: 'Development' }
         },
         as: {
             table: { disable: true, category: 'Development' }

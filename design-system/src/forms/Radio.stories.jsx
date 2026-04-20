@@ -14,6 +14,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Label text for the radio',
@@ -60,10 +63,6 @@ export default {
             table: { disable: true, category: 'Development' },
         },
         className: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        style: {
             control: false,
             table: { disable: true, category: 'Development' },
         },
@@ -147,10 +146,19 @@ export const Layout = () => {
 };
 
 export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
-        <Radio id="radio-small" name="radio-size" label="Small" size="small" defaultChecked />
-        <Radio id="radio-medium" name="radio-size-m" label="Medium (Default)" size="medium" defaultChecked />
-        <Radio id="radio-large" name="radio-size-l" label="Large" size="large" defaultChecked />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+            <Radio id="radio-small" name="radio-size" label="Option" size="small" defaultChecked />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+            <Radio id="radio-medium" name="radio-size-m" label="Option" size="medium" defaultChecked />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+            <Radio id="radio-large" name="radio-size-l" label="Option" size="large" defaultChecked />
+        </div>
     </div>
 );
 
@@ -158,24 +166,33 @@ export const InteractionStates = () => {
     const [value, setValue] = useState('option1');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
-            <Radio
-                id="radio-s1"
-                name="radio-states"
-                label="Selected"
-                value="option1"
-                checked={value === 'option1'}
-                onChange={(e) => setValue(e.target.value)}
-            />
-            <Radio
-                id="radio-s2"
-                name="radio-states"
-                label="Unselected"
-                value="option2"
-                checked={value === 'option2'}
-                onChange={(e) => setValue(e.target.value)}
-            />
-            <Radio id="radio-disabled" name="radio-states-dis" label="Disabled" value="disabled" disabled />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SELECTED</span>
+                <Radio
+                    id="radio-s1"
+                    name="radio-states"
+                    label="Option"
+                    value="option1"
+                    checked={value === 'option1'}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">UNSELECTED</span>
+                <Radio
+                    id="radio-s2"
+                    name="radio-states"
+                    label="Option"
+                    value="option2"
+                    checked={value === 'option2'}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <Radio id="radio-disabled" name="radio-states-dis" label="Option" value="disabled" disabled />
+            </div>
         </div>
     );
 };

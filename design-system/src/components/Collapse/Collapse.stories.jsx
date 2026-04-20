@@ -15,14 +15,14 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         // CONTENT
         trigger: {
             control: 'text',
             description: 'Content for the trigger button/link',
             table: { category: 'Content' }
-        },
-        children: {
-            table: { disable: true, category: 'Content' }
         },
 
         // DESIGN
@@ -79,7 +79,7 @@ function CollapseBasicsDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Default (Uncontrolled)</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (UNCONTROLLED)</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Basic collapse that manages its own open/closed state internally.
                 </p>
@@ -98,7 +98,7 @@ function CollapseBasicsDemos() {
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Initially Open</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INITIALLY OPEN</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Collapse that starts in the expanded state using <code>defaultOpen</code>.
                 </p>
@@ -122,7 +122,7 @@ function CollapseBasicsDemos() {
 function CollapseIconsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>With Icons</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH ICONS</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Collapse triggers can include icons positioned left or right.
             </p>
@@ -157,7 +157,7 @@ function CollapseStateDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Controlled Mode</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CONTROLLED MODE</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     External state management using <code>isOpen</code> prop.
                 </p>
@@ -172,7 +172,7 @@ function CollapseStateDemos() {
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Multiple Targets</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTIPLE TARGETS</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Control multiple collapse sections independently or simultaneously.
                 </p>
@@ -197,7 +197,7 @@ function CollapseStateDemos() {
 function CollapseLinkDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Link Trigger</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LINK TRIGGER</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Use an anchor tag as the trigger instead of a button.
             </p>

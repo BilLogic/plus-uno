@@ -6,10 +6,54 @@ import { Canvas, Controls } from '@storybook/addon-docs/blocks';
  * Use with Component.mdx + `.sb-ds-component-docs` / `.sb-ds-doc-section` wrappers.
  */
 
+/** A card link for the top of the MDX page */
+export function ResourcesCard({ href, icon, title, description }) {
+    return (
+        <a 
+            href={href || '#'} 
+            target={href && href !== '#' ? "_blank" : undefined}
+            rel={href && href !== '#' ? "noreferrer" : undefined}
+            className="group block p-4 rounded-xl border border-border bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-md no-underline transition-all relative text-left"
+            style={{ width: '200px', textDecoration: 'none' }}
+        >
+            <i className="fa-solid fa-arrow-up-right-from-square absolute top-4 right-4 text-on-surface-variant opacity-50 text-sm group-hover:text-primary transition-colors"></i>
+            <div className="mb-3 flex justify-start ml-[-2px]">
+                {icon}
+            </div>
+            <strong className="text-[15px] leading-tight text-on-surface font-semibold m-0 p-0 block">{title}</strong>
+        </a>
+    );
+}
+
+export function ResourcesBlock({ figmaLink, githubLink }) {
+    if (!figmaLink && !githubLink) return null;
+    return (
+        <div style={{ marginTop: '48px', marginBottom: '40px' }}>
+            <h3 className="h3 mb-4 mt-0">Resources</h3>
+            <div className="sb-ds-resources-block flex flex-wrap gap-5">
+                {figmaLink && (
+                    <ResourcesCard 
+                        href={figmaLink}
+                        icon={<i className="fa-brands fa-figma text-3xl" style={{ color: 'var(--color-primary)' }}></i>}
+                        title="Figma"
+                    />
+                )}
+                {githubLink && (
+                    <ResourcesCard 
+                        href={githubLink}
+                        icon={<i className="fa-brands fa-github text-3xl" style={{ color: 'var(--color-primary)' }}></i>}
+                        title="GitHub"
+                    />
+                )}
+            </div>
+        </div>
+    );
+}
+
 /** Muted border + padded inner well — shared by DocsDemoBlock and DocsCanvasShell. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
-        <div className="sb-ds-docs-preview-well overflow-visible rounded-xl border border-border bg-muted/40 shadow-sm dark:bg-muted/25">
+        <div className="sb-ds-docs-preview-well overflow-visible rounded-xl bg-muted/40 dark:bg-muted/25">
             <div
                 className={['min-h-[100px] p-10 md:p-12 lg:p-14', innerClassName].filter(Boolean).join(' ')}
             >
@@ -28,7 +72,7 @@ export function DocsDemoBlock({ description, children, previewClassName = '', ch
     return (
         <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
             {description ? (
-                <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+                <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
             {chrome === 'none' ? (
                 <div className={previewClassName}>{children}</div>
@@ -44,7 +88,7 @@ export function DocsCanvasShell({ description, children }) {
     return (
         <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
             {description ? (
-                <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+                <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
             <DocsPreviewCard>{children}</DocsPreviewCard>
         </div>
@@ -58,9 +102,9 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
     return (
         <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
             {description ? (
-                <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+                <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
-            <div className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible rounded-xl border border-border bg-muted/40 shadow-sm dark:bg-muted/25">
+            <div className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible rounded-xl bg-muted/40 dark:bg-muted/25">
                 <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
                     <Canvas of={ofStory} story={{ inline: true }} sourceState="none" />
                 </div>

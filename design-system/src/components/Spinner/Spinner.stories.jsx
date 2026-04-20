@@ -14,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         variant: {
             control: 'select',
             options: ['border', 'grow', 'growing', 'rotating', 'stacking'],
@@ -38,7 +41,7 @@ const col = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '
 function SpinnerVariantsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Variants</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VARIANTS</span>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                 Different animation styles for loading indicators.
             </p>
@@ -71,7 +74,7 @@ function SpinnerVariantsDemos() {
 function SpinnerStylesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Color</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COLOR</span>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                 All loading indicators use the neutral token <code className="text-foreground">--color-on-surface-variant</code>{' '}
                 (border, grow, and custom animations).
@@ -93,7 +96,7 @@ function SpinnerStylesDemos() {
 function SpinnerSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                 Default and small border spinner.
             </p>

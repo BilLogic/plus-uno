@@ -13,17 +13,14 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         // DESIGN
         size: {
             control: 'select',
             options: ['sm', 'md', 'lg', 'xl'],
             description: 'Divider thickness',
-            table: { category: 'Design' }
-        },
-        style: {
-            control: 'radio',
-            options: ['light', 'dark'],
-            description: 'Color style of the divider',
             table: { category: 'Design' }
         },
         opacity10: {
@@ -57,7 +54,7 @@ const dividerCol = { display: 'flex', flexDirection: 'column', gap: '48px', widt
 function DividerSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Dividers come in four thicknesses: sm (1px), md (1.5px), lg (2px), and xl (2.5px).
             </p>
@@ -87,7 +84,7 @@ function DividerVariantsDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Styles</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STYLES</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Light style for standard backgrounds, dark style for light backgrounds.
                 </p>
@@ -103,7 +100,7 @@ function DividerVariantsDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Opacity Variant</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPACITY VARIANT</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Apply 10% opacity for subtle, less prominent separation.
                 </p>
@@ -126,7 +123,7 @@ function DividerLayoutDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Custom Width</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CUSTOM WIDTH</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Set custom widths for specific layout needs.
                 </p>
@@ -138,7 +135,7 @@ function DividerLayoutDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Use Case Example</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USE CASE EXAMPLE</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Dividers are commonly used to separate content sections.
                 </p>

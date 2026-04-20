@@ -13,6 +13,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -95,50 +98,82 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' }
         },
+        inputRef: { table: { disable: true } },
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 /** Content — Placeholder vs value, label, required, and visuals. */
 export const Content = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
-        <Input id="doc-content-placeholder" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-content-value" placeholder="Placeholder" value="Value" trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-content-label" placeholder="Placeholder" value="" showLabel label="Label" trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-content-required" placeholder="Placeholder" value="" label="Label" required trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-content-leading" placeholder="Placeholder" value="" leadingVisual="fa-solid fa-icons" trailingVisual="dropdown" />
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PLACEHOLDER</span>
+            <Input id="doc-content-placeholder" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALUE</span>
+            <Input id="doc-content-value" placeholder="Placeholder" value="Value" trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LABEL</span>
+            <Input id="doc-content-label" placeholder="Placeholder" value="" showLabel label="Label" trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">REQUIRED</span>
+            <Input id="doc-content-required" placeholder="Placeholder" value="" label="Label" required trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LEADING VISUAL</span>
+            <Input id="doc-content-leading" placeholder="Placeholder" value="" leadingVisual="fa-solid fa-icons" trailingVisual="dropdown" />
+        </div>
     </div>
 );
 
 /** Styles — Validation treatments: none, invalid, and success. */
 export const Styles = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
-        <Input id="doc-style-none" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-style-invalid" placeholder="Placeholder" value="" validation="invalid" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-style-success" placeholder="Placeholder" value="" validation="success" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NONE</span>
+            <Input id="doc-style-none" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <Input id="doc-style-invalid" placeholder="Placeholder" value="" validation="invalid" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUCCESS</span>
+            <Input id="doc-style-success" placeholder="Placeholder" value="" validation="success" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
+        </div>
     </div>
 );
 
 /** Sizes — Available in medium (default) size. */
 export const Sizes = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
-        <Input id="doc-size-medium" placeholder="Placeholder" value="" size="medium" trailingVisual="fa-solid fa-icons" />
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+            <Input id="doc-size-medium" placeholder="Placeholder" value="" size="medium" trailingVisual="fa-solid fa-icons" />
+        </div>
     </div>
 );
 
 /** InteractionStates — Default, hover, focus, disabled, and read-only. */
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
-        <Input id="doc-state-default" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-state-disabled" placeholder="Placeholder" value="" disabled trailingVisual="fa-solid fa-icons" />
-        <Input id="doc-state-readonly" placeholder="Placeholder" value="" readonly trailingVisual="fa-solid fa-icons" />
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <Input id="doc-state-default" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <Input id="doc-state-disabled" placeholder="Placeholder" value="" disabled trailingVisual="fa-solid fa-icons" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+            <Input id="doc-state-readonly" placeholder="Placeholder" value="" readonly trailingVisual="fa-solid fa-icons" />
+        </div>
     </div>
 );
 
