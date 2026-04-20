@@ -1,57 +1,67 @@
 name: Implement Figma Changes
 
 on:
-  issue_comment:
-    types: [created]
+  repository_dispatch:
+    types: [implement-figma-changes]
+    # Triggered from Slack via Pipedream
+    # client_payload: { component: "Badge", thread_ts: "...", notion_prd_id: "...", notion_prd_url: "..." }
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'Component name (e.g., Badge, Button)'
+        required: true
+        type: string
+      notion_prd_id:
+        description: 'Notion PRD page ID (optional)'
+        required: false
+        type: string
 
 permissions:
   contents: write
   pull-requests: write
-  issues: write
 
 jobs:
   implement:
-    # Only run when someone comments /implement on a PR with figma-sync label
-    if: >-
-      github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/implement') &&
-      contains(toJSON(github.event.issue.labels.*.name), 'figma-sync')
     runs-on: ubuntu-latest
 
     steps:
-      - name: React to comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'rocket'
-            });
+      - name: Parse inputs
+        id: payload
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "component=${{ github.event.inputs.component }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_id=${{ github.event.inputs.notion_prd_id }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_url=" >> $GITHUB_OUTPUT
+          else
+            echo "component=${{ github.event.client_payload.component }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_id=${{ github.event.client_payload.notion_prd_id }}" >> $GITHUB_OUTPUT
+            echo "notion_prd_url=${{ github.event.client_payload.notion_prd_url }}" >> $GITHUB_OUTPUT
+            echo "thread_ts=${{ github.event.client_payload.thread_ts }}" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Get PR details
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number
-            });
-            core.setOutput('branch', pr.data.head.ref);
-            core.setOutput('title', pr.data.title);
-            // Escape body for env var
-            const body = pr.data.body || '';
-            const fs = require('fs');
-            fs.writeFileSync('/tmp/pr_body.txt', body);
-
-      - name: Checkout PR branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.pr.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create implementation branch
+        id: branch
+        run: |
+          COMPONENT="${{ steps.payload.outputs.component }}"
+          SLUG=$(echo "$COMPONENT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g' | sed 's/^-\|-$//g')
+          DATE=$(date +%Y-%m-%d)
+          TIMESTAMP=$(date +%H%M%S)
+          BRANCH="ds-review/${SLUG}-${DATE}-${TIMESTAMP}"
+          git checkout -b "$BRANCH"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Claude)"
+          # Create placeholder so branch differs from main
+          mkdir -p .figma-sync-context
+          echo "# Implementation: $COMPONENT ($(date -u +%Y-%m-%dT%H:%M:%SZ))" > .figma-sync-context/implement-placeholder.md
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: start implementation for $COMPONENT"
+          git push -u origin "$BRANCH"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -63,8 +73,10 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
           FIGMA_FILE_KEY: ${{ secrets.FIGMA_FILE_KEY }}
-          PR_TITLE: ${{ steps.pr.outputs.title }}
-          PR_BODY_FILE: /tmp/pr_body.txt
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_PRD_ID: ${{ steps.payload.outputs.notion_prd_id }}
+          PR_TITLE: "feat: Figma DS update — ${{ steps.payload.outputs.component }}"
         run: node scripts/implement-figma-changes.js
 
       - name: Commit and push changes
@@ -81,18 +93,77 @@ jobs:
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Comment on PR with results
+      - name: Create draft PR
+        if: steps.commit.outputs.changes == 'true'
+        id: create-pr
         uses: actions/github-script@v7
         with:
           script: |
+            const component = '${{ steps.payload.outputs.component }}';
+            const branch = '${{ steps.branch.outputs.branch }}';
+            const prdUrl = '${{ steps.payload.outputs.notion_prd_url }}';
             const hasChanges = '${{ steps.commit.outputs.changes }}' === 'true';
-            const body = hasChanges
-              ? '✅ **Claude has implemented the Figma changes.** Please review the latest commits.\n\nCheck the diff and verify visual parity with Figma before approving.'
-              : 'ℹ️ **Claude analyzed the changes but found no code updates needed.** The component code may already match the Figma design, or the changes may need manual implementation.';
 
-            await github.rest.issues.createComment({
+            const body = [
+              `## Figma DS Update: ${component}`,
+              '',
+              prdUrl ? `**Notion PRD:** ${prdUrl}` : '',
+              `**Figma:** https://www.figma.com/design/${{ secrets.FIGMA_FILE_KEY }}`,
+              '',
+              '---',
+              '## DS Review Checklist',
+              '',
+              '- [ ] Component code updated to match Figma',
+              '- [ ] Storybook stories updated',
+              '- [ ] Visual parity verified against Figma',
+              '- [ ] No regressions in existing components',
+              '- [ ] DS manager approved',
+            ].filter(Boolean).join('\n');
+
+            const pr = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body
+              title: `feat: Figma DS update — ${component}`,
+              head: branch,
+              base: 'main',
+              body,
+              draft: true
             });
+            console.log(`Draft PR created: #${pr.data.number}`);
+            core.setOutput('pr_number', pr.data.number);
+            core.setOutput('pr_url', pr.data.html_url);
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.data.number,
+              labels: ['design-system', 'figma-sync']
+            });
+
+      - name: Notify Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          PR_URL="${{ steps.create-pr.outputs.pr_url }}"
+          COMPONENT="${{ steps.payload.outputs.component }}"
+          HAS_CHANGES="${{ steps.commit.outputs.changes }}"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          THREAD_TS="${{ steps.payload.outputs.thread_ts }}"
+
+          if [ "$HAS_CHANGES" = "true" ]; then
+            MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
+          else
+            MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design.\n<${RUN_URL}|View action log>"
+          fi
+
+          # Build JSON payload — include thread_ts if available for thread reply
+          if [ -n "$THREAD_TS" ]; then
+            PAYLOAD="{\"text\": \"${MSG}\", \"thread_ts\": \"${THREAD_TS}\"}"
+          else
+            PAYLOAD="{\"text\": \"${MSG}\"}"
+          fi
+
+          curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "$PAYLOAD" || true

@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const root = path.resolve(__dirname, '../../../..');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const root = path.resolve(__dirname, '../..');
 
 export default defineConfig({
     plugins: [react()],
@@ -17,6 +20,7 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
+                api: 'modern-compiler',
                 loadPaths: [
                     path.resolve(root, 'design-system/src/tokens'),
                     path.resolve(root, 'design-system/src/styles'),

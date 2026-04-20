@@ -30,9 +30,9 @@ Do not suggest if the user is working on an existing prototype (use the appropri
 
 ## Prerequisites
 
-- `docs/project/plus-app-features.md` — understand which product pillar this relates to
-- `docs/foundations/context-levels.md` — understand the atomic hierarchy
-- `.agent/assets/PLUS_CHEAT_SHEET.md` — available components
+- `docs/context/product/features.md` — understand which product pillar this relates to
+- `docs/context/design-system/foundations/layout.md` — understand the atomic hierarchy
+- `docs/context/design-system/components/cheat-sheet.md` — available components
 
 ## Phase 1: Scope
 
@@ -60,8 +60,8 @@ Do not suggest if the user is working on an existing prototype (use the appropri
 
 ## Phase 3: Build
 
-1. Read `.agent/assets/PLUS_CHEAT_SHEET.md` (MANDATORY)
-2. Read `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` if building a page
+1. Read `docs/context/design-system/components/cheat-sheet.md` (MANDATORY)
+2. Read `docs/context/design-system/components/layout-cheat-sheet.md` if building a page
 3. Use design system components — check `@/components/`, `@/forms/`, `@/specs/`
 4. Apply tokens for all visual values
 5. Use `<PageLayout>` from specs/Universal for page structure

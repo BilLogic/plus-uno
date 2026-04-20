@@ -2,10 +2,12 @@
 storybook-static/
 storybook_*.txt
 # Dependencies
-node_modules/
+**/node_modules/
 
 # Build output
 dist/
+coverage/
+*.tsbuildinfo
 
 # IDE
 .vscode/
@@ -32,13 +34,11 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+*.local.json
 
 # Reference files (production repo)
 reference/production/
 
-# Playground directories (opt-in to commit)
-prototyping/playground/*/
-!prototyping/playground/README.md
 # macOS sed backup artifacts
 .!*!*
 
@@ -49,5 +49,9 @@ prototyping/playground/*/
 # Local Netlify folder
 .netlify
 
+# Vercel
+.vercel/
+
 # Figma automation temp files
 .figma-sync-context/
+.agent/handoffs/

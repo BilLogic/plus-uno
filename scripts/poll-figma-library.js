@@ -24,6 +24,8 @@
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+import crypto from 'crypto';
+import { createNotionPRD } from './create-notion-prd.js';
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI — no .env needed */ }
 
@@ -159,6 +161,42 @@ async function fetchComponents() {
 }
 
 /**
+ * Fetch node data for a batch of components and return a hash per node.
+ * This detects visual property changes that metadata alone misses.
+ */
+async function fetchNodeHashes(components, version = null) {
+  if (!components.length) return {};
+
+  // Figma supports batching node IDs in one request (comma-separated)
+  // Split into chunks of 50 to stay within URL length limits
+  const hashes = {};
+  const chunks = [];
+  for (let i = 0; i < components.length; i += 50) {
+    chunks.push(components.slice(i, i + 50));
+  }
+
+  const versionParam = version ? `&version=${version}` : '';
+  for (const chunk of chunks) {
+    const ids = chunk.map(c => c.nodeId).filter(Boolean).join(',');
+    if (!ids) continue;
+    try {
+      const result = await figmaGet(`/files/${FIGMA_FILE_KEY}/nodes?ids=${ids}&geometry=paths${versionParam}`);
+      const nodes = result.nodes || {};
+      for (const [nodeId, nodeData] of Object.entries(nodes)) {
+        if (nodeData?.document) {
+          // Hash the node document (contains all visual properties)
+          const json = JSON.stringify(nodeData.document);
+          hashes[nodeId] = crypto.createHash('md5').update(json).digest('hex');
+        }
+      }
+    } catch (e) {
+      console.warn(`   ⚠️  Failed to fetch node hashes for chunk: ${e.message}`);
+    }
+  }
+  return hashes;
+}
+
+/**
  * Fetch recent file versions
  */
 async function fetchVersions() {
@@ -237,7 +275,7 @@ function diffVersions(oldVersionIds, newVersions) {
 /**
  * Build Slack message for detected changes
  */
-function buildSlackMessage(componentDiff, newVersions) {
+function buildSlackMessage(componentDiff, newVersions, prdResult = null, allComponents = []) {
   const figmaUrl = `https://www.figma.com/design/${FIGMA_FILE_KEY}`;
 
   // Group variants by parent component name (containingFrame)
@@ -269,7 +307,15 @@ function buildSlackMessage(componentDiff, newVersions) {
   if (newVersions.length) {
     for (const v of newVersions) {
       const publishedBy = `*Published by ${v.user}*`;
-      const label = v.label ? ` · _${v.label}_` : '';
+      // Build a dynamic label based on change types instead of Figma's generic "Components published"
+      const changeVerbs = [];
+      if (componentDiff.created.length) changeVerbs.push('added');
+      if (componentDiff.modified.length) changeVerbs.push('updated');
+      if (componentDiff.deleted.length) changeVerbs.push('deleted');
+      const dynamicLabel = changeVerbs.length
+        ? `Components ${changeVerbs.join(', ')}`
+        : (v.label || 'Components published');
+      const label = ` · _${dynamicLabel}_`;
       const versionUrl = `${figmaUrl}?version-id=${v.id}`;
       let versionBlock = `${publishedBy}${label}\n<${versionUrl}|View this version>`;
 
@@ -308,11 +354,30 @@ function buildSlackMessage(componentDiff, newVersions) {
     componentLines.push(`🗑️  *Deleted:*  ${display}`);
   }
 
+  // Fallback: version published but still no component lines
+  // (node hashes should have caught visual changes, but just in case)
+  if (!componentLines.length && newVersions.length) {
+    const rawText = newVersions.map(v => [v.label, v.description].filter(Boolean).join(' — ')).join(', ');
+    componentLines.push(`✏️  *Updated:*  ${rawText || 'Visual changes published'}`);
+  }
+
   if (componentLines.length) {
     blocks.push({ type: 'divider' });
     blocks.push({
       type: 'section',
       text: { type: 'mrkdwn', text: componentLines.join('\n') }
+    });
+  }
+
+  // PRD link (if Notion PRD was created)
+  if (prdResult?.pageUrl) {
+    blocks.push({ type: 'divider' });
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `:clipboard: *PRD Created:* <${prdResult.pageUrl}|${prdResult.title}>\nReview the PRD, then type \`implement ${prdResult.title.replace('DS Update: ', '')}\` in this channel when ready.`
+      }
     });
   }
 
@@ -420,13 +485,16 @@ async function main() {
 
   // Initialize snapshot mode
   if (args.init) {
+    console.log('\n🔍 Fetching initial node hashes (this may take a moment)...');
+    const initHashes = await fetchNodeHashes(components);
     const snapshot = {
       lastChecked: new Date().toISOString(),
       components,
-      versionIds: versions.map(v => v.id)
+      versionIds: versions.map(v => v.id),
+      nodeHashes: initHashes
     };
     saveSnapshot(snapshot);
-    console.log(`\n✅ Initial snapshot saved with ${components.length} components`);
+    console.log(`\n✅ Initial snapshot saved with ${components.length} components and ${Object.keys(initHashes).length} node hashes`);
     return;
   }
 
@@ -439,10 +507,13 @@ async function main() {
     // Auto-init on first run in CI
     if (process.env.CI) {
       console.log('\nCI detected — auto-creating initial snapshot');
+      console.log('🔍 Fetching initial node hashes...');
+      const initHashes = await fetchNodeHashes(components);
       const newSnapshot = {
         lastChecked: new Date().toISOString(),
         components,
-        versionIds: versions.map(v => v.id)
+        versionIds: versions.map(v => v.id),
+        nodeHashes: initHashes
       };
       saveSnapshot(newSnapshot);
     }
@@ -452,6 +523,40 @@ async function main() {
   // Diff
   const componentDiff = diffComponents(snapshot.components, components);
   const newVersions = diffVersions(snapshot.versionIds, versions);
+
+  // When a new version is published but no metadata diff, check visual changes via node hashes
+  const hasMetadataChanges = componentDiff.created.length || componentDiff.modified.length || componentDiff.deleted.length;
+  if (!hasMetadataChanges && newVersions.length > 0) {
+    console.log('\n🔍 New version detected — checking for visual property changes...');
+    const newHashes = await fetchNodeHashes(components);
+    let oldHashes = snapshot.nodeHashes || {};
+
+    // If no stored hashes exist, fetch from the previous version for comparison
+    if (!Object.keys(oldHashes).length && snapshot.versionIds?.length) {
+      const prevVersionId = snapshot.versionIds[0]; // most recent previously-known version
+      console.log(`   📦 No stored hashes — fetching baseline from previous version ${prevVersionId}...`);
+      oldHashes = await fetchNodeHashes(components, prevVersionId);
+    }
+
+    for (const comp of components) {
+      const id = comp.nodeId;
+      if (!id || !newHashes[id]) continue;
+      if (oldHashes[id] && oldHashes[id] !== newHashes[id]) {
+        // Visual change detected — add to modified list
+        const oldComp = snapshot.components.find(c => c.nodeId === id) || comp;
+        componentDiff.modified.push({ old: oldComp, new: comp });
+      }
+    }
+
+    // Store hashes for next comparison
+    snapshot._newNodeHashes = newHashes;
+
+    if (componentDiff.modified.length) {
+      console.log(`   ✅ Found ${componentDiff.modified.length} visually changed components`);
+    } else {
+      console.log('   ℹ️  No visual property changes detected in component nodes');
+    }
+  }
 
   const hasComponentChanges = componentDiff.created.length || componentDiff.modified.length || componentDiff.deleted.length;
   const hasNewVersions = newVersions.length > 0;
@@ -516,10 +621,25 @@ async function main() {
   fs.mkdirSync(path.join(process.cwd(), '.figma-sync-context'), { recursive: true });
   fs.writeFileSync(path.join(process.cwd(), '.figma-sync-context', 'issue-body.md'), issueBody);
 
+  // Create Notion PRD
+  let prdResult = null;
+  try {
+    console.log('\n📋 Creating Notion PRD...');
+    prdResult = await createNotionPRD(componentDiff, newVersions, components);
+  } catch (error) {
+    console.error(`\n⚠ Notion PRD creation failed: ${error.message}`);
+  }
+
+  // Write PRD info for GitHub Actions
+  if (prdResult && githubOutput) {
+    fs.appendFileSync(githubOutput, `notion_prd_url=${prdResult.pageUrl}\n`);
+    fs.appendFileSync(githubOutput, `notion_prd_id=${prdResult.pageId}\n`);
+  }
+
   // Post to Slack
   if (SLACK_WEBHOOK_URL) {
     try {
-      const { blocks, text } = buildSlackMessage(componentDiff, newVersions);
+      const { blocks, text } = buildSlackMessage(componentDiff, newVersions, prdResult, components);
       await postToSlack(blocks, text);
       console.log('\n✅ Slack notification sent');
     } catch (error) {
@@ -532,7 +652,8 @@ async function main() {
     const newSnapshot = {
       lastChecked: new Date().toISOString(),
       components,
-      versionIds: versions.map(v => v.id)
+      versionIds: versions.map(v => v.id),
+      nodeHashes: snapshot._newNodeHashes || snapshot.nodeHashes || {}
     };
     saveSnapshot(newSnapshot);
     console.log('Snapshot updated');

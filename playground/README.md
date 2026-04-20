@@ -20,9 +20,9 @@ npm run dev
 ## Guidance
 
 - Agent workflow: `.agent/SKILL.md`
-- Foundations: `docs/design-system/overview.md` (details in `.agent/assets/foundations-index.json`)
-- Tokens: `docs/design-system/tokens.md`
-- Components: `docs/design-system/components.md`
+- Foundations: `docs/context/design-system/foundations/` (details in `.agent/skills/uno-research/references/foundations-index.json`)
+- Tokens: `docs/context/design-system/foundations/tokens.md`
+- Components: `docs/context/design-system/components/inventory.md`
 
 ## Best Practices
 
