@@ -30,7 +30,6 @@ Loaded when a skill is invoked. Each skill declares its Tier 2 context.
 | uno-plan | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief | ~4K |
 | uno-prototype | `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, `references/cheat-*.md`, handoff plan | ~5K |
 | uno-review | `docs/context/design-system/foundations/accessibility.md`, `docs/context/design-system/foundations/content-voice.md`, `docs/knowledge/preferences.md` | ~3K |
-| check-skill-quality | `references/checklist.md`, `references/output-template.md` | ~2K |
 | uno-post | `references/marketplace-schema.md`, `references/deployment-guide.md` | ~1K |
 | uno-compound | `docs/knowledge/INDEX.md`, target domain lesson file, `references/solution-schema.md` | ~3K |
 

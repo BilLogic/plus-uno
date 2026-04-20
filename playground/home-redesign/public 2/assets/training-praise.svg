@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276 184" fill="none" aria-hidden="true">
-  <rect width="276" height="184" fill="rgba(140,102,0,0.12)"/>
-  <circle cx="138" cy="80" r="36" fill="var(--color-social-emotional,#8c6600)" opacity="0.4"/>
-  <path d="M120 100 L138 78 L156 100 L148 130 L128 130 Z" fill="var(--color-social-emotional,#8c6600)" opacity="0.6"/>
-  <circle cx="100" cy="70" r="12" fill="var(--color-social-emotional,#8c6600)" opacity="0.3"/>
-  <circle cx="176" cy="65" r="16" fill="var(--color-social-emotional,#8c6600)" opacity="0.25"/>
-  <text x="138" y="155" text-anchor="middle" font-family="Lato,sans-serif" font-size="12" fill="var(--color-on-surface-variant,#3f484a)">Giving Effective Praise</text>
-</svg>

@@ -7,12 +7,6 @@
 - Information architecture and page structure decisions.
 - Layout-first wireframing where component detail is secondary.
 
-## Not for Use
-
-- Small UI tweaks or single-component changes.
-- Direct implementation or coding requests.
-- Debugging or fixing issues.
-
 ### Decision Tree
 - If the user asks "what should we do" or "which structure works": use Consulting Mode.
 - If they ask for multiple styled options: use Iteration Mode.
@@ -75,26 +69,6 @@ For exhaustive lookup paths/globs/commands, load `docs/context/design-system/ind
 
 5. MCP Fallback
 - If Stitch MCP or Figma MCP is unavailable in runtime, state that and proceed with repository patterns/specs manually.
-
-## Failure Handling
-
-- If research context is missing: proceed with user input and clearly note assumptions.
-- If component inventory is insufficient: flag it as a gap and ask for discussion before proceeding.
-- If token selection is unclear: propose best-fit options and confirm with the user.
-
-## Assumptions Template
-
-Use this section when context is incomplete so the planning direction is explicit:
-
-### Scope
-- Build a dashboard for tracking user progress
-- Fidelity: mid
-- Product pillar: training
-
-### Assumptions
-- This dashboard is for tutors, not students
-- Data is already available via existing APIs (no backend work required)
-- The dashboard will be accessed as a full page, not embedded in another view
 
 ## Consulting Mode Example
 

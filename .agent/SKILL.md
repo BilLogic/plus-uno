@@ -19,7 +19,6 @@ description: Tier-aware skill router for the PLUS Design System. Routes requests
 | [uno-plan](skills/uno-plan/SKILL.md) | "plan", "scope", "how should we build" | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief | ~4K |
 | [uno-prototype](skills/uno-prototype/SKILL.md) | "scaffold", "prototype", "build", Figma link | `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, handoff plan | ~5K |
 | [uno-review](skills/uno-review/SKILL.md) | "review", "check", "validate" | `docs/context/design-system/foundations/accessibility.md`, `docs/knowledge/preferences.md` | ~3K |
-| [check-skill-quality](skills/check-skill-quality/SKILL.md) | "audit skill", "check skill quality", "review SKILL.md", "skill best practices" | `references/checklist.md`, `references/output-template.md` | ~2K |
 | [uno-post](skills/uno-post/SKILL.md) | "submit", "publish" | `references/marketplace-schema.md` | ~1K |
 | [uno-compound](skills/uno-compound/SKILL.md) | "document", "compound", session ending | `docs/knowledge/INDEX.md`, target domain file, `references/solution-schema.md` | ~3K |
 
@@ -37,7 +36,6 @@ Determine the correct skill from the user's request:
 | "What should the layout be" / "Help me plan" / "Scope this" | **uno-plan** |
 | "Show me options" / "Build this" / "Scaffold" / Figma link | **uno-prototype** |
 | "Check" / "Review" / "Validate" / "Quality gate" | **uno-review** |
-| "Audit skill" / "Check skill quality" / "Review SKILL.md" | **check-skill-quality** |
 | "Submit" / "Publish" / "Add to market" | **uno-post** |
 | "Document" / "Compound" / "Save learning" / session ending | **uno-compound** |
 

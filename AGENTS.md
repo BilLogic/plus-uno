@@ -47,7 +47,6 @@ See docs/knowledge/INDEX.md
 | uno-plan | "Plan", "scope", "how should we build" | `.agent/skills/uno-plan/SKILL.md` |
 | uno-prototype | Scaffold playground prototype | `.agent/skills/uno-prototype/SKILL.md` |
 | uno-review | Quality gate before shipping | `.agent/skills/uno-review/SKILL.md` |
-| check-skill-quality | Audit skill docs against checklist | `.agent/skills/check-skill-quality/SKILL.md` |
 | uno-post | "Submit", "Publish" | `.agent/skills/uno-post/SKILL.md` |
 | uno-compound | Document learnings | `.agent/skills/uno-compound/SKILL.md` |
 
