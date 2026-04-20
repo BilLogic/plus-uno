@@ -518,6 +518,20 @@
   --skill-card-tag-fg: var(--color-on-success-container);
 }
 
+.sb-ai-agent__skill-card--research {
+  --skill-card-badge-bg: var(--color-relationship);
+  --skill-card-badge-fg: var(--color-on-relationship);
+  --skill-card-tag-bg: var(--color-relationship-container);
+  --skill-card-tag-fg: var(--color-on-relationship-container);
+}
+
+.sb-ai-agent__skill-card--plan {
+  --skill-card-badge-bg: var(--color-technology-tools);
+  --skill-card-badge-fg: var(--color-on-technology-tools);
+  --skill-card-tag-bg: var(--color-technology-tools-container);
+  --skill-card-tag-fg: var(--color-on-technology-tools-container);
+}
+
 .sb-ai-agent__skill-card__row {
   display: flex;
   flex-direction: row;

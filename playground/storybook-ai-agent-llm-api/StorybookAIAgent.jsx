@@ -581,6 +581,44 @@ function normalizeForMatch(str) {
     return str.toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
+/* ─── Message Classification ─── */
+
+/**
+ * UNCLEAR INPUT: too short, vague, or no discernible intent.
+ * Examples: "yes", "ok", "this one", "help", "what?", "hmm"
+ */
+function isUnclearInput(text) {
+    const t = text.trim();
+    if (t.length <= 3) return true;
+    const vaguePatterns = /^(yes|no|ok|okay|sure|hmm+|uh+|um+|what|huh|nope|yep|hi|hey|hello|thanks|thank you|cool|nice|great|k|lol|idk|dunno|help|this|that|it|this one|that one|not sure)$/i;
+    return vaguePatterns.test(t.toLowerCase());
+}
+
+/**
+ * OUT OF SCOPE: clear question but unrelated to PLUS UNO assistant role.
+ * Detects topics like general coding, weather, trivia, food, math, personal questions, etc.
+ */
+function isOutOfScope(text) {
+    const t = text.toLowerCase();
+    const outOfScopePatterns = [
+        /\b(weather|temperature|forecast|climate)\b/,
+        /\b(recipe|food|cook|restaurant|eat|drink|coffee|lunch)\b/,
+        /\b(stock|price|bitcoin|crypto|invest|finance|economy)\b/,
+        /\b(movie|film|show|series|netflix|spotify|music|song|album)\b/,
+        /\b(sport|football|soccer|basketball|baseball|nfl|nba|fifa)\b/,
+        /\b(politics|president|government|election|vote|country|war)\b/,
+        /\b(math|calculate|algebra|calculus|geometry|equation|formula)\b/,
+        /\b(history|geography|science|biology|chemistry|physics)\b/,
+        /\b(travel|hotel|flight|vacation|trip|holiday)\b/,
+        /\b(translate|language|spanish|french|chinese|japanese|german)\b/,
+        /\b(joke|funny|meme|story|poem|essay|write me a)\b/,
+        /\b(what is (the|a) capital|how old is|who is|who was|when did|where is)\b/,
+        /\b(relationship|dating|friend|family|personal)\b/,
+    ];
+    // Only flag out-of-scope when there is a clear off-topic signal pattern
+    return outOfScopePatterns.some(p => p.test(t));
+}
+
 
 
 /* Keyboard shortcuts help block — clean, scannable; Mac (⌘) and Windows (Ctrl). */
@@ -592,7 +630,6 @@ const ShortcutsHelpContent = () => (
         <table className="sb-ai-agent__shortcuts-table">
             <tbody>
                 <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + /</td><td>Toggle/Close AI Agent</td></tr>
-                <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + s</td><td>Reset AI Agent Configuration</td></tr>
             </tbody>
         </table>
     </div>
@@ -769,7 +806,7 @@ const buildResponse = (actionId, pageContext) => {
                 }, 1500);
             };
 
-            const SkillsRouterSkillCard = ({ theme, num, titleLine, path, trigger, sideEffects }) => {
+            const SkillsRouterSkillCard = ({ theme, num, titleLine, path, trigger }) => {
                 const tags = parseTriggerLabels(trigger);
                 return (
                     <li className={`sb-ai-agent__skill-card sb-ai-agent__skill-card--${theme}`}>
@@ -796,10 +833,6 @@ const buildResponse = (actionId, pageContext) => {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="sb-ai-agent__skill-card__field">
-                                    <span className="sb-ai-agent__skill-card__label">Side Effects:</span>
-                                    <p className="sb-ai-agent__skill-card__sideeffects">{sideEffects}</p>
-                                </div>
                             </div>
                         </div>
                     </li>
@@ -822,7 +855,6 @@ const buildResponse = (actionId, pageContext) => {
                                 titleLine={<>🧱 <strong className="sb-ai-agent__skill-card__name">uno-prototype</strong></>}
                                 path=".agent/skills/uno-prototype/SKILL.md"
                                 trigger={'"scaffold", "new prototype", "create playground"'}
-                                sideEffects="Creates files in playground/"
                             />
                             <SkillsRouterSkillCard
                                 theme="review"
@@ -830,7 +862,6 @@ const buildResponse = (actionId, pageContext) => {
                                 titleLine={<>🔍 <strong className="sb-ai-agent__skill-card__name">uno-review</strong></>}
                                 path=".agent/skills/uno-review/SKILL.md"
                                 trigger={'"review", "check", "validate", "quality check"'}
-                                sideEffects="Read-only"
                             />
                             <SkillsRouterSkillCard
                                 theme="post"
@@ -838,7 +869,6 @@ const buildResponse = (actionId, pageContext) => {
                                 titleLine={<>🚀 <strong className="sb-ai-agent__skill-card__name">uno-post</strong></>}
                                 path=".agent/skills/uno-post/SKILL.md"
                                 trigger={'"submit", "publish", "add to market"'}
-                                sideEffects="Writes marketplace data file"
                             />
                             <SkillsRouterSkillCard
                                 theme="compound"
@@ -846,13 +876,26 @@ const buildResponse = (actionId, pageContext) => {
                                 titleLine={<>🧠 <strong className="sb-ai-agent__skill-card__name">uno-compound</strong></>}
                                 path=".agent/skills/uno-compound/SKILL.md"
                                 trigger={'"document", "write up", "compound", "save learning"'}
-                                sideEffects="Writes solution doc, may propose instruction edits"
+                            />
+                            <SkillsRouterSkillCard
+                                theme="research"
+                                num="5"
+                                titleLine={<>🔬 <strong className="sb-ai-agent__skill-card__name">uno-research</strong></>}
+                                path=".agent/skills/uno-research/SKILL.md"
+                                trigger={'"what is", "how does", "explore", "audit"'}
+                            />
+                            <SkillsRouterSkillCard
+                                theme="plan"
+                                num="6"
+                                titleLine={<>📋 <strong className="sb-ai-agent__skill-card__name">uno-plan</strong></>}
+                                path=".agent/skills/uno-plan/SKILL.md"
+                                trigger={'"plan", "scope", "how should we build"'}
                             />
                         </ul>
                         <div className="sb-ai-agent__skills-router-pipeline">
-                            <p className="sb-ai-agent__skills-router-pipeline-title">🔁 Pipeline (Recommendation, not a requirement)</p>
+                            <p className="sb-ai-agent__skills-router-pipeline-title">🔁 Recommended Pipeline (Flexible entry)</p>
                             <p className="sb-ai-agent__skills-router-pipeline-flow">
-                                uno-prototype → uno-review → uno-post → uno-compound
+                                uno-research → uno-plan → uno-prototype → uno-review → (iterate) → uno-post → uno-compound
                             </p>
                         </div>
                     </div>
@@ -879,7 +922,12 @@ const PANEL_DEFAULT_HEIGHT = 560;
 const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userName = 'Ashley' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
-    const [aiMode, setAiMode] = useState(() => localStorage.getItem('PLUS_AI_MODE') || null);
+    const [aiMode, setAiMode] = useState(() => {
+        const stored = localStorage.getItem('PLUS_AI_MODE');
+        if (stored) return stored;
+        localStorage.setItem('PLUS_AI_MODE', 'full');
+        return 'full';
+    });
     const [tempKey, setTempKey] = useState(() => getStoredUserApiKey());
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -909,19 +957,11 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
         if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
     }, [messages, isTyping]);
 
-    /* Keyboard shortcuts: ⌘+/ toggle panel, ⌘+Shift+/ hide, ⌘+S reset. */
+    /* Keyboard shortcuts: ⌘+/ toggle panel. */
     useEffect(() => {
         const handler = (e) => {
             const mod = e.metaKey || e.ctrlKey;
             if (!mod) return;
-
-            if (e.key.toLowerCase() === 's') {
-                e.preventDefault();
-                localStorage.removeItem('PLUS_AI_MODE');
-                setAiMode(null);
-                setMessages([]);
-                return;
-            }
 
             if (e.key !== '/') return;
             e.preventDefault();
@@ -989,12 +1029,59 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
         setTimeout(() => { setIsTyping(false); setMessages(p => [...p, { role: 'bot', content }]); }, 900);
     };
 
-    /* Match free‑text to an action (for non-navigation queries) */
+    /* Match free-text to a quick action — only on strong, unambiguous signals */
     const matchAction = (text) => {
-        const t = text.toLowerCase();
-        if (t.includes('explain')) return 'explain';
-        if (t.includes('skill')) return 'skills';
+        const t = text.toLowerCase().trim();
+        // Only match 'explain' when it refers to the current screen/story, not a component name
+        if (/\b(explain this screen|explain this page|what is on this screen)\b/.test(t)) return 'explain';
+        // Only match 'skills' on explicit skill-router phrasing
+        if (/\b(skills router|show skills|list skills|what skills|which skill|uno skills)\b/.test(t)) return 'skills';
         return null;
+    };
+
+    /* Check if the user's text matches a skill trigger keyword from the Skills Router.
+     * IMPORTANT: only use patterns that are unambiguous and NOT shared with component questions.
+     * Patterns like "what is", "how does", "explore", "review", "plan", "check" are intentionally
+     * excluded here because they are also valid component guidance phrases. */
+    const matchSkillIntent = (text) => {
+        const t = text.toLowerCase().trim();
+
+        // Explicit skill name mention (with or without dash) always wins → Skills Router
+        if (/\buno[\s-]?research\b/.test(t)) return 'research';
+        if (/\buno[\s-]?plan\b/.test(t)) return 'plan';
+        if (/\buno[\s-]?prototype\b/.test(t)) return 'prototype';
+        if (/\buno[\s-]?review\b/.test(t)) return 'review';
+        if (/\buno[\s-]?post\b/.test(t)) return 'post';
+        if (/\buno[\s-]?compound\b/.test(t)) return 'compound';
+
+        // If the text also has a component guidance intent, component wins — skip skill routing
+        if (hasComponentGuideIntent(t) || hasUsageIntent(t)) return null;
+
+        const skillTriggers = [
+            // research: only unambiguous workflow signals (NOT "what is" / "how does" — those are component questions)
+            { id: 'research', patterns: [/\baudit the\b/, /\baudit our\b/, /\bresearch this\b/, /\bdo a research\b/] },
+            // plan: require explicit build/design planning context, not just the word "plan"
+            { id: 'plan',     patterns: [/\bhow should (we|i) build\b/, /\bscope (this|the|a) (feature|project|work)\b/, /\bplanning (this|the) (feature|project|work)\b/] },
+            // prototype: all patterns are specific enough
+            { id: 'prototype',patterns: [/\bscaffold\b/, /\bnew prototype\b/, /\bcreate playground\b/] },
+            // review: require "review this prototype/design/playground" phrasing, not "review this component"
+            { id: 'review',   patterns: [/\bquality check\b/, /\breview (this |my |the )?(prototype|playground|design|work)\b/, /\bvalidate (this |my |the )?(prototype|playground|design|work)\b/] },
+            // post: specific enough
+            { id: 'post',     patterns: [/\badd to market\b/, /\bsubmit (to|this) (market|marketplace)\b/] },
+            // compound: specific enough
+            { id: 'compound', patterns: [/\bsave (this |the )?learning\b/, /\bwrite (this |a )?up\b/, /\bcompound (this|the|a)\b/] },
+        ];
+        for (const skill of skillTriggers) {
+            if (skill.patterns.some(p => p.test(t))) return skill.id;
+        }
+        return null;
+    };
+
+    /* Check if extracted component token actually exists in the live story index */
+    const componentExistsInIndex = (token) => {
+        if (!token || storyIndex.length === 0) return false;
+        const matches = findBestMatch(token, storyIndex);
+        return matches.length > 0 && matches[0].score >= 70;
     };
 
     const navigateToEntry = (entry) => {
@@ -1351,65 +1438,81 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             return;
         }
 
-        if (hasNavigationIntent(text)) {
-            runSmartNavigation(text);
+        // ── PRIORITY 1: Unclear input — stop immediately, never guess ──
+        if (isUnclearInput(text)) {
+            respond({ type: 'fallback_unclear' });
             return;
         }
 
-        if (aiMode === 'local') {
-            // Check usage match locally, or fallback
-            const usageEntry = matchUsageGuide(text);
-            if (usageEntry) {
-                respond(usageEntry.answer);
-            } else {
-                respond(<p style={{ color: 'var(--color-error)' }}>⚠️ Large Language Model features are disabled in Local Mode. Turn on Mode 1 to chat with AI.</p>);
-            }
-            return;
-        }
-
-        /* Component Guide & Usage Intent: route ALL questions through ChatGPT API */
-        if (hasComponentGuideIntent(text) || hasUsageIntent(text)) {
-            const parsed = parseComponentGuideQuery(text);
-
-            // "Explain this" / "What does this do" → use current story context
-            if (parsed?.type === 'context') {
-                const storyId = getCurrentStoryId();
-                fetchAIResponse('screen_explain', 'Explain this screen / component', { storyId, pageContext });
-                return;
-            }
-
-            // Build a clean query for GPT
-            const componentQuery = parsed?.tokens?.join(' vs ') || text;
-
-            // Always use ChatGPT API for usage / comparison questions in full mode (no hardcoded USAGE_GUIDE shortcut)
-            fetchAIResponse('component_usage', text, {
-                query: componentQuery,
-                parsed,
-                pageContext,
-                designSystem: 'PLUS UNO Design System (React Bootstrap)'
-            });
-            return;
-        }
-
-
-        /* Typed quick-action keyword */
+        // ── PRIORITY 2: Explicit quick-action keyword match (e.g. "new starter kit") ──
         const quickActionId = matchQuickActionByKeyword(text);
         if (quickActionId) {
             handleQuickAction(quickActionId);
             return;
         }
 
-        const matched = matchAction(text);
-        if (matched) {
-            respond(buildResponse(matched, pageContext));
-        } else {
-            // Smart Nav Fallback: if text strongly matches a story, navigate!
-            const matches = findBestMatch(text, storyIndex);
-            if (matches.length > 0 && matches[0].score >= 90) {
-                runSmartNavigation(text);
-            } else {
-                respond({ type: 'fallback_clarify', text });
+        // ── PRIORITY 3: Skill intent — must be checked BEFORE component guidance ──
+        // Prevents "plan", "how should we build", etc. from leaking into GPT component_usage
+        const skillIntent = matchSkillIntent(text);
+        if (skillIntent) {
+            handleQuickAction('skills');
+            return;
+        }
+
+        // ── PRIORITY 4: Explicit screen-explain or skills-router phrasing ──
+        const explicitAction = matchAction(text);
+        if (explicitAction) {
+            respond(buildResponse(explicitAction, pageContext));
+            return;
+        }
+
+        // ── PRIORITY 5: Navigation intent ──
+        if (hasNavigationIntent(text)) {
+            runSmartNavigation(text);
+            return;
+        }
+
+        // ── PRIORITY 6: Component guidance — only if a real component token exists in the story index ──
+        if (hasComponentGuideIntent(text) || hasUsageIntent(text)) {
+            const parsed = parseComponentGuideQuery(text);
+
+            // "Explain this" / "What does this do" → screen context
+            if (parsed?.type === 'context') {
+                const storyId = getCurrentStoryId();
+                fetchAIResponse('screen_explain', 'Explain this screen / component', { storyId, pageContext });
+                return;
             }
+
+            // Only proceed to GPT if at least one token resolves to a real story in the index
+            const tokens = parsed?.tokens || [];
+            const hasVerifiedComponent = tokens.length === 0 || tokens.some(t => componentExistsInIndex(t));
+
+            if (hasVerifiedComponent) {
+                const componentQuery = tokens.join(' vs ') || text;
+                fetchAIResponse('component_usage', text, {
+                    query: componentQuery,
+                    parsed,
+                    pageContext,
+                    designSystem: 'PLUS UNO Design System (React Bootstrap)'
+                });
+                return;
+            }
+
+            // Token didn't resolve to a known component — fall through to nav or fallback
+        }
+
+        // ── PRIORITY 7: Strong story index match → navigate ──
+        const storyMatches = findBestMatch(text, storyIndex);
+        if (storyMatches.length > 0 && storyMatches[0].score >= 90) {
+            runSmartNavigation(text);
+            return;
+        }
+
+        // ── PRIORITY 8: Out of scope or no reliable match ──
+        if (isOutOfScope(text)) {
+            respond({ type: 'fallback_out_of_scope' });
+        } else {
+            respond({ type: 'fallback_unclear' });
         }
     };
 
@@ -1439,7 +1542,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                             <LogoContainer size="default" />
                             <div className="sb-ai-agent__header-text">
                                 <h3 className="sb-ai-agent__header-name">PLUS UNO</h3>
-                                <span className="sb-ai-agent__header-sub">INLINE AI AGENT</span>
+                                <span className="sb-ai-agent__header-sub">STORYBOOK ASSISTANT</span>
                             </div>
                         </div>
                         <div className="sb-ai-agent__header-actions">
@@ -1454,58 +1557,12 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
 
                     {/* Main - Scrollable Body */}
                     <div className="sb-ai-agent__body" ref={bodyRef}>
-                        {!aiMode ? (
-                            <div className="sb-ai-agent__setup" style={{ padding: 24, paddingBottom: 0 }}>
-                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                <h4 style={{ marginTop: 16, marginBottom: 8, color: 'var(--color-on-surface)' }}>Welcome to the Inline Agent</h4>
-                                
-                                <div style={{ background: 'var(--color-surface-container-high)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
-                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 1: Full AI Functionality</p>
-                                    <p style={{ fontSize: 11, color: 'var(--color-on-surface-variant)', marginBottom: 8, lineHeight: 1.4 }}>
-                                        Paste a key below, or define <code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code> in <code>.env</code> and restart Storybook — then you can start Mode 1 without typing it here (localStorage still overrides env if set).
-                                    </p>
-                                    <input 
-                                        type="password" 
-                                        placeholder="sk-... (optional if set in .env)" 
-                                        value={tempKey} 
-                                        onChange={e => setTempKey(e.target.value)} 
-                                        style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-outline)', marginBottom: 12, outline: 'none' }}
-                                    />
-                                    <button 
-                                        disabled={!tempKey.trim() && !getEnvApiKey()}
-                                        onClick={() => {
-                                            const typed = tempKey.trim();
-                                            if (typed) {
-                                                localStorage.setItem('PLUS_AI_API_KEY', typed);
-                                            }
-                                            localStorage.setItem('PLUS_AI_MODE', 'full');
-                                            setAiMode('full');
-                                        }}
-                                        style={{ background: 'var(--color-primary)', color: 'white', padding: '10px 16px', borderRadius: 8, border: 'none', fontWeight: 600, width: '100%', cursor: (tempKey.trim() || getEnvApiKey()) ? 'pointer' : 'not-allowed', opacity: (tempKey.trim() || getEnvApiKey()) ? 1 : 0.5 }}
-                                    >Save Key & Start Mode 1</button>
-                                </div>
-                                
-                                <div style={{ background: 'var(--color-surface-container)', padding: 16, borderRadius: 12 }}>
-                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 2: Local Processing</p>
-                                    <p style={{ fontSize: 12, color: 'var(--color-on-surface-variant)', marginBottom: 12, lineHeight: 1.4 }}>
-                                        Hide or disable the remote LLM AI features to prevent excessive API usage.
-                                    </p>
-                                    <button 
-                                        onClick={() => {
-                                            localStorage.setItem('PLUS_AI_MODE', 'local');
-                                            setAiMode('local');
-                                        }}
-                                        style={{ background: 'transparent', color: 'var(--color-primary)', padding: '10px 16px', borderRadius: 8, border: '1px solid var(--color-primary)', fontWeight: 600, width: '100%', cursor: 'pointer' }}
-                                    >Continue in Mode 2 (No API Key)</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
+                        <>
                                 {/* Welcome Message */}
                                 <div className="sb-ai-agent__welcome-msg">
                                     <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
                                     <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
-                                        Welcome to PLUS UNO Inline Agent. How can I assist you today?
+                                        Welcome to Storybook Assistant. How can I assist you today?
                                     </div>
                                 </div>
                                 <p className="sb-ai-agent__tip">
@@ -1533,11 +1590,14 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                             )}
                                             {m.noBubble ? (
                                                 m.content
-                                            ) : m.role === 'bot' && m.content?.type === 'fallback_clarify' ? (
+                                            ) : m.role === 'bot' && (m.content?.type === 'fallback_unclear' || m.content?.type === 'fallback_out_of_scope') ? (
                                                 <div className="sb-ai-agent__bot-message-stack">
                                                     <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
                                                         <p style={{ margin: 0 }}>
-                                                            I couldn&apos;t understand your request: &quot;<em>{m.content.text}</em>&quot;. Try rephrasing or pick a quick action below.
+                                                            {m.content.type === 'fallback_out_of_scope'
+                                                                ? "That\u2019s outside my scope right now. Try rephrasing your question or pick a quick action below."
+                                                                : "I\u2019m not sure what you mean yet. Try rephrasing your question or pick a quick action below."
+                                                            }
                                                         </p>
                                                     </div>
                                                     <div className="sb-ai-agent__quick-actions sb-ai-agent__quick-actions--below-bubble">
@@ -1584,30 +1644,27 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                     )}
                                 </div>
                             </>
-                        )}
                     </div>
 
                     {/* Footer / Input */}
-                    {aiMode && (
-                        <div className="sb-ai-agent__footer">
-                            <div className="sb-ai-agent__input-container">
-                                <div className="sb-ai-agent__input-wrapper">
-                                    <input
-                                        ref={inputRef}
-                                        className="sb-ai-agent__input"
-                                        type="text"
-                                        placeholder={aiMode === 'local' ? "Chat disabled (Local Mode)" : "Ask me anything..."}
-                                        value={inputValue}
-                                        onChange={e => setInputValue(e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && handleSend()}
-                                    />
-                                    <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
-                                        <Icons.Send />
-                                    </button>
-                                </div>
+                    <div className="sb-ai-agent__footer">
+                        <div className="sb-ai-agent__input-container">
+                            <div className="sb-ai-agent__input-wrapper">
+                                <input
+                                    ref={inputRef}
+                                    className="sb-ai-agent__input"
+                                    type="text"
+                                    placeholder="Ask me anything..."
+                                    value={inputValue}
+                                    onChange={e => setInputValue(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleSend()}
+                                />
+                                <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
+                                    <Icons.Send />
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
 
                 </div>
 
