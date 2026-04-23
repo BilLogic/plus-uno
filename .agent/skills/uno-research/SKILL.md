@@ -47,6 +47,17 @@ Stay within ~3K tokens of Tier 2 context. Load the INDEX first, then only the sp
 
 ## Workflow
 
+### Step 0: Classify the Question
+
+Determine which type of research question this is:
+- Structural (layout, IA, flow)
+- Component-level (UI elements, props, usage)
+- Token-level (spacing, color, typography)
+- Product/domain (user flow, feature logic)
+- Prior knowledge/lessons
+
+Use this classification to guide search depth, source selection, and which references to load first.
+
 ### Step 1: Check Prior Knowledge
 
 Read `docs/knowledge/INDEX.md` to determine if prior knowledge exists for the topic. If a relevant domain file exists, load it before searching further.
@@ -61,6 +72,13 @@ Search for existing artifacts related to the query:
 - Solution docs: `docs/knowledge/lessons/`
 
 Use Glob for file discovery, Grep for content matching. Cast a wide net first, then narrow.
+
+### Step 2.5: Use Discovery References (if needed)
+
+- If exploring available components or patterns, read `references/component-discovery.md`.
+- If onboarding or understanding system concepts, read `references/learning.md`.
+
+Use these references to guide where and how to search.
 
 ### Step 3: Search Notion (if relevant)
 
@@ -85,6 +103,9 @@ Present findings as a structured research brief:
 ```
 ## Research Brief: {topic}
 
+### Type
+- {Structural / Component / Token / Product / Knowledge}
+
 ### Findings
 - {finding 1} — source: `{file path or Notion page}`
 - {finding 2} — source: `{file path}`
@@ -106,6 +127,12 @@ If the research reveals that planning or building is needed next:
 2. Suggest `/uno:plan` to scope the implementation
 
 If the user only needed an answer (no follow-up work), skip the handoff file.
+
+## Not for Use
+
+- Do NOT use for:
+  - Simple, well-defined questions with direct answers
+  - Tasks that already have clear implementation direction
 
 ## Constraints
 
