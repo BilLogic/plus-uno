@@ -153,6 +153,22 @@ jobs:
               labels: ['design-system', 'figma-sync']
             });
 
+      - name: Update Notion PRD status
+        if: steps.commit.outputs.changes == 'true'
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_PRD_ID: ${{ steps.payload.outputs.notion_prd_id }}
+        run: |
+          if [ -n "$NOTION_PRD_ID" ]; then
+            # Update to "In Review" now that a PR exists
+            curl -s -X PATCH "https://api.notion.com/v1/pages/${NOTION_PRD_ID}" \
+              -H "Authorization: Bearer ${NOTION_API_KEY}" \
+              -H "Notion-Version: 2022-06-28" \
+              -H "Content-Type: application/json" \
+              -d '{"properties": {"Status": {"select": {"name": "In Review"}}}}' || true
+            echo "   ✅ Notion PRD status → In Review"
+          fi
+
       - name: React to Slack message (result)
         if: always() && steps.payload.outputs.channel && steps.payload.outputs.message_ts
         env:
