@@ -1,9 +1,11 @@
 ---
 name: uno-plan
 description: >
-  Scope features, plan implementations, and create structured briefs. Use when
-  the user asks "How should we build...", "Plan this...", "Scope this...", or
-  needs a structured implementation plan before prototyping.
+  This is a planning skill used before implementation. It scopes features,
+  plans implementations, and creates structured briefs that bridge product
+  ideas to prototype execution. Use when the user asks "How should we build...",
+  "Plan this...", "Scope this...", or needs a structured implementation plan
+  before prototyping.
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Write
 ---
@@ -40,6 +42,7 @@ Load on-demand based on the planning scope:
 | Component selection | `docs/context/design-system/components/inventory.md` |
 | Token selection | `docs/context/design-system/foundations/tokens.md` → `styles/` |
 | Research handoff exists | `.agent/handoffs/briefs/{relevant-brief}.md` |
+| Layout / IA unclear | `references/consulting.md` |
 
 Stay within ~4K tokens of Tier 2 context. Load foundations first, then specifics.
 
@@ -106,6 +109,11 @@ Present the plan as a structured brief:
 - Fidelity: {low / mid / high}
 - Product pillar: {admin / home / toolkit / training / profile / login / universal}
 
+### Assumptions (Optional)
+- {assumption 1}
+- {assumption 2}
+- {assumption 3}
+
 ### Components
 | Component | Source | Usage |
 |-----------|--------|-------|
@@ -146,6 +154,19 @@ If the user wants to iterate on the plan, revise in place before writing the han
 - **No assumptions about props**: Note which components are needed but defer prop verification to the prototype phase.
 - **Respect inventory**: If a needed component does not exist in the inventory, flag it as a gap — do not plan to create it without discussion.
 - **Concrete paths**: Every file reference in the plan must be a real path or a clearly marked new-file proposal.
+
+## Not for Use
+
+- Do NOT use for:
+  - Small UI tweaks or single-component changes
+  - Direct implementation or coding requests
+  - Debugging or fixing issues
+
+## Failure Handling
+
+- If research context is missing → proceed with user input but clearly note assumptions.
+- If component inventory is insufficient → flag as a gap and ask for discussion.
+- If token selection is unclear → propose best-fit options and confirm with the user.
 
 ## Next Step
 
