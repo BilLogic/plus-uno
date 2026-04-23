@@ -2,8 +2,8 @@
 
 Use the following repository-local examples as style references for report tone and structure:
 
-- `references/examples/uno-research-audit-example.md`
-- `references/examples/uno-plan-audit-example.md`
+- `references/skill-quality/examples/uno-research-audit-example.md`
+- `references/skill-quality/examples/uno-plan-audit-example.md`
 
 Optional local-only sources (may not exist on other machines):
 
@@ -20,7 +20,7 @@ Optional local-only sources (may not exist on other machines):
 
 ## Important Constraint
 
-The template in `references/output-template.md` is the mandatory output structure.
+The template in `references/skill-quality/output-template.md` is the mandatory output structure.
 The PDF examples are style references, not a schema override.
 
 ## Portability Rule

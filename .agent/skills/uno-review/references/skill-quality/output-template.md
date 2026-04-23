@@ -9,7 +9,7 @@ Use this exact structure for all audits.
 ### Audit Scope
 - Target skill(s): `{path or list of paths}`
 - Audit date: `{YYYY-MM-DD}`
-- Checklist source: `references/checklist.md`
+- Checklist source: `references/skill-quality/checklist.md`
 
 ### Executive Summary
 - Overall result: `{Ready / Needs Revision / Major Revision Required}`
