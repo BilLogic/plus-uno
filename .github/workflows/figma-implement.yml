@@ -37,7 +37,20 @@ jobs:
             echo "notion_prd_id=${{ github.event.client_payload.notion_prd_id }}" >> $GITHUB_OUTPUT
             echo "notion_prd_url=${{ github.event.client_payload.notion_prd_url }}" >> $GITHUB_OUTPUT
             echo "thread_ts=${{ github.event.client_payload.thread_ts }}" >> $GITHUB_OUTPUT
+            echo "channel=${{ github.event.client_payload.channel }}" >> $GITHUB_OUTPUT
+            echo "message_ts=${{ github.event.client_payload.message_ts }}" >> $GITHUB_OUTPUT
           fi
+
+      - name: React to Slack message (working)
+        if: steps.payload.outputs.channel && steps.payload.outputs.message_ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          # Add gear reaction to show we're working on it
+          curl -s -X POST "https://slack.com/api/reactions.add" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"gear\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -139,6 +152,34 @@ jobs:
               issue_number: pr.data.number,
               labels: ['design-system', 'figma-sync']
             });
+
+      - name: React to Slack message (result)
+        if: always() && steps.payload.outputs.channel && steps.payload.outputs.message_ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          HAS_CHANGES="${{ steps.commit.outputs.changes }}"
+          JOB_STATUS="${{ job.status }}"
+
+          # Remove gear reaction
+          curl -s -X POST "https://slack.com/api/reactions.remove" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"gear\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
+
+          # Add result reaction
+          if [ "$JOB_STATUS" = "success" ] && [ "$HAS_CHANGES" = "true" ]; then
+            EMOJI="white_check_mark"
+          elif [ "$JOB_STATUS" = "success" ]; then
+            EMOJI="information_source"
+          else
+            EMOJI="x"
+          fi
+
+          curl -s -X POST "https://slack.com/api/reactions.add" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"$EMOJI\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
 
       - name: Notify Slack
         if: always()
