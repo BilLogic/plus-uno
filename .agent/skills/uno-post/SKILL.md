@@ -23,6 +23,13 @@ Proactively suggest this skill when:
 
 **Never auto-invoke this skill.** Always require the user to explicitly request publishing. This skill writes to the marketplace data file — it must be intentional.
 
+## Not for Use
+
+- Do NOT use for:
+  - Prototypes that have not passed `/uno:review`
+  - Requests focused on implementation or debugging work
+  - Metadata-only edits when the user has not requested publishing
+
 ## Protocol
 
 ### Phase 1: Collect Metadata
@@ -64,6 +71,13 @@ If `deploymentUrl` is null, follow `references/deployment-guide.md` to help the 
 ## Confirmation
 
 Before writing to the file, show the designer the generated entry object and the target file path. See `examples/marketplace-entry-example.md` for the expected format. **Wait for explicit confirmation before writing.**
+
+## Failure Handling
+
+- If required metadata is missing, stop before write and ask for the missing fields.
+- If generated `id` already exists in `prototypes-data.js`, ask for rename or explicit overwrite confirmation.
+- If target file/schema does not match expected `prototypes` array structure, stop and report the mismatch.
+- If user confirmation is not explicit, do not write any file and return draft entry only.
 
 ## Post-Submit Checklist
 
