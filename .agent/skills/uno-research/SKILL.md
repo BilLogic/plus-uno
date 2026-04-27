@@ -62,6 +62,13 @@ Search for existing artifacts related to the query:
 
 Use Glob for file discovery, Grep for content matching. Cast a wide net first, then narrow.
 
+### Step 2.5: Use Discovery References (if needed)
+
+- If exploring available components or patterns, read `references/component-discovery.md`.
+- If onboarding or understanding system concepts, read `references/learning.md`.
+
+Use these references to guide where and how to search.
+
 ### Step 3: Search Notion (if relevant)
 
 When the question relates to product decisions, roadmap, or design rationale, use `mcp__notion-plus__*` tools to search the PLUS Notion workspace. Only invoke if the codebase alone cannot answer the question.
@@ -106,6 +113,12 @@ If the research reveals that planning or building is needed next:
 2. Suggest `/uno:plan` to scope the implementation
 
 If the user only needed an answer (no follow-up work), skip the handoff file.
+
+## Not for Use
+
+- Do NOT use for:
+  - Simple, well-defined questions with direct answers
+  - Tasks that already have clear implementation direction
 
 ## Constraints
 
