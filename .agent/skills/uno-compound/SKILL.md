@@ -31,6 +31,13 @@ Proactively suggest this skill when:
 
 Suggest once at the end of a work session — do not interrupt mid-task.
 
+## Not for Use
+
+- Do NOT use for:
+  - Trivial edits with no transferable learning
+  - Sessions without a clear root cause, decision, or reusable pattern
+  - Requests focused only on immediate implementation with no documentation intent
+
 ## Steps
 
 ### 1. Summarize
@@ -61,6 +68,12 @@ Ask: Should this learning update broader docs? See `references/escalation-rules.
 **GATE:** Show the proposed change to the user and wait for explicit approval before modifying any agent instruction file. These files govern agent behavior across all future sessions on all platforms — changes must be intentional.
 
 If approved, make the update and cite the solution doc as the source.
+
+## Failure Handling
+
+- If domain mapping is unclear, propose the best-fit lessons file and ask the user to confirm before appending.
+- If evidence is insufficient for a reliable lesson entry, return a draft with assumptions and ask for missing details.
+- If user approval is not given for instruction-file updates, keep changes to the solution doc only and stop.
 
 ## Next Step
 
