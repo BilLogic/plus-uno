@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ButtonGroup from './ButtonGroup';
 import Button from '@/components/Button/Button';
 
@@ -90,87 +91,6 @@ function ButtonGroupSizesDemos() {
                         size="large"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
                     />
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function ButtonGroupStylesAndFillsDemos() {
-    return (
-        <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STYLES & FILLS</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Button groups inherit the style system from Button, supporting multiple color themes and fill variants.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Tonal (Default)</p>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                        {['primary', 'secondary', 'tertiary'].map(styleVal => (
-                            <ButtonGroup
-                                key={styleVal}
-                                style={styleVal}
-                                fill="tonal"
-                                buttons={[
-                                    { text: styleVal.charAt(0).toUpperCase() + styleVal.slice(1) },
-                                    { text: 'Action' }
-                                ]}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                <div>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Filled</p>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                        {['primary', 'secondary', 'tertiary'].map(styleVal => (
-                            <ButtonGroup
-                                key={styleVal}
-                                style={styleVal}
-                                fill="filled"
-                                buttons={[
-                                    { text: styleVal.charAt(0).toUpperCase() + styleVal.slice(1) },
-                                    { text: 'Action' }
-                                ]}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                <div>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Outline</p>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                        {['primary', 'secondary', 'tertiary'].map(styleVal => (
-                            <ButtonGroup
-                                key={styleVal}
-                                style={styleVal}
-                                fill="outline"
-                                buttons={[
-                                    { text: styleVal.charAt(0).toUpperCase() + styleVal.slice(1) },
-                                    { text: 'Action' }
-                                ]}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                <div>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>Ghost</p>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                        {['primary', 'secondary', 'tertiary'].map(styleVal => (
-                            <ButtonGroup
-                                key={styleVal}
-                                style={styleVal}
-                                fill="ghost"
-                                buttons={[
-                                    { text: styleVal.charAt(0).toUpperCase() + styleVal.slice(1) },
-                                    { text: 'Action' }
-                                ]}
-                            />
-                        ))}
-                    </div>
                 </div>
             </div>
         </section>
@@ -304,12 +224,6 @@ export const Sizes = () => (
     </div>
 );
 
-export const StylesAndFills = () => (
-    <div style={bgCol}>
-        <ButtonGroupStylesAndFillsDemos />
-    </div>
-);
-
 export const Layout = () => (
     <div style={bgCol}>
         <ButtonGroupLayoutDemos />
@@ -334,22 +248,7 @@ export const Children = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={bgCol}>
-        <ButtonGroupSizesDemos />
-        <ButtonGroupStylesAndFillsDemos />
-        <ButtonGroupLayoutDemos />
-        <ButtonGroupCountsDemos />
-        <ButtonGroupUseCasesDemos />
-        <ButtonGroupChildrenDemos />
-    </div>
-);
-
-/**
- * Interactive Playground
- * Customize the button group attributes in real-time.
- */
-export const Interactive = (args) => {
+function renderButtonGroupPlayground(args) {
     const buttonLabels = ['Left', 'Center', 'Right', 'Fourth', 'Fifth'];
     const buttons = Array.from({ length: args.buttonCount || 3 }, (_, i) => ({
         text: buttonLabels[i] || `Button ${i + 1}`
@@ -361,12 +260,27 @@ export const Interactive = (args) => {
             buttons={buttons}
         />
     );
-};
+}
 
-Interactive.args = {
+const buttonGroupPlaygroundArgs = {
     size: 'medium',
     style: 'primary',
     fill: 'tonal',
     vertical: false,
     buttonCount: 3
 };
+
+export const Overview = renderButtonGroupPlayground;
+Overview.args = { ...buttonGroupPlaygroundArgs };
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.buttonGroup }
+    }
+};
+
+/**
+ * Interactive Playground
+ * Customize the button group attributes in real-time.
+ */
+export const Interactive = renderButtonGroupPlayground;
+Interactive.args = { ...buttonGroupPlaygroundArgs };

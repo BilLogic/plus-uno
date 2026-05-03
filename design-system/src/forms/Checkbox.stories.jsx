@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Checkbox from './Checkbox';
 
 export default {
@@ -171,6 +172,17 @@ function CheckboxInteractionStatesDemos() {
         </div>
     );
 }
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Checkbox id="cb-overview" name="cb-overview" label="Option" defaultChecked />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formCheckbox }
+    }
+};
 
 export const Content = () => (
     <div style={pageWrap}>

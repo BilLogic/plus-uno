@@ -2,7 +2,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AlertStories from './Alert.stories.jsx';
 import * as AlertSubStories from './Alert.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={AlertStories} />
 
@@ -19,10 +19,20 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Title optional, dismissible toggle, and rich body content.</>}>
+    <Canvas of={AlertStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Title optional, dismissible toggle, and rich body content.</>}>
-    <Canvas of={AlertStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Title optional, body-only, non-dismissible, and rich HTML body patterns.</>}>
+    <DsCanvasQuiet of={AlertStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -32,7 +42,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 ### Styles
 
 <DocsCanvasShell description={<>Semantic styles with title and dismissible chrome.</>}>
-    <Canvas of={AlertStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={AlertStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -42,11 +52,11 @@ Provide contextual feedback messages for typical user actions with the handful o
 ### Anatomy
 
 <DocsCanvasShell description={<>Internal title and message layout inside the alert shell.</>}>
-    <Canvas of={AlertSubStories.ContentStructure} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={AlertSubStories.ContentStructure} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Dismiss control.</>}>
-    <Canvas of={AlertSubStories.DismissButton} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={AlertSubStories.DismissButton} />
 </DocsCanvasShell>
 
 </div>

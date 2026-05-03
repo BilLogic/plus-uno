@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Jumbotron from './Jumbotron';
 
 export default {
@@ -142,12 +143,18 @@ export const Sizes = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <JumbotronBasicDemo />
-        <JumbotronActionsDemo />
-        <JumbotronSizesDemo />
+    <div style={{ width: '100%' }}>
+        <Jumbotron
+            title="Hello, world!"
+            children="This is a simple hero unit."
+        />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.jumbotron }
+    }
+};
 
 export const Interactive = Template.bind({});
 Interactive.args = {

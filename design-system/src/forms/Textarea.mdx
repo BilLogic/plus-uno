@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TextareaStories from './Textarea.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={TextareaStories} />
 
@@ -18,10 +18,20 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Long form (boxed) textarea with label and placeholder.</>}>
+    <Canvas of={TextareaStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Styles
 
 <DocsCanvasShell description={<>Long (boxed) and short (underlined) styles.</>}>
-    <Canvas of={TextareaStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TextareaStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -31,11 +41,11 @@ Use text area for multi-line text input form fields.
 ### Interaction states
 
 <DocsCanvasShell description={<>Long form: default, focus, filled, error, disabled, read-only.</>}>
-    <Canvas of={TextareaStories.InteractionStatesLong} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TextareaStories.InteractionStatesLong} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Short form: same state matrix.</>}>
-    <Canvas of={TextareaStories.InteractionStatesShort} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TextareaStories.InteractionStatesShort} />
 </DocsCanvasShell>
 
 </div>

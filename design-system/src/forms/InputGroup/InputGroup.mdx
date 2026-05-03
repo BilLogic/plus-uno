@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputGroupStories from './InputGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={InputGroupStories} />
 
@@ -19,10 +19,20 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Text prefix and icon suffix around the input.</>}>
+    <Canvas of={InputGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Baseline input field with addons on both sides.</>}>
-    <Canvas of={InputGroupStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputGroupStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -32,7 +42,7 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 ### Variants
 
 <DocsCanvasShell description={<>Selection and action addon patterns.</>}>
-    <Canvas of={InputGroupStories.Variants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputGroupStories.Variants} />
 </DocsCanvasShell>
 
 </div>
@@ -42,7 +52,7 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large input groups.</>}>
-    <Canvas of={InputGroupStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputGroupStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -52,7 +62,7 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, disabled, and read-only input groups.</>}>
-    <Canvas of={InputGroupStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputGroupStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

@@ -268,9 +268,11 @@ const preview = {
         setTimeout(() => window.__setAIContext(activeContext), 0);
       }
 
-      // Disable state changes/interactivity for all docs examples EXCEPT 'Interactive'
+      // Disable pointer interaction for static docs examples (keeps scroll/canvas stable).
+      // Allow 'Interactive' and 'Overview' so docs canvases with Controls stay usable.
       if (
-        context.name !== 'Interactive' && 
+        context.name !== 'Interactive' &&
+        context.name !== 'Overview' &&
         (context.title.startsWith('Components/') || context.title.startsWith('Forms/'))
       ) {
          return (

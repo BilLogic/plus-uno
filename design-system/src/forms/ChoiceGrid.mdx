@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ChoiceGridStories from './ChoiceGrid.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ChoiceGridStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Single-row radio grid with one selected column.</>}>
+    <Canvas of={ChoiceGridStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Variants
 
 <DocsCanvasShell description={<>Radio (single per row) and checkbox (multiple per row).</>}>
-    <Canvas of={ChoiceGridStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ChoiceGridStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Several rows against the same column headers.</>}>
-    <Canvas of={ChoiceGridStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ChoiceGridStories.Layout} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Disabled grid.</>}>
-    <Canvas of={ChoiceGridStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ChoiceGridStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

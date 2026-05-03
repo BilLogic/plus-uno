@@ -2,7 +2,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BadgeStories from './Badge.stories.jsx';
 import * as BadgeSubStories from './Badge.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BadgeStories} />
 
@@ -19,14 +19,24 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Icons, counters, and dismissible badge patterns.</>}>
+    <Canvas of={BadgeStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Leading icons, counters, and dismissible patterns.</>}>
-    <Canvas of={BadgeStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Recommended combinations: status, labels, counts, filters, and subcomponent wiring.</>}>
+    <DsCanvasQuiet of={BadgeStories.Content} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Label, leading icon, and trailing icon composition.</>}>
-    <Canvas of={BadgeSubStories.BadgeContent} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BadgeSubStories.BadgeContent} />
 </DocsCanvasShell>
 
 </div>
@@ -36,11 +46,11 @@ Static visual identifiers used to categorize or describe elements. They are used
 ### Styles
 
 <DocsCanvasShell description={<>Semantic and curriculum color themes.</>}>
-    <Canvas of={BadgeStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BadgeStories.Styles} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Numeric counter treatment.</>}>
-    <Canvas of={BadgeSubStories.Counter} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BadgeSubStories.Counter} />
 </DocsCanvasShell>
 
 </div>
@@ -50,7 +60,7 @@ Static visual identifiers used to categorize or describe elements. They are used
 ### Sizes
 
 <DocsCanvasShell description={<>Header and body typography scales.</>}>
-    <Canvas of={BadgeStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BadgeStories.Sizes} />
 </DocsCanvasShell>
 
 </div>

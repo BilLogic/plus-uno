@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import FileUpload from './FileUpload';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
@@ -73,6 +74,22 @@ export default {
             table: { disable: true, category: 'Development' },
         },
     },
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '800px' }}>
+        <FileUpload
+            id="file-upload-overview"
+            label="Upload files"
+            acceptedFormats={formats}
+            buttonText="Choose a file"
+        />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formFile }
+    }
 };
 
 export const Content = () => (

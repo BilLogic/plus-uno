@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Spinner from './Spinner';
 
 export default {
@@ -132,19 +133,14 @@ export const Sizes = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={col}>
-        <SpinnerVariantsDemos />
-        <SpinnerStylesDemos />
-        <SpinnerSizesDemos />
-    </div>
-);
+export const Overview = () => <Spinner variant="border" />;
 
 Overview.parameters = {
     docs: {
         description: {
-            story: 'Comprehensive view of all Loading spinner variants and sizes (single neutral color).'
-        }
+            story: 'Default border spinner. See other stories for grow, sizes, and custom animations.'
+        },
+        source: { language: 'html', code: webAppSourceSnippets.spinner }
     }
 };
 

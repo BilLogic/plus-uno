@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CascaderStories from './Cascader.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CascaderStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Empty field ready for hierarchical selection.</>}>
+    <Canvas of={CascaderStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Empty vs pre-filled path in the trigger.</>}>
-    <Canvas of={CascaderStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CascaderStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Multi-column menu: one column per hierarchy level.</>}>
-    <Canvas of={CascaderStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CascaderStories.Layout} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Disabled: closed field with no interaction.</>}>
-    <Canvas of={CascaderStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CascaderStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

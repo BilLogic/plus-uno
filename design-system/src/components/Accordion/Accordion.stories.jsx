@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Accordion from './Accordion';
 
 export default {
@@ -191,13 +192,15 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={accordionPage}>
-        <AccordionVariantsDemos />
-        <AccordionBehaviorDemos />
-        <AccordionInteractionDemos />
-        <AccordionContentDemos />
+    <div style={{ width: '100%' }}>
+        <Accordion items={sampleItems} defaultActiveKey="0" />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.accordion }
+    }
+};
 
 /**
  * Interactive Playground

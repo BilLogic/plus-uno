@@ -2,7 +2,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ListGroupStories from './ListGroup.stories.jsx';
 import * as ListGroupItemStories from './ListGroup.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ListGroupStories} />
 
@@ -18,10 +18,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Plain list group with typical items.</>}>
+    <Canvas of={ListGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Plain list, actionable items, and rows with badges.</>}>
-    <Canvas of={ListGroupStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Plain list, actionable rows, and badges inside items.</>}>
+    <DsCanvasQuiet of={ListGroupStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,15 +41,15 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Anatomy
 
 <DocsCanvasShell description={<>`ListGroup.Item` content patterns such as icon, label, badge, and disabled item rows.</>}>
-    <Canvas of={ListGroupItemStories.ListItemContent} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ListGroupItemStories.ListItemContent} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Selection anatomy for single-select and multi-select item modes.</>}>
-    <Canvas of={ListGroupItemStories.ListItemSelectionModes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ListGroupItemStories.ListItemSelectionModes} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Body scale tokens available at the item level: <code>b1</code>, <code>b2</code>, and <code>b3</code>.</>}>
-    <Canvas of={ListGroupItemStories.ListItemSizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ListGroupItemStories.ListItemSizes} />
 </DocsCanvasShell>
 
 </div>
@@ -49,7 +59,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Styles
 
 <DocsCanvasShell description={<>Semantic color styles on items.</>}>
-    <Canvas of={ListGroupStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ListGroupStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -59,7 +69,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Normal, active, and disabled items.</>}>
-    <Canvas of={ListGroupStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ListGroupStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
@@ -69,7 +79,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Flush list and horizontal arrangement.</>}>
-    <Canvas of={ListGroupStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ListGroupStories.Layout} />
 </DocsCanvasShell>
 
 </div>

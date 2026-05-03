@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DividerStories from './Divider.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={DividerStories} />
 
@@ -17,10 +17,10 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Overview
 
-<DocsCanvasShell description={<>Light and dark styles, plus the subtle opacity variant.</>}>
-    <Canvas of={DividerStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Divider thickness / size scale.</>}>
+    <Canvas of={DividerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +30,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Sizes
 
 <DocsCanvasShell description={<>Thickness tokens from small through extra large.</>}>
-    <Canvas of={DividerStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DividerStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Custom widths and a typical stacked content pattern.</>}>
-    <Canvas of={DividerStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DividerStories.Layout} />
 </DocsCanvasShell>
 
 </div>

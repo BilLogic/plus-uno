@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DatePickerStories from './DatePicker.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={DatePickerStories} />
 
@@ -19,10 +19,20 @@ Use a date picker when a user needs to select a date or a date range.
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Single date selection for a standard one-value field.</>}>
-    <Canvas of={DatePickerStories.PickDate} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Medium trigger with placeholder — opens calendar on focus.</>}>
+    <Canvas of={DatePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Example
+
+<DocsCanvasShell description={<>Single date selection with selected value summary.</>}>
+    <DsCanvasQuiet of={DatePickerStories.PickDate} />
 </DocsCanvasShell>
 
 </div>
@@ -32,7 +42,7 @@ Use a date picker when a user needs to select a date or a date range.
 ### Variants
 
 <DocsCanvasShell description={<>Paired pickers for a start and end date range.</>}>
-    <Canvas of={DatePickerStories.PickRange} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DatePickerStories.PickRange} />
 </DocsCanvasShell>
 
 </div>
@@ -42,7 +52,7 @@ Use a date picker when a user needs to select a date or a date range.
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={DatePickerStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DatePickerStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -52,7 +62,7 @@ Use a date picker when a user needs to select a date or a date range.
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, filled, disabled, and read-only.</>}>
-    <Canvas of={DatePickerStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DatePickerStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

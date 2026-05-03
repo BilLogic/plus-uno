@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import RichTextEditor from './RichTextEditor';
 
 export default {
@@ -47,6 +48,13 @@ export default {
             description: 'Minimum editor height',
             table: { category: 'Layout' }
         },
+        toolbarPreset: {
+            control: 'select',
+            options: ['compact', 'full'],
+            description:
+                'compact = Figma email/default toolbar; full = extended control set',
+            table: { category: 'Layout' }
+        },
         value: {
             table: { disable: true, category: 'Development' }
         },
@@ -67,87 +75,16 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
-
-function RichTextEditorContentDemo() {
-    return (
-        <section>
-            <h5>Default (medium)</h5>
-            <RichTextEditor
-                placeholder="Type something..."
-                minHeight={150}
-            />
-        </section>
-    );
-}
-
-function RichTextEditorSizesDemos() {
-    return (
-        <section>
-            <h5>Sizes</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <RichTextEditor
-                    size="small"
-                    placeholder="Small editor..."
-                    defaultValue="<p>Small editor content</p>"
-                    minHeight={100}
-                />
-                <RichTextEditor
-                    size="large"
-                    placeholder="Large editor..."
-                    defaultValue="<p>Large editor content</p>"
-                    minHeight={200}
-                />
-            </div>
-        </section>
-    );
-}
-
-function RichTextEditorInteractionStatesDemos() {
-    return (
-        <section>
-            <h5>Read-only and disabled</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <RichTextEditor
-                    readOnly
-                    defaultValue="<p>Read-only content cannot be edited.</p>"
-                    minHeight={120}
-                />
-                <RichTextEditor
-                    disabled
-                    placeholder="Disabled editor"
-                    minHeight={120}
-                />
-            </div>
-        </section>
-    );
-}
-
-export const Content = () => (
-    <div style={col}>
-        <RichTextEditorContentDemo />
-    </div>
-);
-
-export const Sizes = () => (
-    <div style={col}>
-        <RichTextEditorSizesDemos />
-    </div>
-);
-
-export const InteractionStates = () => (
-    <div style={col}>
-        <RichTextEditorInteractionStatesDemos />
-    </div>
-);
-
 export const Overview = () => (
-    <div style={col}>
-        <RichTextEditorContentDemo />
-        <RichTextEditorSizesDemos />
-        <RichTextEditorInteractionStatesDemos />
+    <div style={{ width: '100%' }}>
+        <RichTextEditor placeholder="Type something..." minHeight={150} />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.richTextEditor }
+    }
+};
 
 export const Interactive = (args) => {
     const [content, setContent] = useState(args.initialContent);
@@ -164,6 +101,7 @@ export const Interactive = (args) => {
                 disabled={args.disabled}
                 placeholder={args.placeholder}
                 minHeight={args.minHeight}
+                toolbarPreset={args.toolbarPreset}
                 value={content}
                 onChange={setContent}
             />
@@ -176,5 +114,6 @@ Interactive.args = {
     size: 'medium',
     readOnly: false,
     disabled: false,
-    minHeight: 200
+    minHeight: 200,
+    toolbarPreset: 'compact'
 };

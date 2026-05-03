@@ -1,27 +1,33 @@
 /*
- * Scrollspy Component Styles
- * Per design system tokens - no hardcoded values
- * Navigation bar with pills and scroll tracking
+ * Scrollspy — Figma node 72:16516 / 72:16776 (navbar + scroll region).
+ * Active pill: border = --color-primary, label = --color-primary-text, radius = --size-element-radius-md.
+ * No rule between navbar and content (Figma stacks surface-container-low on surface only).
  */
+
+// Layout wrapper for navbar + scroll region stack (stories / docs). No outer frame border.
+.plus-scrollspy-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 40.5rem; /* 648px reference width from Figma frame */
+    background-color: var(--color-surface);
+    box-sizing: border-box;
+}
 
 .plus-scrollspy-navbar {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-lg);
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-lg);
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
     background-color: var(--color-surface-container-low);
-    border-radius: var(--size-element-radius-md);
+    box-sizing: border-box;
 
-    // --- BRAND ---
+    // --- BRAND (Figma _Navbar Brand inset) ---
     .plus-scrollspy-brand {
         flex-shrink: 0;
+        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
 
         p {
-            font-family: var(--font-family-header);
-            font-size: var(--font-size-h6);
-            font-weight: var(--font-weight-title);
-            line-height: var(--font-line-height-h6);
-            color: var(--color-on-surface);
             margin: 0;
         }
     }
@@ -29,90 +35,157 @@
     // --- SPACER ---
     .plus-scrollspy-spacer {
         flex: 1;
+        min-width: 0;
     }
 
     // --- NAV LIST ---
     .plus-nav-list {
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-sm);
+        flex-wrap: wrap;
+        gap: var(--size-element-gap-md);
     }
 
     // --- NAV ITEM ---
     .plus-nav-item {
         position: relative;
 
-        // --- NAV LINK ---
         .plus-nav-link {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: var(--size-element-gap-sm);
-            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+            margin: 0;
+            padding: var(--size-element-pad-y-md) var(--size-spacing-medium-space-300);
             background-color: transparent;
+            border: var(--size-border-stroke-stroke-100) solid transparent;
             border-radius: var(--size-element-radius-md);
             text-decoration: none;
-            transition: background-color 0.2s ease;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition:
+                background-color 0.15s ease,
+                border-color 0.15s ease,
+                color 0.15s ease;
 
             .plus-nav-text {
                 font-family: var(--font-family-body);
                 font-size: var(--font-size-body1);
-                font-weight: var(--font-weight-normal);
                 line-height: var(--font-line-height-body1);
-                color: var(--color-on-surface-variant);
+                font-weight: var(--font-weight-light);
+                color: var(--color-on-surface);
             }
 
             .plus-nav-dropdown-icon {
-                font-size: var(--font-size-fa-body2-solid);
+                font-size: var(--font-size-fa-body1-solid);
+                line-height: var(--font-line-height-fa-body1);
                 color: var(--color-on-surface-variant);
             }
 
             &:hover {
-                background-color: var(--color-neutral-state-08);
+                background-color: var(--color-neutral-state-12);
             }
 
-            &.active,
-            &:focus {
-                background-color: var(--color-primary-state-16);
+            &:focus-visible {
+                outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
+                outline-offset: 2px;
+            }
+
+            /* Figma — 1px primary border, primary-text label, transparent interior */
+            &.active {
+                background-color: transparent;
+                border-color: var(--color-primary);
 
                 .plus-nav-text {
                     color: var(--color-primary-text);
-                    font-weight: var(--font-weight-semibold-1);
+                    font-weight: var(--font-weight-normal);
+                }
+
+                .plus-nav-dropdown-icon {
+                    color: var(--color-primary-text);
                 }
             }
         }
 
-        // Selected state
-        &.plus-nav-item-selected {
-            .plus-nav-link {
-                background-color: var(--color-primary-state-16);
+        &.plus-nav-item-selected .plus-nav-link {
+            background-color: transparent;
+            border-color: var(--color-primary);
 
-                .plus-nav-text {
-                    color: var(--color-primary-text);
-                    font-weight: var(--font-weight-semibold-1);
-                }
+            .plus-nav-text {
+                color: var(--color-primary-text);
+                font-weight: var(--font-weight-normal);
+            }
+
+            .plus-nav-dropdown-icon {
+                color: var(--color-primary-text);
             }
         }
     }
 
-    // --- PILLS VARIANT ---
-    &.plus-nav-pills {
-        .plus-nav-link.active {
+    // --- Navbar dropdown (PLUS Dropdown, ghost) aligned with nav links ---
+    .plus-scrollspy-nav-dropdown.pdropdown {
+        vertical-align: middle;
+
+        & > .d-inline-block {
+            line-height: 0;
+        }
+
+        .plus-nav-link {
+            /* ghost theme uses semibold on toggle; match nav weight */
+            font-weight: var(--font-weight-light);
+        }
+
+        .dropdown-menu {
+            /* keep menu above scrollable body */
+            z-index: 1080;
+        }
+    }
+
+    // Filled primary pills (legacy) — opt-in via .plus-nav-pills on .plus-nav-list
+    .plus-nav-list.plus-nav-pills {
+        .plus-nav-link.active,
+        .plus-nav-item-selected .plus-nav-link {
             background-color: var(--color-primary);
+            border-color: var(--color-primary);
 
             .plus-nav-text {
+                color: var(--color-on-primary);
+                font-weight: var(--font-weight-semibold-1);
+            }
+
+            .plus-nav-dropdown-icon {
                 color: var(--color-on-primary);
             }
         }
     }
 }
 
-// --- SCROLLSPY CONTENT ---
+.plus-scrollspy-section {
+    scroll-margin-top: var(--size-element-gap-md);
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    box-sizing: border-box;
+
+    .h4,
+    h4 {
+        margin-top: 0;
+        margin-bottom: var(--size-element-gap-xs);
+    }
+
+    .body1-txt {
+        margin: 0;
+    }
+
+    .body1-txt + .body1-txt {
+        margin-top: var(--size-element-gap-md);
+    }
+}
+
 .plus-scrollspy-content {
     position: relative;
     overflow-y: auto;
     scroll-behavior: smooth;
+    background-color: var(--color-surface);
+    box-sizing: border-box;
 
-    // Scrollbar styling
     &::-webkit-scrollbar {
         width: var(--size-element-gap-sm);
     }

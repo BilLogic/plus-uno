@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonGroupStories from './ButtonGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ButtonGroupStories} />
 
@@ -18,20 +18,10 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array when you need more custom content.</>}>
-    <Canvas of={ButtonGroupStories.Children} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Styles
-
-<DocsCanvasShell description={<>Color styles and fill treatments inherited from the Button system.</>}>
-    <Canvas of={ButtonGroupStories.StylesAndFills} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array when you need more custom content.</>}>
+    <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>
@@ -41,11 +31,11 @@ Buttons can be grouped together as individual segments of related actions.
 ### Variants
 
 <DocsCanvasShell description={<>Two through five connected segments.</>}>
-    <Canvas of={ButtonGroupStories.Counts} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ButtonGroupStories.Counts} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Common grouped patterns like pagination controls, toolbars, and segmented toggles.</>}>
-    <Canvas of={ButtonGroupStories.UseCases} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ButtonGroupStories.UseCases} />
 </DocsCanvasShell>
 
 </div>
@@ -55,7 +45,7 @@ Buttons can be grouped together as individual segments of related actions.
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large grouped buttons.</>}>
-    <Canvas of={ButtonGroupStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ButtonGroupStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -65,7 +55,7 @@ Buttons can be grouped together as individual segments of related actions.
 ### Layout
 
 <DocsCanvasShell description={<>Horizontal default versus vertical stacking.</>}>
-    <Canvas of={ButtonGroupStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ButtonGroupStories.Layout} />
 </DocsCanvasShell>
 
 </div>

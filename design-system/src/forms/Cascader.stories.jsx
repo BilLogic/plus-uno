@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Cascader from './Cascader';
 
 export default {
@@ -83,6 +84,27 @@ const sampleOptions = [
         ],
     },
 ];
+
+export const Overview = () => {
+    const [value, setValue] = useState([]);
+
+    return (
+        <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 360 }}>
+            <Cascader
+                id="cascader-overview"
+                value={value}
+                options={sampleOptions}
+                onChange={setValue}
+                placeholder="Please select"
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formCascader }
+    }
+};
 
 export const Content = () => {
     const [value1, setValue1] = useState([]);

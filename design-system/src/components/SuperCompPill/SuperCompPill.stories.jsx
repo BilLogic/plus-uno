@@ -72,12 +72,7 @@ export const Abbreviated = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <SuperCompPillFullDemos />
-        <SuperCompPillAbbreviatedDemos />
-    </div>
-);
+export const Overview = () => <SuperCompPill competencyArea={SMART_CONSTANTS.CA_SE} />;
 
 export const Interactive = {
     args: {

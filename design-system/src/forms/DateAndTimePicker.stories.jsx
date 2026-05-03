@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import DateAndTimePicker from './DateAndTimePicker';
 
 export default {
@@ -85,6 +86,17 @@ const contentVariantCard = {
     border: '1px solid var(--color-outline-variant)',
     borderRadius: '12px',
     background: 'var(--color-surface-container-low)',
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <DateAndTimePicker id="datetime-overview" label="Month" required showSectionLabels={false} />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formDateTime }
+    }
 };
 
 export const Content = () => (

@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SidebarTabStories from './SidebarTab.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SidebarTabStories} />
 
@@ -17,18 +17,23 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Default chrome, optional trailing icon, and icon-only label.</>}>
-    <Canvas of={SidebarTabStories.Default} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Default chrome, optional trailing icon, and icon-only label.</>}>
+    <Canvas of={SidebarTabStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
-<DocsCanvasShell>
-    <Canvas of={SidebarTabStories.NoIcon} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
+</div>
 
-<DocsCanvasShell>
-    <Canvas of={SidebarTabStories.WithTrailingIcon} story={{ inline: true }} sourceState="none" />
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Label without a leading icon, and with an optional trailing visual.</>}>
+    <div className="flex flex-col gap-10 md:gap-12">
+        <DsCanvasQuiet of={SidebarTabStories.NoIcon} />
+        <DsCanvasQuiet of={SidebarTabStories.WithTrailingIcon} />
+    </div>
 </DocsCanvasShell>
 
 </div>
@@ -38,15 +43,15 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Selected, hover, and disabled presentation.</>}>
-    <Canvas of={SidebarTabStories.Selected} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SidebarTabStories.Selected} />
 </DocsCanvasShell>
 
 <DocsCanvasShell>
-    <Canvas of={SidebarTabStories.Hover} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SidebarTabStories.Hover} />
 </DocsCanvasShell>
 
 <DocsCanvasShell>
-    <Canvas of={SidebarTabStories.Disabled} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SidebarTabStories.Disabled} />
 </DocsCanvasShell>
 
 </div>

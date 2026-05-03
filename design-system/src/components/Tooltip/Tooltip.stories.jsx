@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Tooltip from '@/components/Tooltip';
 import Button from '@/components/Button';
 
@@ -124,12 +125,13 @@ export const Sizes = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
-        <TooltipVariantsDemos />
-        <TooltipSizesDemos />
-    </div>
-);
+const tooltipPlaygroundPadding = {
+    padding: 'var(--size-spacing-medium-space-500)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '120px',
+};
 
 export const Interactive = {
     args: {
@@ -137,11 +139,35 @@ export const Interactive = {
         placement: 'top',
         size: 'default',
     },
+    parameters: {
+        controls: { exclude: ['show'] },
+    },
     render: (args) => (
-        <div style={{ padding: '50px' }}>
+        <div style={tooltipPlaygroundPadding}>
+            <Tooltip {...args}>
+                <Button text="Hover or focus me" />
+            </Tooltip>
+        </div>
+    ),
+};
+
+export const Overview = {
+    args: {
+        text: 'Tooltip text',
+        placement: 'top',
+        size: 'default',
+        show: true,
+    },
+    render: (args) => (
+        <div style={tooltipPlaygroundPadding}>
             <Tooltip {...args}>
                 <Button text="Hover me" />
             </Tooltip>
         </div>
     ),
+    parameters: {
+        docs: {
+            source: { language: 'html', code: webAppSourceSnippets.tooltip }
+        }
+    }
 };

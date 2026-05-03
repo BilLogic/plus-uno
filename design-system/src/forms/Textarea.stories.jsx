@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Textarea from './Textarea';
 
 export default {
@@ -68,6 +69,17 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' }
         },},
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Textarea id="textarea-overview" label="Label" placeholder="Enter text..." variant="long" rows={3} />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formTextarea }
+    }
 };
 
 export const Styles = () => (

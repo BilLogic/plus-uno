@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FileUploadStories from './FileUpload.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FileUploadStories} />
 
@@ -18,10 +18,20 @@ The file upload component is used to select and upload files from a local device
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Label, accepted formats, and primary action.</>}>
+    <Canvas of={FileUploadStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Label, formats list, and primary action.</>}>
-    <Canvas of={FileUploadStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Label, required asterisk, accepted formats, and button copy.</>}>
+    <DsCanvasQuiet of={FileUploadStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ The file upload component is used to select and upload files from a local device
 ### Styles
 
 <DocsCanvasShell description={<>Invalid and success validation treatment.</>}>
-    <Canvas of={FileUploadStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={FileUploadStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ The file upload component is used to select and upload files from a local device
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, focus, and disabled.</>}>
-    <Canvas of={FileUploadStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={FileUploadStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

@@ -2,7 +2,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SpinnerStories from './Spinner.stories.jsx';
 import * as SpinnerSubStories from './Spinner.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SpinnerStories} />
 
@@ -18,10 +18,10 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Overview
 
-<DocsCanvasShell description={<>Neutral color only: all spinners use the on-surface-variant token.</>}>
-    <Canvas of={SpinnerStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Neutral color only: all spinners use the on-surface-variant token.</>}>
+    <Canvas of={SpinnerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +31,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Variants
 
 <DocsCanvasShell description={<>Border, grow, and custom animated patterns.</>}>
-    <Canvas of={SpinnerStories.StyleVariants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SpinnerStories.StyleVariants} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +41,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Sizes
 
 <DocsCanvasShell description={<>Default and small border spinner.</>}>
-    <Canvas of={SpinnerStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SpinnerStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -51,7 +51,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Spinner embedded in a loading button pattern.</>}>
-    <Canvas of={SpinnerSubStories.LoadingButtonExample} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SpinnerSubStories.LoadingButtonExample} />
 </DocsCanvasShell>
 
 </div>

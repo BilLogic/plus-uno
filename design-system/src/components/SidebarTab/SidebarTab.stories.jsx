@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import SidebarTab from '@/components/SidebarTab';
 
 export default {
@@ -78,6 +79,15 @@ export const Default = {
         icon: 'home',
         state: 'enabled',
     },
+};
+
+export const Overview = {
+    ...Default,
+    parameters: {
+        docs: {
+            source: { language: 'html', code: webAppSourceSnippets.sidebarTab }
+        }
+    }
 };
 
 export const Selected = {

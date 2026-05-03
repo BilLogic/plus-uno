@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Badge from './Badge';
 
 // Icons for interactive playground
@@ -229,12 +230,13 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={badgeGalleryCol}>
-        <BadgeSizesDemos />
-        <BadgeVariantsDemos />
-        <BadgeContentDemos />
-    </div>
+    <Badge text="Primary" style="primary" size="b2" />
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.badge }
+    }
+};
 
 /**
  * Interactive Playground

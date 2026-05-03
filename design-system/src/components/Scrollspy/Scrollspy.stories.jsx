@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Scrollspy, { ScrollspyContent } from './Scrollspy';
 
 export default {
@@ -22,7 +23,7 @@ export default {
             table: { category: 'Content' }
         },
         sectionCount: {
-            control: { type: 'range', min: 3, max: 5, step: 1 },
+            control: { type: 'range', min: 1, max: 5, step: 1 },
             description: 'Number of sections in the demo content',
             table: { category: 'Content' }
         },
@@ -50,13 +51,49 @@ export default {
 
 function generateContent(count) {
     return Array(count).fill(0).map((_, i) => (
-        <p key={i} className="body1-txt" style={{ marginTop: '16px' }}>
+        <p key={i} className="body1-txt" style={{ marginTop: 'var(--size-spacing-medium-space-300)' }}>
             Additional content paragraph {i + 1}. This content ensures the section is tall enough for scrollspy to detect scroll position changes. Keep scrolling to see the active nav item update automatically.
         </p>
     ));
 }
 
-function ScrollspyLayoutDemo({ brand = 'Navbar', offset = 10, sectionCount = 3 }) {
+function sectionElId(idPrefix, id) {
+    return `${idPrefix}-${id}`;
+}
+
+function buildNavItems(sections, idPrefix) {
+    const byId = Object.fromEntries(sections.map((s) => [s.id, s]));
+    const core = [
+        { id: 'fat', label: '@fat' },
+        { id: 'mdo', label: '@mdo' }
+    ].filter((c) => byId[c.id]);
+
+    const afterMdo = sections.filter((s) => !['fat', 'mdo'].includes(s.id));
+
+    if (afterMdo.length === 0) {
+        return core.map((c) => ({
+            text: c.label,
+            href: `#${sectionElId(idPrefix, c.id)}`
+        }));
+    }
+
+    return [
+        ...core.map((c) => ({
+            text: c.label,
+            href: `#${sectionElId(idPrefix, c.id)}`
+        })),
+        {
+            text: 'Dropdown',
+            isDropdown: true,
+            dropdownItems: afterMdo.map((s) => ({
+                text: s.title,
+                href: `#${sectionElId(idPrefix, s.id)}`
+            }))
+        }
+    ];
+}
+
+function ScrollspyLayoutDemo({ brand = 'Navbar', offset = 10, sectionCount = 5, idPrefix = 'scrollspy-layout' }) {
     const allSections = [
         { id: 'fat', title: '@fat' },
         { id: 'mdo', title: '@mdo' },
@@ -65,35 +102,28 @@ function ScrollspyLayoutDemo({ brand = 'Navbar', offset = 10, sectionCount = 3 }
         { id: 'three', title: 'three' }
     ];
     const sections = allSections.slice(0, sectionCount);
-    const items = sections.map(section => ({
-        text: section.title,
-        href: `#${section.id}`,
-        isDropdown: false
-    }));
+    const items = buildNavItems(sections, idPrefix);
+    const contentId = `${idPrefix}-content`;
+    const navId = `${idPrefix}-nav`;
 
     return (
-        <div style={{
-            backgroundColor: 'var(--color-surface)',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            maxWidth: '648px',
-            maxHeight: '600px',
-            border: '1px solid var(--color-outline-variant)'
-        }}>
+        <div
+            className="plus-scrollspy-shell"
+            style={{ maxHeight: '600px' }}
+        >
             <Scrollspy
-                id="scrollspy-nav-docs"
+                id={navId}
                 brand={brand}
                 items={items}
-                contentId="scrollspy-content-docs"
+                contentId={contentId}
                 offset={offset}
             />
             <ScrollspyContent
-                id="scrollspy-content-docs"
+                id={contentId}
                 height="500px"
             >
                 {sections.map((section, index) => (
-                    <section key={section.id} id={section.id} className="plus-scrollspy-section">
+                    <section key={section.id} id={sectionElId(idPrefix, section.id)} className="plus-scrollspy-section">
                         <h4 className="h4">{section.title}</h4>
                         <p className="body1-txt">
                             Placeholder content for section {index + 1}. Scroll through the content area to
@@ -109,11 +139,18 @@ function ScrollspyLayoutDemo({ brand = 'Navbar', offset = 10, sectionCount = 3 }
 
 export const Layout = () => <ScrollspyLayoutDemo />;
 
-export const Overview = () => <ScrollspyLayoutDemo />;
+export const Overview = () => <ScrollspyLayoutDemo sectionCount={1} idPrefix="scrollspy-docs-overview" />;
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.scrollspy }
+    }
+};
 
-export const Interactive = (args) => <ScrollspyLayoutDemo {...args} />;
+export const Interactive = (args) => (
+    <ScrollspyLayoutDemo {...args} idPrefix="scrollspy-docs-interactive" />
+);
 Interactive.args = {
     brand: 'Navbar',
-    sectionCount: 3,
+    sectionCount: 5,
     offset: 10
 };

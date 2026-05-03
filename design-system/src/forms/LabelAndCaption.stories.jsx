@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 
 /**
  * Label — form label with optional required asterisk.
@@ -128,6 +129,25 @@ export default {
             },
         },
     },
+};
+
+export const Overview = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-element-gap-xs)',
+            maxWidth: '480px',
+        }}
+    >
+        <Label text="Field label" required />
+        <Caption text="Helper or validation copy beneath the label." state="default" icon="square-plus" />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formLabelCaption }
+    }
 };
 
 export const LabelContent = () => (

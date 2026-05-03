@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ProgressStories from './Progress.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ProgressStories} />
 
@@ -17,13 +17,30 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Single bar at 50% with label — semantic fills live under Styles.</>}>
+    <Canvas of={ProgressStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Styles
 
-<DocsCanvasShell description={<>Values and semantic style variants.</>}>
-    <Canvas of={ProgressStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Primary, success, info, and related semantic fills.</>}>
+    <DsCanvasQuiet of={ProgressStories.Styles} />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Effects
+
 <DocsCanvasShell description={<>Striped and animated treatments.</>}>
-    <Canvas of={ProgressStories.Effects} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ProgressStories.Effects} />
 </DocsCanvasShell>
 
 </div>
@@ -33,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large bar heights.</>}>
-    <Canvas of={ProgressStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ProgressStories.Sizes} />
 </DocsCanvasShell>
 
 </div>

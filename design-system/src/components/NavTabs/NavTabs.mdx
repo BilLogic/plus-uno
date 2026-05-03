@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NavTabsStories from './NavTabs.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={NavTabsStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Standard tabs with disabled item and a tab dropdown.</>}>
+    <Canvas of={NavTabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Standard tabs with disabled item and a tab dropdown.</>}>
-    <Canvas of={NavTabsStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Standard tabs, disabled item, and tab dropdown.</>}>
+    <DsCanvasQuiet of={NavTabsStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Pseudo hover, focus, and pressed on inactive and active tabs.</>}>
-    <Canvas of={NavTabsStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={NavTabsStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Justified tab distribution.</>}>
-    <Canvas of={NavTabsStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={NavTabsStories.Layout} />
 </DocsCanvasShell>
 
 </div>

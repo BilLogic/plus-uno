@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as MultipleChoiceStories from './MultipleChoice.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={MultipleChoiceStories} />
 
@@ -18,10 +18,20 @@ The multiple choice component can be used in forms where the user is required to
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Vertical radio list — default single-select pattern.</>}>
+    <Canvas of={MultipleChoiceStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Long lists, pre-selected radio, and pre-checked boxes.</>}>
-    <Canvas of={MultipleChoiceStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Pre-selected radio and checkbox examples.</>}>
+    <DsCanvasQuiet of={MultipleChoiceStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ The multiple choice component can be used in forms where the user is required to
 ### Variants
 
 <DocsCanvasShell description={<>Radio (single choice) and checkbox (multiple choices).</>}>
-    <Canvas of={MultipleChoiceStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={MultipleChoiceStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ The multiple choice component can be used in forms where the user is required to
 ### Sizes
 
 <DocsCanvasShell description={<>Small and large (medium is default).</>}>
-    <Canvas of={MultipleChoiceStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={MultipleChoiceStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -51,7 +61,7 @@ The multiple choice component can be used in forms where the user is required to
 ### Interaction states
 
 <DocsCanvasShell description={<>Disabled radio and checkbox groups.</>}>
-    <Canvas of={MultipleChoiceStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={MultipleChoiceStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

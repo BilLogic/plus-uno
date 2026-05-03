@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AccordionStories from './Accordion.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={AccordionStories} />
 
@@ -17,10 +17,20 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Composable children instead of the `items` array.</>}>
+    <Canvas of={AccordionStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Composable children instead of the `items` array.</>}>
-    <Canvas of={AccordionStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Children-based items pattern alongside the <code>items</code> array API.</>}>
+    <DsCanvasQuiet of={AccordionStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 ### Styles
 
 <DocsCanvasShell description={<>Default bordered accordion and flush (borderless) treatment.</>}>
-    <Canvas of={AccordionStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={AccordionStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 ### Behavior
 
 <DocsCanvasShell description={<>Disclosure <strong>model</strong>: multiple panels open at once (`alwaysOpen`) and an initial state where every panel starts collapsed (no default active key).</>}>
-    <Canvas of={AccordionStories.Behavior} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={AccordionStories.Behavior} />
 </DocsCanvasShell>
 
 </div>
@@ -50,7 +60,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 ### Interaction states
 
 <DocsCanvasShell description={<>Per-header affordances on the trigger (here: <code>disabled</code>). Expanded vs collapsed is <strong>disclosure state</strong> (which keys are open), separate from disabled, hover, focus, or pressed styling on the header.</>}>
-    <Canvas of={AccordionStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={AccordionStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

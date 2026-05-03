@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Pagination from './Pagination';
 
 export default {
@@ -214,22 +215,24 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={paginationCanvas}>
-        <PaginationContentDemos />
-        <PaginationSizesDemos />
-        <PaginationInteractionStatesDemos />
-    </div>
-);
-
-/**
- * Interactive - Full controls for testing all props
- */
-export const Interactive = Template.bind({});
-Interactive.args = {
+const paginationPlaygroundArgs = {
     currentPage: 5,
     totalPages: 10,
     type: 'icon',
     size: 'default',
     maxVisible: 5
 };
+
+export const Overview = Template.bind({});
+Overview.args = { ...paginationPlaygroundArgs };
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.pagination }
+    }
+};
+
+/**
+ * Interactive - Full controls for testing all props
+ */
+export const Interactive = Template.bind({});
+Interactive.args = { ...paginationPlaygroundArgs };

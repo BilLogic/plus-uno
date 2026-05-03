@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Carousel from './Carousel';
 
 export default {
@@ -8,7 +9,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Carousel component for displaying a rotating set of content slides. Supports controls, indicators, captions, and fade transitions. Built on React Bootstrap.'
+                component: 'Carousel component for displaying a rotating set of content slides. Supports controls, indicators, and captions. Built on React Bootstrap.'
             }
         }
     },
@@ -16,11 +17,6 @@ export default {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
-        fade: {
-            control: 'boolean',
-            description: 'Use fade transition instead of slide',
-            table: { category: 'Design' }
-        },
         slideCount: {
             control: { type: 'range', min: 2, max: 6, step: 1 },
             description: 'Number of slides to display',
@@ -198,28 +194,6 @@ function CarouselLayoutDemos() {
     );
 }
 
-function CarouselFadeDemo() {
-    return (
-        <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FADE TRANSITION</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Fade effect instead of slide animation.
-            </p>
-            <Carousel
-                slides={[
-                    { content: createSlideContent('Fade In', slideColors[3]) },
-                    { content: createSlideContent('Fade Out', slideColors[4]) },
-                    { content: createSlideContent('Smooth', slideColors[5]) }
-                ]}
-                controls
-                indicators
-                fade
-                interval={4000}
-            />
-        </section>
-    );
-}
-
 export const Content = () => (
     <div style={carouselCol}>
         <CarouselContentDemos />
@@ -232,21 +206,7 @@ export const Layout = () => (
     </div>
 );
 
-export const Styles = () => (
-    <div style={carouselCol}>
-        <CarouselFadeDemo />
-    </div>
-);
-
-export const Overview = () => (
-    <div style={carouselCol}>
-        <CarouselContentDemos />
-        <CarouselLayoutDemos />
-        <CarouselFadeDemo />
-    </div>
-);
-
-export const Interactive = (args) => {
+function renderCarouselPlayground(args) {
     const slides = Array.from({ length: args.slideCount || 3 }, (_, i) => ({
         content: createSlideContent(slideLabels[i], slideColors[i % slideColors.length]),
         title: args.showCaptions ? `${slideLabels[i]} Title` : undefined,
@@ -254,9 +214,8 @@ export const Interactive = (args) => {
     }));
 
     return (
-        <div style={{ maxWidth: '800px' }}>
+        <div style={{ width: '100%' }}>
             <Carousel
-                fade={args.fade}
                 controls={args.controls}
                 indicators={args.indicators}
                 interval={args.interval}
@@ -264,13 +223,23 @@ export const Interactive = (args) => {
             />
         </div>
     );
-};
+}
 
-Interactive.args = {
+const carouselPlaygroundArgs = {
     controls: true,
     indicators: true,
     interval: 5000,
-    fade: false,
     slideCount: 3,
     showCaptions: false
 };
+
+export const Overview = renderCarouselPlayground;
+Overview.args = { ...carouselPlaygroundArgs };
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.carousel }
+    }
+};
+
+export const Interactive = renderCarouselPlayground;
+Interactive.args = { ...carouselPlaygroundArgs };

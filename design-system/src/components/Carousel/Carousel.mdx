@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CarouselStories from './Carousel.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CarouselStories} />
 
@@ -18,20 +18,20 @@ A slideshow component for cycling through elements—images or slides of text—
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Bare slides and slides with title and caption overlays.</>}>
-    <Canvas of={CarouselStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Bare slides and slides with title and caption overlays.</>}>
+    <Canvas of={CarouselStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Content
 
-<DocsCanvasShell description={<>Fade transition instead of sliding.</>}>
-    <Canvas of={CarouselStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Slides-only carousel and slides with title and caption overlays.</>}>
+    <DsCanvasQuiet of={CarouselStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +41,7 @@ A slideshow component for cycling through elements—images or slides of text—
 ### Layout
 
 <DocsCanvasShell description={<>Controls, indicators, and a full chrome example together.</>}>
-    <Canvas of={CarouselStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CarouselStories.Layout} />
 </DocsCanvasShell>
 
 </div>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NavPills from './NavPills';
 
 export default {
@@ -112,34 +113,124 @@ export const Layout = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={col}>
-        <NavPillsContentDemos />
-        <NavPillsLayoutDemo />
-    </div>
-);
-
-export const Interactive = (args) => {
+export const Overview = () => {
     const [activeKey, setActiveKey] = useState('1');
 
     return (
-        <NavPills
-            activeKey={activeKey}
-            onSelect={(k) => setActiveKey(k)}
-            alignment={args.alignment}
-            direction={args.direction}
-        >
-            <NavPills.Item eventKey="1">Tab 1</NavPills.Item>
-            <NavPills.Item eventKey="2">Tab 2</NavPills.Item>
-            <NavPills.Item eventKey="3">Tab 3</NavPills.Item>
-            {args.showDisabledItem ? <NavPills.Item eventKey="4" disabled>Disabled</NavPills.Item> : null}
-            {args.contentPreset === 'with-dropdown' ? (
-                <NavPills.Dropdown title="More" id="interactive-nav-pills-dropdown">
-                    <NavPills.Dropdown.Item eventKey="action">Action</NavPills.Dropdown.Item>
-                    <NavPills.Dropdown.Item eventKey="another">Another action</NavPills.Dropdown.Item>
-                </NavPills.Dropdown>
-            ) : null}
+        <NavPills activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
+            <NavPills.Item eventKey="1">Home</NavPills.Item>
+            <NavPills.Item eventKey="2">Profile</NavPills.Item>
+            <NavPills.Item eventKey="3">Messages</NavPills.Item>
         </NavPills>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.navPills }
+    }
+};
+
+const interactiveSectionSurface = {
+    marginBottom: '12px',
+    padding: '16px',
+    minHeight: '100px',
+    backgroundColor: 'var(--color-surface-container)',
+    borderRadius: 'var(--size-element-radius-md)',
+    border: '1px solid var(--color-outline-variant)',
+};
+
+export const Interactive = (args) => {
+    const [activeKey, setActiveKey] = useState('1');
+    const skipScrollRef = useRef(true);
+
+    useEffect(() => {
+        if (skipScrollRef.current) {
+            skipScrollRef.current = false;
+            return;
+        }
+        const el = document.getElementById(`navpills-interactive-section-${activeKey}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, [activeKey]);
+
+    const isVertical = args.direction === 'vertical';
+
+    return (
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: isVertical ? 'row' : 'column',
+                alignItems: isVertical ? 'flex-start' : 'stretch',
+                gap: '16px',
+                width: '100%',
+                maxWidth: '640px',
+            }}
+        >
+            <NavPills
+                activeKey={activeKey}
+                onSelect={(k) => setActiveKey(k)}
+                alignment={args.alignment}
+                direction={args.direction}
+            >
+                <NavPills.Item eventKey="1">Tab 1</NavPills.Item>
+                <NavPills.Item eventKey="2">Tab 2</NavPills.Item>
+                <NavPills.Item eventKey="3">Tab 3</NavPills.Item>
+                {args.showDisabledItem ? <NavPills.Item eventKey="4" disabled>Disabled</NavPills.Item> : null}
+                {args.contentPreset === 'with-dropdown' ? (
+                    <NavPills.Dropdown title="More" id="interactive-nav-pills-dropdown">
+                        <NavPills.Dropdown.Item eventKey="action">Action</NavPills.Dropdown.Item>
+                        <NavPills.Dropdown.Item eventKey="another">Another action</NavPills.Dropdown.Item>
+                    </NavPills.Dropdown>
+                ) : null}
+            </NavPills>
+            <div
+                style={{
+                    flex: isVertical ? 1 : undefined,
+                    minWidth: 0,
+                    alignSelf: isVertical ? 'stretch' : undefined,
+                    maxHeight: '280px',
+                    overflowY: 'auto',
+                    padding: '12px',
+                    border: '1px solid var(--color-outline-variant)',
+                    borderRadius: 'var(--size-element-radius-md)',
+                    backgroundColor: 'var(--color-surface)',
+                }}
+            >
+                <section id="navpills-interactive-section-1" style={interactiveSectionSurface}>
+                    <p className="body2-txt m-0 font-semibold">Tab 1</p>
+                    <p className="body3-txt mt-2 mb-0 text-on-surface-variant">
+                        Content for the first tab. Selecting this pill scrolls this block into view.
+                    </p>
+                </section>
+                <section id="navpills-interactive-section-2" style={interactiveSectionSurface}>
+                    <p className="body2-txt m-0 font-semibold">Tab 2</p>
+                    <p className="body3-txt mt-2 mb-0 text-on-surface-variant">
+                        Second panel. Use the nav pills above to jump here.
+                    </p>
+                </section>
+                <section id="navpills-interactive-section-3" style={interactiveSectionSurface}>
+                    <p className="body2-txt m-0 font-semibold">Tab 3</p>
+                    <p className="body3-txt mt-2 mb-0 text-on-surface-variant">
+                        Third panel.
+                    </p>
+                </section>
+                {args.contentPreset === 'with-dropdown' ? (
+                    <>
+                        <section id="navpills-interactive-section-action" style={interactiveSectionSurface}>
+                            <p className="body2-txt m-0 font-semibold">Dropdown: Action</p>
+                            <p className="body3-txt mt-2 mb-0 text-on-surface-variant">
+                                Shown when you pick <strong>Action</strong> from the More menu.
+                            </p>
+                        </section>
+                        <section id="navpills-interactive-section-another" style={{ ...interactiveSectionSurface, marginBottom: 0 }}>
+                            <p className="body2-txt m-0 font-semibold">Dropdown: Another action</p>
+                            <p className="body3-txt mt-2 mb-0 text-on-surface-variant">
+                                Shown when you pick <strong>Another action</strong>.
+                            </p>
+                        </section>
+                    </>
+                ) : null}
+            </div>
+        </div>
     );
 };
 

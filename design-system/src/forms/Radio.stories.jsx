@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Radio from './Radio';
 
 export default {
@@ -67,6 +68,36 @@ export default {
             table: { disable: true, category: 'Development' },
         },
     },
+};
+
+export const Overview = () => {
+    const [value, setValue] = useState('option1');
+
+    return (
+        <div style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <Radio
+                id="radio-overview-1"
+                name="radio-overview"
+                label="Option 1"
+                value="option1"
+                checked={value === 'option1'}
+                onChange={(e) => setValue(e.target.value)}
+            />
+            <Radio
+                id="radio-overview-2"
+                name="radio-overview"
+                label="Option 2"
+                value="option2"
+                checked={value === 'option2'}
+                onChange={(e) => setValue(e.target.value)}
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formRadio }
+    }
 };
 
 export const Content = () => {

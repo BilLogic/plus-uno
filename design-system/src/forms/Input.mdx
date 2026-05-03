@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputStories from './Input.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={InputStories} />
 
@@ -18,10 +18,20 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Default labeled field with placeholder and trailing visual.</>}>
+    <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Placeholder vs value, label visibility, required marker, and leading/trailing visuals.</>}>
-    <Canvas of={InputStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 ### Styles
 
 <DocsCanvasShell description={<>Validation treatments: none, invalid, and success (with optional message).</>}>
-    <Canvas of={InputStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 ### Sizes
 
 <DocsCanvasShell description={<>Available in medium (default) size.</>}>
-    <Canvas of={InputStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -51,7 +61,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, hover, focus, disabled, and read-only.</>}>
-    <Canvas of={InputStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

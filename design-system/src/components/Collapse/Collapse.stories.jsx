@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Collapse from './Collapse';
 import Card from '@/components/Card/Card';
 import Button from '@/components/Button/Button';
@@ -239,13 +240,26 @@ export const LinkTrigger = () => (
 );
 
 export const Overview = () => (
-    <div style={collapseCol}>
-        <CollapseBasicsDemos />
-        <CollapseIconsDemos />
-        <CollapseStateDemos />
-        <CollapseLinkDemos />
+    <div style={{ width: '100%' }}>
+        <Collapse
+            id="overview-collapse"
+            trigger="Toggle Content"
+            triggerClass="btn btn-primary"
+            defaultOpen={false}
+        >
+            <Card
+                body="Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger."
+                className="mt-2"
+                showBorder
+            />
+        </Collapse>
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.collapse }
+    }
+};
 
 /**
  * Interactive Playground

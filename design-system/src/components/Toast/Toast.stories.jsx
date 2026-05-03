@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Toast, { ToastContainer } from './Toast';
 import Button from '@/components/Button/Button';
 
@@ -85,10 +86,17 @@ export const Styles = () => (
 );
 
 export const Overview = () => (
-    <div className="d-flex flex-column gap-3">
-        <ToastVariantsDemos />
-    </div>
+    <ToastContainer className="p-3" style={{ position: 'static' }}>
+        <Toast title="Secondary Toast" style="secondary" timestamp="Just now">
+            This is a secondary toast (default).
+        </Toast>
+    </ToastContainer>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.toast }
+    }
+};
 
 const ToastInteractiveWrapper = ({ style, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);
@@ -98,12 +106,8 @@ const ToastInteractiveWrapper = ({ style, position, title, children, show, autoh
     }, [show]);
 
     return (
-        <div style={{ height: '300px', position: 'relative', background: '#f8f9fa', border: '1px solid #dee2e6' }}>
-            <div className="p-3">
-                <Button text="Trigger Toast" onClick={() => setIsOpen(true)} />
-            </div>
-
-            <ToastContainer position={position} className="p-3" style={{ position: 'absolute' }}>
+        <div className="plus-toast-interactive-demo">
+            <ToastContainer position={position} className="p-3">
                 <Toast
                     show={isOpen}
                     onClose={() => setIsOpen(false)}
@@ -116,17 +120,29 @@ const ToastInteractiveWrapper = ({ style, position, title, children, show, autoh
                     {children}
                 </Toast>
             </ToastContainer>
+            <div className="plus-toast-interactive-demo__trigger">
+                <Button text="Trigger Toast" onClick={() => setIsOpen(true)} />
+            </div>
         </div>
     );
 };
 
 export const Interactive = (args) => <ToastInteractiveWrapper {...args} />;
 Interactive.args = {
-    show: true,
+    show: false,
     style: 'success',
     position: 'top-end',
     title: 'Toast Title',
     children: 'This is an interactive toast message.',
     autohide: false,
     delay: 3000
+};
+Interactive.parameters = {
+    controls: { exclude: ['position'] },
+    docs: {
+        description: {
+            story:
+                'Preview keeps the toast centered. In product code, `position` on `ToastContainer` still controls fixed corner placement.',
+        },
+    },
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NavTabs from './NavTabs';
 
 export default {
@@ -138,13 +139,22 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={col}>
-        <NavTabsContentDemos />
-        <NavTabsLayoutDemo />
-        <NavTabsInteractionStatesDemos />
-    </div>
-);
+export const Overview = () => {
+    const [activeKey, setActiveKey] = useState('1');
+
+    return (
+        <NavTabs activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
+            <NavTabs.Item eventKey="1">Home</NavTabs.Item>
+            <NavTabs.Item eventKey="2">Profile</NavTabs.Item>
+            <NavTabs.Item eventKey="3">Messages</NavTabs.Item>
+        </NavTabs>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.navTabs }
+    }
+};
 
 export const Interactive = (args) => {
     const [activeKey, setActiveKey] = useState('1');

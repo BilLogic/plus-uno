@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import MultipleChoice from './MultipleChoice';
 
 export default {
@@ -71,6 +72,30 @@ const contentVariantCard = {
     border: '1px solid var(--color-outline-variant)',
     borderRadius: '12px',
     background: 'var(--color-surface-container-low)',
+};
+
+const overviewRadioOptions = shortRadioOptions.slice(0, 4);
+
+export const Overview = () => {
+    const [radioValue, setRadioValue] = useState(null);
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <MultipleChoice
+                id="multiple-choice-overview"
+                name="multiple-choice-overview"
+                type="radio"
+                options={overviewRadioOptions}
+                value={radioValue}
+                onChange={setRadioValue}
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formMultipleChoice }
+    }
 };
 
 export const Styles = () => {

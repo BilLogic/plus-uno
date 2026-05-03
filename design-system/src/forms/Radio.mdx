@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RadioStories from './Radio.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={RadioStories} />
 
@@ -19,10 +19,20 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Two-option group with a selected value.</>}>
+    <Canvas of={RadioStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Labels and selection within one group.</>}>
-    <Canvas of={RadioStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={RadioStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -32,7 +42,7 @@ Use radio when a user needs to select one option from a list.
 ### Layout
 
 <DocsCanvasShell description={<>Typical vertical group spacing.</>}>
-    <Canvas of={RadioStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={RadioStories.Layout} />
 </DocsCanvasShell>
 
 </div>
@@ -42,7 +52,7 @@ Use radio when a user needs to select one option from a list.
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={RadioStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={RadioStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -52,7 +62,7 @@ Use radio when a user needs to select one option from a list.
 ### Interaction states
 
 <DocsCanvasShell description={<>Selected, unselected, and disabled.</>}>
-    <Canvas of={RadioStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={RadioStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

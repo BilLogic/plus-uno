@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SwitchStories from './Switch.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SwitchStories} />
 
@@ -18,10 +18,20 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Default switch with short label.</>}>
+    <Canvas of={SwitchStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Label length examples.</>}>
-    <Canvas of={SwitchStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Short and long label text.</>}>
+    <DsCanvasQuiet of={SwitchStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={SwitchStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SwitchStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 ### Interaction states
 
 <DocsCanvasShell description={<>Off, on, and disabled.</>}>
-    <Canvas of={SwitchStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SwitchStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

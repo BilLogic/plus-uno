@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Input from './Input';
 
 export default {
@@ -103,6 +104,26 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' }
         },}
+};
+
+/** Overview — Default field for docs landing. */
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Input
+            id="input-overview"
+            showLabel
+            label="Label"
+            placeholder="Placeholder"
+            value=""
+            required
+            trailingVisual="fa-solid fa-icons"
+        />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formInput }
+    }
 };
 
 /** Content — Placeholder vs value, label, required, and visuals. */

@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Card from '@/components/Card';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
@@ -212,12 +213,18 @@ export const Layout = () => (
 );
 
 export const Overview = () => (
-    <div style={cardCol}>
-        <CardContentDemos />
-        <CardActionsDemos />
-        <CardLayoutDemo />
+    <div style={{ maxWidth: '400px', width: '100%' }}>
+        <Card
+            title="Card Title"
+            body="Some quick example text to build on the card title and make up the bulk of the card's content."
+        />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.card }
+    }
+};
 
 export const Interactive = {
     args: {

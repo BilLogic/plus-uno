@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as MediaObjectStories from './MediaObject.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={MediaObjectStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Nested media object inside the body.</>}>
+    <Canvas of={MediaObjectStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Nested media object inside the body.</>}>
-    <Canvas of={MediaObjectStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Nested media object inside parent body copy.</>}>
+    <DsCanvasQuiet of={MediaObjectStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Sizes
 
 <DocsCanvasShell description={<>Small, default, and large media slots.</>}>
-    <Canvas of={MediaObjectStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={MediaObjectStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Media on the left or right and vertical alignment with body copy.</>}>
-    <Canvas of={MediaObjectStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={MediaObjectStories.Layout} />
 </DocsCanvasShell>
 
 </div>

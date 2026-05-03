@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RatingStories from './Rating.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={RatingStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Comments-style rating with label and required indicator.</>}>
+    <Canvas of={RatingStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Baseline rating field with label and required indicator.</>}>
-    <Canvas of={RatingStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Baseline rating field with supporting copy.</>}>
+    <DsCanvasQuiet of={RatingStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Variants
 
 <DocsCanvasShell description={<>Comments and numeric rating patterns.</>}>
-    <Canvas of={RatingStories.Variants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={RatingStories.Variants} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Disabled comments and numeric ratings.</>}>
-    <Canvas of={RatingStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={RatingStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

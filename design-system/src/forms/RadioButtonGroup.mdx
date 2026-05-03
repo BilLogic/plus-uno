@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ScaleStories from './RadioButtonGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ScaleStories} />
 
@@ -18,10 +18,20 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Three-point scale with end labels and a selected value.</>}>
+    <Canvas of={ScaleStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Baseline three-point scale with end labels.</>}>
-    <Canvas of={ScaleStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ScaleStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ Use radio when a user needs to select one option from a list.
 ### Variants
 
 <DocsCanvasShell description={<>Different scale lengths using the same horizontal pattern.</>}>
-    <Canvas of={ScaleStories.Variants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ScaleStories.Variants} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ Use radio when a user needs to select one option from a list.
 ### Interaction states
 
 <DocsCanvasShell description={<>Disabled scale example.</>}>
-    <Canvas of={ScaleStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ScaleStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

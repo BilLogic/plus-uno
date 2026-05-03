@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={LabelAndCaptionStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Label row and caption row — two separate typography patterns used together on a field.</>}>
+    <Canvas of={LabelAndCaptionStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Label copy and optional required asterisk.</>}>
-    <Canvas of={LabelAndCaptionStories.LabelContent} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={LabelAndCaptionStories.LabelContent} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout
 ### Variants
 
 <DocsCanvasShell description={<>Caption semantic styles: default, success, danger, warning, disabled.</>}>
-    <Canvas of={LabelAndCaptionStories.CaptionVariants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={LabelAndCaptionStories.CaptionVariants} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout
 ### Layout
 
 <DocsCanvasShell description={<>Label, native input, and caption stacked as a field.</>}>
-    <Canvas of={LabelAndCaptionStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={LabelAndCaptionStories.Layout} />
 </DocsCanvasShell>
 
 </div>

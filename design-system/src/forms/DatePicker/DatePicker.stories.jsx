@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import DatePicker from './DatePicker';
 
 export default {
@@ -55,6 +56,17 @@ export default {
             table: { category: 'Behavior' },
         },
     },
+};
+
+export const Overview = () => (
+    <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
+        <DatePicker placeholder="Select a date" size="medium" />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formDatePicker }
+    }
 };
 
 export const Sizes = () => (

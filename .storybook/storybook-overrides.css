@@ -329,3 +329,150 @@ h2.toc-title {
     margin-bottom: 0.75rem !important;
     margin-top: 0 !important;
 }
+
+/*
+ * DocsCanvasShell attachSourceBelow: preview = rounded card only; code toggle + source sit below (attached).
+ * Matches “canvas + extension” layout (toggle associated with the code panel, not inside the muted well).
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root {
+    min-width: 0;
+}
+
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .sbdocs.sbdocs-preview {
+    margin: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+/*
+ * Overview preview: keep generous width but visually center in the docs column (padded layout is start-aligned by default).
+ * Cap ultra-wide viewports so line length stays sane; story roots may still use width:100% inside this frame.
+ * Flex centers shrink-wrapped heroes (e.g. a single Button); roots with inline width:100% still span the row.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper {
+    width: 100% !important;
+    max-width: min(100%, 112rem) !important;
+    min-width: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+}
+
+/*
+ * Preview row: match .sb-ds-docs-preview-well (muted fill only — no extra border/shadow).
+ * Rounded top only; bottom is straight so it meets the code strip flush.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    /* stretch: full-width column; innerZoomElementWrapper flex-row + justify:center centers shrink-wrap previews */
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    padding: 2rem clamp(1rem, 4vw, 2.5rem) !important;
+    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
+    background: color-mix(in srgb, var(--color-muted, #e0e3e7) 40%, transparent);
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
+    background: color-mix(in srgb, var(--color-muted, #3f4847) 25%, transparent);
+}
+
+/* Drop Storybook’s default preview chrome (border/shadow) inside attached canvases */
+/*
+ * Story root under zoom wrapper: center shrink-wrapped previews (Button, Spinner) without collapsing
+ * full-width roots (Carousel/Accordion wrappers use width:100%). flex-shrink:1 + min-width:0 made
+ * percentage-width blocks collapse to a narrow column; flex-basis stays explicit width / intrinsic size.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper > * {
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    border-width: 0 !important;
+    box-shadow: none !important;
+}
+
+/*
+ * Storybook ActionBar defaults to position:absolute; bottom:0 inside .docs-story (floating on the preview).
+ * Pull it into normal flow so it sits between the rounded canvas and the source block.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    left: auto !important;
+    top: auto !important;
+    max-width: none !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0.375rem 0.5rem !important;
+    background: var(--color-surface, #fffbfe) !important;
+    border: none !important;
+    border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 50%, transparent) !important;
+    border-radius: 0 !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+    z-index: 1;
+}
+
+/* Code collapsed: round the bottom of the toolbar to mirror the preview’s top radius */
+.sbdocs
+    .sb-ds-docs-canvas-shell--source-attached
+    .sb-ds-docs-canvas-attached-root
+    .sbdocs.sbdocs-preview:not(:has(pre))
+    .docs-story
+    > *:last-child:not(:only-child) {
+    border-radius: 0 0 var(--size-card-radius-sm) var(--size-card-radius-sm) !important;
+    border-bottom: none !important;
+}
+
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) button {
+    position: relative !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 55%, transparent) !important;
+    border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 55%, transparent) !important;
+    box-shadow: none !important;
+}
+
+.sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
+    background: var(--color-surface, #191c1e) !important;
+    border-top-color: color-mix(in srgb, var(--color-border, #8e918f) 40%, transparent) !important;
+}
+
+/* Code expanded: toolbar stays square-bottom; syntax block gets the bottom radius */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .sbdocs.sbdocs-preview pre {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: var(--size-card-radius-sm) !important;
+    border-bottom-right-radius: var(--size-card-radius-sm) !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+}

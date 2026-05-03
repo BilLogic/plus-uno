@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Switch from './Switch';
 
 export default {
@@ -57,6 +58,17 @@ export default {
             table: { disable: true, category: 'Development' },
         },
     },
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Switch id="switch-overview" name="switch-overview" label="Wi‑Fi" defaultChecked />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formSwitch }
+    }
 };
 
 export const Content = () => (

@@ -2,7 +2,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BreadcrumbStories from './Breadcrumb.stories.jsx';
 import * as BreadcrumbSubStories from './Breadcrumb.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BreadcrumbStories} />
 
@@ -19,10 +19,10 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Link and current-page items.</>}>
-    <Canvas of={BreadcrumbSubStories.PageItem} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Standard multi-level trail (typical page context).</>}>
+    <Canvas of={BreadcrumbStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>
@@ -32,11 +32,11 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 ### Variants
 
 <DocsCanvasShell description={<>Full trail with linked ancestors and a non-link current page.</>}>
-    <Canvas of={BreadcrumbStories.Standard} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BreadcrumbStories.Standard} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Minimal two-level trail.</>}>
-    <Canvas of={BreadcrumbStories.Short} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BreadcrumbStories.Short} />
 </DocsCanvasShell>
 
 </div>
@@ -46,7 +46,7 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 ### Layout
 
 <DocsCanvasShell description={<>Separator between trail segments.</>}>
-    <Canvas of={BreadcrumbSubStories.Divider} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BreadcrumbSubStories.Divider} />
 </DocsCanvasShell>
 
 </div>

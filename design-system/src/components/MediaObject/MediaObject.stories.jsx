@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import MediaObject from './MediaObject';
 
 export default {
@@ -182,12 +183,20 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <MediaObjectLayoutDemos />
-        <MediaObjectSizesDemos />
-        <MediaObjectContentNestedDemo />
+    <div style={{ maxWidth: '560px', width: '100%' }}>
+        <MediaObject
+            media={<PlaceholderMedia />}
+            heading="Media heading"
+        >
+            Will you do the same for me? It's time to face the music.
+        </MediaObject>
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.mediaObject }
+    }
+};
 
 export const Interactive = (args) => {
     const mediaSizeMap = {

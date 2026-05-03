@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
 
 const sampleItems = [
@@ -83,12 +84,12 @@ export const Short = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={breadcrumbCol}>
-        <BreadcrumbStandardDemo />
-        <BreadcrumbShortDemo />
-    </div>
-);
+export const Overview = () => <Breadcrumb items={sampleItems} />;
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.breadcrumb }
+    }
+};
 
 /**
  * Interactive Breadcrumb

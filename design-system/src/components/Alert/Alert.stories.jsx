@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Alert from './Alert';
 
 export default {
@@ -130,11 +131,15 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={alertCol}>
-        <AlertVariantsDemos />
-        <AlertContentDemos />
-    </div>
+    <Alert style="primary" title="With Title" dismissable>
+        Alert with title and message text.
+    </Alert>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.alert }
+    }
+};
 
 /**
  * Interactive Alert

@@ -257,3 +257,31 @@
         margin-top: var(--size-element-gap-md);
     }
 }
+
+// Storybook interactive: keep toasts inside the preview (override BS position-fixed + corner utilities)
+.plus-toast-interactive-demo {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 280px;
+    border: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface-container-lowest);
+    border-radius: var(--size-element-radius-md);
+    padding: var(--size-spacing-medium-space-400);
+}
+
+.plus-toast-interactive-demo .plus-toast-container.toast-container {
+    position: absolute !important;
+    margin: 0 !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+.plus-toast-interactive-demo__trigger {
+    position: absolute;
+    left: 50%;
+    bottom: var(--size-spacing-medium-space-400);
+    transform: translateX(-50%);
+}

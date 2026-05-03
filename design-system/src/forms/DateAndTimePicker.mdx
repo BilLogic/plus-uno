@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TimePickerStories from './DateAndTimePicker.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={TimePickerStories} />
 
@@ -18,10 +18,20 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Compact date and time row with field label.</>}>
+    <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Field label and optional Date/Time section labels.</>}>
-    <Canvas of={TimePickerStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TimePickerStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 ### Styles
 
 <DocsCanvasShell description={<>Invalid and success validation.</>}>
-    <Canvas of={TimePickerStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TimePickerStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={TimePickerStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TimePickerStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -51,7 +61,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, disabled, and read-only.</>}>
-    <Canvas of={TimePickerStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={TimePickerStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

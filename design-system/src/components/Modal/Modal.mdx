@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ModalStories} />
 
@@ -18,10 +18,20 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
+    <Canvas of={ModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
-    <Canvas of={ModalStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Default, scrollable, and footer combinations in inline docs previews.</>}>
+    <DsCanvasQuiet of={ModalStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 ### Layout
 
 <DocsCanvasShell description={<>Header-only versus header with a primary and secondary action row.</>}>
-    <Canvas of={ModalStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ModalStories.Layout} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 ### Types
 
 <DocsCanvasShell description={<>Scrollable body with decorative scrollbar affordances for long content.</>}>
-    <Canvas of={ModalStories.Types} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ModalStories.Types} />
 </DocsCanvasShell>
 
 </div>

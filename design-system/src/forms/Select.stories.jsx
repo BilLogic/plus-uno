@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Select from './Select';
 
 /**
@@ -196,125 +197,27 @@ export const InteractionStates = {
     )
 };
 
-/**
- * Overview
- * Full component showcase with all use cases.
- */
+/** Overview — Single-select default for docs landing. */
 export const Overview = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
-            {/* Use Cases */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Use Cases</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    There are five types of Select uses: Single-select, Multi-select, Search + Single-select, Search + Multi-select, Add New Value + multi-select.
-                </p>
-                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "flex", justifyContent: "center" }}>
-                    <Select
-                        mode="multi"
-                        searchable
-                        creatable
-                        options={sampleOptions}
-                        placeholder="Select {value(s)} from below"
-                        style={{ maxWidth: 400 }}
-                    />
-                </div>
-            </section>
-
-            {/* When Activated */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>When Activated</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    When activated, Select has 4 states: closed and empty, open and empty, closed and filled, open and filled.
-                </p>
-                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND EMPTY</span>
-                        <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
-                        <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND FILLED</span>
-                        <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
-                        <Select defaultValue="option-3" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                </div>
-            </section>
-
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Read only and Disabled</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    There are 2 additional special states: Read only (display only, no add/delete/edit) and Disabled (cannot be used temporarily).
-                </p>
-                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY: SINGLE-SELECT</span>
-                        <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY: MULTI-SELECT</span>
-                        <Select mode="multi" readonly defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED: SINGLE-SELECT</span>
-                        <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED: MULTI-SELECT</span>
-                        <Select mode="multi" disabled defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
-                    </div>
-                </div>
-            </section>
-
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Search + Single-Select</h6>
-                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
-                        <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
-                        <Select searchable defaultValue="option-3" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-                    </div>
-                </div>
-            </section>
-
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Search + Multi-Select</h6>
-                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
-                        <Select mode="multi" searchable options={sampleOptions} placeholder="Select {value(s)} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
-                        <Select mode="multi" searchable defaultValue={['option-1', 'option-2']} options={sampleOptions} placeholder="Select {value(s)} from below" />
-                    </div>
-                </div>
-            </section>
-
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Add New Value + Multi-Select</h6>
-                <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", backgroundColor: "rgba(221, 227, 234, 0.16)", borderRadius: 8, padding: 64, display: "grid", gap: 20, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND EMPTY</span>
-                        <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
-                    </div>
-                    <div>
-                        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPEN AND FILLED</span>
-                        <Select mode="multi" searchable creatable defaultValue={['option-1', 'option-2', 'option-3', 'option-4']} options={sampleOptions} placeholder="Select {value(s)} from below" />
-                    </div>
-                </div>
-            </section>
+        <div
+            className="sb-select-interactive-override"
+            style={{
+                pointerEvents: 'auto',
+                maxWidth: 400,
+                width: '100%',
+                minHeight: 48,
+                paddingBottom: 320,
+            }}
+        >
+            <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
         </div>
-    )
+    ),
+    parameters: {
+        docs: {
+            source: { language: 'html', code: webAppSourceSnippets.formSelect }
+        }
+    }
 };
 
 /**

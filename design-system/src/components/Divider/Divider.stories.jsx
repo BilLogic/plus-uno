@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Divider from '@/components/Divider';
 
 export default {
@@ -170,12 +171,15 @@ export const Layout = () => (
 );
 
 export const Overview = () => (
-    <div style={dividerCol}>
-        <DividerSizesDemos />
-        <DividerVariantsDemos />
-        <DividerLayoutDemos />
+    <div style={{ width: '100%', maxWidth: '600px' }}>
+        <Divider size="md" style="light" />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.divider }
+    }
+};
 
 /**
  * Interactive Playground

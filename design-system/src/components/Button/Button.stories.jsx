@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Button from './Button';
 import { ButtonSizesFilledRowContainer } from './button-segmented-demos.jsx';
 
@@ -119,6 +120,23 @@ export default {
             table: { disable: true, category: 'Development' }
         }
     }
+};
+
+/**
+ * Docs-only: hero `Overview` on Button.mdx (React preview + HTML source from PLUS web-app).
+ * The canvas uses the design-system `Button`; the code panel is overridden to match production
+ * (JSP + Bootstrap `btn btn-primary` in `java/docroot/...`).
+ */
+export const Overview = {
+    parameters: {
+        docs: {
+            source: {
+                language: 'html',
+                code: webAppSourceSnippets.button
+            }
+        }
+    },
+    render: () => <Button text="Button" style="primary" fill="filled" size="medium" />
 };
 
 /** Docs-only embed for Button.mdx (`Canvas`); sidebar hidden via meta `!dev`. */

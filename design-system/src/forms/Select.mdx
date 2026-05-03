@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelectStories from './Select.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SelectStories} />
 
@@ -18,10 +18,20 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Single-select with placeholder — default docs entry.</>}>
+    <Canvas of={SelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
 <DocsCanvasShell description={<>Placeholder and value display in single-select mode.</>}>
-    <Canvas of={SelectStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SelectStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 ### Variants
 
 <DocsCanvasShell description={<>Multi-select, searchable, and creatable behaviors.</>}>
-    <Canvas of={SelectStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SelectStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={SelectStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SelectStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -51,7 +61,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 ### Interaction states
 
 <DocsCanvasShell description={<>Enabled, disabled, and read-only.</>}>
-    <Canvas of={SelectStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SelectStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>

@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DropdownStories from './Dropdown.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={DropdownStories} />
 
@@ -18,10 +18,20 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Closed and open states for single-button and split-button dropdowns, aligned to the core Figma content examples.</>}>
+    <Canvas of={DropdownStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Closed and open states for single-button and split-button dropdowns, aligned to the core Figma content examples.</>}>
-    <Canvas of={DropdownStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Single and split triggers in closed and open states.</>}>
+    <DsCanvasQuiet of={DropdownStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +41,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 ### Color styles
 
 <DocsCanvasShell description={<>Semantic color roles on the dropdown trigger.</>}>
-    <Canvas of={DropdownStories.StyleVariants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DropdownStories.StyleVariants} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +51,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 ### Fill treatments
 
 <DocsCanvasShell description={<>Filled, tonal, outline, and ghost treatments on the trigger.</>}>
-    <Canvas of={DropdownStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DropdownStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -51,7 +61,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 ### Sizes
 
 <DocsCanvasShell description={<>Small, default, and large triggers.</>}>
-    <Canvas of={DropdownStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DropdownStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -61,7 +71,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 ### Layout
 
 <DocsCanvasShell description={<>Split button and menu opening direction.</>}>
-    <Canvas of={DropdownStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={DropdownStories.Layout} />
 </DocsCanvasShell>
 
 </div>

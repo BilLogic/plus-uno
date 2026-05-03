@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PopoverStories from './Popover.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={PopoverStories} />
 
@@ -17,10 +17,20 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Popover with title and body in a fixed, non-interactive layout (always visible). Use Interactive for click/hover behavior.</>}>
+    <Canvas of={PopoverStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Body-only popover without a title.</>}>
-    <Canvas of={PopoverStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Body-only popover (no title).</>}>
+    <DsCanvasQuiet of={PopoverStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -30,7 +40,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Interaction states
 
 <DocsCanvasShell description={<>Open on click, hover, or focus.</>}>
-    <Canvas of={PopoverStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={PopoverStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +50,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 ### Layout
 
 <DocsCanvasShell description={<>Placement around the trigger: top, bottom, left, and right.</>}>
-    <Canvas of={PopoverStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={PopoverStories.Layout} />
 </DocsCanvasShell>
 
 </div>

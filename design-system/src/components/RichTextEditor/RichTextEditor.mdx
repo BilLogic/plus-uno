@@ -17,30 +17,10 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Default medium editor and placeholder.</>}>
-    <Canvas of={RichTextEditorStories.Content} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Sizes
-
-<DocsCanvasShell description={<>Small and large editor chrome.</>}>
-    <Canvas of={RichTextEditorStories.Sizes} story={{ inline: true }} sourceState="none" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interaction states
-
-<DocsCanvasShell description={<>Read-only content and disabled input.</>}>
-    <Canvas of={RichTextEditorStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Default medium editor and placeholder.</>}>
+    <Canvas of={RichTextEditorStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>

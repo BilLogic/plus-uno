@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Progress from '@/components/Progress';
 
 export default {
@@ -85,12 +86,15 @@ export const Sizes = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <ProgressVariantsDemos />
-        <ProgressEffectsDemos />
-        <ProgressSizesDemos />
+    <div style={{ width: '100%', minWidth: '200px', maxWidth: '100%' }}>
+        <Progress value={50} style="primary" size="medium" showLabel />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.progress }
+    }
+};
 
 export const Interactive = {
     args: {

@@ -1,7 +1,7 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ToastStories from './Toast.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ToastStories} />
 
@@ -17,10 +17,10 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Overview
 
-<DocsCanvasShell description={<>Semantic styles in a static container for documentation.</>}>
-    <Canvas of={ToastStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Semantic styles in a static container for documentation.</>}>
+    <Canvas of={ToastStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
 </DocsCanvasShell>
 
 </div>

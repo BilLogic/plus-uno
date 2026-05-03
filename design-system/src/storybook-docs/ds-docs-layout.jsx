@@ -6,6 +6,32 @@ import { Canvas, Controls } from '@storybook/addon-docs/blocks';
  * Use with Component.mdx + `.sb-ds-component-docs` / `.sb-ds-doc-section` wrappers.
  */
 
+/** Overview / hero canvases: inline story + source panel visible. */
+export function DsCanvasHero({ of: ofStory, layout, ...rest }) {
+    return (
+        <Canvas
+            of={ofStory}
+            story={{ inline: true }}
+            layout={layout}
+            sourceState="shown"
+            {...rest}
+        />
+    );
+}
+
+/** Secondary sections: preview only (no source). */
+export function DsCanvasQuiet({ of: ofStory, layout, ...rest }) {
+    return (
+        <Canvas
+            of={ofStory}
+            story={{ inline: true }}
+            layout={layout}
+            sourceState="none"
+            {...rest}
+        />
+    );
+}
+
 /** A card link for the top of the MDX page */
 export function ResourcesCard({ href, icon, title, description }) {
     return (
@@ -13,8 +39,12 @@ export function ResourcesCard({ href, icon, title, description }) {
             href={href || '#'} 
             target={href && href !== '#' ? "_blank" : undefined}
             rel={href && href !== '#' ? "noreferrer" : undefined}
-            className="group block p-4 rounded-xl border border-border bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-md no-underline transition-all relative text-left"
-            style={{ width: '200px', textDecoration: 'none' }}
+            className="group block p-4 border border-border bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-md no-underline transition-all relative text-left"
+            style={{
+                width: '200px',
+                textDecoration: 'none',
+                borderRadius: 'var(--size-card-radius-sm)',
+            }}
         >
             <i className="fa-solid fa-arrow-up-right-from-square absolute top-4 right-4 text-on-surface-variant opacity-50 text-sm group-hover:text-primary transition-colors"></i>
             <div className="mb-3 flex justify-start ml-[-2px]">
@@ -25,6 +55,11 @@ export function ResourcesCard({ href, icon, title, description }) {
     );
 }
 
+/**
+ * Design + repo links above the docs body.
+ * Figma: specs and tokens. GitHub: full source tree, history, and PR context — unlike the Overview code snippet,
+ * which is usually a curated web-app/JSP-style excerpt, not the whole React implementation.
+ */
 export function ResourcesBlock({ figmaLink, githubLink }) {
     if (!figmaLink && !githubLink) return null;
     return (
@@ -53,7 +88,10 @@ export function ResourcesBlock({ figmaLink, githubLink }) {
 /** Muted border + padded inner well — shared by DocsDemoBlock and DocsCanvasShell. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
-        <div className="sb-ds-docs-preview-well overflow-visible rounded-xl bg-muted/40 dark:bg-muted/25">
+        <div
+            className="sb-ds-docs-preview-well overflow-visible bg-muted/40 dark:bg-muted/25"
+            style={{ borderRadius: 'var(--size-card-radius-sm)' }}
+        >
             <div
                 className={['min-h-[100px] p-10 md:p-12 lg:p-14', innerClassName].filter(Boolean).join(' ')}
             >
@@ -83,14 +121,33 @@ export function DocsDemoBlock({ description, children, previewClassName = '', ch
     );
 }
 
-/** Wrap Storybook Canvas in the same preview chrome + spacing as DocsDemoBlock. */
-export function DocsCanvasShell({ description, children }) {
+/**
+ * Wrap Storybook Canvas in the same preview chrome + spacing as DocsDemoBlock.
+ *
+ * @param {boolean} [attachSourceBelow] — When true, the Canvas preview is a rounded card only;
+ *   the “Show code” control and source block sit below it (visually attached), not inside the card.
+ */
+export function DocsCanvasShell({ description, children, attachSourceBelow = false }) {
+    const shellClass = [
+        'sb-docs-demo',
+        'not-prose',
+        'space-y-6',
+        'md:space-y-8',
+        attachSourceBelow && 'sb-ds-docs-canvas-shell--source-attached'
+    ]
+        .filter(Boolean)
+        .join(' ');
+
     return (
-        <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
+        <div className={shellClass}>
             {description ? (
                 <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
-            <DocsPreviewCard>{children}</DocsPreviewCard>
+            {attachSourceBelow ? (
+                <div className="sb-ds-docs-canvas-attached-root">{children}</div>
+            ) : (
+                <DocsPreviewCard>{children}</DocsPreviewCard>
+            )}
         </div>
     );
 }
@@ -104,7 +161,10 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
             {description ? (
                 <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
-            <div className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible rounded-xl bg-muted/40 dark:bg-muted/25">
+            <div
+                className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible bg-muted/40 dark:bg-muted/25"
+                style={{ borderRadius: 'var(--size-card-radius-sm)' }}
+            >
                 <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
                     <Canvas of={ofStory} story={{ inline: true }} sourceState="none" />
                 </div>

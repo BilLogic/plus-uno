@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ChoiceGrid from './ChoiceGrid';
 
 export default {
@@ -61,6 +62,33 @@ const columns = [
 ];
 
 const singleRow = [{ id: 'row-1', label: 'Row 1' }];
+
+const overviewColumns = columns.slice(0, 3);
+
+export const Overview = () => {
+    const [radioValues, setRadioValues] = useState({ 'row-1': 'col-2' });
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <ChoiceGrid
+                id="choice-grid-overview"
+                name="choice-grid-overview"
+                type="radio"
+                rows={singleRow}
+                columns={overviewColumns}
+                values={radioValues}
+                onChange={(rowId, columnId) => {
+                    setRadioValues({ ...radioValues, [rowId]: columnId });
+                }}
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formChoiceGrid }
+    }
+};
 
 export const Styles = () => {
     const [radioValues, setRadioValues] = useState({ 'row-1': 'col-2' });

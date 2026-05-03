@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Dropdown from './Dropdown';
 
 export default {
@@ -252,14 +253,15 @@ export const Layout = () => (
 );
 
 export const Overview = () => (
-    <div style={dropdownCol}>
-        <DropdownContentDemos />
-        <DropdownVariantsDemos />
-        <DropdownStylesDemos />
-        <DropdownSizesDemos />
-        <DropdownLayoutDemos />
+    <div style={{ padding: '100px 24px 160px' }}>
+        <Dropdown buttonText="Dropdown" style="primary" fill="tonal" items={basicItems} />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.dropdown }
+    }
+};
 
 export const Interactive = {
     args: {

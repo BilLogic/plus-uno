@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NumberInput from './NumberInput';
 
 export default {
@@ -97,6 +98,17 @@ export default {
             table: { disable: true, category: 'Development' },
         },
     },
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '800px' }}>
+        <NumberInput id="number-input-overview" placeholder="Number" />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formNumber }
+    }
 };
 
 export const Content = () => {

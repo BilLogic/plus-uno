@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/Modal';
 
 export default {
@@ -277,13 +278,10 @@ export const Types = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={{ ...col, gap: '48px' }}>
-        <ModalContentDemos />
-        <ModalLayoutDemos />
-        <ModalScrollableDemo />
-    </div>
-);
+const modalDocsShellStyle = {
+    minHeight: 400,
+    width: '100%',
+};
 
 export const Interactive = {
     args: {
@@ -295,35 +293,41 @@ export const Interactive = {
         width: 340,
     },
     render: (args) => (
-        <InlineModalCanvas
-            minHeight={420}
-            modal={
-                <Modal
-                    {...args}
-                    renderAs="inline"
-                    primaryButton={
-                        args.showBottomButtons
-                            ? {
-                                  text: 'Primary',
-                                  style: 'primary',
-                                  fill: 'filled',
-                                  onClick: () => console.log('Primary clicked'),
-                              }
-                            : null
-                    }
-                    secondaryButton={
-                        args.showBottomButtons
-                            ? {
-                                  text: 'Secondary',
-                                  style: 'secondary',
-                                  fill: 'tonal',
-                                  onClick: () => console.log('Secondary clicked'),
-                              }
-                            : null
-                    }
-                    onClose={() => {}}
-                />
-            }
-        />
+        <div style={modalDocsShellStyle}>
+            <Modal
+                {...args}
+                renderAs="inline"
+                primaryButton={
+                    args.showBottomButtons
+                        ? {
+                              text: 'Primary',
+                              style: 'primary',
+                              fill: 'filled',
+                              onClick: () => console.log('Primary clicked'),
+                          }
+                        : null
+                }
+                secondaryButton={
+                    args.showBottomButtons
+                        ? {
+                              text: 'Secondary',
+                              style: 'secondary',
+                              fill: 'tonal',
+                              onClick: () => console.log('Secondary clicked'),
+                          }
+                        : null
+                }
+                onClose={() => {}}
+            />
+        </div>
     ),
+};
+
+export const Overview = {
+    ...Interactive,
+    parameters: {
+        docs: {
+            source: { language: 'html', code: webAppSourceSnippets.modal }
+        }
+    }
 };
