@@ -90,7 +90,7 @@ Overview.parameters = {
     }
 };
 
-export const Styles = () => {
+export const Variants = () => {
     const [radioValues, setRadioValues] = useState({ 'row-1': 'col-2' });
     const [checkboxValues, setCheckboxValues] = useState({
         'row-1': { 'col-1': true, 'col-3': true },
@@ -99,10 +99,7 @@ export const Styles = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO (ONE PER ROW)</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Single selection per row.
-                </p>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio (one per row)</span>
                 <ChoiceGrid
                     id="choice-grid-radio"
                     name="choice-grid-radio"
@@ -116,10 +113,7 @@ export const Styles = () => {
                 />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX (MANY PER ROW)</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Multiple selections per row.
-                </p>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox (multiple per row)</span>
                 <ChoiceGrid
                     id="choice-grid-checkbox"
                     name="choice-grid-checkbox"

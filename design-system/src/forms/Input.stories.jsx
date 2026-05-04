@@ -128,26 +128,41 @@ Overview.parameters = {
 
 /** Content — Placeholder vs value, label, required, and visuals. */
 export const Content = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PLACEHOLDER</span>
-            <Input id="doc-content-placeholder" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+    <div
+        style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 48,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+        }}
+    >
+        {/* Column: no-label variants */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 260 }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PLACEHOLDER</span>
+                <Input id="doc-content-placeholder" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALUE</span>
+                <Input id="doc-content-value" placeholder="Placeholder" value="Value" trailingVisual="fa-solid fa-icons" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LEADING VISUAL</span>
+                <Input id="doc-content-leading" placeholder="Placeholder" value="" leadingVisual="fa-solid fa-icons" trailingVisual="dropdown" />
+            </div>
         </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALUE</span>
-            <Input id="doc-content-value" placeholder="Placeholder" value="Value" trailingVisual="fa-solid fa-icons" />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LABEL</span>
-            <Input id="doc-content-label" placeholder="Placeholder" value="" showLabel label="Label" trailingVisual="fa-solid fa-icons" />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">REQUIRED</span>
-            <Input id="doc-content-required" placeholder="Placeholder" value="" label="Label" required trailingVisual="fa-solid fa-icons" />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LEADING VISUAL</span>
-            <Input id="doc-content-leading" placeholder="Placeholder" value="" leadingVisual="fa-solid fa-icons" trailingVisual="dropdown" />
+
+        {/* Column: labeled variants */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 260 }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LABEL</span>
+                <Input id="doc-content-label" placeholder="Placeholder" value="" showLabel label="Label" trailingVisual="fa-solid fa-icons" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">REQUIRED</span>
+                <Input id="doc-content-required" placeholder="Placeholder" value="" label="Label" required trailingVisual="fa-solid fa-icons" />
+            </div>
         </div>
     </div>
 );

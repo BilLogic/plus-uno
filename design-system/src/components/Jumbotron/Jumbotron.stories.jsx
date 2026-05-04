@@ -129,6 +129,11 @@ export const Basic = () => (
         <JumbotronBasicDemo />
     </div>
 );
+Basic.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const WithActions = () => (
     <div style={col}>

@@ -1,0 +1,71 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as ColumnRangeChartStories from './ColumnRangeChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ColumnRangeChartStories} />
+
+<Title />
+
+Shows **ranges between minimum and maximum values** for each category using bars.
+
+### Overview
+Shows **ranges between minimum and maximum values** for each category using bars.
+
+<Primary />
+
+---
+
+### How to Read
+- **Bar extent** = range from low to high value
+- **Bar position** = category on axis
+- Compare ranges visually across categories
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Temperature ranges</td><td>✅ Ideal</td></tr>
+    <tr><td>Schedule duration</td><td>✅ Ideal</td></tr>
+    <tr><td>Salary bands</td><td>✅ Good</td></tr>
+    <tr><td>Single values</td><td>❌ Use Bar Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Session Durations**</td><td>Min/max lesson times</td></tr>
+    <tr><td>**Score Ranges**</td><td>Low/high by subject</td></tr>
+    <tr><td>**Availability Windows**</td><td>Tutor schedules</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the column range chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={ColumnRangeChartStories.Interactive} />

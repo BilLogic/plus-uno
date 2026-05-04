@@ -51,7 +51,7 @@ const Dropdown = ({
         direction !== 'dropdown' ? direction : '',
         size !== 'default' ? size : '',
         style !== 'default' ? `pdropdown-${style}` : 'pdropdown-default',
-        fill !== 'filled' ? `pdropdown-${fill}` : '', // NEW: fill variant class
+        fill === 'ghost' ? 'pdropdown-ghost' : 'pdropdown-outline',
         split ? 'pdropdown-split-dropdown' : '',
         show ? 'show' : '',
         className
@@ -182,7 +182,7 @@ Dropdown.propTypes = {
     })),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default']),
-    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
+    fill: PropTypes.oneOf(['outline', 'ghost']),
     split: PropTypes.bool,
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
     className: PropTypes.string,

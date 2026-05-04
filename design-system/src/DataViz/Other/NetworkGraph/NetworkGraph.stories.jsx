@@ -4,18 +4,20 @@ import NetworkGraph from './NetworkGraph';
 export default {
     title: 'Data Visualizations/Other/NetworkGraph',
     component: NetworkGraph,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Network Graph
+                component: `## Network Graph
 
+A network graph shows **relationships and connections** between entities as nodes and links.
+
+### Overview
 A network graph shows **relationships and connections** between entities as nodes and links.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Nodes** = entities (people, concepts, items)
 - **Links/edges** = relationships between entities
 - **Clusters** = groups of closely connected nodes
@@ -23,7 +25,7 @@ A network graph shows **relationships and connections** between entities as node
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A network graph shows **relationships and connections** between entities as node
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A network graph shows **relationships and connections** between entities as node
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use meaningful node labels

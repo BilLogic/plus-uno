@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Buttons can be grouped together as individual segments of related actions.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/ButtonGroup"
 />
 
@@ -21,7 +21,17 @@ Buttons can be grouped together as individual segments of related actions.
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array when you need more custom content.</>}>
-    <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Content
+
+<DocsCanvasShell description={<>Use child <code>Button</code> elements for custom per-segment content and visuals.</>}>
+    <DsCanvasQuiet of={ButtonGroupStories.Children} />
 </DocsCanvasShell>
 
 </div>
@@ -30,12 +40,18 @@ Buttons can be grouped together as individual segments of related actions.
 
 ### Variants
 
-<DocsCanvasShell description={<>Two through five connected segments.</>}>
+<DocsCanvasShell description={<>Connected groups with two through five segments.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Counts} />
 </DocsCanvasShell>
 
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Patterns
+
 <DocsCanvasShell description={<>Common grouped patterns like pagination controls, toolbars, and segmented toggles.</>}>
-    <DsCanvasQuiet of={ButtonGroupStories.UseCases} />
+    <DsCanvasQuiet of={ButtonGroupStories.Patterns} />
 </DocsCanvasShell>
 
 </div>
@@ -52,7 +68,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <DocsCanvasShell description={<>Horizontal default versus vertical stacking.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Layout} />
@@ -62,7 +78,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={ButtonGroupStories.Interactive}

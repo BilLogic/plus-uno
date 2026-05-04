@@ -4,18 +4,20 @@ import BarChart from './BarChart';
 export default {
     title: 'Data Visualizations/Comparison/BarChart',
     component: BarChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Bar Chart
+                component: `## Bar Chart
 
+A bar chart (or column chart) is one of the most common and effective data visualization types for **comparing categorical data**.
+
+### Overview
 A bar chart (or column chart) is one of the most common and effective data visualization types for **comparing categorical data**.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Height/Length** of each bar represents the value for that category
 - **Grouped bars** allow comparison of multiple series within each category
 - Compare bars visually by their relative lengths
@@ -23,7 +25,7 @@ A bar chart (or column chart) is one of the most common and effective data visua
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -39,7 +41,7 @@ A bar chart (or column chart) is one of the most common and effective data visua
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -51,7 +53,7 @@ A bar chart (or column chart) is one of the most common and effective data visua
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Start Y-axis at zero

@@ -4,25 +4,27 @@ import ArcDiagram from './ArcDiagram';
 export default {
     title: 'Data Visualizations/Other/ArcDiagram',
     component: ArcDiagram,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Arc Diagram
+                component: `## Arc Diagram
 
+Shows **nodes and links along a single axis** to visualize connections.
+
+### Overview
 Shows **nodes and links along a single axis** to visualize connections.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Nodes** = placed on a line
 - **Arcs** = connections between nodes
 - **Arc thickness** = strength/weight of connection
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows **nodes and links along a single axis** to visualize connections.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Lesson Flow** | Valid transitions between lessons |
 | **Student Interactions** | Connections between classmates |
 | **Topic Relations** | Linked concepts |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the arc diagram setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -64,6 +81,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

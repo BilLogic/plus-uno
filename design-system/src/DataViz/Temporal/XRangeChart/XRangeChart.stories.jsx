@@ -4,25 +4,27 @@ import XRangeChart from './XRangeChart';
 export default {
     title: 'Data Visualizations/Temporal/XRangeChart',
     component: XRangeChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## X-Range Chart
+                component: `## X-Range Chart
 
 Shows **ranges on an X-axis** (usually time). A simpler alternative to Gantt charts.
 
+### Overview
+Shows **ranges on an X-axis** (usually time).
+
 ---
 
-### 📖 How to Read
+### How to Read
 - **Bars** = duration of task/event
 - **X-axis** = time
 - **Y-axis** = category/resource
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows **ranges on an X-axis** (usually time). A simpler alternative to Gantt cha
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Tutor Availability** | Time slots blocked out |
 | **Exam Schedule** | Test durations |
 | **Lesson Plan** | Topic duration estimates |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the x range chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -67,6 +84,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

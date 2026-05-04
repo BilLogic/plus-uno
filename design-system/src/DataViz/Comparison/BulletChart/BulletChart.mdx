@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as BulletChartStories from './BulletChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BulletChartStories} />
+
+<Title />
+
+A bullet chart displays **actual vs target** performance with qualitative ranges, replacing gauges in dashboards.
+
+### Overview
+A bullet chart displays **actual vs target** performance with qualitative ranges, replacing gauges in dashboards.
+
+<Primary />
+
+---
+
+### How to Read
+- **Bar** = actual value
+- **Vertical line** = target value
+- **Background zones** = qualitative ranges (poor/ok/good)
+- Bar reaching target = goal met
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>KPI vs target</td><td>✅ Ideal</td></tr>
+    <tr><td>Goal progress</td><td>✅ Ideal</td></tr>
+    <tr><td>Multiple metrics dashboard</td><td>✅ Good</td></tr>
+    <tr><td>Single metric</td><td>❌ Use Gauge</td></tr>
+    <tr><td>Time trends</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Session Goals**</td><td>Actual sessions vs weekly target</td></tr>
+    <tr><td>**Completion Rate**</td><td>Current % vs goal %</td></tr>
+    <tr><td>**Performance Metrics**</td><td>Score vs benchmark</td></tr>
+    <tr><td>**Revenue Targets**</td><td>Actual vs budget</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use consistent color bands (red/yellow/green)
+✅ Show clear target marker
+✅ Compare multiple bullets vertically
+✅ Include metric labels
+
+**Avoid:**
+❌ Inconsistent scales across bullets
+❌ Missing target markers
+❌ Too many range zones (>3)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={BulletChartStories.Interactive} />

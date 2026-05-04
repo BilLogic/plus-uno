@@ -42,10 +42,6 @@ const col = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '
 function SpinnerVariantsDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VARIANTS</span>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Different animation styles for loading indicators.
-            </p>
             <div style={{ display: 'flex', gap: '32px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
@@ -75,11 +71,6 @@ function SpinnerVariantsDemos() {
 function SpinnerStylesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COLOR</span>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                All loading indicators use the neutral token <code className="text-foreground">--color-on-surface-variant</code>{' '}
-                (border, grow, and custom animations).
-            </p>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
@@ -97,10 +88,6 @@ function SpinnerStylesDemos() {
 function SpinnerSizesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Default and small border spinner.
-            </p>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />

@@ -4,18 +4,20 @@ import WaterfallChart from './WaterfallChart';
 export default {
     title: 'Data Visualizations/Temporal/WaterfallChart',
     component: WaterfallChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Waterfall Chart
+                component: `## Waterfall Chart
 
+A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+
+### Overview
 A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **First bar** = starting value
 - **Green bars** = positive additions
 - **Red bars** = deductions/losses
@@ -24,7 +26,7 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -36,7 +38,7 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use green for additions, red for subtractions

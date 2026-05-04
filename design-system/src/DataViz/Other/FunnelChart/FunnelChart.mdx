@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as FunnelChartStories from './FunnelChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FunnelChartStories} />
+
+<Title />
+
+A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
+
+### Overview
+A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
+
+<Primary />
+
+---
+
+### How to Read
+- **Widest section** = starting point (most volume)
+- **Narrowing** = drop-off at each stage
+- **Width** = proportional to stage value
+- Compare adjacent sections for conversion rates
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Sales pipelines</td><td>✅ Ideal</td></tr>
+    <tr><td>Conversion funnels</td><td>✅ Ideal</td></tr>
+    <tr><td>Process efficiency</td><td>✅ Good</td></tr>
+    <tr><td>Non-sequential data</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Time-based trends</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Student Journey**</td><td>Interest → Trial → Enrollment → Active</td></tr>
+    <tr><td>**Learning Path**</td><td>Started → Engaged → Completed → Certified</td></tr>
+    <tr><td>**Onboarding**</td><td>Sign-up → Profile → First Session → Regular</td></tr>
+    <tr><td>**Assessment Flow**</td><td>Started → Submitted → Passed</td></tr>
+    <tr><td>**Referral Process**</td><td>Referred → Signed Up → Converted</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Order from largest to smallest
+✅ Show percentages with values
+✅ Use consistent colors/gradient
+✅ Label each stage clearly
+
+**Avoid:**
+❌ Non-sequential relationships
+❌ More than 5-7 stages
+❌ Stages that don't flow logically
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={FunnelChartStories.Interactive} />

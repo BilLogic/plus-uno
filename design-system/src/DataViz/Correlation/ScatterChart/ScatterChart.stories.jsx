@@ -4,18 +4,20 @@ import ScatterChart from './ScatterChart';
 export default {
     title: 'Data Visualizations/Correlation/ScatterChart',
     component: ScatterChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Scatter Chart
+                component: `## Scatter Chart
 
+A scatter chart plots data points on X-Y axes to reveal **relationships and correlations** between two variables.
+
+### Overview
 A scatter chart plots data points on X-Y axes to reveal **relationships and correlations** between two variables.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - Each **dot** represents one data point
 - **X position** = first variable value
 - **Y position** = second variable value
@@ -23,7 +25,7 @@ A scatter chart plots data points on X-Y axes to reveal **relationships and corr
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A scatter chart plots data points on X-Y axes to reveal **relationships and corr
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A scatter chart plots data points on X-Y axes to reveal **relationships and corr
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use clear axis labels with units

@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as DonutChartStories from './DonutChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DonutChartStories} />
+
+<Title />
+
+A donut chart shows **part-to-whole relationships** with a center cutout, ideal for displaying completion rates and KPIs.
+
+### Overview
+A donut chart shows **part-to-whole relationships** with a center cutout, ideal for displaying completion rates and KPIs.
+
+<Primary />
+
+---
+
+### How to Read
+- Each **segment** = a proportion of the whole
+- **Segment size** = percentage of total
+- **Center value** = key metric or total
+- All segments should sum to 100%
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Progress indicators</td><td>✅ Ideal</td></tr>
+    <tr><td>KPI displays</td><td>✅ Ideal</td></tr>
+    <tr><td>2-5 category proportions</td><td>✅ Good</td></tr>
+    <tr><td>Comparing multiple items</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Precise comparisons</td><td>❌ Use Bar Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Course Completion**</td><td>% of modules completed</td></tr>
+    <tr><td>**Goal Progress**</td><td>Sessions done vs target</td></tr>
+    <tr><td>**Skill Mastery**</td><td>Skills mastered vs total</td></tr>
+    <tr><td>**Engagement Rate**</td><td>Active vs inactive students</td></tr>
+    <tr><td>**Time Allocation**</td><td>Time spent per subject</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Limit to 5 or fewer segments
+✅ Use center for key values
+✅ Ensure segments sum to 100%
+✅ Use contrasting colors
+
+**Avoid:**
+❌ Comparing multiple donuts
+❌ Many small segments
+❌ Precise value comparisons
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={DonutChartStories.Interactive} />

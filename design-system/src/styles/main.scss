@@ -35,23 +35,41 @@
 // Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
 // Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
 .plus-card {
-    margin: 0; // Remove any default margin from React Bootstrap Card
-    background-color: var(--color-surface-container-lowest); // Card background color token
+    --plus-card-pad-x: 0px;
+    --plus-card-pad-y: 0px;
+    margin: 0;
+    overflow: hidden; // clip image to card border-radius
+    background-color: var(--color-surface-container-lowest);
 }
 
 .plus-card .plus-card-content {
     padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
 }
 
+// Image always flush to top/left/right edges regardless of card padding size
+.plus-card .plus-card-image {
+    display: block;
+    width: calc(100% + 2 * var(--plus-card-pad-x));
+    margin-top: calc(-1 * var(--plus-card-pad-y));
+    margin-left: calc(-1 * var(--plus-card-pad-x));
+    margin-right: calc(-1 * var(--plus-card-pad-x));
+}
+
 .plus-card-pad-sm {
+    --plus-card-pad-x: var(--size-card-pad-x-sm);
+    --plus-card-pad-y: var(--size-card-pad-y-sm);
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
 }
 
 .plus-card-pad-md {
+    --plus-card-pad-x: var(--size-card-pad-x-md);
+    --plus-card-pad-y: var(--size-card-pad-y-md);
     padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
 }
 
 .plus-card-pad-lg {
+    --plus-card-pad-x: var(--size-card-pad-x-lg);
+    --plus-card-pad-y: var(--size-card-pad-y-lg);
     padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
 }
 

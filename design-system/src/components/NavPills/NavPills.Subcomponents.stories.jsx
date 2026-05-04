@@ -198,6 +198,11 @@ export const NavPillsSubOverview = () => (
         <NavPillsSubLayoutDemos />
     </div>
 );
+NavPillsSubOverview.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const NavPillsItemInteractive = (args) => {
     const [activeKey, setActiveKey] = useState('selected');

@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Use a select input when a user needs to select one or multiple options from a long list.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
 />
 
@@ -21,7 +21,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Single-select with placeholder — default docs entry.</>}>
-    <Canvas of={SelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={SelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -38,10 +38,10 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### Variants
+### Modes
 
 <DocsCanvasShell description={<>Multi-select, searchable, and creatable behaviors.</>}>
-    <DsCanvasQuiet of={SelectStories.Styles} />
+    <DsCanvasQuiet of={SelectStories.Modes} />
 </DocsCanvasShell>
 
 </div>
@@ -68,7 +68,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={SelectStories.Interactive}

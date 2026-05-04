@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as ComboChartStories from './ComboChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ComboChartStories} />
+
+<Title />
+
+A combo chart helps compare and communicate key patterns in the underlying data.
+
+### Overview
+A combo chart helps compare and communicate key patterns in the underlying data.
+
+<Primary />
+
+---
+
+### How to Read
+- Start with the primary axis and labels to understand the scale
+- Compare shapes, lengths, or positions to identify differences
+- Use legend and annotations to interpret series or categories
+- Look for outliers, clusters, or trend changes
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Communicating key comparisons</td><td>✅ Ideal</td></tr>
+    <tr><td>Highlighting notable patterns</td><td>✅ Ideal</td></tr>
+    <tr><td>Showing supporting context</td><td>✅ Good</td></tr>
+    <tr><td>Displaying exact raw tables</td><td>❌ Use data table</td></tr>
+    <tr><td>Dense exploratory analysis</td><td>❌ Use interactive analysis view</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Learner Progress**</td><td>Compare progress metrics across cohorts</td></tr>
+    <tr><td>**Content Performance**</td><td>Highlight top and low performing modules</td></tr>
+    <tr><td>**Engagement Signals**</td><td>Surface usage patterns by period</td></tr>
+    <tr><td>**Program Outcomes**</td><td>Track outcomes across programs or terms</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the combo chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={ComboChartStories.Interactive} />

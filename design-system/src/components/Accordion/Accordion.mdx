@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Accordion component for organizing content into collapsible sections. Built on React Bootstrap with custom styling per the design system.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Accordion"
 />
 
@@ -20,7 +20,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Composable children instead of the `items` array.</>}>
-    <Canvas of={AccordionStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={AccordionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -57,7 +57,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+### States
 
 <DocsCanvasShell description={<>Per-header affordances on the trigger (here: <code>disabled</code>). Expanded vs collapsed is <strong>disclosure state</strong> (which keys are open), separate from disabled, hover, focus, or pressed styling on the header.</>}>
     <DsCanvasQuiet of={AccordionStories.InteractionStates} />
@@ -67,7 +67,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={AccordionStories.Interactive}

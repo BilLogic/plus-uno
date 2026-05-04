@@ -96,10 +96,7 @@ export const Content = () => {
     return (
         <div style={scaleCol}>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE SCALE</span>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Three-point scale with end labels and labels above each radio button.
-                </p>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Baseline scale</span>
                 <Scale
                     id="scale-content"
                     name="scale-content"
@@ -127,7 +124,7 @@ export const Variants = () => {
     return (
         <div style={scaleCol}>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOUR OPTIONS</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Four options</span>
                 <Scale
                     id="scale-4-options"
                     name="scale-4-options"
@@ -144,7 +141,7 @@ export const Variants = () => {
                 />
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIVE OPTIONS</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Five options</span>
                 <Scale
                     id="scale-5-options"
                     name="scale-5-options"
@@ -162,7 +159,7 @@ export const Variants = () => {
                 />
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SEVEN OPTIONS</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Seven options</span>
                 <Scale
                     id="scale-7-options"
                     name="scale-7-options"
@@ -188,10 +185,7 @@ export const Variants = () => {
 export const InteractionStates = () => (
     <div style={scaleCol}>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Disabled scales remain readable but cannot be changed.
-            </p>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Disabled</span>
             <Scale
                 id="scale-disabled"
                 name="scale-disabled"

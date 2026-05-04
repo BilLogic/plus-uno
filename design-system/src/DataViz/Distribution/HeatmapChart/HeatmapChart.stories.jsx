@@ -4,18 +4,20 @@ import HeatmapChart from './HeatmapChart';
 export default {
     title: 'Data Visualizations/Distribution/HeatmapChart',
     component: HeatmapChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Heatmap Chart
+                component: `## Heatmap Chart
 
+A heatmap displays data as a **matrix of colored cells**, where color intensity represents value magnitude.
+
+### Overview
 A heatmap displays data as a **matrix of colored cells**, where color intensity represents value magnitude.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Rows/Columns** = categories being compared
 - **Cell color** = value intensity (darker = higher)
 - **Color scale** = reference for interpreting values
@@ -23,7 +25,7 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use sequential color scale (light→dark)

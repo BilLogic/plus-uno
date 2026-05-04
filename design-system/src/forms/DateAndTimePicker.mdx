@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Date and time pickers let people select a date or range of dates and/or a time from a visual calendar and time list.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
 />
 
@@ -21,7 +21,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Compact date and time row with field label.</>}>
-    <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -38,7 +38,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Validation & feedback
 
 <DocsCanvasShell description={<>Invalid and success validation.</>}>
     <DsCanvasQuiet of={TimePickerStories.Styles} />
@@ -68,7 +68,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={TimePickerStories.Interactive}

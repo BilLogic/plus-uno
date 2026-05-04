@@ -94,7 +94,7 @@ function DividerVariantsDemos() {
                         <span className="plus-label" style={{ fontSize: '12px', marginBottom: '8px', display: 'block' }}>Light Style</span>
                         <Divider style="light" />
                     </div>
-                    <div style={{ backgroundColor: 'var(--color-surface-container)', padding: '16px', borderRadius: '8px' }}>
+                    <div>
                         <span className="plus-label" style={{ fontSize: '12px', marginBottom: '8px', display: 'block' }}>Dark Style</span>
                         <Divider style="dark" />
                     </div>
@@ -172,7 +172,9 @@ export const Layout = () => (
 
 export const Overview = () => (
     <div style={{ width: '100%', maxWidth: '600px' }}>
+        <p className="plus-body-1" style={{ marginBottom: '12px', color: 'var(--color-on-surface)' }}>Section above</p>
         <Divider size="md" style="light" />
+        <p className="plus-body-1" style={{ marginTop: '12px', color: 'var(--color-on-surface)' }}>Section below</p>
     </div>
 );
 Overview.parameters = {

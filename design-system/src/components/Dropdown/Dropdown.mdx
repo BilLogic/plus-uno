@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Toggle contextual overlays for displaying lists of links and more with the Bootstrap dropdown plugin.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19488&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Dropdown"
 />
 
@@ -21,7 +21,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Closed and open states for single-button and split-button dropdowns, aligned to the core Figma content examples.</>}>
-    <Canvas of={DropdownStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={DropdownStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -38,20 +38,10 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Color styles
+### Variants
 
-<DocsCanvasShell description={<>Semantic color roles on the dropdown trigger.</>}>
+<DocsCanvasShell description={<>Semantic roles for the trigger, matching the Dropdown variants frame in Figma (outline default; ghost shown as the alternate treatment).</>}>
     <DsCanvasQuiet of={DropdownStories.StyleVariants} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Fill treatments
-
-<DocsCanvasShell description={<>Filled, tonal, outline, and ghost treatments on the trigger.</>}>
-    <DsCanvasQuiet of={DropdownStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -68,7 +58,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <DocsCanvasShell description={<>Split button and menu opening direction.</>}>
     <DsCanvasQuiet of={DropdownStories.Layout} />
@@ -78,7 +68,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={DropdownStories.Interactive}

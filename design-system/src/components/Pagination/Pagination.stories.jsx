@@ -77,10 +77,6 @@ function PaginationContentDemos() {
     return (
         <>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON TYPE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Chevron-only previous/next controls with numeric page items.
-                </p>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
@@ -91,11 +87,7 @@ function PaginationContentDemos() {
                     />
                 </div>
             </section>
-            <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT TYPE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Uses explicit Previous/Next labels for stronger textual affordance.
-                </p>
+            <section style={{ marginTop: '24px' }}>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}

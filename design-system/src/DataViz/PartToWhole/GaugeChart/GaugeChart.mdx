@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as GaugeChartStories from './GaugeChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={GaugeChartStories} />
+
+<Title />
+
+A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
+
+### Overview
+A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
+
+<Primary />
+
+---
+
+### How to Read
+- **Needle/fill position** indicates current value
+- **Scale** shows the range (min to max)
+- **Center text** displays the exact value
+- Color zones can indicate performance thresholds
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Single KPI display</td><td>✅ Ideal</td></tr>
+    <tr><td>Progress toward goal</td><td>✅ Ideal</td></tr>
+    <tr><td>Performance dashboards</td><td>✅ Good</td></tr>
+    <tr><td>Multiple values</td><td>❌ Use Bar/Donut</td></tr>
+    <tr><td>Trend over time</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Completion Rate**</td><td>Course/module completion %</td></tr>
+    <tr><td>**Session Goals**</td><td>Sessions completed vs target</td></tr>
+    <tr><td>**Student Progress**</td><td>Learning objectives achieved</td></tr>
+    <tr><td>**Platform Health**</td><td>System uptime, response time</td></tr>
+    <tr><td>**Tutor Metrics**</td><td>Student satisfaction score</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use sparingly for key metrics only
+✅ Include clear min/max labels
+✅ Add color zones for thresholds (red/yellow/green)
+✅ Show exact value in center
+
+**Avoid:**
+❌ Too many gauges on one dashboard
+❌ Comparing multiple gauges (use bar charts)
+❌ Complex scales or many tick marks
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={GaugeChartStories.Interactive} />

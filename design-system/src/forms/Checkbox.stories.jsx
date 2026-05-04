@@ -82,15 +82,6 @@ function CheckboxContentDemos() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Short label</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Compact label copy for dense forms.
-                </p>
-                <div style={contentVariantCard}>
-                    <Checkbox id="cb-content-short" name="cb-content-short" label="Short label" defaultChecked />
-                </div>
-            </section>
-            <section>
                 <h6 className="h6" style={{ marginBottom: '8px' }}>Long label</h6>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Longer descriptive copy used in forms and filters.

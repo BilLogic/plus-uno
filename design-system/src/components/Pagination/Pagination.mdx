@@ -8,7 +8,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Pagination"
 />
 
@@ -20,7 +20,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Navigation content patterns: icon controls vs text controls.</>}>
-    <Canvas of={PaginationStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={PaginationStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -47,7 +47,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+### States
 
 <DocsCanvasShell description={<>Disabled controls on first/last page and enabled controls in middle pages.</>}>
     <DsCanvasQuiet of={PaginationStories.InteractionStates} />
@@ -57,7 +57,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={PaginationStories.Interactive}

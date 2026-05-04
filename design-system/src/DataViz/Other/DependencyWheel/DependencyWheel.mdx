@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as DependencyWheelStories from './DependencyWheel.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DependencyWheelStories} />
+
+<Title />
+
+A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+
+### Overview
+A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+
+<Primary />
+
+---
+
+### How to Read
+- **Nodes** = entities around the circle
+- **Chords** = connections between entities
+- **Chord width** = strength of connection
+- Follow chords to trace relationships
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Mutual dependencies</td><td>✅ Ideal</td></tr>
+    <tr><td>Trade/flow relationships</td><td>✅ Ideal</td></tr>
+    <tr><td>Interconnected systems</td><td>✅ Good</td></tr>
+    <tr><td>Hierarchical data</td><td>❌ Use Sunburst</td></tr>
+    <tr><td>Directional flows</td><td>❌ Use Sankey</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Skill Dependencies**</td><td>How skills relate to each other</td></tr>
+    <tr><td>**Peer Learning**</td><td>Student collaboration patterns</td></tr>
+    <tr><td>**Content Links**</td><td>How topics reference each other</td></tr>
+    <tr><td>**Prerequisite Map**</td><td>Skill requirements visualization</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Limit to 10-15 nodes maximum
+✅ Use color to group categories
+✅ Show connection weights in tooltips
+✅ Order nodes logically
+
+**Avoid:**
+❌ Too many nodes (becomes unreadable)
+❌ Very weak connections (filter them out)
+❌ Unrelated entities
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={DependencyWheelStories.Interactive} />

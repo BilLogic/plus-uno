@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as LollipopChartStories from './LollipopChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={LollipopChartStories} />
+
+<Title />
+
+A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems instead of bars.
+
+### Overview
+A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems instead of bars.
+
+<Primary />
+
+---
+
+### How to Read
+- **Dot position** = value for that category
+- **Stem** = visual connection to axis
+- Compare dot positions to compare values
+- Easier to read with many categories
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Rankings with many items</td><td>✅ Ideal</td></tr>
+    <tr><td>Clean value comparison</td><td>✅ Ideal</td></tr>
+    <tr><td>Data with small differences</td><td>✅ Good</td></tr>
+    <tr><td>Part-to-whole</td><td>❌ Use Stacked Bar</td></tr>
+    <tr><td>Grouped comparisons</td><td>❌ Use Bar Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Student Rankings**</td><td>Scores by student</td></tr>
+    <tr><td>**Content Popularity**</td><td>Lesson views by lesson</td></tr>
+    <tr><td>**Tutor Ratings**</td><td>Average ratings by tutor</td></tr>
+    <tr><td>**Subject Performance**</td><td>Average scores by subject</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Sort by value for rankings
+✅ Use horizontally for long labels
+✅ Highlight key items with color
+✅ Add value labels at dots
+
+**Avoid:**
+❌ Grouped lollipops (confusing)
+❌ Missing axis labels
+❌ Inconsistent dot sizes
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={LollipopChartStories.Interactive} />

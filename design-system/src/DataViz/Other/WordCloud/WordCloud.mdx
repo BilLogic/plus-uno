@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as WordCloudStories from './WordCloud.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={WordCloudStories} />
+
+<Title />
+
+A word cloud displays **text frequency** with word size proportional to occurrence.
+
+### Overview
+A word cloud displays **text frequency** with word size proportional to occurrence.
+
+<Primary />
+
+---
+
+### How to Read
+- **Larger words** = more frequent/important
+- **Smaller words** = less frequent
+- Position is typically random (no meaning)
+- Focus on the most prominent words first
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Text analysis overview</td><td>✅ Ideal</td></tr>
+    <tr><td>Survey response themes</td><td>✅ Ideal</td></tr>
+    <tr><td>Tag/keyword display</td><td>✅ Good</td></tr>
+    <tr><td>Precise frequency comparison</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Categorical analysis</td><td>❌ Use Treemap</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Feedback Analysis**</td><td>Common words in student feedback</td></tr>
+    <tr><td>**Topic Tagging**</td><td>Frequently discussed topics</td></tr>
+    <tr><td>**Learning Keywords**</td><td>Key terms in course content</td></tr>
+    <tr><td>**Survey Responses**</td><td>Open-ended question themes</td></tr>
+    <tr><td>**Session Notes**</td><td>Common themes in tutor notes</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Filter out common words (the, and, etc.)
+✅ Limit to top 50-100 words
+✅ Use readable fonts
+✅ Consider color by category
+
+**Avoid:**
+❌ Precise value comparisons
+❌ Too many words (illegible)
+❌ Very long words (layout issues)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={WordCloudStories.Interactive} />

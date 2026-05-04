@@ -8,7 +8,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Divider"
 />
 
@@ -20,7 +20,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Divider thickness / size scale.</>}>
-    <Canvas of={DividerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={DividerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -37,7 +37,17 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Variants
+
+<DocsCanvasShell description={<>Light and dark divider styles, plus reduced-opacity treatment for subtle separation.</>}>
+    <DsCanvasQuiet of={DividerStories.Styles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
 
 <DocsCanvasShell description={<>Custom widths and a typical stacked content pattern.</>}>
     <DsCanvasQuiet of={DividerStories.Layout} />
@@ -47,7 +57,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={DividerStories.Interactive}

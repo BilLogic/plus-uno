@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as BoxPlotChartStories from './BoxPlotChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BoxPlotChartStories} />
+
+<Title />
+
+A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and maximum values.
+
+### Overview
+A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and maximum values.
+
+<Primary />
+
+---
+
+### How to Read
+- **Box** spans from Q1 (25th percentile) to Q3 (75th percentile)
+- **Line inside box** = median (50th percentile)
+- **Whiskers** extend to min and max values
+- **Box width** = interquartile range (IQR), represents middle 50% of data
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Comparing distributions</td><td>✅ Ideal</td></tr>
+    <tr><td>Statistical analysis</td><td>✅ Ideal</td></tr>
+    <tr><td>Identifying outliers</td><td>✅ Good</td></tr>
+    <tr><td>Showing exact values</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Time trends</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Test Score Distribution**</td><td>Compare score spreads across classes</td></tr>
+    <tr><td>**Session Duration**</td><td>Analyze tutoring session length patterns</td></tr>
+    <tr><td>**Response Times**</td><td>Compare platform performance metrics</td></tr>
+    <tr><td>**Assignment Grades**</td><td>Distribution by assignment type</td></tr>
+    <tr><td>**Tutor Ratings**</td><td>Rating distribution by subject</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Label axes clearly with units
+✅ Show outliers as individual points
+✅ Use consistent scales when comparing
+✅ Include sample size in labels if relevant
+
+**Avoid:**
+❌ Small sample sizes (&lt;10 per group)
+❌ Non-numeric data
+❌ Comparing too many groups (>10)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={BoxPlotChartStories.Interactive} />

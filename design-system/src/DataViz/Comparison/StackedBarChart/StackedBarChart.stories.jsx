@@ -4,18 +4,20 @@ import StackedBarChart from './StackedBarChart';
 export default {
     title: 'Data Visualizations/Comparison/StackedBarChart',
     component: StackedBarChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Stacked Bar Chart
+                component: `## Stacked Bar Chart
 
+A stacked bar chart shows **part-to-whole relationships within comparative categories**, stacking segments to show composition.
+
+### Overview
 A stacked bar chart shows **part-to-whole relationships within comparative categories**, stacking segments to show composition.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Each bar** = total value for that category
 - **Segments** = components that make up the total
 - **Segment height** = proportion of that component
@@ -23,7 +25,7 @@ A stacked bar chart shows **part-to-whole relationships within comparative categ
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A stacked bar chart shows **part-to-whole relationships within comparative categ
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A stacked bar chart shows **part-to-whole relationships within comparative categ
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use consistent segment colors across bars

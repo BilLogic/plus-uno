@@ -8,7 +8,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Popover"
 />
 
@@ -20,7 +20,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Popover with title and body in a fixed, non-interactive layout (always visible). Use Interactive for click/hover behavior.</>}>
-    <Canvas of={PopoverStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={PopoverStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -37,7 +37,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+### States
 
 <DocsCanvasShell description={<>Open on click, hover, or focus.</>}>
     <DsCanvasQuiet of={PopoverStories.InteractionStates} />
@@ -47,7 +47,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <DocsCanvasShell description={<>Placement around the trigger: top, bottom, left, and right.</>}>
     <DsCanvasQuiet of={PopoverStories.Layout} />
@@ -57,7 +57,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={PopoverStories.Interactive}

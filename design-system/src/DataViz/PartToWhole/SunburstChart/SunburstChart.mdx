@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as SunburstChartStories from './SunburstChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SunburstChartStories} />
+
+<Title />
+
+A sunburst chart displays **hierarchical data as nested rings**, radiating from centre outward.
+
+### Overview
+A sunburst chart displays **hierarchical data as nested rings**, radiating from centre outward.
+
+<Primary />
+
+---
+
+### How to Read
+- **Center** = root/top-level category
+- **Outer rings** = child/nested levels
+- **Arc size** = proportion relative to parent
+- Click to drill down (if interactive)
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Hierarchical part-to-whole</td><td>✅ Ideal</td></tr>
+    <tr><td>Multi-level drill-down</td><td>✅ Ideal</td></tr>
+    <tr><td>Category breakdowns</td><td>✅ Good</td></tr>
+    <tr><td>Flat data</td><td>❌ Use Pie/Donut</td></tr>
+    <tr><td>Many levels (>4)</td><td>❌ Use Treemap</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Curriculum Structure**</td><td>Subject → Unit → Lesson</td></tr>
+    <tr><td>**Competency Framework**</td><td>Domain → Skill → Indicator</td></tr>
+    <tr><td>**Time Breakdown**</td><td>Category → Subcategory → Activity</td></tr>
+    <tr><td>**Content Organization**</td><td>Library → Section → Resource</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Limit to 3-4 levels
+✅ Use color to encode categories
+✅ Enable drill-down interaction
+✅ Show labels for major arcs
+
+**Avoid:**
+❌ Too many segments (illegible)
+❌ Deep hierarchies (>4 levels)
+❌ Flat data without hierarchy
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={SunburstChartStories.Interactive} />

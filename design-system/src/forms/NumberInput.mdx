@@ -8,7 +8,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
 />
 
@@ -20,7 +20,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default numeric field with steppers.</>}>
-    <Canvas of={NumberInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={NumberInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -37,20 +37,10 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Validation & feedback
 
 <DocsCanvasShell description={<>Validation styling: invalid and success.</>}>
     <DsCanvasQuiet of={NumberInputStories.Styles} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Sizes
-
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <DsCanvasQuiet of={NumberInputStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -67,7 +57,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={NumberInputStories.Interactive}

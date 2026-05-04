@@ -4,18 +4,20 @@ import DumbbellChart from './DumbbellChart';
 export default {
     title: 'Data Visualizations/Comparison/DumbbellChart',
     component: DumbbellChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Dumbbell Chart
+                component: `## Dumbbell Chart
 
+A dumbbell chart shows the **change or gap between two values** for each category.
+
+### Overview
 A dumbbell chart shows the **change or gap between two values** for each category.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Two dots** = start and end values
 - **Bar connecting** = range/change between them
 - Longer bars = bigger changes/gaps
@@ -23,7 +25,7 @@ A dumbbell chart shows the **change or gap between two values** for each categor
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A dumbbell chart shows the **change or gap between two values** for each categor
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A dumbbell chart shows the **change or gap between two values** for each categor
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Sort by gap size for impact

@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as NetworkGraphStories from './NetworkGraph.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={NetworkGraphStories} />
+
+<Title />
+
+A network graph shows **relationships and connections** between entities as nodes and links.
+
+### Overview
+A network graph shows **relationships and connections** between entities as nodes and links.
+
+<Primary />
+
+---
+
+### How to Read
+- **Nodes** = entities (people, concepts, items)
+- **Links/edges** = relationships between entities
+- **Clusters** = groups of closely connected nodes
+- **Central nodes** = highly connected entities
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Showing relationships</td><td>✅ Ideal</td></tr>
+    <tr><td>Social networks</td><td>✅ Ideal</td></tr>
+    <tr><td>Concept maps</td><td>✅ Good</td></tr>
+    <tr><td>Hierarchical data</td><td>❌ Use Sunburst/Treemap</td></tr>
+    <tr><td>Sequential flows</td><td>❌ Use Sankey</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Concept Maps**</td><td>How learning topics connect</td></tr>
+    <tr><td>**Student Networks**</td><td>Peer tutoring relationships</td></tr>
+    <tr><td>**Skill Dependencies**</td><td>Prerequisites between skills</td></tr>
+    <tr><td>**Tutor-Student Matching**</td><td>Assignment relationships</td></tr>
+    <tr><td>**Content Relationships**</td><td>How lessons relate to each other</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use meaningful node labels
+✅ Color-code node types
+✅ Allow interactive exploration
+✅ Show edge weights when relevant
+
+**Avoid:**
+❌ Too many nodes (>50 becomes cluttered)
+❌ Missing labels
+❌ Overlapping node positions
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={NetworkGraphStories.Interactive} />

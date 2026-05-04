@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Use text area for multi-line text input form fields.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13338-2290&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
 />
 
@@ -21,17 +21,21 @@ Use text area for multi-line text input form fields.
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Long form (boxed) textarea with label and placeholder.</>}>
-    <Canvas of={TextareaStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={TextareaStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Variants
 
 <DocsCanvasShell description={<>Long (boxed) and short (underlined) styles.</>}>
     <DsCanvasQuiet of={TextareaStories.Styles} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Size variants: small, medium, and large.</>}>
+    <DsCanvasQuiet of={TextareaStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -40,7 +44,7 @@ Use text area for multi-line text input form fields.
 
 ### Interaction states
 
-<DocsCanvasShell description={<>Long form: default, focus, filled, error, disabled, read-only.</>}>
+<DocsCanvasShell description={<>Long form: default, focus, filled, valid, error, disabled, read-only (plus placeholder examples).</>}>
     <DsCanvasQuiet of={TextareaStories.InteractionStatesLong} />
 </DocsCanvasShell>
 
@@ -52,7 +56,7 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={TextareaStories.Interactive}

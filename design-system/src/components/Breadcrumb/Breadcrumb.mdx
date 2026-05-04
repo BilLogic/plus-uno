@@ -10,7 +10,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Use breadcrumbs to show navigational context on pages that are many levels deep in a site's hierarchy.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Breadcrumb"
 />
 
@@ -22,7 +22,7 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Standard multi-level trail (typical page context).</>}>
-    <Canvas of={BreadcrumbStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={BreadcrumbStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -43,7 +43,17 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Anatomy
+
+<DocsCanvasShell description={<>Single breadcrumb item behavior for linked ancestors versus current-page item.</>}>
+    <DsCanvasQuiet of={BreadcrumbSubStories.PageItem} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
 
 <DocsCanvasShell description={<>Separator between trail segments.</>}>
     <DsCanvasQuiet of={BreadcrumbSubStories.Divider} />
@@ -53,7 +63,7 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={BreadcrumbStories.Interactive}

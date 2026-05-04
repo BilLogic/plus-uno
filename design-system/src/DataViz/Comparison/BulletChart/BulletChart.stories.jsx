@@ -4,18 +4,20 @@ import BulletChart from './BulletChart';
 export default {
     title: 'Data Visualizations/Comparison/BulletChart',
     component: BulletChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Bullet Chart
+                component: `## Bullet Chart
 
+A bullet chart displays **actual vs target** performance with qualitative ranges, replacing gauges in dashboards.
+
+### Overview
 A bullet chart displays **actual vs target** performance with qualitative ranges, replacing gauges in dashboards.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Bar** = actual value
 - **Vertical line** = target value
 - **Background zones** = qualitative ranges (poor/ok/good)
@@ -23,7 +25,7 @@ A bullet chart displays **actual vs target** performance with qualitative ranges
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A bullet chart displays **actual vs target** performance with qualitative ranges
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A bullet chart displays **actual vs target** performance with qualitative ranges
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use consistent color bands (red/yellow/green)

@@ -4,18 +4,20 @@ import PieChart from './PieChart';
 export default {
     title: 'Data Visualizations/PartToWhole/PieChart',
     component: PieChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Pie Chart
+                component: `## Pie Chart
 
 A pie chart displays **parts of a whole** as slices of a circle. Best for showing simple proportions.
 
+### Overview
+A pie chart displays **parts of a whole** as slices of a circle.
+
 ---
 
-### 📖 How to Read
+### How to Read
 - **Whole circle** = 100% of total
 - **Each slice** = proportion of total
 - **Slice angle** = percentage (360° = 100%)
@@ -23,7 +25,7 @@ A pie chart displays **parts of a whole** as slices of a circle. Best for showin
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A pie chart displays **parts of a whole** as slices of a circle. Best for showin
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A pie chart displays **parts of a whole** as slices of a circle. Best for showin
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Limit to 5 or fewer slices

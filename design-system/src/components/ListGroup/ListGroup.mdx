@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/ListGroup"
 />
 
@@ -21,7 +21,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Plain list group with typical items.</>}>
-    <Canvas of={ListGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={ListGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -44,9 +44,21 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
     <DsCanvasQuiet of={ListGroupItemStories.ListItemContent} />
 </DocsCanvasShell>
 
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Selection modes
+
 <DocsCanvasShell description={<>Selection anatomy for single-select and multi-select item modes.</>}>
     <DsCanvasQuiet of={ListGroupItemStories.ListItemSelectionModes} />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Item sizes
 
 <DocsCanvasShell description={<>Body scale tokens available at the item level: <code>b1</code>, <code>b2</code>, and <code>b3</code>.</>}>
     <DsCanvasQuiet of={ListGroupItemStories.ListItemSizes} />
@@ -66,7 +78,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+### States
 
 <DocsCanvasShell description={<>Normal, active, and disabled items.</>}>
     <DsCanvasQuiet of={ListGroupStories.InteractionStates} />
@@ -76,7 +88,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <DocsCanvasShell description={<>Flush list and horizontal arrangement.</>}>
     <DsCanvasQuiet of={ListGroupStories.Layout} />
@@ -86,7 +98,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={ListGroupStories.Interactive}

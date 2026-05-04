@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/NavPills"
 />
 
@@ -21,7 +21,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Horizontal pill group with a disabled item and a dropdown pill.</>}>
-    <Canvas of={NavPillsStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={NavPillsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -32,26 +32,6 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <DocsCanvasShell description={<>Horizontal pills with disabled item and dropdown pill.</>}>
     <DsCanvasQuiet of={NavPillsStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interaction states
-
-<DocsCanvasShell description={<>Default, selected, and disabled single pills (subcomponents).</>}>
-    <DsCanvasQuiet of={NavPillsSubStories.NavPillsItemStates} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Layout
-
-<DocsCanvasShell description={<>Vertical stack of pills.</>}>
-    <DsCanvasQuiet of={NavPillsStories.Layout} />
 </DocsCanvasShell>
 
 </div>
@@ -72,7 +52,27 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### States
+
+<DocsCanvasShell description={<>Default, selected, and disabled single-pill states.</>}>
+    <DsCanvasQuiet of={NavPillsSubStories.NavPillsItemStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
+
+<DocsCanvasShell description={<>Vertical stack of pills.</>}>
+    <DsCanvasQuiet of={NavPillsStories.Layout} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
 
 <DocsInteractivePlayground
     of={NavPillsStories.Interactive}

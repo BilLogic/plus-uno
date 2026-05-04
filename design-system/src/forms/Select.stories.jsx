@@ -15,15 +15,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Enhanced Select component with custom dropdown popup.
-
-| Feature | Description |
-|---------|-------------|
-| **Single Select** | Radio-style selection |
-| **Multi Select** | Checkbox-style with dismissible badges |
-| **Searchable** | Filter options by typing |
-| **Creatable** | Add new values on the fly |
-| **Sizes** | small, medium (default), large |`
+                component: 'Enhanced select input with single/multi selection plus optional searchable and creatable modes.'
             }
         }
     },
@@ -126,31 +118,31 @@ export const Content = {
     render: () => (
         <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND EMPTY</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Closed, empty</span>
                 <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CLOSED AND FILLED</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Closed, filled</span>
                 <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
             </div>
         </div>
     )
 };
 
-/** Styles — Multi-select, searchable, and creatable behaviors. */
-export const Styles = {
+/** Modes — Multi-select, searchable, and creatable behaviors. */
+export const Modes = {
     render: () => (
         <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTI-SELECT</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Multi-select</span>
                 <Select mode="multi" options={sampleOptions} placeholder="Select {value(s)} from below" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SEARCHABLE</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Searchable</span>
                 <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CREATABLE</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Creatable</span>
                 <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
             </div>
         </div>
@@ -162,15 +154,15 @@ export const Sizes = {
     render: () => (
         <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", gap: 20 }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Small</span>
                 <Select size="small" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Medium (default)</span>
                 <Select size="medium" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Large</span>
                 <Select size="large" options={sampleOptions} placeholder="Select..." />
             </div>
         </div>
@@ -182,15 +174,15 @@ export const InteractionStates = {
     render: () => (
         <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ENABLED</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Enabled</span>
                 <Select defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Disabled</span>
                 <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Read only</span>
                 <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
             </div>
         </div>

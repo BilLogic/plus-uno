@@ -4,18 +4,20 @@ import WordCloud from './WordCloud';
 export default {
     title: 'Data Visualizations/Other/WordCloud',
     component: WordCloud,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Word Cloud
+                component: `## Word Cloud
 
+A word cloud displays **text frequency** with word size proportional to occurrence.
+
+### Overview
 A word cloud displays **text frequency** with word size proportional to occurrence.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Larger words** = more frequent/important
 - **Smaller words** = less frequent
 - Position is typically random (no meaning)
@@ -23,7 +25,7 @@ A word cloud displays **text frequency** with word size proportional to occurren
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A word cloud displays **text frequency** with word size proportional to occurren
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A word cloud displays **text frequency** with word size proportional to occurren
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Filter out common words (the, and, etc.)

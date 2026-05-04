@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as SankeyDiagramStories from './SankeyDiagram.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SankeyDiagramStories} />
+
+<Title />
+
+A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+
+### Overview
+A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+
+<Primary />
+
+---
+
+### How to Read
+- **Nodes** = stages or entities
+- **Links** = flow between nodes
+- **Link width** = proportional to flow volume
+- Follow the flow from left to right (or source to destination)
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Showing flows/transfers</td><td>✅ Ideal</td></tr>
+    <tr><td>Energy/material flows</td><td>✅ Ideal</td></tr>
+    <tr><td>User journey paths</td><td>✅ Good</td></tr>
+    <tr><td>Simple comparisons</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Hierarchical data</td><td>❌ Use Treemap</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Learning Pathways**</td><td>How students progress through modules</td></tr>
+    <tr><td>**Student Flow**</td><td>Enrollment → Engagement → Completion</td></tr>
+    <tr><td>**Resource Distribution**</td><td>Budget allocation across programs</td></tr>
+    <tr><td>**Referral Sources**</td><td>How students find the platform</td></tr>
+    <tr><td>**User Journeys**</td><td>Navigation paths through the app</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Order nodes logically (source → destination)
+✅ Use distinct colors for major flows
+✅ Include flow values in tooltips
+✅ Limit to 5-7 stages for clarity
+
+**Avoid:**
+❌ Circular flows (sankey is directional)
+❌ Too many nodes (becomes spaghetti)
+❌ Unrelated categories in same diagram
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={SankeyDiagramStories.Interactive} />

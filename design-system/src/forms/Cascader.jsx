@@ -101,6 +101,24 @@ const Cascader = ({
         }
     };
 
+    const handleOptionHover = (option, columnIndex) => {
+        if (disabled) return;
+        const isOptionDisabled = typeof option === 'object' && option.disabled;
+        if (isOptionDisabled) return;
+
+        const hasChildren = typeof option === 'object' && option.children && option.children.length > 0;
+
+        // On hover, preview the next column (without committing selection).
+        // If the hovered option has no children, trim any deeper columns.
+        if (hasChildren) {
+            const newColumns = activeColumns.slice(0, columnIndex + 1);
+            newColumns.push(option.children);
+            setActiveColumns(newColumns);
+        } else {
+            setActiveColumns((cols) => cols.slice(0, columnIndex + 1));
+        }
+    };
+
     // Rebuild columns based on selected path when opening
     const rebuildColumnsFromPath = useMemo(() => {
         if (!isOpen) return [options];
@@ -176,6 +194,7 @@ const Cascader = ({
                                             key={optionIndex}
                                             className={`plus-cascader-option ${isSelected ? 'plus-cascader-option-selected' : ''} ${isDisabled ? 'plus-cascader-option-disabled' : ''}`}
                                             onClick={() => !isDisabled && handleOptionClick(option, columnIndex)}
+                                            onMouseEnter={() => handleOptionHover(option, columnIndex)}
                                         >
                                             <span className="plus-cascader-option-text">{optionText}</span>
                                             {hasChildren && (

@@ -72,6 +72,11 @@ export const InSidebar = () => {
         </div>
     );
 };
+InSidebar.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const Default = {
     args: {
@@ -79,6 +84,11 @@ export const Default = {
         icon: 'home',
         state: 'enabled',
     },
+    parameters: {
+        docs: {
+            disable: true
+        }
+    }
 };
 
 export const Overview = {

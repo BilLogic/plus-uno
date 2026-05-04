@@ -21,7 +21,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default labeled field with placeholder and trailing visual.</>}>
-    <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -38,7 +38,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Validation & feedback
 
 <DocsCanvasShell description={<>Validation treatments: none, invalid, and success (with optional message).</>}>
     <DsCanvasQuiet of={InputStories.Styles} />
@@ -68,7 +68,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={InputStories.Interactive}

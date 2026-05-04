@@ -159,6 +159,11 @@ export const ListItemOverview = () => (
         <ListGroupItemSizesDemo />
     </div>
 );
+ListItemOverview.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const ListItemInteractive = {
     render: (args) => {

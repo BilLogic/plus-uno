@@ -29,11 +29,17 @@ function CardContentDemos() {
                 <Card
                     title="Card Title"
                     body="Some quick example text to build on the card title and make up the bulk of the card's content."
+                    actionButton={{ text: 'Go somewhere', onClick: () => {} }}
                 />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIA SUPPORT</span>
-                <Card image={imageCap} title="Card Title" body="Some quick example text to build on the card title and make up the bulk of the card's content." />
+                <Card
+                    image={imageCap}
+                    title="Card Title"
+                    body="Some quick example text to build on the card title and make up the bulk of the card's content."
+                    actionButton={{ text: 'Go somewhere', onClick: () => {} }}
+                />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUBTITLES</span>
@@ -41,6 +47,7 @@ function CardContentDemos() {
                     title="Card Title"
                     subtitle="Card Subtitle"
                     body="Some quick example text to build on the card title and make up the bulk of the card's content."
+                    actionButton={{ text: 'Go somewhere', onClick: () => {} }}
                 />
             </div>
         </div>

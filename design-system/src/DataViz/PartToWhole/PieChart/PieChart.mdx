@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as PieChartStories from './PieChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PieChartStories} />
+
+<Title />
+
+A pie chart displays **parts of a whole** as slices of a circle. Best for showing simple proportions.
+
+### Overview
+A pie chart displays **parts of a whole** as slices of a circle.
+
+<Primary />
+
+---
+
+### How to Read
+- **Whole circle** = 100% of total
+- **Each slice** = proportion of total
+- **Slice angle** = percentage (360° = 100%)
+- Compare slice sizes to understand proportions
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Simple part-to-whole</td><td>✅ Ideal</td></tr>
+    <tr><td>2-5 categories</td><td>✅ Ideal</td></tr>
+    <tr><td>Showing single dominant share</td><td>✅ Good</td></tr>
+    <tr><td>Comparing multiple charts</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Many categories (>5)</td><td>❌ Use Treemap</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Subject Distribution**</td><td>Time spent per subject</td></tr>
+    <tr><td>**User Segments**</td><td>Student types breakdown</td></tr>
+    <tr><td>**Content Mix**</td><td>Resource types in library</td></tr>
+    <tr><td>**Engagement Sources**</td><td>How users found the platform</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Limit to 5 or fewer slices
+✅ Order slices by size (largest first)
+✅ Use contrasting colors
+✅ Label slices with percentages
+
+**Avoid:**
+❌ Comparing multiple pie charts
+❌ 3D effects (distorts perception)
+❌ Many small slices
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={PieChartStories.Interactive} />

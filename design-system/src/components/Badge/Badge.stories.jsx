@@ -110,7 +110,7 @@ const contentVariantCard = {
 function BadgeSizesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL SIZES</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Sizes</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Badges are available in both Header (Lato) and Body (Merriweather Sans) scales.
             </p>
@@ -136,12 +136,13 @@ function BadgeSizesDemos() {
 function BadgeVariantsDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL COLOR THEMES</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Semantic themes</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                 {['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'].map(style => (
                     <Badge key={style} text={style.charAt(0).toUpperCase() + style.slice(1)} style={style} />
                 ))}
             </div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3" style={{ marginTop: '12px' }}>Curriculum themes</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px' }}>
                 {['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'].map(style => (
                     <Badge key={style} text={style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} style={style} />
@@ -154,13 +155,9 @@ function BadgeVariantsDemos() {
 function BadgeContentDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RECOMMENDED COMBINATIONS</span>
             <div style={contentVariantCol}>
-                <section>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STATUS INDICATORS</span>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Text + leading icon for success, warning, and error semantics.
-                    </p>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Status indicators</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check"></i>} />
@@ -168,43 +165,34 @@ function BadgeContentDemos() {
                             <Badge text="Error" style="danger" leadingVisual={<i className="fa-solid fa-circle-exclamation"></i>} />
                         </div>
                     </div>
-                </section>
-                <section>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LABELS & CATEGORIES</span>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Compact badges in smaller size for metadata and labels.
-                    </p>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Labels and categories</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="New Feature" style="info" size="b3" />
                             <Badge text="Beta" style="tertiary" size="b3" />
                         </div>
                     </div>
-                </section>
-                <section>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COUNTS</span>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Text + counter for inbox/message counts and similar tallies.
-                    </p>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Counts</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Inbox" style="primary" counter="12" />
                             <Badge text="Messages" style="secondary" counter="99+" />
                         </div>
                     </div>
-                </section>
-                <section>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILTERS & SELECTIONS</span>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Dismissible badges for active filters and selected entities.
-                    </p>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Filters and selections</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Filter: Active" style="primary" dismissible />
                             <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
                         </div>
                     </div>
-                </section>
+                </div>
             </div>
         </section>
     );

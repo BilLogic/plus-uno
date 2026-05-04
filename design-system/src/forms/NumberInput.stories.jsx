@@ -28,12 +28,6 @@ export default {
             description: 'Show required indicator',
             table: { category: 'Content' },
         },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant of the number input',
-            table: { category: 'Design' },
-        },
         disabled: {
             control: 'boolean',
             description: 'Disable the number input',
@@ -161,14 +155,6 @@ export const Styles = () => {
     );
 };
 
-export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '800px' }}>
-        <NumberInput id="ni-s" placeholder="Small" size="small" />
-        <NumberInput id="ni-m" placeholder="Medium" size="medium" />
-        <NumberInput id="ni-l" placeholder="Large" size="large" />
-    </div>
-);
-
 export const InteractionStates = () => {
     const [v1, setV1] = useState('');
     const [v2, setV2] = useState('42');
@@ -218,7 +204,6 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                size={args.size}
                 disabled={args.disabled}
                 readonly={args.readonly}
                 validation={args.validation}
@@ -236,7 +221,6 @@ Interactive.args = {
     required: false,
     placeholder: 'Number',
     value: '',
-    size: 'medium',
     disabled: false,
     readonly: false,
     validation: 'none',

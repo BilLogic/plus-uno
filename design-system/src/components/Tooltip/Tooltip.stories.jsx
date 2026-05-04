@@ -113,7 +113,7 @@ function TooltipSizesDemos() {
     );
 }
 
-export const Styles = () => (
+export const Placements = () => (
     <div style={{ marginBottom: '60px' }}>
         <TooltipVariantsDemos />
     </div>

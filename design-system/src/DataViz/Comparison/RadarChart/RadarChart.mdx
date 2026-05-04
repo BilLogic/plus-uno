@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as RadarChartStories from './RadarChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={RadarChartStories} />
+
+<Title />
+
+A radar chart (spider/web chart) displays multivariate data on axes radiating from a center point, ideal for **comparing profiles across multiple dimensions**.
+
+### Overview
+A radar chart (spider/web chart) displays multivariate data on axes radiating from a center point, ideal for **comparing profiles across multiple dimensions**.
+
+<Primary />
+
+---
+
+### How to Read
+- Each **axis** represents a different variable/dimension
+- **Distance from center** indicates value magnitude
+- **Shape** of the polygon reveals the overall profile
+- **Overlapping shapes** allow direct comparison between entities
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Comparing multivariate profiles</td><td>✅ Ideal</td></tr>
+    <tr><td>Skill/competency assessments</td><td>✅ Ideal</td></tr>
+    <tr><td>Product feature comparison</td><td>✅ Good</td></tr>
+    <tr><td>Time-series data</td><td>❌ Use Line Chart</td></tr>
+    <tr><td>Many variables (>8)</td><td>❌ Use parallel coordinates</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**SMART Competencies**</td><td>Visualize student's 5-factor SMART profile</td></tr>
+    <tr><td>**Skill Assessment**</td><td>Compare skills across learning areas</td></tr>
+    <tr><td>**Tutor Evaluation**</td><td>Rate tutors on multiple criteria</td></tr>
+    <tr><td>**Class Comparison**</td><td>Compare class averages across subjects</td></tr>
+    <tr><td>**Progress Tracking**</td><td>Before/after skill development</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Limit to 3-8 axes for readability
+✅ Use filled area to emphasize coverage
+✅ Ensure consistent scale across all axes
+✅ Use transparency for overlapping series
+
+**Avoid:**
+❌ Too many overlapping series (max 3)
+❌ Inconsistent scales between axes
+❌ Using for time-series data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={RadarChartStories.Interactive} />

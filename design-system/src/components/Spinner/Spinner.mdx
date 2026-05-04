@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Title />
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Spinner"
 />
 
@@ -20,8 +20,8 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Neutral color only: all spinners use the on-surface-variant token.</>}>
-    <Canvas of={SpinnerStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+<DocsCanvasShell attachSourceBelow description={<>Default border spinner for inline loading feedback.</>}>
+    <Canvas of={SpinnerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -38,6 +38,16 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
+### Styles
+
+<DocsCanvasShell description={<>Neutral token treatment across spinner variants.</>}>
+    <DsCanvasQuiet of={SpinnerStories.Styles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Sizes
 
 <DocsCanvasShell description={<>Default and small border spinner.</>}>
@@ -48,7 +58,17 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### States
+
+<DocsCanvasShell description={<>Standard spinner states and custom animated states in one comparison view.</>}>
+    <DsCanvasQuiet of={SpinnerSubStories.SpinnerStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
 
 <DocsCanvasShell description={<>Spinner embedded in a loading button pattern.</>}>
     <DsCanvasQuiet of={SpinnerSubStories.LoadingButtonExample} />
@@ -58,7 +78,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={SpinnerStories.Interactive}

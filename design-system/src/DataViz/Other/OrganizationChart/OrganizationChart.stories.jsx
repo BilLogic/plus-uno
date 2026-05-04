@@ -4,25 +4,27 @@ import OrganizationChart from './OrganizationChart';
 export default {
     title: 'Data Visualizations/Other/OrganizationChart',
     component: OrganizationChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Organization Chart
+                component: `## Organization Chart
 
+Shows **hierarchical organizational structures** with reporting lines.
+
+### Overview
 Shows **hierarchical organizational structures** with reporting lines.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Nodes** = people/roles
 - **Lines** = reporting relationships
 - **Levels** = hierarchy depth
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -32,13 +34,28 @@ Shows **hierarchical organizational structures** with reporting lines.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Team Structure** | Tutor organization |
 | **Course Hierarchy** | Subject → Topic → Lesson |
 | **Support Escalation** | Support team structure |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the organization chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -65,6 +82,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

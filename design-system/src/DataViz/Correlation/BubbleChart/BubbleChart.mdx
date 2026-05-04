@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as BubbleChartStories from './BubbleChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BubbleChartStories} />
+
+<Title />
+
+A bubble chart extends the scatter plot by using **bubble size as a third dimension**, allowing visualization of relationships between three variables.
+
+### Overview
+A bubble chart extends the scatter plot by using **bubble size as a third dimension**, allowing visualization of relationships between three variables.
+
+<Primary />
+
+---
+
+### How to Read
+- **X-axis position**: First variable value
+- **Y-axis position**: Second variable value  
+- **Bubble size**: Third variable magnitude
+- Larger bubbles indicate higher values for the size variable
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Showing 3 variables at once</td><td>✅ Ideal</td></tr>
+    <tr><td>Market/portfolio analysis</td><td>✅ Ideal</td></tr>
+    <tr><td>Comparing groups with size metric</td><td>✅ Good</td></tr>
+    <tr><td>Only 2 variables</td><td>❌ Use Scatter Chart</td></tr>
+    <tr><td>Precise size comparisons</td><td>❌ Use Bar Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Variables (X, Y, Size)</th></tr></thead>
+  <tbody>
+    <tr><td>**Student Analysis**</td><td>Study hours, Test score, Assignments completed</td></tr>
+    <tr><td>**Class Performance**</td><td>Attendance %, Grade avg, Class size</td></tr>
+    <tr><td>**Tutor Workload**</td><td>Sessions/week, Avg rating, Student count</td></tr>
+    <tr><td>**Resource Allocation**</td><td>Cost, Impact, Usage volume</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use clear axis labels with units
+✅ Provide a size legend
+✅ Use transparency for overlapping bubbles
+✅ Limit to 2-3 series for clarity
+
+**Avoid:**
+❌ Too many bubbles (becomes cluttered)
+❌ Very small size differences (hard to perceive)
+❌ Missing size legend
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={BubbleChartStories.Interactive} />

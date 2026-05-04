@@ -72,8 +72,6 @@
 
     &:focus {
         outline: none;
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
         z-index: 1;
     }
 
@@ -82,7 +80,6 @@
         background-color: var(--color-surface-container-low);
         border-color: var(--color-outline-variant);
         color: var(--color-on-surface-variant);
-        opacity: 0.6;
         cursor: not-allowed;
     }
 
@@ -99,26 +96,12 @@
     }
 }
 
-// Size variants for input
-.plus-number-input-small {
-    .plus-number-input-field {
-        padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
-        font-size: var(--font-size-body3);
-        line-height: var(--font-line-height-body3);
-        min-height: 40px;
-
-        &::placeholder {
-            font-size: var(--font-size-body3);
-        }
-    }
-}
-
 .plus-number-input-medium {
     .plus-number-input-field {
-        padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+        padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
         font-size: var(--font-size-body2);
         line-height: var(--font-line-height-body2);
-        min-height: 48px;
+        min-height: 40px;
 
         &::placeholder {
             font-size: var(--font-size-body2);
@@ -126,28 +109,31 @@
     }
 }
 
-.plus-number-input-large {
-    .plus-number-input-field {
-        padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
-        font-size: var(--font-size-body1);
-        line-height: var(--font-line-height-body1);
-        min-height: 56px;
-
-        &::placeholder {
-            font-size: var(--font-size-body1);
-        }
-    }
-}
-
 // Button group container
-.plus-number-input-buttons {
+.plus-number-input-wrapper .plus-number-input-buttons {
     border: 1px solid var(--border-color, var(--color-outline-variant));
-    background-color: var(--bg-color, var(--color-surface-container-lowest));
+    // Stepper segment uses container-low surface in Figma for default/focus/read-only
+    background-color: var(--color-surface-container-low) !important;
     display: flex;
     flex-direction: row;
     padding: 0;
     margin: 0;
-    border-left: none;
+    // Keep a visible divider between the input and the stepper segment.
+    // Bootstrap can collapse/remove borders between grouped controls, so draw it
+    // as a positioned pseudo-element.
+    border-left: none !important;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--border-color, var(--color-outline-variant));
+        pointer-events: none;
+    }
     gap: 0;
     overflow: hidden;
 }
@@ -156,7 +142,7 @@
 .plus-number-input-button {
     border: none;
     border-left: 1px solid var(--border-color, var(--color-outline-variant));
-    background-color: var(--bg-color, var(--color-surface-container-lowest));
+    background-color: var(--color-surface-container-low);
     color: var(--color-on-surface);
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);
@@ -171,12 +157,14 @@
     min-width: 32px;
     height: 100%;
 
-    // First button (increment) KEEP left border as separator from input
-    // This creates the outline/stroke appearance per Figma
+    // Divider between input and buttons is drawn by the container
+    &:first-child {
+        border-left: none;
+    }
 
     i {
         font-size: var(--font-size-body2);
-        color: var(--color-on-surface);
+        color: currentColor;
     }
 
     &:hover:not(:disabled) {
@@ -188,7 +176,6 @@
     }
 
     &:disabled {
-        opacity: 0.6;
         cursor: not-allowed;
         color: var(--color-on-surface-variant);
         background-color: var(--color-surface-container-low);
@@ -204,26 +191,6 @@
     }
 }
 
-// Size variants for buttons
-.plus-number-input-small {
-    .plus-number-input-button {
-        min-width: 28px;
-
-        i {
-            font-size: var(--font-size-body3);
-        }
-    }
-}
-
-.plus-number-input-large {
-    .plus-number-input-button {
-        min-width: 36px;
-
-        i {
-            font-size: var(--font-size-body1);
-        }
-    }
-}
 
 // Validation states - stroke style (colored borders, white background)
 .plus-number-input-invalid {
@@ -239,12 +206,16 @@
     .plus-number-input-buttons {
         border-color: var(--color-danger);
         background-color: var(--color-surface-container-lowest);
+
+        &::before {
+            background: var(--color-danger);
+        }
     }
 
     .plus-number-input-button {
         background-color: var(--color-surface-container-lowest);
         border-left-color: var(--color-danger);
-        color: var(--color-danger);
+        color: var(--color-danger) !important;
 
         // First button has no left border, but second button has danger-colored separator
         &:not(:first-child) {
@@ -252,7 +223,7 @@
         }
 
         i {
-            color: var(--color-danger);
+            color: currentColor !important;
         }
 
         &:hover:not(:disabled) {
@@ -278,12 +249,16 @@
     .plus-number-input-buttons {
         border-color: var(--color-success);
         background-color: var(--color-surface-container-lowest);
+
+        &::before {
+            background: var(--color-success);
+        }
     }
 
     .plus-number-input-button {
         background-color: var(--color-surface-container-lowest);
         border-left-color: var(--color-success);
-        color: var(--color-success);
+        color: var(--color-success) !important;
 
         // First button has no left border, but second button has success-colored separator
         &:not(:first-child) {
@@ -291,7 +266,7 @@
         }
 
         i {
-            color: var(--color-success);
+            color: currentColor !important;
         }
 
         &:hover:not(:disabled) {
@@ -322,7 +297,6 @@
 
 // Disabled state
 .plus-number-input-disabled {
-    opacity: 0.6;
     pointer-events: none;
 
     .plus-number-input-field {
@@ -355,7 +329,7 @@
     }
 
     .plus-number-input-buttons {
-        background-color: var(--color-surface-container);
+        background-color: var(--color-surface-container-low);
     }
 }
 

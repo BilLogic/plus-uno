@@ -4,18 +4,20 @@ import BoxPlotChart from './BoxPlotChart';
 export default {
     title: 'Data Visualizations/Distribution/BoxPlotChart',
     component: BoxPlotChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Box Plot Chart
+                component: `## Box Plot Chart
 
+A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and maximum values.
+
+### Overview
 A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and maximum values.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Box** spans from Q1 (25th percentile) to Q3 (75th percentile)
 - **Line inside box** = median (50th percentile)
 - **Whiskers** extend to min and max values
@@ -23,7 +25,7 @@ A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and 
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and 
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and 
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Label axes clearly with units

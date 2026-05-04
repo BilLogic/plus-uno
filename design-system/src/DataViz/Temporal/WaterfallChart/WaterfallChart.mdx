@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as WaterfallChartStories from './WaterfallChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={WaterfallChartStories} />
+
+<Title />
+
+A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+
+### Overview
+A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+
+<Primary />
+
+---
+
+### How to Read
+- **First bar** = starting value
+- **Green bars** = positive additions
+- **Red bars** = deductions/losses
+- **Final bar** = ending total (sum)
+- Each bar floats from previous endpoint
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Financial statements (P&L)</td><td>✅ Ideal</td></tr>
+    <tr><td>Progress/cumulative changes</td><td>✅ Ideal</td></tr>
+    <tr><td>Variance analysis</td><td>✅ Good</td></tr>
+    <tr><td>Unordered comparisons</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Part-to-whole</td><td>❌ Use Stacked Bar</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Budget Tracking**</td><td>Starting budget → changes → remaining</td></tr>
+    <tr><td>**Score Progression**</td><td>Base score + bonus - penalties = final</td></tr>
+    <tr><td>**Enrollment Changes**</td><td>Start → additions → dropouts → current</td></tr>
+    <tr><td>**Progress Tracking**</td><td>Initial → completed → added → total</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use green for additions, red for subtractions
+✅ Include summary bars (totals)
+✅ Label each step clearly
+✅ Show intermediate totals if needed
+
+**Avoid:**
+❌ Non-sequential data
+❌ Too many intermediate steps (>10)
+❌ Missing color legend
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={WaterfallChartStories.Interactive} />

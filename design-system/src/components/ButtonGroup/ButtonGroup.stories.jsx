@@ -66,10 +66,6 @@ const bgCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
 function ButtonGroupSizesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Button groups are available in three sizes: Small, Medium (default), and Large.
-            </p>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
                     <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Small</span>
@@ -100,10 +96,6 @@ function ButtonGroupSizesDemos() {
 function ButtonGroupLayoutDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALIGNMENTS</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Button groups can be arranged horizontally (default) or vertically stacked.
-            </p>
             <div style={{ display: 'flex', gap: '48px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Horizontal</span>
@@ -126,10 +118,6 @@ function ButtonGroupLayoutDemos() {
 function ButtonGroupCountsDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BUTTON COUNTS</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Button groups can contain 2 to 5 buttons, maintaining consistent connected styling.
-            </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)', minWidth: '80px' }}>2 Buttons</span>
@@ -155,7 +143,6 @@ function ButtonGroupCountsDemos() {
 function ButtonGroupUseCasesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMMON USE CASES</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -205,10 +192,6 @@ function ButtonGroupUseCasesDemos() {
 function ButtonGroupChildrenDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USING CHILDREN (ALTERNATIVE PATTERN)</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                ButtonGroup supports both the <code>buttons</code> array prop and direct child Button components for more flexible composition.
-            </p>
             <ButtonGroup style="secondary" fill="tonal">
                 <Button text="Custom" leadingVisual="star" />
                 <Button text="Button" />
@@ -236,7 +219,7 @@ export const Counts = () => (
     </div>
 );
 
-export const UseCases = () => (
+export const Patterns = () => (
     <div style={bgCol}>
         <ButtonGroupUseCasesDemos />
     </div>
@@ -262,7 +245,7 @@ function renderButtonGroupPlayground(args) {
     );
 }
 
-const buttonGroupPlaygroundArgs = {
+const buttonGroupOverviewArgs = {
     size: 'medium',
     style: 'primary',
     fill: 'tonal',
@@ -270,11 +253,21 @@ const buttonGroupPlaygroundArgs = {
     buttonCount: 3
 };
 
-export const Overview = renderButtonGroupPlayground;
-Overview.args = { ...buttonGroupPlaygroundArgs };
-Overview.parameters = {
-    docs: {
-        source: { language: 'html', code: webAppSourceSnippets.buttonGroup }
+const buttonGroupPlaygroundArgs = {
+    size: 'medium',
+    style: 'secondary',
+    fill: 'tonal',
+    vertical: false,
+    buttonCount: 4
+};
+
+export const Overview = {
+    render: renderButtonGroupPlayground,
+    args: { ...buttonGroupOverviewArgs },
+    parameters: {
+        docs: {
+            source: { language: 'html', code: webAppSourceSnippets.buttonGroup }
+        }
     }
 };
 
@@ -282,5 +275,7 @@ Overview.parameters = {
  * Interactive Playground
  * Customize the button group attributes in real-time.
  */
-export const Interactive = renderButtonGroupPlayground;
-Interactive.args = { ...buttonGroupPlaygroundArgs };
+export const Interactive = {
+    render: renderButtonGroupPlayground,
+    args: { ...buttonGroupPlaygroundArgs }
+};

@@ -21,9 +21,9 @@
         font-family: var(--font-family-body);
         font-size: var(--font-size-body2);
         line-height: var(--font-line-height-body2);
-        font-weight: var(--font-weight-body2-regular);
-        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.2s ease-in-out, outline-offset 0.2s ease-in-out;
+        font-weight: var(--font-weight-light, 300);
+        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 12px);
+        transition: border-color 0.15s ease-in-out;
 
         &::placeholder {
             color: var(--color-on-surface-variant);
@@ -36,76 +36,175 @@
         }
     }
 
+    // Sizes
+    &--sm {
+        .plus-textarea-v2__control {
+            border-width: 0.6px;
+            padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
+            font-size: var(--font-size-body3);
+            line-height: var(--font-line-height-body3);
+        }
+    }
+
+    &--md {
+        // default tokens in base styles
+    }
+
+    &--lg {
+        .plus-textarea-v2__control {
+            border-width: 1px;
+            padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px);
+            font-size: var(--font-size-body1);
+            line-height: var(--font-line-height-body1);
+        }
+    }
+
     // Variant: Long (Box)
     &--long {
-        // Add padding to accommodate focus outline/box-shadow (3px) so it doesn't get clipped
-        padding: 3px;
-        margin: -3px;
-
-        .plus-textarea-v2__control {
-            border: 1px solid var(--color-outline);
+        textarea.plus-textarea-v2__control.form-control {
+            border: 0.6px solid var(--color-outline-variant) !important;
             border-radius: 0;
 
             &:focus {
-                border-color: var(--color-primary);
-                box-shadow: 0 0 0 3px var(--color-primary-container);
+                border-width: var(--size-element-stroke-lg, 2px) !important;
+                border-color: var(--color-primary-container) !important;
+            }
+
+            // Value (filled) state: darker border when not showing placeholder
+            &:not(:placeholder-shown):not(:focus) {
+                border-width: 0.8px !important;
+                border-color: var(--color-outline) !important;
             }
         }
     }
 
     // Variant: Short (Underline/Input-like)
     &--short {
-        .plus-textarea-v2__control {
-            border: none;
-            border-bottom: 1px solid var(--color-outline);
+        textarea.plus-textarea-v2__control.form-control {
+            border: none !important;
+            border-bottom: 0.6px solid var(--color-outline-variant) !important;
             border-radius: 0;
-            background-color: transparent;
-            padding-left: 0;
-            padding-right: 0;
+            background-color: var(--color-surface);
             resize: none;
             /* Often checking if short form should resize */
 
             &:focus {
-                border-bottom-color: var(--color-primary);
-                box-shadow: 0 3px 0 0 var(--color-primary-container);
+                border-bottom-width: var(--size-element-stroke-lg, 2px) !important;
+                border-bottom-color: var(--color-primary-container) !important;
+            }
+
+            // Value (filled) state: darker underline when not showing placeholder
+            &:not(:placeholder-shown):not(:focus) {
+                border-bottom-width: 0.8px !important;
+                border-bottom-color: var(--color-outline) !important;
             }
         }
     }
 
     // States
     &--disabled {
-        opacity: 0.5;
+        opacity: 0.38;
         pointer-events: none;
 
-        .plus-textarea-v2__control {
-            background-color: var(--color-surface-container-low);
+        textarea.plus-textarea-v2__control.form-control {
+            background-color: var(--color-surface);
+            color: var(--color-on-surface-variant);
+            border-color: var(--color-outline-variant) !important;
+            border-width: 0.6px !important;
+
+            &::placeholder {
+                color: var(--color-on-surface-variant);
+                opacity: 1;
+            }
         }
     }
 
     &--readonly {
-        .plus-textarea-v2__control {
-            background-color: transparent;
-            border-color: transparent;
-            padding-left: 0;
+        textarea.plus-textarea-v2__control.form-control {
+            background-color: var(--color-surface-variant);
+            border-color: var(--color-outline-variant) !important;
+            border-width: 0.8px !important;
+            cursor: default;
 
             &:focus {
-                box-shadow: none;
-                border-color: transparent;
+                border-color: var(--color-outline-variant) !important;
+            }
+
+            &:not(:placeholder-shown):not(:focus) {
+                border-color: var(--color-outline) !important;
+            }
+        }
+
+        &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
+            background-color: var(--color-surface-variant);
+            border-bottom-color: var(--color-outline-variant) !important;
+            border-bottom-width: 0.8px !important;
+
+            &:not(:placeholder-shown):not(:focus) {
+                border-bottom-color: var(--color-outline) !important;
             }
         }
     }
 
     &--error {
-        .plus-textarea-v2__control {
-            border-color: var(--color-danger);
+        textarea.plus-textarea-v2__control.form-control {
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
 
             &:focus {
-                box-shadow: 0 0 0 1px var(--color-danger);
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+            }
+
+            &:not(:placeholder-shown):not(:focus) {
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
             }
         }
 
-        &.plus-textarea-v2--short .plus-textarea-v2__control:focus {
-            box-shadow: 0 1px 0 0 var(--color-danger);
+        &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
+            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+
+            &:focus {
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+            }
+
+            &:not(:placeholder-shown):not(:focus) {
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+            }
+        }
+    }
+
+    &--success {
+        textarea.plus-textarea-v2__control.form-control {
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+
+            &:focus {
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+            }
+
+            &:not(:placeholder-shown):not(:focus) {
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+            }
+        }
+
+        &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
+            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+
+            &:focus {
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+            }
+
+            &:not(:placeholder-shown):not(:focus) {
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+            }
+        }
+    }
+
+    &--focus {
+        textarea.plus-textarea-v2__control.form-control {
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-primary-container) !important;
+        }
+
+        &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
+            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-primary-container) !important;
         }
     }
 }

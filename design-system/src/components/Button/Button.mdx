@@ -17,7 +17,7 @@ import {
 Buttons are interactive elements that are used to perform actions on a page.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Button"
 />
 
@@ -36,7 +36,7 @@ Buttons are interactive elements that are used to perform actions on a page.
         of={ButtonStories.Overview}
         story={{ inline: true }}
         layout="padded"
-        sourceState="shown"
+        sourceState="hidden"
     />
 </DocsCanvasShell>
 
@@ -52,17 +52,12 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Color styles
+### Variants
 
-<ColorStylesSection />
-
+<div className="space-y-10 md:space-y-12">
+    <ColorStylesSection />
+    <FillTreatmentsSection />
 </div>
-
-<div className="sb-ds-doc-section">
-
-### Fill treatments
-
-<FillTreatmentsSection />
 
 </div>
 
@@ -78,7 +73,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+### States
 
 <InteractionStatesSection />
 
@@ -86,7 +81,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <LayoutSection />
 
@@ -94,7 +89,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={ButtonStories.Interactive}

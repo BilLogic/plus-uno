@@ -98,14 +98,14 @@ Overview.parameters = {
     }
 };
 
-export const Styles = () => {
+export const Variants = () => {
     const [radioValue, setRadioValue] = useState(null);
     const [checkboxValues, setCheckboxValues] = useState([]);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio</span>
                 <MultipleChoice
                     id="multiple-choice-radio-default"
                     name="multiple-choice-radio-default"
@@ -116,7 +116,7 @@ export const Styles = () => {
                 />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX</span>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox</span>
                 <MultipleChoice
                     id="multiple-choice-checkbox-default"
                     name="multiple-choice-checkbox-default"
@@ -134,7 +134,7 @@ export const Content = () => (
     <div style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
         <section>
-            <h6 className="h6 mb-2">Radio — with selection</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio — with selection</span>
             <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                 Pre-selected item in a single-select list.
             </p>
@@ -149,7 +149,7 @@ export const Content = () => (
             </div>
         </section>
         <section>
-            <h6 className="h6 mb-2">Checkbox — with selections</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox — with selections</span>
             <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                 Pre-selected values for multi-select behavior.
             </p>
@@ -169,7 +169,7 @@ export const Content = () => (
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Small</span>
             <MultipleChoice
                 id="multiple-choice-radio-small"
                 name="multiple-choice-radio-small"
@@ -179,7 +179,7 @@ export const Sizes = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Large</span>
             <MultipleChoice
                 id="multiple-choice-radio-large"
                 name="multiple-choice-radio-large"
@@ -194,7 +194,7 @@ export const Sizes = () => (
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RADIO — DISABLED</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio — disabled</span>
             <MultipleChoice
                 id="multiple-choice-radio-disabled"
                 name="multiple-choice-radio-disabled"
@@ -205,7 +205,7 @@ export const InteractionStates = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKBOX — DISABLED</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox — disabled</span>
             <MultipleChoice
                 id="multiple-choice-checkbox-disabled"
                 name="multiple-choice-checkbox-disabled"

@@ -1,15 +1,15 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as ScaleStories from './RadioButtonGroup.stories.jsx';
+import * as RadioButtonGroupStories from './RadioButtonGroup.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={ScaleStories} />
+<Meta of={RadioButtonGroupStories} />
 
 <Title />
-Use radio when a user needs to select one option from a list.
+Use a scale when a user needs to communicate degree or intensity across an ordered range.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
 />
 
@@ -21,7 +21,7 @@ Use radio when a user needs to select one option from a list.
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Three-point scale with end labels and a selected value.</>}>
-    <Canvas of={ScaleStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={RadioButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -31,7 +31,7 @@ Use radio when a user needs to select one option from a list.
 ### Content
 
 <DocsCanvasShell description={<>Baseline three-point scale with end labels.</>}>
-    <DsCanvasQuiet of={ScaleStories.Content} />
+    <DsCanvasQuiet of={RadioButtonGroupStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -41,7 +41,7 @@ Use radio when a user needs to select one option from a list.
 ### Variants
 
 <DocsCanvasShell description={<>Different scale lengths using the same horizontal pattern.</>}>
-    <DsCanvasQuiet of={ScaleStories.Variants} />
+    <DsCanvasQuiet of={RadioButtonGroupStories.Variants} />
 </DocsCanvasShell>
 
 </div>
@@ -51,17 +51,17 @@ Use radio when a user needs to select one option from a list.
 ### Interaction states
 
 <DocsCanvasShell description={<>Disabled scale example.</>}>
-    <DsCanvasQuiet of={ScaleStories.InteractionStates} />
+    <DsCanvasQuiet of={RadioButtonGroupStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
-    of={ScaleStories.Interactive}
+    of={RadioButtonGroupStories.Interactive}
     description={
         <>
             Use the table below to change props. The preview is rendered{' '}

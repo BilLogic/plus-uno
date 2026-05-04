@@ -9,7 +9,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 Add dialogs to your site for lightboxes, user notifications, or completely custom content.
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502&p=f"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Modal"
 />
 
@@ -21,7 +21,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
-    <Canvas of={ModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="shown" />
+    <Canvas of={ModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -38,7 +38,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <DocsCanvasShell description={<>Header-only versus header with a primary and secondary action row.</>}>
     <DsCanvasQuiet of={ModalStories.Layout} />
@@ -58,7 +58,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={ModalStories.Interactive}

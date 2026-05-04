@@ -33,6 +33,12 @@ export default {
             description: 'Visible text rows',
             table: { category: 'Layout' },
         },
+        size: {
+            control: 'radio',
+            options: ['small', 'medium', 'large'],
+            description: 'Size variant',
+            table: { category: 'Design' },
+        },
         variant: {
             control: 'radio',
             options: ['long', 'short'],
@@ -41,7 +47,7 @@ export default {
         },
         state: {
             control: 'select',
-            options: ['default', 'focus', 'error', 'read-only', 'disabled'],
+            options: ['default', 'focus', 'success', 'error', 'readonly', 'disabled'],
             description: 'The visual state of the component',
             table: { category: 'Behavior' },
         },
@@ -100,6 +106,46 @@ export const Styles = () => (
     </div>
 );
 
+export const Sizes = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px' }}>
+        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+            Size variants: small, medium, large.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block">LONG FORM</span>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">SMALL</span>
+                    <Textarea placeholder="Enter text..." variant="long" size="small" />
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">MEDIUM</span>
+                    <Textarea placeholder="Enter text..." variant="long" size="medium" />
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">LARGE</span>
+                    <Textarea placeholder="Enter text..." variant="long" size="large" />
+                </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block">SHORT FORM</span>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">SMALL</span>
+                    <Textarea placeholder="Enter text..." variant="short" size="small" />
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">MEDIUM</span>
+                    <Textarea placeholder="Enter text..." variant="short" size="medium" />
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">LARGE</span>
+                    <Textarea placeholder="Enter text..." variant="short" size="large" />
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 export const InteractionStatesLong = () => (
     <div style={{ maxWidth: '1000px' }}>
         <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-4">LONG FORM</span>
@@ -109,12 +155,16 @@ export const InteractionStatesLong = () => (
                 <Textarea placeholder="Enter text..." variant="long" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (SIMULATED)</span>
-                <Textarea placeholder="Enter text..." variant="long" className="focus-simulation" autoFocus />
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (STATIC)</span>
+                <Textarea placeholder="Enter text..." variant="long" state="focus" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED</span>
                 <Textarea defaultValue="Some content here" variant="long" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
+                <Textarea defaultValue="Looks good" variant="long" state="success" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ERROR</span>
@@ -127,6 +177,10 @@ export const InteractionStatesLong = () => (
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
                 <Textarea defaultValue="Read only content" variant="long" readOnly />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY (PLACEHOLDER)</span>
+                <Textarea placeholder="Read only placeholder" variant="long" readOnly />
             </div>
         </div>
     </div>
@@ -141,12 +195,16 @@ export const InteractionStatesShort = () => (
                 <Textarea placeholder="Enter text..." variant="short" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (SIMULATED)</span>
-                <Textarea placeholder="Enter text..." variant="short" className="focus-simulation" autoFocus />
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (STATIC)</span>
+                <Textarea placeholder="Enter text..." variant="short" state="focus" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED</span>
                 <Textarea defaultValue="Short content" variant="short" />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
+                <Textarea defaultValue="Looks good" variant="short" state="success" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ERROR</span>
@@ -159,6 +217,10 @@ export const InteractionStatesShort = () => (
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
                 <Textarea defaultValue="Read only short content" variant="short" readOnly />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY (PLACEHOLDER)</span>
+                <Textarea placeholder="Read only placeholder" variant="short" readOnly />
             </div>
         </div>
     </div>
@@ -178,6 +240,7 @@ Interactive.args = {
     label: 'Interactive Label',
     placeholder: 'Type something...',
     variant: 'long',
+    size: 'medium',
     rows: 3,
     state: 'default',
 };

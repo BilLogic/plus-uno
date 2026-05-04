@@ -4,25 +4,27 @@ import AreaRangeChart from './AreaRangeChart';
 export default {
     title: 'Data Visualizations/Temporal/AreaRangeChart',
     component: AreaRangeChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Area Range Chart
+                component: `## Area Range Chart
 
+Shows a **range of values over time** with a filled area between min and max.
+
+### Overview
 Shows a **range of values over time** with a filled area between min and max.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Filled area** = range between low and high
 - **Width of band** = variability at that point
 - Wider band = more variation
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows a **range of values over time** with a filled area between min and max.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Score Bands** | Expected score range |
 | **Activity Windows** | Peak usage times |
 | **Performance Range** | Min/max ratings |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the area range chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -65,6 +82,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

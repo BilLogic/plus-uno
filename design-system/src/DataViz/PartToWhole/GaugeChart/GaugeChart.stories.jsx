@@ -4,18 +4,20 @@ import GaugeChart from './GaugeChart';
 export default {
     title: 'Data Visualizations/PartToWhole/GaugeChart',
     component: GaugeChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Gauge Chart
+                component: `## Gauge Chart
 
+A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
+
+### Overview
 A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Needle/fill position** indicates current value
 - **Scale** shows the range (min to max)
 - **Center text** displays the exact value
@@ -23,7 +25,7 @@ A gauge chart displays a **single value on a dial**, perfect for KPIs and progre
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A gauge chart displays a **single value on a dial**, perfect for KPIs and progre
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A gauge chart displays a **single value on a dial**, perfect for KPIs and progre
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use sparingly for key metrics only

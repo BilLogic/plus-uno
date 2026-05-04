@@ -4,18 +4,20 @@ import LineChart from './LineChart';
 export default {
     title: 'Data Visualizations/Temporal/LineChart',
     component: LineChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Line Chart
+                component: `## Line Chart
 
+A line chart displays data as connected points, ideal for showing **trends over continuous time**.
+
+### Overview
 A line chart displays data as connected points, ideal for showing **trends over continuous time**.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Points** = data values at each time
 - **Line** = trend connection between points
 - **Slope up** = increasing trend
@@ -24,7 +26,7 @@ A line chart displays data as connected points, ideal for showing **trends over 
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -36,7 +38,7 @@ A line chart displays data as connected points, ideal for showing **trends over 
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -48,7 +50,7 @@ A line chart displays data as connected points, ideal for showing **trends over 
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use consistent time intervals

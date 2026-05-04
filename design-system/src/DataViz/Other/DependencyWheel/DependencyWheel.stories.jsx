@@ -4,18 +4,20 @@ import DependencyWheel from './DependencyWheel';
 export default {
     title: 'Data Visualizations/Other/DependencyWheel',
     component: DependencyWheel,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Dependency Wheel
+                component: `## Dependency Wheel
 
+A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+
+### Overview
 A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Nodes** = entities around the circle
 - **Chords** = connections between entities
 - **Chord width** = strength of connection
@@ -23,7 +25,7 @@ A dependency wheel shows **circular relationships** between entities, with conne
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A dependency wheel shows **circular relationships** between entities, with conne
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A dependency wheel shows **circular relationships** between entities, with conne
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Limit to 10-15 nodes maximum
