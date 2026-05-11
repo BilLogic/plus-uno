@@ -40,22 +40,41 @@ const PageLayout = ({
 }) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(() => (sidebarExpanded || !sidebarHidden));
     const containerRef = React.useRef(null);
+    /** When shell width is below lg, user-expanded sidebar must not be undone by ResizeObserver. */
+    const manualNarrowExpandRef = React.useRef(false);
     const breakpoint = 1024; // lg-min breakpoint per DS schema
 
     const showSidebar = !sidebarHidden && isSidebarVisible;
 
+    /** Sidebar expects `activeTabId`; specs often pass `activeTab`. Strip both before spread. */
+    const sidebarProps = { ...(sidebarConfig || {}) };
+    const sidebarActiveCombined = sidebarProps.activeTabId ?? sidebarProps.activeTab;
+    delete sidebarProps.activeTabId;
+    delete sidebarProps.activeTab;
+
     useEffect(() => {
         if (sidebarHidden) {
+            manualNarrowExpandRef.current = false;
             setIsSidebarVisible(false);
             return undefined;
         }
-        if (sidebarExpanded) return undefined;
+        if (sidebarExpanded) {
+            manualNarrowExpandRef.current = false;
+            setIsSidebarVisible(true);
+            return undefined;
+        }
         if (!containerRef.current) return;
 
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
-                const width = entry.contentRect.width;
-                setIsSidebarVisible(width >= breakpoint);
+                const w = entry.contentRect.width;
+                if (w >= breakpoint) {
+                    manualNarrowExpandRef.current = false;
+                    setIsSidebarVisible(true);
+                } else {
+                    // Narrow: respect user overlay-open; otherwise collapse (default below lg).
+                    setIsSidebarVisible(manualNarrowExpandRef.current);
+                }
             }
         });
 
@@ -66,7 +85,15 @@ const PageLayout = ({
 
     const handleSidebarToggle = (newMode) => {
         if (sidebarHidden) return;
-        setIsSidebarVisible(newMode === 'expanded');
+        const expanded = newMode === 'expanded';
+        if (!expanded) {
+            manualNarrowExpandRef.current = false;
+            setIsSidebarVisible(false);
+            return;
+        }
+        const w = containerRef.current?.getBoundingClientRect().width ?? breakpoint;
+        manualNarrowExpandRef.current = w < breakpoint;
+        setIsSidebarVisible(true);
     };
 
     return (
@@ -153,7 +180,8 @@ const PageLayout = ({
                 >
                     <div style={{ width: 184, minWidth: 184, height: '100%', overflowY: 'auto' }}>
                         <Sidebar
-                            {...sidebarConfig}
+                            {...sidebarProps}
+                            activeTabId={sidebarActiveCombined}
                             visible={true}
                             loading={shellLoading}
                         />

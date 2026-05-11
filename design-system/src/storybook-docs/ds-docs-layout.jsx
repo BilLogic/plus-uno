@@ -167,7 +167,12 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 style={{ borderRadius: 'var(--size-card-radius-sm)' }}
             >
                 <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
-                    <Canvas of={ofStory} story={{ inline: true }} sourceState="none" />
+                    <Canvas
+                        of={ofStory}
+                        story={{ inline: true }}
+                        layout="fullscreen"
+                        sourceState="none"
+                    />
                 </div>
                 <div className="sb-ds-docs-interactive-panel__controls border-t border-border/50 bg-muted/25 px-10 pb-8 pt-6 md:px-12 md:pb-10 md:pt-7 lg:px-14 dark:bg-muted/15">
                     <Controls of={ofStory} />

@@ -122,6 +122,22 @@ html {
     position: static !important;
 }
 
+/* ResponsiveFrame: Fullscreen API — fill the physical display so MD/LG/XL previews can use full width */
+.responsive-frame-root:fullscreen,
+.responsive-frame-root:-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    box-sizing: border-box;
+}
+
+.responsive-frame-root--browser-fullscreen .responsive-frame-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
 /* PageLayout relies on `height: 100%` resolving against its parent. ResponsiveFrame’s inner
    provides that via `min-height: calc(100vh - 120px)`; in docs the docs body is the scroll
    container, but the inner’s height still needs a definite floor so the in-page Sidebar /
