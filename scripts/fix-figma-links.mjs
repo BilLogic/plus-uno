@@ -37,10 +37,6 @@ const norm = id => id.replace(':', '-');
 const RATING_PRIMARY = '63-177636';
 
 const AREA_OVERRIDES = {
-    'design-system/src/specs/Admin/TutorAdmin': '258-262669',
-    'design-system/src/specs/Admin/StudentAdmin': '1006-258597',
-    'design-system/src/specs/Admin/SessionAdmin': '987-128734',
-    'design-system/src/specs/Admin/GroupAdmin': '258-263800',
     'design-system/src/specs/Universal/Elements/SmartBadges': '83-125838',
 };
 
