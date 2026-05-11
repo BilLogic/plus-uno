@@ -29,9 +29,10 @@ const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
     const width = widthMap[selectedBreakpoint] || widthMap.xl;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', minHeight: '100vh' }}>
+        <div className="responsive-frame-root" style={{ display: 'flex', flexDirection: 'column', width: '100%', minHeight: '100vh' }}>
             {/* Breakpoint Toolbar */}
             <div
+                className="responsive-frame-toolbar"
                 style={{
                     padding: '12px 24px',
                     borderBottom: '1px solid var(--color-outline-variant, #e0e0e0)',
@@ -81,14 +82,15 @@ const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
                 </div>
             </div>
 
-            {/* Frame Canvas */}
+            {/* Frame Canvas — flex-start so the page's own left sidebar is always visible first;
+                the right edge is reachable via horizontal scroll on this wrapper (`overflow-x: auto`). */}
             <div
                 className="responsive-frame-wrapper"
                 style={{
                     flex: 1,
                     backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     overflowX: 'auto',
                     padding: '24px'
                 }}
