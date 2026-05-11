@@ -5,7 +5,7 @@ import Jumbotron from './Jumbotron';
 export default {
     title: 'Components/Jumbotron',
     component: Jumbotron,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

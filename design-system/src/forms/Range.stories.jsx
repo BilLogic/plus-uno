@@ -5,7 +5,7 @@ import Range from './Range';
 export default {
     title: 'Forms/Range',
     component: Range,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

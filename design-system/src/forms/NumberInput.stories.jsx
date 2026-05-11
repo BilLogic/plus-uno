@@ -5,7 +5,7 @@ import NumberInput from './NumberInput';
 export default {
     title: 'Forms/Number Input',
     component: NumberInput,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

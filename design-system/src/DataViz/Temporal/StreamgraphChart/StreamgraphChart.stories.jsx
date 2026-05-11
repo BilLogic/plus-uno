@@ -4,7 +4,7 @@ import StreamgraphChart from './StreamgraphChart';
 export default {
     title: 'Data Visualizations/Temporal/StreamgraphChart',
     component: StreamgraphChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

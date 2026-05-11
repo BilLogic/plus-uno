@@ -3,6 +3,7 @@ import { CardBadges } from './CardBadges';
 
 export default {
     title: 'Specs/Home/Elements/CardBadges',
+    tags: ['!dev', '!autodocs'],
     component: CardBadges,
     parameters: {
         layout: 'centered',

@@ -4,7 +4,7 @@ import LineChart from './LineChart';
 export default {
     title: 'Data Visualizations/Temporal/LineChart',
     component: LineChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

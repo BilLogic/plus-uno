@@ -4,7 +4,7 @@ import DumbbellChart from './DumbbellChart';
 export default {
     title: 'Data Visualizations/Comparison/DumbbellChart',
     component: DumbbellChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

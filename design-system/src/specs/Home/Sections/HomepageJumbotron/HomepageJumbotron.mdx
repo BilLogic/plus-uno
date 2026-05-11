@@ -1,0 +1,73 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as HomepageJumbotronStories from './HomepageJumbotron.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={HomepageJumbotronStories} />
+
+<Title />
+
+Primary CTA section at the top of the tutor home page. Switches between three tabs — `sign-up`, `session`, and `reflection` — each surfacing different actions.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-206909"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Sections/HomepageJumbotron"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>All three tab modes stacked.</>}
+>
+    <Canvas
+        of={HomepageJumbotronStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sign-up tab
+
+<DocsInteractivePlayground
+    of={HomepageJumbotronStories.SignUp}
+    description={<>Sign-up tab — prompts the tutor to register for upcoming sessions.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Session tab
+
+<DocsInteractivePlayground
+    of={HomepageJumbotronStories.Session}
+    description={<>Session tab — lists upcoming sessions with join controls.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Reflection tab
+
+<DocsInteractivePlayground
+    of={HomepageJumbotronStories.Reflection}
+    description={<>Reflection tab — prompts the tutor to submit a post-session reflection.</>}
+/>
+
+</div>
+
+</div>

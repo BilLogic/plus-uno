@@ -4,7 +4,7 @@ import DonutChart from './DonutChart';
 export default {
     title: 'Data Visualizations/PartToWhole/DonutChart',
     component: DonutChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

@@ -4,7 +4,7 @@ import BulletChart from './BulletChart';
 export default {
     title: 'Data Visualizations/Comparison/BulletChart',
     component: BulletChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

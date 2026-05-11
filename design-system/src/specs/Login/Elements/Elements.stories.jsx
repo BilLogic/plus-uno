@@ -25,7 +25,7 @@ import cleverImage from '@/assets/images/auth-providers/clever-image.png';
 
 export default {
     title: 'Specs/Login/Elements',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

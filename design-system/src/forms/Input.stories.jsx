@@ -5,7 +5,7 @@ import Input from './Input';
 export default {
     title: 'Forms/Input',
     component: Input,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

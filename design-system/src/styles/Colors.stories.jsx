@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Colors',
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const ColorRow = ({ token, value, description, color }) => (

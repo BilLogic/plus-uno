@@ -4,7 +4,7 @@ import VariwidthChart from './VariwidthChart';
 export default {
     title: 'Data Visualizations/Distribution/VariwidthChart',
     component: VariwidthChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

@@ -1,0 +1,39 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as RecommendedLessonsStories from './RecommendedLessons.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={RecommendedLessonsStories} />
+
+<Title />
+
+Recommended-lesson card for the tutor home carousel. Includes title, duration, SMART badge, completion status, and an optional "AI recommended" indicator. Renders with fixed widths at two breakpoints (`< XXL` and `XXL & above`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-206909"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Cards/RecommendedLessons"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Card at both responsive breakpoints — narrow (~275px) and XXL (368px).</>}
+>
+    <Canvas
+        of={RecommendedLessonsStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

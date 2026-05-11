@@ -4,7 +4,7 @@ import TimelineChart from './TimelineChart';
 export default {
     title: 'Data Visualizations/Temporal/TimelineChart',
     component: TimelineChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

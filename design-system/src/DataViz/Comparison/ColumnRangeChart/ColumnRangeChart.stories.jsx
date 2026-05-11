@@ -4,7 +4,7 @@ import ColumnRangeChart from './ColumnRangeChart';
 export default {
     title: 'Data Visualizations/Comparison/ColumnRangeChart',
     component: ColumnRangeChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

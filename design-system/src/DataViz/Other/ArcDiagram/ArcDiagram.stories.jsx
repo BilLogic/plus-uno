@@ -4,7 +4,7 @@ import ArcDiagram from './ArcDiagram';
 export default {
     title: 'Data Visualizations/Other/ArcDiagram',
     component: ArcDiagram,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

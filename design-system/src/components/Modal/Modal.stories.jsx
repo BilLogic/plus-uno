@@ -5,7 +5,7 @@ import Modal from '@/components/Modal';
 export default {
     title: 'Components/Modal',
     component: Modal,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },

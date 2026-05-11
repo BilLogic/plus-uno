@@ -4,7 +4,7 @@ import UserFeedbackModal from './UserFeedbackModal';
 export default {
     title: 'Specs/Home/Modals/UserFeedbackModal',
     component: UserFeedbackModal,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'centered',
     },

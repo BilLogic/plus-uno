@@ -4,7 +4,7 @@ import OrganizationChart from './OrganizationChart';
 export default {
     title: 'Data Visualizations/Other/OrganizationChart',
     component: OrganizationChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

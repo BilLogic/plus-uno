@@ -3,6 +3,7 @@ import { ResourceType } from './ResourceType';
 
 export default {
     title: 'Specs/Home/Elements/ResourceType',
+    tags: ['!dev', '!autodocs'],
     component: ResourceType,
     parameters: {
         layout: 'centered',

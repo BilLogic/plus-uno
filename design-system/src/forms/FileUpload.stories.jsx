@@ -7,7 +7,7 @@ const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 export default {
     title: 'Forms/File Upload',
     component: FileUpload,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

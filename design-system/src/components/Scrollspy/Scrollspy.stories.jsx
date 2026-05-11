@@ -5,7 +5,7 @@ import Scrollspy, { ScrollspyContent } from './Scrollspy';
 export default {
     title: 'Components/Scrollspy',
     component: Scrollspy,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

@@ -6,7 +6,7 @@ import DataVisualizationSkillsProgress from './DataVisualizationSkillsProgress';
 export default {
     title: 'Specs/Home/Cards/DataVisualization',
     component: DataVisualization,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story) => (
             <div className="plus-storybook-constrained" style={{ padding: '24px', maxWidth: '900px', margin: '0 auto' }}>

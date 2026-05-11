@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Layout',
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const TokenTable = ({ headers, rows }) => (

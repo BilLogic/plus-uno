@@ -1,0 +1,51 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorHomePageSkillsProgressStories from './TutorHomePageSkillsProgress.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorHomePageSkillsProgressStories} />
+
+<Title />
+
+Tutor home page with the Skills Progress tab active and a rating-metrics impact card. Same app shell as Skills Overview, but the visualization defaults to the session-range line chart.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-206909"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Pages/TutorHomePageSkillsProgress"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Full-page render with default tutor data.</>}
+>
+    <Canvas
+        of={TutorHomePageSkillsProgressStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TutorHomePageSkillsProgressStories.Interactive}
+    description={<>Edit the tutor name and user badge inline.</>}
+/>
+
+</div>
+
+</div>

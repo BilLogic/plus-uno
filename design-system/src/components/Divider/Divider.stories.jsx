@@ -5,7 +5,7 @@ import Divider from '@/components/Divider';
 export default {
     title: 'Components/Divider',
     component: Divider,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

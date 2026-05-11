@@ -5,7 +5,7 @@ import Scale from './RadioButtonGroup';
 export default {
     title: 'Forms/Scale',
     component: Scale,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

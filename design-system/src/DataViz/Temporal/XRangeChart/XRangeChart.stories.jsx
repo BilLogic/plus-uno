@@ -4,7 +4,7 @@ import XRangeChart from './XRangeChart';
 export default {
     title: 'Data Visualizations/Temporal/XRangeChart',
     component: XRangeChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

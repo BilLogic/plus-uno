@@ -6,7 +6,7 @@ import Rating from './Rating';
 export default {
     title: 'Forms/Rating',
     component: Rating,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

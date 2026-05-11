@@ -14,7 +14,7 @@ const icons = {
 export default {
     title: 'Components/Badge',
     component: Badge,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     // Define argTypes to create the custom controls user requested
     argTypes: {
         children: { table: { disable: true } },

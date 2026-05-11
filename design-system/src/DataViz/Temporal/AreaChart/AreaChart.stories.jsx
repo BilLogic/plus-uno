@@ -4,7 +4,7 @@ import AreaChart from './AreaChart';
 export default {
     title: 'Data Visualizations/Temporal/AreaChart',
     component: AreaChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

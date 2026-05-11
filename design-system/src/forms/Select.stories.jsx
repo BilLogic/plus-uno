@@ -11,7 +11,7 @@ import Select from './Select';
 export default {
     title: 'Forms/Select',
     component: Select,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

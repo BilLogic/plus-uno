@@ -117,7 +117,7 @@ function CardLayoutDemo() {
 export default {
     title: 'Components/Card',
     component: Card,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },

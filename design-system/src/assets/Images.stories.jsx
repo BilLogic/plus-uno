@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Assets/Images',
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const AuthProviders = () => {

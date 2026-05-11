@@ -4,7 +4,7 @@ import ParliamentChart from './ParliamentChart';
 export default {
     title: 'Data Visualizations/PartToWhole/ParliamentChart',
     component: ParliamentChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

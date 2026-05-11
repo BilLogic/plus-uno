@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Icons',
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const IconTokenTable = ({ rows }) => (

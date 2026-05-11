@@ -5,7 +5,7 @@ import Pagination from './Pagination';
 export default {
     title: 'Components/Pagination',
     component: Pagination,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

@@ -4,7 +4,7 @@ import RadarChart from './RadarChart';
 export default {
     title: 'Data Visualizations/Comparison/RadarChart',
     component: RadarChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

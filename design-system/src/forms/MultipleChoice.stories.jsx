@@ -5,7 +5,7 @@ import MultipleChoice from './MultipleChoice';
 export default {
     title: 'Forms/Multiple Choice',
     component: MultipleChoice,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

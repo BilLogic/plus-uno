@@ -5,7 +5,7 @@ import Switch from './Switch';
 export default {
     title: 'Forms/Switch',
     component: Switch,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

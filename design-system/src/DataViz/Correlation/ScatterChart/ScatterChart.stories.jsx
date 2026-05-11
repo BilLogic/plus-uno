@@ -4,7 +4,7 @@ import ScatterChart from './ScatterChart';
 export default {
     title: 'Data Visualizations/Correlation/ScatterChart',
     component: ScatterChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

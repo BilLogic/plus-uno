@@ -4,7 +4,7 @@ import RecommendedLessons from './RecommendedLessons';
 export default {
     title: 'Specs/Home/Cards/RecommendedLessons',
     component: RecommendedLessons,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Overview = () => (

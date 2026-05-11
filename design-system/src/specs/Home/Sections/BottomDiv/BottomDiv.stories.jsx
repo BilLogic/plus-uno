@@ -4,7 +4,7 @@ import BottomDiv from './BottomDiv';
 export default {
     title: 'Specs/Home/Sections/BottomDiv',
     component: BottomDiv,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const defaultOverviewCards = [

@@ -5,7 +5,7 @@ import NavPills from './NavPills';
 export default {
     title: 'Components/NavPills',
     component: NavPills,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

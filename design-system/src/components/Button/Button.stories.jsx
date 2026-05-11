@@ -20,7 +20,7 @@ export default {
     title: 'Components/Button',
     component: Button,
     /** Hide CSF stories from the sidebar; docs live on Button.mdx (Canvas still embeds them). */
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             toc: {

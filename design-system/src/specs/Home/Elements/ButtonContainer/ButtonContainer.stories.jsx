@@ -3,6 +3,7 @@ import { ButtonContainer } from './ButtonContainer';
 
 export default {
     title: 'Specs/Home/Elements/ButtonContainer',
+    tags: ['!dev', '!autodocs'],
     component: ButtonContainer,
     parameters: {
         layout: 'centered',

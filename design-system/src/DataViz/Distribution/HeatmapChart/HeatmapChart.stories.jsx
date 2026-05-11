@@ -4,7 +4,7 @@ import HeatmapChart from './HeatmapChart';
 export default {
     title: 'Data Visualizations/Distribution/HeatmapChart',
     component: HeatmapChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

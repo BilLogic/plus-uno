@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Elevation',
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const ElevationTable = ({ headers, rows }) => (

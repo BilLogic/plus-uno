@@ -6,7 +6,7 @@ import { Badge } from '@/components/Badge';
 export default {
     title: 'Components/ListGroup',
     component: ListGroup,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     subcomponents: { 'ListGroup.Item': ListGroup.Item },
     parameters: {
         docs: {

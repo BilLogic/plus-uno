@@ -4,7 +4,7 @@ import ParetoChart from './ParetoChart';
 export default {
     title: 'Data Visualizations/Comparison/ParetoChart',
     component: ParetoChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

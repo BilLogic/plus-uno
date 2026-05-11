@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Typography',
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const TypeScale = ({ category, description, examples }) => (

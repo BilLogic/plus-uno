@@ -3,6 +3,7 @@ import { ProductAreaDropdown } from './ProductAreaDropdown';
 
 export default {
     title: 'Specs/Home/Elements/ProductAreaDropdown',
+    tags: ['!dev', '!autodocs'],
     component: ProductAreaDropdown,
     parameters: {
         layout: 'centered',

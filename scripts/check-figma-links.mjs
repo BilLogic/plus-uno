@@ -21,6 +21,7 @@ const roots = [
     'design-system/src/specs/Admin',
     'design-system/src/specs/Training',
     'design-system/src/specs/Universal',
+    'design-system/src/specs/Home',
 ];
 
 function walk(dir, out = []) {
