@@ -24,7 +24,7 @@ const defaultTutors = [
 export default {
     title: 'Specs/Admin/Tutor Admin/Tables/TutorsPerformanceTable',
     component: TutorsPerformanceTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -55,33 +55,6 @@ Node ID: 258-262435
             table: { category: 'Data' },
         },
     },
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorsPerformanceTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying tutor performance data with color-coded metrics.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Color Thresholds</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>≥80%</strong>: Green (Success)</li>
-                        <li><strong>50-79%</strong>: Yellow (Warning)</li>
-                        <li><strong>&lt;50%</strong>: Red (Danger)</li>
-                    </ul>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

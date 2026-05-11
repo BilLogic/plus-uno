@@ -6,6 +6,7 @@ import DeleteTutorModal from './DeleteTutorModal';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Modals/DeleteTutorModal',
+    tags: ['!dev', '!autodocs'],
     component: DeleteTutorModal,
     parameters: {
         docs: {

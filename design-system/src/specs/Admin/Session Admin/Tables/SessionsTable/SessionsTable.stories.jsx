@@ -51,7 +51,7 @@ const defaultNineRows = [
 export default {
     title: 'Specs/Admin/Session Admin/Tables/SessionsTable',
     component: SessionsTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -91,40 +91,6 @@ Node ID: 987-127618
             table: { category: 'Data' },
         },
     },
-};
-
-/**
- * Docs - Documentation for SessionsTable component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>SessionsTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying session data with metrics. Shows Day (Date), Shift, School, 
-                        Teacher, and four metric columns with color-coded badges.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Metric Color Thresholds</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>≥80%</strong>: Green (Success)</li>
-                        <li><strong>50-79%</strong>: Yellow (Warning)</li>
-                        <li><strong>&lt;50%</strong>: Red (Danger)</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 987-127618
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

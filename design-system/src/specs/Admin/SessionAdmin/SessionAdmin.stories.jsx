@@ -3,6 +3,7 @@ import { SessionAdminSpec } from './SessionAdminSpec';
 
 export default {
     title: 'Specs/Admin/Session Admin',
+    tags: ['!dev', '!autodocs'],
     component: SessionAdminSpec,
     parameters: {
         layout: 'fullscreen',

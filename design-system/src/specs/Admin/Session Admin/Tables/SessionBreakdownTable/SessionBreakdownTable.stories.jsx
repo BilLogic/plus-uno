@@ -46,7 +46,7 @@ const defaultNineRows = [
 export default {
     title: 'Specs/Admin/Session Admin/Tables/SessionBreakdownTable',
     component: SessionBreakdownTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -76,42 +76,6 @@ Node ID: 987-127671
             table: { category: 'Data' },
         },
     },
-};
-
-/**
- * Docs - Documentation for SessionBreakdownTable component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>SessionBreakdownTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying session breakdown data. Used inside the Session Modal
-                        to show student-tutor pairings and time spent.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Columns</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Student Name</strong>: Full name of the student</li>
-                        <li><strong>Student Status</strong>: Badge showing goal status</li>
-                        <li><strong>Tutor Name</strong>: Assigned tutor name</li>
-                        <li><strong>Tutor Type</strong>: Badge (Lead = teal, Regular = gray)</li>
-                        <li><strong>Time Spent (Mins)</strong>: Duration in minutes</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 987-127671
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

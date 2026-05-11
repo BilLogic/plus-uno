@@ -1,0 +1,58 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as TutorModalStories from './TutorModal.stories.jsx';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorModalStories} />
+
+<Title />
+
+Two-tab modal (Info / Sessions) for viewing, editing, and adding tutors. Used across every Tutor Admin page when a row is clicked or the "Add New Tutor" action is invoked.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262669"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor%20Admin/Modals/TutorModal"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+The modal stories all render in an overlay (`show={true}`), so they are not embedded inline here — opening them inside the Docs page would cover the page itself. Instead, jump to the dedicated story entries in the sidebar:
+
+- **Edit Tutor** — `Specs/Admin/Tutor Admin/Modals/TutorModal/EditTutor`. Opens on the Info tab with the tutor's profile fields loaded.
+- **Edit Tutor / Sessions** — `Specs/Admin/Tutor Admin/Modals/TutorModal/EditTutorSessions`. Same modal, Sessions tab active.
+- **Add New Tutor** — `Specs/Admin/Tutor Admin/Modals/TutorModal/AddNewTutor`. Blank Info form for creating a new tutor record.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+- **Header** with the tutor's name (edit mode) or `Add New Tutor` title (add mode), plus a close button.
+- **Tab navigation** — `Info` and `Sessions` tabs (Sessions is hidden in `add` mode).
+- **Info tab body** — profile form fields (name, school, contact, status).
+- **Sessions tab body** — embedded <code>TutorSessionsTable</code>.
+- **Footer actions** — `Cancel` and a primary `Save` / `Add Tutor` button.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Props
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `show` | `boolean` | Controls visibility. |
+| `onHide` | `() => void` | Fires on close button or backdrop click. |
+| `mode` | `'edit' \| 'add'` | Swap header copy, footer copy, and hide the Sessions tab in `add`. |
+| `defaultTab` | `'info' \| 'sessions'` | Which tab opens first. |
+| `tutor` | `object` | Tutor record for edit mode. |
+| `onSave` | `(tutor) => void` | Fires when the primary action is clicked. |
+
+</div>
+
+</div>

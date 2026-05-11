@@ -26,6 +26,7 @@ const mockSessions = [
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Modals/TutorModal',
+    tags: ['!dev', '!autodocs'],
     component: TutorModal,
     parameters: {
         docs: {

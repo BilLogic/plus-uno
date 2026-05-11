@@ -36,7 +36,7 @@ const defaultNineRows = generateStudentData(9);
 export default {
     title: 'Specs/Admin/Student Admin/Tables/StudentsTable',
     component: StudentsTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -72,44 +72,6 @@ Node ID: 999-108965
             table: { category: 'Data' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for StudentsTable component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>StudentsTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying student information in the Student Admin section.
-                        Each row shows a student name, school, teacher, status badge (e.g., "Needs to set goals"),
-                        and an action button to view student goals. Default displays 9 rows.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>students</strong>: Array of student objects (id, name, school, teacher, status)</li>
-                        <li><strong>sortable</strong>: Enable sortable columns (default: true)</li>
-                        <li><strong>hover</strong>: Enable row hover effects (default: true)</li>
-                        <li><strong>onViewGoalsClick</strong>: Callback when View goals button is clicked</li>
-                        <li><strong>onStudentClick</strong>: Callback when a student row is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 999-108965
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

@@ -18,7 +18,7 @@ const defaultFilters = [
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements/ExportSearchFilterBar',
     component: ExportSearchFilterBar,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -48,26 +48,6 @@ Node ID: 433-370346
             table: { category: 'Content' },
         },
     },
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>ExportSearchFilterBar</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Action bar component combining export functionality, search, and multiple filter dropdowns.
-                        Used in Tutor Admin tables and data views.
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

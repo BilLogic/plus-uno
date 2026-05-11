@@ -25,7 +25,7 @@ const defaultStudents = [
 export default {
     title: 'Specs/Admin/Session Admin/Modals/SessionModal',
     component: SessionModal,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -55,42 +55,6 @@ Node ID: 987-127605
             table: { category: 'Content' },
         },
     },
-};
-
-/**
- * Docs - Documentation for SessionModal component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>SessionModal</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Modal component for viewing session breakdown details. Contains a table showing 
-                        student-tutor pairings with status badges and time spent.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>show</strong>: Whether the modal is visible</li>
-                        <li><strong>sessionDate</strong>: Date string for the title</li>
-                        <li><strong>students</strong>: Array of student breakdown objects</li>
-                        <li><strong>onHide</strong>: Callback when modal is closed</li>
-                        <li><strong>onSort</strong>: Callback when sort changes</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 987-127605
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

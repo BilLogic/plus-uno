@@ -12,7 +12,7 @@ import './SessionOverviewSection.scss';
 export default {
     title: 'Specs/Admin/Session Admin/Sections/SessionOverviewSection',
     component: SessionOverviewSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -63,43 +63,6 @@ Node ID: 987-127692
             table: { category: 'Data' },
         },
     },
-};
-
-/**
- * Docs - Documentation for SessionOverviewSection component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>SessionOverviewSection</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Section component displaying 5 donut charts for session metrics overview.
-                        Shows Time Allocation, Student Attendance, Student Engagement, Tutor Attendance,
-                        and Check-in Completion.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Charts</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Time Allocation</strong>: Pink donut - motivation needs</li>
-                        <li><strong>Student Attendance</strong>: Green donut - joined vs didn't join</li>
-                        <li><strong>Student Engagement</strong>: Green donut - engagement levels</li>
-                        <li><strong>Tutor Attendance</strong>: Green donut - tutor attendance</li>
-                        <li><strong>Check-in Completion</strong>: Green donut - check-in status</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 987-127692
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

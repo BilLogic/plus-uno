@@ -11,7 +11,7 @@ import TutorToolUsageSection from './TutorToolUsageSection';
 export default {
     title: 'Specs/Admin/Tutor Admin/Sections/TutorToolUsageSection',
     component: TutorToolUsageSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

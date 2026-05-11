@@ -1,0 +1,103 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as StudentAdminStories from './StudentAdmin.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+import * as StudentAdminPageStories from '../Student Admin/Pages/StudentAdminPage/StudentAdminPage.stories.jsx';
+import * as StudentOverviewSectionStories from '../Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.stories.jsx';
+import * as StudentsTableStories from '../Student Admin/Tables/StudentsTable/StudentsTable.stories.jsx';
+
+<Meta of={StudentAdminStories} />
+
+<Title />
+
+The Student Admin spec is the unified surface for monitoring student rosters, attendance, and engagement across schools and cohorts. Pages, sections, tables, and modals are bundled here — every block renders inline with its own controls so you can poke at props without leaving the page.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=276-103678"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Student%20Admin"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={
+        <>
+            Student Admin uses the same shell as the other Admin specs — TopBar, sidebar, action buttons,
+            and a section/table workspace below.
+        </>
+    }
+>
+    <Canvas
+        of={StudentAdminPageStories.Overview}
+        story={{ inline: true }}
+        layout="padded"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Pages
+
+#### Student Admin page
+
+<DocsInteractivePlayground
+    of={StudentAdminPageStories.Interactive}
+    description={
+        <>
+            Full student admin page — overview section, students table, and the student modal layer.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sections
+
+#### Student Overview section
+
+<DocsInteractivePlayground
+    of={StudentOverviewSectionStories.Interactive}
+    description={<>Overview metrics for the active student cohort.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tables
+
+#### Students table
+
+<DocsInteractivePlayground
+    of={StudentsTableStories.Interactive}
+    description={<>Student details with attendance and badge progress per row.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Modals
+
+Modal stories render in an overlay layer, so they're listed here but linked out to their dedicated sidebar entries instead of embedded inline.
+
+- **Student modal** — two-tab modal (Info / Sessions) with edit and add modes. → `Specs/Admin/Student Admin/Modals/StudentModal` (variants: `InfoVariant`, `SessionsVariant`).
+
+</div>
+
+</div>

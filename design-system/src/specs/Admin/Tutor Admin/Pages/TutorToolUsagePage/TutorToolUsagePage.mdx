@@ -1,0 +1,75 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorToolUsagePageStories from './TutorToolUsagePage.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorToolUsagePageStories} />
+
+<Title />
+
+Full-page layout for the Tool Usage tab — recording upload, reflection completion, and help center usage charts above a searchable tool usage table with CSV export.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-263367"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor%20Admin/Pages/TutorToolUsagePage"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={
+        <>
+            Default layout at the <strong className="text-foreground">xl</strong> breakpoint with the
+            tool usage section and details table fully populated.
+        </>
+    }
+>
+    <Canvas
+        of={TutorToolUsagePageStories.Overview}
+        story={{ inline: true }}
+        layout="padded"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+- **TopBar** with breadcrumbs `Admin / Tutor Admin / Tool Usage`.
+- **Sidebar** for primary navigation.
+- **Tab navigation** — Tool Usage tab active.
+- **Action buttons** — `Email Tutors` and `Export Reflection Data`.
+- **Tool Usage Overview section** — three donut metric cards: Recording Uploads, Reflection Completion, Help Center Usage.
+- **Tool Usage Details table** — searchable with CSV export, sortable columns, pagination.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TutorToolUsagePageStories.Interactive}
+    description={
+        <>
+            Tweak breakpoint, filters, active tab, modal state, and table density without leaving the
+            doc.
+        </>
+    }
+/>
+
+</div>
+
+</div>

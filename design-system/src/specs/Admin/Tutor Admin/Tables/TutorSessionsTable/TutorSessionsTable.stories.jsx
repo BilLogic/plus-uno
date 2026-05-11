@@ -16,7 +16,7 @@ const defaultSessions = [
 export default {
     title: 'Specs/Admin/Tutor Admin/Tables/TutorSessionsTable',
     component: TutorSessionsTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

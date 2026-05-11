@@ -9,6 +9,7 @@ import TutorsStatusAndWarningsTable from './TutorsStatusAndWarningsTable';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Tables/TutorsStatusAndWarningsTable',
+    tags: ['!dev', '!autodocs'],
     component: TutorsStatusAndWarningsTable,
     parameters: {
         layout: 'padded',

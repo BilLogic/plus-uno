@@ -12,7 +12,7 @@ import './AdminDateRangeFilter.scss';
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements/AdminDateRangeFilter',
     component: AdminDateRangeFilter,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
