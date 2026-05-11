@@ -12,7 +12,7 @@ import './StatusIndicators.scss';
 export default {
     title: 'Specs/Training/Onboarding/Elements/StatusIndicators',
     component: StatusIndicators,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -34,28 +34,6 @@ export default {
             table: { category: 'Design' }
         }
     }
-};
-
-/**
- * Docs
- * Documentation overview of the component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 24px)' }}>
-            <h3 className="h3" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>StatusIndicators</h3>
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
-                Status indicator icons showing different stages of completion.
-                Uses FontAwesome icons with PLUS DS color tokens.
-            </p>
-            <h4 className="h4" style={{ marginBottom: 'var(--size-element-gap-md, 8px)' }}>Variants</h4>
-            <ul className="body2-txt">
-                <li><strong>not started</strong>: Circle-stop icon in neutral color</li>
-                <li><strong>in progress</strong>: Spinner icon in info color</li>
-                <li><strong>completed</strong>: Circle-check icon in success color</li>
-            </ul>
-        </div>
-    )
 };
 
 /**

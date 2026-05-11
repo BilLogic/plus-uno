@@ -12,7 +12,7 @@ import './OnboardingAlertCard.scss';
 export default {
     title: 'Specs/Training/Onboarding/Cards/OnboardingAlertCard',
     component: OnboardingAlertCard,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -41,43 +41,6 @@ export default {
             table: { category: 'Events' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for OnboardingAlertCard component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>OnboardingAlertCard</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Alert card component for displaying important reminders during onboarding.
-                        Uses primary color scheme with tinted background and solid border.
-                        Can be dismissed via the close button.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>title</strong>: Alert title text</li>
-                        <li><strong>description</strong>: Description/body text</li>
-                        <li><strong>dismissible</strong>: Whether to show dismiss button (default: true)</li>
-                        <li><strong>onDismiss</strong>: Callback when dismiss button is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 542-50027
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

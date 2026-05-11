@@ -13,7 +13,7 @@ import '../StrategyBadge/StrategyBadge.scss';
 export default {
     title: 'Specs/Training/Onboarding/Elements/ContentBlurb',
     component: ContentBlurb,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -58,27 +58,6 @@ export default {
             table: { category: 'Events' }
         }
     }
-};
-
-/**
- * Docs
- * Documentation overview of the component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 24px)' }}>
-            <h3 className="h3" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>ContentBlurb</h3>
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
-                A content card component that displays module information including title, description,
-                duration with strategy badge, and a call-to-action button.
-            </p>
-            <h4 className="h4" style={{ marginBottom: 'var(--size-element-gap-md, 8px)' }}>Components Used</h4>
-            <ul className="body2-txt">
-                <li><strong>StrategyBadge</strong>: Shows content type icon</li>
-                <li><strong>Button</strong>: Primary outline button with external link icon</li>
-            </ul>
-        </div>
-    )
 };
 
 /**

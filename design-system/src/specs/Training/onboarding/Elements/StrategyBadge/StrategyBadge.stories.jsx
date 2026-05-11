@@ -12,7 +12,7 @@ import './StrategyBadge.scss';
 export default {
     title: 'Specs/Training/Onboarding/Elements/StrategyBadge',
     component: StrategyBadge,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -33,32 +33,6 @@ export default {
             table: { category: 'Content' }
         }
     }
-};
-
-/**
- * Docs
- * Documentation overview of the component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 24px)' }}>
-            <h3 className="h3" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>StrategyBadge</h3>
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
-                Badge component showing different file/strategy types. 
-                Uses FontAwesome file icons with PLUS DS tokens.
-            </p>
-            <h4 className="h4" style={{ marginBottom: 'var(--size-element-gap-md, 8px)' }}>Types</h4>
-            <ul className="body2-txt">
-                <li><strong>image</strong>: File-image icon</li>
-                <li><strong>video</strong>: File-video icon</li>
-                <li><strong>audio</strong>: File-audio icon</li>
-                <li><strong>document</strong>: File-pdf icon</li>
-                <li><strong>book</strong>: File-lines icon</li>
-                <li><strong>website</strong>: External link icon</li>
-                <li><strong>other</strong>: Generic file icon</li>
-            </ul>
-        </div>
-    )
 };
 
 /**

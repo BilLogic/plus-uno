@@ -1,11 +1,15 @@
 #!/usr/bin/env node
-/* One-off helper used while migrating Admin specs to per-component MDX docs.
- * Operates on .stories.jsx files under design-system/src/specs/Admin/*  Admin/.
+/* One-off helper used while migrating spec areas to per-component MDX docs.
+ * Operates on .stories.jsx files under the supplied roots.
  *
  * - Replaces tags: [...] with tags: ['!dev', '!autodocs'] in the default export
  *   (and inserts a tags entry if missing)
  * - Removes any `export const Docs = { … };` block (now redundant with the MDX docs page),
  *   including the immediately-preceding JSDoc comment if present
+ *
+ * Usage:
+ *   node scripts/admin-mdx-prep.mjs                       # defaults to specs/Admin
+ *   node scripts/admin-mdx-prep.mjs design-system/src/specs/Training
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,9 +18,10 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), '..');
 
-const adminRoots = [
-    'design-system/src/specs/Admin',
-];
+const cliRoots = process.argv.slice(2);
+const adminRoots = cliRoots.length > 0
+    ? cliRoots
+    : ['design-system/src/specs/Admin'];
 
 function walk(dir, out = []) {
     if (!fs.existsSync(dir)) return out;

@@ -1,0 +1,239 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TrainingStories from './Training.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+import * as LessonsOverviewPageStories from './TrainingLessons/Pages/LessonsOverviewPage/LessonsOverviewPage.stories.jsx';
+import * as LessonsDetailPageStories from './TrainingLessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx';
+import * as LessonsTableStories from './TrainingLessons/Tables/LessonsTable/LessonsTable.stories.jsx';
+import * as LessonWelcomeSectionStories from './TrainingLessons/Sections/LessonWelcomeSection/LessonWelcomeSection.stories.jsx';
+import * as LessonOverviewSectionStories from './TrainingLessons/Sections/LessonOverviewSection/LessonOverviewSection.stories.jsx';
+import * as LessonListSectionStories from './TrainingLessons/Sections/LessonListSection/LessonListSection.stories.jsx';
+import * as AlertForSupervisorsStories from './TrainingLessons/Cards/AlertForSupervisors/AlertForSupervisors.stories.jsx';
+import * as AiIndicatorStories from './TrainingLessons/Elements/AiIndicator/AiIndicator.stories.jsx';
+import * as RatingStories from './TrainingLessons/Elements/Rating/Rating.stories.jsx';
+import * as RatingSingleStories from './TrainingLessons/Elements/RatingSingle/RatingSingle.stories.jsx';
+import * as SortControlStories from './TrainingLessons/Elements/SortControl/SortControl.stories.jsx';
+import * as LessonToastStories from './TrainingLessons/Elements/Toast/Toast.stories.jsx';
+import * as TrainingLessonStatusSelectStories from './TrainingLessons/Elements/TrainingLessonStatusSelect/TrainingLessonStatusSelect.stories.jsx';
+
+import * as OnboardingOverviewPageStories from './onboarding/Pages/OnboardingOverviewPage/OnboardingOverviewPage.stories.jsx';
+import * as OnboardingInnerPageStories from './onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage.stories.jsx';
+import * as OnboardingModulesTableStories from './onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable.stories.jsx';
+import * as OnboardingModuleCardStories from './onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard.stories.jsx';
+import * as OnboardingAlertCardStories from './onboarding/Cards/OnboardingAlertCard/OnboardingAlertCard.stories.jsx';
+import * as ContentBlurbStories from './onboarding/Elements/ContentBlurb/ContentBlurb.stories.jsx';
+import * as CtaButtonsStories from './onboarding/Elements/CtaButtons/CtaButtons.stories.jsx';
+import * as DropdownListOptionsStories from './onboarding/Elements/DropdownListOptions/DropdownListOptions.stories.jsx';
+import * as SortingDropdownStories from './onboarding/Elements/SortingDropdown/SortingDropdown.stories.jsx';
+import * as StatusIndicatorsStories from './onboarding/Elements/StatusIndicators/StatusIndicators.stories.jsx';
+import * as StrategyBadgeStories from './onboarding/Elements/StrategyBadge/StrategyBadge.stories.jsx';
+
+<Meta of={TrainingStories} />
+
+<Title />
+
+The Training spec is the unified surface for everything tutors see while learning the PLUS platform — onboarding modules they complete once, and the per-week lessons that drive ongoing skill development. Two sub-areas live below: **Training Lessons** (recurring lesson flow) and **Onboarding** (first-run modules).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=108-64429"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={
+        <>
+            Training is composed of two top-level pages — the Lessons Overview (recurring) and the
+            Onboarding Overview (first-run). Both share the same PLUS shell with TopBar, sidebar, and a
+            workspace below.
+        </>
+    }
+>
+    <Canvas
+        of={LessonsOverviewPageStories.Overview}
+        story={{ inline: true }}
+        layout="padded"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Training Lessons
+
+The recurring lesson flow — a tutor's home for assigned weekly content.
+
+#### Lessons Overview page
+
+<DocsInteractivePlayground
+    of={LessonsOverviewPageStories.Interactive}
+    description={
+        <>
+            Lessons home with welcome section, status filters, and the paginated lessons table. Figma
+            node <strong className="text-foreground">63-178289</strong>.
+        </>
+    }
+/>
+
+#### Lessons Detail page
+
+<DocsInteractivePlayground
+    of={LessonsDetailPageStories.Interactive}
+    description={
+        <>
+            Single-lesson page with five variants (P1 intro · P2 research · P3 conclusion · P4 scenario
+            · P5 congratulations). Switch the <code>variant</code> control to flip between stages.
+        </>
+    }
+/>
+
+#### Sections
+
+<DocsCanvasShell description={<>Welcome section greeting the tutor.</>}>
+    <Canvas of={LessonWelcomeSectionStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Overview metrics strip (Need · Status · Effort · Progress).</>}>
+    <Canvas of={LessonOverviewSectionStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>List section wrapper used inside the Lessons Overview page.</>}>
+    <Canvas of={LessonListSectionStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+#### Tables
+
+<DocsInteractivePlayground
+    of={LessonsTableStories.Interactive}
+    description={<>Lessons table with collapsed / expanded rows and full interactive state coverage.</>}
+/>
+
+#### Cards
+
+<DocsCanvasShell description={<>Inline alert card surfaced inside lessons that need supervisor follow-up.</>}>
+    <Canvas of={AlertForSupervisorsStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+#### Elements
+
+<DocsCanvasShell description={<>AI indicator chip labelling AI-generated content.</>}>
+    <Canvas of={AiIndicatorStories.Default} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Multi-button rating input (rest + selected).</>}>
+    <Canvas of={RatingStories.Rest} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Single rating button — the atom used inside <code>Rating</code>.</>}>
+    <Canvas of={RatingSingleStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Sort toggle used on lesson table headers.</>}>
+    <Canvas of={SortControlStories.Default} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>In-lesson toast notification.</>}>
+    <Canvas of={LessonToastStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Lesson status select — flips between Not started / In progress / Completed.</>}>
+    <Canvas
+        of={TrainingLessonStatusSelectStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Onboarding
+
+The first-run flow tutors complete when joining PLUS.
+
+#### Onboarding Overview page
+
+<DocsInteractivePlayground
+    of={OnboardingOverviewPageStories.Interactive}
+    description={
+        <>
+            Onboarding home with module grid and table. Figma node{' '}
+            <strong className="text-foreground">108-64429</strong>.
+        </>
+    }
+/>
+
+#### Onboarding Inner page
+
+<DocsInteractivePlayground
+    of={OnboardingInnerPageStories.Interactive}
+    description={<>Single-module page with content blurb, CTA buttons, and optional completion modal.</>}
+/>
+
+#### Tables
+
+<DocsInteractivePlayground
+    of={OnboardingModulesTableStories.Interactive}
+    description={<>Module details table with stage and CTA columns.</>}
+/>
+
+#### Cards
+
+<DocsCanvasShell description={<>Onboarding module thumbnail card.</>}>
+    <Canvas of={OnboardingModuleCardStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Persistent alert card nudging the tutor toward an incomplete module.</>}>
+    <Canvas of={OnboardingAlertCardStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+#### Elements
+
+<DocsCanvasShell description={<>Titled content blurb used inside module bodies.</>}>
+    <Canvas of={ContentBlurbStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Bottom-of-page CTA buttons.</>}>
+    <Canvas of={CtaButtonsStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dropdown list of options used in strategy prompts.</>}>
+    <Canvas of={DropdownListOptionsStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Sort-by control for the modules table.</>}>
+    <Canvas of={SortingDropdownStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Stage pills (Not started / In progress / Completed).</>}>
+    <Canvas of={StatusIndicatorsStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Strategy badge variants used on module cards.</>}>
+    <Canvas of={StrategyBadgeStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+#### Modals
+
+Modal stories render in an overlay layer, so they're listed here but linked out to their dedicated sidebar entries instead of embedded inline (otherwise every modal would auto-open over the doc body).
+
+- **Module completion modal** — celebratory close-out for a completed module. → `Specs/Training/Onboarding/Modals/ModuleCompletionModal` (variant: `Overview`).
+- **Strategy content prompt modal** — multiple-choice strategy prompt. → `Specs/Training/Onboarding/Modals/StrategyContentPromptModal` (variant: `Overview`).
+
+</div>
+
+</div>

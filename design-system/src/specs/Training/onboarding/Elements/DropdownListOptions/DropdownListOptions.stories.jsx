@@ -12,7 +12,7 @@ import './DropdownListOptions.scss';
 export default {
     title: 'Specs/Training/Onboarding/Elements/DropdownListOptions',
     component: DropdownListOptions,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -36,27 +36,6 @@ export default {
             table: { category: 'Events' }
         }
     }
-};
-
-/**
- * Docs
- * Documentation overview of the component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 24px)' }}>
-            <h3 className="h3" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>DropdownListOptions</h3>
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
-                Dropdown menu showing sorting options. The type prop determines which order options are shown.
-            </p>
-            <h4 className="h4" style={{ marginBottom: 'var(--size-element-gap-md, 8px)' }}>Types & Order Options</h4>
-            <ul className="body2-txt">
-                <li><strong>name</strong>: A-Z, Z-A</li>
-                <li><strong>duration</strong>: Shortest First, Longest Last</li>
-                <li><strong>progress</strong>: Completed First, Completed Last</li>
-            </ul>
-        </div>
-    )
 };
 
 /**

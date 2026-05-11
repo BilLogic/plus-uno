@@ -12,7 +12,7 @@ import './ModuleCompletionModal.scss';
 export default {
     title: 'Specs/Training/Onboarding/Modals/ModuleCompletionModal',
     component: ModuleCompletionModal,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -50,44 +50,6 @@ export default {
             table: { category: 'Events' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for ModuleCompletionModal component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>ModuleCompletionModal</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Modal component displayed when a user completes an onboarding module.
-                        Shows a congratulations message and provides a button to navigate back to the onboarding overview.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>title</strong>: Modal title (default: "Module Completed!")</li>
-                        <li><strong>message</strong>: Body message text</li>
-                        <li><strong>buttonText</strong>: CTA button text</li>
-                        <li><strong>show</strong>: Whether to show the modal</li>
-                        <li><strong>onClose</strong>: Callback when X button is clicked</li>
-                        <li><strong>onContinue</strong>: Callback when CTA button is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 74-122005
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

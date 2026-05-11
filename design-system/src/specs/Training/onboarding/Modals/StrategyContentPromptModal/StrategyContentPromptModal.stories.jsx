@@ -12,7 +12,7 @@ import './StrategyContentPromptModal.scss';
 export default {
     title: 'Specs/Training/Onboarding/Modals/StrategyContentPromptModal',
     component: StrategyContentPromptModal,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -70,48 +70,6 @@ export default {
             table: { category: 'Events' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for StrategyContentPromptModal component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>StrategyContentPromptModal</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Modal component for collecting user reflection responses at the end of onboarding modules.
-                        Contains instructions section, required question with label, textarea input, and submit button.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>instructionsTitle</strong>: Section title for instructions</li>
-                        <li><strong>instructionsText</strong>: Instructions body text</li>
-                        <li><strong>questionLabel</strong>: Question number/label</li>
-                        <li><strong>questionText</strong>: The reflection question</li>
-                        <li><strong>placeholder</strong>: Textarea placeholder text</li>
-                        <li><strong>buttonText</strong>: Submit button text</li>
-                        <li><strong>required</strong>: Shows red asterisk if true</li>
-                        <li><strong>value</strong>: Current textarea value</li>
-                        <li><strong>onChange</strong>: Callback when text changes</li>
-                        <li><strong>onSubmit</strong>: Callback when submit is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 74-121977
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

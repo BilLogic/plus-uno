@@ -12,7 +12,7 @@ import './TrainingLessonStatusSelect.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Elements/TrainingLessonStatusSelect',
     component: TrainingLessonStatusSelect,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

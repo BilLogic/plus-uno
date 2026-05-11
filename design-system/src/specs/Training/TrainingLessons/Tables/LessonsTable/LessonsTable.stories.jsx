@@ -12,7 +12,7 @@ import './LessonsTable.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Tables/LessonsTable',
     component: LessonsTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

@@ -9,7 +9,7 @@ import React from 'react';
 
 export default {
     title: 'Specs/Training',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

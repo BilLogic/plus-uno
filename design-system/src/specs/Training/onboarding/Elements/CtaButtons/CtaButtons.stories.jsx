@@ -12,7 +12,7 @@ import './CtaButtons.scss';
 export default {
     title: 'Specs/Training/Onboarding/Elements/CtaButtons',
     component: CtaButtons,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -37,28 +37,6 @@ export default {
             table: { category: 'Events' }
         }
     }
-};
-
-/**
- * Docs
- * Documentation overview of the component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 24px)' }}>
-            <h3 className="h3" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>CtaButtons</h3>
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-section-gap-md, 24px)' }}>
-                CTA button component that changes text and styling based on the user's progress state.
-                Uses the PLUS DS Button component as its foundation.
-            </p>
-            <h4 className="h4" style={{ marginBottom: 'var(--size-element-gap-md, 8px)' }}>States</h4>
-            <ul className="body2-txt">
-                <li><strong>not started</strong>: "Get Started" - Primary filled button</li>
-                <li><strong>in progress</strong>: "Continue" - Primary filled button</li>
-                <li><strong>completed</strong>: "Review" - Success tonal button</li>
-            </ul>
-        </div>
-    )
 };
 
 /**
