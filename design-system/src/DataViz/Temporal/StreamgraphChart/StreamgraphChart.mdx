@@ -1,0 +1,70 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as StreamgraphChartStories from './StreamgraphChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={StreamgraphChartStories} />
+
+<Title />
+
+Shows **composition changes over time** with flowing organic shapes.
+
+### Overview
+Shows **composition changes over time** with flowing organic shapes.
+
+<Primary />
+
+---
+
+### How to Read
+- **Width** = relative value at that time
+- **Flow** = trend direction
+- **Colors** = different categories
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Trend evolution</td><td>✅ Ideal</td></tr>
+    <tr><td>Topic popularity</td><td>✅ Good</td></tr>
+    <tr><td>Proportions over time</td><td>✅ Good</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Subject Popularity**</td><td>Enrollment trends</td></tr>
+    <tr><td>**Feature Usage**</td><td>Daily usage by feature</td></tr>
+    <tr><td>**Content Engagement**</td><td>Lesson views over time</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the streamgraph chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={StreamgraphChartStories.Interactive} />

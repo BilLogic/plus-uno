@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Progress from '@/components/Progress';
 
 export default {
@@ -6,13 +7,10 @@ export default {
     component: Progress,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value', table: { category: 'Content' } },
-        style: {
-            control: 'select',
-            options: ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'],
-            description: 'Progress bar style',
-            table: { category: 'Design' }
-        },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -88,12 +86,15 @@ export const Sizes = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <ProgressVariantsDemos />
-        <ProgressEffectsDemos />
-        <ProgressSizesDemos />
+    <div style={{ width: '100%', minWidth: '200px', maxWidth: '100%' }}>
+        <Progress value={50} style="primary" size="medium" showLabel />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.progress }
+    }
+};
 
 export const Interactive = {
     args: {

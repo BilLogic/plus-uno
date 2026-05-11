@@ -14,8 +14,8 @@ const Carousel = ({
     pause = 'hover',
     wrap = true,
     keyboard = true,
-    fade = false,
-    /** When omitted, `false` while `fade` is true so crossfade uses CSS (react-bootstrap slide transitions override fade). */
+    /** @deprecated Fade transition is not supported; value is ignored. */
+    fade: _fadeIgnored,
     slide: slideProp,
     className = '',
     style,
@@ -24,7 +24,7 @@ const Carousel = ({
     children, // Allow manual composition if preferred
     ...props
 }) => {
-    const slide = slideProp !== undefined ? slideProp : !fade;
+    const slide = slideProp !== undefined ? slideProp : true;
     // Custom icons matching legacy
     const defaultPrevIcon = <span aria-hidden="true" className="carousel-control-prev-icon plus-carousel-control-icon"><i className="fas fa-chevron-left"></i></span>;
     const defaultNextIcon = <span aria-hidden="true" className="carousel-control-next-icon plus-carousel-control-icon"><i className="fas fa-chevron-right"></i></span>;
@@ -65,7 +65,7 @@ const Carousel = ({
             pause={pause}
             wrap={wrap}
             keyboard={keyboard}
-            fade={fade}
+            fade={false}
             slide={slide}
             className={`plus-carousel ${className}`}
             style={style}
@@ -97,7 +97,6 @@ Carousel.propTypes = {
     pause: PropTypes.oneOf(['hover', false]),
     wrap: PropTypes.bool,
     keyboard: PropTypes.bool,
-    fade: PropTypes.bool,
     slide: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,

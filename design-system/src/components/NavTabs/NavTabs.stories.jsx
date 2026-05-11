@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NavTabs from './NavTabs';
 
 export default {
@@ -13,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         contentPreset: {
             control: 'select',
             options: ['tabs-only', 'with-dropdown'],
@@ -34,9 +38,6 @@ export default {
         onSelect: {
             table: { disable: true, category: 'Development' }
         },
-        children: {
-            table: { disable: true, category: 'Development' }
-        },
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -52,7 +53,7 @@ function NavTabsContentDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Standard tabs</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STANDARD TABS</span>
                 <NavTabs activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
                     <NavTabs.Item eventKey="1">Home</NavTabs.Item>
                     <NavTabs.Item eventKey="2">Profile</NavTabs.Item>
@@ -61,7 +62,7 @@ function NavTabsContentDemos() {
                 </NavTabs>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>With dropdown</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH DROPDOWN</span>
                 <NavTabs defaultActiveKey="home">
                     <NavTabs.Item eventKey="home">Home</NavTabs.Item>
                     <NavTabs.Dropdown title="More Options" id="nav-tab-dropdown">
@@ -79,7 +80,7 @@ function NavTabsContentDemos() {
 function NavTabsLayoutDemo() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Justified tabs</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">JUSTIFIED TABS</span>
             <NavTabs alignment="justified" defaultActiveKey="1">
                 <NavTabs.Item eventKey="1">Tab One</NavTabs.Item>
                 <NavTabs.Item eventKey="2">Tab Two</NavTabs.Item>
@@ -92,7 +93,7 @@ function NavTabsLayoutDemo() {
 function NavTabsInteractionStatesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Interaction states</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INTERACTION STATES</span>
             <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--color-on-surface-variant)' }}>
                 States below are artificially forced for demonstration.
             </p>
@@ -138,13 +139,22 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={col}>
-        <NavTabsContentDemos />
-        <NavTabsLayoutDemo />
-        <NavTabsInteractionStatesDemos />
-    </div>
-);
+export const Overview = () => {
+    const [activeKey, setActiveKey] = useState('1');
+
+    return (
+        <NavTabs activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
+            <NavTabs.Item eventKey="1">Home</NavTabs.Item>
+            <NavTabs.Item eventKey="2">Profile</NavTabs.Item>
+            <NavTabs.Item eventKey="3">Messages</NavTabs.Item>
+        </NavTabs>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.navTabs }
+    }
+};
 
 export const Interactive = (args) => {
     const [activeKey, setActiveKey] = useState('1');

@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ListGroup from './ListGroup';
 import { Badge } from '@/components/Badge';
 
@@ -15,6 +16,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         flush: {
             control: 'boolean',
             table: { category: 'Design' }
@@ -30,9 +34,6 @@ export default {
         activeItem: {
             control: { type: 'range', min: 1, max: 5, step: 1 },
             table: { category: 'Behavior' }
-        },
-        children: {
-            table: { disable: true, category: 'Development' }
         },
         as: {
             table: { disable: true, category: 'Development' }
@@ -174,16 +175,19 @@ export const Layout = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <ListGroupContentPlainDemo />
-        <ListGroupInteractionStatesDemo />
-        <ListGroupVariantsDemo />
-        <ListGroupContentActionableDemo />
-        <ListGroupLayoutFlushDemo />
-        <ListGroupContentBadgesDemo />
-        <ListGroupLayoutHorizontalDemo />
+    <div style={{ maxWidth: '400px', width: '100%' }}>
+        <ListGroup>
+            <ListGroup.Item>List item 1</ListGroup.Item>
+            <ListGroup.Item>List item 2</ListGroup.Item>
+            <ListGroup.Item>List item 3</ListGroup.Item>
+        </ListGroup>
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.listGroup }
+    }
+};
 
 export const Interactive = (args) => (
     <ListGroup {...args}>

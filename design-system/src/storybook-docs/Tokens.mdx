@@ -52,4 +52,40 @@ import { Alert, AlertDescription, AlertTitle } from '@/storybook-docs/ui/alert';
       </li>
     </ul>
   </DocSection>
+
+  <DocSection title="Token principles">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>Prefer semantic tokens over raw values so UI intent survives theme and brand evolution.</li>
+      <li>Do not hardcode color, spacing, typography, radius, or elevation values in component code.</li>
+      <li>Use this page as navigation; canonical token definitions come from generated PLUS token outputs.</li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Next actions by role">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        Designers: start with{' '}
+        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Colors" name="Docs">
+          Colors
+        </LinkTo>{' '}
+        and{' '}
+        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Typography" name="Docs">
+          Typography
+        </LinkTo>{' '}
+        when reviewing visual consistency.
+      </li>
+      <li>
+        Engineers: review{' '}
+        <LinkTo className="text-foreground underline hover:no-underline" title="Forms/Input" name="Docs">
+          Forms/Input
+        </LinkTo>{' '}
+        and{' '}
+        <LinkTo className="text-foreground underline hover:no-underline" title="Components/Button" name="Docs">
+          Components/Button
+        </LinkTo>{' '}
+        to see token usage in real component docs.
+      </li>
+      <li>PMs and partners: use this page to navigate foundations before reviewing product Specs pages.</li>
+    </ul>
+  </DocSection>
 </DocPage>

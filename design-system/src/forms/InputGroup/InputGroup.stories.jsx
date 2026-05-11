@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import InputGroup from './InputGroup';
 
 export default {
@@ -13,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -65,12 +69,7 @@ export default {
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const addonDropdownItems = [
@@ -81,13 +80,35 @@ const addonDropdownItems = [
 
 const docsCol = { display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' };
 
+export const Overview = () => {
+    const [value, setValue] = useState('');
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <InputGroup
+                id="input-group-overview"
+                placeholder="Placeholder"
+                leadingVisual={{ type: 'text', children: 'https://' }}
+                trailingVisual="icon"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formInputGroup }
+    }
+};
+
 export const Content = () => {
     const [value, setValue] = useState('');
 
     return (
         <div style={docsCol}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Baseline input group</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE INPUT GROUP</span>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Text addon on the left with an icon addon on the right.
                 </p>
@@ -112,7 +133,7 @@ export const Variants = () => {
     return (
         <div style={docsCol}>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Selection addons</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SELECTION ADDONS</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <InputGroup
                         placeholder="Checkbox addons"
@@ -131,7 +152,7 @@ export const Variants = () => {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Action addons</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ACTION ADDONS</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <InputGroup
                         placeholder="Button addons"
@@ -156,7 +177,7 @@ export const Variants = () => {
 export const Sizes = () => (
     <div style={docsCol}>
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <InputGroup
                     placeholder="Small"
@@ -184,7 +205,7 @@ export const Sizes = () => (
 export const InteractionStates = () => (
     <div style={docsCol}>
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Interaction states</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INTERACTION STATES</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <InputGroup
                     placeholder="Default"
@@ -258,176 +279,4 @@ Interactive.args = {
  * Overview
  * Comprehensive view of Input Group configurations matching Figma specifications.
  */
-export const Overview = () => {
-    const [value1, setValue1] = useState('');
-    const [value2, setValue2] = useState('');
-    const [value3, setValue3] = useState('');
-    const [value4, setValue4] = useState('');
-    const [value5, setValue5] = useState('');
-    const [value6, setValue6] = useState('');
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' }}>
-            {/* Checkbox Input Group */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Checkbox Input Group</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with checkbox addons on both sides.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual="checkbox"
-                    trailingVisual="checkbox"
-                    value={value1}
-                    onChange={(e) => setValue1(e.target.value)}
-                />
-            </section>
-
-            {/* Icon Input Group */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Icon Input Group</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with plus icon addons on both sides.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual="icon"
-                    trailingVisual="icon"
-                    value={value2}
-                    onChange={(e) => setValue2(e.target.value)}
-                />
-            </section>
-
-            {/* Radio Input Group */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Radio Input Group</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with radio button addons on both sides.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual={{ type: 'radio', checked: true }}
-                    trailingVisual={{ type: 'radio', checked: false }}
-                    value={value3}
-                    onChange={(e) => setValue3(e.target.value)}
-                />
-            </section>
-
-            {/* Text Input Group */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Text Input Group</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with text addons on both sides.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual={{ type: 'text', children: 'Text' }}
-                    trailingVisual={{ type: 'text', children: 'Text' }}
-                    value={value4}
-                    onChange={(e) => setValue4(e.target.value)}
-                />
-            </section>
-
-            {/* Button Input Group */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Button Input Group</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with button addons on both sides.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual="button"
-                    trailingVisual="button"
-                    value={value5}
-                    onChange={(e) => setValue5(e.target.value)}
-                />
-            </section>
-
-            {/* Dropdown Input Group */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Dropdown Input Group</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with dropdown addons on both sides.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual="dropdown"
-                    trailingVisual="dropdown"
-                    value={value6}
-                    onChange={(e) => setValue6(e.target.value)}
-                />
-            </section>
-
-            {/* Multiple Addons */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Multiple Addons</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input group with multiple addons on the trailing side.
-                </p>
-                <InputGroup
-                    placeholder="Placeholder"
-                    leadingVisual={{ type: 'text', children: 'Text' }}
-                    trailingVisual={{ type: 'text', children: 'Text' }}
-                    trailingVisual2={{ type: 'text', children: 'Text' }}
-                />
-            </section>
-
-            {/* Size Variants */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Size Variants</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input groups in small, medium, and large sizes.
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <InputGroup
-                        placeholder="Placeholder"
-                        size="small"
-                        leadingVisual={{ type: 'text', children: 'Text' }}
-                        trailingVisual={{ type: 'text', children: 'Text' }}
-                    />
-                    <InputGroup
-                        placeholder="Placeholder"
-                        size="medium"
-                        leadingVisual={{ type: 'text', children: 'Text' }}
-                        trailingVisual={{ type: 'text', children: 'Text' }}
-                    />
-                    <InputGroup
-                        placeholder="Placeholder"
-                        size="large"
-                        leadingVisual={{ type: 'text', children: 'Text' }}
-                        trailingVisual={{ type: 'text', children: 'Text' }}
-                    />
-                </div>
-            </section>
-
-            {/* States */}
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>States</h6>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                    Input groups in different states: default, disabled, and read-only.
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <InputGroup
-                        placeholder="Placeholder"
-                        leadingVisual={{ type: 'text', children: 'Text' }}
-                        trailingVisual={{ type: 'text', children: 'Text' }}
-                    />
-                    <InputGroup
-                        placeholder="Placeholder"
-                        disabled
-                        leadingVisual={{ type: 'text', children: 'Text' }}
-                        trailingVisual={{ type: 'text', children: 'Text' }}
-                    />
-                    <InputGroup
-                        placeholder="Placeholder"
-                        readonly
-                        value="Read-only value"
-                        leadingVisual={{ type: 'text', children: 'Text' }}
-                        trailingVisual={{ type: 'text', children: 'Text' }}
-                    />
-                </div>
-            </section>
-        </div>
-    );
-};
 

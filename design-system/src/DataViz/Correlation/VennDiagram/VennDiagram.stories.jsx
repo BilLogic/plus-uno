@@ -4,25 +4,27 @@ import VennDiagram from './VennDiagram';
 export default {
     title: 'Data Visualizations/Correlation/VennDiagram',
     component: VennDiagram,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Venn Diagram
+                component: `## Venn Diagram
 
+Shows **overlapping sets** and their relationships.
+
+### Overview
 Shows **overlapping sets** and their relationships.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Circles** = distinct sets/groups
 - **Overlaps** = shared elements
 - **Size** = relative quantity
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -32,13 +34,28 @@ Shows **overlapping sets** and their relationships.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Skill Overlap** | Math + Science students |
 | **Feature Usage** | Users using multiple features |
 | **Course Enrollment** | Multi-subject students |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the venn diagram setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -65,6 +82,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

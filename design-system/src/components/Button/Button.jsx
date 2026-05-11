@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './Button.scss';
-import { BUTTON_CONSTANTS } from '../constants';
 import RBButton from 'react-bootstrap/Button';
 
 /**

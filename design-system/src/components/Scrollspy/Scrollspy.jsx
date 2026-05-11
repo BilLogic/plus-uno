@@ -1,6 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import Dropdown from '@/components/Dropdown';
 import './Scrollspy.scss';
+
+/** Y-offset of `el`'s top edge within `scrollContainer`'s scrollable content (any DOM nesting). */
+function scrollOffsetTop(el, scrollContainer) {
+    if (!el || !scrollContainer) return 0;
+    const cRect = scrollContainer.getBoundingClientRect();
+    const eRect = el.getBoundingClientRect();
+    return scrollContainer.scrollTop + (eRect.top - cRect.top);
+}
+
+/** Section ids in scroll order (top-level links, then each dropdown target in order). */
+function collectSectionIds(navItems) {
+    const ids = [];
+    navItems.forEach((item) => {
+        if (item.isDropdown && item.dropdownItems?.length) {
+            item.dropdownItems.forEach((d) => ids.push(d.href.replace('#', '')));
+        } else if (item.href) {
+            ids.push(item.href.replace('#', ''));
+        }
+    });
+    return ids;
+}
 
 // The Content Component
 export const ScrollspyContent = ({
@@ -52,8 +74,15 @@ const Scrollspy = ({
     style,
     ...props
 }) => {
-    const [internalActiveId, setInternalActiveId] = useState(items[0]?.href.replace('#', '') || '');
+    const firstSectionId = items.length
+        ? (items[0].isDropdown
+            ? items[0].dropdownItems?.[0]?.href.replace('#', '')
+            : items[0].href.replace('#', ''))
+        : '';
+    const [internalActiveId, setInternalActiveId] = useState(firstSectionId || '');
     const activeId = controlledActiveId !== undefined ? controlledActiveId : internalActiveId;
+    const activeIdRef = useRef(activeId);
+    activeIdRef.current = activeId;
 
     useEffect(() => {
         if (!contentId) return;
@@ -62,8 +91,8 @@ const Scrollspy = ({
         if (!contentElement) return;
 
         const handleScroll = () => {
-            const scrollTop = contentElement.scrollTop + offset;
-            const sectionIds = items.map(item => item.href.replace('#', ''));
+            const probe = contentElement.scrollTop + offset;
+            const sectionIds = collectSectionIds(items);
 
             let currentId = sectionIds[0];
 
@@ -73,23 +102,15 @@ const Scrollspy = ({
                 const section = document.getElementById(sectionId);
 
                 if (section) {
-                    // Calculate offset relative to the scrollable container's top
-                    // We need to account for the container's offset calculation logic
-                    // The legacy code used JQuery position().top which is relative to offset parent (likely the container if positioned)
-                    // Here we can use offsetTop if the container is the offsetParent.
-
-                    // A safer robust way without jQuery:
-                    // section.offsetTop is relative to offsetParent.
-                    // If contentElement is positioned (relative/absolute/fixed), it is likely the offsetParent.
-
-                    if (section.offsetTop <= scrollTop) {
+                    const sectionTop = scrollOffsetTop(section, contentElement);
+                    if (sectionTop <= probe) {
                         currentId = sectionId;
                         break;
                     }
                 }
             }
 
-            if (currentId !== activeId) {
+            if (currentId !== activeIdRef.current) {
                 if (controlledActiveId === undefined) {
                     setInternalActiveId(currentId);
                 }
@@ -106,7 +127,7 @@ const Scrollspy = ({
         return () => {
             contentElement.removeEventListener('scroll', handleScroll);
         };
-    }, [contentId, items, offset, activeId, controlledActiveId, onActivate]);
+    }, [contentId, items, offset, controlledActiveId, onActivate]);
 
     const handleLinkClick = (e, href) => {
         e.preventDefault();
@@ -115,10 +136,17 @@ const Scrollspy = ({
         const contentElement = document.getElementById(contentId);
 
         if (targetElement && contentElement) {
+            const top = scrollOffsetTop(targetElement, contentElement) - offset;
             contentElement.scrollTo({
-                top: targetElement.offsetTop,
+                top: Math.max(0, top),
                 behavior: 'smooth'
             });
+            if (controlledActiveId === undefined) {
+                setInternalActiveId(targetId);
+            }
+            if (onActivate) {
+                onActivate(targetId);
+            }
         }
     };
 
@@ -135,20 +163,48 @@ const Scrollspy = ({
                 <p className="body-lead-txt">{brand}</p>
             </div>
             <div className="plus-scrollspy-spacer"></div>
-            <div className="plus-nav-list plus-nav-pills">
+            <div className="plus-nav-list">
                 {items.map((item, index) => {
+                    if (item.isDropdown && item.dropdownItems?.length) {
+                        const isDdActive = item.dropdownItems.some(
+                            (d) => d.href.replace('#', '') === activeId
+                        );
+                        return (
+                            <div
+                                key={index}
+                                className={`plus-nav-item plus-nav-item-dropdown ${isDdActive ? 'plus-nav-item-selected' : ''}`}
+                            >
+                                <Dropdown
+                                    id={id ? `${id}-dropdown-${index}` : undefined}
+                                    className={`plus-scrollspy-nav-dropdown ${isDdActive ? 'plus-scrollspy-nav-dropdown--active' : ''}`}
+                                    style="default"
+                                    fill="ghost"
+                                    toggle={(
+                                        <span className={`plus-nav-link ${isDdActive ? 'active' : ''}`}>
+                                            <span className="plus-nav-text">{item.text}</span>
+                                            <i className="fa-solid fa-caret-down plus-nav-dropdown-icon" aria-hidden />
+                                        </span>
+                                    )}
+                                    items={item.dropdownItems.map((d) => ({
+                                        text: d.text,
+                                        onClick: (e) => handleLinkClick(e, d.href)
+                                    }))}
+                                />
+                            </div>
+                        );
+                    }
+
                     const itemId = item.href.replace('#', '');
                     const isActive = activeId === itemId;
 
                     return (
-                        <div key={index} className={`plus-nav-item ${isActive ? 'plus-nav-item-selected' : ''} ${item.isDropdown ? 'plus-nav-item-dropdown' : ''}`}>
+                        <div key={index} className={`plus-nav-item ${isActive ? 'plus-nav-item-selected' : ''}`}>
                             <a
                                 href={item.href}
                                 className={`plus-nav-link ${isActive ? 'active' : ''}`}
                                 onClick={(e) => handleLinkClick(e, item.href)}
                             >
-                                <span className="plus-nav-text body1-txt">{item.text}</span>
-                                {item.isDropdown && <i className="fas fa-caret-down plus-nav-dropdown-icon"></i>}
+                                <span className="plus-nav-text">{item.text}</span>
                             </a>
                         </div>
                     );
@@ -163,8 +219,12 @@ Scrollspy.propTypes = {
     brand: PropTypes.node,
     items: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string.isRequired,
-        href: PropTypes.string.isRequired,
-        isDropdown: PropTypes.bool
+        href: PropTypes.string,
+        isDropdown: PropTypes.bool,
+        dropdownItems: PropTypes.arrayOf(PropTypes.shape({
+            text: PropTypes.string.isRequired,
+            href: PropTypes.string.isRequired
+        }))
     })).isRequired,
     contentId: PropTypes.string, // ID of the content container
     offset: PropTypes.number,

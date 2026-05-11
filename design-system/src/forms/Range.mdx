@@ -1,28 +1,43 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RangeStories from './Range.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={RangeStories} />
 
 <Title />
-<Description />
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+### Overview
 
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <Canvas of={RangeStories.Sizes} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Medium slider at a mid-range value.</>}>
+    <Canvas of={RangeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Sizes
+
+<DocsCanvasShell description={<>Small, medium, and large.</>}>
+    <DsCanvasQuiet of={RangeStories.Sizes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
 
 <DocsInteractivePlayground
     of={RangeStories.Interactive}

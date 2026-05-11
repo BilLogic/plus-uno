@@ -1,0 +1,80 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as BarChartStories from './BarChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BarChartStories} />
+
+<Title />
+
+A bar chart (or column chart) is one of the most common and effective data visualization types for **comparing categorical data**.
+
+### Overview
+A bar chart (or column chart) is one of the most common and effective data visualization types for **comparing categorical data**.
+
+<Primary />
+
+---
+
+### How to Read
+- **Height/Length** of each bar represents the value for that category
+- **Grouped bars** allow comparison of multiple series within each category
+- Compare bars visually by their relative lengths
+- Look for the tallest/longest bars to identify highest values
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Comparing values across categories</td><td>✅ Ideal</td></tr>
+    <tr><td>Showing rankings or ordered data</td><td>✅ Ideal</td></tr>
+    <tr><td>Time-series with discrete periods</td><td>✅ Good</td></tr>
+    <tr><td>Part-to-whole relationships</td><td>❌ Use Pie/Donut</td></tr>
+    <tr><td>Continuous trends</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+**Orientation Guide:**
+- **Vertical (Column)**: Time-series, short labels, &lt;7 categories
+- **Horizontal (Bar)**: Long labels, many categories, rankings
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Student Enrollment**</td><td>Students enrolled per subject/grade</td></tr>
+    <tr><td>**Performance Comparison**</td><td>Average scores by class/teacher</td></tr>
+    <tr><td>**Resource Utilization**</td><td>Tutoring hours by subject area</td></tr>
+    <tr><td>**SMART Competencies**</td><td>Skill ratings across competency areas</td></tr>
+    <tr><td>**Session Analytics**</td><td>Sessions completed by day of week</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Start Y-axis at zero
+✅ Sort bars by value when showing rankings
+✅ Use consistent colors for same series
+✅ Limit grouped bars to 2-3 series
+
+**Avoid:**
+❌ More than 12 categories
+❌ Truncating Y-axis
+❌ 3D effects
+❌ Mixing stacked and grouped
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={BarChartStories.Interactive} />

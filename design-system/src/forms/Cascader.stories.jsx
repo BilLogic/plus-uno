@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Cascader from './Cascader';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         contentPreset: {
             control: 'select',
             options: ['empty', 'preselected'],
@@ -81,6 +85,27 @@ const sampleOptions = [
     },
 ];
 
+export const Overview = () => {
+    const [value, setValue] = useState([]);
+
+    return (
+        <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 360 }}>
+            <Cascader
+                id="cascader-overview"
+                value={value}
+                options={sampleOptions}
+                onChange={setValue}
+                placeholder="Please select"
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formCascader }
+    }
+};
+
 export const Content = () => {
     const [value1, setValue1] = useState([]);
     const [value2, setValue2] = useState(['zhejiang', 'hangzhou', 'westlake']);
@@ -88,14 +113,14 @@ export const Content = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <h6 className="h6 mb-2">Empty selection</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">EMPTY SELECTION</span>
                 <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Opens the menu and builds a path from the hierarchy.
                 </p>
                 <Cascader id="cascader-basic" value={value1} options={sampleOptions} onChange={setValue1} />
             </div>
             <div>
-                <h6 className="h6 mb-2">Pre-selected path</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PRE-SELECTED PATH</span>
                 <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Value shown in the field; opening reveals columns up to the current level.
                 </p>

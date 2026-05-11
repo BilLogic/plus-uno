@@ -4,18 +4,20 @@ import RadarChart from './RadarChart';
 export default {
     title: 'Data Visualizations/Comparison/RadarChart',
     component: RadarChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Radar Chart
+                component: `## Radar Chart
 
+A radar chart (spider/web chart) displays multivariate data on axes radiating from a center point, ideal for **comparing profiles across multiple dimensions**.
+
+### Overview
 A radar chart (spider/web chart) displays multivariate data on axes radiating from a center point, ideal for **comparing profiles across multiple dimensions**.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - Each **axis** represents a different variable/dimension
 - **Distance from center** indicates value magnitude
 - **Shape** of the polygon reveals the overall profile
@@ -23,7 +25,7 @@ A radar chart (spider/web chart) displays multivariate data on axes radiating fr
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A radar chart (spider/web chart) displays multivariate data on axes radiating fr
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A radar chart (spider/web chart) displays multivariate data on axes radiating fr
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Limit to 3-8 axes for readability

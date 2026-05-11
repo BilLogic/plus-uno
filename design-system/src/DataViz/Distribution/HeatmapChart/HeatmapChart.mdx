@@ -1,0 +1,75 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as HeatmapChartStories from './HeatmapChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={HeatmapChartStories} />
+
+<Title />
+
+A heatmap displays data as a **matrix of colored cells**, where color intensity represents value magnitude.
+
+### Overview
+A heatmap displays data as a **matrix of colored cells**, where color intensity represents value magnitude.
+
+<Primary />
+
+---
+
+### How to Read
+- **Rows/Columns** = categories being compared
+- **Cell color** = value intensity (darker = higher)
+- **Color scale** = reference for interpreting values
+- Look for **patterns** in color distribution
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>2D pattern analysis</td><td>✅ Ideal</td></tr>
+    <tr><td>Time-based activity</td><td>✅ Ideal</td></tr>
+    <tr><td>Correlation matrices</td><td>✅ Good</td></tr>
+    <tr><td>Precise values</td><td>❌ Use Table</td></tr>
+    <tr><td>Trends over time</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Activity Patterns**</td><td>Sessions by day × hour</td></tr>
+    <tr><td>**Skill Matrix**</td><td>Students × skills mastered</td></tr>
+    <tr><td>**Engagement**</td><td>Subjects × engagement level</td></tr>
+    <tr><td>**Tutor Availability**</td><td>Time slots × days</td></tr>
+    <tr><td>**Performance Grid**</td><td>Students × assignments</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use sequential color scale (light→dark)
+✅ Include color legend
+✅ Consider color-blind friendly palettes
+✅ Add cell values if space permits
+
+**Avoid:**
+❌ Rainbow color scales
+❌ Too many categories
+❌ Missing legends
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={HeatmapChartStories.Interactive} />

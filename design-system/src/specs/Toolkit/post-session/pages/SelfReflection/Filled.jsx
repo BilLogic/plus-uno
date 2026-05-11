@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../../../../../components/Button/Button';
 import Rating from '../../../../../forms/Rating';
 import Checkbox from '../../../../../forms/Checkbox';
-import TextareaVer2 from '../../../../../forms/TextareaVer2';
+import Textarea from '../../../../../forms/Textarea';
 import { PageLayout } from '../../../../../specs/Universal/Pages';
 import SideNavBar from '../../sections/SideNavBar/SideNavBar';
 
@@ -147,7 +147,7 @@ const SelfReflectionFilled = ({
                                                             onChange={() => {}}
                                                         />
                                                         <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                                                            <TextareaVer2
+                                                            <Textarea
                                                                 id="self-reflection-other-input"
                                                                 name="self-reflection-other-input"
                                                                 variant="short"
@@ -190,7 +190,7 @@ const SelfReflectionFilled = ({
                                 <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
                                     E.g. I struggle to explain concepts I know so I need materials to enhance math teaching proficiency.
                                 </p>
-                                <TextareaVer2
+                                <Textarea
                                     id="training-materials"
                                     name="training-materials"
                                     value={trainingMaterialsText}

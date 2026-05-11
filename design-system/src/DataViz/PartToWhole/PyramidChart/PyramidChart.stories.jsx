@@ -4,25 +4,27 @@ import PyramidChart from './PyramidChart';
 export default {
     title: 'Data Visualizations/PartToWhole/PyramidChart',
     component: PyramidChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Pyramid Chart
+                component: `## Pyramid Chart
 
+Shows **hierarchical quantities** from largest at bottom to smallest at top.
+
+### Overview
 Shows **hierarchical quantities** from largest at bottom to smallest at top.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Width** = relative size/quantity
 - **Position** = hierarchical level
 - Bottom = largest, Top = smallest
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows **hierarchical quantities** from largest at bottom to smallest at top.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Student Funnel** | Prospects → Enrolled |
 | **Learning Stages** | Awareness → Mastery |
 | **Support Escalation** | Self-help → Expert |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the pyramid chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -64,6 +81,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

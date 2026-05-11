@@ -119,31 +119,31 @@ const preview = {
       storySort: {
         order: [
           'PLUS Docs',
-          ['Introduction', 'Components', 'Component Organization', 'Tokens'],
+          ['Introduction', 'How are Components Organized?', 'What are tokens?'],
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           'Forms',
           [
-            'Label and Caption',
-            'Input',
-            'Textarea',
-            'Textarea ver 2',
-            'Number Input',
-            'Select',
             'Cascader',
             'Checkbox',
-            'Radio',
-            'Switch',
-            'Range',
-            'Multiple Choice',
             'Choice Grid',
-            'File Upload',
             'Date Picker',
-            'Time Picker',
-            'Rating',
+            'File Upload',
+            'Input',
             'Input Group',
+            'Label and Caption',
+            'Multiple Choice',
+            'Number Input',
+            'Radio',
+            'Range',
+            'Rating',
             'Scale',
+            'Select',
+            'Switch',
+            'Textarea',
+            'Textarea ver 2',
+            'Time Picker',
           ],
           'Components',
           [
@@ -268,9 +268,11 @@ const preview = {
         setTimeout(() => window.__setAIContext(activeContext), 0);
       }
 
-      // Disable state changes/interactivity for all docs examples EXCEPT 'Interactive'
+      // Disable pointer interaction for static docs examples (keeps scroll/canvas stable).
+      // Allow 'Interactive' and 'Overview' so docs canvases with Controls stay usable.
       if (
-        context.name !== 'Interactive' && 
+        context.name !== 'Interactive' &&
+        context.name !== 'Overview' &&
         (context.title.startsWith('Components/') || context.title.startsWith('Forms/'))
       ) {
          return (

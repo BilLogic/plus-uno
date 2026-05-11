@@ -4,18 +4,20 @@ import HistogramChart from './HistogramChart';
 export default {
     title: 'Data Visualizations/Distribution/HistogramChart',
     component: HistogramChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Histogram Chart
+                component: `## Histogram Chart
 
+A histogram displays **frequency distribution** by grouping continuous data into bins.
+
+### Overview
 A histogram displays **frequency distribution** by grouping continuous data into bins.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **X-axis** = value ranges (bins)
 - **Y-axis** = count/frequency in each bin
 - **Bar height** = number of data points in that range
@@ -23,7 +25,7 @@ A histogram displays **frequency distribution** by grouping continuous data into
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A histogram displays **frequency distribution** by grouping continuous data into
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A histogram displays **frequency distribution** by grouping continuous data into
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Choose appropriate bin size

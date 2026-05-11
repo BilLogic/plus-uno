@@ -4,18 +4,20 @@ import SankeyDiagram from './SankeyDiagram';
 export default {
     title: 'Data Visualizations/Other/SankeyDiagram',
     component: SankeyDiagram,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Sankey Diagram
+                component: `## Sankey Diagram
 
+A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+
+### Overview
 A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Nodes** = stages or entities
 - **Links** = flow between nodes
 - **Link width** = proportional to flow volume
@@ -23,7 +25,7 @@ A Sankey diagram visualizes **flow and transfer** between entities, with link wi
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A Sankey diagram visualizes **flow and transfer** between entities, with link wi
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A Sankey diagram visualizes **flow and transfer** between entities, with link wi
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Order nodes logically (source → destination)

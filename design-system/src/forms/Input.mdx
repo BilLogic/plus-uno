@@ -1,31 +1,47 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputStories from './Input.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={InputStories} />
 
 <Title />
-<Description />
+The labeled text input box allows users to enter textual inputs and receive validation feedback with messages.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Placeholder vs value, label visibility, required marker, and leading/trailing visuals.</>}>
-    <Canvas of={InputStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Default labeled field with placeholder and trailing visual.</>}>
+    <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Content
+
+<DocsCanvasShell description={<>Placeholder vs value, label visibility, required marker, and leading/trailing visuals.</>}>
+    <DsCanvasQuiet of={InputStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Validation & feedback
 
 <DocsCanvasShell description={<>Validation treatments: none, invalid, and success (with optional message).</>}>
-    <Canvas of={InputStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -35,7 +51,7 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Sizes
 
 <DocsCanvasShell description={<>Available in medium (default) size.</>}>
-    <Canvas of={InputStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -45,14 +61,14 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, hover, focus, disabled, and read-only.</>}>
-    <Canvas of={InputStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={InputStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={InputStories.Interactive}

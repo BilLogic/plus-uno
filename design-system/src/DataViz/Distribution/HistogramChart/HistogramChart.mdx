@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as HistogramChartStories from './HistogramChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={HistogramChartStories} />
+
+<Title />
+
+A histogram displays **frequency distribution** by grouping continuous data into bins.
+
+### Overview
+A histogram displays **frequency distribution** by grouping continuous data into bins.
+
+<Primary />
+
+---
+
+### How to Read
+- **X-axis** = value ranges (bins)
+- **Y-axis** = count/frequency in each bin
+- **Bar height** = number of data points in that range
+- Shape reveals the distribution pattern
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Frequency distribution</td><td>✅ Ideal</td></tr>
+    <tr><td>Understanding data spread</td><td>✅ Ideal</td></tr>
+    <tr><td>Identifying patterns</td><td>✅ Good</td></tr>
+    <tr><td>Categorical data</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Comparing groups</td><td>❌ Use Box Plot</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Score Distribution**</td><td>How test scores are distributed</td></tr>
+    <tr><td>**Session Length**</td><td>Distribution of session durations</td></tr>
+    <tr><td>**Response Times**</td><td>Pattern of system response times</td></tr>
+    <tr><td>**Age Distribution**</td><td>Student age ranges</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Choose appropriate bin size
+✅ Label axes clearly
+✅ Consider overlaying distribution curve
+✅ Use consistent bin widths
+
+**Avoid:**
+❌ Too few bins (loses detail)
+❌ Too many bins (noise)
+❌ Categorical data (use bar chart)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={HistogramChartStories.Interactive} />

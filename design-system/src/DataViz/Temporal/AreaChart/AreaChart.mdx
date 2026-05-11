@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as AreaChartStories from './AreaChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AreaChartStories} />
+
+<Title />
+
+An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
+
+### Overview
+An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
+
+<Primary />
+
+---
+
+### How to Read
+- **Line** shows the trend over time
+- **Filled area** emphasizes cumulative magnitude
+- **Stacked areas** show how parts contribute to total
+- Height at any point = total value at that time
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Emphasizing volume/magnitude</td><td>✅ Ideal</td></tr>
+    <tr><td>Stacked part-to-whole over time</td><td>✅ Ideal</td></tr>
+    <tr><td>Simple trend lines</td><td>❌ Use Line Chart</td></tr>
+    <tr><td>Precise value reading</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Many overlapping series</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Cumulative Learning**</td><td>Total hours studied over semester</td></tr>
+    <tr><td>**Enrollment Growth**</td><td>Student count over time (stacked by grade)</td></tr>
+    <tr><td>**Session Volume**</td><td>Daily sessions by type (stacked)</td></tr>
+    <tr><td>**Progress Tracking**</td><td>Cumulative assignments completed</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use transparency for overlapping areas
+✅ Order stacked areas logically (largest at bottom)
+✅ Include X-axis time labels
+✅ Use consistent time intervals
+
+**Avoid:**
+❌ Too many overlapping unstacked areas
+❌ Vastly different scales in same chart
+❌ Missing axis labels
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={AreaChartStories.Interactive} />

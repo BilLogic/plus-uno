@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [implement-figma-changes]
     # Triggered from Slack via Pipedream
-    # client_payload: { component: "Badge", notion_prd_id: "...", notion_prd_url: "..." }
+    # client_payload: { component: "Badge", thread_ts: "...", notion_prd_id: "...", notion_prd_url: "..." }
   workflow_dispatch:
     inputs:
       component:
@@ -36,7 +36,21 @@ jobs:
             echo "component=${{ github.event.client_payload.component }}" >> $GITHUB_OUTPUT
             echo "notion_prd_id=${{ github.event.client_payload.notion_prd_id }}" >> $GITHUB_OUTPUT
             echo "notion_prd_url=${{ github.event.client_payload.notion_prd_url }}" >> $GITHUB_OUTPUT
+            echo "thread_ts=${{ github.event.client_payload.thread_ts }}" >> $GITHUB_OUTPUT
+            echo "channel=${{ github.event.client_payload.channel }}" >> $GITHUB_OUTPUT
+            echo "message_ts=${{ github.event.client_payload.message_ts }}" >> $GITHUB_OUTPUT
           fi
+
+      - name: React to Slack message (working)
+        if: steps.payload.outputs.channel && steps.payload.outputs.message_ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          # Add gear reaction to show we're working on it
+          curl -s -X POST "https://slack.com/api/reactions.add" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"gear\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -139,6 +153,50 @@ jobs:
               labels: ['design-system', 'figma-sync']
             });
 
+      - name: Update Notion PRD status
+        if: steps.commit.outputs.changes == 'true'
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_PRD_ID: ${{ steps.payload.outputs.notion_prd_id }}
+        run: |
+          if [ -n "$NOTION_PRD_ID" ]; then
+            # Update to "In Review" now that a PR exists
+            curl -s -X PATCH "https://api.notion.com/v1/pages/${NOTION_PRD_ID}" \
+              -H "Authorization: Bearer ${NOTION_API_KEY}" \
+              -H "Notion-Version: 2022-06-28" \
+              -H "Content-Type: application/json" \
+              -d '{"properties": {"Status": {"select": {"name": "In Review"}}}}' || true
+            echo "   ✅ Notion PRD status → In Review"
+          fi
+
+      - name: React to Slack message (result)
+        if: always() && steps.payload.outputs.channel && steps.payload.outputs.message_ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          HAS_CHANGES="${{ steps.commit.outputs.changes }}"
+          JOB_STATUS="${{ job.status }}"
+
+          # Remove gear reaction
+          curl -s -X POST "https://slack.com/api/reactions.remove" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"gear\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
+
+          # Add result reaction
+          if [ "$JOB_STATUS" = "success" ] && [ "$HAS_CHANGES" = "true" ]; then
+            EMOJI="white_check_mark"
+          elif [ "$JOB_STATUS" = "success" ]; then
+            EMOJI="information_source"
+          else
+            EMOJI="x"
+          fi
+
+          curl -s -X POST "https://slack.com/api/reactions.add" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"$EMOJI\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
+
       - name: Notify Slack
         if: always()
         env:
@@ -148,6 +206,7 @@ jobs:
           COMPONENT="${{ steps.payload.outputs.component }}"
           HAS_CHANGES="${{ steps.commit.outputs.changes }}"
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          THREAD_TS="${{ steps.payload.outputs.thread_ts }}"
 
           if [ "$HAS_CHANGES" = "true" ]; then
             MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
@@ -155,6 +214,13 @@ jobs:
             MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design.\n<${RUN_URL}|View action log>"
           fi
 
+          # Build JSON payload — include thread_ts if available for thread reply
+          if [ -n "$THREAD_TS" ]; then
+            PAYLOAD="{\"text\": \"${MSG}\", \"thread_ts\": \"${THREAD_TS}\"}"
+          else
+            PAYLOAD="{\"text\": \"${MSG}\"}"
+          fi
+
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
-            -d "{\"text\": \"${MSG}\"}" || true
+            -d "$PAYLOAD" || true

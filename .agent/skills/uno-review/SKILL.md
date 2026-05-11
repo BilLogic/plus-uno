@@ -4,8 +4,8 @@ description: >
   Quality gate before shipping. Reviews work against PLUS conventions,
   forbidden patterns, and design system rules. Use when the user asks to
   "review my work", "check this", "run quality checks", "validate before
-  shipping", or before committing significant UI changes or submitting
-  to the marketplace.
+  shipping", before committing significant UI changes or submitting
+  to the marketplace, or when a skill-definition quality audit is needed.
 user-invocable: true
 argument-hint: [files-or-description]
 ---
@@ -20,6 +20,7 @@ Review work against PLUS conventions before shipping.
 - Before submitting a prototype to marketplace
 - When unsure if implementation follows DS patterns
 - As a final check before a PR
+- When reviewing one or multiple `SKILL.md` files for quality and readiness
 
 ## Auto-Suggest
 
@@ -28,8 +29,21 @@ Proactively suggest this skill when:
 - Before any git commit that touches files under `playground/` or `design-system/src/specs/`
 - Before the user invokes `/uno:post` (review should precede publishing)
 - After completing work in Prototyping or Finalization mode
+- When the user asks to audit skill quality, validate a skill against a checklist, or improve `SKILL.md` structure
 
 Suggest once per work session — do not repeat if declined.
+
+## Routing
+
+Use routing rules before running checks:
+
+1. If target is implementation code (UI/prototype/spec files), run the standard `uno-review` checklist and scripts.
+2. If target is skill documentation (`.agent/skills/**/SKILL.md` or skill reference docs), run the embedded Skill Quality Audit workflow from:
+   - `references/skill-quality/checklist.md`
+   - `references/skill-quality/output-template.md`
+   - `references/skill-quality/audit-workflow.md`
+   - `references/skill-quality/audit-examples.md`
+3. If request includes both code review and skill-doc review, run both paths and present results in separate sections.
 
 ## Checklist
 
@@ -71,11 +85,19 @@ Present findings as (see `examples/review-output-example.md` for format):
 - **Warn** — minor issues, can ship with notes
 - **Fail** — violations that must be fixed before shipping
 
+For skill-quality audits routed through the embedded `uno-review` workflow, include:
+- Specific issue
+- Original code snippet
+- Improvement suggestion
+- Suggested revised code
+- Priority (`P0`/`P1`/`P2`)
+
 ## Next Step
 
 - If **Pass** → Suggest `/uno:post` to register the prototype in the marketplace.
 - If **Warn** → Note the issues, then suggest `/uno:post` if the user wants to ship with notes.
 - If **Fail** → Help fix violations, then re-run the review.
+- If the review target is skill docs → Use the embedded skill-quality audit references and provide strict checklist-driven remediation with rewrite proposals.
 - After fixing violations → Suggest `/uno:compound` to document what was learned.
 
 These are suggestions — the user may choose to skip steps.

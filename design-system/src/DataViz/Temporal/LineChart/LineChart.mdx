@@ -1,0 +1,76 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as LineChartStories from './LineChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={LineChartStories} />
+
+<Title />
+
+A line chart displays data as connected points, ideal for showing **trends over continuous time**.
+
+### Overview
+A line chart displays data as connected points, ideal for showing **trends over continuous time**.
+
+<Primary />
+
+---
+
+### How to Read
+- **Points** = data values at each time
+- **Line** = trend connection between points
+- **Slope up** = increasing trend
+- **Slope down** = decreasing trend
+- **Multiple lines** = comparison of trends
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Time-series trends</td><td>✅ Ideal</td></tr>
+    <tr><td>Comparing multiple trends</td><td>✅ Ideal</td></tr>
+    <tr><td>Continuous change</td><td>✅ Good</td></tr>
+    <tr><td>Discrete categories</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Emphasizing volume</td><td>❌ Use Area Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Progress Over Time**</td><td>Test scores over semester</td></tr>
+    <tr><td>**Engagement Trends**</td><td>Daily active users</td></tr>
+    <tr><td>**Performance Tracking**</td><td>Weekly session completion</td></tr>
+    <tr><td>**Comparison**</td><td>Multiple students' progress</td></tr>
+    <tr><td>**Forecasting**</td><td>Projected enrollment</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use consistent time intervals
+✅ Limit to 4-5 lines maximum
+✅ Use distinct colors/styles
+✅ Include legend for multiple series
+
+**Avoid:**
+❌ Unordered categorical data
+❌ Data with large gaps
+❌ "Spaghetti charts" (too many lines)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={LineChartStories.Interactive} />

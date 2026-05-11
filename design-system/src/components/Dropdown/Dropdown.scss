@@ -1,8 +1,7 @@
 /*
- * Dropdown Component Styles
- * Uses context-aware color roles with outline as the default treatment.
- * Outline: colored stroke + text tokens on surface
- * Filled/Tonal/Ghost: optional alternate treatments
+ * Dropdown trigger styles
+ * Spec (Figma): semantic roles with outline as the default trigger treatment; ghost for minimal emphasis.
+ * SCSS still includes filled/tonal compound blocks for legacy markup parity, but the React API only documents outline | ghost.
  */
 
 @use "sass:map";

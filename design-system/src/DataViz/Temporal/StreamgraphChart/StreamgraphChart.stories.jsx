@@ -4,25 +4,27 @@ import StreamgraphChart from './StreamgraphChart';
 export default {
     title: 'Data Visualizations/Temporal/StreamgraphChart',
     component: StreamgraphChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Streamgraph Chart
+                component: `## Streamgraph Chart
 
+Shows **composition changes over time** with flowing organic shapes.
+
+### Overview
 Shows **composition changes over time** with flowing organic shapes.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Width** = relative value at that time
 - **Flow** = trend direction
 - **Colors** = different categories
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -32,13 +34,28 @@ Shows **composition changes over time** with flowing organic shapes.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Subject Popularity** | Enrollment trends |
 | **Feature Usage** | Daily usage by feature |
 | **Content Engagement** | Lesson views over time |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the streamgraph chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -63,6 +80,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

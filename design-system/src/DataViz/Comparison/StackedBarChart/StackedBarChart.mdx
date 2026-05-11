@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as StackedBarChartStories from './StackedBarChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={StackedBarChartStories} />
+
+<Title />
+
+A stacked bar chart shows **part-to-whole relationships within comparative categories**, stacking segments to show composition.
+
+### Overview
+A stacked bar chart shows **part-to-whole relationships within comparative categories**, stacking segments to show composition.
+
+<Primary />
+
+---
+
+### How to Read
+- **Each bar** = total value for that category
+- **Segments** = components that make up the total
+- **Segment height** = proportion of that component
+- Compare both totals (bar height) and composition (segments)
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Part-to-whole by category</td><td>✅ Ideal</td></tr>
+    <tr><td>Comparing totals + composition</td><td>✅ Ideal</td></tr>
+    <tr><td>Budget breakdowns over time</td><td>✅ Good</td></tr>
+    <tr><td>Single-variable comparison</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>Showing 100% breakdown</td><td>❌ Use 100% Stacked</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Learning Time**</td><td>Hours by subject, stacked by activity type</td></tr>
+    <tr><td>**Session Breakdown**</td><td>Total sessions, stacked by mode (1-on-1, group)</td></tr>
+    <tr><td>**Score Composition**</td><td>Total score, stacked by section</td></tr>
+    <tr><td>**Resource Usage**</td><td>Time by day, stacked by resource type</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use consistent segment colors across bars
+✅ Order segments logically (most important at bottom)
+✅ Include legend for segments
+✅ Use 100% stacked for pure composition
+
+**Avoid:**
+❌ Too many segments (>5)
+❌ Comparing non-adjacent segments
+❌ Missing legends
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={StackedBarChartStories.Interactive} />

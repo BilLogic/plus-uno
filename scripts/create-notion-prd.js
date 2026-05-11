@@ -186,13 +186,13 @@ function groupByComponent(items, getFrame, getName) {
  * @param {Array} newVersions - Array of new version objects
  * @returns {Object} - { pageId, pageUrl } or null if skipped
  */
-export async function createNotionPRD(componentDiff, newVersions) {
+export async function createNotionPRD(componentDiff, newVersions, allComponents = []) {
   if (!NOTION_API_KEY || !NOTION_DATABASE_ID) {
     console.log('   NOTION_API_KEY or NOTION_DATABASE_ID not set — skipping PRD creation');
     return null;
   }
 
-  const allChangedItems = [
+  let allChangedItems = [
     ...componentDiff.created,
     ...componentDiff.modified.map(m => m.new),
     ...componentDiff.deleted
@@ -205,8 +205,11 @@ export async function createNotionPRD(componentDiff, newVersions) {
 
   // Group components by parent frame
   const createdGroups = groupByComponent(componentDiff.created, c => c.containingFrame, c => c.name);
-  const modifiedGroups = groupByComponent(componentDiff.modified, c => c.new.containingFrame, c => c.new.name);
+  let modifiedGroups = groupByComponent(componentDiff.modified, c => c.new.containingFrame, c => c.new.name);
   const deletedGroups = groupByComponent(componentDiff.deleted, c => c.containingFrame, c => c.name);
+
+  // Note: visual-only changes are now detected upstream via node hashes
+  // and added to componentDiff.modified before this function is called.
 
   // Build PRD title
   const allFrames = new Set([
@@ -216,7 +219,9 @@ export async function createNotionPRD(componentDiff, newVersions) {
   ]);
   const componentNames = [...allFrames].slice(0, 3).join(', ');
   const extra = allFrames.size > 3 ? ` +${allFrames.size - 3} more` : '';
-  const prdTitle = `DS Update: ${componentNames}${extra}`;
+  const prdTitle = allFrames.size
+    ? `DS Update: ${componentNames}${extra}`
+    : `DS Update: ${newVersions.map(v => v.label || v.description || 'Published changes').join(', ')}`;
 
   const figmaUrl = `https://www.figma.com/design/${FIGMA_FILE_KEY}`;
   const date = new Date().toISOString().slice(0, 10);

@@ -1,0 +1,70 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as OrganizationChartStories from './OrganizationChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={OrganizationChartStories} />
+
+<Title />
+
+Shows **hierarchical organizational structures** with reporting lines.
+
+### Overview
+Shows **hierarchical organizational structures** with reporting lines.
+
+<Primary />
+
+---
+
+### How to Read
+- **Nodes** = people/roles
+- **Lines** = reporting relationships
+- **Levels** = hierarchy depth
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Team structures</td><td>✅ Ideal</td></tr>
+    <tr><td>Reporting lines</td><td>✅ Ideal</td></tr>
+    <tr><td>Decision hierarchies</td><td>✅ Good</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Team Structure**</td><td>Tutor organization</td></tr>
+    <tr><td>**Course Hierarchy**</td><td>Subject → Topic → Lesson</td></tr>
+    <tr><td>**Support Escalation**</td><td>Support team structure</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the organization chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={OrganizationChartStories.Interactive} />

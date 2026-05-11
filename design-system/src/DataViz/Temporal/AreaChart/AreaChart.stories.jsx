@@ -4,18 +4,20 @@ import AreaChart from './AreaChart';
 export default {
     title: 'Data Visualizations/Temporal/AreaChart',
     component: AreaChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Area Chart
+                component: `## Area Chart
 
+An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
+
+### Overview
 An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Line** shows the trend over time
 - **Filled area** emphasizes cumulative magnitude
 - **Stacked areas** show how parts contribute to total
@@ -23,7 +25,7 @@ An area chart fills the space below a line, emphasizing **volume and magnitude o
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ An area chart fills the space below a line, emphasizing **volume and magnitude o
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ An area chart fills the space below a line, emphasizing **volume and magnitude o
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use transparency for overlapping areas

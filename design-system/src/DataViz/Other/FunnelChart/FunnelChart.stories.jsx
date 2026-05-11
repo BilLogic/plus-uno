@@ -4,18 +4,20 @@ import FunnelChart from './FunnelChart';
 export default {
     title: 'Data Visualizations/Other/FunnelChart',
     component: FunnelChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Funnel Chart
+                component: `## Funnel Chart
 
+A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
+
+### Overview
 A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Widest section** = starting point (most volume)
 - **Narrowing** = drop-off at each stage
 - **Width** = proportional to stage value
@@ -23,7 +25,7 @@ A funnel chart displays **sequential stages in a process**, showing how values d
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A funnel chart displays **sequential stages in a process**, showing how values d
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A funnel chart displays **sequential stages in a process**, showing how values d
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Order from largest to smallest

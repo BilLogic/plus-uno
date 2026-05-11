@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Range from './Range';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
@@ -64,11 +68,29 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' },
         },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
     },
+};
+
+export const Overview = () => {
+    const [value, setValue] = useState(50);
+
+    return (
+        <div style={{ maxWidth: '600px' }}>
+            <Range
+                id="range-overview"
+                min={0}
+                max={100}
+                value={value}
+                onChange={(e) => setValue(parseFloat(e.target.value))}
+                size="medium"
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formRange }
+    }
 };
 
 export const Sizes = () => {

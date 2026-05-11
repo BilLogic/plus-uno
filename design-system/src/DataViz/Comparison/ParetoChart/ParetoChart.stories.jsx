@@ -4,25 +4,27 @@ import ParetoChart from './ParetoChart';
 export default {
     title: 'Data Visualizations/Comparison/ParetoChart',
     component: ParetoChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Pareto Chart
+                component: `## Pareto Chart
 
+Shows columns with a **cumulative percentage line** for 80-20 analysis.
+
+### Overview
 Shows columns with a **cumulative percentage line** for 80-20 analysis.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Bars** = individual category values
 - **Line** = cumulative percentage
 - Find where line crosses 80% for key factors
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -32,13 +34,28 @@ Shows columns with a **cumulative percentage line** for 80-20 analysis.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Support Issues** | Most common problems |
 | **Student Struggles** | Top difficulty areas |
 | **Usage Patterns** | Most used features |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the pareto chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -59,6 +76,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

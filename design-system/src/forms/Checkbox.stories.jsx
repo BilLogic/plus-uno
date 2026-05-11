@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Checkbox from './Checkbox';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Label text for the checkbox',
@@ -63,10 +67,6 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' },
         },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
     },
 };
 
@@ -81,15 +81,6 @@ const contentVariantCard = {
 function CheckboxContentDemos() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Short label</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Compact label copy for dense forms.
-                </p>
-                <div style={contentVariantCard}>
-                    <Checkbox id="cb-content-short" name="cb-content-short" label="Short label" defaultChecked />
-                </div>
-            </section>
             <section>
                 <h6 className="h6" style={{ marginBottom: '8px' }}>Long label</h6>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
@@ -114,10 +105,19 @@ function CheckboxContentDemos() {
 
 function CheckboxSizesDemos() {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Checkbox id="cb-small" name="cb-small" label="Small" size="small" defaultChecked />
-            <Checkbox id="cb-medium" name="cb-medium" label="Medium (Default)" size="medium" defaultChecked />
-            <Checkbox id="cb-large" name="cb-large" label="Large" size="large" defaultChecked />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+                <Checkbox id="cb-small" name="cb-small" label="Option" size="small" defaultChecked />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+                <Checkbox id="cb-medium" name="cb-medium" label="Option" size="medium" defaultChecked />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+                <Checkbox id="cb-large" name="cb-large" label="Option" size="large" defaultChecked />
+            </div>
         </div>
     );
 }
@@ -127,27 +127,53 @@ function CheckboxInteractionStatesDemos() {
     const [checked2, setChecked2] = useState(true);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Checkbox
-                id="cb-unchecked"
-                name="cb-unchecked"
-                label="Unchecked"
-                checked={checked1}
-                onChange={(e) => setChecked1(e.target.checked)}
-            />
-            <Checkbox
-                id="cb-checked"
-                name="cb-checked"
-                label="Checked"
-                checked={checked2}
-                onChange={(e) => setChecked2(e.target.checked)}
-            />
-            <Checkbox id="cb-indeterminate" name="cb-indeterminate" label="Indeterminate" indeterminate />
-            <Checkbox id="cb-disabled" name="cb-disabled" label="Disabled" disabled />
-            <Checkbox id="cb-required" name="cb-required" label="Required" required />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">UNCHECKED</span>
+                <Checkbox
+                    id="cb-unchecked"
+                    name="cb-unchecked"
+                    label="Label"
+                    checked={checked1}
+                    onChange={(e) => setChecked1(e.target.checked)}
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKED</span>
+                <Checkbox
+                    id="cb-checked"
+                    name="cb-checked"
+                    label="Label"
+                    checked={checked2}
+                    onChange={(e) => setChecked2(e.target.checked)}
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INDETERMINATE</span>
+                <Checkbox id="cb-indeterminate" name="cb-indeterminate" label="Label" indeterminate />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <Checkbox id="cb-disabled" name="cb-disabled" label="Label" disabled />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">REQUIRED</span>
+                <Checkbox id="cb-required" name="cb-required" label="Label" required />
+            </div>
         </div>
     );
 }
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Checkbox id="cb-overview" name="cb-overview" label="Option" defaultChecked />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formCheckbox }
+    }
+};
 
 export const Content = () => (
     <div style={pageWrap}>

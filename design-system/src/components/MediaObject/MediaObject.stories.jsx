@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import MediaObject from './MediaObject';
 
 export default {
@@ -13,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         heading: {
             control: 'text',
             description: 'Heading text',
@@ -51,11 +55,7 @@ export default {
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },
-        onClick: {
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 const PlaceholderMedia = ({ size = '64px', text = '64' }) => (
@@ -183,12 +183,20 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <MediaObjectLayoutDemos />
-        <MediaObjectSizesDemos />
-        <MediaObjectContentNestedDemo />
+    <div style={{ maxWidth: '560px', width: '100%' }}>
+        <MediaObject
+            media={<PlaceholderMedia />}
+            heading="Media heading"
+        >
+            Will you do the same for me? It's time to face the music.
+        </MediaObject>
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.mediaObject }
+    }
+};
 
 export const Interactive = (args) => {
     const mediaSizeMap = {

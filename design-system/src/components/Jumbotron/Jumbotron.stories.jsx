@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Jumbotron from './Jumbotron';
 
 export default {
@@ -13,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         title: {
             control: 'text',
             description: 'Headline text',
@@ -21,11 +25,6 @@ export default {
         subtitle: {
             control: 'text',
             description: 'Supporting subtitle',
-            table: { category: 'Content' }
-        },
-        children: {
-            control: 'text',
-            description: 'Body copy',
             table: { category: 'Content' }
         },
         actionPreset: {
@@ -130,6 +129,11 @@ export const Basic = () => (
         <JumbotronBasicDemo />
     </div>
 );
+Basic.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const WithActions = () => (
     <div style={col}>
@@ -144,12 +148,18 @@ export const Sizes = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <JumbotronBasicDemo />
-        <JumbotronActionsDemo />
-        <JumbotronSizesDemo />
+    <div style={{ width: '100%' }}>
+        <Jumbotron
+            title="Hello, world!"
+            children="This is a simple hero unit."
+        />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.jumbotron }
+    }
+};
 
 export const Interactive = Template.bind({});
 Interactive.args = {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NumberInput from './NumberInput';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Optional field label',
@@ -23,12 +27,6 @@ export default {
             control: 'boolean',
             description: 'Show required indicator',
             table: { category: 'Content' },
-        },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant of the number input',
-            table: { category: 'Design' },
         },
         disabled: {
             control: 'boolean',
@@ -87,15 +85,24 @@ export default {
         onChange: {
             table: { disable: true, category: 'Development' },
         },
+        onIncrement: { table: { disable: true } },
+        onDecrement: { table: { disable: true } },
         className: {
             control: false,
             table: { disable: true, category: 'Development' },
         },
-        style: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
     },
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '800px' }}>
+        <NumberInput id="number-input-overview" placeholder="Number" />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formNumber }
+    }
 };
 
 export const Content = () => {
@@ -148,35 +155,39 @@ export const Styles = () => {
     );
 };
 
-export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '800px' }}>
-        <NumberInput id="ni-s" placeholder="Small" size="small" />
-        <NumberInput id="ni-m" placeholder="Medium" size="medium" />
-        <NumberInput id="ni-l" placeholder="Large" size="large" />
-    </div>
-);
-
 export const InteractionStates = () => {
     const [v1, setV1] = useState('');
     const [v2, setV2] = useState('42');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '800px' }}>
-            <NumberInput
-                id="number-input-default"
-                placeholder="Number"
-                value={v1}
-                onChange={(e) => setV1(e.target.value)}
-            />
-            <NumberInput
-                id="number-input-focus"
-                placeholder="Number"
-                value={v2}
-                onChange={(e) => setV2(e.target.value)}
-                autoFocus
-            />
-            <NumberInput id="number-input-disabled" placeholder="Number" disabled />
-            <NumberInput id="number-input-readonly" placeholder="Number" value="12" readonly />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+                <NumberInput
+                    id="number-input-default"
+                    placeholder="Number"
+                    value={v1}
+                    onChange={(e) => setV1(e.target.value)}
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS</span>
+                <NumberInput
+                    id="number-input-focus"
+                    placeholder="Number"
+                    value={v2}
+                    onChange={(e) => setV2(e.target.value)}
+                    autoFocus
+                />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <NumberInput id="number-input-disabled" placeholder="Number" disabled />
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ-ONLY</span>
+                <NumberInput id="number-input-readonly" placeholder="Number" value="12" readonly />
+            </div>
         </div>
     );
 };
@@ -193,7 +204,6 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                size={args.size}
                 disabled={args.disabled}
                 readonly={args.readonly}
                 validation={args.validation}
@@ -211,7 +221,6 @@ Interactive.args = {
     required: false,
     placeholder: 'Number',
     value: '',
-    size: 'medium',
     disabled: false,
     readonly: false,
     validation: 'none',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import FileUpload from './FileUpload';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
@@ -16,6 +17,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Label text for the file upload field',
@@ -72,6 +76,22 @@ export default {
     },
 };
 
+export const Overview = () => (
+    <div style={{ maxWidth: '800px' }}>
+        <FileUpload
+            id="file-upload-overview"
+            label="Upload files"
+            acceptedFormats={formats}
+            buttonText="Choose a file"
+        />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.formFile }
+    }
+};
+
 export const Content = () => (
     <div style={{ maxWidth: '800px' }}>
         <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -89,51 +109,66 @@ export const Content = () => (
 
 export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
-        <FileUpload
-            id="file-upload-error"
-            label="Upload files"
-            required
-            acceptedFormats={formats}
-            buttonText="Choose a file"
-            validation="invalid"
-            validationMessage="Validation message"
-        />
-        <FileUpload
-            id="file-upload-success"
-            label="Upload files"
-            required
-            acceptedFormats={formats}
-            buttonText="Choose a file"
-            validation="success"
-            validationMessage="Validation message"
-        />
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <FileUpload
+                id="file-upload-error"
+                label="Upload files"
+                required
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+                validation="invalid"
+                validationMessage="Validation message"
+            />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUCCESS</span>
+            <FileUpload
+                id="file-upload-success"
+                label="Upload files"
+                required
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+                validation="success"
+                validationMessage="Validation message"
+            />
+        </div>
     </div>
 );
 
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
-        <FileUpload
-            id="file-upload-default"
-            label="Upload files"
-            required
-            acceptedFormats={formats}
-            buttonText="Choose a file"
-        />
-        <FileUpload
-            id="file-upload-focus"
-            label="Upload files"
-            required
-            acceptedFormats={formats}
-            buttonText="Choose a file"
-        />
-        <FileUpload
-            id="file-upload-disabled"
-            label="Upload files"
-            required
-            acceptedFormats={formats}
-            buttonText="Choose a file"
-            disabled
-        />
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <FileUpload
+                id="file-upload-default"
+                label="Upload files"
+                required
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+            />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS</span>
+            <FileUpload
+                id="file-upload-focus"
+                label="Upload files"
+                required
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+            />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <FileUpload
+                id="file-upload-disabled"
+                label="Upload files"
+                required
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+                disabled
+            />
+        </div>
     </div>
 );
 

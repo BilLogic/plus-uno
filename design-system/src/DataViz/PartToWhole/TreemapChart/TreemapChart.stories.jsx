@@ -4,18 +4,20 @@ import TreemapChart from './TreemapChart';
 export default {
     title: 'Data Visualizations/PartToWhole/TreemapChart',
     component: TreemapChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Treemap Chart
+                component: `## Treemap Chart
 
+A treemap displays **hierarchical data as nested rectangles**, where rectangle size represents value.
+
+### Overview
 A treemap displays **hierarchical data as nested rectangles**, where rectangle size represents value.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Rectangle size** = proportional to the value
 - **Nesting** = parent-child hierarchy
 - **Color** = can encode category or additional metric
@@ -23,7 +25,7 @@ A treemap displays **hierarchical data as nested rectangles**, where rectangle s
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A treemap displays **hierarchical data as nested rectangles**, where rectangle s
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A treemap displays **hierarchical data as nested rectangles**, where rectangle s
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use for hierarchical data with clear parent-child relationships

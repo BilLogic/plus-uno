@@ -1,0 +1,234 @@
+/*
+ * Rich text editor — Figma 10010:37927. Toolbar uses DS Button + ButtonGroup; field uses tokens + body3.
+ */
+
+.plus-rich-text-editor {
+    --rte-toolbar-height: calc(
+        var(--size-spacing-medium-space-200) + var(--size-spacing-medium-space-300)
+    );
+    --rte-content-pad-x: var(--size-element-pad-x-sm);
+    --rte-content-pad-y: var(--size-element-pad-y-sm);
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 56rem;
+    align-items: stretch;
+    background-color: var(--color-surface);
+    border-radius: var(--size-border-radius-radius-50);
+    overflow: hidden;
+    box-sizing: border-box;
+
+    &.plus-rich-text-editor-small {
+        --rte-content-pad-x: var(--size-element-pad-x-sm);
+        --rte-content-pad-y: var(--size-element-pad-y-sm);
+    }
+
+    &.plus-rich-text-editor-large {
+        --rte-toolbar-height: calc(
+            var(--size-spacing-medium-space-300) + var(--size-spacing-medium-space-400)
+        );
+        --rte-content-pad-x: var(--size-section-pad-x-md);
+        --rte-content-pad-y: var(--size-section-pad-y-md);
+    }
+
+    &.plus-rich-text-editor--full {
+        max-width: none;
+        border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
+        border-radius: var(--size-element-radius-md);
+    }
+}
+
+/* ========== Compact toolbar (DS components) ========== */
+
+.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar {
+    align-self: stretch;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    box-sizing: border-box;
+    background-color: var(--color-surface-container-high);
+}
+
+/* Block style: flat “text” control (no button chrome) — Figma Normal + arrows-up-down */
+.plus-rich-text-editor-block-toggle {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    margin: 0;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body3);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body3);
+    border-radius: var(--size-element-radius-md);
+
+    &:hover:not(:disabled) {
+        background-color: var(--color-surface-container-high-state-08);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: calc(1 - var(--color-disabled-opacity));
+    }
+
+    &:focus-visible {
+        outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
+.plus-rich-text-editor-block-toggle-caret .fa-solid {
+    font-size: var(--font-size-fa-body3-solid);
+    line-height: var(--font-line-height-fa-body3);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-rich-text-editor-block-dropdown .dropdown-toggle::after {
+    display: none;
+}
+
+/*
+ * Compact icon row: Figma has no borders on individual icon hits — flat on surface-container-high.
+ * Bootstrap .btn can still add borders; strip them here only inside this toolbar.
+ */
+.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar {
+    .plus-btn.btn {
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+
+        &:hover:not(:disabled):not(.active) {
+            background-color: var(--color-surface-container-high-state-08);
+        }
+
+        &.active {
+            background-color: var(--color-primary-state-16);
+            color: var(--color-primary-text);
+        }
+
+        &:focus-visible {
+            outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        &:disabled,
+        &.disabled {
+            background-color: transparent;
+            border: none;
+            opacity: calc(1 - var(--color-disabled-opacity));
+        }
+    }
+
+    .plus-btn:not(.active) .fa-solid {
+        color: var(--color-secondary-text);
+    }
+
+    .plus-btn.active .fa-solid {
+        color: var(--color-primary-text);
+    }
+}
+
+.plus-rich-text-editor-biu-cluster {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+}
+
+.plus-rich-text-editor-block-menu {
+    min-width: 10rem;
+    padding: var(--size-element-pad-y-sm) 0;
+    margin-top: var(--size-element-gap-sm);
+    background-color: var(--color-surface);
+    border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md);
+    box-shadow: var(--elevation-light-1);
+
+    .dropdown-item {
+        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+        color: var(--color-on-surface);
+
+        &:hover,
+        &:focus {
+            background-color: var(--color-neutral-state-08);
+        }
+
+        &.active {
+            background-color: var(--color-primary-state-16);
+            color: var(--color-primary-text);
+        }
+    }
+}
+
+.plus-rich-text-editor-ghost-tools {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+}
+
+/* Compact row: icon-only buttons use FA B3 via .body3-txt on parent scope — inherit from Button small */
+
+.plus-rich-text-editor-readonly .plus-rich-text-editor-toolbar,
+.plus-rich-text-editor-disabled .plus-rich-text-editor-toolbar {
+    opacity: calc(1 - var(--color-disabled-opacity));
+    pointer-events: none;
+}
+
+/* ========== Full toolbar ========== */
+
+.plus-rich-text-editor--full .plus-rich-text-editor-toolbar {
+    padding: 0;
+    background: transparent;
+}
+
+.plus-rich-text-editor-full-group.plus-button-group {
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+.plus-rich-text-editor-content {
+    flex: 1 1 auto;
+    min-height: calc(
+        var(--size-spacing-large-space-900) + var(--size-spacing-large-space-600)
+    );
+    padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
+    outline: none;
+    color: var(--color-on-surface);
+    background-color: var(--color-surface);
+    box-sizing: border-box;
+    border: var(--size-border-stroke-stroke-150) solid var(--color-outline-variant);
+    font-weight: var(--font-weight-light);
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.plus-rich-text-editor:not(.plus-rich-text-editor-has-value) .plus-rich-text-editor-content:empty::before {
+    content: attr(data-placeholder);
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    pointer-events: none;
+    font-weight: var(--font-weight-light);
+}
+
+.plus-rich-text-editor-readonly .plus-rich-text-editor-content,
+.plus-rich-text-editor-disabled .plus-rich-text-editor-content {
+    background-color: var(--color-surface-container-low);
+    color: var(--color-on-surface-variant);
+    cursor: default;
+}

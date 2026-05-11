@@ -78,7 +78,8 @@
     border-radius: var(--size-element-radius-sm, 4px);
     box-shadow: var(--elevation-light-2);
     padding: var(--size-element-pad-y-sm, 4px) 0;
-    min-width: 200px;
+    width: fit-content;
+    min-width: unset;
     max-height: 400px;
     overflow-y: auto;
 }
@@ -88,12 +89,15 @@
     flex-direction: row;
     align-items: flex-start;
     gap: 0;
+    width: max-content;
 }
 
 .plus-cascader-column {
     display: flex;
     flex-direction: column;
-    min-width: 105px; // From Figma: Columns/col-2: 105.33px
+    flex: 0 0 auto;
+    width: max-content;
+    min-width: 0;
     max-width: 250px;
     border-right: 1px solid var(--color-outline-variant);
     
@@ -150,6 +154,7 @@
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 220px;
 }
 
 .plus-cascader-option-chevron {

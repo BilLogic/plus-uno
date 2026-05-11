@@ -118,7 +118,7 @@ const Card = ({
 
                     {/* Action Button */}
                     {actionButton && (
-                        <div className="plus-card-action-button ms-3">
+                        <div className="plus-card-action-button ms-auto">
                             <Button
                                 btnText={actionButton.text || 'Action'}
                                 btnStyle={actionButton.style || 'primary'}

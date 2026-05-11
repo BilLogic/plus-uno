@@ -1,0 +1,70 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as ParetoChartStories from './ParetoChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ParetoChartStories} />
+
+<Title />
+
+Shows columns with a **cumulative percentage line** for 80-20 analysis.
+
+### Overview
+Shows columns with a **cumulative percentage line** for 80-20 analysis.
+
+<Primary />
+
+---
+
+### How to Read
+- **Bars** = individual category values
+- **Line** = cumulative percentage
+- Find where line crosses 80% for key factors
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>80-20 analysis</td><td>✅ Ideal</td></tr>
+    <tr><td>Root cause analysis</td><td>✅ Ideal</td></tr>
+    <tr><td>Quality control</td><td>✅ Good</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Support Issues**</td><td>Most common problems</td></tr>
+    <tr><td>**Student Struggles**</td><td>Top difficulty areas</td></tr>
+    <tr><td>**Usage Patterns**</td><td>Most used features</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the pareto chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={ParetoChartStories.Interactive} />

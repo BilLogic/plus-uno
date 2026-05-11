@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import SidebarTab from '@/components/SidebarTab';
 
 export default {
@@ -6,6 +7,9 @@ export default {
     component: SidebarTab,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         state: {
             control: { type: 'select' },
             options: ['enabled', 'selected', 'disabled'],
@@ -21,9 +25,6 @@ export default {
         },
         className: {
             control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        onClick: {
             table: { disable: true, category: 'Development' }
         },
     },
@@ -71,6 +72,11 @@ export const InSidebar = () => {
         </div>
     );
 };
+InSidebar.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const Default = {
     args: {
@@ -78,6 +84,20 @@ export const Default = {
         icon: 'home',
         state: 'enabled',
     },
+    parameters: {
+        docs: {
+            disable: true
+        }
+    }
+};
+
+export const Overview = {
+    ...Default,
+    parameters: {
+        docs: {
+            source: { language: 'html', code: webAppSourceSnippets.sidebarTab }
+        }
+    }
 };
 
 export const Selected = {

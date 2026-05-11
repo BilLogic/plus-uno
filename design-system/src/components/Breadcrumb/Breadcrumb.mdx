@@ -2,21 +2,27 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BreadcrumbStories from './Breadcrumb.stories.jsx';
 import * as BreadcrumbSubStories from './Breadcrumb.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BreadcrumbStories} />
 
 <Title />
-<Description />
+Use breadcrumbs to show navigational context on pages that are many levels deep in a site's hierarchy.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Breadcrumb"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Link and current-page items.</>}>
-    <Canvas of={BreadcrumbSubStories.PageItem} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Standard multi-level trail (typical page context).</>}>
+    <Canvas of={BreadcrumbStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -26,28 +32,38 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Variants
 
 <DocsCanvasShell description={<>Full trail with linked ancestors and a non-link current page.</>}>
-    <Canvas of={BreadcrumbStories.Standard} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BreadcrumbStories.Standard} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Minimal two-level trail.</>}>
-    <Canvas of={BreadcrumbStories.Short} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BreadcrumbStories.Short} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Anatomy
+
+<DocsCanvasShell description={<>Single breadcrumb item behavior for linked ancestors versus current-page item.</>}>
+    <DsCanvasQuiet of={BreadcrumbSubStories.PageItem} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
 
 <DocsCanvasShell description={<>Separator between trail segments.</>}>
-    <Canvas of={BreadcrumbSubStories.Divider} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={BreadcrumbSubStories.Divider} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={BreadcrumbStories.Interactive}

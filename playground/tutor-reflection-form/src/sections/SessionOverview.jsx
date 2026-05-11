@@ -1,6 +1,6 @@
 import React from 'react';
 import Rating from '@/forms/Rating';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 
 const RATING_LABELS = {
     0: '',
@@ -36,7 +36,7 @@ const SessionOverview = ({ data, onChange }) => {
             </div>
 
             <div className="reflection-form__field-group">
-                <TextareaVer2
+                <Textarea
                     name="went-well"
                     label="What went well? *"
                     placeholder="Describe what worked in this session — teaching moments, student breakthroughs, effective strategies..."
@@ -48,7 +48,7 @@ const SessionOverview = ({ data, onChange }) => {
             </div>
 
             <div className="reflection-form__field-group">
-                <TextareaVer2
+                <Textarea
                     name="challenges"
                     label="What was challenging?"
                     placeholder="Any obstacles, student disengagement, content difficulty, technical issues..."

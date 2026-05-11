@@ -1,31 +1,47 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ModalStories} />
 
 <Title />
-<Description />
+Add dialogs to your site for lightboxes, user notifications, or completely custom content.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Modal"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
-    <Canvas of={ModalStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
+    <Canvas of={ModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Content
+
+<DocsCanvasShell description={<>Default, scrollable, and footer combinations in inline docs previews.</>}>
+    <DsCanvasQuiet of={ModalStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
 
 <DocsCanvasShell description={<>Header-only versus header with a primary and secondary action row.</>}>
-    <Canvas of={ModalStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ModalStories.Layout} />
 </DocsCanvasShell>
 
 </div>
@@ -35,14 +51,14 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Types
 
 <DocsCanvasShell description={<>Scrollable body with decorative scrollbar affordances for long content.</>}>
-    <Canvas of={ModalStories.Types} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={ModalStories.Types} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={ModalStories.Interactive}

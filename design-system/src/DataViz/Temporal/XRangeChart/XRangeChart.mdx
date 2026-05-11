@@ -1,0 +1,71 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as XRangeChartStories from './XRangeChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={XRangeChartStories} />
+
+<Title />
+
+Shows **ranges on an X-axis** (usually time). A simpler alternative to Gantt charts.
+
+### Overview
+Shows **ranges on an X-axis** (usually time).
+
+<Primary />
+
+---
+
+### How to Read
+- **Bars** = duration of task/event
+- **X-axis** = time
+- **Y-axis** = category/resource
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Simple project schedules</td><td>✅ Ideal</td></tr>
+    <tr><td>Resource booking</td><td>✅ Ideal</td></tr>
+    <tr><td>Shift schedules</td><td>✅ Ideal</td></tr>
+    <tr><td>Complex dependencies</td><td>❌ Use Gantt Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Tutor Availability**</td><td>Time slots blocked out</td></tr>
+    <tr><td>**Exam Schedule**</td><td>Test durations</td></tr>
+    <tr><td>**Lesson Plan**</td><td>Topic duration estimates</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the x range chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={XRangeChartStories.Interactive} />

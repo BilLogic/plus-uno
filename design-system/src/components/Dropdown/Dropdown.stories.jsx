@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Dropdown from './Dropdown';
 
 export default {
@@ -13,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         buttonText: {
             control: 'text',
             description: 'Text displayed on the dropdown toggle button',
@@ -26,12 +30,6 @@ export default {
             options: ['basic', 'with-divider', 'with-icons', 'with-selection'],
             description: 'Preset menu content for the interactive demo',
             table: { category: 'Content' }
-        },
-        style: {
-            control: 'select',
-            options: ['default', 'primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-            description: 'Button style variant',
-            table: { category: 'Design' }
         },
         size: {
             control: 'radio',
@@ -51,9 +49,9 @@ export default {
             table: { category: 'Design' }
         },
         fill: {
-            control: 'select',
-            options: ['filled', 'tonal', 'outline', 'ghost'],
-            description: 'Button fill style',
+            control: 'radio',
+            options: ['outline', 'ghost'],
+            description: 'Trigger surface treatment (outline default per spec; ghost for minimal emphasis)',
             table: { category: 'Design' }
         },
         id: {
@@ -110,10 +108,6 @@ const contentVariantCard = {
 function DropdownContentDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '8px' }}>Single and split dropdowns</h6>
-            <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                Core content states from the design system: closed and open, using both single-button and split-button triggers.
-            </p>
             <div
                 style={{
                     ...contentVariantCard,
@@ -143,34 +137,22 @@ function DropdownContentDemos() {
     );
 }
 
+const SEMANTIC_STYLES = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default'];
+
 function DropdownVariantsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Toggle style</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Semantic styles on the dropdown trigger.
-            </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Dropdown buttonText="Primary" style="primary" items={basicItems} />
-                <Dropdown buttonText="Secondary" style="secondary" items={basicItems} />
-                <Dropdown buttonText="Success" style="success" items={basicItems} />
-                <Dropdown buttonText="Danger" style="danger" items={basicItems} />
+                {SEMANTIC_STYLES.map((s) => (
+                    <Dropdown
+                        key={s}
+                        buttonText={s.charAt(0).toUpperCase() + s.slice(1)}
+                        style={s}
+                        items={basicItems}
+                    />
+                ))}
             </div>
-        </section>
-    );
-}
-
-function DropdownStylesDemos() {
-    return (
-        <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Toggle fill</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Filled, tonal, outline, and ghost fills on a primary trigger.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Dropdown buttonText="Filled" style="primary" fill="filled" items={basicItems} />
-                <Dropdown buttonText="Tonal" style="primary" fill="tonal" items={basicItems} />
-                <Dropdown buttonText="Outline" style="primary" fill="outline" items={basicItems} />
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
                 <Dropdown buttonText="Ghost" style="primary" fill="ghost" items={basicItems} />
             </div>
         </section>
@@ -180,10 +162,6 @@ function DropdownStylesDemos() {
 function DropdownSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                Small, default, and large triggers.
-            </p>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                 <Dropdown buttonText="Small" size="small" items={basicItems} />
                 <Dropdown buttonText="Default" size="default" items={basicItems} />
@@ -197,22 +175,14 @@ function DropdownLayoutDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Split button</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                    Separate primary action from the menu toggle.
-                </p>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <Dropdown buttonText="Filled Split" split style="primary" fill="filled" items={basicItems} />
-                    <Dropdown buttonText="Tonal Split" split style="primary" fill="tonal" items={basicItems} />
-                    <Dropdown buttonText="Outline Split" split style="primary" fill="outline" items={basicItems} />
-                    <Dropdown buttonText="Ghost Split" split style="primary" fill="ghost" items={basicItems} />
+                    <Dropdown buttonText="Primary split" split style="primary" items={basicItems} />
+                    <Dropdown buttonText="Secondary split" split style="secondary" items={basicItems} />
+                    <Dropdown buttonText="Default split" split style="default" items={basicItems} />
+                    <Dropdown buttonText="Ghost split" split style="primary" fill="ghost" items={basicItems} />
                 </div>
             </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Menu direction</h6>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
-                    Open below, above, or to the sides.
-                </p>
+            <section style={{ marginTop: '48px' }}>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', paddingTop: '120px', paddingBottom: '120px' }}>
                     <Dropdown buttonText="Dropdown" direction="dropdown" items={basicItems} />
                     <Dropdown buttonText="Dropup" direction="dropup" items={basicItems} />
@@ -236,12 +206,6 @@ export const StyleVariants = () => (
     </div>
 );
 
-export const Styles = () => (
-    <div style={dropdownCol}>
-        <DropdownStylesDemos />
-    </div>
-);
-
 export const Sizes = () => (
     <div style={dropdownCol}>
         <DropdownSizesDemos />
@@ -255,20 +219,21 @@ export const Layout = () => (
 );
 
 export const Overview = () => (
-    <div style={dropdownCol}>
-        <DropdownContentDemos />
-        <DropdownVariantsDemos />
-        <DropdownStylesDemos />
-        <DropdownSizesDemos />
-        <DropdownLayoutDemos />
+    <div style={{ padding: '100px 24px 160px' }}>
+        <Dropdown buttonText="Dropdown" style="primary" items={basicItems} />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'html', code: webAppSourceSnippets.dropdown }
+    }
+};
 
 export const Interactive = {
     args: {
         buttonText: 'Dropdown',
         style: 'default',
-        fill: 'filled',
+        fill: 'outline',
         size: 'default',
         direction: 'dropdown',
         split: false,

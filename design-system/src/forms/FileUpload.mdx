@@ -1,31 +1,47 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FileUploadStories from './FileUpload.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FileUploadStories} />
 
 <Title />
-<Description />
+The file upload component is used to select and upload files from a local device.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Content
+### Overview
 
-<DocsCanvasShell description={<>Label, formats list, and primary action.</>}>
-    <Canvas of={FileUploadStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Label, accepted formats, and primary action.</>}>
+    <Canvas of={FileUploadStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Content
+
+<DocsCanvasShell description={<>Label, required asterisk, accepted formats, and button copy.</>}>
+    <DsCanvasQuiet of={FileUploadStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Validation & feedback
 
 <DocsCanvasShell description={<>Invalid and success validation treatment.</>}>
-    <Canvas of={FileUploadStories.Styles} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={FileUploadStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -35,14 +51,14 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Interaction states
 
 <DocsCanvasShell description={<>Default, focus, and disabled.</>}>
-    <Canvas of={FileUploadStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={FileUploadStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={FileUploadStories.Interactive}
