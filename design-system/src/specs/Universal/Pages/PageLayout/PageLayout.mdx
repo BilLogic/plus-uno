@@ -18,7 +18,7 @@ App outer layout — wraps every page with Sidebar, TopBar, content slot, and Fo
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout"
 />
 
-<div className="sb-ds-component-docs not-prose">
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-ds-component-docs--page-fullbleed not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -31,6 +31,7 @@ App outer layout — wraps every page with Sidebar, TopBar, content slot, and Fo
     <Canvas
         of={PageLayoutStories.Overview}
         story={{ inline: true }}
+        layout="fullscreen"
         sourceState="hidden"
     />
 </DocsCanvasShell>
@@ -43,7 +44,7 @@ App outer layout — wraps every page with Sidebar, TopBar, content slot, and Fo
 
 <DocsInteractivePlayground
     of={PageLayoutStories.Interactive}
-    description={<>Switch user type, simulate breakpoints, and edit the user name + notification counter inline.</>}
+    description={<>Switch user type and edit the user name + notification counter inline. Use the MD / LG / XL toolbar above the preview to change viewport width.</>}
 />
 
 </div>
