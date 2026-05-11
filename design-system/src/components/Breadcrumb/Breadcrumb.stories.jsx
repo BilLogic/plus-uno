@@ -87,7 +87,7 @@ export const Short = () => (
 export const Overview = () => <Breadcrumb items={sampleItems} />;
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.breadcrumb }
+        source: { language: 'jsx', code: webAppSourceSnippets.breadcrumb }
     }
 };
 

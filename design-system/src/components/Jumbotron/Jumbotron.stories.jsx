@@ -157,7 +157,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.jumbotron }
+        source: { language: 'jsx', code: webAppSourceSnippets.jumbotron }
     }
 };
 

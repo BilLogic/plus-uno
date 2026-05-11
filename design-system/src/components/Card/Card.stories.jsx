@@ -229,7 +229,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.card }
+        source: { language: 'jsx', code: webAppSourceSnippets.card }
     }
 };
 

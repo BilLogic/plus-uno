@@ -95,7 +95,7 @@ export const Overview = {
     ...Default,
     parameters: {
         docs: {
-            source: { language: 'html', code: webAppSourceSnippets.sidebarTab }
+            source: { language: 'jsx', code: webAppSourceSnippets.sidebarTab }
         }
     }
 };

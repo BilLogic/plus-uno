@@ -84,7 +84,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formTextarea }
+        source: { language: 'jsx', code: webAppSourceSnippets.formTextarea }
     }
 };
 

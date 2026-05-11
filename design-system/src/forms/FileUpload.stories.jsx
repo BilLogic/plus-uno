@@ -88,7 +88,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formFile }
+        source: { language: 'jsx', code: webAppSourceSnippets.formFile }
     }
 };
 

@@ -131,7 +131,7 @@ export const Overview = {
     parameters: {
         docs: {
             source: {
-                language: 'html',
+                language: 'jsx',
                 code: webAppSourceSnippets.button
             }
         }

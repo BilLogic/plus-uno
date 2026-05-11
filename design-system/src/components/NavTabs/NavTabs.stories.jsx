@@ -152,7 +152,7 @@ export const Overview = () => {
 };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.navTabs }
+        source: { language: 'jsx', code: webAppSourceSnippets.navTabs }
     }
 };
 

@@ -96,7 +96,7 @@ export const Overview = () => {
 };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formRadio }
+        source: { language: 'jsx', code: webAppSourceSnippets.formRadio }
     }
 };
 

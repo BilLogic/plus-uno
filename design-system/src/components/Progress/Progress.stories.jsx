@@ -92,7 +92,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.progress }
+        source: { language: 'jsx', code: webAppSourceSnippets.progress }
     }
 };
 

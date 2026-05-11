@@ -127,7 +127,7 @@ Overview.parameters = {
         description: {
             story: 'Default border spinner. See other stories for grow, sizes, and custom animations.'
         },
-        source: { language: 'html', code: webAppSourceSnippets.spinner }
+        source: { language: 'jsx', code: webAppSourceSnippets.spinner }
     }
 };
 

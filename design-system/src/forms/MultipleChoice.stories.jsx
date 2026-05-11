@@ -94,7 +94,7 @@ export const Overview = () => {
 };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formMultipleChoice }
+        source: { language: 'jsx', code: webAppSourceSnippets.formMultipleChoice }
     }
 };
 

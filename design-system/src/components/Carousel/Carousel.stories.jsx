@@ -264,7 +264,7 @@ export const Overview = renderCarouselPlayground;
 Overview.args = { ...overviewCarouselArgs };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.carousel }
+        source: { language: 'jsx', code: webAppSourceSnippets.carousel }
     }
 };
 
