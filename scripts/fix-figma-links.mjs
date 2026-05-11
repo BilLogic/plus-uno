@@ -18,6 +18,7 @@ const repoRoot = path.resolve(path.dirname(__filename), '..');
 const roots = [
     'design-system/src/specs/Admin',
     'design-system/src/specs/Training',
+    'design-system/src/specs/Universal',
 ];
 
 function walk(dir, out = []) {
@@ -30,7 +31,7 @@ function walk(dir, out = []) {
     return out;
 }
 
-const figmaIdRe = /(?:node-id|Figma Node|Node ID|node id)[=:\s"*]+([0-9]+[-:][0-9]+)/gi;
+const figmaIdRe = /(?:node-id|Figma Node|Node ID|node id|Figma Specs?)[=:\s"*-]+([0-9]+[-:][0-9]+)/gi;
 const norm = id => id.replace(':', '-');
 
 const RATING_PRIMARY = '63-177636';
@@ -40,6 +41,7 @@ const AREA_OVERRIDES = {
     'design-system/src/specs/Admin/StudentAdmin': '1006-258597',
     'design-system/src/specs/Admin/SessionAdmin': '987-128734',
     'design-system/src/specs/Admin/GroupAdmin': '258-263800',
+    'design-system/src/specs/Universal/Elements/SmartBadges': '83-125838',
 };
 
 const sourceIdsByDir = {};

@@ -11,7 +11,7 @@ import TopBar from './TopBar';
 export default {
     title: 'Specs/Universal/Sections/TopBar',
     component: TopBar,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

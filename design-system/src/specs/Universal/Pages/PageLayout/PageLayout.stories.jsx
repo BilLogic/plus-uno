@@ -20,7 +20,7 @@ import Card from '../../../../components/Card/Card';
 export default {
     title: 'Specs/Universal/Pages/PageLayout',
     component: PageLayout,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'fullscreen',
         docs: {

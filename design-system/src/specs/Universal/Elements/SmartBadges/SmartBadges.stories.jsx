@@ -15,7 +15,7 @@ import StaticBadgeSmart from '../../../../components/StaticBadgeSmart/StaticBadg
 export default {
     title: 'Specs/Universal/Elements/SmartBadges',
     component: StaticBadgeSmart,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

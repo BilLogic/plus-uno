@@ -1,0 +1,51 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SidebarTabStories from './SidebarTab.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SidebarTabStories} />
+
+<Title />
+
+Sidebar navigation tab — leading icon, text, optional trailing icon, and five interaction states.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227838"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/SidebarTab"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>All states (enabled, hover, selected, disabled, focus) plus a tab with both leading and trailing visuals.</>}
+>
+    <Canvas
+        of={SidebarTabStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SidebarTabStories.Interactive}
+    description={<>Tweak the label, icon, state, and visual slots inline.</>}
+/>
+
+</div>
+
+</div>

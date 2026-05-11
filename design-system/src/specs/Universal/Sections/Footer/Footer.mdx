@@ -1,0 +1,51 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as FooterStories from './Footer.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FooterStories} />
+
+<Title />
+
+Universal page footer — version label, copyright line, and a terms-of-use link. No border per Figma spec.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227939"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Footer"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default footer with version, copyright, and terms link.</>}
+>
+    <Canvas
+        of={FooterStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={FooterStories.Interactive}
+    description={<>Edit the version label, copyright line, and terms link inline.</>}
+/>
+
+</div>
+
+</div>

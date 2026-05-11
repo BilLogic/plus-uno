@@ -1,0 +1,51 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TopBarStories from './TopBar.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TopBarStories} />
+
+<Title />
+
+Universal top navigation bar — sidebar control button, breadcrumb, and user avatar.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227860"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/TopBar"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Click the sidebar control button to toggle between expanded and collapsed modes.</>}
+>
+    <Canvas
+        of={TopBarStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TopBarStories.Interactive}
+    description={<>Edit the breadcrumb label, user name, and notification counter inline.</>}
+/>
+
+</div>
+
+</div>

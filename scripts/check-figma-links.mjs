@@ -20,6 +20,7 @@ const repoRoot = path.resolve(path.dirname(__filename), '..');
 const roots = [
     'design-system/src/specs/Admin',
     'design-system/src/specs/Training',
+    'design-system/src/specs/Universal',
 ];
 
 function walk(dir, out = []) {
@@ -32,7 +33,7 @@ function walk(dir, out = []) {
     return out;
 }
 
-const figmaIdRe = /(?:node-id|Figma Node|Node ID|node id)[=:\s"*]+([0-9]+[-:][0-9]+)/gi;
+const figmaIdRe = /(?:node-id|Figma Node|Node ID|node id|Figma Specs?)[=:\s"*-]+([0-9]+[-:][0-9]+)/gi;
 const norm = id => id.replace(':', '-');
 
 const sourceIdsByDir = {};
