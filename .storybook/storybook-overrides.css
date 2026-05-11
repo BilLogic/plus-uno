@@ -401,12 +401,16 @@ h2.toc-title {
 
 /* Drop Storybook’s default preview chrome (border/shadow) inside attached canvases */
 /*
- * Story root under zoom wrapper: center shrink-wrapped previews (Button, Spinner) without collapsing
- * full-width roots (Carousel/Accordion wrappers use width:100%). flex-shrink:1 + min-width:0 made
- * percentage-width blocks collapse to a narrow column; flex-basis stays explicit width / intrinsic size.
+ * Story root under zoom wrapper: Storybook injects a transform-wrapper div between innerZoomElementWrapper
+ * and the story JSX root. That wrapper has no explicit width, so flex-basis:auto resolves to content-size,
+ * collapsing any percentage-width child (e.g. Carousel/Accordion). Setting width:100% here gives the
+ * wrapper a definite size so its children's width:100% resolves correctly against the full column width.
+ * Small shrink-wrapped components (Badge, Button, Spinner) remain centered via Storybook's inner
+ * column-flex align-items:center on the transform wrapper.
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper > * {
     flex: 0 0 auto !important;
+    width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     border-width: 0 !important;

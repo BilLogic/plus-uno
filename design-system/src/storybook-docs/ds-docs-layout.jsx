@@ -13,7 +13,7 @@ export function DsCanvasHero({ of: ofStory, layout, ...rest }) {
             of={ofStory}
             story={{ inline: true }}
             layout={layout}
-            sourceState="shown"
+            sourceState="hidden"
             {...rest}
         />
     );
@@ -34,11 +34,12 @@ export function DsCanvasQuiet({ of: ofStory, layout, ...rest }) {
 
 /** A card link for the top of the MDX page */
 export function ResourcesCard({ href, icon, title, description }) {
+    const isExternalLink = typeof href === 'string' && /^https?:\/\//.test(href);
     return (
         <a 
             href={href || '#'} 
-            target={href && href !== '#' ? "_blank" : undefined}
-            rel={href && href !== '#' ? "noreferrer" : undefined}
+            target={isExternalLink ? "_blank" : undefined}
+            rel={isExternalLink ? "noreferrer noopener" : undefined}
             className="group block p-4 border border-border bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-md no-underline transition-all relative text-left"
             style={{
                 width: '200px',

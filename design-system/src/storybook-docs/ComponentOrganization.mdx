@@ -29,11 +29,8 @@ import * as CheckboxStories from '@/forms/Checkbox.stories.jsx';
   <Alert>
     <AlertTitle>Source of truth</AlertTitle>
     <AlertDescription>
-      This page is intentionally condensed. For full details, open{' '}
-      <code className="rounded bg-muted px-1 py-0.5 text-xs">
-        docs/design-system/guides/storybook-component-docs.md
-      </code>
-      .
+      This page is intentionally condensed and mirrors the team taxonomy standards for component and
+      form docs.
     </AlertDescription>
   </Alert>
 
@@ -140,6 +137,30 @@ import * as CheckboxStories from '@/forms/Checkbox.stories.jsx';
       <li>
         Keep top-level headings stable; scenario labels usually belong as smaller subsections.
       </li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="Maintainer checklist">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        Keep component and form story titles flat (<code className="rounded bg-muted px-1 py-0.5 text-xs">Components/Name</code>{' '}
+        or <code className="rounded bg-muted px-1 py-0.5 text-xs">Forms/Name</code> only).
+      </li>
+      <li>
+        For docs-first pages, keep stories tagged with{' '}
+        <code className="rounded bg-muted px-1 py-0.5 text-xs">!dev</code> so the Docs entry stays primary.
+      </li>
+      <li>
+        Keep top-level section names stable and prefer the default spine before introducing exceptions.
+      </li>
+    </ul>
+  </DocSection>
+
+  <DocSection title="What to do next">
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>Auditing an existing page? Verify it follows the default section spine and naming rubric.</li>
+      <li>Adding a new component doc? Start from the template and keep section intent explicit.</li>
+      <li>Fixing drift? Standardize headings first, then move story examples into the right section.</li>
     </ul>
   </DocSection>
 
