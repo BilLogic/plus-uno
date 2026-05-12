@@ -13,7 +13,19 @@ import { DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-d
 
 <Title />
 
-Toolkit organism specs cover scheduling, live session UI, and post-session reflection flows. Each component under **Specs / Toolkit** has a docs page with **Overview**, **Variants** (when exported), and **Interactive playground**, aligned with Profile and Admin specs.
+# Toolkit
+
+Organism-level specs for scheduling (pre-session), live classroom UI (in-session), and reflection flows (post-session). This page is the **single scrollable overview**; every Toolkit component also has its **own docs page** in the sidebar under **Specs → Toolkit →** phase → category → component.
+
+## How documentation is organized
+
+- **One CSF file per component**: `*.stories.jsx` next to implementation or local demo wrappers.
+- **One MDX docs page per CSF file**: sibling `*.mdx` with **Overview**, **Variants** (only when the story file exports `Variants`), and **Interactive playground** — same pattern as **Profile** and **Components** docs (`sb-ds-component-docs--page`, inline canvases, `Resources` → GitHub).
+- **Sidebar**: Stories use `tags: ['!dev', '!autodocs']` so canvases do not clutter the tree; navigation is MDX-first.
+- **Merged Storybook titles**: Some modal/page families share one Storybook `title` across multiple files (e.g. several entries under one modal family). Each MDX uses `<Meta of={…} name="Toolkit Docs — …">` so docs pages stay distinct.
+- **Regenerate sibling MDX** after adding or renaming stories: run `node scripts/toolkit-spec-docs.mjs` from the repo root.
+
+Under each phase, specs follow **Elements**, **Cards**, **Tables**, **Modals**, **Sections**, and **Pages** (when present).
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs"
@@ -24,13 +36,17 @@ Toolkit organism specs cover scheduling, live session UI, and post-session refle
 
 <div className="sb-ds-doc-section">
 
-## Pre-session
+## Sample previews
 
-### Days Dropdown
+Representative inline playgrounds below; open any leaf under **Toolkit** in the sidebar for the full doc page.
+
+### Pre-session
+
+#### Days Dropdown
 
 <DocsInteractivePlayground of={DaysDropdownStories.Interactive} />
 
-### My Sessions
+#### My Sessions
 
 <DocsInteractivePlayground of={MySessionsStories.Interactive} />
 
@@ -38,13 +54,13 @@ Toolkit organism specs cover scheduling, live session UI, and post-session refle
 
 <div className="sb-ds-doc-section">
 
-## In-session
+### In-session
 
-### Student list table
+#### Student list table
 
 <DocsInteractivePlayground of={StudentListStories.Interactive} />
 
-### MATHia goal status banner
+#### MATHia goal status banner
 
 <DocsInteractivePlayground of={MATHiaGoalStatusBannerStories.Interactive} />
 
@@ -52,13 +68,13 @@ Toolkit organism specs cover scheduling, live session UI, and post-session refle
 
 <div className="sb-ds-doc-section">
 
-## Post-session
+### Post-session
 
-### Session reflection (part 1)
+#### Session reflection (part 1)
 
 <DocsInteractivePlayground of={SessionReflectionPart1Stories.Part1} />
 
-### Self reflection (unfilled)
+#### Self reflection (unfilled)
 
 <DocsInteractivePlayground of={SelfReflectionUnfilledStories.Unfilled} />
 

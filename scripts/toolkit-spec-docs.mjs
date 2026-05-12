@@ -105,6 +105,13 @@ function writeMdx(storyPath) {
     const importAlias = toImportAlias(base);
     const relGithub = path.relative(REPO_ROOT, storyPath).replace(/\\/g, '/');
     const githubLink = `https://github.com/BilLogic/plus-uno/blob/main/${relGithub}`;
+    const titleMatch = content.match(/title:\s*['"]([^'"]+)['"]/);
+    const storyTitle = titleMatch ? titleMatch[1] : '';
+    const safeStoryTitle = storyTitle.replace(/`/g, "'");
+    const introLine = storyTitle
+        ? `This entry is part of **Toolkit** specs (Storybook title \`${safeStoryTitle}\`). Token notes, layout notes, and behavior details are documented in the **GitHub** story source below.`
+        : 'Toolkit organism spec — see the GitHub story source for tokens and behavior notes.';
+
 
     const variantsSection = variants
         ? `
@@ -129,7 +136,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <Title />
 
-Toolkit organism spec — see the story source for detailed tokens and behavior notes.
+${introLine}
 
 <ResourcesBlock githubLink="${githubLink}" />
 
@@ -139,7 +146,7 @@ Toolkit organism spec — see the story source for detailed tokens and behavior 
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Primary documentation canvas.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>${overview}</code> story).</>}>
     <Canvas of={${importAlias}.${overview}} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 

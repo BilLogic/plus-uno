@@ -8,9 +8,14 @@ The Toolkit organism contains components for sessions, sign-ups, call-offs, refl
 ```
 design-system/src/specs/Toolkit/
 ├── STRUCTURE.md (this file)
-├── Toolkit.stories.js (main organism overview story)
+├── ToolkitSpecification.mdx (Storybook aggregate: title Specs/Toolkit)
+│   Regenerate all sibling *.mdx files: `node scripts/toolkit-spec-docs.mjs` from repo root.
 │
-├── Elements/
+├── pre-session/   (elements, cards, tables, modals, sections, pages — each with *.stories.jsx + *.mdx)
+├── in-session/
+├── post-session/
+│
+├── Elements/   (legacy conceptual grouping — see phase folders for actual specs)
 │   ├── SessionControlButtons/
 │   ├── ReflectionFilterDropdown/
 │   ├── StudentsDropdown/
@@ -146,9 +151,14 @@ design-system/src/specs/Toolkit/
 - **SessionReflection** (`Session Reflection`): Session reflection pages (part=1-4)
 - **StudentReflection** (`Student Reflection`): Student reflection pages (part=1-3)
 
-## Storybook Organization
+## Storybook organization
 
-Each subcategory (Elements, Cards, Tables, Modals, Sections, Pages) will have its own Storybook page/section, making it easy to navigate and view all components within that category.
+- **Sidebar**: **Specs → Toolkit →** `Pre-Session` | `In-Session` | `Post-Session` → category (Elements, Cards, Tables, Modals, Sections, Pages) → component.
+- **Each component**: one `*.stories.jsx` and one sibling `*.mdx` with Overview, Variants (if exported), and Interactive playground; CSF uses `tags: ['!dev', '!autodocs']` so the sidebar stays MDX-led.
+- **Overview doc**: `ToolkitSpecification.mdx` samples a few interactive stories; full catalog is every leaf under Toolkit.
+- **Regenerate MDX** after adding or renaming stories: `node scripts/toolkit-spec-docs.mjs` from the repo root.
+
+Some modal/page families intentionally share one Storybook `title` across multiple CSF files; each MDX sets a distinct `Meta` **name** (`Toolkit Docs — …`) so docs pages do not collide.
 
 ## Implementation Notes
 
