@@ -54,12 +54,6 @@
  * - Additional Email info icon tooltip: "Get notifications sent to an alternate email address"
  */
 import React from 'react';
-import { Title, Canvas } from '@storybook/addon-docs/blocks';
-import {
-    DocsCanvasShell,
-    DocsInteractivePlayground,
-    ResourcesBlock,
-} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Input from '../../../forms/Input';
 import Button from '../../../components/Button/Button';
@@ -67,13 +61,12 @@ import Tooltip from '../../../components/Tooltip/Tooltip';
 import { Pronouns } from '../Elements/Pronouns.stories';
 
 export default {
-    title: 'Specs/Profile/Sections/Basic Information',
+    title: 'Specs/Profile/Sections/BasicInformation',
     excludeStories: ['BasicInformationSection'],
-    tags: ['!autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {
-            page: BasicInformationSpecDocsPage,
             description: {
                 component:
                     'Basic Information section on tutor profile — contact fields and Save / Update. Token notes are in the file header.',
@@ -331,9 +324,26 @@ export const BasicInformationSection = ({ changed = false }) => {
     );
 };
 
-/**
- * Interactive — inline controls (see Profile specification doc).
- */
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <BasicInformationSection changed={false} />
+    </div>
+);
+
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <BasicInformationSection changed={false} />
+        <BasicInformationSection changed={true} />
+    </div>
+);
+
 export const Interactive = {
     args: {
         changed: false,
@@ -351,84 +361,3 @@ export const Interactive = {
         </div>
     ),
 };
-
-/**
- * All States
- * Shows the Basic Information section in both states:
- * Default (unchanged, save disabled) and Changed (save active).
- */
-export const AllStates = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Default (unchanged) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default (Unchanged — Save Disabled)
-                </h6>
-                <BasicInformationSection changed={false} />
-            </div>
-
-            {/* State 2: Changed (save active) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Changed (Save Active)
-                </h6>
-                <BasicInformationSection changed={true} />
-            </div>
-        </div>
-    );
-};
-
-function BasicInformationSpecDocsPage() {
-    return (
-        <>
-            <Title />
-
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
-                Basic Information section on tutor profile — name, pronouns, emails, semester chips, and Save / Update
-                actions.
-            </p>
-
-            <ResourcesBlock
-                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4477-18992"
-                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Sections"
-            />
-
-            <div className="sb-ds-component-docs not-prose">
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">States</h3>
-                    <DocsCanvasShell>
-                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
-                    </DocsCanvasShell>
-                </div>
-
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">Interactive playground</h3>
-                    <DocsInteractivePlayground
-                        of={Interactive}
-                        description={<>Toggle <code>changed</code> to mirror Save button enabled state.</>}
-                    />
-                </div>
-            </div>
-        </>
-    );
-}

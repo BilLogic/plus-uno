@@ -1,67 +1,27 @@
 /**
  * Profile - Elements - Update Profile Toast
- * 
+ *
  * Toast notification prompting users to complete their profile.
- * Appears on login when profile is incomplete.
- * 
+ *
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214381&m=dev
- * 
- * Typography:
- * - Title: body1-txt font-weight-bold (Merriweather Sans Bold, 16px, line-height 1.5)
- * - Body text: body3-txt font-weight-light (Merriweather Sans Light, 12px, line-height 1.667)
- * - Link text: body3-txt font-weight-bold (Merriweather Sans Bold, 12px, line-height 1.667)
- * - Icon: Font Awesome 7 Free Solid, 14px, line-height 1.714 (--font-size-fa-body1-solid)
- * 
- * Colors:
- * - Header background: --color-primary
- * - Header text/icon: --color-on-primary (white)
- * - Body text: --color-on-surface
- * - Link text: --color-primary-text (#00547e)
- * - Link underline: solid
- * - Surface: --color-surface
- * - Divider: --color-surface-container-high
- * 
- * Spacing:
- * - Header padding: var(--size-element-pad-x-lg, 16px) var(--size-element-pad-y-lg, 8px)
- * - Header gap: var(--size-element-gap-sm, 8px)
- * - Body padding: var(--size-element-pad-x-lg, 16px) var(--size-element-pad-y-lg, 8px)
- * - Border radius: var(--size-modal-radius-md, 6px)
- * 
- * Dimensions:
- * - Width: var(--columns-col-8, 445.33px)
- * 
- * Shadow: Elevation Light/3
  */
-import React, { useState } from 'react';
-import { Title, Canvas } from '@storybook/addon-docs/blocks';
-import {
-    DocsCanvasShell,
-    DocsInteractivePlayground,
-    ResourcesBlock,
-} from '@/storybook-docs/ds-docs-layout.jsx';
-import Toast, { ToastContainer } from '../../../components/Toast';
-import Button from '../../../components/Button';
+import React from 'react';
+import Toast from '../../../components/Toast';
 
 export default {
-    title: 'Specs/Profile/Elements/Update Profile Toast',
-    tags: ['!autodocs'],
+    title: 'Specs/Profile/Elements/UpdateProfileToast',
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {
-            page: UpdateProfileToastSpecDocsPage,
             description: {
                 component:
-                    'Toast feedback after profile updates / completion prompts. Token notes are in the file header.',
+                    'Toast feedback after profile updates / completion prompts. Token notes are in the file header comment.',
             },
         },
     },
 };
 
-/**
- * UpdateProfileToast
- * Prompts user to complete their profile with a clickable link.
- * Uses the design system Toast component with primary style.
- */
 const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
     return (
         <div style={{ width: 'var(--columns-col-8, 445.33px)' }}>
@@ -85,22 +45,49 @@ const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
                         }}
                         onClick={(e) => {
                             e.preventDefault();
-                            // Navigate to profile page
-                            console.log('Navigate to profile page');
                         }}
                     >
                         Complete your profile
-                    </a>
-                    {' '}to finish setup.
+                    </a>{' '}
+                    to finish setup.
                 </span>
             </Toast>
         </div>
     );
 };
 
-/**
- * Interactive — inline controls (see Profile specification doc).
- */
+export const Overview = () => (
+    <div
+        style={{
+            position: 'relative',
+            minHeight: '200px',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <UpdateProfileToast show onClose={() => {}} />
+    </div>
+);
+
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <div style={{ position: 'relative', minHeight: '200px' }}>
+            <UpdateProfileToast show onClose={() => {}} />
+        </div>
+        <div style={{ position: 'relative', minHeight: '120px' }}>
+            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
+                Hidden — use Interactive playground to toggle <code>show</code>.
+            </p>
+        </div>
+    </div>
+);
+
 export const Interactive = {
     args: {
         show: true,
@@ -108,7 +95,7 @@ export const Interactive = {
     argTypes: {
         show: {
             control: 'boolean',
-            description: 'Whether the toast is visible initially',
+            description: 'Whether the toast is visible',
             table: { category: 'State' },
         },
     },
@@ -127,60 +114,3 @@ export const Interactive = {
         </div>
     ),
 };
-
-/**
- * Update Profile Toast
- * Shows the toast notification prompting users to complete their profile.
- */
-export const AllStates = () => {
-    const [show, setShow] = useState(true);
-
-    return (
-        <div style={{ position: 'relative', minHeight: '200px' }}>
-            {!show && (
-                <Button
-                    text="Show Toast"
-                    style="primary"
-                    fill="filled"
-                    size="small"
-                    onClick={() => setShow(true)}
-                />
-            )}
-            {show && <UpdateProfileToast show={show} onClose={() => setShow(false)} />}
-        </div>
-    );
-};
-
-function UpdateProfileToastSpecDocsPage() {
-    return (
-        <>
-            <Title />
-
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
-                Toast feedback after profile updates on tutor profile flows.
-            </p>
-
-            <ResourcesBlock
-                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214381"
-                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
-            />
-
-            <div className="sb-ds-component-docs not-prose">
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">States</h3>
-                    <DocsCanvasShell description={<>Visibility and dismiss behavior on one canvas.</>}>
-                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
-                    </DocsCanvasShell>
-                </div>
-
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">Interactive playground</h3>
-                    <DocsInteractivePlayground
-                        of={Interactive}
-                        description={<>Toggle <code>show</code> to preview visible vs hidden.</>}
-                    />
-                </div>
-            </div>
-        </>
-    );
-}

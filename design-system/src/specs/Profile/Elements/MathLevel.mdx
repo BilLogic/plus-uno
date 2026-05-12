@@ -1,0 +1,55 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as MathLevelStories from './MathLevel.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={MathLevelStories} />
+
+<Title />
+
+Math topic expertise multi-select with searchable checkbox list and badges.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4483-3723&m=dev"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Profile/Elements/MathLevel.stories.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Baseline topic badges at rest.</>}>
+    <Canvas of={MathLevelStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Different topic mixes and badge density.</>}>
+    <DsCanvasQuiet of={MathLevelStories.Variants} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={MathLevelStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

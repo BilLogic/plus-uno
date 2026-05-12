@@ -1,0 +1,174 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorProfilePageStories from './Pages/TutorProfilePage/TutorProfilePage.stories.jsx';
+import * as BasicInformationStories from './Sections/BasicInformation.stories.jsx';
+import * as BackgroundAndMatchingStories from './Sections/BackgroundAndMatching.stories.jsx';
+import * as StatusStories from './Sections/Status.stories.jsx';
+import * as PronounsStories from './Elements/Pronouns.stories.jsx';
+import * as UploadProfilePicStories from './Elements/UploadProfilePic.stories.jsx';
+import * as ClearanceStatusStories from './Elements/ClearanceStatus.stories.jsx';
+import * as SemesterAtPLUSStories from './Elements/SemesterAtPLUS.stories.jsx';
+import * as StudentTypeDropdownStories from './Elements/StudentTypeDropdown.stories.jsx';
+import * as UniversityStories from './Elements/University.stories.jsx';
+import * as GradYearDropdownStories from './Elements/GradYearDropdown.stories.jsx';
+import * as MathLevelStories from './Elements/MathLevel.stories.jsx';
+import * as LanguagePreferencesStories from './Elements/LanguagePreferences.stories.jsx';
+import * as TooltipAdditionalEmailStories from './Elements/TooltipAdditionalEmail.stories.jsx';
+import * as TooltipBackgroundMatchingStories from './Elements/TooltipBackgroundMatching.stories.jsx';
+import * as UpdateProfileToastStories from './Elements/UpdateProfileToast.stories.jsx';
+import * as PreviewImageStories from './Modals/PreviewImage.stories.jsx';
+import * as UnsavedChangesStories from './Modals/UnsavedChanges.stories.jsx';
+
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta title="Specs/Profile" />
+
+# Profile
+
+Single scrollable reference for tutor profile specs. Previews use the same MDX pattern as Admin specs (for example **TutorChartsElement**): **Canvas** for static variants and **DocsInteractivePlayground** so **Controls** sit inline under the preview instead of only in the bottom addon panel.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214865"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Full page
+
+### Tutor Profile (responsive shell)
+
+<DocsInteractivePlayground
+    of={TutorProfilePageStories.Interactive}
+    description={
+        <>
+            Adjust <code>breakpoint</code>, <code>changed</code>, <code>profileState</code>, and{' '}
+            <code>pageMode</code> (<strong>shell</strong> vs <strong>live</strong> wired saves). Per-story Overview
+            and Variants live under <strong>Specs / Profile / Pages / TutorProfilePage</strong>.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sections
+
+### Basic Information
+
+<DocsInteractivePlayground
+    of={BasicInformationStories.Interactive}
+    description={<>Toggle <code>changed</code> to mirror the Save button state.</>}
+/>
+
+### Background &amp; Matching
+
+<DocsInteractivePlayground
+    of={BackgroundAndMatchingStories.Interactive}
+    description={<>Toggle <code>changed</code> for the primary Save control state.</>}
+/>
+
+### Status &amp; Clearance
+
+<DocsCanvasShell description="Read-only section with clearance variants (verified, expired, in progress).">
+    <Canvas of={StatusStories.Variants} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Elements
+
+### Pronouns
+
+<DocsInteractivePlayground of={PronounsStories.Interactive} />
+
+### Upload profile picture
+
+<DocsInteractivePlayground of={UploadProfilePicStories.Interactive} />
+
+### Clearance status
+
+<DocsInteractivePlayground of={ClearanceStatusStories.Interactive} />
+
+### Semester at PLUS
+
+<DocsInteractivePlayground
+    of={SemesterAtPLUSStories.Interactive}
+    description={<>Choose how many semester badges appear (read-only field).</>}
+/>
+
+### Student type
+
+<DocsInteractivePlayground of={StudentTypeDropdownStories.Interactive} />
+
+### University
+
+<DocsInteractivePlayground of={UniversityStories.Interactive} />
+
+### Graduation year
+
+<DocsInteractivePlayground of={GradYearDropdownStories.Interactive} />
+
+### Math level
+
+<DocsInteractivePlayground
+    of={MathLevelStories.Interactive}
+    description={<>Preset controls how many topic badges load initially; open the control to add or remove topics.</>}
+/>
+
+### Language preferences
+
+<DocsInteractivePlayground
+    of={LanguagePreferencesStories.Interactive}
+    description={<>Preset loads a few languages; use the control to switch the initial badge set.</>}
+/>
+
+### Tooltip — Additional Email
+
+<DocsCanvasShell>
+    <Canvas of={TooltipAdditionalEmailStories.Variants} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+### Tooltip — Background &amp; Matching
+
+<DocsCanvasShell>
+    <Canvas of={TooltipBackgroundMatchingStories.Variants} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+### Update profile toast
+
+<DocsInteractivePlayground
+    of={UpdateProfileToastStories.Interactive}
+    description={<>Toggle <code>show</code> to preview visible vs hidden; static variants are under <strong>Variants</strong> on the toast doc page.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Modals
+
+### Preview image
+
+<DocsCanvasShell>
+    <Canvas of={PreviewImageStories.Variants} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+### Unsaved changes
+
+<DocsCanvasShell>
+    <Canvas of={UnsavedChangesStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

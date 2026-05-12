@@ -43,18 +43,15 @@
  * Width: 340px (from Figma)
  */
 import React, { useState } from 'react';
-import { Title, Canvas } from '@storybook/addon-docs/blocks';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import Range from '../../../forms/Range';
 import Button from '../../../components/Button/Button';
 
 export default {
-    title: 'Specs/Profile/Modals/Preview Image',
-    tags: ['!autodocs'],
+    title: 'Specs/Profile/Modals/PreviewImage',
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {
-            page: PreviewImageSpecDocsPage,
             description: {
                 component:
                     'Modal for previewing and adjusting profile photo zoom before save. Token notes are in the file header.',
@@ -333,102 +330,57 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
     );
 };
 
-/**
- * All States
- * Shows the Preview Image modal in all three states:
- * Default, Zoomed In, and Loading.
- */
-export const AllStates = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Default */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default (Zoom ~49%)
-                </h6>
-                <PreviewImageModal zoomValue={49} />
-            </div>
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <PreviewImageModal zoomValue={49} />
+    </div>
+);
 
-            {/* State 2: Zoomed In */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Zoomed In (~82%)
-                </h6>
-                <PreviewImageModal zoomValue={82} />
-            </div>
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <PreviewImageModal zoomValue={49} />
+        <PreviewImageModal zoomValue={82} />
+        <PreviewImageModal isLoading={true} />
+    </div>
+);
 
-            {/* State 3: Loading */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Loading
-                </h6>
-                <PreviewImageModal isLoading={true} />
+export const Interactive = {
+    args: {
+        preset: 'interactive',
+    },
+    argTypes: {
+        preset: {
+            control: 'select',
+            options: ['default', 'zoomedIn', 'loading', 'interactive'],
+            description: 'Static zoom presets vs draggable slider',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => {
+        const wrap = (child) => (
+            <div
+                key={args.preset}
+                style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}
+            >
+                {child}
             </div>
-
-            {/* Interactive */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Interactive
-                </h6>
-                <PreviewImageModal zoomValue={49} interactive={true} />
-            </div>
-        </div>
-    );
+        );
+        switch (args.preset) {
+            case 'default':
+                return wrap(<PreviewImageModal zoomValue={49} />);
+            case 'zoomedIn':
+                return wrap(<PreviewImageModal zoomValue={82} />);
+            case 'loading':
+                return wrap(<PreviewImageModal isLoading={true} />);
+            default:
+                return wrap(<PreviewImageModal zoomValue={49} interactive={true} />);
+        }
+    },
 };
-
-function PreviewImageSpecDocsPage() {
-    return (
-        <>
-            <Title />
-
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
-                Modal for previewing the tutor profile photo before upload / save (zoom slider and actions).
-            </p>
-
-            <ResourcesBlock
-                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4536-3943"
-                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Modals"
-            />
-
-            <div className="sb-ds-component-docs not-prose">
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">States</h3>
-                    <DocsCanvasShell>
-                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
-                    </DocsCanvasShell>
-                </div>
-            </div>
-        </>
-    );
-}

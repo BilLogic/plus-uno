@@ -1,227 +1,104 @@
 /**
  * Profile - Elements - Tooltip: Background & Matching
- * 
- * Info icon with tooltip that explains how to request corrections
- * to background and matching information.
- * Re-uses the Tooltip component and Icon from the design system.
- * 
+ *
+ * Info icon with tooltip that explains how to request corrections.
+ *
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5719-19492&m=dev
- * 
- * States:
- * - Default: Info circle icon only (no tooltip visible)
- * - Hovered: Info circle icon with tooltip visible to the right
- * 
- * Typography:
- * - Tooltip text: Merriweather Sans Light, 8px, line-height 1.667, centered
- *   in --color-inverse-on-surface (#f0f1f3)
- * - Icon: Font Awesome 7 Solid, 10px in --color-primary (#0472a8)
- * 
- * Colors:
- * - Icon: --color-primary
- * - Tooltip background: --color-inverse-surface (#2e3133)
- * - Tooltip text: --color-inverse-on-surface (#f0f1f3)
- * - Tooltip link: --color-inverse-on-surface with underline
- * - Tooltip border-radius: var(--size-element-radius-md, 4px)
- * - Tooltip padding: var(--size-element-pad-x-sm, 8px) / var(--size-element-pad-y-md, 6px)
- * 
- * Tooltip text: "Is some information incorrect? Contact help@tutors.plus to request a correction."
- * Tooltip placement: right (arrow points left toward the icon)
  */
 import React from 'react';
-import { Title, Canvas } from '@storybook/addon-docs/blocks';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import Tooltip from '../../../components/Tooltip/Tooltip';
 
 export default {
-    title: 'Specs/Profile/Elements/Tooltip Background and Matching',
-    tags: ['!autodocs'],
+    title: 'Specs/Profile/Elements/TooltipBackgroundMatching',
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {
-            page: TooltipBackgroundMatchingSpecDocsPage,
             description: {
                 component:
-                    'Tooltip copy for the Background & Matching section on tutor profile. Token notes are in the file header.',
+                    'Tooltip copy for the Background & Matching section on tutor profile. Token notes are in the file header comment.',
             },
         },
     },
 };
 
-/** Tooltip content with email link */
 const TooltipContent = () => (
     <span>
         Is some information incorrect? Contact{' '}
-        <a
-            href="mailto:help@tutors.plus"
-            style={{
-                color: 'inherit',
-                textDecoration: 'underline',
-            }}
-        >
+        <a href="mailto:help@tutors.plus" style={{ color: 'inherit', textDecoration: 'underline' }}>
             help@tutors.plus
         </a>{' '}
         to request a correction.
     </span>
 );
 
-/**
- * All States
- * Shows the Tooltip: Background & Matching in its different states:
- * Default (icon only) and Hovered (icon + tooltip).
- */
-export const AllStates = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Default (icon only) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default (Icon Only)
-                </h6>
-                <div
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <i
-                        className="fa-solid fa-circle-info"
-                        style={{
-                            fontSize: '10px',
-                            color: 'var(--color-primary)',
-                            cursor: 'pointer',
-                        }}
-                    />
-                </div>
-            </div>
+const TriggerIcon = () => (
+    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+        <i className="fa-solid fa-circle-info" style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
+    </span>
+);
 
-            {/* State 2: Hovered (icon + tooltip) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Hovered (Icon + Tooltip) — Hover over the icon
-                </h6>
-                <div
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Tooltip
-                        text={<TooltipContent />}
-                        placement="right"
-                        size="small"
-                        id="tooltip-bg-matching"
-                    >
-                        <span
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            <i
-                                className="fa-solid fa-circle-info"
-                                style={{
-                                    fontSize: '10px',
-                                    color: 'var(--color-primary)',
-                                }}
-                            />
-                        </span>
-                    </Tooltip>
-                </div>
-            </div>
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <Tooltip text={<TooltipContent />} placement="right" size="small" id="tooltip-bg-matching-overview">
+            <TriggerIcon />
+        </Tooltip>
+    </div>
+);
 
-            {/* Interactive */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Interactive — Hover over the icon
-                </h6>
-                <div
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        paddingLeft: '20px',
-                    }}
-                >
-                    <Tooltip
-                        text={<TooltipContent />}
-                        placement="right"
-                        size="small"
-                        id="tooltip-bg-matching-interactive"
-                    >
-                        <span
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            <i
-                                className="fa-solid fa-circle-info"
-                                style={{
-                                    fontSize: '10px',
-                                    color: 'var(--color-primary)',
-                                }}
-                            />
-                        </span>
-                    </Tooltip>
-                </div>
-            </div>
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+            alignItems: 'flex-start',
+        }}
+    >
+        {['top', 'right', 'bottom', 'left'].map((placement) => (
+            <Tooltip
+                key={placement}
+                text={<TooltipContent />}
+                placement={placement}
+                size="small"
+                id={`tooltip-bg-matching-var-${placement}`}
+                show={true}
+            >
+                <TriggerIcon />
+            </Tooltip>
+        ))}
+    </div>
+);
+
+export const Interactive = {
+    args: {
+        showTooltip: true,
+        placement: 'right',
+    },
+    argTypes: {
+        showTooltip: {
+            control: 'boolean',
+            description: 'Force tooltip visibility for review (uses Tooltip show prop)',
+            table: { category: 'State' },
+        },
+        placement: {
+            control: 'select',
+            options: ['top', 'bottom', 'left', 'right'],
+            table: { category: 'Layout' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <Tooltip
+                text={<TooltipContent />}
+                placement={args.placement}
+                size="small"
+                id="tooltip-bg-matching-interactive"
+                show={args.showTooltip ? true : undefined}
+            >
+                <TriggerIcon />
+            </Tooltip>
         </div>
-    );
+    ),
 };
-
-function TooltipBackgroundMatchingSpecDocsPage() {
-    return (
-        <>
-            <Title />
-
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
-                Tooltip copy for the Background &amp; Matching section on tutor profile.
-            </p>
-
-            <ResourcesBlock
-                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5719-19492"
-                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
-            />
-
-            <div className="sb-ds-component-docs not-prose">
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">States</h3>
-                    <DocsCanvasShell>
-                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
-                    </DocsCanvasShell>
-                </div>
-            </div>
-        </>
-    );
-}

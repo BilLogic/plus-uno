@@ -51,21 +51,19 @@
  * - This information determines your eligibility to tutor with PLUS.
  */
 import React from 'react';
-import { Title, Canvas } from '@storybook/addon-docs/blocks';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Input from '../../../forms/Input';
 import Tooltip from '../../../components/Tooltip/Tooltip';
 import { SemesterAtPLUS } from '../Elements/SemesterAtPLUS.stories';
+import { ClearanceStatus } from '../Elements/ClearanceStatus.stories';
 
 export default {
     title: 'Specs/Profile/Sections/Status',
     excludeStories: ['StatusSection'],
-    tags: ['!autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {
-            page: StatusSpecDocsPage,
             description: {
                 component:
                     'Status & Clearance read-only section on tutor profile. Token notes are in the file header.',
@@ -94,7 +92,7 @@ const InfoTooltipContent = () => (
 /**
  * Reusable Status & Clearance section component for use in pages
  */
-export const StatusSection = () => {
+export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'March 16, 2026' } = {}) => {
     return (
         <div
             style={{
@@ -284,96 +282,58 @@ export const StatusSection = () => {
             </div>
 
             {/* Clearance Status */}
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-small-gap-xs, 4px)',
-                }}
-            >
-                <Label text="Clearance Status" required={false} />
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 'var(--size-spacing-space-050, 4px)',
-                        alignItems: 'flex-start',
-                    }}
-                >
-                    <i
-                        className="fa-solid fa-circle-check"
-                        style={{
-                            fontSize: '10px',
-                            color: 'var(--color-success)',
-                            lineHeight: '20px',
-                        }}
-                    />
-                    <span
-                        className="body3-txt font-weight-light"
-                        style={{
-                            color: 'var(--color-success-text)',
-                        }}
-                    >
-                        Verified: March 16, 2026
-                    </span>
-                </div>
-            </div>
+            <ClearanceStatus status={clearanceStatus} date={clearanceDate} />
         </div>
     );
 };
 
-/**
- * All States
- * Shows the Status & Clearance section in its default state.
- */
-export const AllStates = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* Default State */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default
-                </h6>
-                <StatusSection />
-            </div>
-        </div>
-    );
-};
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <StatusSection />
+    </div>
+);
 
-function StatusSpecDocsPage() {
-    return (
-        <>
-            <Title />
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <StatusSection clearanceStatus="verified" clearanceDate="March 16, 2026" />
+        <StatusSection clearanceStatus="expired" clearanceDate="Feb 16, 2026" />
+        <StatusSection clearanceStatus="in-progress" />
+    </div>
+);
 
-            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
-                Status &amp; clearance read-only section on tutor profile.
-            </p>
-
-            <ResourcesBlock
-                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4477-19341"
-                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Sections"
+export const Interactive = {
+    args: {
+        clearanceStatus: 'verified',
+        clearanceDate: 'March 16, 2026',
+    },
+    argTypes: {
+        clearanceStatus: {
+            control: 'select',
+            options: ['verified', 'expired', 'in-progress'],
+            description: 'Clearance row driven by ClearanceStatus element',
+            table: { category: 'State' },
+        },
+        clearanceDate: {
+            control: 'text',
+            description: 'Date copy for verified / expired',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <StatusSection
+                clearanceStatus={args.clearanceStatus}
+                clearanceDate={
+                    args.clearanceStatus === 'in-progress' ? undefined : args.clearanceDate
+                }
             />
-
-            <div className="sb-ds-component-docs not-prose">
-                <div className="sb-ds-doc-section">
-                    <h3 className="h5">States</h3>
-                    <DocsCanvasShell description={<>Section layout and clearance variants in context.</>}>
-                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
-                    </DocsCanvasShell>
-                </div>
-            </div>
-        </>
-    );
-}
+        </div>
+    ),
+};

@@ -1,0 +1,55 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as GradYearDropdownStories from './GradYearDropdown.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={GradYearDropdownStories} />
+
+<Title />
+
+Graduation year select for tutor profile Background & Matching.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4313-28236&m=dev"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Profile/Elements/GradYearDropdown.stories.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Default selection at rest.</>}>
+    <Canvas of={GradYearDropdownStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Alternate graduation years in the same control shell.</>}>
+    <DsCanvasQuiet of={GradYearDropdownStories.Variants} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={GradYearDropdownStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
