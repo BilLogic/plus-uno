@@ -15,6 +15,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const TOOLKIT = path.join(REPO_ROOT, 'design-system/src/specs/Toolkit');
 
+/** When a story file has no `figma.com/design/...` URL, link to the Web App Specs file. */
+const DEFAULT_TOOLKIT_FIGMA =
+    'https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs';
+
 const DELETE_REL = [
     'Toolkit.stories.jsx',
     'ToolkitSpec.jsx',
@@ -89,6 +93,12 @@ function toImportAlias(base) {
     return `${alphanumeric || 'Story'}Stories`;
 }
 
+function extractFigmaLink(content) {
+    const m = content.match(/https:\/\/www\.figma\.com\/design\/[^\s`'")\]>\\]+/);
+    if (!m) return DEFAULT_TOOLKIT_FIGMA;
+    return m[0].replace(/[.,;:]+$/, '');
+}
+
 function writeMdx(storyPath) {
     const dir = path.dirname(storyPath);
     const base = path.basename(storyPath, '.stories.jsx');
@@ -105,12 +115,13 @@ function writeMdx(storyPath) {
     const importAlias = toImportAlias(base);
     const relGithub = path.relative(REPO_ROOT, storyPath).replace(/\\/g, '/');
     const githubLink = `https://github.com/BilLogic/plus-uno/blob/main/${relGithub}`;
+    const figmaLink = extractFigmaLink(content);
     const titleMatch = content.match(/title:\s*['"]([^'"]+)['"]/);
     const storyTitle = titleMatch ? titleMatch[1] : '';
     const safeStoryTitle = storyTitle.replace(/`/g, "'");
     const introLine = storyTitle
-        ? `This entry is part of **Toolkit** specs (Storybook title \`${safeStoryTitle}\`). Token notes, layout notes, and behavior details are documented in the **GitHub** story source below.`
-        : 'Toolkit organism spec — see the GitHub story source for tokens and behavior notes.';
+        ? `This entry is part of **Toolkit** specs (Storybook title \`${safeStoryTitle}\`). Visual specs live in **Figma**; tokens, layout, and behavior notes are in the **GitHub** source below.`
+        : 'Toolkit organism spec — use **Figma** for visuals and **GitHub** for implementation notes.';
 
 
     const variantsSection = variants
@@ -138,7 +149,10 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 ${introLine}
 
-<ResourcesBlock githubLink="${githubLink}" />
+<ResourcesBlock
+    figmaLink="${figmaLink}"
+    githubLink="${githubLink}"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
