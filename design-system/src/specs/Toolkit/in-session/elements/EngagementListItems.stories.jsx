@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EngagementListItems, EngagementSubmenuItems } from './EngagementListItems.jsx';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Engagement List Items',
     component: EngagementListItems,
     parameters: {

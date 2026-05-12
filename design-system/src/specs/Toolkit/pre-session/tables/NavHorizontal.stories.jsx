@@ -3,7 +3,7 @@ import Badge from '../../../../components/Badge/Badge';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Tables/Nav Horizontal',
-    tags: ['!autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },

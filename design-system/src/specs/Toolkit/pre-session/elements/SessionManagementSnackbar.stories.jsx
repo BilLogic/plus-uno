@@ -2,6 +2,7 @@ import React from 'react';
 import SessionManagementSnackbar from '../../../../components/SessionManagementSnackbar/SessionManagementSnackbar';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Session Management Snackbar (Supervisor)',
     component: SessionManagementSnackbar,
     parameters: {

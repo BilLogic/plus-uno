@@ -188,7 +188,14 @@ const preview = {
             'Training',
             ['TrainingLessons', 'Onboarding'],
             'Toolkit',
-            ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
+            [
+              'Pre-Session',
+              ['Elements', 'Cards', 'Tables', 'Modals', 'Sections', 'Pages'],
+              'In-Session',
+              ['Elements', 'Cards', 'Tables', 'Modals', 'Sections', 'Pages'],
+              'Post-Session',
+              ['Elements', 'Cards', 'Tables', 'Modals', 'Sections', 'Pages'],
+            ],
             'Admin',
             [
               'Group Admin',

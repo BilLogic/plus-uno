@@ -9,6 +9,7 @@ import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
 import SessionAvailabilitySnackbar from '../../../../components/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Confirm Session Availability',
     parameters: {
         layout: 'padded',

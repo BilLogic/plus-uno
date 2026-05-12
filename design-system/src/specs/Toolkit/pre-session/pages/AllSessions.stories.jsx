@@ -10,6 +10,7 @@ import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
 import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/All Sessions',
     parameters: {
         layout: 'padded',

@@ -24,7 +24,7 @@ export default {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 // --- State 1: Fill In (Empty State) ---

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Dropdown from '../../../../components/Dropdown/Dropdown';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Sorting Options',
     component: Dropdown,
     parameters: {

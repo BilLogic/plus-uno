@@ -3,6 +3,7 @@ import { EngagementDropdown } from './EngagementDropdown.jsx';
 import { EngagementBadge } from './EngagementBadge.jsx';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Engagement Dropdown',
     component: EngagementDropdown,
     parameters: {

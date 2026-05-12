@@ -1,6 +1,7 @@
 import { AttendanceDropdown } from './AttendanceDropdown.jsx';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Attendance Dropdown',
     component: AttendanceDropdown,
     parameters: {

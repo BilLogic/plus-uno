@@ -13,6 +13,7 @@ import { CapacityFilter } from '../elements/Filters/Capacity Filter/CapacityFilt
 import * as SignUpsModals from '../modals/Sign-Ups/SignUps.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Sign-Ups',
     parameters: {
         layout: 'padded',

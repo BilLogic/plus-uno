@@ -3,6 +3,7 @@ import Button from '../../../../components/Button/Button';
 import Badge from '../../../../components/Badge';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Editing Attendance Roster Items',
     parameters: {
         layout: 'padded',

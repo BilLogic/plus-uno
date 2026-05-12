@@ -10,6 +10,7 @@ import { DaysFilter } from '../elements/Filters/Days Filter/DaysFilter.stories';
 import { CapacityFilter } from '../elements/Filters/Capacity Filter/CapacityFilter.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Sign-Ups',
     parameters: {
         layout: 'padded',

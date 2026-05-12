@@ -1,0 +1,42 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as MySessionsStories from './MySessions.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={MySessionsStories} name="Toolkit Docs — MySessions" />
+
+<Title />
+
+Toolkit organism spec — see the story source for detailed tokens and behavior notes.
+
+<ResourcesBlock githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Toolkit/pre-session/pages/MySessions.stories.jsx" />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary documentation canvas.</>}>
+    <Canvas of={MySessionsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={MySessionsStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

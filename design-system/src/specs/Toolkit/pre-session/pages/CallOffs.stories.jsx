@@ -14,6 +14,7 @@ import * as AutoExcuseConfirmationModal from '../modals/Call-Offs/AutoExcuseConf
 import * as AutoApproveConfirmationModal from '../modals/Call-Offs/AutoApproveConfirmation.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Call-Offs',
     parameters: {
         layout: 'padded',

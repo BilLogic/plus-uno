@@ -4,7 +4,7 @@ import Textarea from '@/forms/Textarea';
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Text Input Additional Details',
     component: Textarea,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },

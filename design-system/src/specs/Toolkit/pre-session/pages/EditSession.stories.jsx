@@ -9,6 +9,7 @@ import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
 import SessionManagementSnackbar from '../../../../components/SessionManagementSnackbar/SessionManagementSnackbar';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Edit Session',
     parameters: {
         layout: 'padded',

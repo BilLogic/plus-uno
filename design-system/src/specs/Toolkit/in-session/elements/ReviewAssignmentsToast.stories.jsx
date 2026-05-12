@@ -2,6 +2,7 @@ import React from 'react';
 import { Toast } from '../../../../components/Toast';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Review Assignments Toast',
     parameters: {
         layout: 'centered',

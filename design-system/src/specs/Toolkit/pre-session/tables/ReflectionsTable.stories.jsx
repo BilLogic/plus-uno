@@ -3,6 +3,7 @@ import Button from '../../../../components/Button/Button';
 import Badge from '../../../../components/Badge/Badge';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Tables/Reflections',
     parameters: {
         layout: 'padded',

@@ -7,6 +7,7 @@ import { NavHorizontal } from '../tables/NavHorizontal.stories';
 import { CompletionFilter } from '../elements/Filters/CompletionFilter.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Reflection',
     parameters: {
         layout: 'padded',

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Badge from '../../../../../components/Badge/Badge';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Badges/Engagement Badges',
     component: Badge,
     parameters: {

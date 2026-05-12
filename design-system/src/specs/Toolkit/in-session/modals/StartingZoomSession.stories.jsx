@@ -3,6 +3,7 @@ import Modal from '../../../../components/Modal';
 import Button from '../../../../components/Button';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Modals',
     component: Modal,
     parameters: {

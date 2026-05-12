@@ -8,6 +8,7 @@ import { Stepper } from '../../elements/Steppers.stories';
 import { CancelButton, CreateSessionButton } from '../../elements/SupervisorManagementButtons.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Modals/Create New Session',
     component: Modal,
     parameters: {

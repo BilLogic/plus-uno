@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import SessionControlsConsolidated from './SessionControlsConsolidated';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Session Controls Consolidated',
     component: SessionControlsConsolidated,
     parameters: {

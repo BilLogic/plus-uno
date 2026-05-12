@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '../../../../components/Button/Button';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Call-Offs Button',
     component: Button,
     parameters: {

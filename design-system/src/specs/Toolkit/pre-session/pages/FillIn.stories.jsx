@@ -9,6 +9,7 @@ import { CapacityFilter } from '../elements/Filters/Capacity Filter/CapacityFilt
 import { TutorFilter } from '../elements/Filters/Tutor Filter/TutorFilter.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Fill-In',
     parameters: {
         layout: 'padded',

@@ -4,7 +4,7 @@ import MATHiaGoalStatusBanner from './MATHiaGoalStatusBanner';
 export default {
     title: 'Specs/Toolkit/In-Session/Elements/MATHia Goal Status Banner',
     component: MATHiaGoalStatusBanner,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

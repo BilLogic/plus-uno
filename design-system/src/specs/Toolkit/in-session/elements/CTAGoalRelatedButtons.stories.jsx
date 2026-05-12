@@ -2,7 +2,8 @@ import React from 'react';
 import Button from '../../../../components/Button/Button';
 
 export default {
-    title: 'Specs/Toolkit/In-Session/Elements',
+    tags: ['!dev', '!autodocs'],
+    title: 'Specs/Toolkit/In-Session/Elements/CTA Goal Related Buttons',
     component: Button,
     parameters: {
         layout: 'padded',

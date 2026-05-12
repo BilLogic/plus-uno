@@ -8,6 +8,7 @@ import { AvailableButton, UnavailableButton } from '../../elements/CTATutorsButt
 import { Recurring_Session } from '../../cards/TutorViewSessionManagement.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Modals/Confirm Session Availability',
     component: Modal,
     parameters: {

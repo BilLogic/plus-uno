@@ -15,6 +15,7 @@ import { Reconfirm_Tutor_Availability } from '../modals/Edit Session/ReconfirmTu
 import { Unsaved_Warning } from '../modals/Edit Session/UnsavedWarning.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Edit Session',
     parameters: {
         layout: 'padded',

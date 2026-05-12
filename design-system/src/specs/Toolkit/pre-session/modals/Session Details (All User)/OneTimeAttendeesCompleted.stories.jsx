@@ -14,7 +14,7 @@ export default {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 // ─── Sub-components ──────────────────────────────────────────────

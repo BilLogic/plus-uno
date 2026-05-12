@@ -12,7 +12,7 @@ export default {
             }
         }
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         date: { control: 'text' },
         time: { control: 'text' },

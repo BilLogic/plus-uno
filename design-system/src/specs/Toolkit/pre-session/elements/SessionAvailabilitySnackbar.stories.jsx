@@ -2,6 +2,7 @@ import React from 'react';
 import SessionAvailabilitySnackbar from '../../../../components/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Session Availability Confirmation Snackbar (Tutor)',
     component: SessionAvailabilitySnackbar,
     parameters: {

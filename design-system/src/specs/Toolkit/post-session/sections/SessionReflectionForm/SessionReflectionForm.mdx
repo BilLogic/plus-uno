@@ -1,0 +1,42 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SessionReflectionFormStories from './SessionReflectionForm.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionReflectionFormStories} name="Toolkit Docs — SessionReflectionForm" />
+
+<Title />
+
+Toolkit organism spec — see the story source for detailed tokens and behavior notes.
+
+<ResourcesBlock githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Toolkit/post-session/sections/SessionReflectionForm/SessionReflectionForm.stories.jsx" />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary documentation canvas.</>}>
+    <Canvas of={SessionReflectionFormStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SessionReflectionFormStories.Default}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
