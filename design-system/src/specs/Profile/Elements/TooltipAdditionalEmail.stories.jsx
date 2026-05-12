@@ -33,7 +33,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /**
@@ -41,7 +41,7 @@ export default {
  * Shows the Tooltip: Additional Email in its different states:
  * Default (icon only) and Hovered (icon + tooltip).
  */
-export const TooltipAdditionalEmailStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

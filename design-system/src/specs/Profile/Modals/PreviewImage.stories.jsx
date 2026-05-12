@@ -51,7 +51,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /** Placeholder profile image (circle with avatar illustration) */
@@ -329,7 +329,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
  * Shows the Preview Image modal in all three states:
  * Default, Zoomed In, and Loading.
  */
-export const PreviewImageStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

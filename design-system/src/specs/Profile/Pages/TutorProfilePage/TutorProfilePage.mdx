@@ -1,0 +1,81 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorProfilePageStories from './TutorProfilePage.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorProfilePageStories} />
+
+<Title />
+
+Full-page tutor profile — `PageLayout` shell with TopBar (`Home` / `Profile`), tutor sidebar, profile photo upload, Basic Information, Status &amp; Clearance (read-only), and Background &amp; Matching sections with save actions.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214865"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Pages/TutorProfilePage"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-ds-component-docs--page-fullbleed not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={
+        <>
+            Default shell at the <strong className="text-foreground">xl</strong> breakpoint. Use controls
+            for <strong className="text-foreground">changed</strong> (save buttons) and{' '}
+            <strong className="text-foreground">profileState</strong> (profile photo). Use the MD / LG /
+            XL toolbar above the preview to change viewport width.
+        </>
+    }
+>
+    <Canvas
+        of={TutorProfilePageStories.Overview}
+        story={{ inline: true }}
+        layout="fullscreen"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+The page is built on the PLUS `PageLayout` shell. Top-down:
+
+- **TopBar** — breadcrumbs `Home` / `Profile`, user block.
+- **Sidebar** — tutor navigation (same pattern as other tutor app pages).
+- **Title** — `Tutor Profile` (`h3`).
+- **Upload profile pic** — `UploadProfilePic` (`unfilled` / `filled`).
+- **Basic Information** — `BasicInformationSection`; Save and Update respects the `changed` prop in this overview story.
+- **Status &amp; Clearance** — `StatusSection` (read-only fields and clearance line).
+- **Background &amp; Matching** — `BackgroundAndMatchingSection`; Save and Update respects `changed`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TutorProfilePageStories.Interactive}
+    description={
+        <>
+            Fully wired form sections: editing fields enables each section's Save and Update button;
+            save handlers use a browser alert for feedback. Use the MD / LG / XL toolbar above the preview
+            to change viewport width.
+        </>
+    }
+/>
+
+</div>
+
+</div>

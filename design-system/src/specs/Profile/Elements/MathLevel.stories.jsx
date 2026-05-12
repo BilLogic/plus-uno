@@ -65,7 +65,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const mathTopicOptions = [
@@ -113,7 +113,7 @@ export const MathLevel = ({ id = 'math-level', value, onChange, defaultValue, re
  * Shows the Math Level dropdown in all three states:
  * Default (closed/unfilled), Open (unfilled), and Closed (with selections).
  */
-export const MathLevelStory = () => {
+export const AllStates = () => {
     const [interactiveValue, setInteractiveValue] = useState([]);
 
     return (

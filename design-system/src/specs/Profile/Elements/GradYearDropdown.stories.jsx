@@ -53,7 +53,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const gradYearOptions = [
@@ -99,7 +99,7 @@ export const GradYearDropdown = ({ id = 'grad-year', value, onChange, defaultVal
  * Shows the Grad Year Dropdown in all three states:
  * Default (closed/unfilled), Open (unfilled), and Filled (closed).
  */
-export const GradYearDropdownStory = () => {
+export const AllStates = () => {
     const [selectedValue, setSelectedValue] = useState('');
 
     return (

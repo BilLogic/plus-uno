@@ -25,7 +25,7 @@ import { UploadProfilePic } from '../../Elements/UploadProfilePic.stories';
 export default {
     title: 'Specs/Profile/Pages/TutorProfilePage',
     component: TutorProfilePage,
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -75,10 +75,10 @@ Node ID: 5615-214865
             table: { category: 'State' },
         },
         breakpoint: {
-            control: { type: 'select' },
+            control: 'select',
             options: ['md', 'lg', 'xl'],
-            description: 'Responsive breakpoint',
-            table: { category: 'Responsive' },
+            description: 'Simulated viewport width in the preview toolbar',
+            table: { category: 'Layout' },
         },
     },
     args: {

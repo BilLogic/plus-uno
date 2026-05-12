@@ -42,7 +42,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /**
@@ -144,7 +144,7 @@ const UnsavedChangesModal = () => {
  * All States
  * Shows the Unsaved Changes modal.
  */
-export const UnsavedChangesStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

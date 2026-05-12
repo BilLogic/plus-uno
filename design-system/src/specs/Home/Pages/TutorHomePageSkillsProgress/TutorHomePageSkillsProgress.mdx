@@ -18,7 +18,7 @@ Tutor home page with the Skills Progress tab active and a rating-metrics impact 
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Pages/TutorHomePageSkillsProgress"
 />
 
-<div className="sb-ds-component-docs not-prose">
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-ds-component-docs--page-fullbleed not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -31,6 +31,7 @@ Tutor home page with the Skills Progress tab active and a rating-metrics impact 
     <Canvas
         of={TutorHomePageSkillsProgressStories.Overview}
         story={{ inline: true }}
+        layout="fullscreen"
         sourceState="hidden"
     />
 </DocsCanvasShell>
@@ -43,7 +44,7 @@ Tutor home page with the Skills Progress tab active and a rating-metrics impact 
 
 <DocsInteractivePlayground
     of={TutorHomePageSkillsProgressStories.Interactive}
-    description={<>Edit the tutor name and user badge inline.</>}
+    description={<>Edit the tutor name and user badge inline. Use the MD / LG / XL toolbar above the preview to change viewport width.</>}
 />
 
 </div>

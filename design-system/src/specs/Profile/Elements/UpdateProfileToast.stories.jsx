@@ -41,7 +41,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /**
@@ -89,7 +89,7 @@ const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
  * Update Profile Toast
  * Shows the toast notification prompting users to complete their profile.
  */
-export const UpdateProfileToastStory = () => {
+export const AllStates = () => {
     const [show, setShow] = useState(true);
 
     return (

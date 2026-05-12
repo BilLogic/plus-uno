@@ -61,7 +61,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -315,7 +315,7 @@ export const StatusSection = () => {
  * All States
  * Shows the Status & Clearance section in its default state.
  */
-export const StatusStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

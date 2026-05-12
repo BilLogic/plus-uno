@@ -61,7 +61,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -277,7 +277,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
  * Shows the Background & Matching section in both states:
  * Default (unchanged, save disabled) and Changed (save active).
  */
-export const BackgroundAndMatchingStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

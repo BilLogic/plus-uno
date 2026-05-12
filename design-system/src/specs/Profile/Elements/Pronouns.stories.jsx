@@ -49,7 +49,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const pronounOptions = [
@@ -93,7 +93,7 @@ export const Pronouns = ({ id = 'pronouns', value, onChange, defaultValue, ...pr
  * Shows the Pronouns dropdown in all three states:
  * Default (closed/unfilled), Open (unfilled), and Filled (closed).
  */
-export const PronounsStory = () => {
+export const AllStates = () => {
     const [selectedValue, setSelectedValue] = useState('');
 
     return (

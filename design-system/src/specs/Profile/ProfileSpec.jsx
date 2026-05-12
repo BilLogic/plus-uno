@@ -4,8 +4,8 @@ import { SpecOverview } from '../SpecOverview';
 export const ProfileSpec = () => {
     return (
         <SpecOverview
-            title="Profile Organism"
-            description="The Profile organism combines multiple components to create complete profile management experiences. It is organized into the following categories:"
+            title="Profile Spec"
+            description="The Profile spec contains components for tutor profile management — form elements, sections, modals, and the full tutor profile page. It is organized into the following categories:"
             categories={[
                 { name: 'Elements', description: 'Individual form elements and UI components (tutor profile select dropdown)' },
                 { name: 'Cards', description: 'Card components (to be added as needed)' },

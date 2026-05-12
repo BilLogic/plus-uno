@@ -49,7 +49,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const universityOptions = [
@@ -93,7 +93,7 @@ export const University = ({ id = 'university', value, onChange, defaultValue, r
  * Shows the University dropdown in all three states:
  * Default (closed/unfilled), Open (unfilled), and Filled (closed).
  */
-export const UniversityStory = () => {
+export const AllStates = () => {
     const [selectedValue, setSelectedValue] = useState('');
 
     return (

@@ -63,7 +63,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const languageOptions = [
@@ -111,7 +111,7 @@ export const LanguagePreferences = ({ id = 'language-preferences', value, onChan
  * Shows Language Preferences in all three states:
  * Default (closed/unfilled), Open (with selections), and Closed (with selections).
  */
-export const LanguagePreferencesStory = () => {
+export const AllStates = () => {
     const [interactiveValue, setInteractiveValue] = useState([]);
 
     return (

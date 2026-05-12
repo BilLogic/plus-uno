@@ -51,7 +51,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const semesterOptions = [
@@ -98,7 +98,7 @@ export const SemesterAtPLUS = ({ id = 'semester-plus', value, onChange, defaultV
  * Shows the Semester at PLUS field in its different filled states.
  * This field is read-only — values are set by the system.
  */
-export const SemesterAtPLUSStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

@@ -53,7 +53,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 const studentTypeOptions = [
@@ -99,7 +99,7 @@ export const StudentTypeDropdown = ({ id = 'student-type', value, onChange, defa
  * Shows the Student Type Dropdown in all three states:
  * Default (closed/unfilled), Open (unfilled), and Filled (closed).
  */
-export const StudentTypeDropdownStory = () => {
+export const AllStates = () => {
     const [selectedValue, setSelectedValue] = useState('');
 
     return (

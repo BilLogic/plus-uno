@@ -5,6 +5,7 @@
 
 import React from 'react';
 import TutorHomePageSkillsProgress from './TutorHomePageSkillsProgress';
+import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 
 const skillsOverviewData = {
     categories: [
@@ -28,6 +29,24 @@ export default {
     title: 'Specs/Home/Pages/TutorHomePageSkillsProgress',
     component: TutorHomePageSkillsProgress,
     tags: ['!dev', '!autodocs'],
+    decorators: [
+        (Story, context) => (
+            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+                <Story />
+            </ResponsiveFrame>
+        ),
+    ],
+    args: {
+        breakpoint: 'xl',
+    },
+    argTypes: {
+        breakpoint: {
+            control: 'select',
+            options: ['md', 'lg', 'xl'],
+            description: 'Simulated viewport width in the preview toolbar',
+            table: { category: 'Layout' },
+        },
+    },
     parameters: {
         layout: 'fullscreen',
         docs: {
@@ -47,7 +66,6 @@ export const Overview = {
             skillsProgressData={skillsProgressData}
         />
     ),
-    parameters: { layout: 'fullscreen' }
 };
 
 export const Interactive = {
@@ -70,5 +88,4 @@ export const Interactive = {
             table: { category: 'Content' }
         }
     },
-    parameters: { layout: 'fullscreen' }
 };

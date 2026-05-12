@@ -35,7 +35,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -60,7 +60,7 @@ const TooltipContent = () => (
  * Shows the Tooltip: Background & Matching in its different states:
  * Default (icon only) and Hovered (icon + tooltip).
  */
-export const TooltipBackgroundMatchingStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{

@@ -65,7 +65,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!autodocs'],
 };
 
 /**
@@ -322,7 +322,7 @@ export const BasicInformationSection = ({ changed = false }) => {
  * Shows the Basic Information section in both states:
  * Default (unchanged, save disabled) and Changed (save active).
  */
-export const BasicInformationStory = () => {
+export const AllStates = () => {
     return (
         <div
             style={{
