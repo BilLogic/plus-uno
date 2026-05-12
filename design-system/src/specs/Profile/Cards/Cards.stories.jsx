@@ -12,7 +12,11 @@ export default {
         layout: 'padded',
         docs: {
             description: {
-                component: 'Card-level components for Profile pages (none published in Storybook yet).',
+                component: `Card-level Profile specs — add stories here when designs exist.
+
+Browse **Elements**, **Sections**, and **Pages** under **Specs / Profile** for live profile pieces until card-level specs exist.
+
+[Profile Cards folder](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Cards)`,
             },
         },
     },

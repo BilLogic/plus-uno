@@ -12,7 +12,11 @@ export default {
         layout: 'padded',
         docs: {
             description: {
-                component: 'Table-level components for Profile pages (none published in Storybook yet).',
+                component: `Table-level Profile specs — add stories here when designs exist.
+
+Browse **Specs / Profile** in the sidebar (same structure as Admin specs) for elements, sections, and pages.
+
+[Profile Tables folder](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Tables)`,
             },
         },
     },

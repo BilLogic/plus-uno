@@ -41,15 +41,29 @@
  * - University of Pittsburgh
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/University',
+    excludeStories: ['University'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: UniversitySpecDocsPage,
+            description: {
+                component:
+                    'University autocomplete / select for tutor profile. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const universityOptions = [
@@ -86,6 +100,33 @@ export const University = ({ id = 'university', value, onChange, defaultValue, r
             />
         </div>
     );
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        initialValue: '',
+    },
+    argTypes: {
+        initialValue: {
+            name: 'initial selection',
+            control: 'select',
+            options: ['', 'carnegie-mellon', 'duquesne', 'pitt'],
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <University
+                id="university-playground"
+                key={args.initialValue ?? ''}
+                defaultValue={args.initialValue || undefined}
+                required={false}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -245,3 +286,34 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function UniversitySpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                University autocomplete / select for tutor profile.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4478-4514"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground of={Interactive} />
+                </div>
+            </div>
+        </>
+    );
+}

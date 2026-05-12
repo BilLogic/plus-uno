@@ -45,15 +45,29 @@
  * - Spring 2027
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/Grad Year Dropdown',
+    excludeStories: ['GradYearDropdown'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: GradYearDropdownSpecDocsPage,
+            description: {
+                component:
+                    'Graduation year select for tutor profile background & matching. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const gradYearOptions = [
@@ -92,6 +106,33 @@ export const GradYearDropdown = ({ id = 'grad-year', value, onChange, defaultVal
             />
         </div>
     );
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        initialValue: '',
+    },
+    argTypes: {
+        initialValue: {
+            name: 'initial selection',
+            control: 'select',
+            options: ['', 'undecided', 'spring-2026', 'summer-2026', 'fall-2026', 'spring-2027'],
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ width: '200px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <GradYearDropdown
+                id="grad-year-playground"
+                key={args.initialValue ?? ''}
+                defaultValue={args.initialValue || undefined}
+                required={false}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -251,3 +292,34 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function GradYearDropdownSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Graduation year select for tutor profile background &amp; matching.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4313-28236"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground of={Interactive} />
+                </div>
+            </div>
+        </>
+    );
+}

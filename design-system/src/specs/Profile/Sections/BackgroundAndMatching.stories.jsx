@@ -48,6 +48,12 @@
  * - Save button gets set active upon any edits
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import Tooltip from '../../../components/Tooltip/Tooltip';
 import Button from '../../../components/Button/Button';
 import { StudentTypeDropdown } from '../Elements/StudentTypeDropdown.stories';
@@ -58,10 +64,18 @@ import { LanguagePreferences } from '../Elements/LanguagePreferences.stories';
 
 export default {
     title: 'Specs/Profile/Sections/Background and Matching',
+    excludeStories: ['BackgroundAndMatchingSection'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: BackgroundAndMatchingSpecDocsPage,
+            description: {
+                component:
+                    'Background & Matching section — academic fields and Save / Update. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -273,6 +287,27 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
 };
 
 /**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        changed: false,
+    },
+    argTypes: {
+        changed: {
+            control: 'boolean',
+            description: 'Enables Save and Update when true',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <BackgroundAndMatchingSection changed={args.changed} />
+        </div>
+    ),
+};
+
+/**
  * All States
  * Shows the Background & Matching section in both states:
  * Default (unchanged, save disabled) and Changed (save active).
@@ -317,3 +352,38 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function BackgroundAndMatchingSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Background &amp; Matching section — student type, university, graduation year, math level, languages,
+                and Save / Update actions.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4535-22983"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Sections"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={<>Toggle <code>changed</code> for the primary Save control state.</>}
+                    />
+                </div>
+            </div>
+        </>
+    );
+}

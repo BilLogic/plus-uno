@@ -7,12 +7,12 @@ export const ProfileSpec = () => {
             title="Profile Spec"
             description="The Profile spec contains components for tutor profile management — form elements, sections, modals, and the full tutor profile page. It is organized into the following categories:"
             categories={[
-                { name: 'Elements', description: 'Individual form elements and UI components (tutor profile select dropdown)' },
-                { name: 'Cards', description: 'Card components (to be added as needed)' },
-                { name: 'Tables', description: 'Table components' },
-                { name: 'Modals', description: 'Modal dialogs' },
-                { name: 'Sections', description: 'Section-level components' },
-                { name: 'Pages', description: 'Complete page-level components (tutor profile page)' },
+                { name: 'Cards', description: 'Card-level profile specs (placeholder until designs land)' },
+                { name: 'Elements', description: 'Form controls, tooltips, and small profile UI pieces' },
+                { name: 'Modals', description: 'Dialogs such as preview image and unsaved changes' },
+                { name: 'Pages', description: 'Full tutor profile shell and responsive layouts' },
+                { name: 'Sections', description: 'Profile page sections (basic info, background, status)' },
+                { name: 'Tables', description: 'Table-level profile specs (placeholder until designs land)' },
             ]}
         />
     );

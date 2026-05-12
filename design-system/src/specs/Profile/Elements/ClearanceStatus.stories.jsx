@@ -23,13 +23,27 @@
  * Width: 200px (fixed from Figma)
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export default {
     title: 'Specs/Profile/Elements/Clearance Status',
+    excludeStories: ['ClearanceStatus'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: ClearanceStatusSpecDocsPage,
+            description: {
+                component:
+                    'Read-only clearance badge states for tutor profile (verified, expired, in progress). Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /**
@@ -40,7 +54,7 @@ export default {
  * @param {'verified' | 'expired' | 'in-progress'} props.status - The clearance status
  * @param {string} props.date - The date string (e.g., "March 16, 2026")
  */
-const ClearanceStatus = ({ status = 'verified', date = 'March 16, 2026' }) => {
+export function ClearanceStatus({ status = 'verified', date = 'March 16, 2026' }) {
     const statusConfig = {
         verified: {
             icon: 'fa-solid fa-circle-check',
@@ -112,6 +126,36 @@ const ClearanceStatus = ({ status = 'verified', date = 'March 16, 2026' }) => {
             </div>
         </div>
     );
+}
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        status: 'verified',
+        date: 'March 16, 2026',
+    },
+    argTypes: {
+        status: {
+            control: 'select',
+            options: ['verified', 'expired', 'in-progress'],
+            table: { category: 'State' },
+        },
+        date: {
+            control: 'text',
+            description: 'Date label for verified / expired (ignored when status is in progress)',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <ClearanceStatus
+                status={args.status}
+                date={args.status === 'in-progress' ? undefined : args.date}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -160,3 +204,37 @@ export const AllStates = () => (
     </div>
 );
 AllStates.storyName = 'All States';
+
+function ClearanceStatusSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Read-only clearance badge states for tutor profile (verified, expired, in progress).
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5667-26454"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">All states</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={<>Switch the clearance variant from controls.</>}
+                    />
+                </div>
+            </div>
+        </>
+    );
+}

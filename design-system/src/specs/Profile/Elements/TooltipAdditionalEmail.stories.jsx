@@ -26,14 +26,23 @@
  * Tooltip placement: right (arrow points left toward the icon)
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import Tooltip from '../../../components/Tooltip/Tooltip';
 
 export default {
     title: 'Specs/Profile/Elements/Tooltip Additional Email',
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: TooltipAdditionalEmailSpecDocsPage,
+            description: {
+                component:
+                    'Tooltip copy for the additional email field on tutor profile basic information. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /**
@@ -171,3 +180,29 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function TooltipAdditionalEmailSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Tooltip copy for the additional email field on tutor profile basic information.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5719-19370"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+            </div>
+        </>
+    );
+}

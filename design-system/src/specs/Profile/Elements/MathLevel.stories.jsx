@@ -57,15 +57,29 @@
  * - Data & Probability
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/Math Level',
+    excludeStories: ['MathLevel'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: MathLevelSpecDocsPage,
+            description: {
+                component:
+                    'Math level / topics multi-select for tutor profile. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const mathTopicOptions = [
@@ -106,6 +120,39 @@ export const MathLevel = ({ id = 'math-level', value, onChange, defaultValue, re
             />
         </div>
     );
+};
+
+const mathLevelPresetDefaults = {
+    empty: undefined,
+    one: ['ratios'],
+    two: ['ratios', 'fractions-decimals'],
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        preset: 'empty',
+    },
+    argTypes: {
+        preset: {
+            control: 'radio',
+            options: ['empty', 'one', 'two'],
+            description: 'Initial badge selection',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ width: '249px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <MathLevel
+                id="math-level-playground"
+                key={args.preset}
+                defaultValue={mathLevelPresetDefaults[args.preset]}
+                required={true}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -277,3 +324,37 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function MathLevelSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Math level / topics multi-select for tutor profile background &amp; matching.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4483-3723"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={<>Preset controls how many topic badges load initially; use the control to adjust topics.</>}
+                    />
+                </div>
+            </div>
+        </>
+    );
+}

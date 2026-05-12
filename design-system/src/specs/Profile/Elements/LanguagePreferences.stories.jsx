@@ -55,15 +55,29 @@
  * - Korean
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/Language Preferences',
+    excludeStories: ['LanguagePreferences'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: LanguagePreferencesSpecDocsPage,
+            description: {
+                component:
+                    'Language preferences multi-select with badges for tutor profile. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const languageOptions = [
@@ -104,6 +118,39 @@ export const LanguagePreferences = ({ id = 'language-preferences', value, onChan
             />
         </div>
     );
+};
+
+const languagePresetDefaults = {
+    empty: undefined,
+    bilingual: ['english', 'french'],
+    trilingual: ['arabic', 'english', 'korean'],
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        preset: 'empty',
+    },
+    argTypes: {
+        preset: {
+            control: 'radio',
+            options: ['empty', 'bilingual', 'trilingual'],
+            description: 'Initial language badges',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <LanguagePreferences
+                id="language-preferences-playground"
+                key={args.preset}
+                defaultValue={languagePresetDefaults[args.preset]}
+                required={false}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -276,3 +323,37 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function LanguagePreferencesSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Language preferences multi-select with removable badges for tutor profile.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4899-13061"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={<>Use the preset control to load an initial badge set, then edit on canvas.</>}
+                    />
+                </div>
+            </div>
+        </>
+    );
+}

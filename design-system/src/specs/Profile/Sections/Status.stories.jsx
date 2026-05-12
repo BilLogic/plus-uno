@@ -51,6 +51,8 @@
  * - This information determines your eligibility to tutor with PLUS.
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Input from '../../../forms/Input';
 import Tooltip from '../../../components/Tooltip/Tooltip';
@@ -58,10 +60,18 @@ import { SemesterAtPLUS } from '../Elements/SemesterAtPLUS.stories';
 
 export default {
     title: 'Specs/Profile/Sections/Status',
+    excludeStories: ['StatusSection'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: StatusSpecDocsPage,
+            description: {
+                component:
+                    'Status & Clearance read-only section on tutor profile. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -341,3 +351,29 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function StatusSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Status &amp; clearance read-only section on tutor profile.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4477-19341"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Sections"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell description={<>Section layout and clearance variants in context.</>}>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+            </div>
+        </>
+    );
+}

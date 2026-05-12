@@ -43,15 +43,24 @@
  * Width: 340px (from Figma)
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import Range from '../../../forms/Range';
 import Button from '../../../components/Button/Button';
 
 export default {
     title: 'Specs/Profile/Modals/Preview Image',
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: PreviewImageSpecDocsPage,
+            description: {
+                component:
+                    'Modal for previewing and adjusting profile photo zoom before save. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /** Placeholder profile image (circle with avatar illustration) */
@@ -397,3 +406,29 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function PreviewImageSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Modal for previewing the tutor profile photo before upload / save (zoom slider and actions).
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4536-3943"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Modals"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+            </div>
+        </>
+    );
+}

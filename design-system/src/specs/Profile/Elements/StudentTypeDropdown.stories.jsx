@@ -45,15 +45,29 @@
  * - Retired Teacher
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/Student Type Dropdown',
+    excludeStories: ['StudentTypeDropdown'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: StudentTypeDropdownSpecDocsPage,
+            description: {
+                component:
+                    'Student type single-select for tutor profile background & matching. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const studentTypeOptions = [
@@ -92,6 +106,40 @@ export const StudentTypeDropdown = ({ id = 'student-type', value, onChange, defa
             />
         </div>
     );
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        initialValue: '',
+    },
+    argTypes: {
+        initialValue: {
+            name: 'initial selection',
+            control: 'select',
+            options: [
+                '',
+                'undergraduate-student',
+                'graduate-student',
+                'phd-student',
+                'teacher',
+                'retired-teacher',
+            ],
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ width: '229px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <StudentTypeDropdown
+                id="student-type-playground"
+                key={args.initialValue ?? ''}
+                defaultValue={args.initialValue || undefined}
+                required={true}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -251,3 +299,34 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function StudentTypeDropdownSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Student type single-select for tutor profile background &amp; matching.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5667-35179"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground of={Interactive} />
+                </div>
+            </div>
+        </>
+    );
+}

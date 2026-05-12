@@ -43,15 +43,29 @@
  * - Fall 2025
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/Semester at PLUS',
+    excludeStories: ['SemesterAtPLUS'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: SemesterAtPLUSSpecDocsPage,
+            description: {
+                component:
+                    'Read-only semester badges for time at PLUS on tutor profile. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const semesterOptions = [
@@ -91,6 +105,40 @@ export const SemesterAtPLUS = ({ id = 'semester-plus', value, onChange, defaultV
             />
         </div>
     );
+};
+
+const semesterPresetDefaults = {
+    one: ['fall-2024'],
+    two: ['fall-2024', 'spring-2025'],
+    four: ['fall-2024', 'spring-2025', 'summer-2025', 'fall-2025'],
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        preset: 'four',
+    },
+    argTypes: {
+        preset: {
+            control: 'radio',
+            options: ['one', 'two', 'four'],
+            description: 'How many semester badges are shown (read-only)',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <SemesterAtPLUS
+                id="semester-plus-playground"
+                key={args.preset}
+                defaultValue={semesterPresetDefaults[args.preset]}
+                label="Semester Tutored at PLUS"
+                required={false}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -178,3 +226,37 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function SemesterAtPLUSSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Read-only semester badges for “Semester tutored at PLUS” on tutor profile.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5470-9151"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={<>Choose how many semester badges appear (read-only field).</>}
+                    />
+                </div>
+            </div>
+        </>
+    );
+}

@@ -35,14 +35,23 @@
  * Width: ~388.67px (var(--columns-col-7))
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import Button from '../../../components/Button/Button';
 
 export default {
     title: 'Specs/Profile/Modals/Unsaved Changes',
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: UnsavedChangesSpecDocsPage,
+            description: {
+                component:
+                    'Confirmation modal when leaving tutor profile with unsaved edits. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /**
@@ -170,3 +179,29 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function UnsavedChangesSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Confirmation modal when leaving tutor profile with unsaved edits.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5696-13933"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Modals"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+            </div>
+        </>
+    );
+}

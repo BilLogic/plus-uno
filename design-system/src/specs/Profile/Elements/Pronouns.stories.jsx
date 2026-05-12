@@ -41,15 +41,29 @@
  * - They/Them
  */
 import React, { useState } from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
     title: 'Specs/Profile/Elements/Pronouns',
+    excludeStories: ['Pronouns'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: PronounsSpecDocsPage,
+            description: {
+                component:
+                    'Preferred pronouns — single-select dropdown on tutor profile (Label + Select). Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 const pronounOptions = [
@@ -86,6 +100,32 @@ export const Pronouns = ({ id = 'pronouns', value, onChange, defaultValue, ...pr
             />
         </div>
     );
+};
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        pronoun: '',
+    },
+    argTypes: {
+        pronoun: {
+            name: 'initial pronoun',
+            control: 'select',
+            options: ['', 'she-her', 'he-him', 'they-them'],
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ width: '163px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <Pronouns
+                id="pronouns-playground"
+                key={args.pronoun ?? ''}
+                defaultValue={args.pronoun || undefined}
+            />
+        </div>
+    ),
 };
 
 /**
@@ -245,3 +285,38 @@ export const AllStates = () => {
         </div>
     );
 };
+
+function PronounsSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Preferred pronouns — single-select dropdown on the tutor profile (Label + Select). Typography and
+                spacing follow tokens documented in the stories source header.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4913-8269"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell description={<>Default, open, and filled variants on one canvas.</>}>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={<>Choose the initial pronoun from controls; open the dropdown on the canvas.</>}
+                    />
+                </div>
+            </div>
+        </>
+    );
+}

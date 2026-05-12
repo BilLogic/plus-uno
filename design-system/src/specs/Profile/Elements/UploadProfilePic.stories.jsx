@@ -27,6 +27,12 @@
  * - Avatar: 120px × 120px
  */
 import React from 'react';
+import { Title, Canvas } from '@storybook/addon-docs/blocks';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import Button from '../../../components/Button';
 
 const placeholderAvatar = 'https://www.figma.com/api/mcp/asset/2639388b-a606-45a9-9eef-47aeb0ac2c74';
@@ -34,10 +40,18 @@ const filledAvatar = 'https://www.figma.com/api/mcp/asset/ba92c16a-334e-43a3-a4c
 
 export default {
     title: 'Specs/Profile/Elements/Upload Profile Pic',
+    excludeStories: ['UploadProfilePic', 'Unfilled', 'Filled'],
+    tags: ['!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            page: UploadProfilePicSpecDocsPage,
+            description: {
+                component:
+                    'Avatar upload control for tutor profile (unfilled / filled). Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['!autodocs'],
 };
 
 /**
@@ -182,3 +196,61 @@ export const AllStates = () => (
     </div>
 );
 AllStates.storyName = 'All States';
+
+/**
+ * Interactive — inline controls (see Profile specification doc).
+ */
+export const Interactive = {
+    args: {
+        state: 'unfilled',
+    },
+    argTypes: {
+        state: {
+            control: 'radio',
+            options: ['unfilled', 'filled'],
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div
+            style={{
+                padding: 'var(--size-element-pad-y-lg, 12px)',
+                display: 'flex',
+                justifyContent: 'center',
+            }}
+        >
+            <UploadProfilePic state={args.state} />
+        </div>
+    ),
+};
+
+function UploadProfilePicSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Avatar upload control for tutor profile (unfilled / filled states).
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4282-2368"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">States</h3>
+                    <DocsCanvasShell>
+                        <Canvas of={AllStates} story={{ inline: true }} sourceState="hidden" />
+                    </DocsCanvasShell>
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Interactive playground</h3>
+                    <DocsInteractivePlayground of={Interactive} />
+                </div>
+            </div>
+        </>
+    );
+}

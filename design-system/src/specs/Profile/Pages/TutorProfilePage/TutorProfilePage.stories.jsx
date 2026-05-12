@@ -6,6 +6,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { Title } from '@storybook/addon-docs/blocks';
+import { DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import TutorProfilePage from './TutorProfilePage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { PageLayout } from '../../../Universal/Pages';
@@ -36,29 +38,10 @@ export default {
     parameters: {
         layout: 'fullscreen',
         docs: {
+            page: TutorProfilePageSpecDocsPage,
             description: {
-                component: `Full page layout for Tutor Profile. Includes TopBar with breadcrumbs, Sidebar navigation, and profile content sections.
-
-## Figma Reference
-Node ID: 5615-214865
-
-## Features
-- TopBar with breadcrumbs (Home / Profile)
-- Sidebar navigation (tutor user type)
-- Page title "Tutor Profile" (h3)
-- Upload Profile Pic element
-- Basic Information section (with Save and Update button)
-- Status & Clearance section (readonly)
-- Background & Matching section (with Save and Update button)
-- Responsive breakpoints (md, lg, xl)
-
-## Reused Components
-- **PageLayout** (sidebar + topbar from Universal)
-- **UploadProfilePic** (from Profile/Elements)
-- **BasicInformationSection** (from Profile/Sections)
-- **StatusSection** (from Profile/Sections)
-- **BackgroundAndMatchingSection** (from Profile/Sections)
-`,
+                component:
+                    'Full tutor profile shell — layout, sections, and responsive breakpoints. Token notes are in the file header.',
             },
         },
     },
@@ -335,3 +318,47 @@ export const Interactive = {
         );
     },
 };
+
+function TutorProfilePageSpecDocsPage() {
+    return (
+        <>
+            <Title />
+
+            <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-md)' }}>
+                Full tutor profile shell — page layout, sidebar, sections, and responsive breakpoints.
+            </p>
+
+            <ResourcesBlock
+                figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214865"
+                githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Pages/TutorProfilePage"
+            />
+
+            <div className="sb-ds-component-docs not-prose">
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Responsive shell</h3>
+                    <DocsInteractivePlayground
+                        of={Overview}
+                        description={
+                            <>
+                                Adjust <code>breakpoint</code>, <code>changed</code>, and <code>profileState</code> from
+                                controls.
+                            </>
+                        }
+                    />
+                </div>
+
+                <div className="sb-ds-doc-section">
+                    <h3 className="h5">Fully interactive page</h3>
+                    <DocsInteractivePlayground
+                        of={Interactive}
+                        description={
+                            <>
+                                All inputs, dropdowns, and buttons are wired; Save enables when sections become dirty.
+                            </>
+                        }
+                    />
+                </div>
+            </div>
+        </>
+    );
+}
