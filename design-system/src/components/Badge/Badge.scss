@@ -1,3 +1,4 @@
+```scss
 @use "sass:map";
 
 /* 
@@ -29,7 +30,8 @@
     text-align: center;
     white-space: nowrap;
 
-
+    // Reset any default borders
+    border: none;
 
     // --- SIZES ---
     // Override padding based on size class
@@ -55,7 +57,6 @@
         // Font weight now handled via typography class in JSX (font-weight-semibold)
     }
 
-
     // --- COLOR THEMES ---
     // Mixin to generate color styles
     // Using state-08 backgrounds for subtle tints (matching legacy-ds/Figma spec)
@@ -71,23 +72,61 @@
 
             // Integrated Dismissible Style
             &.plus-badge--dismissible {
-                border-color: var($main-color-token);
+                // Figma shows dismissible badges have border + background fill
+                border: var(--size-element-border) solid var($main-color-token);
+                
+                // Default state with background fill
+                background-color: var($bg-token);
 
                 &:hover {
-                    // Use state-12 for hover
-                    background-color: var(#{$bg-token + '-state-12'}, color-mix(in srgb, var($bg-token), black 10%));
+                    // Use state-12 for hover (slightly more opaque)
+                    background-color: var(#{$bg-token}-state-12, color-mix(in srgb, var($bg-token), var($main-color-token) 4%));
+                }
+
+                &:focus {
+                    // Focus state with slightly more opacity
+                    background-color: var(#{$bg-token}-state-12, color-mix(in srgb, var($bg-token), var($main-color-token) 4%));
+                    outline: 2px solid var($main-color-token);
+                    outline-offset: 2px;
+                }
+
+                &:active {
+                    // Pressed state with even more opacity
+                    background-color: var(#{$bg-token}-state-16, color-mix(in srgb, var($bg-token), var($main-color-token) 8%));
+                }
+
+                &.plus-badge--disabled {
+                    border-color: var(--color-on-surface);
+                    background-color: transparent;
+                    color: var(--color-on-surface);
+                    opacity: var(--color-disabled-opacity);
+                    pointer-events: none;
+                    cursor: not-allowed;
                 }
             }
         }
     }
 
-    // Using state-08 backgrounds for subtle tints (matches Figma and legacy-ds)
+    // Apply badge themes with proper token mapping
+    // Primary - Figma border: rgba(0, 101, 142, 1) matches --color-primary
     @include badge-theme('primary', --color-primary-state-08, --color-primary-text, --color-primary);
+    
+    // Secondary - Figma border: rgba(68, 92, 106, 1) matches --color-secondary
     @include badge-theme('secondary', --color-secondary-state-08, --color-secondary-text, --color-secondary);
+    
+    // Tertiary
     @include badge-theme('tertiary', --color-tertiary-state-08, --color-tertiary-text, --color-tertiary);
+    
+    // Success - Figma border: rgba(62, 105, 26, 1) matches --color-success
     @include badge-theme('success', --color-success-state-08, --color-success-text, --color-success);
+    
+    // Warning - Figma border: rgba(159, 130, 5, 1) close to --color-warning
     @include badge-theme('warning', --color-warning-state-08, --color-warning-text, --color-warning);
+    
+    // Danger - Figma border: rgba(186, 26, 26, 1) close to --color-danger
     @include badge-theme('danger', --color-danger-state-08, --color-danger-text, --color-danger);
+    
+    // Info
     @include badge-theme('info', --color-info-state-08, --color-info-text, --color-info);
 
     // Extended Palette (SMART framework colors)
@@ -97,24 +136,35 @@
     @include badge-theme('relationship', --color-relationship-state-08, --color-relationship-text, --color-relationship);
     @include badge-theme('technology-tools', --color-technology-tools-state-08, --color-technology-tools-text, --color-technology-tools);
 
-
     // --- DISMISSIBLE VARIANT ---
     &--dismissible {
         cursor: pointer;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
 
-        // Border: 1px Solid [ThemeColor]
-        // Defined in badge-theme mixin
-        border-style: solid;
-        border-width: var(--size-element-border);
-
-        // Hover logic handled in mixin for background
-
+        // Focus styles for keyboard navigation
+        &:focus {
+            outline: none; // Handled in theme mixin
+        }
 
         // Action icon (xmark) specific styling
         .plus-badge-visual--trailing {
             margin-left: var(--size-element-gap-sm);
             cursor: pointer;
             font-size: 0.8em; // Slightly smaller X
+        }
+    }
+
+    // --- DISABLED STATE ---
+    &--disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        
+        // Override all theme colors when disabled
+        &.plus-badge--dismissible {
+            border-color: var(--color-on-surface) !important;
+            background-color: transparent !important;
+            color: var(--color-on-surface) !important;
+            opacity: var(--color-disabled-opacity);
         }
     }
 
@@ -208,3 +258,4 @@
         line-height: 1;
     }
 }
+```

@@ -1,3 +1,4 @@
+```jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import RBBadge from 'react-bootstrap/Badge';
@@ -12,13 +13,14 @@ export const Badge = ({
     trailingVisual,
     counter,
     dismissible = false,
+    disabled = false,
     onDismiss,
     className = '',
     id
 }) => {
     // Support both text prop and children (children takes precedence)
     const displayText = children || text;
-    // ... (logic for visuals/dismiss button same) ...
+    
     // Determine visuals
     let definedTrailingVisual = trailingVisual;
 
@@ -34,6 +36,7 @@ export const Badge = ({
                     if (onDismiss) onDismiss();
                 }}
                 aria-label="Dismiss"
+                disabled={disabled}
             >
                 <i className="fa-solid fa-xmark"></i>
             </button>
@@ -63,10 +66,12 @@ export const Badge = ({
                 ${typographyClass}
                 plus-badge--${style} 
                 ${dismissible ? 'plus-badge--dismissible' : ''} 
+                ${disabled ? 'plus-badge--disabled' : ''}
                 ${className}
             `}
             role={dismissible ? 'button' : undefined}
-            tabIndex={dismissible ? 0 : undefined}
+            tabIndex={dismissible && !disabled ? 0 : undefined}
+            aria-disabled={disabled}
         >
             {/* Leading Visual */}
             {leadingVisual && (
@@ -109,9 +114,11 @@ Badge.propTypes = {
     trailingVisual: PropTypes.node,
     counter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     dismissible: PropTypes.boolean,
+    disabled: PropTypes.boolean,
     onDismiss: PropTypes.func,
     className: PropTypes.string,
     id: PropTypes.string,
 };
 
 export default Badge;
+```

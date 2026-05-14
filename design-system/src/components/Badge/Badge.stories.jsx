@@ -1,3 +1,4 @@
+```jsx
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Badge from './Badge';
@@ -71,6 +72,11 @@ export default {
         dismissible: {
             control: 'boolean',
             description: 'Enable dismissible mode (automates trailing xmark)',
+            table: { category: 'Behavior' }
+        },
+        disabled: {
+            control: 'boolean',
+            description: 'Disable the badge (for dismissible badges)',
             table: { category: 'Behavior' }
         },
 
@@ -190,6 +196,17 @@ function BadgeContentDemos() {
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Filter: Active" style="primary" dismissible />
                             <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
+                            <Badge text="Disabled" style="secondary" dismissible disabled />
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Interactive states</span>
+                    <div style={contentVariantCard}>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Badge text="Default" style="success" dismissible />
+                            <Badge text="Danger" style="danger" dismissible />
+                            <Badge text="Warning" style="warning" dismissible />
                         </div>
                     </div>
                 </div>
@@ -250,6 +267,7 @@ Interactive.args = {
     style: 'primary',
     size: 'b2',
     dismissible: false,
+    disabled: false,
 
     // Custom Control Defaults
     showLeadingVisual: false,
@@ -259,3 +277,4 @@ Interactive.args = {
     showCounter: false,
     counterValue: '5',
 };
+```
