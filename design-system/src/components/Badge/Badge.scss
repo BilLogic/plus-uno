@@ -71,11 +71,32 @@
 
             // Integrated Dismissible Style
             &.plus-badge--dismissible {
-                border-color: var($main-color-token);
+                // Remove background for dismissible badges (transparent)
+                background-color: transparent;
+                border: var(--size-element-border) solid var($main-color-token);
 
                 &:hover {
-                    // Use state-12 for hover
-                    background-color: var(#{$bg-token + '-state-12'}, color-mix(in srgb, var($bg-token), black 10%));
+                    // Use state-08 for hover background
+                    background-color: var($bg-token);
+                }
+
+                &:focus {
+                    // Use state-12 for focus background
+                    background-color: var(#{$bg-token + '-state-12'}, color-mix(in srgb, var($bg-token), black 4%));
+                }
+
+                // Disabled state
+                &[disabled],
+                &.disabled {
+                    background-color: transparent;
+                    border-color: var(--color-on-surface);
+                    color: var(--color-on-surface);
+                    opacity: var(--color-disabled-opacity);
+                    cursor: not-allowed;
+
+                    .plus-badge-visual {
+                        color: inherit;
+                    }
                 }
             }
         }
@@ -102,13 +123,9 @@
     &--dismissible {
         cursor: pointer;
 
-        // Border: 1px Solid [ThemeColor]
-        // Defined in badge-theme mixin
+        // Border and background are handled in badge-theme mixin
         border-style: solid;
         border-width: var(--size-element-border);
-
-        // Hover logic handled in mixin for background
-
 
         // Action icon (xmark) specific styling
         .plus-badge-visual--trailing {
