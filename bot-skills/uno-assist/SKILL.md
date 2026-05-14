@@ -107,18 +107,18 @@ Picked dynamically by question type per Step 1. Typical loads are 1-3 of:
 
 ## Output Format
 
-Threaded Slack reply. Conversational, not template-heavy:
+Threaded Slack reply, in **Slack mrkdwn** (see `AGENTS.md` → "Slack output formatting" — bold is `*single asterisk*`, no `#` headings). Conversational, not template-heavy:
 
 ```
 {Direct answer — 2-5 sentences. State the answer clearly upfront, then
 expand with detail. Use concrete names: token strings, component
 names, file paths.}
 
-Sources
+*Sources*
   • {file/path/used.md}
   • {file/path/2.md}
 
-Related (optional)
+*Related* (optional)
   • {pointer to a related concept, another skill, or a useful follow-up read}
 ```
 

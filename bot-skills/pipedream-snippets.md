@@ -275,23 +275,26 @@ Return ONLY the JSON object. No markdown fence, no preamble.`;
 
 **Wiring notes:**
 - Model: `claude-haiku-4-5-20251001` — verify this is the current Haiku ID at runtime; bump as needed.
-- Latency budget: ~0.7s for the Haiku call + ~10ms for the Switch. Stays under 1s total routing overhead.
+- Latency budget: ~0.7s for the Haiku call. Stays under 1s total routing overhead.
 - Cost per call: ~$0.0001 after cache warm-up (system prompt is ~500 tokens, output ~50 tokens, cached at 0.1×).
 
 ---
 
-## Step 4: Switch Operator
+## Step 4: Branching — Sequential Workers (no Switch operator)
 
-**Not code** — configure in Pipedream UI:
+> **Plan note (updated 2026-05):** Pipedream's **Switch** and **If/Else** operators are gated behind the paid plan. On the free tier, branching is done in plain code instead — every plan includes unlimited code steps. This is the approach below.
 
-- **Operator:** Switch
-- **Input:** `{{ steps.router.$return_value.skill }}`
-- **Cases:**
-  - `uno-implement` → Step 5a
-  - `uno-critique` → Step 5b
-  - `uno-assist` → Step 5c (default)
+There is **no dedicated branching step.** Instead, the three worker steps (5a, 5b, 5c) run **sequentially** after the router, and each one **self-guards**: it reads `steps.router.$return_value.skill` at the top and returns immediately (no-op, sub-millisecond, no API calls) if it's not that worker's skill. Exactly one worker does real work per message.
 
-The Switch operator is in beta as of 2026-05. If unstable, replace with an If/Else chain.
+Workflow chain:
+
+```
+trigger → filter → router → uno_implement → uno_critique → uno_assist → metrics
+```
+
+**Critical:** the guard clause must use `return { skipped: true }` — a plain step return that lets the workflow continue to the next step. It must NOT use `$.flow.exit()`, which terminates the *entire* workflow and would stop the other workers (and metrics) from running. The snippets below use the correct `return` form.
+
+Cost: two no-op guard returns per message are sub-millisecond and free. Only the matching worker does billable work — identical to what a Switch would have cost.
 
 ---
 
@@ -303,8 +306,9 @@ The Switch operator is in beta as of 2026-05. If unstable, replace with an If/El
 export default defineComponent({
   async run({ steps, $ }) {
     const routed = steps.router.$return_value;
+    // Self-guard: no-op return (NOT $.flow.exit) so the workflow continues to the other workers
     if (!routed || routed.skill !== 'uno-implement') {
-      return $.flow.exit('Wrong skill for this branch');
+      return { skipped: true, reason: `skill is ${routed?.skill || 'unknown'}` };
     }
 
     // Post a Slack ack immediately so the user sees the bot is working.
@@ -377,7 +381,8 @@ export default defineComponent({
 export default defineComponent({
   async run({ steps, $ }) {
     const routed = steps.router.$return_value;
-    if (!routed || routed.skill !== 'uno-critique') return $.flow.exit('Wrong skill');
+    // Self-guard: no-op return (NOT $.flow.exit) so the workflow continues to the other workers
+    if (!routed || routed.skill !== 'uno-critique') return { skipped: true, reason: `skill is ${routed?.skill || 'unknown'}` };
 
     const baseUrl = process.env.BOT_SKILLS_BASE_URL || 'https://raw.githubusercontent.com/BilLogic/plus-uno/main/bot-skills';
 
@@ -519,7 +524,8 @@ export default defineComponent({
 export default defineComponent({
   async run({ steps, $ }) {
     const routed = steps.router.$return_value;
-    if (!routed || routed.skill !== 'uno-assist') return $.flow.exit('Wrong skill');
+    // Self-guard: no-op return (NOT $.flow.exit) so the workflow continues to the metrics step
+    if (!routed || routed.skill !== 'uno-assist') return { skipped: true, reason: `skill is ${routed?.skill || 'unknown'}` };
 
     const baseUrl = process.env.BOT_SKILLS_BASE_URL || 'https://raw.githubusercontent.com/BilLogic/plus-uno/main/bot-skills';
     const docsBase = baseUrl.replace('/bot-skills', '');
@@ -648,14 +654,17 @@ export default defineComponent({
 export default defineComponent({
   async run({ steps, $ }) {
     const routed = steps.router.$return_value;
-    const startTs = steps.trigger.event?.event_time || Date.now();
-    const latencyMs = Date.now() - startTs;
 
-    // Determine which worker ran and pull its return value for token info
+    // Latency: message ts (Unix seconds, e.g. "1234567890.123456") -> ms
+    const startMs = routed?.ts ? parseFloat(routed.ts) * 1000 : Date.now();
+    const latencyMs = Math.round(Date.now() - startMs);
+
+    // Determine which worker actually ran (the other two returned { skipped: true }).
+    // Find the first worker output that is NOT a skip-guard return.
     const workerOutput =
-      steps.uno_implement?.$return_value ||
-      steps.uno_critique?.$return_value ||
-      steps.uno_assist?.$return_value || {};
+      [steps.uno_implement, steps.uno_critique, steps.uno_assist]
+        .map((s) => s?.$return_value)
+        .find((v) => v && !v.skipped) || {};
 
     const row = {
       timestamp: new Date().toISOString(),
@@ -670,13 +679,16 @@ export default defineComponent({
       error_category: workerOutput.error_category || null,
     };
 
-    // POST to Google Sheets via Apps Script webhook (set up the sheet + script once)
+    // POST to Google Sheets via Apps Script webhook (set up the sheet + script once).
+    // No-ops cleanly when METRICS_WEBHOOK_URL is unset.
     if (process.env.METRICS_WEBHOOK_URL) {
       await fetch(process.env.METRICS_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(row),
       });
+    } else {
+      console.log('METRICS_WEBHOOK_URL not set — row not logged:', JSON.stringify(row));
     }
 
     return row;
@@ -738,14 +750,14 @@ async function removeReaction(channel, ts, name) {
 
 When wiring these in Pipedream, verify:
 
-- [ ] Slack source connected, listening on `#figma-sync` + any other approved channels
-- [ ] Step 2 (filter) drops bot messages and channel-join events
-- [ ] Step 3 (router) returns JSON with confidence floor handling
-- [ ] Step 4 (switch) has 3 cases + default → uno-assist
-- [ ] Step 5a posts ack + dispatches to GitHub Actions
-- [ ] Step 5b fetches SKILL.md + always-load references + (stubbed) artifact context, calls Sonnet, posts threaded reply
-- [ ] Step 5c does two-pass classify→fetch→answer with knowledge map
-- [ ] Step 6 (metrics) runs after every branch, writes to the Google Sheet
+- [ ] Slack source connected, listening on the sandbox channel (`#figma-sync` after cutover)
+- [ ] Step 2 (filter) drops bot messages and channel-join events, named exactly `filter`
+- [ ] Step 3 (router) returns JSON with confidence floor handling, named exactly `router`
+- [ ] No Switch/If-Else operator — workers run sequentially, each self-guards with `return { skipped: true }`
+- [ ] Step 5a (`uno_implement`) posts ack + dispatches to GitHub Actions; self-guards on skill
+- [ ] Step 5b (`uno_critique`) fetches SKILL.md + always-load references + (stubbed) artifact context, calls Sonnet, posts threaded reply; self-guards on skill
+- [ ] Step 5c (`uno_assist`) does two-pass classify→fetch→answer with knowledge map; self-guards on skill
+- [ ] Step 6 (metrics) runs last, finds the non-skipped worker output, writes to the Google Sheet
 - [ ] Step 7 (reactions) wraps each worker with ⚙️ → ✅/ℹ️/❌
 - [ ] Env vars set: `ANTHROPIC_API_KEY`, `SLACK_BOT_TOKEN`, `SLACK_BOT_USER_ID`, `GITHUB_PAT`, `GITHUB_OWNER`, `GITHUB_REPO`, `BOT_SKILLS_BASE_URL`, `BOT_LISTENING_CHANNELS`, `METRICS_WEBHOOK_URL` (optional)
 - [ ] Workflow concurrency capped at 5 (Pipedream UI → Settings → Concurrency) to prevent thundering herd

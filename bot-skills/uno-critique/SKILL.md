@@ -125,31 +125,30 @@ Threaded reply on the originating Slack message. If output exceeds ~1500 chars, 
 
 ## Output Format
 
-Threaded Slack reply. Severity sections with zero findings are omitted entirely.
+Threaded Slack reply, in **Slack mrkdwn** (see `AGENTS.md` → "Slack output formatting" — bold is `*single asterisk*`, no `#` headings). Severity sections with zero findings are omitted entirely.
 
 ```
-🔍 Critique: {artifact title or link}
+🔍 *Critique: {artifact title or link}*
 
-Overall: {1-2 sentences naming the single strongest signal}
+*Overall:* {1-2 sentences naming the single strongest signal}
 
-🔴 P0 — Must fix ({n})
+*🔴 P0 — Must fix ({n})*
   • [{Category}] {Finding}
     — Evidence: {what's in the artifact}
     — Reference: {Plus doc path or component path}
 
-🟡 P1 — Should fix ({n})
+*🟡 P1 — Should fix ({n})*
   • [{Category}] {Finding}
     — Evidence: {what's in the artifact}
     — Reference: {Plus doc path}
 
-🟢 P2 — Nice to have ({n})
+*🟢 P2 — Nice to have ({n})*
   • [{Category}] {Finding}
 
-✓ What's working ({n})
+*✓ What's working ({n})*
   • {Specific strength + which doc/principle it matches}
 
-— Reply in this thread to drill into any finding, or run `implement <component>`
-  if you want me to apply the fixable items.
+— Reply in this thread to drill into any finding, or run `implement <component>` if you want me to apply the fixable items.
 ```
 
 ## Critique Discipline (skill-specific)
