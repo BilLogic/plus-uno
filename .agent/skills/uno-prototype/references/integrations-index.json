@@ -19,6 +19,7 @@
   ],
   "design_workflow_docs": [
     ".agent/skills/uno-prototype/references/figma-workflow.md",
+    ".agent/skills/uno-prototype/references/figma-round-trip-workflow.md",
     "docs/context/conventions/integrations.md"
   ],
   "storybook": {

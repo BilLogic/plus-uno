@@ -2,6 +2,14 @@
 
 # Figma MCP Reference Guide
 
+## Official Figma MCP skills (Cursor / plugin)
+
+Figma ships **named skills** with the Figma MCP plugin (e.g. `figma-implement-design`, `figma-use`, `figma-generate-design`, `figma-create-new-file`). They teach the assistant how to call MCP reliably for those workflows. See [Figma skills for MCP](https://help.figma.com/hc/en-us/articles/39166810751895-Figma-skills-for-MCP).
+
+**How this file fits:** The **implement-design (7 steps)** below is the **PLUS repo** checklist (tokens, Cheat Sheet, validation). Use it together with **`figma-implement-design`** when the client offers that skill—same direction (design → code), one vendor skill + one project contract.
+
+**Optional Figma ↔ Cursor loop** (implement in Cursor → user-approved write-back to Figma → tweak in Figma → re-import): under **uno-prototype**, the assistant asks at the **end of each** create/update delivery; if the user agrees and **provides a Figma link**, load `references/figma-round-trip-workflow.md`. That doc maps **write-back** to official skills (`figma-use` before canvas writes, `figma-generate-design` for page push, etc.).
+
 ## Available Tools
 
 | Tool | Purpose | Rate-Limited? |
