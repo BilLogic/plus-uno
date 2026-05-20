@@ -1,3 +1,33 @@
+<!-- ====================================================================
+     ⚠️  DEFERRED (2026-05-12) — NOT WIRED INTO V2 AGENT
+     ====================================================================
+     Status: parking-lot doc. This skill was drafted for v1 (the rigid
+     router → switch → workers architecture) but was deferred during the
+     v2 architectural pivot. v2's agentic Claude does NOT load this skill
+     or expose it as a tool.
+
+     Why deferred:
+     - Q&A (uno-qa) handles informal evaluation conversationally
+       ("what's off about this design?") — covers ~80% of critique value
+       without the structured severity-tier ceremony.
+     - The severity-tiered output format adds maintenance surface for
+       arguable gain over inline Q&A-style feedback.
+     - No designer has explicitly requested structured artifact evaluation
+       in the conversations leading to the v2 pivot.
+
+     When to revive:
+     - If designers explicitly ask for structured/severity-graded review
+       outputs (e.g. for design-review threads with multiple findings).
+     - If a "pre-flight before PR" structured pass becomes a real need.
+
+     Reviving requires: adding this skill as a tool the agent can call
+     (alongside implement and marketplace), updating AGENTS.md tool
+     definitions, and ensuring the output format renders well in Slack
+     mrkdwn.
+
+     The content below is preserved as-is from the v1 draft for reference.
+     ==================================================================== -->
+
 ---
 name: uno-critique
 description: >
