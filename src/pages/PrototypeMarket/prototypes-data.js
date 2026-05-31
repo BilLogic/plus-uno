@@ -408,4 +408,20 @@ export const prototypes = [
     localPath: '/1027',
     repoPath: 'playground/toolkit-ia-revision/',
   },
+  {
+    id: '1028',
+    title: 'Toolkit IA — Time-based session hub',
+    description:
+      'Context-first toolkit prototype: PLUS supervisor shell, main Sessions hub with Today / Upcoming / History tabs, session cards with tab-specific actions, persistent context panel, and session workspace (mock data).',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'mid',
+    lastUpdated: '2026-05-31',
+    creators: ['PLUS'],
+    contributors: ['PLUS'],
+    productPillar: 'toolkit',
+    localPath: '/1028',
+    repoPath: 'playground/toolkit-ia-v2/',
+  },
 ];

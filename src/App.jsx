@@ -17,6 +17,7 @@ const StarterApp = React.lazy(() => import('../playground/starter/src/App'));
 const StudentGoalDashboardApp = React.lazy(() => import('../playground/student-goal-dashboard-flow/src/App'));
 const StudentOnboardingWizardApp = React.lazy(() => import('../playground/student-onboarding-wizard/src/App'));
 const ToolkitIaRevisionApp = React.lazy(() => import('../playground/toolkit-ia-revision/src/App'));
+const ToolkitIaV2App = React.lazy(() => import('../playground/toolkit-ia-v2/src/App'));
 
 // --- Lazy-loaded Group 2 prototypes (page components, no App shell) ---
 const SessionsPage = React.lazy(() => import('../playground/session-management/SessionsPage'));
@@ -97,6 +98,7 @@ function PrototypeRouter() {
     '1025': StudentOnboardingWizardApp,
     '1026': TrainingOnboardingClickthrough,
     '1027': ToolkitIaRevisionApp,
+    '1028': ToolkitIaV2App,
   };
 
   const LazyComponent = STANDALONE_ROUTES[prototypeId];

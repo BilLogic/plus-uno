@@ -1,0 +1,281 @@
+/* Toolkit IA v2 — time-based session hub + context panel (tokens only) */
+
+.ti2-shell {
+    display: flex;
+    min-height: 100vh;
+    max-height: 100vh;
+    background-color: var(--color-surface-container-low);
+    color: var(--color-on-surface);
+}
+
+.ti2-nav-column {
+    flex-shrink: 0;
+    align-self: stretch;
+    max-height: 100vh;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface-container);
+}
+
+.ti2-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ti2-main__inner {
+    flex: 1;
+    overflow: auto;
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+}
+
+.ti2-context-panel {
+    flex-shrink: 0;
+    width: min(320px, 32vw);
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    border-left: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface-container);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md);
+}
+
+.ti2-context-panel--empty {
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-context-panel__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+}
+
+.ti2-context-panel__section--actions {
+    margin-top: auto;
+    padding-top: var(--size-section-gap-sm);
+    border-top: 1px solid var(--color-outline-variant);
+}
+
+.ti2-context-panel__label {
+    margin: 0;
+    color: var(--color-on-surface-variant);
+    font-weight: var(--font-weight-title);
+}
+
+.ti2-context-panel__badge {
+    align-self: flex-start;
+}
+
+.ti2-context-panel__flags li {
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-context-panel__flags i {
+    margin-right: var(--size-element-gap-xs);
+    color: var(--color-warning);
+}
+
+.ti2-context-panel__notes {
+    margin: var(--size-element-gap-xs) 0 0;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--color-surface-container-low);
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-context-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+}
+
+.ti2-hub__header {
+    margin-bottom: var(--size-section-gap-md);
+}
+
+.ti2-hub__tabs {
+    margin-bottom: var(--size-section-gap-md);
+}
+
+.ti2-hub__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-sm);
+}
+
+.ti2-session-card {
+    border-radius: var(--size-card-radius-md);
+    outline: none;
+}
+
+.ti2-session-card--selected .plus-card {
+    box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.ti2-session-card--reflection-incomplete .plus-card {
+    border-left: 3px solid var(--color-warning);
+}
+
+.ti2-session-card__incomplete-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    padding: var(--size-element-pad-y-xs) var(--size-element-pad-x-sm);
+    margin-bottom: var(--size-element-gap-xs);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--color-warning-container);
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-title);
+}
+
+.ti2-session-card__incomplete-banner i {
+    color: var(--color-warning);
+}
+
+.ti2-session-card__reflection-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+}
+
+.ti2-session-card__reflection-callout {
+    color: var(--color-on-surface-variant);
+    font-style: italic;
+}
+
+.ti2-session-card__roster-note {
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-session-card__roster-note i {
+    margin-right: var(--size-element-gap-xs);
+}
+
+.ti2-reflection-badge--emphasize.plus-badge {
+    font-weight: var(--font-weight-title);
+}
+
+.ti2-hub__reflection-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    margin-bottom: var(--size-section-gap-md);
+    border-radius: var(--size-card-radius-sm);
+    background-color: var(--color-surface-container);
+    border: 1px solid var(--color-outline-variant);
+    color: var(--color-on-surface);
+}
+
+.ti2-hub__reflection-alert i {
+    color: var(--color-warning);
+    margin-top: 2px;
+}
+
+.ti2-context-panel__reflection-note {
+    margin: var(--size-element-gap-xs) 0 0;
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-context-panel__roster li {
+    margin-top: var(--size-element-gap-xs);
+}
+
+.ti2-session-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+}
+
+.ti2-session-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+}
+
+.ti2-session-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-md);
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-session-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    margin: 0;
+}
+
+.ti2-session-card__preview {
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-session-card__history-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-session-card__history-meta i {
+    margin-right: var(--size-element-gap-xs);
+}
+
+.ti2-session-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-xs);
+    margin-top: var(--size-element-gap-xs);
+    padding-top: var(--size-element-gap-sm);
+    border-top: 1px solid var(--color-outline-variant);
+}
+
+.ti2-workspace-view__toolbar {
+    margin-bottom: var(--size-section-gap-sm);
+}
+
+.ti2-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    gap: var(--size-section-gap-sm);
+    color: var(--color-on-surface-variant);
+    text-align: center;
+}
+
+.ti2-session-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-md);
+    margin-bottom: var(--size-section-gap-md);
+}
+
+.ti2-list-plain {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-list-plain li + li {
+    margin-top: var(--size-element-gap-xs);
+}
+
+.ti2-reflection-placeholder {
+    padding: var(--size-section-pad-y-md);
+    border-radius: var(--size-card-radius-md);
+    border: 1px dashed var(--color-outline-variant);
+    background-color: var(--color-surface-container-low);
+    color: var(--color-on-surface-variant);
+}
