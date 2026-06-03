@@ -1,0 +1,210 @@
+name: Implement Design (Prototype)
+
+on:
+  repository_dispatch:
+    types: [implement-design-from-figma]
+    # Triggered from Slack via uno-bot (implement_design tool). client_payload:
+    # { figma_url, file_key, node_id, slug?, notion_prd_id?, notion_prd_url,
+    #   notes?, thread_ts, channel, message_ts }
+  workflow_dispatch:
+    inputs:
+      figma_url:
+        description: 'Full Figma URL (must contain a node-id)'
+        required: true
+        type: string
+      slug:
+        description: 'Prototype folder slug (optional; derived from node name if blank)'
+        required: false
+        type: string
+      notion_prd_id:
+        description: 'Notion PRD page id (optional)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  implement-design:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse inputs
+        id: payload
+        # Pass payload fields via env (not interpolated into the shell) so a
+        # crafted value can't inject shell commands.
+        env:
+          EV_CHANNEL: ${{ github.event.client_payload.channel }}
+          EV_MESSAGE_TS: ${{ github.event.client_payload.message_ts }}
+          EV_THREAD_TS: ${{ github.event.client_payload.thread_ts }}
+          EV_FIGMA_URL: ${{ github.event.client_payload.figma_url || github.event.inputs.figma_url }}
+          EV_NOTION_PRD_URL: ${{ github.event.client_payload.notion_prd_url }}
+        run: |
+          {
+            echo "channel=$EV_CHANNEL"
+            echo "message_ts=$EV_MESSAGE_TS"
+            echo "thread_ts=$EV_THREAD_TS"
+            echo "figma_url=$EV_FIGMA_URL"
+            echo "notion_prd_url=$EV_NOTION_PRD_URL"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: React to Slack message (working)
+        if: steps.payload.outputs.channel && steps.payload.outputs.message_ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CHANNEL: ${{ steps.payload.outputs.channel }}
+          MESSAGE_TS: ${{ steps.payload.outputs.message_ts }}
+        run: |
+          curl -s -X POST "https://slack.com/api/reactions.add" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"$CHANNEL\", \"name\": \"gear\", \"timestamp\": \"$MESSAGE_TS\"}" || true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Scaffold prototype with Claude
+        id: implement
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          FIGMA_URL: ${{ github.event.client_payload.figma_url || github.event.inputs.figma_url }}
+          FIGMA_FILE_KEY: ${{ github.event.client_payload.file_key }}
+          FIGMA_NODE_ID: ${{ github.event.client_payload.node_id }}
+          SLUG: ${{ github.event.client_payload.slug || github.event.inputs.slug }}
+          NOTION_PRD_ID: ${{ github.event.client_payload.notion_prd_id || github.event.inputs.notion_prd_id }}
+          NOTION_PRD_URL: ${{ github.event.client_payload.notion_prd_url }}
+          NOTES: ${{ github.event.client_payload.notes }}
+        run: node scripts/implement-design-from-figma.js
+
+      - name: Commit and push changes
+        id: commit
+        env:
+          SLUG: ${{ steps.implement.outputs.slug }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Claude)"
+          DATE=$(date +%Y-%m-%d)
+          TIMESTAMP=$(date +%H%M%S)
+          BRANCH="ds-review/${SLUG}-${DATE}-${TIMESTAMP}"
+          git checkout -b "$BRANCH"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changes=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "feat: scaffold prototype — ${SLUG}"
+            git push -u origin "$BRANCH"
+            echo "changes=true" >> "$GITHUB_OUTPUT"
+            echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create draft PR
+        if: steps.commit.outputs.changes == 'true'
+        id: create-pr
+        uses: actions/github-script@v7
+        env:
+          SLUG: ${{ steps.implement.outputs.slug }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+          FIGMA_URL: ${{ steps.payload.outputs.figma_url }}
+          PRD_URL: ${{ steps.payload.outputs.notion_prd_url }}
+          FILES_WRITTEN: ${{ steps.implement.outputs.files_written }}
+        with:
+          script: |
+            const slug = process.env.SLUG;
+            const branch = process.env.BRANCH;
+            const figmaUrl = process.env.FIGMA_URL;
+            const prdUrl = process.env.PRD_URL;
+            const filesWritten = process.env.FILES_WRITTEN;
+
+            const body = [
+              `## New Prototype: ${slug}`,
+              '',
+              `Scaffolded by Claude into \`playground/${slug}/\` (${filesWritten} files).`,
+              `Run locally: \`npm run dev:${slug}\``,
+              '',
+              figmaUrl ? `**Figma:** ${figmaUrl}` : '',
+              prdUrl ? `**Notion PRD:** ${prdUrl}` : '',
+              '',
+              '---',
+              '## Prototype Review Checklist',
+              '',
+              '- [ ] Boots locally via the dev script',
+              '- [ ] Visual parity verified against the Figma frame',
+              '- [ ] Uses PLUS components + design tokens (no hardcoded values)',
+              '- [ ] No writes outside `playground/' + slug + '/` (besides the root dev script)',
+              '- [ ] FA Free icons only',
+            ].filter(Boolean).join('\n');
+
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `feat: prototype — ${slug}`,
+              head: branch,
+              base: 'main',
+              body,
+              draft: true,
+            });
+            console.log(`Draft PR created: #${pr.data.number}`);
+            core.setOutput('pr_url', pr.data.html_url);
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.data.number,
+              labels: ['prototype', 'playground', 'figma-sync'],
+            });
+
+      - name: React to Slack message (result)
+        if: always() && steps.payload.outputs.channel && steps.payload.outputs.message_ts
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CHANNEL: ${{ steps.payload.outputs.channel }}
+          MESSAGE_TS: ${{ steps.payload.outputs.message_ts }}
+          JOB_STATUS: ${{ job.status }}
+          HAS_CHANGES: ${{ steps.commit.outputs.changes }}
+        run: |
+          curl -s -X POST "https://slack.com/api/reactions.remove" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"$CHANNEL\", \"name\": \"gear\", \"timestamp\": \"$MESSAGE_TS\"}" || true
+
+          if [ "$JOB_STATUS" = "success" ] && [ "$HAS_CHANGES" = "true" ]; then
+            EMOJI="white_check_mark"
+          elif [ "$JOB_STATUS" = "success" ]; then
+            EMOJI="information_source"
+          else
+            EMOJI="x"
+          fi
+
+          curl -s -X POST "https://slack.com/api/reactions.add" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\": \"$CHANNEL\", \"name\": \"$EMOJI\", \"timestamp\": \"$MESSAGE_TS\"}" || true
+
+      - name: Notify Slack
+        if: always() && steps.payload.outputs.thread_ts
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_URL: ${{ steps.create-pr.outputs.pr_url }}
+          SLUG: ${{ steps.implement.outputs.slug }}
+          HAS_CHANGES: ${{ steps.commit.outputs.changes }}
+          THREAD_TS: ${{ steps.payload.outputs.thread_ts }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$HAS_CHANGES" = "true" ]; then
+            MSG=":white_check_mark: *Claude scaffolded the \`${SLUG}\` prototype*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nRun it locally with \`npm run dev:${SLUG}\` and check visual parity against Figma."
+          else
+            MSG=":x: *Couldn't scaffold the prototype*\n<${RUN_URL}|View action log> for details."
+          fi
+          curl -s -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "{\"text\": \"${MSG}\", \"thread_ts\": \"${THREAD_TS}\"}" || true
