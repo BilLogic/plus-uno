@@ -424,4 +424,20 @@ export const prototypes = [
     localPath: '/1028',
     repoPath: 'playground/toolkit-ia-v2/',
   },
+  {
+    id: '1029',
+    title: 'Toolkit IA — Persistent context panel',
+    description:
+      'Three-column tutor IA: PLUS sidebar, left session rail (Today / Upcoming / History), center workspace tabs (Overview / Students / Reflection), and always-visible right context panel for back-to-back group sessions (mock data).',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'mid',
+    lastUpdated: '2026-05-31',
+    creators: ['PLUS'],
+    contributors: ['PLUS'],
+    productPillar: 'toolkit',
+    localPath: '/1029',
+    repoPath: 'playground/toolkit-ia-v3/',
+  },
 ];

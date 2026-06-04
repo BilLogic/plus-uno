@@ -26,7 +26,7 @@ export default defineConfig({
         },
     },
     server: {
-        port: 3011,
+        port: 3012,
         open: true,
         fs: {
             allow: [path.resolve(root)],
