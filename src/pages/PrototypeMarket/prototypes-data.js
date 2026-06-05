@@ -408,4 +408,20 @@ export const prototypes = [
     localPath: '/1027',
     repoPath: 'playground/toolkit-ia-revision/',
   },
+  {
+    id: '1028',
+    title: 'Full Demo Walkthrough',
+    description:
+      'Full-screen, edge-to-edge recording build that stitches the key screens into one click-through flow: Home → Lessons → Sessions → Reflection → Training Progress → Research terminal. Press "\\" to toggle the admin sidebar section.',
+    deploymentUrl: '/demo/demo.html',
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'high',
+    lastUpdated: '2026-06-04',
+    creators: ['Bill'],
+    contributors: ['Bill'],
+    productPillar: 'universal',
+    localPath: null,
+    repoPath: 'playground/home-redesign/',
+  },
 ];
