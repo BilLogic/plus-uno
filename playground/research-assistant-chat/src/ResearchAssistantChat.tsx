@@ -107,9 +107,9 @@ export function ResearchAssistantChat({
           addMessage('user', { type: 'text', text: text });
           setInput('');
           setIsAutoTyping(false);
-        }, 500);
+        }, 200);
       }
-    }, 27); // Typing speed (150% faster)
+    }, 14); // per-char auto-typing speed (shared consistent pace)
   };
 
   // Derived state to check phase

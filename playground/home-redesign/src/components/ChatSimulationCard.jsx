@@ -67,9 +67,9 @@ const AutoTypeComposer = ({ onSend, disabled, isTyping, placeholder = "Type your
                 // Auto-send after typing completes
                 setTimeout(() => {
                     onSend(targetText);
-                }, 800);
+                }, 350);
             }
-        }, 33); // Typing speed (150% faster)
+        }, 14); // per-char auto-typing speed (shared consistent pace)
         return () => clearInterval(interval);
     }, [isTyping, onSend]);
 

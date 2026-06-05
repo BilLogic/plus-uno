@@ -18,6 +18,15 @@ import TutorsTrainingProgressTable from '@/specs/Admin/Tutor Admin/Tables/Tutors
 import ExportSearchFilterBar from '@/specs/Admin/Tutor Admin/Elements/ExportSearchFilterBar/ExportSearchFilterBar';
 import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
+// Stable reference: OverviewCard's intro-animation effect lists `smartData` in
+// its deps, so passing a new object literal on every render re-runs that effect
+// every render → infinite "Maximum update depth" loop. Hoist it to a constant.
+const TUTOR_NEED_SMART_DATA = { socio: 0.8, mastering: 0.6, advocacy: 0.2, relationships: 0.9, technology: 0.7 };
+// Cards without their own smartData otherwise fall back to OverviewCard's default
+// `{}` literal, which is recreated every render and (being in the intro effect's
+// deps) triggers the same infinite update loop. Pass one stable empty object.
+const EMPTY_SMART_DATA = {};
+
 const DEFAULT_TUTORS = [
   { id: 1, tutorName: 'Ben Green', email: 'dummy@gmail.com', completion: '8/18', accuracy: '30%', badgeClaimed: 'Yes', timeSpent: 328 },
   { id: 2, tutorName: 'Albert Flores', email: 'albert@gmail.com', completion: '18/18', accuracy: '95%', badgeClaimed: 'Yes', timeSpent: 520 },
@@ -30,6 +39,16 @@ const DEFAULT_TUTORS = [
   { id: 9, tutorName: 'Jane Cooper', email: 'jane@gmail.com', completion: '18/18', accuracy: '92%', badgeClaimed: 'Yes', timeSpent: 550 },
   { id: 10, tutorName: 'Jenny Wilson', email: 'jenny@gmail.com', completion: '6/18', accuracy: '50%', badgeClaimed: 'No', timeSpent: 180 },
 ];
+
+// Stable references for props passed to child components. Inline object/array/
+// function literals are recreated every render; when a child lists them in an
+// effect's deps, that effect re-runs every render → infinite update loop.
+const FILTER_BAR_FILTERS = [
+  { key: 'group', label: 'All Groups' },
+  { key: 'date', label: 'All Dates' },
+  { key: 'status', label: 'All Status' },
+];
+const noop = () => { };
 
 export function TrainingProgressContent(): React.ReactElement {
   const [currentViewMode, setCurrentViewMode] = useState('By Tutor');
@@ -56,7 +75,7 @@ export function TrainingProgressContent(): React.ReactElement {
               title="Tutor Need"
               subtitle="Advocacy"
               description="is where tutors had received least training."
-              smartData={{ socio: 0.8, mastering: 0.6, advocacy: 0.2, relationships: 0.9, technology: 0.7 }}
+              smartData={TUTOR_NEED_SMART_DATA}
               animateIntro
               introDelay={90}
             />
@@ -67,6 +86,7 @@ export function TrainingProgressContent(): React.ReactElement {
               chartColor="#f5d061"
               subtitle="20%"
               description="of total lessons have been completed"
+              smartData={EMPTY_SMART_DATA}
               animateIntro
               introDelay={230}
             />
@@ -77,6 +97,7 @@ export function TrainingProgressContent(): React.ReactElement {
               chartColor="#f5d061"
               subtitle="20%"
               description="of eligible tutors have finished"
+              smartData={EMPTY_SMART_DATA}
               animateIntro
               introDelay={370}
             />
@@ -87,6 +108,7 @@ export function TrainingProgressContent(): React.ReactElement {
               chartColor="#f5d061"
               subtitle="20%"
               description="of tutors had finished"
+              smartData={EMPTY_SMART_DATA}
               animateIntro
               introDelay={510}
             />
@@ -99,13 +121,13 @@ export function TrainingProgressContent(): React.ReactElement {
           <div className="tutor-training-progress-page__details-header">
             <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>Training Progress Details</h2>
           </div>
-          <ExportSearchFilterBar searchPlaceholder="Search" onSearch={() => { }} onExport={() => { }} filters={[{ key: 'group', label: 'All Groups' }, { key: 'date', label: 'All Dates' }, { key: 'status', label: 'All Status' }]} />
-          <TutorsTrainingProgressTable tutors={DEFAULT_TUTORS} onRowClick={() => { }} />
+          <ExportSearchFilterBar searchPlaceholder="Search" onSearch={noop} onExport={noop} filters={FILTER_BAR_FILTERS} />
+          <TutorsTrainingProgressTable tutors={DEFAULT_TUTORS} onRowClick={noop} />
           <div className="tutor-training-progress-page__pagination">
             <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
               Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
             </div>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={() => { }} type="icon" size="small" />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={noop} type="icon" size="small" />
           </div>
         </div>
       </div>
