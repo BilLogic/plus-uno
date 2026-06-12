@@ -1,28 +1,43 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ScrollspyStories from './Scrollspy.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ScrollspyStories} />
 
 <Title />
-<Description />
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Scrollspy"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Overview
 
-<DocsCanvasShell description={<>Navbar linked to scrollable sections; active item follows scroll position.</>}>
-    <Canvas of={ScrollspyStories.Layout} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Navbar linked to scrollable sections; active item follows scroll position.</>}>
+    <Canvas of={ScrollspyStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Layout & composition
+
+<DocsCanvasShell description={<>Full scrollable shell with nav + section content wiring.</>}>
+    <DsCanvasQuiet of={ScrollspyStories.Layout} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
 
 <DocsInteractivePlayground
     of={ScrollspyStories.Interactive}

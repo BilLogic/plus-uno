@@ -4,25 +4,27 @@ import ColumnRangeChart from './ColumnRangeChart';
 export default {
     title: 'Data Visualizations/Comparison/ColumnRangeChart',
     component: ColumnRangeChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Column Range Chart
+                component: `## Column Range Chart
 
+Shows **ranges between minimum and maximum values** for each category using bars.
+
+### Overview
 Shows **ranges between minimum and maximum values** for each category using bars.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Bar extent** = range from low to high value
 - **Bar position** = category on axis
 - Compare ranges visually across categories
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows **ranges between minimum and maximum values** for each category using bars
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Session Durations** | Min/max lesson times |
 | **Score Ranges** | Low/high by subject |
 | **Availability Windows** | Tutor schedules |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the column range chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -66,6 +83,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

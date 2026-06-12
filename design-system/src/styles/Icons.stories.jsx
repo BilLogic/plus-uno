@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Icons',
-    tags: ['autodocs'],
+    tags: ['!dev'],
 };
 
 const IconTokenTable = ({ rows }) => (
@@ -29,18 +29,17 @@ const IconTokenTable = ({ rows }) => (
 
 export const Overview = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h3" style={{ marginBottom: '16px' }}>Font Awesome Free Icon Library</h2>
         <p className="body2-txt" style={{ marginBottom: '24px' }}>
             PLUS Design System uses <strong>Font Awesome's free icon library</strong> for all icons.
         </p>
 
-        <h3 className="h4" style={{ marginBottom: '16px' }}>Icon Styles</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Icon Styles</h4>
         <ul className="body2-txt" style={{ paddingLeft: '24px', marginBottom: '24px' }}>
             <li><strong>Solid (fas)</strong>: Filled icons for emphasis or primary actions</li>
             <li><strong>Regular (far)</strong>: Outlined icons for secondary actions or lighter emphasis</li>
         </ul>
 
-        <h3 className="h4" style={{ marginBottom: '16px' }}>Usage Example</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Usage Example</h4>
         <pre style={{
             backgroundColor: 'var(--color-surface-container-low)',
             padding: '16px',
@@ -55,9 +54,8 @@ export const Overview = () => (
 
 export const IconSizeTokensSolid = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h3" style={{ marginBottom: '24px' }}>Font Awesome Solid Icon Tokens</h2>
 
-        <h3 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h4>
         <IconTokenTable
             rows={[
                 { token: '--font-size-fa-h1-solid', size: '36px (2.25rem)', lineHeight: '177.8%', description: 'H1 headline icon size' },
@@ -69,7 +67,7 @@ export const IconSizeTokensSolid = () => (
             ]}
         />
 
-        <h3 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Body Icons</h3>
+        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Body Icons</h4>
         <IconTokenTable
             rows={[
                 { token: '--font-size-fa-body1-solid', size: '14px (0.875rem)', lineHeight: '171.4%', description: 'Body 1 icon size' },
@@ -82,9 +80,8 @@ export const IconSizeTokensSolid = () => (
 
 export const IconSizeTokensRegular = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h3" style={{ marginBottom: '24px' }}>Font Awesome Regular Icon Tokens</h2>
 
-        <h3 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h3>
+        <h4 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h4>
         <IconTokenTable
             rows={[
                 { token: '--font-size-fa-h1-regular', size: '36px (2.25rem)', lineHeight: '177.8%', description: 'H1 headline icon size' },
@@ -96,7 +93,7 @@ export const IconSizeTokensRegular = () => (
             ]}
         />
 
-        <h3 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Body Icons</h3>
+        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Body Icons</h4>
         <IconTokenTable
             rows={[
                 { token: '--font-size-fa-body1-regular', size: '14px (0.875rem)', lineHeight: '171.4%', description: 'Body 1 icon size' },
@@ -133,7 +130,6 @@ export const CommonIcons = () => {
 
     return (
         <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 className="h3" style={{ marginBottom: '24px' }}>Common Icons</h2>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',

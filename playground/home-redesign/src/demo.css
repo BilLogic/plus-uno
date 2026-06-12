@@ -1,0 +1,109 @@
+/**
+ * Demo Recording build – full-screen, no fixed frame, no card container.
+ * Overrides index.css's fixed 1280×850 demo frame so the app fills the viewport.
+ * Reuses #home-redesign-page so all reveal/scrollbar styles in App.css still apply.
+ */
+:root {
+  --chat-bg: #f9fafb;
+  --chat-bg-deep: #f3f4f6;
+  --chat-surface: #e5e7eb;
+  --chat-on-surface: #111827;
+  --chat-on-surface-muted: #6b7280;
+  --chat-outline: #d1d5db;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface, #191c1e);
+  -webkit-font-smoothing: antialiased;
+  /* No centering / no gray matte: the app fills the whole window. */
+  background-color: var(--color-surface-container, #fff);
+  overflow: hidden;
+}
+
+/* Fill the screen: no fixed size, no card background, no shadow/radius. */
+#root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-surface-container);
+}
+
+/* Strip the PageLayout's card frame (border + radius are inline styles → need !important). */
+#home-redesign-page.plus-page-layout {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Filled-button label color fix.
+   The DS Button adds a typography class (e.g. .h6 for medium) to its label span.
+   The global `.h6 { color: var(--color-on-surface) }` rule ties in specificity
+   with `.plus-btn-text { color: inherit }` and wins by source order, so filled
+   buttons (primary "Update goals", etc.) render dark text on a colored fill even
+   though the icon stays on-primary. Re-assert that filled-button text inherits
+   the button's on-color (higher specificity → always wins). */
+.plus-btn--filled .plus-btn-text {
+  color: inherit !important;
+}
+
+/* The Admin sidebar section is toggled in/out via the "\" key. Its default
+   shell-reveal entrance staggers with delays up to ~2.6s, which feels laggy on
+   toggle. Keep the animated disclosure (fade + slide), but make it quick with a
+   short stagger so it discloses snappily. */
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab {
+  animation: revealIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  animation-delay: 0ms !important;
+}
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2) { animation-delay: 50ms !important; }
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3) { animation-delay: 100ms !important; }
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4) { animation-delay: 150ms !important; }
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5) { animation-delay: 200ms !important; }
+#home-redesign-page .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) { animation-delay: 250ms !important; }
+
+/* Home: the three summary cards (Tutoring Performance / Monthly Tutoring Load /
+   Student Momentum) are fixed 361px in the base styles, leaving empty space on
+   the right at full-screen width. Stretch them to fill the available width. */
+.home-redesign-three-cards {
+  grid-template-columns: repeat(3, 1fr) !important;
+  overflow-x: visible !important;
+}
+.home-redesign-card-tutoring,
+.home-redesign-card-monthly,
+.home-redesign-card-momentum {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+@media (max-width: 1100px) {
+  .home-redesign-three-cards { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 760px) {
+  .home-redesign-three-cards { grid-template-columns: 1fr !important; }
+}
+
+/* Hide scrollbars on the main content area; scrolling still enabled. */
+#home-redesign-page .plus-page-main,
+#home-redesign-page .plus-page-content-wrapper {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#home-redesign-page .plus-page-main::-webkit-scrollbar,
+#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+  display: none;
+}

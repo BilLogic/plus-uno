@@ -4,18 +4,20 @@ import SunburstChart from './SunburstChart';
 export default {
     title: 'Data Visualizations/PartToWhole/SunburstChart',
     component: SunburstChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Sunburst Chart
+                component: `## Sunburst Chart
 
+A sunburst chart displays **hierarchical data as nested rings**, radiating from centre outward.
+
+### Overview
 A sunburst chart displays **hierarchical data as nested rings**, radiating from centre outward.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Center** = root/top-level category
 - **Outer rings** = child/nested levels
 - **Arc size** = proportion relative to parent
@@ -23,7 +25,7 @@ A sunburst chart displays **hierarchical data as nested rings**, radiating from 
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A sunburst chart displays **hierarchical data as nested rings**, radiating from 
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A sunburst chart displays **hierarchical data as nested rings**, radiating from 
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Limit to 3-4 levels

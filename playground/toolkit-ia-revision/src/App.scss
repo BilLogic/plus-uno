@@ -1,0 +1,137 @@
+/* Session-centered Toolkit IA — layout only; colors/spacing via tokens */
+
+.ti2-shell {
+    display: flex;
+    min-height: 100vh;
+    max-height: 100vh;
+    background-color: var(--color-surface-container-low);
+    color: var(--color-on-surface);
+}
+
+.ti2-sessions-rail {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: min(320px, 36vw);
+    max-width: 360px;
+    border-right: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface-container);
+}
+
+.ti2-sessions-rail__header {
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.ti2-accordion-count {
+    margin-left: var(--size-element-gap-sm);
+}
+
+.ti2-sessions-rail__scroll {
+    flex: 1;
+    overflow: auto;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+}
+
+.ti2-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ti2-tab-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--size-element-gap-xs);
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    background-color: var(--color-surface-container);
+    min-height: 48px;
+}
+
+.ti2-tab {
+    display: inline-flex;
+    align-items: center;
+    max-width: 220px;
+    border-radius: var(--size-element-radius-md) var(--size-element-radius-md) 0 0;
+    border: 1px solid var(--color-outline-variant);
+    border-bottom: none;
+    background-color: var(--color-surface-container-low);
+    overflow: hidden;
+}
+
+.ti2-tab--active {
+    background-color: var(--color-surface-container-high);
+    border-color: var(--color-outline);
+    position: relative;
+    z-index: 1;
+    margin-bottom: -1px;
+    padding-bottom: 1px;
+}
+
+.ti2-tab__main {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    text-align: left;
+    cursor: pointer;
+    color: var(--color-on-surface);
+    font: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ti2-tab__main:hover {
+    background-color: var(--color-on-surface-state-04);
+}
+
+.ti2-tab__close {
+    flex-shrink: 0;
+}
+
+.ti2-workspace {
+    flex: 1;
+    overflow: auto;
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+}
+
+.ti2-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    gap: var(--size-section-gap-sm);
+    color: var(--color-on-surface-variant);
+    text-align: center;
+}
+
+.ti2-session-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-md);
+    margin-bottom: var(--size-section-gap-md);
+}
+
+.ti2-list-plain {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--color-on-surface-variant);
+}
+
+.ti2-list-plain li + li {
+    margin-top: var(--size-element-gap-xs);
+}
+
+.ti2-reflection-placeholder {
+    padding: var(--size-section-pad-y-md);
+    border-radius: var(--size-card-radius-md);
+    border: 1px dashed var(--color-outline-variant);
+    background-color: var(--color-surface-container-low);
+    color: var(--color-on-surface-variant);
+}

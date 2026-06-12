@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Button from './Button';
 import { ButtonSizesFilledRowContainer } from './button-segmented-demos.jsx';
 
@@ -28,6 +29,8 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
         // CONTENT
         text: {
             control: 'text',
@@ -70,9 +73,7 @@ export default {
             table: { category: 'Design' }
         },
         vertical: {
-            control: 'boolean',
-            description: 'Stack content vertically',
-            table: { category: 'Design' }
+            table: { disable: true, category: 'Design' }
         },
         block: {
             control: 'boolean',
@@ -86,55 +87,56 @@ export default {
             table: { category: 'Behavior' }
         },
         active: {
-            control: 'boolean',
-            description: 'Manually trigger active/pressed state',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         loading: {
             control: 'boolean',
             description: 'Show loading spinner',
             table: { category: 'Behavior' }
         },
-        onClick: {
-            action: 'clicked',
-            table: { category: 'Behavior' }
-        },
         href: {
-            control: 'text',
-            description: 'URL (renders as anchor tag)',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         target: {
-            control: 'text',
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
         type: {
-            control: 'select',
-            options: ['button', 'submit', 'reset'],
-            table: { category: 'Behavior' }
+            table: { disable: true, category: 'Behavior' }
         },
 
         // DEVELOPMENT
         title: {
-            control: 'text',
-            description: 'HTML Title attribute',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         id: {
-            control: 'text',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            table: { category: 'Development' }
-        },
-        children: {
+            control: false,
             table: { disable: true, category: 'Development' }
         },
         as: {
             table: { disable: true, category: 'Development' }
         }
     }
+};
+
+/**
+ * Docs-only: hero `Overview` on Button.mdx (React preview + HTML source from PLUS web-app).
+ * The canvas uses the design-system `Button`; the code panel is overridden to match production
+ * (JSP + Bootstrap `btn btn-primary` in `java/docroot/...`).
+ */
+export const Overview = {
+    parameters: {
+        docs: {
+            source: {
+                language: 'jsx',
+                code: webAppSourceSnippets.button
+            }
+        }
+    },
+    render: () => <Button text="Button" style="primary" fill="filled" size="medium" />
 };
 
 /** Docs-only embed for Button.mdx (`Canvas`); sidebar hidden via meta `!dev`. */
@@ -154,7 +156,6 @@ export const Interactive = {
         leadingVisual: 'none',
         trailingVisual: 'none',
         disabled: false,
-        active: false,
         loading: false,
         block: false
     },

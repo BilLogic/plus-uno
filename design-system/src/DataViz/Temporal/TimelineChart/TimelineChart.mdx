@@ -1,0 +1,71 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as TimelineChartStories from './TimelineChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TimelineChartStories} />
+
+<Title />
+
+Shows **events or milestones** along a horizontal timeline.
+
+### Overview
+Shows **events or milestones** along a horizontal timeline.
+
+<Primary />
+
+---
+
+### How to Read
+- **Points** = events/milestones
+- **Position** = chronological order
+- **Labels** = event names and descriptions
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Project milestones</td><td>✅ Ideal</td></tr>
+    <tr><td>Historical events</td><td>✅ Ideal</td></tr>
+    <tr><td>Progress tracking</td><td>✅ Good</td></tr>
+    <tr><td>Quantitative data</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Student Journey**</td><td>Enrollment → Completion</td></tr>
+    <tr><td>**Course Milestones**</td><td>Module completion dates</td></tr>
+    <tr><td>**Project Timeline**</td><td>Development phases</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the timeline chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={TimelineChartStories.Interactive} />

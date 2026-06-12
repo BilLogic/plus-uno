@@ -1,69 +1,273 @@
-import { Meta } from '@storybook/addon-docs/blocks';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/storybook-docs/ui/card';
-import { DocHero, DocPage, DocSection } from '@/storybook-docs/doc-layout';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import LinkTo from '@storybook/addon-links/react';
+import Badge from '@/components/Badge';
+import Divider from '@/components/Divider';
+import Pagination from '@/components/Pagination';
+import Button from '@/components/Button';
 
 <Meta
   title="PLUS Docs/Introduction"
   parameters={{
     docs: {
       description: {
-        story: 'Start here for how this Storybook is organized and how to review components.',
+        story:
+          'Start here for how this Storybook is organized, how docs sections are classified, and where token foundations live.',
       },
     },
   }}
 />
 
-<DocPage width="narrow">
-  <DocHero
-    title="Introduction"
-    lead="This Storybook documents the PLUS design system: tokens, patterns, shared components, and
-      product specs. Documentation pages use a neutral layout for reading; the canvas still renders
-      real components with Bootstrap and design-system styles."
-  />
+<Title />
 
-  <div className="grid gap-4 md:grid-cols-2">
-    <Card>
-      <CardHeader>
-        <CardTitle>Open the canvas</CardTitle>
-        <CardDescription>Inspect states, controls, and viewports.</CardDescription>
-      </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">
-        Use the toolbar to change background, viewport, and globals. Controls map to component props
-        where stories define <code className="rounded bg-muted px-1 py-0.5 text-xs">argTypes</code>
-        .
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader>
-        <CardTitle>Read the docs tab</CardTitle>
-        <CardDescription>Usage notes and autodocs where enabled.</CardDescription>
-      </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">
-        Each story file can ship markdown descriptions; many components use autodocs for props and
-        snippets. Long pages show a table of contents on the right when headings are present.
-      </CardContent>
-    </Card>
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-plus-intro-page not-prose">
+  <div className="sb-ds-doc-section">
+    <h1 className="sb-plus-intro-overview-title">Overview</h1>
+
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      PLUS Storybook is a practical implementation handbook for the design system. It combines
+      foundation references, shared component guidance, and product-spec examples so teams can move
+      from design intent to shippable UI quickly.
+    </p>
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        <strong className="text-foreground">Docs-first reading:</strong> scan usage patterns, intent, and
+        implementation guidance.
+      </li>
+      <li>
+        <strong className="text-foreground">Canvas validation:</strong> inspect behavior in real rendered
+        components.
+      </li>
+      <li>
+        <strong className="text-foreground">Shared docs structure:</strong> Components and Forms generally
+        follow the same spine for predictable scanning.
+      </li>
+      <li>
+        <strong className="text-foreground">Foundation alignment:</strong> tokenized typography, color,
+        and layout conventions keep UI consistent across teams.
+      </li>
+    </ul>
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      Start here to orient quickly, then branch into detailed component and style pages for deeper
+      implementation decisions.
+    </p>
   </div>
 
-  <DocSection title="Who this is for">
+  <div className="sb-ds-doc-section">
+    ### Who this is for
+
     <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
       <li>Designers reviewing visual and interaction patterns</li>
       <li>Engineers implementing or extending shared UI</li>
       <li>PMs and partners orienting to what the system already provides</li>
     </ul>
-  </DocSection>
+  </div>
 
-  <DocSection title="Where to go next">
+  <div className="sb-ds-doc-section">
+    ### How are components organized?
+
     <p className="text-sm leading-relaxed text-muted-foreground">
-      Jump to <strong className="text-foreground">PLUS Docs / Components</strong> for a compact index
-      of entry points into the library, or browse the sidebar groups (Styles, Components, Forms,
-      Specs, and more).
+      Components and controls live under <strong className="text-foreground">Components</strong> and{' '}
+      <strong className="text-foreground">Forms</strong>. Most entries are docs-first for scanning, and
+      Canvas is where interaction and Controls live.
     </p>
-  </DocSection>
-</DocPage>
+
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      Default section spine (omit anything that does not apply):
+    </p>
+    <ol className="ml-6 list-decimal space-y-1 text-sm text-muted-foreground">
+      <li>
+        <strong className="text-foreground">Content</strong> - baseline shape and meaning.
+      </li>
+      <li>
+        <strong className="text-foreground">Styles</strong> - visual treatments that keep meaning stable.
+      </li>
+      <li>
+        <strong className="text-foreground">Sizes</strong> - scale comparisons.
+      </li>
+      <li>
+        <strong className="text-foreground">Interaction States</strong> - hover, focus, selected, disabled,
+        loading, validation.
+      </li>
+      <li>
+        <strong className="text-foreground">Layout</strong> - composition and spacing rules.
+      </li>
+      <li>
+        <strong className="text-foreground">Interactive</strong> - controlled sandbox for prop checks.
+      </li>
+    </ol>
+
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        If meaning or affordance changes, place it in <strong className="text-foreground">Content</strong>.
+      </li>
+      <li>
+        If only visual skin changes, place it in <strong className="text-foreground">Styles</strong>.
+      </li>
+      <li>
+        If composition or placement rules change, place it in <strong className="text-foreground">Layout</strong>.
+      </li>
+    </ul>
+
+    <div className="sb-plus-intro-sections-stack">
+      <div className="sb-plus-intro-mini-card">
+        <h4 className="sb-plus-intro-mini-title">Content</h4>
+        <p className="sb-plus-intro-mini-copy">What the component communicates and what actions it supports.</p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check" />} />
+            <Badge text="Inbox" style="primary" counter="12" />
+          </div>
+        </div>
+      </div>
+
+      <div className="sb-plus-intro-mini-card">
+        <h4 className="sb-plus-intro-mini-title">Styles</h4>
+        <p className="sb-plus-intro-mini-copy">Visual treatments for emphasis and semantic intent.</p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button text="Primary" style="primary" fill="filled" size="small" />
+            <Button text="Secondary" style="secondary" fill="filled" size="small" />
+            <Button text="Danger" style="danger" fill="filled" size="small" />
+          </div>
+        </div>
+      </div>
+
+      <div className="sb-plus-intro-mini-card">
+        <h4 className="sb-plus-intro-mini-title">Sizes</h4>
+        <p className="sb-plus-intro-mini-copy">Scale choices that adapt component prominence to context.</p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button text="Small" style="primary" fill="outline" size="small" />
+            <Button text="Medium" style="primary" fill="outline" size="medium" />
+            <Button text="Large" style="primary" fill="outline" size="large" />
+          </div>
+        </div>
+      </div>
+
+      <div className="sb-plus-intro-mini-card">
+        <h4 className="sb-plus-intro-mini-title">Interaction States</h4>
+        <p className="sb-plus-intro-mini-copy">Disabled, hover, focus, and active behavior for usability.</p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button text="Disabled" style="secondary" fill="filled" size="small" disabled />
+            <Button text="Loading" style="primary" fill="filled" size="small" loading />
+          </div>
+        </div>
+      </div>
+
+      <div className="sb-plus-intro-mini-card">
+        <h4 className="sb-plus-intro-mini-title">Layout</h4>
+        <p className="sb-plus-intro-mini-copy">Composition and spacing rules within surrounding UI structures.</p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="rounded-lg border border-outline-variant p-3">
+            <p className="body2-txt mb-2">Section A</p>
+            <Divider />
+            <p className="body2-txt mt-2">Section B</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="sb-plus-intro-mini-card">
+        <h4 className="sb-plus-intro-mini-title">Interactive</h4>
+        <p className="sb-plus-intro-mini-copy">Use Controls in component docs to validate prop combinations quickly.</p>
+        <div className="sb-plus-intro-mini-canvas">
+          <Pagination currentPage={1} totalPages={4} type="icon" size="default" onPageChange={() => {}} />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="sb-ds-doc-section">
+    ### What are tokens?
+
+    <p className="text-sm leading-relaxed text-muted-foreground">
+      Tokens are the shared design values (color, spacing, type, radius, elevation) consumed by PLUS
+      styles and components. Prefer semantic tokens over raw values so intent survives future theme and
+      brand updates.
+    </p>
+
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Typography" name="Docs">
+          Typography
+        </LinkTo>{' '}
+        - type scale and font stacks
+      </li>
+      <li>
+        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Colors" name="Docs">
+          Colors
+        </LinkTo>{' '}
+        - palette and semantic color usage
+      </li>
+      <li>
+        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Layout" name="Docs">
+          Layout
+        </LinkTo>{' '}
+        - spacing and grid patterns
+      </li>
+    </ul>
+
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>Do not hardcode color, spacing, typography, radius, or elevation values in component code.</li>
+      <li>Use semantic token names rather than raw values whenever possible.</li>
+      <li>Generated PLUS token outputs are the canonical implementation source of truth.</li>
+    </ul>
+
+    <div className="sb-plus-intro-token-grid">
+      <div className="sb-plus-intro-mini-card">
+        <p className="sb-plus-intro-mini-title">Typography tokens</p>
+        <p className="sb-plus-intro-mini-copy">
+          Type ramps and semantic text classes create consistent reading hierarchy.
+        </p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="space-y-1">
+            <p className="h6 m-0">Heading scale sample</p>
+            <p className="body1-txt m-0">Body 1 text for core reading content.</p>
+            <p className="body2-txt m-0">Body 2 text for helper/contextual copy.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="sb-plus-intro-mini-card">
+        <p className="sb-plus-intro-mini-title">Color tokens</p>
+        <p className="sb-plus-intro-mini-copy">
+          Semantic color roles preserve intent across themes and surfaces.
+        </p>
+        <div className="sb-plus-intro-mini-canvas">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-4 w-8 rounded border border-outline-variant" style={{ backgroundColor: 'var(--color-primary)' }} />
+              <span className="body3-txt">--color-primary</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-4 w-8 rounded border border-outline-variant" style={{ backgroundColor: 'var(--color-surface-container)' }} />
+              <span className="body3-txt">--color-surface-container</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-4 w-8 rounded border border-outline-variant" style={{ backgroundColor: 'var(--color-outline)' }} />
+              <span className="body3-txt">--color-outline</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="sb-ds-doc-section">
+    ### Run Storybook locally
+
+    <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
+      <li>
+        Install and start Storybook: <code className="rounded bg-muted px-1 py-0.5 text-xs">npm install</code>{' '}
+        then <code className="rounded bg-muted px-1 py-0.5 text-xs">npm run storybook</code>
+      </li>
+      <li>
+        Storybook runs on <code className="rounded bg-muted px-1 py-0.5 text-xs">http://localhost:4200</code>
+      </li>
+      <li>
+        For app + Storybook together, run <code className="rounded bg-muted px-1 py-0.5 text-xs">npm run dev</code>{' '}
+        (Vite on 4100, Storybook on 4200)
+      </li>
+    </ul>
+  </div>
+</div>

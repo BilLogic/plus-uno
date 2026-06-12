@@ -52,7 +52,17 @@ const Icons = {
     ),
     Skills: () => (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="5" /><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2" />
+            <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
+        </svg>
+    ),
+    Onboarding: () => (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+        </svg>
+    ),
+    Tour: () => (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
         </svg>
     ),
     /* FAB when panel is closed: star + badge lines + dot */
@@ -158,10 +168,11 @@ const LogoContainer = ({ size = 'default', className = '', variant = 'default' }
 
 /* ─── Quick action definitions ─── */
 const QUICK_ACTIONS = [
-    { id: 'usage', label: 'Component Usage Guide', aliases: ['usage guide', 'component usage guide'], Icon: Icons.Analyze, color: 'var(--color-primary-text)', bg: 'var(--color-primary-container)' },
-    { id: 'explain', label: 'Explain This Screen', aliases: ['explain this screen', 'explain the screen', 'explain screen'], Icon: Icons.Explain, color: 'var(--color-mastering-content-text)', bg: 'var(--color-mastering-content-container)' },
-    { id: 'find', label: 'Smart Navigation', aliases: ['smart navigation'], Icon: Icons.Navigate, color: 'var(--color-warning-text)', bg: 'var(--color-warning-container)' },
-    { id: 'skills', label: 'Agent Modes', aliases: ['agent modes'], Icon: Icons.Skills, color: 'var(--color-advocacy-text)', bg: 'var(--color-advocacy-container)' },
+    { id: 'onboarding', label: 'New Starter Kit', aliases: ['onboarding', 'new starter kit', 'getting started', 'setup'], Icon: Icons.Onboarding },
+    { id: 'usage', label: 'Component Usage Guide', aliases: ['usage guide', 'component usage guide'], Icon: Icons.Analyze },
+    { id: 'explain', label: 'Explain This Screen', aliases: ['explain this screen', 'explain the screen', 'explain screen'], Icon: Icons.Explain },
+    { id: 'find', label: 'Smart Navigation', aliases: ['smart navigation'], Icon: Icons.Navigate },
+    { id: 'skills', label: 'Skills Router', aliases: ['skills router', 'skill router', 'agent modes', 'mode routing', 'modes', 'uno skills'], Icon: Icons.Skills }
 ];
 
 /* Levenshtein distance for typo-tolerant keyword match (max length ~20). */
@@ -180,6 +191,20 @@ function levenshtein(a, b) {
         prev = curr;
     }
     return prev[bn];
+}
+
+/** OpenAI-compatible API key: user localStorage override, then Vite env (never commit `.env` with real keys). */
+function getEnvApiKey() {
+    return (import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.VITE_CHATGPT_API_KEY || '').trim();
+}
+
+function getStoredUserApiKey() {
+    if (typeof localStorage === 'undefined') return '';
+    return (localStorage.getItem('PLUS_AI_API_KEY') || '').trim();
+}
+
+function getEffectiveApiKey() {
+    return getStoredUserApiKey() || getEnvApiKey();
 }
 
 /** Match typed text to a quick action by label/aliases; tolerates minor typos. Returns action id or null. */
@@ -238,7 +263,7 @@ function matchQuickActionByKeyword(text) {
     return null;
 }
 
-/* ─── Usage Guide: when to use which component ─── */
+/* ─── Usage Guide: offline / Mode 2 only — full mode always uses ChatGPT API for usage questions ─── */
 const USAGE_GUIDE = [
     {
         queries: ['modal vs cards', 'cards vs modal', 'when do i use modal vs cards', 'when to use modal vs cards', 'modal or cards'],
@@ -556,6 +581,44 @@ function normalizeForMatch(str) {
     return str.toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
+/* ─── Message Classification ─── */
+
+/**
+ * UNCLEAR INPUT: too short, vague, or no discernible intent.
+ * Examples: "yes", "ok", "this one", "help", "what?", "hmm"
+ */
+function isUnclearInput(text) {
+    const t = text.trim();
+    if (t.length <= 3) return true;
+    const vaguePatterns = /^(yes|no|ok|okay|sure|hmm+|uh+|um+|what|huh|nope|yep|hi|hey|hello|thanks|thank you|cool|nice|great|k|lol|idk|dunno|help|this|that|it|this one|that one|not sure)$/i;
+    return vaguePatterns.test(t.toLowerCase());
+}
+
+/**
+ * OUT OF SCOPE: clear question but unrelated to PLUS UNO assistant role.
+ * Detects topics like general coding, weather, trivia, food, math, personal questions, etc.
+ */
+function isOutOfScope(text) {
+    const t = text.toLowerCase();
+    const outOfScopePatterns = [
+        /\b(weather|temperature|forecast|climate)\b/,
+        /\b(recipe|food|cook|restaurant|eat|drink|coffee|lunch)\b/,
+        /\b(stock|price|bitcoin|crypto|invest|finance|economy)\b/,
+        /\b(movie|film|show|series|netflix|spotify|music|song|album)\b/,
+        /\b(sport|football|soccer|basketball|baseball|nfl|nba|fifa)\b/,
+        /\b(politics|president|government|election|vote|country|war)\b/,
+        /\b(math|calculate|algebra|calculus|geometry|equation|formula)\b/,
+        /\b(history|geography|science|biology|chemistry|physics)\b/,
+        /\b(travel|hotel|flight|vacation|trip|holiday)\b/,
+        /\b(translate|language|spanish|french|chinese|japanese|german)\b/,
+        /\b(joke|funny|meme|story|poem|essay|write me a)\b/,
+        /\b(what is (the|a) capital|how old is|who is|who was|when did|where is)\b/,
+        /\b(relationship|dating|friend|family|personal)\b/,
+    ];
+    // Only flag out-of-scope when there is a clear off-topic signal pattern
+    return outOfScopePatterns.some(p => p.test(t));
+}
+
 
 
 /* Keyboard shortcuts help block — clean, scannable; Mac (⌘) and Windows (Ctrl). */
@@ -567,8 +630,6 @@ const ShortcutsHelpContent = () => (
         <table className="sb-ai-agent__shortcuts-table">
             <tbody>
                 <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + /</td><td>Toggle/Close AI Agent</td></tr>
-                <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + Shift + /</td><td>Hide AI (Focus Mode)</td></tr>
-                <tr><td className="sb-ai-agent__shortcuts-key">{MOD} + s</td><td>Reset AI Agent Configuration</td></tr>
             </tbody>
         </table>
     </div>
@@ -581,7 +642,6 @@ const SmartNavIntroMessage = () => (
         <p style={{ marginBottom: 6, fontSize: 13 }}>Examples:</p>
         <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13 }}>
             <li>“Where are the cards?”</li>
-            <li>“Open destructive modal”</li>
             <li>“Go to Training Progress page”</li>
             <li>“Buttons”</li>
         </ul>
@@ -597,25 +657,6 @@ const UsageGuideIntroMessage = () => (
             <li>"When do I use Modal vs Cards?"</li>
             <li>"When should I use a Badge?"</li>
         </ul>
-    </div>
-);
-
-/* Fallback message with quick action buttons repeated so user can pick without scrolling */
-const FallbackWithQuickActions = ({ text, onQuickAction }) => (
-    <div>
-        <p style={{ marginBottom: 12 }}>I couldn&apos;t understand your request: &quot;<em>{text}</em>&quot;. Try rephrasing or use one of the quick actions below.</p>
-        <div className="sb-ai-agent__quick-actions">
-            {QUICK_ACTIONS.map(a => (
-                <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => onQuickAction(a.id)}>
-                    <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                        <span style={{ color: a.color }}>
-                            <a.Icon />
-                        </span>
-                    </div>
-                    <span className="sb-ai-agent__quick-label">{a.label}</span>
-                </button>
-            ))}
-        </div>
     </div>
 );
 
@@ -666,38 +707,201 @@ const buildResponse = (actionId, pageContext) => {
                 </div>
             );
 
-        case 'skills':
+        case 'onboarding':
+            const copyOnboardingPath = async (path, e) => {
+                e.preventDefault();
+                const target = e.currentTarget;
+                const originalText = target.innerHTML;
+                try {
+                    await navigator.clipboard.writeText(path);
+                } catch (err) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = path;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (err2) {}
+                    document.body.removeChild(textArea);
+                }
+                target.innerHTML = '✅ Copied!';
+                target.style.color = 'var(--color-success, #2e7d32)';
+                setTimeout(() => {
+                    target.innerHTML = originalText;
+                    target.style.color = 'var(--color-primary)';
+                }, 1500);
+            };
+
+            const OnboardingLinkItem = ({ num, title, desc, path, bg, fg }) => (
+                <li style={{ marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ background: bg, color: fg, borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>{num}</span>
+                        <span>{title} — {desc}</span>
+                    </div>
+                    <button 
+                        onClick={(e) => copyOnboardingPath(path, e)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 32, fontSize: 11, marginTop: 4, color: 'var(--color-primary)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
+                        title="Click to copy path"
+                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                    >
+                        <i className="fa-regular fa-copy" style={{ fontSize: 11 }}></i> {path}
+                    </button>
+                </li>
+            );
+
             return (
                 <div>
-                    <p style={{ fontWeight: 600, marginBottom: 8 }}>🎯 The 6 Main Modes</p>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-primary-container)', color: 'var(--color-on-primary-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>1</span>
-                            📚 <strong>Learning</strong> — Understand what exists and how it works
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-warning-container)', color: 'var(--color-on-warning-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>2</span>
-                            🔧 <strong>Maintaining</strong> — Update the design system itself
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-relationship-container)', color: 'var(--color-on-relationship-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>3</span>
-                            💡 <strong>Consulting</strong> — Early structure-first concepting
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-advocacy-container)', color: 'var(--color-on-advocacy-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>4</span>
-                            🔄 <strong>Iteration</strong> — Explore 3-5 distinct options
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-technology-tools-container)', color: 'var(--color-on-technology-tools-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>5</span>
-                            🎨 <strong>Prototyping</strong> — High-fidelity exploratory prototypes
-                        </li>
-                        <li style={{ marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: 'var(--color-secondary-container)', color: 'var(--color-on-secondary-container)', borderRadius: 6, padding: '2px 8px', fontSize: 12, fontWeight: 600, minWidth: 24, height: 22, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>6</span>
-                            🏗️ <strong>Finalization</strong> — Production-ready code
-                        </li>
+                    <p style={{ fontWeight: 600, marginBottom: 8, fontSize: '14px' }}>🎒 New Starter Kit</p>
+                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--color-on-surface-variant)', background: 'var(--color-surface-container-high)', padding: '6px 10px', borderRadius: '6px' }}>
+                        💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
+                    </p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
+                        <OnboardingLinkItem num="1" title={<span>🎨 <strong>Cheat Sheet</strong></span>} desc="Design Tokens & Component Props" path="docs/context/design-system/components/cheat-sheet.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
+                        <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path="docs/context/design-system/components/layout-cheat-sheet.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
+                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/context/product/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
+                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/context/conventions/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
                     </ul>
                 </div>
             );
+
+        case 'skills': {
+            const parseTriggerLabels = (triggerStr) =>
+                triggerStr.split(',').map((s) => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+
+            const copySkillPath = async (path, e) => {
+                e.preventDefault();
+                const btn = e.currentTarget;
+                const labelEl = btn.querySelector('.sb-ai-agent__skill-card__path-label');
+                const prev = labelEl ? labelEl.textContent : path;
+
+                try {
+                    await navigator.clipboard.writeText(path);
+                } catch (err) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = path;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                    } catch (err2) {
+                        console.error('Copy fallback failed', err2);
+                    }
+                    document.body.removeChild(textArea);
+                }
+
+                if (labelEl) {
+                    labelEl.textContent = '✅ Copied to clipboard!';
+                }
+                btn.style.color = 'var(--color-success-text)';
+                setTimeout(() => {
+                    if (labelEl) {
+                        labelEl.textContent = prev;
+                    }
+                    btn.style.color = '';
+                }, 1500);
+            };
+
+            const SkillsRouterSkillCard = ({ theme, num, titleLine, path, trigger }) => {
+                const tags = parseTriggerLabels(trigger);
+                return (
+                    <li className={`sb-ai-agent__skill-card sb-ai-agent__skill-card--${theme}`}>
+                        <div className="sb-ai-agent__skill-card__row">
+                            <span className="sb-ai-agent__skill-card__badge">{num}</span>
+                            <div className="sb-ai-agent__skill-card__body">
+                                <p className="sb-ai-agent__skill-card__title">{titleLine}</p>
+                                <button
+                                    type="button"
+                                    className="sb-ai-agent__skill-card__path"
+                                    onClick={(e) => copySkillPath(path, e)}
+                                    title="Click to copy path"
+                                >
+                                    <i className="fa-regular fa-copy sb-ai-agent__skill-card__path-icon" style={{ fontSize: 11 }} aria-hidden />
+                                    <span className="sb-ai-agent__skill-card__path-label">{path}</span>
+                                </button>
+                                <div className="sb-ai-agent__skill-card__field">
+                                    <span className="sb-ai-agent__skill-card__label">Trigger:</span>
+                                    <div className="sb-ai-agent__skill-card__tags">
+                                        {tags.map((label) => (
+                                            <span key={label} className="sb-ai-agent__skill-card__tag">
+                                                {label}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                );
+            };
+
+            return (
+                <div className="sb-ai-agent__skills-router">
+                    <div className="sb-ai-agent__skills-router-canvas">
+                        <header className="sb-ai-agent__skills-router-header">
+                            <h4 className="sb-ai-agent__skills-router-heading">Skills Router</h4>
+                        </header>
+                        <p className="sb-ai-agent__skills-router-tip">
+                            💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
+                        </p>
+                        <ul className="sb-ai-agent__skills-router-cards">
+                            <SkillsRouterSkillCard
+                                theme="prototype"
+                                num="1"
+                                titleLine={<>🧱 <strong className="sb-ai-agent__skill-card__name">uno-prototype</strong></>}
+                                path=".agent/skills/uno-prototype/SKILL.md"
+                                trigger={'"scaffold", "new prototype", "create playground"'}
+                            />
+                            <SkillsRouterSkillCard
+                                theme="review"
+                                num="2"
+                                titleLine={<>🔍 <strong className="sb-ai-agent__skill-card__name">uno-review</strong></>}
+                                path=".agent/skills/uno-review/SKILL.md"
+                                trigger={'"review", "check", "validate", "quality check"'}
+                            />
+                            <SkillsRouterSkillCard
+                                theme="post"
+                                num="3"
+                                titleLine={<>🚀 <strong className="sb-ai-agent__skill-card__name">uno-post</strong></>}
+                                path=".agent/skills/uno-post/SKILL.md"
+                                trigger={'"submit", "publish", "add to market"'}
+                            />
+                            <SkillsRouterSkillCard
+                                theme="compound"
+                                num="4"
+                                titleLine={<>🧠 <strong className="sb-ai-agent__skill-card__name">uno-compound</strong></>}
+                                path=".agent/skills/uno-compound/SKILL.md"
+                                trigger={'"document", "write up", "compound", "save learning"'}
+                            />
+                            <SkillsRouterSkillCard
+                                theme="research"
+                                num="5"
+                                titleLine={<>🔬 <strong className="sb-ai-agent__skill-card__name">uno-research</strong></>}
+                                path=".agent/skills/uno-research/SKILL.md"
+                                trigger={'"what is", "how does", "explore", "audit"'}
+                            />
+                            <SkillsRouterSkillCard
+                                theme="plan"
+                                num="6"
+                                titleLine={<>📋 <strong className="sb-ai-agent__skill-card__name">uno-plan</strong></>}
+                                path=".agent/skills/uno-plan/SKILL.md"
+                                trigger={'"plan", "scope", "how should we build"'}
+                            />
+                        </ul>
+                        <div className="sb-ai-agent__skills-router-pipeline">
+                            <p className="sb-ai-agent__skills-router-pipeline-title">🔁 Recommended Pipeline (Flexible entry)</p>
+                            <p className="sb-ai-agent__skills-router-pipeline-flow">
+                                uno-research → uno-plan → uno-prototype → uno-review → (iterate) → uno-post → uno-compound
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
         default:
             return <p>I'm a demo agent. Try one of the quick actions or ask about a component!</p>;
@@ -718,9 +922,13 @@ const PANEL_DEFAULT_HEIGHT = 560;
 const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userName = 'Ashley' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
-    const [aiMode, setAiMode] = useState(() => localStorage.getItem('PLUS_AI_MODE') || null);
-    const [apiKey, setApiKey] = useState(() => localStorage.getItem('PLUS_AI_API_KEY') || '');
-    const [tempKey, setTempKey] = useState(apiKey);
+    const [aiMode, setAiMode] = useState(() => {
+        const stored = localStorage.getItem('PLUS_AI_MODE');
+        if (stored) return stored;
+        localStorage.setItem('PLUS_AI_MODE', 'full');
+        return 'full';
+    });
+    const [tempKey, setTempKey] = useState(() => getStoredUserApiKey());
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -749,27 +957,13 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
         if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
     }, [messages, isTyping]);
 
-    /* Keyboard shortcuts: ⌘+/ toggle panel, ⌘+Shift+/ hide, ⌘+S reset. */
+    /* Keyboard shortcuts: ⌘+/ toggle panel. */
     useEffect(() => {
         const handler = (e) => {
             const mod = e.metaKey || e.ctrlKey;
             if (!mod) return;
 
-            if (e.key.toLowerCase() === 's') {
-                e.preventDefault();
-                localStorage.removeItem('PLUS_AI_MODE');
-                setAiMode(null);
-                setMessages([]);
-                return;
-            }
-
             if (e.key !== '/') return;
-            if (e.shiftKey) {
-                e.preventDefault();
-                setIsHidden(true);
-                setIsOpen(false);
-                return;
-            }
             e.preventDefault();
             if (isHidden) {
                 setIsHidden(false);
@@ -835,12 +1029,59 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
         setTimeout(() => { setIsTyping(false); setMessages(p => [...p, { role: 'bot', content }]); }, 900);
     };
 
-    /* Match free‑text to an action (for non-navigation queries) */
+    /* Match free-text to a quick action — only on strong, unambiguous signals */
     const matchAction = (text) => {
-        const t = text.toLowerCase();
-        if (t.includes('explain')) return 'explain';
-        if (t.includes('skill')) return 'skills';
+        const t = text.toLowerCase().trim();
+        // Only match 'explain' when it refers to the current screen/story, not a component name
+        if (/\b(explain this screen|explain this page|what is on this screen)\b/.test(t)) return 'explain';
+        // Only match 'skills' on explicit skill-router phrasing
+        if (/\b(skills router|show skills|list skills|what skills|which skill|uno skills)\b/.test(t)) return 'skills';
         return null;
+    };
+
+    /* Check if the user's text matches a skill trigger keyword from the Skills Router.
+     * IMPORTANT: only use patterns that are unambiguous and NOT shared with component questions.
+     * Patterns like "what is", "how does", "explore", "review", "plan", "check" are intentionally
+     * excluded here because they are also valid component guidance phrases. */
+    const matchSkillIntent = (text) => {
+        const t = text.toLowerCase().trim();
+
+        // Explicit skill name mention (with or without dash) always wins → Skills Router
+        if (/\buno[\s-]?research\b/.test(t)) return 'research';
+        if (/\buno[\s-]?plan\b/.test(t)) return 'plan';
+        if (/\buno[\s-]?prototype\b/.test(t)) return 'prototype';
+        if (/\buno[\s-]?review\b/.test(t)) return 'review';
+        if (/\buno[\s-]?post\b/.test(t)) return 'post';
+        if (/\buno[\s-]?compound\b/.test(t)) return 'compound';
+
+        // If the text also has a component guidance intent, component wins — skip skill routing
+        if (hasComponentGuideIntent(t) || hasUsageIntent(t)) return null;
+
+        const skillTriggers = [
+            // research: only unambiguous workflow signals (NOT "what is" / "how does" — those are component questions)
+            { id: 'research', patterns: [/\baudit the\b/, /\baudit our\b/, /\bresearch this\b/, /\bdo a research\b/] },
+            // plan: require explicit build/design planning context, not just the word "plan"
+            { id: 'plan',     patterns: [/\bhow should (we|i) build\b/, /\bscope (this|the|a) (feature|project|work)\b/, /\bplanning (this|the) (feature|project|work)\b/] },
+            // prototype: all patterns are specific enough
+            { id: 'prototype',patterns: [/\bscaffold\b/, /\bnew prototype\b/, /\bcreate playground\b/] },
+            // review: require "review this prototype/design/playground" phrasing, not "review this component"
+            { id: 'review',   patterns: [/\bquality check\b/, /\breview (this |my |the )?(prototype|playground|design|work)\b/, /\bvalidate (this |my |the )?(prototype|playground|design|work)\b/] },
+            // post: specific enough
+            { id: 'post',     patterns: [/\badd to market\b/, /\bsubmit (to|this) (market|marketplace)\b/] },
+            // compound: specific enough
+            { id: 'compound', patterns: [/\bsave (this |the )?learning\b/, /\bwrite (this |a )?up\b/, /\bcompound (this|the|a)\b/] },
+        ];
+        for (const skill of skillTriggers) {
+            if (skill.patterns.some(p => p.test(t))) return skill.id;
+        }
+        return null;
+    };
+
+    /* Check if extracted component token actually exists in the live story index */
+    const componentExistsInIndex = (token) => {
+        if (!token || storyIndex.length === 0) return false;
+        const matches = findBestMatch(token, storyIndex);
+        return matches.length > 0 && matches[0].score >= 70;
     };
 
     const navigateToEntry = (entry) => {
@@ -853,6 +1094,7 @@ const StorybookAIAgent = ({ pageContext = 'Tutor Training Progress Page', userNa
     const fetchAIResponse = async (feature, userInput, context) => {
         setIsTyping(true);
         try {
+            const apiKey = getEffectiveApiKey();
             if (aiMode !== 'full' || !apiKey) {
                 throw new Error("Local mode active or API key missing.");
             }
@@ -1056,13 +1298,13 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                     setMessages(p => [...p, {
                         role: 'bot', content: (
                             <p style={{ color: 'var(--color-error)' }}>
-                                ⚠️ AI server offline. Start the backend with <code>node server/server.js</code> to answer any component question.
+                                ⚠️ Could not reach the AI API. Add a key in Mode 1, set <code>VITE_OPENAI_API_KEY</code> or <code>VITE_CHATGPT_API_KEY</code> in <code>.env</code>, and check your network.
                             </p>
                         )
                     }]);
                 }
             } else {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>⚠️ AI server offline. Make sure the backend is running on port 3001.</p> }]);
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>⚠️ Could not reach the AI API. Check your key, `.env` (<code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code>), and network.</p> }]);
             }
         }
     };
@@ -1112,6 +1354,37 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                 const storyId = getCurrentStoryId();
                 fetchAIResponse('screen_explain', 'Explain this screen', { storyId, pageContext });
             }
+        } else if (actionId === 'tour') {
+            setMessages(p => [...p, { role: 'user', content: action.label }]);
+            
+            const TourStepButton = ({ title, desc, keyword, category, bg, fg, emoji }) => (
+                <button 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        let entry = findBestMatch(keyword, storyIndex).find(m => m.entry.category?.includes(category) || m.entry.category?.includes('Docs'))?.entry;
+                        if (!entry) entry = findBestMatch(keyword, storyIndex)[0]?.entry;
+                        if (entry) navigateToEntry(entry);
+                    }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: bg, color: fg, padding: 12, borderRadius: 8, fontSize: 13, border: '1px solid var(--color-outline-variant)', cursor: 'pointer', marginBottom: 8 }}
+                    onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(0.95)'}
+                    onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
+                >
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>{emoji} {title}</div>
+                    <div style={{ fontSize: 12, opacity: 0.9 }}>{desc}</div>
+                </button>
+            );
+
+            setMessages(p => [...p, { role: 'bot', content: (
+                <div>
+                    <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>🚀 Interactive System Tour</p>
+                    <p style={{ marginBottom: 12, fontSize: 13, lineHeight: 1.4 }}>Click each step below to jump through the system and see how tokens become full pages:</p>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        <li><TourStepButton title="Colors & Tokens" desc="See where it all begins. A single change here propagates everywhere." keyword="tokens" category="Tokens" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" emoji="🎨" /></li>
+                        <li><TourStepButton title="Components" desc="Look at our Button inheriting those precise tokens and properties." keyword="button" category="Components" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" emoji="🧱" /></li>
+                        <li><TourStepButton title="Pages & Prototypes" desc="Explore how components perfectly assemble into a final layout." keyword="redesign" category="Pages" bg="var(--color-success-container)" fg="var(--color-success)" emoji="✨" /></li>
+                    </ul>
+                </div>
+            ) }]);
         } else {
             setMessages(p => [...p, { role: 'user', content: action.label }]);
             respond(buildResponse(actionId, pageContext));
@@ -1135,77 +1408,111 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             return;
         }
 
+        if (text.toLowerCase() === 'quick action' || text.toLowerCase() === 'quick actions') {
+            setIsTyping(true);
+            setTimeout(() => {
+                setIsTyping(false);
+                setMessages(p => [...p, {
+                    role: 'bot',
+                    noBubble: true,
+                    noLogo: true,
+                    content: (
+                        <div className="sb-ai-agent__quick-actions">
+                            {QUICK_ACTIONS.map(a => (
+                                <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
+                                    <div className={`sb-ai-agent__quick-icon sb-ai-agent__quick-icon--${a.id}`}>
+                                        <a.Icon />
+                                    </div>
+                                    <span className="sb-ai-agent__quick-label">{a.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )
+                }]);
+            }, 900);
+            return;
+        }
+
         if (hasShortcutIntent(text)) {
             setMessages(p => [...p, { role: 'bot', content: <ShortcutsHelpContent /> }]);
             return;
         }
 
-        if (hasNavigationIntent(text)) {
-            runSmartNavigation(text);
+        // ── PRIORITY 1: Unclear input — stop immediately, never guess ──
+        if (isUnclearInput(text)) {
+            respond({ type: 'fallback_unclear' });
             return;
         }
 
-        if (aiMode === 'local') {
-            // Check usage match locally, or fallback
-            const usageEntry = matchUsageGuide(text);
-            if (usageEntry) {
-                respond(usageEntry.answer);
-            } else {
-                respond(<p style={{ color: 'var(--color-error)' }}>⚠️ Large Language Model features are disabled in Local Mode. Turn on Mode 1 to chat with AI.</p>);
-            }
-            return;
-        }
-
-        /* Component Guide & Usage Intent: route ALL questions through ChatGPT API */
-        if (hasComponentGuideIntent(text) || hasUsageIntent(text)) {
-            const parsed = parseComponentGuideQuery(text);
-
-            // "Explain this" / "What does this do" → use current story context
-            if (parsed?.type === 'context') {
-                const storyId = getCurrentStoryId();
-                fetchAIResponse('screen_explain', 'Explain this screen / component', { storyId, pageContext });
-                return;
-            }
-
-            // Build a clean query for GPT
-            const componentQuery = parsed?.tokens?.join(' vs ') || text;
-
-            // Check local USAGE_GUIDE first for instant known comparisons
-            const usageEntry = matchUsageGuide(text);
-            if (usageEntry && !(parsed?.type === 'single')) {
-                respond(usageEntry.answer);
-                return;
-            }
-
-            // Ask ChatGPT — works for ANY component name
-            fetchAIResponse('component_usage', text, {
-                query: componentQuery,
-                parsed,
-                pageContext,
-                designSystem: 'PLUS UNO Design System (React Bootstrap)'
-            });
-            return;
-        }
-
-
-        /* Typed quick-action keyword */
+        // ── PRIORITY 2: Explicit quick-action keyword match (e.g. "new starter kit") ──
         const quickActionId = matchQuickActionByKeyword(text);
         if (quickActionId) {
             handleQuickAction(quickActionId);
             return;
         }
 
-        const matched = matchAction(text);
-        if (matched) {
-            respond(buildResponse(matched, pageContext));
-        } else {
-            // Smart Nav Fallback: if text strongly matches a story, navigate!
-            const matches = findBestMatch(text, storyIndex);
-            if (matches.length > 0 && matches[0].score >= 90) {
-                runSmartNavigation(text);
-            } else {
-                respond(<FallbackWithQuickActions text={text} onQuickAction={handleQuickAction} />);
+        // ── PRIORITY 3: Skill intent — must be checked BEFORE component guidance ──
+        // Prevents "plan", "how should we build", etc. from leaking into GPT component_usage
+        const skillIntent = matchSkillIntent(text);
+        if (skillIntent) {
+            handleQuickAction('skills');
+            return;
+        }
+
+        // ── PRIORITY 4: Explicit screen-explain or skills-router phrasing ──
+        const explicitAction = matchAction(text);
+        if (explicitAction) {
+            respond(buildResponse(explicitAction, pageContext));
+            return;
+        }
+
+        // ── PRIORITY 5: Navigation intent ──
+        if (hasNavigationIntent(text)) {
+            runSmartNavigation(text);
+            return;
+        }
+
+        // ── PRIORITY 6: Component guidance — only if a real component token exists in the story index ──
+        if (hasComponentGuideIntent(text) || hasUsageIntent(text)) {
+            const parsed = parseComponentGuideQuery(text);
+
+            // "Explain this" / "What does this do" → screen context
+            if (parsed?.type === 'context') {
+                const storyId = getCurrentStoryId();
+                fetchAIResponse('screen_explain', 'Explain this screen / component', { storyId, pageContext });
+                return;
             }
+
+            // Only proceed to GPT if at least one token resolves to a real story in the index
+            const tokens = parsed?.tokens || [];
+            const hasVerifiedComponent = tokens.length === 0 || tokens.some(t => componentExistsInIndex(t));
+
+            if (hasVerifiedComponent) {
+                const componentQuery = tokens.join(' vs ') || text;
+                fetchAIResponse('component_usage', text, {
+                    query: componentQuery,
+                    parsed,
+                    pageContext,
+                    designSystem: 'PLUS UNO Design System (React Bootstrap)'
+                });
+                return;
+            }
+
+            // Token didn't resolve to a known component — fall through to nav or fallback
+        }
+
+        // ── PRIORITY 7: Strong story index match → navigate ──
+        const storyMatches = findBestMatch(text, storyIndex);
+        if (storyMatches.length > 0 && storyMatches[0].score >= 90) {
+            runSmartNavigation(text);
+            return;
+        }
+
+        // ── PRIORITY 8: Out of scope or no reliable match ──
+        if (isOutOfScope(text)) {
+            respond({ type: 'fallback_out_of_scope' });
+        } else {
+            respond({ type: 'fallback_unclear' });
         }
     };
 
@@ -1234,8 +1541,8 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                         <div className="sb-ai-agent__header-container">
                             <LogoContainer size="default" />
                             <div className="sb-ai-agent__header-text">
-                                <h3 className="sb-ai-agent__header-name">Hi, {userName}</h3>
-                                <span className="sb-ai-agent__header-sub">WELCOME BACK</span>
+                                <h3 className="sb-ai-agent__header-name">PLUS UNO</h3>
+                                <span className="sb-ai-agent__header-sub">STORYBOOK ASSISTANT</span>
                             </div>
                         </div>
                         <div className="sb-ai-agent__header-actions">
@@ -1250,53 +1557,12 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
 
                     {/* Main - Scrollable Body */}
                     <div className="sb-ai-agent__body" ref={bodyRef}>
-                        {!aiMode ? (
-                            <div className="sb-ai-agent__setup" style={{ padding: 24, paddingBottom: 0 }}>
-                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
-                                <h4 style={{ marginTop: 16, marginBottom: 8, color: 'var(--color-on-surface)' }}>Welcome to the Inline Agent</h4>
-                                
-                                <div style={{ background: 'var(--color-surface-container-high)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
-                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 1: Full AI Functionality</p>
-                                    <input 
-                                        type="password" 
-                                        placeholder="sk-..." 
-                                        value={tempKey} 
-                                        onChange={e => setTempKey(e.target.value)} 
-                                        style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-outline)', marginBottom: 12, outline: 'none' }}
-                                    />
-                                    <button 
-                                        disabled={!tempKey.trim()}
-                                        onClick={() => {
-                                            localStorage.setItem('PLUS_AI_API_KEY', tempKey.trim());
-                                            localStorage.setItem('PLUS_AI_MODE', 'full');
-                                            setApiKey(tempKey.trim());
-                                            setAiMode('full');
-                                        }}
-                                        style={{ background: 'var(--color-primary)', color: 'white', padding: '10px 16px', borderRadius: 8, border: 'none', fontWeight: 600, width: '100%', cursor: tempKey.trim() ? 'pointer' : 'not-allowed', opacity: tempKey.trim() ? 1 : 0.5 }}
-                                    >Save Key & Start Mode 1</button>
-                                </div>
-                                
-                                <div style={{ background: 'var(--color-surface-container)', padding: 16, borderRadius: 12 }}>
-                                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: 'var(--color-on-surface)' }}>Mode 2: Local Processing</p>
-                                    <p style={{ fontSize: 12, color: 'var(--color-on-surface-variant)', marginBottom: 12, lineHeight: 1.4 }}>
-                                        Hide or disable the remote LLM AI features to prevent excessive API usage.
-                                    </p>
-                                    <button 
-                                        onClick={() => {
-                                            localStorage.setItem('PLUS_AI_MODE', 'local');
-                                            setAiMode('local');
-                                        }}
-                                        style={{ background: 'transparent', color: 'var(--color-primary)', padding: '10px 16px', borderRadius: 8, border: '1px solid var(--color-primary)', fontWeight: 600, width: '100%', cursor: 'pointer' }}
-                                    >Continue in Mode 2 (No API Key)</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
+                        <>
                                 {/* Welcome Message */}
                                 <div className="sb-ai-agent__welcome-msg">
                                     <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
                                     <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
-                                        Welcome to PLUS UNO Inline Agent. How can I assist you today?
+                                        Welcome to Storybook Assistant. How can I assist you today?
                                     </div>
                                 </div>
                                 <p className="sb-ai-agent__tip">
@@ -1307,10 +1573,8 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 <div className="sb-ai-agent__quick-actions">
                                     {QUICK_ACTIONS.map(a => (
                                         <button key={a.id} className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
-                                            <div className="sb-ai-agent__quick-icon" style={{ background: a.bg }}>
-                                                <span style={{ color: a.color }}>
-                                                    <a.Icon />
-                                                </span>
+                                            <div className={`sb-ai-agent__quick-icon sb-ai-agent__quick-icon--${a.id}`}>
+                                                <a.Icon />
                                             </div>
                                             <span className="sb-ai-agent__quick-label">{a.label}</span>
                                         </button>
@@ -1320,24 +1584,49 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 {/* Message List */}
                                 <div className="sb-ai-agent__message-list">
                                     {messages.map((m, i) => (
-                                        <div key={i} className={`sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
-                                            {m.role === 'bot' && (
+                                        <div key={i} className={m.noBubble ? '' : `sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
+                                            {!m.noLogo && m.role === 'bot' && (
                                                 <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
                                             )}
-                                            <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
-                                                {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
-                                                    <>
-                                                        <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
-                                                        {navMatches.length > 0 && (
-                                                            <NavMatchList
-                                                                matches={navMatches}
-                                                                selectedIndex={selectedNavIndex}
-                                                                onSelect={navigateToEntry}
-                                                            />
-                                                        )}
-                                                    </>
-                                                ) : m.content}
-                                            </div>
+                                            {m.noBubble ? (
+                                                m.content
+                                            ) : m.role === 'bot' && (m.content?.type === 'fallback_unclear' || m.content?.type === 'fallback_out_of_scope') ? (
+                                                <div className="sb-ai-agent__bot-message-stack">
+                                                    <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
+                                                        <p style={{ margin: 0 }}>
+                                                            {m.content.type === 'fallback_out_of_scope'
+                                                                ? "That\u2019s outside my scope right now. Try rephrasing your question or pick a quick action below."
+                                                                : "I\u2019m not sure what you mean yet. Try rephrasing your question or pick a quick action below."
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                    <div className="sb-ai-agent__quick-actions sb-ai-agent__quick-actions--below-bubble">
+                                                        {QUICK_ACTIONS.map(a => (
+                                                            <button key={a.id} type="button" className="sb-ai-agent__quick-btn" onClick={() => handleQuickAction(a.id)}>
+                                                                <div className={`sb-ai-agent__quick-icon sb-ai-agent__quick-icon--${a.id}`}>
+                                                                    <a.Icon />
+                                                                </div>
+                                                                <span className="sb-ai-agent__quick-label">{a.label}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className={`sb-ai-agent__bubble sb-ai-agent__bubble--${m.role}`}>
+                                                    {typeof m.content === 'string' ? m.content : m.content?.type === 'nav-picker' ? (
+                                                        <>
+                                                            <p style={{ marginBottom: navMatches.length ? 8 : 0 }}>{m.content.text}</p>
+                                                            {navMatches.length > 0 && (
+                                                                <NavMatchList
+                                                                    matches={navMatches}
+                                                                    selectedIndex={selectedNavIndex}
+                                                                    onSelect={navigateToEntry}
+                                                                />
+                                                            )}
+                                                        </>
+                                                    ) : m.content}
+                                                </div>
+                                            )}
                                             {m.role === 'user' && (
                                                 <div className="sb-ai-agent__user-avatar">A</div>
                                             )}
@@ -1355,30 +1644,27 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                     )}
                                 </div>
                             </>
-                        )}
                     </div>
 
                     {/* Footer / Input */}
-                    {aiMode && (
-                        <div className="sb-ai-agent__footer">
-                            <div className="sb-ai-agent__input-container">
-                                <div className="sb-ai-agent__input-wrapper">
-                                    <input
-                                        ref={inputRef}
-                                        className="sb-ai-agent__input"
-                                        type="text"
-                                        placeholder={aiMode === 'local' ? "Chat disabled (Local Mode)" : "Ask me anything..."}
-                                        value={inputValue}
-                                        onChange={e => setInputValue(e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && handleSend()}
-                                    />
-                                    <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
-                                        <Icons.Send />
-                                    </button>
-                                </div>
+                    <div className="sb-ai-agent__footer">
+                        <div className="sb-ai-agent__input-container">
+                            <div className="sb-ai-agent__input-wrapper">
+                                <input
+                                    ref={inputRef}
+                                    className="sb-ai-agent__input"
+                                    type="text"
+                                    placeholder="Ask me anything..."
+                                    value={inputValue}
+                                    onChange={e => setInputValue(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleSend()}
+                                />
+                                <button className="sb-ai-agent__send" onClick={handleSend} title="Send">
+                                    <Icons.Send />
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
 
                 </div>
 

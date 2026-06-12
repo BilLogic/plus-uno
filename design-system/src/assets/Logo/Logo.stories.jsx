@@ -4,7 +4,7 @@ import Logo from './Logo';
 export default {
     title: 'Assets/Logo',
     component: Logo,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     argTypes: {
         // Appearance Group
         style: {
@@ -131,34 +131,3 @@ export const Overview = () => (
     </div>
 );
 
-/**
- * Interactive Playground
- * Adjust controls to test different Logo configurations.
- */
-/**
- * Interactive Playground
- * Adjust controls to test different Logo configurations.
- */
-export const Interactive = (args) => {
-    // Determine background color based on style to ensure visibility
-    // Filled and Outlined are white-ish, so they need a dark background
-    const bg = args.style === 'colored' ? 'transparent' : '#1a1c1e';
-    const color = args.style === 'colored' ? 'inherit' : '#F9F9FC';
-
-    return (
-        <div style={{
-            padding: '40px',
-            backgroundColor: bg,
-            borderRadius: '8px',
-            color: color,
-            display: 'inline-flex'
-        }}>
-            <Logo {...args} />
-        </div>
-    );
-};
-Interactive.args = {
-    style: 'colored',
-    size: 'M',
-    text: false
-};

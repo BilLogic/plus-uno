@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
 
 const sampleItems = [
@@ -21,25 +22,28 @@ export default {
         },
     },
     argTypes: {
-        items: {
-            control: 'object',
-            description: 'Array of breadcrumb items',
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        pathPreset: {
+            control: 'select',
+            options: ['short', 'standard', 'deep'],
+            description: 'Preset breadcrumb depth for the interactive demo',
             table: { category: 'Content' },
         },
         separator: {
-            control: 'text',
-            description: 'Custom separator character (Note: Default / is styled via CSS)',
-            table: { category: 'Design' },
+            table: { disable: true, category: 'Design' },
         },
         id: {
-            control: 'text',
-            description: 'HTML ID for the last item',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         className: {
-            control: 'text',
-            description: 'Custom CSS classes',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        items: {
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -50,7 +54,7 @@ const breadcrumbBlock = { display: 'flex', flexDirection: 'column', gap: 'var(--
 function BreadcrumbStandardDemo() {
     return (
         <div style={breadcrumbBlock}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-sm, 12px)' }}>Standard Breadcrumb</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STANDARD BREADCRUMB</span>
             <Breadcrumb items={sampleItems} />
         </div>
     );
@@ -59,7 +63,7 @@ function BreadcrumbStandardDemo() {
 function BreadcrumbShortDemo() {
     return (
         <div style={breadcrumbBlock}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-sm, 12px)' }}>Short Breadcrumb (2 Levels)</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SHORT BREADCRUMB (2 LEVELS)</span>
             <Breadcrumb items={[
                 { text: 'Home', href: '/' },
                 { text: 'Current Page' }
@@ -80,24 +84,36 @@ export const Short = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={breadcrumbCol}>
-        <BreadcrumbStandardDemo />
-        <BreadcrumbShortDemo />
-    </div>
-);
+export const Overview = () => <Breadcrumb items={sampleItems} />;
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.breadcrumb }
+    }
+};
 
 /**
  * Interactive Breadcrumb
  * Interactive playground for testing breadcrumb props.
  */
-export const Interactive = (args) => <Breadcrumb {...args} />;
+export const Interactive = (args) => (
+    <Breadcrumb
+        {...args}
+        items={{
+            short: [
+                { text: 'Home', href: '/' },
+                { text: 'Current Page' }
+            ],
+            standard: sampleItems,
+            deep: [
+                { text: 'Home', href: '/' },
+                { text: 'Training', href: '/training' },
+                { text: 'Lessons', href: '/lessons' },
+                { text: 'Module 3', href: '/lessons/module-3' },
+                { text: 'Current Page' }
+            ]
+        }[args.pathPreset] || sampleItems}
+    />
+);
 Interactive.args = {
-    items: [
-        { text: 'Home', href: '/' },
-        { text: 'Section', href: '/section' },
-        { text: 'Subsection', href: '/subsection' },
-        { text: 'Current Page' } // No href for current page
-    ],
-    separator: '/',
+    pathPreset: 'standard',
 };

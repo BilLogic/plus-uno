@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../../../../components/Button/Button';
 import Checkbox from '../../../../../forms/Checkbox';
-import TextareaVer2 from '../../../../../forms/TextareaVer2';
+import Textarea from '../../../../../forms/Textarea';
 import { PageLayout } from '../../../../../specs/Universal/Pages';
 import SideNavBar from '../../sections/SideNavBar/SideNavBar';
 import { SessionRatingField } from '../../elements/SessionRating.stories';
@@ -154,7 +154,7 @@ const SessionReflectionPart2 = ({
                                                     {area.label}
                                                 </span>
                                                 <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                                                    <TextareaVer2
+                                                    <Textarea
                                                         id="session-reflection-part-2-other-input"
                                                         name="session-reflection-part-2-other-input"
                                                         variant="short"
@@ -196,7 +196,7 @@ const SessionReflectionPart2 = ({
                                 Eg. I&apos;m experiencing technical difficulties in the breakout room so I need
                                 instructions.
                             </p>
-                            <TextareaVer2
+                            <Textarea
                                 id="session-reflection-part-2-support-text"
                                 name="session-reflection-part-2-support-text"
                                 variant="long"

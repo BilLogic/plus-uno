@@ -3,11 +3,33 @@
  * Per Figma specs - Dark Header / Light Body with unified container
  * 
  * STRUCTURE:
- * .popover (container - holds shadow, border-radius, overflow:hidden)
+ * .popover (container - holds shadow, border-radius, overflow:visible for arrow)
  *   ├── .popover-header (dark background)
  *   └── .popover-body (light background)
  *   └── .popover-arrow (matches appropriate section)
  */
+
+// Storybook Overview: inline panel next to trigger (not positioned by Popper)
+.plus-popover-overview-static {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    // Tight gap so the placement arrow reads as pointing at the trigger (see Figma BS4 popover)
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-spacing-medium-space-400);
+
+    .plus-popover.popover {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+}
 
 // ===== MAIN CONTAINER =====
 // Single elevation layer - no background here (header/body provide their own)
@@ -26,9 +48,9 @@
     // Container is transparent - header/body provide backgrounds
     background-color: transparent !important;
 
-    // Unified border radius and overflow hidden to clip header/body corners
+    // Rounded shell; overflow visible so .popover-arrow (Popper + static) is not clipped
     border-radius: var(--size-modal-radius-sm, 8px) !important;
-    overflow: hidden !important;
+    overflow: visible !important;
 
     // SINGLE elevation shadow on container only
     box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
@@ -45,8 +67,8 @@
         border: none !important;
         margin: 0 !important;
 
-        // No border-radius here - container's overflow:hidden clips corners
-        border-radius: 0 !important;
+        border-top-left-radius: var(--size-modal-radius-sm, 8px) !important;
+        border-top-right-radius: var(--size-modal-radius-sm, 8px) !important;
 
         // Padding per Figma
         padding: 8px 12px !important;
@@ -78,8 +100,8 @@
         border: none !important;
         margin: 0 !important;
 
-        // No border-radius here - container's overflow:hidden clips corners
-        border-radius: 0 !important;
+        border-bottom-left-radius: var(--size-modal-radius-sm, 8px) !important;
+        border-bottom-right-radius: var(--size-modal-radius-sm, 8px) !important;
 
         // Padding per Figma
         padding: 8px 12px !important;
@@ -92,8 +114,8 @@
     }
 }
 
-// ===== ARROW STYLING (outside overflow:hidden scope) =====
-// Arrows need to work with the header/body backgrounds
+// ===== ARROW STYLING =====
+// Arrows sit outside the header/body fill; container uses overflow:visible
 .popover .popover-arrow,
 .plus-popover .popover-arrow {
     display: block !important;
@@ -115,6 +137,8 @@
 .popover.bs-popover-bottom .popover-arrow,
 .popover[data-popper-placement^="bottom"] .popover-arrow {
     top: calc(-0.5rem + 1px);
+    left: 50%;
+    transform: translateX(-50%);
 
     &::before {
         top: 0;
@@ -133,6 +157,8 @@
 .popover.bs-popover-top .popover-arrow,
 .popover[data-popper-placement^="top"] .popover-arrow {
     bottom: calc(-0.5rem + 1px);
+    left: 50%;
+    transform: translateX(-50%);
 
     &::before {
         bottom: 0;
@@ -151,6 +177,8 @@
 .popover.bs-popover-end .popover-arrow,
 .popover[data-popper-placement^="right"] .popover-arrow {
     left: calc(-0.5rem + 1px);
+    top: 50%;
+    transform: translateY(-50%);
     width: 0.5rem;
     height: 1rem;
 
@@ -171,6 +199,8 @@
 .popover.bs-popover-start .popover-arrow,
 .popover[data-popper-placement^="left"] .popover-arrow {
     right: calc(-0.5rem + 1px);
+    top: 50%;
+    transform: translateY(-50%);
     width: 0.5rem;
     height: 1rem;
 

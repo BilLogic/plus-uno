@@ -1,8 +1,10 @@
 ---
 name: uno-prototype
 description: >
-  Scaffold and build a new playground prototype using the PLUS design system.
-  Use when creating new feature prototypes, experiments, or proof-of-concepts.
+  Scaffold a new playground prototype with proper PLUS design system integration.
+  Use when the user asks to "create a prototype", "scaffold a new project",
+  "set up a playground", "start a new experiment", "build a proof-of-concept",
+  or needs a standalone prototype for user testing.
 user-invocable: true
 argument-hint: [project-name]
 ---
@@ -17,11 +19,20 @@ Create a new playground prototype project with proper DS integration.
 - Need a standalone prototype for user testing
 - Building a proof-of-concept for a product pillar
 
+## Auto-Suggest
+
+Proactively suggest this skill when:
+- The user describes a new feature idea that doesn't have an existing prototype
+- The user wants to explore or validate a concept visually
+- A new `playground/` project needs to be set up from scratch
+
+Do not suggest if the user is working on an existing prototype (use the appropriate mode instead).
+
 ## Prerequisites
 
-- `docs/project/plus-app-features.md` — understand which product pillar this relates to
-- `docs/foundations/context-levels.md` — understand the atomic hierarchy
-- `.agent/assets/PLUS_CHEAT_SHEET.md` — available components
+- `docs/context/product/features.md` — understand which product pillar this relates to
+- `docs/context/design-system/foundations/layout.md` — understand the atomic hierarchy
+- `docs/context/design-system/components/cheat-sheet.md` — available components
 
 ## Phase 1: Scope
 
@@ -49,8 +60,8 @@ Create a new playground prototype project with proper DS integration.
 
 ## Phase 3: Build
 
-1. Read `.agent/assets/PLUS_CHEAT_SHEET.md` (MANDATORY)
-2. Read `.agent/assets/PLUS_LAYOUT_CHEAT_SHEET.md` if building a page
+1. Read `docs/context/design-system/components/cheat-sheet.md` (MANDATORY)
+2. Read `docs/context/design-system/components/layout-cheat-sheet.md` if building a page
 3. Use design system components — check `@/components/`, `@/forms/`, `@/specs/`
 4. Apply tokens for all visual values
 5. Use `<PageLayout>` from specs/Universal for page structure
@@ -66,3 +77,10 @@ Create a new playground prototype project with proper DS integration.
 
 1. Add entry to `src/pages/PrototypeMarket/prototypes-data.js`
 2. Or use `/uno:post` skill for guided submission
+
+## Next Step
+
+After completing the prototype:
+→ Suggest `/uno:review` to check DS compliance before shipping. Pass the prototype's directory path as the argument.
+
+These are suggestions — the user may choose to skip steps.

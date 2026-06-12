@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Supervisor Decision Rationale Text Input',
-    component: TextareaVer2,
+    component: Textarea,
     tags: ['autodocs'],
     parameters: {
         layout: 'padded',
@@ -14,7 +14,7 @@ export default {
  * Overview - All States
  * Shows all visual states of the Supervisor Decision Rationale text input
  * 
- * Uses design system TextareaVer2 component with:
+ * Uses design system Textarea component with:
  * - variant="long" for boxed style
  * - placeholder for unfilled state
  * - rows=2 for appropriate height
@@ -30,7 +30,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Unfilled State (Placeholder)</h6>
             <div style={{ maxWidth: '592px' }}>
-                <TextareaVer2
+                <Textarea
                     label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     placeholder="Please provide a reason for this decision..."
                     rows={2}
@@ -42,7 +42,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Filled State</h6>
             <div style={{ maxWidth: '592px' }}>
-                <TextareaVer2
+                <Textarea
                     label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     defaultValue="Bla bla bla bla"
                     rows={2}
@@ -67,7 +67,7 @@ export const Interactive = () => {
                 Provide a rationale for the supervisor's decision on the call-off request.
             </p>
             <div style={{ maxWidth: '592px' }}>
-                <TextareaVer2
+                <Textarea
                     label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     placeholder="Please provide a reason for this decision..."
                     value={rationale}

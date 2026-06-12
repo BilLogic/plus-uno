@@ -4,7 +4,66 @@ import ComboChart from './ComboChart';
 export default {
     title: 'Data Visualizations/Temporal/ComboChart',
     component: ComboChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
+    parameters: {
+        docs: {
+            description: {
+                component: `## Combo Chart
+
+A combo chart helps compare and communicate key patterns in the underlying data.
+
+### Overview
+A combo chart helps compare and communicate key patterns in the underlying data.
+
+---
+
+### How to Read
+- Start with the primary axis and labels to understand the scale
+- Compare shapes, lengths, or positions to identify differences
+- Use legend and annotations to interpret series or categories
+- Look for outliers, clusters, or trend changes
+
+---
+
+### When to Use
+
+| Use Case | Recommendation |
+|----------|----------------|
+| Communicating key comparisons | ✅ Ideal |
+| Highlighting notable patterns | ✅ Ideal |
+| Showing supporting context | ✅ Good |
+| Displaying exact raw tables | ❌ Use data table |
+| Dense exploratory analysis | ❌ Use interactive analysis view |
+
+---
+
+### PLUS Context
+
+| Scenario | Example |
+|----------|---------|
+| **Learner Progress** | Compare progress metrics across cohorts |
+| **Content Performance** | Highlight top and low performing modules |
+| **Engagement Signals** | Surface usage patterns by period |
+| **Program Outcomes** | Track outcomes across programs or terms |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the combo chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+                `
+            }
+        }
+    },
     argTypes: {
         primaryAxisLabel: { control: 'text' },
         secondaryAxisLabel: { control: 'text' },

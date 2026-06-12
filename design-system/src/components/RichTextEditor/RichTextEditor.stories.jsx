@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import RichTextEditor from './RichTextEditor';
 
 export default {
@@ -13,119 +14,106 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        placeholder: {
+            control: 'text',
+            description: 'Placeholder text',
+            table: { category: 'Content' }
+        },
+        initialContent: {
+            control: 'text',
+            description: 'Starting editor content',
+            table: { category: 'Content' }
+        },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
-            description: 'Editor size'
+            description: 'Editor size',
+            table: { category: 'Design' }
         },
         readOnly: {
             control: 'boolean',
-            description: 'Read-only state'
+            description: 'Read-only state',
+            table: { category: 'Behavior' }
         },
         disabled: {
             control: 'boolean',
-            description: 'Disabled state'
+            description: 'Disabled state',
+            table: { category: 'Behavior' }
+        },
+        minHeight: {
+            control: 'number',
+            description: 'Minimum editor height',
+            table: { category: 'Layout' }
+        },
+        toolbarPreset: {
+            control: 'select',
+            options: ['compact', 'full'],
+            description:
+                'compact = Figma email/default toolbar; full = extended control set',
+            table: { category: 'Layout' }
+        },
+        value: {
+            table: { disable: true, category: 'Development' }
+        },
+        defaultValue: {
+            table: { disable: true, category: 'Development' }
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
-
-function RichTextEditorContentDemo() {
-    return (
-        <section>
-            <h5>Default (medium)</h5>
-            <RichTextEditor
-                placeholder="Type something..."
-                minHeight={150}
-            />
-        </section>
-    );
-}
-
-function RichTextEditorSizesDemos() {
-    return (
-        <section>
-            <h5>Sizes</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <RichTextEditor
-                    size="small"
-                    placeholder="Small editor..."
-                    defaultValue="<p>Small editor content</p>"
-                    minHeight={100}
-                />
-                <RichTextEditor
-                    size="large"
-                    placeholder="Large editor..."
-                    defaultValue="<p>Large editor content</p>"
-                    minHeight={200}
-                />
-            </div>
-        </section>
-    );
-}
-
-function RichTextEditorInteractionStatesDemos() {
-    return (
-        <section>
-            <h5>Read-only and disabled</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <RichTextEditor
-                    readOnly
-                    defaultValue="<p>Read-only content cannot be edited.</p>"
-                    minHeight={120}
-                />
-                <RichTextEditor
-                    disabled
-                    placeholder="Disabled editor"
-                    minHeight={120}
-                />
-            </div>
-        </section>
-    );
-}
-
-export const Content = () => (
-    <div style={col}>
-        <RichTextEditorContentDemo />
-    </div>
-);
-
-export const Sizes = () => (
-    <div style={col}>
-        <RichTextEditorSizesDemos />
-    </div>
-);
-
-export const InteractionStates = () => (
-    <div style={col}>
-        <RichTextEditorInteractionStatesDemos />
-    </div>
-);
-
 export const Overview = () => (
-    <div style={col}>
-        <RichTextEditorContentDemo />
-        <RichTextEditorSizesDemos />
-        <RichTextEditorInteractionStatesDemos />
+    <div style={{ width: '100%' }}>
+        <RichTextEditor placeholder="Type something..." minHeight={150} />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.richTextEditor }
+    }
+};
 
-export const Interactive = () => {
-    const [content, setContent] = useState('<p>Initial content...</p>');
+export const Interactive = (args) => {
+    const [content, setContent] = useState(args.initialContent);
+
+    useEffect(() => {
+        setContent(args.initialContent);
+    }, [args.initialContent]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ maxWidth: '880px' }}>
             <RichTextEditor
+                size={args.size}
+                readOnly={args.readOnly}
+                disabled={args.disabled}
+                placeholder={args.placeholder}
+                minHeight={args.minHeight}
+                toolbarPreset={args.toolbarPreset}
                 value={content}
                 onChange={setContent}
-                placeholder="Interactive editor..."
-                minHeight={200}
             />
-            <div style={{ padding: '16px', background: '#f5f5f5', borderRadius: '4px' }}>
-                <h6>Current Content:</h6>
-                <pre style={{ whiteSpace: 'pre-wrap' }}>{content}</pre>
-            </div>
         </div>
     );
+};
+Interactive.args = {
+    placeholder: 'Interactive editor...',
+    initialContent: '<p>Initial content...</p>',
+    size: 'medium',
+    readOnly: false,
+    disabled: false,
+    minHeight: 200,
+    toolbarPreset: 'compact'
 };

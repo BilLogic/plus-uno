@@ -182,6 +182,10 @@ const InSessionContent = () => {
                                                 style={{
                                                     animationDelay: `${560 + i * 100}ms`
                                                 }}
+                                                onClick={() => openStudentInsights({
+                                                    student: s,
+                                                    allStudents: yourStudents
+                                                })}
                                             >
                                                 <td
                                                     style={{
@@ -204,12 +208,12 @@ const InSessionContent = () => {
                                                 <td style={{ padding: '12px 16px' }}>
                                                     <Badge text={s.status} style={getStatusBadgeStyle(s.status)} size="b3" fill="tonal" />
                                                 </td>
-                                                <td style={{ padding: '12px 16px' }}>
+                                                <td style={{ padding: '12px 16px' }} onClick={(e) => e.stopPropagation()}>
                                                     <select className="form-select form-select-sm" style={{ width: 'auto', minWidth: '120px' }} value={s.attendance || ''} onChange={() => { }}>
                                                         {ATTENDANCE_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                                                     </select>
                                                 </td>
-                                                <td style={{ padding: '12px 16px' }}>
+                                                <td style={{ padding: '12px 16px' }} onClick={(e) => e.stopPropagation()}>
                                                     <select className="form-select form-select-sm" style={{ width: 'auto', minWidth: '160px' }} value={s.engagement || ''} onChange={() => { }}>
                                                         {ENGAGEMENT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                                                     </select>

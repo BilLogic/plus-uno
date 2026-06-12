@@ -8,7 +8,7 @@ const Dropdown = ({
     items = [],
     size = "default",
     style = "default",
-    fill = "filled", // NEW: filled, tonal, outline, ghost
+    fill = "outline",
     split = false,
     direction = "dropdown",
     className = "",
@@ -51,7 +51,7 @@ const Dropdown = ({
         direction !== 'dropdown' ? direction : '',
         size !== 'default' ? size : '',
         style !== 'default' ? `pdropdown-${style}` : 'pdropdown-default',
-        fill !== 'filled' ? `pdropdown-${fill}` : '', // NEW: fill variant class
+        fill === 'ghost' ? 'pdropdown-ghost' : 'pdropdown-outline',
         split ? 'pdropdown-split-dropdown' : '',
         show ? 'show' : '',
         className
@@ -90,7 +90,7 @@ const Dropdown = ({
     };
 
     const renderSplitButton = () => (
-        <button type="button" className="pdropdown-split-text-btn pdropdown-default-toggle">
+        <button type="button" className="pdropdown-split-text-btn">
             <span>{buttonText}</span>
         </button>
     );
@@ -182,7 +182,7 @@ Dropdown.propTypes = {
     })),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default']),
-    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
+    fill: PropTypes.oneOf(['outline', 'ghost']),
     split: PropTypes.bool,
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
     className: PropTypes.string,

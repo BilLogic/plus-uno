@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as ScatterChartStories from './ScatterChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ScatterChartStories} />
+
+<Title />
+
+A scatter chart plots data points on X-Y axes to reveal **relationships and correlations** between two variables.
+
+### Overview
+A scatter chart plots data points on X-Y axes to reveal **relationships and correlations** between two variables.
+
+<Primary />
+
+---
+
+### How to Read
+- Each **dot** represents one data point
+- **X position** = first variable value
+- **Y position** = second variable value
+- Look for **patterns**: clusters, trends, outliers
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Finding correlations</td><td>✅ Ideal</td></tr>
+    <tr><td>Identifying clusters</td><td>✅ Ideal</td></tr>
+    <tr><td>Spotting outliers</td><td>✅ Good</td></tr>
+    <tr><td>Categorical data</td><td>❌ Use Bar Chart</td></tr>
+    <tr><td>3 variables</td><td>❌ Use Bubble Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Study vs Performance**</td><td>Hours studied vs test score</td></tr>
+    <tr><td>**Engagement Analysis**</td><td>Session time vs completion rate</td></tr>
+    <tr><td>**Tutor Effect**</td><td>Sessions with tutor vs grade improvement</td></tr>
+    <tr><td>**Attendance Impact**</td><td>Classes attended vs final grade</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use clear axis labels with units
+✅ Add trend line for correlations
+✅ Use transparency for overlapping points
+✅ Include gridlines for readability
+
+**Avoid:**
+❌ Categorical data (use bar charts)
+❌ More than 3-4 series
+❌ Varying point sizes (use Bubble Chart)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={ScatterChartStories.Interactive} />

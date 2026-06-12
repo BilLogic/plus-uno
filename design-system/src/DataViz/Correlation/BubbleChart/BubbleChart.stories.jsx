@@ -4,18 +4,20 @@ import BubbleChart from './BubbleChart';
 export default {
     title: 'Data Visualizations/Correlation/BubbleChart',
     component: BubbleChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Bubble Chart
+                component: `## Bubble Chart
 
+A bubble chart extends the scatter plot by using **bubble size as a third dimension**, allowing visualization of relationships between three variables.
+
+### Overview
 A bubble chart extends the scatter plot by using **bubble size as a third dimension**, allowing visualization of relationships between three variables.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **X-axis position**: First variable value
 - **Y-axis position**: Second variable value  
 - **Bubble size**: Third variable magnitude
@@ -23,7 +25,7 @@ A bubble chart extends the scatter plot by using **bubble size as a third dimens
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A bubble chart extends the scatter plot by using **bubble size as a third dimens
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Variables (X, Y, Size) |
 |----------|------------------------|
@@ -46,7 +48,7 @@ A bubble chart extends the scatter plot by using **bubble size as a third dimens
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Use clear axis labels with units

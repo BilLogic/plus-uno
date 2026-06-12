@@ -1,48 +1,63 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NavTabsStories from './NavTabs.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={NavTabsStories} />
 
 <Title />
-<Description />
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/NavTabs"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Standard tabs with disabled item and a tab dropdown.</>}>
+    <Canvas of={NavTabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Standard tabs with disabled item and a tab dropdown.</>}>
-    <Canvas of={NavTabsStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Standard tabs, disabled item, and tab dropdown.</>}>
+    <DsCanvasQuiet of={NavTabsStories.Content} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+### States
 
 <DocsCanvasShell description={<>Pseudo hover, focus, and pressed on inactive and active tabs.</>}>
-    <Canvas of={NavTabsStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={NavTabsStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### Layout & composition
 
 <DocsCanvasShell description={<>Justified tab distribution.</>}>
-    <Canvas of={NavTabsStories.Layout} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={NavTabsStories.Layout} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={NavTabsStories.Interactive}

@@ -1,0 +1,70 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as VennDiagramStories from './VennDiagram.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={VennDiagramStories} />
+
+<Title />
+
+Shows **overlapping sets** and their relationships.
+
+### Overview
+Shows **overlapping sets** and their relationships.
+
+<Primary />
+
+---
+
+### How to Read
+- **Circles** = distinct sets/groups
+- **Overlaps** = shared elements
+- **Size** = relative quantity
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Set relationships</td><td>✅ Ideal</td></tr>
+    <tr><td>Skill overlaps</td><td>✅ Good</td></tr>
+    <tr><td>Group comparisons</td><td>✅ Good</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Skill Overlap**</td><td>Math + Science students</td></tr>
+    <tr><td>**Feature Usage**</td><td>Users using multiple features</td></tr>
+    <tr><td>**Course Enrollment**</td><td>Multi-subject students</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the venn diagram setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={VennDiagramStories.Interactive} />

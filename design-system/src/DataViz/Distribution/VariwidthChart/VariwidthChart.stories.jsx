@@ -4,25 +4,27 @@ import VariwidthChart from './VariwidthChart';
 export default {
     title: 'Data Visualizations/Distribution/VariwidthChart',
     component: VariwidthChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Variwidth Chart (Variwide)
+                component: `## Variwidth Chart (Variwide)
 
+A column chart where **column width varies** based on a second value.
+
+### Overview
 A column chart where **column width varies** based on a second value.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Height (Y)** = Primary value (e.g., Score)
 - **Width (Z)** = Secondary value/Weight (e.g., Number of students)
 - **Area** = Total impact (Score * Students)
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -32,13 +34,28 @@ A column chart where **column width varies** based on a second value.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Subject Performance** | Avg Score (Height) x Enrollment Count (Width) |
 | **Tutor Ratings** | Rating (Height) x Number of Reviews (Width) |
 | **Feature Usage** | User Count (Height) x Time Spent (Width) |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the variwidth chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -64,6 +81,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

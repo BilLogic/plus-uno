@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TextareaVer2 from '@plus-ds/forms/TextareaVer2';
+import Textarea from '@plus-ds/forms/Textarea';
 import TagInput from '@plus-ds/forms/TagInput';
 
 const Step3Goals = ({ data, updateData }) => {
@@ -26,7 +26,7 @@ const Step3Goals = ({ data, updateData }) => {
                 </p>
             </div>
 
-            <TextareaVer2
+            <Textarea
                 label="Goal Description"
                 placeholder="e.g., The student will be able to add and subtract fractions with unlike denominators with 80% accuracy by Nov 15th."
                 variant="long"

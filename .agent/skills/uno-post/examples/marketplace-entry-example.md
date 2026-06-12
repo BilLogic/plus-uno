@@ -20,6 +20,8 @@ A complete example entry for `src/pages/PrototypeMarket/prototypes-data.js`.
     productPillar: 'toolkit',
     localPath: '/1026',
     repoPath: 'playground/tutor-scheduling/',
+    loomVideoUrl: 'https://www.loom.com/share/abc123',
+    upvotes: 0,
 },
 ```
 
@@ -41,6 +43,8 @@ A complete example entry for `src/pages/PrototypeMarket/prototypes-data.js`.
     productPillar: 'admin',
     localPath: null,
     repoPath: 'playground/parent-communication/',
+    loomVideoUrl: null,
+    upvotes: 0,
 },
 ```
 
@@ -51,3 +55,5 @@ A complete example entry for `src/pages/PrototypeMarket/prototypes-data.js`.
 - `repoPath` must end with a trailing `/`
 - `localPath` is null when the prototype is not yet wired into the root app's router
 - `deploymentUrl` is null until the prototype is deployed to Netlify
+- `loomVideoUrl` is a Loom share URL shown as embedded video in the popup detail modal; null if none
+- `upvotes` is always `0` for new entries (managed in-app)

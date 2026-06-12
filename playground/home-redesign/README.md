@@ -21,7 +21,7 @@ Styling uses **PLUS design tokens** from `design-system/src/styles`:
 - **Typography**: `--font-family-header`, `--font-family-body`, `--font-size-title-m4`, `--font-size-body2`, `--font-line-height-title`.
 - **Spacing/layout**: `--size-section-gap-lg`, `--size-section-pad-y-lg`, `--size-surface-radius`, `--size-element-gap-*`.
 
-See `docs/design-system/tokens.md` for the full token set.
+See `docs/context/design-system/foundations/tokens.md` for the full token set.
 
 ## Data visualization framework
 

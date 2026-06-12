@@ -6,7 +6,7 @@ import './NavTabs.scss';
 // Subcomponents are wrappers around React-Bootstrap Nav.Item/Link/Dropdown
 const NavTabsItem = ({
     children,
-    active = false,
+    active,
     disabled = false,
     href,
     onClick,
@@ -20,7 +20,7 @@ const NavTabsItem = ({
             <Nav.Link
                 as={as}
                 href={href}
-                active={active}
+                {...(active !== undefined ? { active } : {})}
                 disabled={disabled}
                 eventKey={eventKey}
                 onClick={onClick}

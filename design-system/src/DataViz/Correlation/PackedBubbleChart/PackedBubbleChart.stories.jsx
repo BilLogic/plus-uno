@@ -4,25 +4,27 @@ import PackedBubbleChart from './PackedBubbleChart';
 export default {
     title: 'Data Visualizations/Correlation/PackedBubbleChart',
     component: PackedBubbleChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Packed Bubble Chart
+                component: `## Packed Bubble Chart
 
+Shows **grouped bubbles** where size represents quantity and color represents category.
+
+### Overview
 Shows **grouped bubbles** where size represents quantity and color represents category.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Bubble size** = value magnitude
 - **Bubble color** = category group
 - **Clustering** = related items grouped together
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows **grouped bubbles** where size represents quantity and color represents ca
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Subject Enrollment** | Students by subject area |
 | **Tutor Expertise** | Tutors by specialty |
 | **Content Library** | Lessons by category |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the packed bubble chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -83,6 +100,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

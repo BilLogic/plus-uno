@@ -1,14 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../design-system/src/styles/main.scss';
 // Docs-only Tailwind + shadcn (no Preflight; see storybook-tailwind.css)
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
+import StorybookAIAgent from '../playground/storybook-ai-agent-llm-api/StorybookAIAgent';
 
 /**
  * Storybook preview configuration for PLUS Design System
  */
+
+import { createRoot } from 'react-dom/client';
+
+// ---- Global AI Agent Setup ---------------------------------
+// We inject the AI Agent globally so it is available on pure Docs pages
+// that do not contain any Story blocks (where decorators would not run).
+
+const GlobalAgentWrapper = () => {
+  const [context, setContext] = useState('Storybook Docs');
+  
+  useEffect(() => {
+    window.__setAIContext = setContext;
+  }, []);
+
+  return <StorybookAIAgent pageContext={context} />;
+};
+
+if (typeof window !== 'undefined' && !window.__PLUS_AI_AGENT_ROOT__) {
+  window.__PLUS_AI_AGENT_ROOT__ = true;
+  
+  const injectAgent = () => {
+    let container = document.getElementById('plus-ai-agent-global');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'plus-ai-agent-global';
+      document.body.appendChild(container);
+    }
+    const root = createRoot(container);
+    root.render(<GlobalAgentWrapper />);
+  };
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    // wait a tick for body to be ready if in interactive
+    setTimeout(injectAgent, 0);
+  } else {
+    window.addEventListener('DOMContentLoaded', injectAgent);
+  }
+}
 
 // ---- Console noise filters (Storybook-only) ---------------------------------
 // Goal: keep the console clean for design review by hiding known, non-actionable
@@ -79,31 +119,31 @@ const preview = {
       storySort: {
         order: [
           'PLUS Docs',
-          ['Introduction', 'Components', 'Guidelines', 'Tokens'],
+          ['Introduction'],
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',
           'Forms',
           [
-            'Label and Caption',
-            'Input',
-            'Textarea',
-            'Textarea ver 2',
-            'Number Input',
-            'Select',
             'Cascader',
             'Checkbox',
-            'Radio',
-            'Switch',
-            'Range',
-            'Multiple Choice',
             'Choice Grid',
-            'File Upload',
             'Date Picker',
-            'Time Picker',
-            'Rating',
+            'File Upload',
+            'Input',
             'Input Group',
+            'Label and Caption',
+            'Multiple Choice',
+            'Number Input',
+            'Radio',
+            'Range',
+            'Rating',
             'Scale',
+            'Select',
+            'Switch',
+            'Textarea',
+            'Textarea ver 2',
+            'Time Picker',
           ],
           'Components',
           [
@@ -131,7 +171,6 @@ const preview = {
             'RichTextEditor',
             'Scrollspy',
             'SidebarTab',
-            'SuperCompPill',
             'Toast',
             'Tooltip',
           ],
@@ -168,6 +207,7 @@ const preview = {
     },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
+      exclude: ['id', 'className', 'name', 'defaultValue', 'onChange', 'onInput', 'onFocus', 'onBlur'],
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
@@ -221,7 +261,27 @@ const preview = {
   },
 
   decorators: [
-    (Story) => {
+    (Story, context) => {
+      // Provide dynamic context to the AI Agent so the LLM knows which screen/story it's looking at
+      const activeContext = `${context.title} — ${context.name}`;
+      if (typeof window !== 'undefined' && window.__setAIContext) {
+        setTimeout(() => window.__setAIContext(activeContext), 0);
+      }
+
+      // Disable pointer interaction for static docs examples (keeps scroll/canvas stable).
+      // Allow 'Interactive' and 'Overview' so docs canvases with Controls stay usable.
+      if (
+        context.name !== 'Interactive' &&
+        context.name !== 'Overview' &&
+        (context.title.startsWith('Components/') || context.title.startsWith('Forms/'))
+      ) {
+         return (
+           <div style={{ pointerEvents: 'none' }}>
+             <Story />
+           </div>
+         );
+      }
+
       return <Story />;
     },
   ],

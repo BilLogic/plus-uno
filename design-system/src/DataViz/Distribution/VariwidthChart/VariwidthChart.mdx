@@ -1,0 +1,70 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as VariwidthChartStories from './VariwidthChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={VariwidthChartStories} />
+
+<Title />
+
+A column chart where **column width varies** based on a second value.
+
+### Overview
+A column chart where **column width varies** based on a second value.
+
+<Primary />
+
+---
+
+### How to Read
+- **Height (Y)** = Primary value (e.g., Score)
+- **Width (Z)** = Secondary value/Weight (e.g., Number of students)
+- **Area** = Total impact (Score * Students)
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Weighted comparisons</td><td>✅ Ideal</td></tr>
+    <tr><td>Market share x Growth</td><td>✅ Ideal</td></tr>
+    <tr><td>Cost x Volume</td><td>✅ Ideal</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Subject Performance**</td><td>Avg Score (Height) x Enrollment Count (Width)</td></tr>
+    <tr><td>**Tutor Ratings**</td><td>Rating (Height) x Number of Reviews (Width)</td></tr>
+    <tr><td>**Feature Usage**</td><td>User Count (Height) x Time Spent (Width)</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the variwidth chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={VariwidthChartStories.Interactive} />

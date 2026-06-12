@@ -15,10 +15,10 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
         alias: {
-            '@tutors.plus/design-system': path.resolve(__dirname, '../../../../design-system/src/index.js'),
-            '@': path.resolve(__dirname, '../../../../design-system/src'),
-            react: path.resolve(__dirname, '../../../../node_modules/react'),
-            'react-dom': path.resolve(__dirname, '../../../../node_modules/react-dom'),
+            '@tutors.plus/design-system': path.resolve(__dirname, '../../design-system/src/index.js'),
+            '@': path.resolve(__dirname, '../../design-system/src'),
+            react: path.resolve(__dirname, '../../node_modules/react'),
+            'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
         },
     },
     server: {

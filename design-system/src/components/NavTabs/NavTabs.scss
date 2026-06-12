@@ -15,7 +15,7 @@
     list-style: none;
 
     // Bottom border line across all tabs
-    border-bottom: 1px solid var(--color-outline-variant);
+    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--color-outline-variant);
 
     // Constrain width to content so border doesn't exceed tabs
     width: fit-content;
@@ -42,23 +42,44 @@
 
         &.pseudo-focus>.nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus>.plus-nav-link:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-secondary-state-12);
+            background-color: var(--color-on-surface-state-12);
             outline: none;
         }
 
-        &.pseudo-hover>.nav-link.active,
-        &.pseudo-hover>.plus-nav-link.active {
-            background-color: var(--color-secondary-state-08) !important;
+        &.pseudo-hover > .nav-link.active,
+        &.pseudo-hover > .plus-nav-link.active,
+        &.pseudo-hover > .nav-link[aria-selected="true"],
+        &.pseudo-hover > .plus-nav-link[aria-selected="true"],
+        &.pseudo-hover > .nav-link[aria-current="page"],
+        &.pseudo-hover > .plus-nav-link[aria-current="page"],
+        &.pseudo-hover > .nav-link[aria-current="true"],
+        &.pseudo-hover > .plus-nav-link[aria-current="true"] {
+            background-color: var(--color-primary-state-08) !important;
+            border-bottom-color: var(--color-primary) !important;
         }
 
-        &.pseudo-pressed>.nav-link.active,
-        &.pseudo-pressed>.plus-nav-link.active {
-            background-color: var(--color-secondary-state-16) !important;
+        &.pseudo-pressed > .nav-link.active,
+        &.pseudo-pressed > .plus-nav-link.active,
+        &.pseudo-pressed > .nav-link[aria-selected="true"],
+        &.pseudo-pressed > .plus-nav-link[aria-selected="true"],
+        &.pseudo-pressed > .nav-link[aria-current="page"],
+        &.pseudo-pressed > .plus-nav-link[aria-current="page"],
+        &.pseudo-pressed > .nav-link[aria-current="true"],
+        &.pseudo-pressed > .plus-nav-link[aria-current="true"] {
+            background-color: var(--color-primary-state-16) !important;
+            border-bottom-color: var(--color-primary) !important;
         }
 
-        &.pseudo-focus>.nav-link.active,
-        &.pseudo-focus>.plus-nav-link.active {
-            background-color: var(--color-secondary-state-12) !important;
+        &.pseudo-focus > .nav-link.active,
+        &.pseudo-focus > .plus-nav-link.active,
+        &.pseudo-focus > .nav-link[aria-selected="true"],
+        &.pseudo-focus > .plus-nav-link[aria-selected="true"],
+        &.pseudo-focus > .nav-link[aria-current="page"],
+        &.pseudo-focus > .plus-nav-link[aria-current="page"],
+        &.pseudo-focus > .nav-link[aria-current="true"],
+        &.pseudo-focus > .plus-nav-link[aria-current="true"] {
+            background-color: var(--color-primary-state-12) !important;
+            border-bottom-color: var(--color-primary) !important;
             outline: none;
         }
     }
@@ -76,8 +97,8 @@
 
         // Borders
         border: none;
-        border-bottom: 1px solid var(--color-outline-variant);
-        border-radius: var(--Element-radius-md, 4px) var(--Element-radius-md, 4px) 0 0;
+        border-bottom: var(--size-element-stroke-sm, 1px) solid var(--color-outline-variant);
+        border-radius: var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0 0;
 
         // Typography
         font-family: var(--font-family-body);
@@ -110,32 +131,35 @@
 
         // FOCUS state
         &:focus-visible:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-secondary-state-12);
+            background-color: var(--color-on-surface-state-12);
             border-color: transparent transparent var(--color-outline-variant) transparent !important;
             outline: none;
         }
 
         // ACTIVE/SELECTED state - SECONDARY UNDERLINE
-        &.active {
+        &.active,
+        &[aria-selected="true"],
+        &[aria-current="page"],
+        &[aria-current="true"] {
             font-weight: var(--font-weight-body1-semibold);
             background-color: transparent !important;
             color: var(--color-secondary-text) !important;
-            border-color: transparent transparent var(--color-secondary) transparent !important;
+            border-color: transparent transparent var(--color-primary) transparent !important;
             // The active state overrides the 1px outline with a 2px secondary line
-            border-bottom-width: 2px !important;
+            border-bottom-width: var(--size-element-stroke-md, 2px) !important;
             // Negative margin to prevent layout shift from 1px -> 2px border change
-            margin-bottom: -1px;
+            margin-bottom: calc(var(--size-element-stroke-sm, 1px) - var(--size-element-stroke-md, 2px));
 
             &:hover {
-                background-color: var(--color-secondary-state-08) !important;
+                background-color: var(--color-primary-state-08) !important;
             }
 
             &:active {
-                background-color: var(--color-secondary-state-16) !important;
+                background-color: var(--color-primary-state-16) !important;
             }
 
             &:focus-visible {
-                background-color: var(--color-secondary-state-12) !important;
+                background-color: var(--color-primary-state-12) !important;
                 outline: none;
             }
         }
@@ -172,12 +196,12 @@
             font-weight: var(--font-weight-normal, 400);
 
             &:hover {
-                background-color: var(--State-layers-on-surface-8, rgba(0, 0, 0, 0.08));
+                background-color: var(--color-on-surface-state-08);
                 border-bottom-color: var(--color-outline-variant);
             }
 
             &:active {
-                background-color: var(--State-layers-on-surface-16, rgba(0, 0, 0, 0.16));
+                background-color: var(--color-on-surface-state-16);
                 border-bottom-color: var(--color-outline-variant);
             }
 

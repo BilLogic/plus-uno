@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import SidebarTab from '@/components/SidebarTab';
 
 export default {
@@ -6,14 +7,26 @@ export default {
     component: SidebarTab,
     tags: ['!dev'],
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         state: {
             control: { type: 'select' },
-            options: ['enabled', 'hover', 'selected', 'disabled', 'focus']
+            options: ['enabled', 'selected', 'disabled'],
+            table: { category: 'Behavior' }
         },
-        icon: { control: 'text' },
-        text: { control: 'text' },
-        leadingVisual: { control: 'boolean' },
-        trailingVisual: { control: 'boolean' },
+        icon: { control: 'text', table: { category: 'Content' } },
+        text: { control: 'text', table: { category: 'Content' } },
+        leadingVisual: { control: 'boolean', table: { category: 'Content' } },
+        trailingVisual: { control: 'boolean', table: { category: 'Content' } },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
     },
     // Add gap to decorator for better spacing in list
     decorators: [
@@ -59,6 +72,11 @@ export const InSidebar = () => {
         </div>
     );
 };
+InSidebar.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const Default = {
     args: {
@@ -66,6 +84,20 @@ export const Default = {
         icon: 'home',
         state: 'enabled',
     },
+    parameters: {
+        docs: {
+            disable: true
+        }
+    }
+};
+
+export const Overview = {
+    ...Default,
+    parameters: {
+        docs: {
+            source: { language: 'jsx', code: webAppSourceSnippets.sidebarTab }
+        }
+    }
 };
 
 export const Selected = {

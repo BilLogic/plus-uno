@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import MultipleChoice from './MultipleChoice';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         type: {
             control: 'select',
             options: ['radio', 'checkbox'],
@@ -21,8 +25,11 @@ export default {
             table: { category: 'Content' },
         },
         options: {
-            control: 'object',
-            description: 'Array of option objects with id, value, and label properties',
+            table: { disable: true, category: 'Development' },
+        },
+        optionCount: {
+            control: { type: 'range', min: 3, max: 7, step: 1 },
+            description: 'Number of options in the demo list',
             table: { category: 'Content' },
         },
         size: {
@@ -37,9 +44,7 @@ export default {
             table: { category: 'Behavior' },
         },
         value: {
-            control: 'object',
-            description: 'Controlled value (single value for radio, array for checkbox)',
-            table: { category: 'Content' },
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -69,14 +74,38 @@ const contentVariantCard = {
     background: 'var(--color-surface-container-low)',
 };
 
-export const Styles = () => {
+const overviewRadioOptions = shortRadioOptions.slice(0, 4);
+
+export const Overview = () => {
+    const [radioValue, setRadioValue] = useState(null);
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <MultipleChoice
+                id="multiple-choice-overview"
+                name="multiple-choice-overview"
+                type="radio"
+                options={overviewRadioOptions}
+                value={radioValue}
+                onChange={setRadioValue}
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.formMultipleChoice }
+    }
+};
+
+export const Variants = () => {
     const [radioValue, setRadioValue] = useState(null);
     const [checkboxValues, setCheckboxValues] = useState([]);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <h6 className="h6 mb-2">Radio</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio</span>
                 <MultipleChoice
                     id="multiple-choice-radio-default"
                     name="multiple-choice-radio-default"
@@ -87,7 +116,7 @@ export const Styles = () => {
                 />
             </div>
             <div>
-                <h6 className="h6 mb-2">Checkbox</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox</span>
                 <MultipleChoice
                     id="multiple-choice-checkbox-default"
                     name="multiple-choice-checkbox-default"
@@ -103,22 +132,9 @@ export const Styles = () => {
 
 export const Content = () => (
     <div style={{ maxWidth: '800px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        
         <section>
-            <h6 className="h6 mb-2">Long list (radio)</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Long vertical option set for single-selection flows.
-            </p>
-            <div style={contentVariantCard}>
-                <MultipleChoice
-                    id="multiple-choice-radio-long"
-                    name="multiple-choice-radio-long"
-                    type="radio"
-                    options={longRadioOptions}
-                />
-            </div>
-        </section>
-        <section>
-            <h6 className="h6 mb-2">Radio — with selection</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio — with selection</span>
             <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                 Pre-selected item in a single-select list.
             </p>
@@ -133,7 +149,7 @@ export const Content = () => (
             </div>
         </section>
         <section>
-            <h6 className="h6 mb-2">Checkbox — with selections</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox — with selections</span>
             <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                 Pre-selected values for multi-select behavior.
             </p>
@@ -153,7 +169,7 @@ export const Content = () => (
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <h6 className="h6 mb-2">Small</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Small</span>
             <MultipleChoice
                 id="multiple-choice-radio-small"
                 name="multiple-choice-radio-small"
@@ -163,7 +179,7 @@ export const Sizes = () => (
             />
         </div>
         <div>
-            <h6 className="h6 mb-2">Large</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Large</span>
             <MultipleChoice
                 id="multiple-choice-radio-large"
                 name="multiple-choice-radio-large"
@@ -178,7 +194,7 @@ export const Sizes = () => (
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <h6 className="h6 mb-2">Radio — disabled</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio — disabled</span>
             <MultipleChoice
                 id="multiple-choice-radio-disabled"
                 name="multiple-choice-radio-disabled"
@@ -189,7 +205,7 @@ export const InteractionStates = () => (
             />
         </div>
         <div>
-            <h6 className="h6 mb-2">Checkbox — disabled</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox — disabled</span>
             <MultipleChoice
                 id="multiple-choice-checkbox-disabled"
                 name="multiple-choice-checkbox-disabled"
@@ -205,6 +221,19 @@ export const InteractionStates = () => (
 export const Interactive = (args) => {
     const [radioValue, setRadioValue] = useState(args.type === 'radio' ? args.value || null : undefined);
     const [checkboxValues, setCheckboxValues] = useState(args.type === 'checkbox' ? args.value || [] : undefined);
+    const options = Array.from({ length: args.optionCount }, (_, index) => ({
+        id: `option-${index + 1}`,
+        value: `option-${index + 1}`,
+        label: 'Text'
+    }));
+
+    useEffect(() => {
+        if (args.type === 'radio') {
+            setRadioValue(null);
+        } else {
+            setCheckboxValues([]);
+        }
+    }, [args.type, args.optionCount]);
 
     const handleChange = args.type === 'radio' ? setRadioValue : setCheckboxValues;
     const currentValue = args.type === 'radio' ? radioValue : checkboxValues;
@@ -215,7 +244,7 @@ export const Interactive = (args) => {
                 id="multiple-choice-interactive"
                 name="multiple-choice-interactive"
                 type={args.type}
-                options={args.options}
+                options={options}
                 value={currentValue}
                 onChange={handleChange}
                 size={args.size}
@@ -229,12 +258,5 @@ Interactive.args = {
     type: 'radio',
     size: 'medium',
     disabled: false,
-    options: [
-        { id: 'option-1', value: 'option-1', label: 'Text' },
-        { id: 'option-2', value: 'option-2', label: 'Text' },
-        { id: 'option-3', value: 'option-3', label: 'Text' },
-        { id: 'option-4', value: 'option-4', label: 'Text' },
-        { id: 'option-5', value: 'option-5', label: 'Text' },
-    ],
-    value: null,
+    optionCount: 5,
 };

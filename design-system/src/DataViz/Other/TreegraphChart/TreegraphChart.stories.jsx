@@ -4,25 +4,27 @@ import TreegraphChart from './TreegraphChart';
 export default {
     title: 'Data Visualizations/Other/TreegraphChart',
     component: TreegraphChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Treegraph Chart
+                component: `## Treegraph Chart
 
+Shows **hierarchical structures** like family trees or decision trees.
+
+### Overview
 Shows **hierarchical structures** like family trees or decision trees.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Nodes** = individual items
 - **Connections** = parent-child relationships
 - **Layout** = hierarchical tree structure
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -33,13 +35,28 @@ Shows **hierarchical structures** like family trees or decision trees.
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
 | **Prerequisite Chains** | Course dependencies |
 | **Logic Flows** | Learning path decisions |
 | **Categorization** | Topic hierarchy |
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the treegraph chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
                 `
             }
         }
@@ -66,6 +83,7 @@ export const Overview = () => (
         </section>
     </div>
 );
+
 
 export const Interactive = {
     args: {

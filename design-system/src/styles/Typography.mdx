@@ -1,0 +1,49 @@
+import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as TypographyStories from './Typography.stories.jsx';
+
+<Meta of={TypographyStories} />
+
+<Title />
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Display
+
+<div className="sb-unstyled">
+<TypographyStories.TypographyDisplay />
+</div>
+</div>
+
+<div className="sb-ds-doc-section">
+### Headlines
+
+<div className="sb-unstyled">
+<TypographyStories.TypographyHeadlines />
+</div>
+</div>
+
+<div className="sb-ds-doc-section">
+### Titles
+
+<div className="sb-unstyled">
+<TypographyStories.TypographyTitles />
+</div>
+</div>
+
+<div className="sb-ds-doc-section">
+### Body
+
+<div className="sb-unstyled">
+<TypographyStories.TypographyBody />
+</div>
+</div>
+
+<div className="sb-ds-doc-section">
+### Interactive
+
+<DocsInteractivePlayground of={TypographyStories.Interactive} />
+</div>
+
+</div>

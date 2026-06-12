@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Jumbotron from './Jumbotron';
 
 export default {
@@ -13,24 +14,61 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        title: {
+            control: 'text',
+            description: 'Headline text',
+            table: { category: 'Content' }
+        },
+        subtitle: {
+            control: 'text',
+            description: 'Supporting subtitle',
+            table: { category: 'Content' }
+        },
+        actionPreset: {
+            control: 'select',
+            options: ['none', 'primary', 'both'],
+            description: 'Curated action-button combination',
+            table: { category: 'Content' }
+        },
         paddingSize: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
-            description: 'Padding size'
+            description: 'Padding size',
+            table: { category: 'Design' }
         },
         gapSize: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
-            description: 'Gap size'
+            description: 'Gap size',
+            table: { category: 'Design' }
         },
         radiusSize: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
-            description: 'Border radius size'
+            description: 'Border radius size',
+            table: { category: 'Design' }
         },
         fluid: {
             control: 'boolean',
-            description: 'Fluid width (no border radius)'
+            description: 'Fluid width (no border radius)',
+            table: { category: 'Layout' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        primaryButton: {
+            table: { disable: true, category: 'Development' }
+        },
+        secondaryButton: {
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -91,6 +129,11 @@ export const Basic = () => (
         <JumbotronBasicDemo />
     </div>
 );
+Basic.parameters = {
+    docs: {
+        disable: true
+    }
+};
 
 export const WithActions = () => (
     <div style={col}>
@@ -105,22 +148,41 @@ export const Sizes = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <JumbotronBasicDemo />
-        <JumbotronActionsDemo />
-        <JumbotronSizesDemo />
+    <div style={{ width: '100%' }}>
+        <Jumbotron
+            title="Hello, world!"
+            children="This is a simple hero unit."
+        />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.jumbotron }
+    }
+};
 
 export const Interactive = Template.bind({});
 Interactive.args = {
+    actionPreset: 'both',
     title: 'Hello, world!',
     subtitle: 'It uses utility classes for typography and spacing.',
     children: 'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
-    primaryButton: { text: 'Learn more', style: 'primary', fill: 'filled' },
-    secondaryButton: { text: 'Get started', style: 'secondary', fill: 'outline' },
     fluid: false,
     paddingSize: 'md',
     gapSize: 'md',
     radiusSize: 'md'
 };
+Interactive.render = (args) => (
+    <Jumbotron
+        title={args.title}
+        subtitle={args.subtitle}
+        fluid={args.fluid}
+        paddingSize={args.paddingSize}
+        gapSize={args.gapSize}
+        radiusSize={args.radiusSize}
+        primaryButton={args.actionPreset === 'none' ? null : { text: 'Learn more', style: 'primary', fill: 'filled' }}
+        secondaryButton={args.actionPreset === 'both' ? { text: 'Get started', style: 'secondary', fill: 'outline' } : null}
+    >
+        {args.children}
+    </Jumbotron>
+);

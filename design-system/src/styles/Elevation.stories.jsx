@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Styles/Elevation',
-    tags: ['autodocs'],
+    tags: ['!dev'],
 };
 
 const ElevationTable = ({ headers, rows }) => (
@@ -38,12 +38,11 @@ const ElevationTable = ({ headers, rows }) => (
 
 export const Overview = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 className="h1" style={{ marginBottom: '24px' }}>Elevation</h1>
         <p className="body1-txt" style={{ marginBottom: '32px' }}>
             Elevation tokens provide box-shadow values for creating depth and hierarchy in the UI.
         </p>
 
-        <h2 className="h2" style={{ marginBottom: '16px' }}>Elevation Principles</h2>
+        <h4 className="h2" style={{ marginBottom: '16px' }}>Elevation Principles</h4>
         <ul className="body2-txt" style={{ paddingLeft: '24px' }}>
             <li style={{ marginBottom: '8px' }}>Use elevation tokens: Always use elevation tokens instead of custom box-shadow values</li>
             <li style={{ marginBottom: '8px' }}>Match elevation to importance: Use higher elevation for more important/urgent content</li>
@@ -54,7 +53,6 @@ export const Overview = () => (
 
 export const AllElevations = () => (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Elevation Levels</h2>
         <ElevationTable
             headers={['Token', 'Value', 'Visual', 'Use Case']}
             rows={[
@@ -85,55 +83,5 @@ export const AllElevations = () => (
                 },
             ]}
         />
-    </div>
-);
-
-export const UsageExamples = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="h2" style={{ marginBottom: '24px' }}>Usage Examples</h2>
-
-        <div style={{ marginBottom: '32px' }}>
-            <h3 className="h3" style={{ marginBottom: '16px' }}>Card at Rest and Hover</h3>
-            <pre style={{
-                backgroundColor: 'var(--color-surface-container-low)',
-                padding: '16px',
-                borderRadius: '12px',
-                fontSize: '0.875rem',
-                fontFamily: 'monospace'
-            }}>
-                {`.card {
-    box-shadow: var(--elevation-light-1);
-}
-
-.card:hover {
-    box-shadow: var(--elevation-light-2);
-}`}
-            </pre>
-        </div>
-
-        <div>
-            <h3 className="h3" style={{ marginBottom: '16px' }}>Modal/Dialog</h3>
-            <pre style={{
-                backgroundColor: 'var(--color-surface-container-low)',
-                padding: '16px',
-                borderRadius: '12px',
-                fontSize: '0.875rem',
-                fontFamily: 'monospace'
-            }}>
-                {`.modal {
-    box-shadow: var(--elevation-light-3);
-}
-
-/* For prominent modals */
-.modal.prominent {
-    box-shadow: var(--elevation-light-4);
-}
-
-/* For critical dialogs */
-.modal.critical {
-    box-shadow: var(--elevation-light-5);
-}`}
-            </pre>
-        </div>
     </div>
 );

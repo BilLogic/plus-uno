@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Spinner from './Spinner';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         variant: {
             control: 'select',
             options: ['border', 'grow', 'growing', 'rotating', 'stacking'],
@@ -27,9 +31,8 @@ export default {
             table: { category: 'Design', defaultValue: { summary: null } }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -39,10 +42,6 @@ const col = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '
 function SpinnerVariantsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Variants</h6>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Different animation styles for loading indicators.
-            </p>
             <div style={{ display: 'flex', gap: '32px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
@@ -72,11 +71,6 @@ function SpinnerVariantsDemos() {
 function SpinnerStylesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Color</h6>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                All loading indicators use the neutral token <code className="text-foreground">--color-on-surface-variant</code>{' '}
-                (border, grow, and custom animations).
-            </p>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
@@ -94,10 +88,6 @@ function SpinnerStylesDemos() {
 function SpinnerSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Sizes</h6>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Default and small border spinner.
-            </p>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
@@ -130,19 +120,14 @@ export const Sizes = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={col}>
-        <SpinnerVariantsDemos />
-        <SpinnerStylesDemos />
-        <SpinnerSizesDemos />
-    </div>
-);
+export const Overview = () => <Spinner variant="border" />;
 
 Overview.parameters = {
     docs: {
         description: {
-            story: 'Comprehensive view of all Loading spinner variants and sizes (single neutral color).'
-        }
+            story: 'Default border spinner. See other stories for grow, sizes, and custom animations.'
+        },
+        source: { language: 'jsx', code: webAppSourceSnippets.spinner }
     }
 };
 

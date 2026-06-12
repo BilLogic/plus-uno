@@ -2,31 +2,46 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SpinnerStories from './Spinner.stories.jsx';
 import * as SpinnerSubStories from './Spinner.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SpinnerStories} />
 
 <Title />
-<Description />
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Spinner"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Styles
+### Overview
 
-<DocsCanvasShell description={<>Neutral color only: all spinners use the on-surface-variant token.</>}>
-    <Canvas of={SpinnerStories.Styles} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell attachSourceBelow description={<>Default border spinner for inline loading feedback.</>}>
+    <Canvas of={SpinnerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Style Variants
+### Variants
 
 <DocsCanvasShell description={<>Border, grow, and custom animated patterns.</>}>
-    <Canvas of={SpinnerStories.StyleVariants} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SpinnerStories.StyleVariants} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Styles
+
+<DocsCanvasShell description={<>Neutral token treatment across spinner variants.</>}>
+    <DsCanvasQuiet of={SpinnerStories.Styles} />
 </DocsCanvasShell>
 
 </div>
@@ -36,24 +51,34 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Sizes
 
 <DocsCanvasShell description={<>Default and small border spinner.</>}>
-    <Canvas of={SpinnerStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SpinnerStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Layout
+### States
+
+<DocsCanvasShell description={<>Standard spinner states and custom animated states in one comparison view.</>}>
+    <DsCanvasQuiet of={SpinnerSubStories.SpinnerStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout & composition
 
 <DocsCanvasShell description={<>Spinner embedded in a loading button pattern.</>}>
-    <Canvas of={SpinnerSubStories.LoadingButtonExample} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={SpinnerSubStories.LoadingButtonExample} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={SpinnerStories.Interactive}

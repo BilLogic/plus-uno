@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ListGroup from './ListGroup';
 import { Badge } from '@/components/Badge';
 
@@ -7,12 +8,39 @@ export default {
     component: ListGroup,
     tags: ['!dev'],
     subcomponents: { 'ListGroup.Item': ListGroup.Item },
-    argTypes: { ListGroupItem: ListGroup.Item },
     parameters: {
         docs: {
             description: {
                 component: 'List group component for displaying a series of content items. Built on Bootstrap list-group pattern with PLUS design token customizations.'
             }
+        }
+    },
+    argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        flush: {
+            control: 'boolean',
+            table: { category: 'Design' }
+        },
+        horizontal: {
+            control: 'boolean',
+            table: { category: 'Design' }
+        },
+        itemCount: {
+            control: { type: 'range', min: 2, max: 5, step: 1 },
+            table: { category: 'Content' }
+        },
+        activeItem: {
+            control: { type: 'range', min: 1, max: 5, step: 1 },
+            table: { category: 'Behavior' }
+        },
+        as: {
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
@@ -147,16 +175,19 @@ export const Layout = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <ListGroupContentPlainDemo />
-        <ListGroupInteractionStatesDemo />
-        <ListGroupVariantsDemo />
-        <ListGroupContentActionableDemo />
-        <ListGroupLayoutFlushDemo />
-        <ListGroupContentBadgesDemo />
-        <ListGroupLayoutHorizontalDemo />
+    <div style={{ maxWidth: '400px', width: '100%' }}>
+        <ListGroup>
+            <ListGroup.Item>List item 1</ListGroup.Item>
+            <ListGroup.Item>List item 2</ListGroup.Item>
+            <ListGroup.Item>List item 3</ListGroup.Item>
+        </ListGroup>
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.listGroup }
+    }
+};
 
 export const Interactive = (args) => (
     <ListGroup {...args}>
@@ -168,31 +199,15 @@ export const Interactive = (args) => (
 Interactive.args = {
     flush: false,
     horizontal: false,
-    as: 'div'
+    itemCount: 3,
+    activeItem: 2
 };
-Interactive.argTypes = {
-    children: {
-        table: { disable: true }
-    },
-    flush: {
-        control: 'boolean',
-        description: 'Remove borders and rounded corners to render list group items edge-to-edge',
-        table: { category: 'Design' }
-    },
-    horizontal: {
-        control: 'boolean',
-        description: 'Change the layout of list group items from vertical to horizontal',
-        table: { category: 'Design' }
-    },
-    as: {
-        control: 'select',
-        options: ['div', 'ul', 'ol'],
-        description: 'The underlying HTML element to use for the ListGroup',
-        table: { category: 'Behavior' }
-    },
-    className: {
-        control: 'text',
-        description: 'Check class propagation',
-        table: { category: 'System' }
-    }
-};
+Interactive.render = (args) => (
+    <ListGroup flush={args.flush} horizontal={args.horizontal}>
+        {Array.from({ length: args.itemCount }, (_, index) => (
+            <ListGroup.Item key={index} active={index + 1 === args.activeItem}>
+                Item {index + 1}
+            </ListGroup.Item>
+        ))}
+    </ListGroup>
+);

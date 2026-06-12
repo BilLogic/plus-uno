@@ -25,6 +25,7 @@ const OnboardingInnerPage = ({
     showCompletionModal = false,
     reflectionQuestion = "What's one specific action you plan to take in your next session based on what you learned in this module?",
     iframeUrl = '',
+    userName = 'Ashley Xu',
     onModuleComplete,
     onBackToOverview,
 }) => {
@@ -58,7 +59,7 @@ const OnboardingInnerPage = ({
             { text: moduleTitle }
         ],
         user: {
-            name: 'John Doe',
+            name: userName,
             counter: true,
             counterValue: 2
         }

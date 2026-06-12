@@ -4,18 +4,20 @@ import LollipopChart from './LollipopChart';
 export default {
     title: 'Data Visualizations/Comparison/LollipopChart',
     component: LollipopChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Lollipop Chart
+                component: `## Lollipop Chart
 
+A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems instead of bars.
+
+### Overview
 A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems instead of bars.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - **Dot position** = value for that category
 - **Stem** = visual connection to axis
 - Compare dot positions to compare values
@@ -23,7 +25,7 @@ A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -46,7 +48,7 @@ A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Sort by value for rankings

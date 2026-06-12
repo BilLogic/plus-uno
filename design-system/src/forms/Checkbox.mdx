@@ -1,21 +1,38 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CheckboxStories from './Checkbox.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CheckboxStories} />
 
 <Title />
-<Description />
+Use checkbox when a user needs to select more than one option from a list.
+
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Single checkbox with label.</>}>
+    <Canvas of={CheckboxStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ### Content
 
 <DocsCanvasShell description={<>Label text lengths and the required indicator.</>}>
-    <Canvas of={CheckboxStories.Content} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CheckboxStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -25,7 +42,7 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Sizes
 
 <DocsCanvasShell description={<>Small, medium (default), and large.</>}>
-    <Canvas of={CheckboxStories.Sizes} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CheckboxStories.Sizes} />
 </DocsCanvasShell>
 
 </div>
@@ -35,14 +52,14 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Interaction states
 
 <DocsCanvasShell description={<>Unchecked, checked, indeterminate, disabled, and required.</>}>
-    <Canvas of={CheckboxStories.InteractionStates} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CheckboxStories.InteractionStates} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={CheckboxStories.Interactive}

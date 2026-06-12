@@ -1,21 +1,37 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CollapseStories from './Collapse.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CollapseStories} />
 
 <Title />
-<Description />
+The collapse JavaScript plugin is used to show and hide content. Buttons or anchors are used as triggers that are mapped to specific elements you toggle.
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Collapse"
+/>
+
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Uncontrolled usage and an initially expanded panel via <code>defaultOpen</code>.</>}>
+    <Canvas of={CollapseStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Content
 
-<DocsCanvasShell description={<>Uncontrolled usage and an initially expanded panel via <code>defaultOpen</code>.</>}>
-    <Canvas of={CollapseStories.Content} story={{ inline: true }} sourceState="none" />
+<DocsCanvasShell description={<>Default collapsed panel and an initially expanded panel.</>}>
+    <DsCanvasQuiet of={CollapseStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -25,34 +41,27 @@ import { DocsCanvasShell, DocsInteractivePlayground } from '@/storybook-docs/ds-
 ### Icons
 
 <DocsCanvasShell description={<>Optional trigger icons on the left or right.</>}>
-    <Canvas of={CollapseStories.Icons} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CollapseStories.Icons} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### State patterns
+### Behavior
 
 <DocsCanvasShell description={<>External open state and multiple independent panels.</>}>
-    <Canvas of={CollapseStories.StatePatterns} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CollapseStories.StatePatterns} />
 </DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Link trigger
-
 <DocsCanvasShell description={<>Anchor trigger with <code>triggerTag=&quot;a&quot;</code>.</>}>
-    <Canvas of={CollapseStories.LinkTrigger} story={{ inline: true }} sourceState="none" />
+    <DsCanvasQuiet of={CollapseStories.LinkTrigger} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Interactive
+### Interactive playground
 
 <DocsInteractivePlayground
     of={CollapseStories.Interactive}

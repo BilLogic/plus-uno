@@ -1,0 +1,71 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as TreegraphChartStories from './TreegraphChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TreegraphChartStories} />
+
+<Title />
+
+Shows **hierarchical structures** like family trees or decision trees.
+
+### Overview
+Shows **hierarchical structures** like family trees or decision trees.
+
+<Primary />
+
+---
+
+### How to Read
+- **Nodes** = individual items
+- **Connections** = parent-child relationships
+- **Layout** = hierarchical tree structure
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Decision trees</td><td>✅ Ideal</td></tr>
+    <tr><td>Family trees</td><td>✅ Ideal</td></tr>
+    <tr><td>Process flows</td><td>✅ Good</td></tr>
+    <tr><td>Org charts</td><td>✅ Good (or use OrgChart)</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Prerequisite Chains**</td><td>Course dependencies</td></tr>
+    <tr><td>**Logic Flows**</td><td>Learning path decisions</td></tr>
+    <tr><td>**Categorization**</td><td>Topic hierarchy</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the treegraph chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={TreegraphChartStories.Interactive} />

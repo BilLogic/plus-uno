@@ -6,7 +6,7 @@ cd "$ROOT"
 
 status=0
 
-echo "[check] validating markdown links in .agent docs"
+echo "[check] validating markdown links in .agent/ docs"
 
 while IFS= read -r file; do
   while IFS= read -r link; do
@@ -40,31 +40,40 @@ while IFS= read -r file; do
   done < <(rg -o '\[[^]]+\]\(([^)]+)\)' "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
 done < <(find .agent -type f -name '*.md' | sort)
 
-echo "[check] validating .agent/assets markdown policy"
+echo "[check] validating AGENTS.md 'See' references"
 
-while IFS= read -r md_asset; do
-  rel="${md_asset#./}"
-  if [[ "$rel" != ".agent/assets/README.md" ]]; then
-    echo "[policy] markdown reference file found in assets: $rel"
+grep "^See " AGENTS.md | sed 's/^See //' | while read -r ref; do
+  ref="${ref%% *}"  # Strip trailing description
+  if [[ ! -f "$ref" ]]; then
+    echo "[missing] AGENTS.md -> $ref"
     status=1
   fi
-done < <(find .agent/assets -type f -name '*.md' | sort)
+done
 
-echo "[check] validating .agent/assets index json files"
+echo "[check] validating SKILL.md skill links"
 
-required_asset_indexes=(
-  ".agent/assets/index-manifest.json"
-  ".agent/assets/foundations-index.json"
-  ".agent/assets/components-index.json"
-  ".agent/assets/patterns-index.json"
-  ".agent/assets/tokens-index.json"
-  ".agent/assets/examples-index.json"
-  ".agent/assets/integrations-index.json"
+grep -oE 'skills/[a-z-]+/SKILL\.md' .agent/SKILL.md | while read -r ref; do
+  if [[ ! -f ".agent/$ref" ]]; then
+    echo "[missing] SKILL.md -> .agent/$ref"
+    status=1
+  fi
+done
+
+echo "[check] validating JSON index files"
+
+required_indexes=(
+  "docs/context/design-system/index-manifest.json"
+  "docs/context/design-system/components/components-index.json"
+  ".agent/skills/uno-research/references/foundations-index.json"
+  ".agent/skills/uno-research/references/patterns-index.json"
+  ".agent/skills/uno-prototype/references/tokens-index.json"
+  ".agent/skills/uno-prototype/references/examples-index.json"
+  ".agent/skills/uno-prototype/references/integrations-index.json"
 )
 
-for idx in "${required_asset_indexes[@]}"; do
+for idx in "${required_indexes[@]}"; do
   if [[ ! -f "$idx" ]]; then
-    echo "[missing] required asset index: $idx"
+    echo "[missing] required index: $idx"
     status=1
     continue
   fi
@@ -74,10 +83,30 @@ for idx in "${required_asset_indexes[@]}"; do
   fi
 done
 
+echo "[check] validating no old path remnants in active files"
+
+old_patterns=(
+  "docs/project/"
+  "docs/foundations/"
+  "docs/design-system/"
+  "\.agent/assets/"
+  "\.agent/references/"
+)
+
+for pattern in "${old_patterns[@]}"; do
+  count=$(grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" 2>/dev/null \
+    | grep -v "node_modules/" | grep -v "docs/plans/" | grep -v "docs/knowledge/" | grep -v "storybook-static/" \
+    | wc -l | tr -d ' ')
+  if [[ "$count" -gt 0 ]]; then
+    echo "[stale] $count references to old path pattern: $pattern"
+    status=1
+  fi
+done
+
 if [[ $status -eq 0 ]]; then
-  echo "[ok] markdown link check passed"
+  echo "[ok] all validation checks passed"
 else
-  echo "[fail] markdown link check failed"
+  echo "[fail] validation checks failed — see details above"
 fi
 
 exit $status

@@ -11,7 +11,6 @@ const NumberInput = ({
     showLabel = true,
     placeholder = 'Number',
     value,
-    size = 'medium',
     disabled = false,
     readonly = false,
     validation = 'none', // 'none', 'invalid', 'success'
@@ -37,9 +36,6 @@ const NumberInput = ({
             setInternalValue(value);
         }
     }, [value]);
-
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    const bsSize = size === 'small' ? 'sm' : (size === 'large' ? 'lg' : undefined);
 
     const handleFocus = (e) => {
         setIsFocused(true);
@@ -125,8 +121,8 @@ const NumberInput = ({
 
     const wrapperClasses = [
         'plus-number-input-wrapper',
-        `plus-number-input-${size}`,
-        sizeClass,
+        'plus-number-input-medium',
+        'body2-txt',
         disabled ? 'plus-number-input-disabled' : '',
         readonly ? 'plus-number-input-readonly' : '',
         isFocused ? 'plus-number-input-focused' : '',
@@ -160,7 +156,6 @@ const NumberInput = ({
                 </Form.Label>
             )}
             <BootstrapInputGroup
-                size={bsSize}
                 className={wrapperClasses}
                 style={inputGroupStyle}
                 {...props}
@@ -217,7 +212,6 @@ NumberInput.propTypes = {
     showLabel: PropTypes.bool,
     placeholder: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),

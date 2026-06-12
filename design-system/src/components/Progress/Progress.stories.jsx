@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Progress from '@/components/Progress';
 
 export default {
@@ -6,20 +7,32 @@ export default {
     component: Progress,
     tags: ['!dev'],
     argTypes: {
-        value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value' },
-        style: {
-            control: 'select',
-            options: ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'light', 'dark'],
-            description: 'Progress bar style',
-        },
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value', table: { category: 'Content' } },
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
             description: 'Progress bar size',
+            table: { category: 'Design' }
         },
-        striped: { control: 'boolean', description: 'Striped effect' },
-        animated: { control: 'boolean', description: 'Animated stripes' },
-        showLabel: { control: 'boolean', description: 'Show percentage label' },
+        striped: { control: 'boolean', description: 'Striped effect', table: { category: 'Behavior' } },
+        animated: { control: 'boolean', description: 'Animated stripes', table: { category: 'Behavior' } },
+        showLabel: { control: 'boolean', description: 'Show percentage label', table: { category: 'Behavior' } },
+        min: {
+            table: { disable: true, category: 'Development' }
+        },
+        max: {
+            table: { disable: true, category: 'Development' }
+        },
+        label: {
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        }
     },
 };
 
@@ -73,12 +86,15 @@ export const Sizes = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <ProgressVariantsDemos />
-        <ProgressEffectsDemos />
-        <ProgressSizesDemos />
+    <div style={{ width: '100%', minWidth: '200px', maxWidth: '100%' }}>
+        <Progress value={50} style="primary" size="medium" showLabel />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.progress }
+    }
+};
 
 export const Interactive = {
     args: {

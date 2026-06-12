@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Accordion from './Accordion';
 
 export default {
@@ -13,6 +14,9 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         // DESIGN
         flush: {
             control: 'boolean',
@@ -36,35 +40,25 @@ export default {
 
         // DEVELOPMENT
         defaultActiveKey: {
-            control: 'text',
-            description: 'Initially expanded item key (or comma-separated keys for alwaysOpen)',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         activeKey: {
-            control: 'text',
-            description: 'Controlled active key(s)',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         onSelect: {
             table: { disable: true, category: 'Development' }
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         items: {
             table: { disable: true, category: 'Development' }
-        },
-        children: {
-            table: { disable: true, category: 'Development' }
-        }
-    }
+        },}
 };
 
 // Sample accordion content
@@ -92,14 +86,14 @@ function AccordionVariantsDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Default Accordion</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT ACCORDION</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Standard accordion with borders and one item open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Flush Accordion</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FLUSH ACCORDION</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
@@ -115,14 +109,14 @@ function AccordionBehaviorDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>Always Open (Multiple Expanded)</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALWAYS OPEN (MULTIPLE EXPANDED)</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Multiple accordion items can be open simultaneously.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey={['0', '1']} alwaysOpen />
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '16px' }}>All Collapsed</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL COLLAPSED</span>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                     Accordion with no default expanded item.
                 </p>
@@ -135,7 +129,7 @@ function AccordionBehaviorDemos() {
 function AccordionInteractionDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>With Disabled Item</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH DISABLED ITEM</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Individual items can be disabled to prevent interaction.
             </p>
@@ -154,7 +148,7 @@ function AccordionInteractionDemos() {
 function AccordionContentDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Using Children (Alternative Pattern)</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USING CHILDREN (ALTERNATIVE PATTERN)</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Accordion supports both the <code>items</code> array prop and direct child components.
             </p>
@@ -198,37 +192,34 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={accordionPage}>
-        <AccordionVariantsDemos />
-        <AccordionBehaviorDemos />
-        <AccordionInteractionDemos />
-        <AccordionContentDemos />
+    <div style={{ width: '100%' }}>
+        <Accordion items={sampleItems} defaultActiveKey="0" />
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.accordion }
+    }
+};
 
 /**
  * Interactive Playground
  * Customize the accordion attributes in real-time.
  */
 export const Interactive = (args) => {
-    // Generate items based on itemCount
     const items = Array.from({ length: args.itemCount || 3 }, (_, i) => ({
         eventKey: String(i),
         header: `Accordion Item #${i + 1}`,
         body: `This is the content for accordion item ${i + 1}. It can contain any content including text, images, or other components.`
     }));
 
-    // Parse defaultActiveKey if it contains comma-separated values
-    const activeKey = args.defaultActiveKey?.includes(',')
-        ? args.defaultActiveKey.split(',').map(k => k.trim())
-        : args.defaultActiveKey;
-
     return (
         <div style={{ maxWidth: '800px' }}>
             <Accordion
-                {...args}
+                flush={args.flush}
+                alwaysOpen={args.alwaysOpen}
                 items={items}
-                defaultActiveKey={activeKey}
+                defaultActiveKey={args.alwaysOpen ? ['0'] : '0'}
             />
         </div>
     );
@@ -237,6 +228,5 @@ export const Interactive = (args) => {
 Interactive.args = {
     flush: false,
     alwaysOpen: false,
-    itemCount: 3,
-    defaultActiveKey: '0'
+    itemCount: 3
 };

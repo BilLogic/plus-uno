@@ -158,6 +158,6 @@ Each subcategory (Elements, Cards, Tables, Modals, Sections, Pages) will have it
 
 1. **Organisms vs Molecules**: Organisms are higher-level compositions that may use molecules and elements as building blocks
 2. **Token Usage**: Follow the same token reference guidelines, but may use tokens from multiple component types (elements, cards, sections, etc.)
-3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
+3. **Bootstrap Foundation**: Use Bootstrap 5.3 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 

@@ -37,7 +37,7 @@ playground/templates/universal/
 
 1. **Reference Specs First**: Always check `../../../design-system/src/specs/Universal/` for component specifications
 2. **Use Design Tokens**: Always use semantic design tokens from `../../../design-system/src/styles/`
-3. **Bootstrap Foundation**: Use Bootstrap 4.6.2 as functional foundation, then customize all styling to match Figma exactly
+3. **Bootstrap Foundation**: Use Bootstrap 5.3 as functional foundation, then customize all styling to match Figma exactly
 4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
 5. **Complete Pages**: Templates should represent complete, functional page implementations
 

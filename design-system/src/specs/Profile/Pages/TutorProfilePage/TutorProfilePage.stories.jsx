@@ -303,7 +303,7 @@ export const Interactive = {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
                             {/* Row 1 */}
-                            <div style={{ display: 'flex', gap: 'var(--size-spacing-between-components-spacer-2, 8px)', width: '100%' }}>
+                            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', width: '100%' }}>
                                 <div style={{ flex: '1 0 0', maxWidth: '382.67px' }}>
                                     <StudentTypeDropdown id="bg-student-type" onChange={() => setStudentTypeDirty(true)} required={true} />
                                 </div>
@@ -315,7 +315,7 @@ export const Interactive = {
                                 </div>
                             </div>
                             {/* Row 2 */}
-                            <div style={{ display: 'flex', gap: 'var(--size-spacing-between-components-spacer-2, 8px)', width: '100%' }}>
+                            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', width: '100%' }}>
                                 <div style={{ flex: '1 0 0', maxWidth: '578px' }}>
                                     <MathLevel id="bg-math-level" onChange={() => setMathLevelDirty(true)} required={true} />
                                 </div>

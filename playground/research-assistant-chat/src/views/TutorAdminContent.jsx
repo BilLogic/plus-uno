@@ -78,10 +78,18 @@ export const TutorAdminContent = () => {
                 <CompactChatBar onExpand={handleExpand} />
             </div>
         );
-    }, [showResearchAssistant, setBreadcrumbs, setMainClassName, setContentDirect, setFloatingContent, navigate]);
+        // Depend only on showResearchAssistant: the context setters are stable
+        // useState dispatchers, and `navigate` can change identity on navigation —
+        // including it here re-ran this effect every render, calling
+        // setFloatingContent(<new element>) repeatedly (infinite update loop).
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showResearchAssistant]);
 
     useEffect(() => {
-        requestAnimationFrame(() => setHasEntered(true));
+        // setTimeout (not requestAnimationFrame) so the reveal still triggers when
+        // the tab isn't foregrounded — rAF is paused in background/hidden tabs.
+        const t = window.setTimeout(() => setHasEntered(true), 0);
+        return () => window.clearTimeout(t);
     }, []);
 
     useEffect(() => {
@@ -97,9 +105,11 @@ export const TutorAdminContent = () => {
             return undefined;
         }
 
+        // Top (overview) reveals first; the bottom (details) starts as the top is
+        // finishing, so the cascade reads cleanly top-to-bottom with light overlap.
         setHasStageOverview(true);
-        const detailsTimer = window.setTimeout(() => setHasStageDetails(true), 360);
-        const rowsTimer = window.setTimeout(() => setHasStageRows(true), 760);
+        const detailsTimer = window.setTimeout(() => setHasStageDetails(true), 620);
+        const rowsTimer = window.setTimeout(() => setHasStageRows(true), 900);
 
         return () => {
             window.clearTimeout(detailsTimer);
@@ -130,17 +140,14 @@ export const TutorAdminContent = () => {
     }
 
     return (
-        <motion.div
-            key="content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+        <div
             className={`admin-reveal-root${hasEntered ? ' has-entered' : ''}${hasStageOverview ? ' has-stage-overview' : ''}${hasStageDetails ? ' has-stage-details' : ''}${hasStageRows ? ' has-stage-rows' : ''}`}
             style={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}
         >
             <div className="reveal-section">
                 <TrainingProgressContent />
             </div>
-        </motion.div>
+        </div>
     );
 };
 

@@ -12,11 +12,11 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./packages/plus-ds/src/*"]
+      "@/*": ["./design-system/src/*"]
     }
   },
   "include": [
-    "packages/plus-ds/src/**/*",
+    "design-system/src/**/*",
     ".storybook/**/*",
     "vite.config.js",
     "src/**/*"

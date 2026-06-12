@@ -2,7 +2,7 @@ import React from 'react';
 
 export default {
     title: 'Assets/Images',
-    tags: ['autodocs'],
+    tags: ['!dev'],
 };
 
 export const AuthProviders = () => {
@@ -21,7 +21,6 @@ export const AuthProviders = () => {
 
     return (
         <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>Auth Provider Images</h2>
             <p className="body1-txt" style={{ marginBottom: '32px' }}>
                 Static image assets for authentication providers.
             </p>
@@ -129,7 +128,6 @@ export const TutorBadges = () => {
 
     return (
         <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>Tutor Badge Images</h2>
             <p className="body1-txt" style={{ marginBottom: '32px' }}>
                 Badge images for tutor certification status. These are used to display tutor certification badges in various contexts (thumbnail, modal, and full-size).
             </p>
@@ -138,7 +136,7 @@ export const TutorBadges = () => {
                 const categoryAssets = assets.filter(asset => asset.category === category);
                 return (
                     <div key={category} style={{ marginBottom: '48px' }}>
-                        <h3 className="h3" style={{ marginBottom: '24px' }}>{category} Badges</h3>
+                        <h4 className="h4" style={{ marginBottom: '24px' }}>{category} Badges</h4>
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',

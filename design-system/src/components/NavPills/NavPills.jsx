@@ -5,7 +5,7 @@ import './NavPills.scss';
 
 const NavPillsItem = ({
     children,
-    active = false,
+    active,
     disabled = false,
     href,
     onClick,
@@ -19,7 +19,7 @@ const NavPillsItem = ({
             <Nav.Link
                 as={as}
                 href={href}
-                active={active}
+                {...(active !== undefined ? { active } : {})}
                 disabled={disabled}
                 eventKey={eventKey}
                 onClick={onClick}

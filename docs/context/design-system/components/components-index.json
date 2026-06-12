@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "updated_for_branch": "main",
+  "component_roots": [
+    "design-system/src/components",
+    "design-system/src/forms",
+    "design-system/src/DataViz",
+    "design-system/src/specs"
+  ],
+  "export_entrypoints": [
+    "design-system/src/index.js",
+    "design-system/src/components/index.js",
+    "design-system/src/forms/index.js"
+  ],
+  "storybook_story_globs": [
+    "../design-system/src/**/*.stories.{js,jsx,ts,tsx}",
+    "../playground/**/*.stories.{js,jsx,ts,tsx}"
+  ],
+  "discovery_docs": [
+    "docs/context/design-system/components/inventory.md"
+  ]
+}

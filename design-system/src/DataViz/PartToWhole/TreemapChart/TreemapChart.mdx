@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as TreemapChartStories from './TreemapChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TreemapChartStories} />
+
+<Title />
+
+A treemap displays **hierarchical data as nested rectangles**, where rectangle size represents value.
+
+### Overview
+A treemap displays **hierarchical data as nested rectangles**, where rectangle size represents value.
+
+<Primary />
+
+---
+
+### How to Read
+- **Rectangle size** = proportional to the value
+- **Nesting** = parent-child hierarchy
+- **Color** = can encode category or additional metric
+- Larger rectangles dominate; compare areas visually
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Hierarchical part-to-whole</td><td>✅ Ideal</td></tr>
+    <tr><td>Storage/disk usage</td><td>✅ Ideal</td></tr>
+    <tr><td>Budget allocation</td><td>✅ Good</td></tr>
+    <tr><td>Time-series</td><td>❌ Use Line/Area</td></tr>
+    <tr><td>Few categories</td><td>❌ Use Pie/Donut</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Curriculum Breakdown**</td><td>Time spent per subject → topic → lesson</td></tr>
+    <tr><td>**Resource Allocation**</td><td>Budget by department → program → activity</td></tr>
+    <tr><td>**Content Library**</td><td>Materials by category → subcategory</td></tr>
+    <tr><td>**Student Distribution**</td><td>Students by grade → class → group</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Use for hierarchical data with clear parent-child relationships
+✅ Color-code by category for visual grouping
+✅ Include labels for major rectangles
+✅ Allow drill-down for exploration
+
+**Avoid:**
+❌ Flat data without hierarchy
+❌ Too many small rectangles (illegible)
+❌ Comparing exact values (use bar charts)
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={TreemapChartStories.Interactive} />

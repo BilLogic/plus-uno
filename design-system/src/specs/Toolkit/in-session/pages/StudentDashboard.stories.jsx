@@ -426,7 +426,7 @@ export const Interactive = () => {
  * - Body: body1-txt (Merriweather Sans Light, 16px), color: --color-on-surface-variant
  * - Button: outlined primary, default size with leading icon (refresh)
  * - Content width: 332px centered
- * - Gap between text and button: 16px (--size-spacing-within-component-spacer-4-5)
+ * - Gap between text and button: 16px (--size-section-gap-md)
  */
 const RegularTutorEmptyState = () => (
     <div

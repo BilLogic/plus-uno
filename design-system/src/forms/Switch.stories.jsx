@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Switch from './Switch';
 
 export default {
@@ -14,15 +15,16 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Label text for the switch',
             table: { category: 'Content' },
         },
         checked: {
-            control: 'boolean',
-            description: 'Controlled checked state',
-            table: { category: 'State' },
+            table: { disable: true, category: 'Development' },
         },
         size: {
             control: 'select',
@@ -35,7 +37,38 @@ export default {
             description: 'Disable the switch',
             table: { category: 'Behavior' },
         },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
+        name: {
+            table: { disable: true, category: 'Development' },
+        },
+        value: {
+            table: { disable: true, category: 'Development' },
+        },
+        defaultChecked: {
+            table: { disable: true, category: 'Development' },
+        },
+        onChange: {
+            table: { disable: true, category: 'Development' },
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' },
+        },
     },
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Switch id="switch-overview" name="switch-overview" label="Wi‑Fi" defaultChecked />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.formSwitch }
+    }
 };
 
 export const Content = () => (
@@ -54,19 +87,40 @@ export const Content = () => (
 );
 
 export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
-        <Switch id="switch-small" name="switch-small" label="Small" size="small" defaultChecked />
-        <Switch id="switch-medium" name="switch-medium" label="Medium (Default)" size="medium" defaultChecked />
-        <Switch id="switch-large" name="switch-large" label="Large" size="large" defaultChecked />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+            <Switch id="switch-small" name="switch-small" label="Label" size="small" defaultChecked />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+            <Switch id="switch-medium" name="switch-medium" label="Label" size="medium" defaultChecked />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+            <Switch id="switch-large" name="switch-large" label="Label" size="large" defaultChecked />
+        </div>
     </div>
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
-        <Switch id="switch-off" name="switch-off" label="Off" defaultChecked={false} />
-        <Switch id="switch-on" name="switch-on" label="On" defaultChecked />
-        <Switch id="switch-disabled" name="switch-disabled" label="Disabled" disabled />
-        <Switch id="switch-disabled-on" name="switch-disabled-on" label="Disabled (On)" disabled defaultChecked />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OFF</span>
+            <Switch id="switch-off" name="switch-off" label="Label" defaultChecked={false} />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ON</span>
+            <Switch id="switch-on" name="switch-on" label="Label" defaultChecked />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <Switch id="switch-disabled" name="switch-disabled" label="Label" disabled />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED (ON)</span>
+            <Switch id="switch-disabled-on" name="switch-disabled-on" label="Label" disabled defaultChecked />
+        </div>
     </div>
 );
 
@@ -79,6 +133,7 @@ export const Interactive = (args) => {
             name="switch-interactive"
             label={args.label}
             checked={checked}
+            size={args.size}
             disabled={args.disabled}
             onChange={(e) => setChecked(e.target.checked)}
         />
@@ -87,7 +142,6 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     label: 'Toggle Switch',
-    checked: false,
     size: 'medium',
     disabled: false,
 };

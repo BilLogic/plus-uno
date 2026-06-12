@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Badge from './Badge';
 
 // Icons for interactive playground
@@ -16,6 +17,9 @@ export default {
     tags: ['!dev'],
     // Define argTypes to create the custom controls user requested
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         // Content
         text: {
             control: 'text',
@@ -56,15 +60,6 @@ export default {
         },
 
         // Design
-        style: {
-            control: 'select',
-            options: [
-                'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger',
-                'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'
-            ],
-            description: 'Color theme of the badge',
-            table: { category: 'Design' }
-        },
         size: {
             control: 'select',
             options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'],
@@ -81,19 +76,15 @@ export default {
 
         // Development
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         className: {
-            control: 'text',
-            description: 'Custom CSS classes',
-            table: { category: 'Development' }
+            control: false,
+            table: { disable: true, category: 'Development' }
         },
         onDismiss: {
-            action: 'dismissed',
-            description: 'Dismiss callback',
-            table: { category: 'Development' }
+            table: { disable: true, category: 'Development' }
         },
         leadingVisual: {
             table: { disable: true, category: 'Development' }
@@ -119,7 +110,7 @@ const contentVariantCard = {
 function BadgeSizesDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>All Sizes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Sizes</span>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
                 Badges are available in both Header (Lato) and Body (Merriweather Sans) scales.
             </p>
@@ -145,12 +136,13 @@ function BadgeSizesDemos() {
 function BadgeVariantsDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>All Color Themes</h6>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Semantic themes</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                 {['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'].map(style => (
                     <Badge key={style} text={style.charAt(0).toUpperCase() + style.slice(1)} style={style} />
                 ))}
             </div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3" style={{ marginTop: '12px' }}>Curriculum themes</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px' }}>
                 {['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'].map(style => (
                     <Badge key={style} text={style.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} style={style} />
@@ -163,13 +155,9 @@ function BadgeVariantsDemos() {
 function BadgeContentDemos() {
     return (
         <section>
-            <h6 className="h6" style={{ marginBottom: '16px' }}>Recommended Combinations</h6>
             <div style={contentVariantCol}>
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Status Indicators</h6>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Text + leading icon for success, warning, and error semantics.
-                    </p>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Status indicators</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check"></i>} />
@@ -177,43 +165,34 @@ function BadgeContentDemos() {
                             <Badge text="Error" style="danger" leadingVisual={<i className="fa-solid fa-circle-exclamation"></i>} />
                         </div>
                     </div>
-                </section>
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Labels & Categories</h6>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Compact badges in smaller size for metadata and labels.
-                    </p>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Labels and categories</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="New Feature" style="info" size="b3" />
                             <Badge text="Beta" style="tertiary" size="b3" />
                         </div>
                     </div>
-                </section>
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Counts</h6>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Text + counter for inbox/message counts and similar tallies.
-                    </p>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Counts</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Inbox" style="primary" counter="12" />
                             <Badge text="Messages" style="secondary" counter="99+" />
                         </div>
                     </div>
-                </section>
-                <section>
-                    <h6 className="h6" style={{ marginBottom: '8px' }}>Filters & Selections</h6>
-                    <p className="plus-body-2" style={{ marginBottom: '12px', color: 'var(--color-neutral-text)' }}>
-                        Dismissible badges for active filters and selected entities.
-                    </p>
+                </div>
+                <div>
+                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Filters and selections</span>
                     <div style={contentVariantCard}>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <Badge text="Filter: Active" style="primary" dismissible />
                             <Badge text="Jane Doe" style="secondary" dismissible leadingVisual={<i className="fa-solid fa-user"></i>} />
                         </div>
                     </div>
-                </section>
+                </div>
             </div>
         </section>
     );
@@ -239,12 +218,13 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <div style={badgeGalleryCol}>
-        <BadgeSizesDemos />
-        <BadgeVariantsDemos />
-        <BadgeContentDemos />
-    </div>
+    <Badge text="Primary" style="primary" size="b2" />
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.badge }
+    }
+};
 
 /**
  * Interactive Playground

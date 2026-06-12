@@ -1,5 +1,5 @@
 import React from 'react';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 import Badge from '@/components/Badge';
 import StudentCard from '../components/StudentCard';
 
@@ -91,7 +91,7 @@ const StudentCheckIn = ({ students, data, onChange }) => {
                                     </div>
                                 </div>
                             </div>
-                            <TextareaVer2
+                            <Textarea
                                 name={`comment-${student.id}`}
                                 placeholder="Optional quick note about this student..."
                                 variant="short"

@@ -44,13 +44,13 @@
 
 .plus-user-feedback-modal-type-selection {
     display: flex;
-    gap: var(--size-spacing-within-component-spacer-4, 12px);
+    gap: var(--size-element-gap-lg);
 }
 
 .plus-user-feedback-modal-form {
     display: flex;
     flex-direction: column;
-    gap: var(--size-spacing-within-component-spacer-3-base, 8px);
+    gap: var(--size-element-gap-sm);
 }
 
 .plus-user-feedback-modal-severity {
@@ -73,7 +73,7 @@
 
 .plus-user-feedback-modal-form-row {
     display: flex;
-    gap: var(--size-spacing-within-component-spacer-3-base, 8px);
+    gap: var(--size-element-gap-sm);
     align-items: flex-start;
     width: 100%;
 }

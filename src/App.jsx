@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Routes, Route, useParams, Navigate } from 'react-router-dom';
+import { Routes, Route, useParams, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import NavFab from './components/NavFab/NavFab';
 import HomeRedesignApp from '../playground/home-redesign/src/App';
@@ -16,6 +16,7 @@ const RecommendSessionsApp = React.lazy(() => import('../playground/recommend-se
 const StarterApp = React.lazy(() => import('../playground/starter/src/App'));
 const StudentGoalDashboardApp = React.lazy(() => import('../playground/student-goal-dashboard-flow/src/App'));
 const StudentOnboardingWizardApp = React.lazy(() => import('../playground/student-onboarding-wizard/src/App'));
+const ToolkitIaRevisionApp = React.lazy(() => import('../playground/toolkit-ia-revision/src/App'));
 
 // --- Lazy-loaded Group 2 prototypes (page components, no App shell) ---
 const SessionsPage = React.lazy(() => import('../playground/session-management/SessionsPage'));
@@ -23,6 +24,7 @@ const TutorPerformancePage = React.lazy(() => import('../playground/tutor-perfor
 const TrainingProgressPage = React.lazy(() => import('../playground/training-progress/TrainingProgressPage'));
 const GroupPerformanceV2Page = React.lazy(() => import('../playground/group-performance-v2/GroupPerformanceV2Page'));
 const TutorRiskInterventionsPage = React.lazy(() => import('../playground/tutor-risk-interventions/TutorRiskInterventionsPage'));
+const TrainingOnboardingClickthrough = React.lazy(() => import('../playground/training-onboarding/TrainingOnboardingClickthrough'));
 
 function StorybookEmbed() {
   const storyBookUrl = import.meta.env.VITE_STORYBOOK_URL || 'http://localhost:4200';
@@ -93,6 +95,8 @@ function PrototypeRouter() {
     '1023': StarterApp,
     '1024': StudentGoalDashboardApp,
     '1025': StudentOnboardingWizardApp,
+    '1026': TrainingOnboardingClickthrough,
+    '1027': ToolkitIaRevisionApp,
   };
 
   const LazyComponent = STANDALONE_ROUTES[prototypeId];
@@ -126,9 +130,12 @@ function PrototypeRouter() {
 }
 
 function App() {
+  const location = useLocation();
+  const isStorybook = location.pathname.startsWith('/storybook');
+
   return (
     <ThemeProvider>
-      <NavFab />
+      {!isStorybook && <NavFab />}
       <Routes>
         {/* Marketplace is the landing page */}
         <Route path="/" element={<PrototypeMarket />} />

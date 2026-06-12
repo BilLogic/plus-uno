@@ -87,29 +87,15 @@ async function fetchFigmaVariables() {
     }
 }
 
-/**
- * Fetch variable collections from Figma
- */
-async function fetchVariableCollections() {
-    console.log('Fetching variable collections from Figma...');
-    
-    try {
-        const response = await figmaApiRequest(`/files/${FIGMA_FILE_KEY}/variable-collections`);
-        return response;
-    } catch (error) {
-        console.error('Error fetching variable collections:', error.message);
-        throw error;
-    }
-}
 
 /**
  * Transform Figma API response to match existing JSON structure
  */
-function transformToExistingFormat(variables, collections) {
-    // Group variables by collection
+function transformToExistingFormat(variablesResponse) {
+    // The /variables/local endpoint returns both variables and collections in meta
     const collectionsMap = {};
-    if (collections && collections.meta && collections.meta.variableCollections) {
-        collections.meta.variableCollections.forEach(col => {
+    if (variablesResponse?.meta?.variableCollections) {
+        Object.values(variablesResponse.meta.variableCollections).forEach(col => {
             collectionsMap[col.id] = col;
         });
     }
@@ -124,79 +110,78 @@ function transformToExistingFormat(variables, collections) {
     };
 
     // Process each variable
-    if (variables && variables.meta && variables.meta.variables) {
-        variables.meta.variables.forEach(variable => {
-            const collectionId = variable.variableCollectionId;
-            const collection = collectionsMap[collectionId];
-            
-            if (!collection) return;
+    const variablesObj = variablesResponse?.meta?.variables || {};
+    Object.values(variablesObj).forEach(variable => {
+        const collectionId = variable.variableCollectionId;
+        const collection = collectionsMap[collectionId];
+        
+        if (!collection) return;
 
-            const collectionName = collection.name.toLowerCase();
-            let targetFile = null;
+        const collectionName = collection.name.toLowerCase();
+        let targetFile = null;
 
-            // Map collection names to file names
-            if (collectionName.includes('color') && (collectionName.includes('accent') || collectionName.includes('primary') || collectionName.includes('secondary'))) {
-                targetFile = 'colors _ accent';
-            } else if (collectionName.includes('color') && (collectionName.includes('neutral') || collectionName.includes('surface'))) {
-                targetFile = 'colors _ neutral';
-            } else if (collectionName.includes('primitive') || collectionName.includes('base')) {
-                targetFile = 'size _ primitive';
-            } else if (collectionName.includes('semantic') || collectionName.includes('element') || collectionName.includes('card') || collectionName.includes('section')) {
-                targetFile = 'size _ semantics';
-            } else if (collectionName.includes('layout') || collectionName.includes('breakpoint')) {
-                targetFile = 'size _ layout';
-            }
+        // Map collection names to file names
+        if (collectionName.includes('color') && (collectionName.includes('accent') || collectionName.includes('primary') || collectionName.includes('secondary'))) {
+            targetFile = 'colors _ accent';
+        } else if (collectionName.includes('color') && (collectionName.includes('neutral') || collectionName.includes('surface'))) {
+            targetFile = 'colors _ neutral';
+        } else if (collectionName.includes('primitive') || collectionName.includes('base')) {
+            targetFile = 'size _ primitive';
+        } else if (collectionName.includes('semantic') || collectionName.includes('element') || collectionName.includes('card') || collectionName.includes('section')) {
+            targetFile = 'size _ semantics';
+        } else if (collectionName.includes('layout') || collectionName.includes('breakpoint')) {
+            targetFile = 'size _ layout';
+        }
 
-            if (targetFile && organized[targetFile]) {
-                // Transform variable to match existing format
-                const transformedVar = {
-                    id: variable.id,
-                    name: variable.name,
-                    variableCollectionId: variable.variableCollectionId,
-                    resolvedType: variable.resolvedType,
-                    valuesByMode: {},
-                    resolvedValuesByMode: {}
-                };
+        if (targetFile && organized[targetFile]) {
+            // Transform variable to match existing format
+            const transformedVar = {
+                id: variable.id,
+                name: variable.name,
+                variableCollectionId: variable.variableCollectionId,
+                resolvedType: variable.resolvedType,
+                valuesByMode: {},
+                resolvedValuesByMode: {}
+            };
 
-                // Process each mode
-                if (collection.modes) {
-                    collection.modes.forEach(mode => {
-                        const modeId = mode.modeId;
-                        const value = variable.valuesByMode ? variable.valuesByMode[modeId] : undefined;
+            // Process each mode
+            if (collection.modes) {
+                collection.modes.forEach(mode => {
+                    const modeId = mode.modeId;
+                    const value = variable.valuesByMode ? variable.valuesByMode[modeId] : undefined;
 
-                        if (value !== undefined) {
-                            transformedVar.valuesByMode[modeId] = value;
-                            
-                            // Resolve value if it's an alias
-                            if (value && value.type === 'VARIABLE_ALIAS') {
-                                // Find the referenced variable
-                                const refVar = variables.meta.variables.find(v => v.id === value.id);
-                                if (refVar) {
-                                    const refValue = refVar.valuesByMode ? refVar.valuesByMode[modeId] : undefined;
-                                    if (refValue && refValue.type !== 'VARIABLE_ALIAS') {
-                                        transformedVar.resolvedValuesByMode[modeId] = refValue;
-                                    } else {
-                                        transformedVar.resolvedValuesByMode[modeId] = { aliasName: refVar.name };
-                                    }
+                    if (value !== undefined) {
+                        transformedVar.valuesByMode[modeId] = value;
+                        
+                        // Resolve value if it's an alias
+                        if (value && value.type === 'VARIABLE_ALIAS') {
+                            // Find the referenced variable
+                            const refVar = variablesObj[value.id];
+                            if (refVar) {
+                                const refValue = refVar.valuesByMode ? refVar.valuesByMode[modeId] : undefined;
+                                if (refValue && refValue.type !== 'VARIABLE_ALIAS') {
+                                    transformedVar.resolvedValuesByMode[modeId] = refValue;
+                                } else {
+                                    transformedVar.resolvedValuesByMode[modeId] = { aliasName: refVar.name };
                                 }
-                            } else {
-                                transformedVar.resolvedValuesByMode[modeId] = value;
                             }
+                        } else {
+                            transformedVar.resolvedValuesByMode[modeId] = value;
                         }
-                    });
-
-                    // Store modes from collection (only once per file)
-                    if (Object.keys(organized[targetFile].modes).length === 0) {
-                        collection.modes.forEach(mode => {
-                            organized[targetFile].modes[mode.modeId] = mode.name;
-                        });
                     }
-                }
+                });
 
-                organized[targetFile].variables.push(transformedVar);
+                // Store modes from collection (only once per file)
+                if (Object.keys(organized[targetFile].modes).length === 0) {
+                    collection.modes.forEach(mode => {
+                        organized[targetFile].modes[mode.modeId] = mode.name;
+                    });
+                }
             }
-        });
-    }
+
+            organized[targetFile].variables.push(transformedVar);
+        }
+    });
 
     return organized;
 }
@@ -227,14 +212,11 @@ async function syncTokens() {
         console.log('Starting Figma token sync...');
         console.log(`File Key: ${FIGMA_FILE_KEY.substring(0, 8)}...`);
 
-        // Fetch data from Figma
-        const [variables, collections] = await Promise.all([
-            fetchFigmaVariables(),
-            fetchVariableCollections()
-        ]);
+        // Fetch data from Figma (variables + collections in one call)
+        const variablesResponse = await fetchFigmaVariables();
 
         // Transform to existing format
-        const organized = transformToExistingFormat(variables, collections);
+        const organized = transformToExistingFormat(variablesResponse);
 
         // Save to files
         saveTokenFiles(organized);
@@ -243,6 +225,12 @@ async function syncTokens() {
         console.log('Run "npm run generate:tokens" to generate SCSS files from synced tokens.');
         
     } catch (error) {
+        if (error.message.includes('403') && error.message.includes('scope')) {
+            console.log('\n⚠ Variables REST API requires Figma Enterprise plan.');
+            console.log('  Token sync via API is not available on your current plan.');
+            console.log('  Use the Figma Tokens plugin or manual export instead.');
+            process.exit(0);
+        }
         console.error('\n❌ Token sync failed:', error.message);
         process.exit(1);
     }

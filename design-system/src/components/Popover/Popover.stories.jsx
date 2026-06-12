@@ -1,4 +1,6 @@
 import React from 'react';
+import { Popover as RBPopover } from 'react-bootstrap';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popover from './Popover';
 import Button from '@/components/Button/Button';
 
@@ -14,20 +16,44 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        triggerLabel: {
+            control: 'text',
+            description: 'Button label used as the popover trigger',
+            table: { category: 'Content' }
+        },
+        title: {
+            control: 'text',
+            description: 'Popover title',
+            table: { category: 'Content' }
+        },
         placement: {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
-            description: 'Popover placement'
+            description: 'Popover placement',
+            table: { category: 'Layout' }
         },
         triggerType: {
             control: 'select',
             options: ['click', 'hover', 'focus', ['hover', 'focus']],
-            description: 'Trigger behavior'
+            description: 'Trigger behavior',
+            table: { category: 'Behavior' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        trigger: {
+            table: { disable: true, category: 'Development' }
         }
     }
 };
-
-const Template = (args) => <Popover {...args} />;
 
 const col = { display: 'flex', flexDirection: 'column', gap: '64px', padding: '48px', alignItems: 'center' };
 
@@ -69,7 +95,7 @@ function PopoverLayoutDemos() {
 function PopoverContentDemo() {
     return (
         <section>
-            <h5>No title</h5>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NO TITLE</span>
             <Popover
                 trigger={<Button text="Content Only" style="primary" />}
                 placement="right"
@@ -83,7 +109,7 @@ function PopoverContentDemo() {
 function PopoverInteractionStatesDemos() {
     return (
         <section>
-            <h5>Trigger types</h5>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TRIGGER TYPES</span>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <Popover
                     trigger={<Button text="Click (Default)" style="info" />}
@@ -127,18 +153,40 @@ export const InteractionStates = () => (
 );
 
 export const Overview = () => (
-    <div style={col}>
-        <PopoverLayoutDemos />
-        <PopoverContentDemo />
-        <PopoverInteractionStatesDemos />
+    <div className="plus-popover-overview-static">
+        <Button type="button" text="Toggle popover" style="primary" />
+        <RBPopover className="plus-popover" placement="right">
+            <RBPopover.Header className="plus-popover-title">Popover title</RBPopover.Header>
+            <RBPopover.Body className="plus-popover-body">
+                Body content appears below the title. This overview is non-interactive; use Interactive for
+                click/hover behavior.
+            </RBPopover.Body>
+        </RBPopover>
     </div>
 );
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.popover }
+    }
+};
 
-export const Interactive = Template.bind({});
-Interactive.args = {
-    trigger: <Button text="Interactive Trigger" />,
-    title: 'Interactive Popover',
-    children: 'Change my placement or title in the controls.',
-    placement: 'top',
-    triggerType: 'click'
+export const Interactive = {
+    args: {
+        triggerLabel: 'Interactive Trigger',
+        title: 'Interactive Popover',
+        children: 'Change my placement or title in the controls.',
+        placement: 'top',
+        triggerType: 'click'
+    },
+    render: (args) => {
+        const { triggerLabel, ...popoverProps } = args;
+        return (
+            <div style={{ padding: '48px', display: 'flex', justifyContent: 'center' }}>
+                <Popover
+                    {...popoverProps}
+                    trigger={<Button text={triggerLabel} style="primary" />}
+                />
+            </div>
+        );
+    }
 };

@@ -4,18 +4,20 @@ import DonutChart from './DonutChart';
 export default {
     title: 'Data Visualizations/PartToWhole/DonutChart',
     component: DonutChart,
-    tags: ['autodocs'],
+    tags: ['!dev'],
     parameters: {
         docs: {
             description: {
-                component: `
-## Donut Chart
+                component: `## Donut Chart
 
+A donut chart shows **part-to-whole relationships** with a center cutout, ideal for displaying completion rates and KPIs.
+
+### Overview
 A donut chart shows **part-to-whole relationships** with a center cutout, ideal for displaying completion rates and KPIs.
 
 ---
 
-### 📖 How to Read
+### How to Read
 - Each **segment** = a proportion of the whole
 - **Segment size** = percentage of total
 - **Center value** = key metric or total
@@ -23,7 +25,7 @@ A donut chart shows **part-to-whole relationships** with a center cutout, ideal 
 
 ---
 
-### 🎯 When to Use
+### When to Use
 
 | Use Case | Recommendation |
 |----------|----------------|
@@ -35,7 +37,7 @@ A donut chart shows **part-to-whole relationships** with a center cutout, ideal 
 
 ---
 
-### 🏫 适用场景 (PLUS Context)
+### PLUS Context
 
 | Scenario | Example |
 |----------|---------|
@@ -47,7 +49,7 @@ A donut chart shows **part-to-whole relationships** with a center cutout, ideal 
 
 ---
 
-### 🛠️ How to Use
+### How to Use
 
 **Best Practices:**
 ✅ Limit to 5 or fewer segments

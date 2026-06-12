@@ -1,0 +1,71 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as PackedBubbleChartStories from './PackedBubbleChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PackedBubbleChartStories} />
+
+<Title />
+
+Shows **grouped bubbles** where size represents quantity and color represents category.
+
+### Overview
+Shows **grouped bubbles** where size represents quantity and color represents category.
+
+<Primary />
+
+---
+
+### How to Read
+- **Bubble size** = value magnitude
+- **Bubble color** = category group
+- **Clustering** = related items grouped together
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Grouped comparisons</td><td>✅ Ideal</td></tr>
+    <tr><td>Category clusters</td><td>✅ Ideal</td></tr>
+    <tr><td>Market share by segment</td><td>✅ Good</td></tr>
+    <tr><td>Precise comparisons</td><td>❌ Use Bar Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Subject Enrollment**</td><td>Students by subject area</td></tr>
+    <tr><td>**Tutor Expertise**</td><td>Tutors by specialty</td></tr>
+    <tr><td>**Content Library**</td><td>Lessons by category</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Align the packed bubble chart setup with the primary question you need to answer
+✅ Keep labels, units, and legends explicit so interpretation is immediate
+✅ Limit visual complexity to emphasize the most important pattern
+✅ Use consistent color meaning across categories or series
+
+**Avoid:**
+❌ Mixing unrelated metrics without clarifying scale or context
+❌ Overcrowding the chart with too many categories or series
+❌ Using decorative styling that competes with the data
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={PackedBubbleChartStories.Interactive} />

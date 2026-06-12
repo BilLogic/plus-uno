@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import DateAndTimePicker from './DateAndTimePicker';
 
 export default {
@@ -14,6 +15,9 @@ export default {
         },
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         label: {
             control: 'text',
             description: 'Label text for the date and time picker field',
@@ -62,9 +66,8 @@ export default {
             table: { category: 'Validation' },
         },
         id: {
-            control: 'text',
-            description: 'HTML ID attribute',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
         showSectionLabels: {
             control: 'boolean',
@@ -72,9 +75,8 @@ export default {
             table: { category: 'Content' },
         },
         className: {
-            control: 'text',
-            description: 'Additional CSS classes',
-            table: { category: 'Development' },
+            control: false,
+            table: { disable: true, category: 'Development' },
         },
     },
 };
@@ -84,6 +86,17 @@ const contentVariantCard = {
     border: '1px solid var(--color-outline-variant)',
     borderRadius: '12px',
     background: 'var(--color-surface-container-low)',
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <DateAndTimePicker id="datetime-overview" label="Month" required showSectionLabels={false} />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.formDateTime }
+    }
 };
 
 export const Content = () => (
@@ -111,38 +124,62 @@ export const Content = () => (
 
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
-        <DateAndTimePicker id="dt-small" label="Month" required size="small" showSectionLabels={false} />
-        <DateAndTimePicker id="dt-medium" label="Month" required size="medium" showSectionLabels={false} />
-        <DateAndTimePicker id="dt-large" label="Month" required size="large" showSectionLabels={false} />
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+            <DateAndTimePicker id="dt-small" label="Month" required size="small" showSectionLabels={false} />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
+            <DateAndTimePicker id="dt-medium" label="Month" required size="medium" showSectionLabels={false} />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+            <DateAndTimePicker id="dt-large" label="Month" required size="large" showSectionLabels={false} />
+        </div>
     </div>
 );
 
 export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
-        <DateAndTimePicker
-            id="datetime-error"
-            label="Month"
-            required
-            validation="invalid"
-            validationMessage="Validation message"
-            showSectionLabels={false}
-        />
-        <DateAndTimePicker
-            id="datetime-success"
-            label="Month"
-            required
-            validation="success"
-            validationMessage="Validation message"
-            showSectionLabels={false}
-        />
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <DateAndTimePicker
+                id="datetime-error"
+                label="Month"
+                required
+                validation="invalid"
+                validationMessage="Validation message"
+                showSectionLabels={false}
+            />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUCCESS</span>
+            <DateAndTimePicker
+                id="datetime-success"
+                label="Month"
+                required
+                validation="success"
+                validationMessage="Validation message"
+                showSectionLabels={false}
+            />
+        </div>
     </div>
 );
 
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
-        <DateAndTimePicker id="datetime-default" label="Month" required showSectionLabels={false} />
-        <DateAndTimePicker id="datetime-disabled" label="Month" required disabled showSectionLabels={false} />
-        <DateAndTimePicker id="datetime-readonly" label="Month" required readonly showSectionLabels={false} />
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <DateAndTimePicker id="datetime-default" label="Month" required showSectionLabels={false} />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <DateAndTimePicker id="datetime-disabled" label="Month" required disabled showSectionLabels={false} />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+            <DateAndTimePicker id="datetime-readonly" label="Month" required readonly showSectionLabels={false} />
+        </div>
     </div>
 );
 
@@ -155,7 +192,6 @@ export const Interactive = (args) => {
                 {...args}
                 onChange={(data) => {
                     setValue(data);
-                    console.log('Date and Time:', data);
                 }}
             />
             {value && (

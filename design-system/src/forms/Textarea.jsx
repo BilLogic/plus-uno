@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import './Textarea.scss';
 
 const Textarea = ({
     id,
@@ -11,6 +12,8 @@ const Textarea = ({
     placeholder,
     rows = 3,
     size = 'medium',
+    variant = 'long',
+    state = 'default',
     disabled = false,
     readOnly = false,
     onChange,
@@ -20,13 +23,28 @@ const Textarea = ({
     style,
     ...props
 }) => {
-    // Legacy sizing classes based on body typography
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    const formClass = `plus-form-textarea plus-form-textarea-${size} ${sizeClass}`;
+    const normalizeState = (nextState) => {
+        // Back-compat aliases used in stories/docs.
+        if (nextState === 'read-only' || nextState === 'readOnly') return 'readonly';
+        if (nextState === 'valid') return 'success';
+        return nextState;
+    };
+
+    // Determine effective state (disabled/readonly override)
+    let visualState = normalizeState(state);
+    if (disabled) visualState = 'disabled';
+    else if (readOnly) visualState = 'readonly';
+
+    const sizeClass = size === 'small' ? 'plus-textarea-v2--sm' : (size === 'large' ? 'plus-textarea-v2--lg' : 'plus-textarea-v2--md');
+
+    const containerClass = `plus-textarea-v2 ${sizeClass} plus-textarea-v2--${variant} plus-textarea-v2--${visualState} ${className}`;
+
+    // Adjust rows for short variant if not explicitly set
+    const effectiveRows = variant === 'short' ? 1 : rows;
 
     return (
-        <>
-            {label && <Form.Label htmlFor={id || name}>{label}</Form.Label>}
+        <div className={containerClass} style={style}>
+            {label && <label htmlFor={id || name} className="plus-textarea-v2__label">{label}</label>}
             <Form.Control
                 as="textarea"
                 id={id}
@@ -34,17 +52,16 @@ const Textarea = ({
                 value={value}
                 defaultValue={defaultValue}
                 placeholder={placeholder}
-                rows={rows}
+                rows={effectiveRows}
                 disabled={disabled}
                 readOnly={readOnly}
                 onChange={onChange}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                className={`${formClass} ${readOnly ? 'plus-form-textarea-readonly' : ''} ${disabled ? 'plus-form-textarea-disabled' : ''} ${className}`}
-                style={style}
+                className="plus-textarea-v2__control"
                 {...props}
             />
-        </>
+        </div>
     );
 };
 
@@ -57,6 +74,8 @@ Textarea.propTypes = {
     placeholder: PropTypes.string,
     rows: PropTypes.number,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
+    variant: PropTypes.oneOf(['long', 'short']),
+    state: PropTypes.oneOf(['default', 'focus', 'error', 'success', 'readonly', 'disabled', 'valid', 'read-only']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
     onChange: PropTypes.func,

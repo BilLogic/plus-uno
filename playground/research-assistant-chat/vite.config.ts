@@ -1,14 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const plusDsSrc = path.resolve(__dirname, '../../../../design-system/src');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const plusDsSrc = path.resolve(__dirname, '../../design-system/src');
 
 /**
  * Vite config for Research Assistant Chat prototype.
  * Resolves plus-ds tokens and design system from monorepo.
  */
-const projectRoot = path.resolve(__dirname, '../../../../');
+const projectRoot = path.resolve(__dirname, '../../');
 
 export default defineConfig({
   root: __dirname,
@@ -28,6 +31,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
+        api: 'modern-compiler',
         loadPaths: [plusDsSrc, path.join(plusDsSrc, 'styles')],
       },
     },

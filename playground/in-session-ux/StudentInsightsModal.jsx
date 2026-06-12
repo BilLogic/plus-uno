@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { GaugeChart, HeatmapChart } from '@/DataViz';
 import Button from '@/components/Button';
@@ -48,6 +48,22 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
     const [selectedStudentId, setSelectedStudentId] = useState(student?.id);
     const [activeAccordionKey, setActiveAccordionKey] = useState(null);
     const [shouldPlayIntroAnimations, setShouldPlayIntroAnimations] = useState(true);
+
+    // Practice Activity heatmap fills the remaining height of the left column.
+    const heatmapWrapRef = useRef(null);
+    const [heatmapHeight, setHeatmapHeight] = useState(150);
+    useEffect(() => {
+        const el = heatmapWrapRef.current;
+        if (!el || typeof ResizeObserver === 'undefined') return undefined;
+        const ro = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const h = Math.floor(entry.contentRect.height);
+                if (h > 80) setHeatmapHeight(h);
+            }
+        });
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, [activeContentTab]);
 
     // Sync state when student prop changes
     useEffect(() => {
@@ -162,6 +178,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     width: 'min(1120px, calc(100% - 48px))',
                     height: '80%',
                     maxWidth: '1120px',
+                    maxHeight: '760px',
                     overflow: 'hidden',
                     display: 'flex',
                     flexDirection: 'column',
@@ -207,7 +224,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     <div className="modal-header-reveal" style={{ animationDelay: '100ms' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                             <h2 id="student-insights-modal-title" className="h4" style={{ margin: 0 }}>{currentStudent?.name}</h2>
-                            <Button text="Update goals" style="primary" fill="filled" size="medium" trailingVisual={<i className="fa-solid fa-pencil" aria-hidden />} onClick={() => { }} />
+                            <Button text="Update goals" style="primary" fill="filled" size="medium" trailingVisual={<i className="fa-solid fa-pencil" aria-hidden />} onClick={() => setActiveContentTab('goals')} />
                         </div>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                             {statusTags.map((tag, i) => (
@@ -347,12 +364,12 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                 </div>
                             </div>
                             <h4 className="body2-txt animate-enter delay-inner-2" style={{ fontWeight: 600, marginTop: '12px', marginBottom: '4px', '--base-delay': '100ms' }}>Practice Activity (Last 4 Weeks)</h4>
-                            <div className="animate-enter delay-inner-3" style={{ '--base-delay': '100ms' }}>
+                            <div ref={heatmapWrapRef} className="animate-enter delay-inner-3" style={{ '--base-delay': '100ms', flex: 1, minHeight: 120, display: 'flex', flexDirection: 'column' }}>
                                 <HeatmapChart
                                     xCategories={practiceHeatmapX}
                                     yCategories={practiceHeatmapY}
                                     data={practiceHeatmapData}
-                                    height={150}
+                                    height={heatmapHeight}
                                     minColor="rgba(176, 227, 255, 0.32)"
                                     maxColor="rgba(0, 82, 145, 0.96)"
                                     enableAnimation={false}
@@ -425,8 +442,31 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     </div>
 
                     {activeContentTab === 'goals' && (
-                        <div className="body1-txt" style={{ padding: '16px 0', color: 'var(--color-on-surface-variant)' }}>
-                            Goal details are available from the Update goals action.
+                        <div className="animate-enter delay-1" style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', gap: '16px', '--base-delay': '0ms' }}>
+                            {[
+                                { title: 'Build persistence on multi-step problems', progress: 92, due: 'Due in 2 weeks' },
+                                { title: 'Master fractions with unlike denominators', progress: 64, due: 'Due in 3 weeks' },
+                                { title: 'Maintain 90%+ accuracy on integer operations', progress: 95, due: 'Ongoing' }
+                            ].map((goal, i) => (
+                                <div key={i} className={`obs-card animate-enter delay-inner-${i + 1}`} style={{
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--color-outline-variant)',
+                                    backgroundColor: 'var(--color-surface-container)',
+                                    '--base-delay': '0ms'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                        <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{goal.title}</span>
+                                        <Badge text={goal.due} style="secondary" size="b3" fill="tonal" />
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
+                                        <div style={{ flex: 1, height: '8px', borderRadius: '4px', backgroundColor: 'var(--color-outline-variant)', overflow: 'hidden' }}>
+                                            <div style={{ width: `${goal.progress}%`, height: '100%', borderRadius: '4px', backgroundColor: 'var(--color-tertiary, #0e8175)' }} />
+                                        </div>
+                                        <span className="body3-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{goal.progress}%</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                     {activeContentTab === 'notes' && (

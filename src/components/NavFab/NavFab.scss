@@ -57,5 +57,57 @@
       outline: 2px solid var(--color-primary, #1a73e8);
       outline-offset: 2px;
     }
+
+    // AI Agent button — same size/shape as the agent's own FAB, no border
+    &--ai {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+
+      &:hover {
+        background: transparent;
+        transform: scale(1.06);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+    }
   }
+
+  // The gradient blob + sparkle icon wrapper (replicates the AI agent's LogoContainer)
+  &__ai-logo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+
+    &-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    &-icon {
+      position: relative;
+      z-index: 1;
+      width: 45%;
+      height: 45%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+// Hide the AI agent's own built-in FAB so NavFab is the sole trigger
+.sb-ai-agent__fab-wrapper {
+  display: none !important;
 }

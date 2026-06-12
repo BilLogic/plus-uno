@@ -294,8 +294,14 @@ $btn-themes: (
 }
 
 // --- ELEMENTS ---
+&-text {
+    // Typography utility classes (like .h6) often set an explicit color.
+    // We ensure the button's theme color always wins.
+    color: inherit;
+}
+
 &-visual {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     line-height: 1;

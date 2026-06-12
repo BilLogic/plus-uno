@@ -15,20 +15,35 @@ body,
 
 /* Headers in Storybook docs */
 .sbdocs h1,
+.sbdocs-title,
+.sbdocs-h1 {
+    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-size: var(--font-size-display4, 56px) !important;
+    font-weight: var(--font-weight-headline, 700) !important;
+    color: var(--color-on-surface, #191c1e) !important;
+}
+
 .sbdocs h2,
+.sbdocs-h2 {
+    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-size: var(--font-size-h2, 32px) !important;
+    font-weight: var(--font-weight-headline, 700) !important;
+    color: var(--color-on-surface, #191c1e) !important;
+    margin-top: var(--size-section-gap-md) !important;
+}
+
 .sbdocs h3,
 .sbdocs h4,
 .sbdocs h5,
 .sbdocs h6,
-.sbdocs-title,
-.sbdocs-h1,
-.sbdocs-h2,
 .sbdocs-h3,
 .sbdocs-h4,
 .sbdocs-h5 {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-size: var(--font-size-h3, 28px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
     color: var(--color-on-surface, #191c1e) !important;
+    margin-top: var(--size-element-gap-md) !important;
 }
 
 /* Body text in docs */
@@ -37,9 +52,18 @@ body,
 .sbdocs td,
 .sbdocs th {
     font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
+    font-size: var(--font-size-body1, 16px) !important;
+    line-height: var(--font-line-height-body1, 150%) !important;
+    font-weight: var(--font-weight-normal, 300) !important;
+}
+
+/* Canvas Descriptions text */
+.sb-ds-canvas-description {
+    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
     font-size: var(--font-size-body2, 14px) !important;
     line-height: var(--font-line-height-body2, 157.1%) !important;
     font-weight: var(--font-weight-normal, 300) !important;
+    color: var(--color-on-surface-variant, #5c5c5c) !important;
 }
 
 /* Code blocks */
@@ -163,6 +187,106 @@ a.sbdocs-a {
   margin-bottom: 0;
 }
 
+/* Space out major sections with macro spacing */
+.sbdocs .sb-ds-doc-section,
+.sbdocs .sb-button-docs .sb-button-doc-section {
+  margin-top: clamp(6rem, 8vw, 8rem) !important;
+  margin-bottom: clamp(6rem, 8vw, 8rem) !important;
+}
+
+/*
+ * PLUS Docs Introduction: tighter narrative rhythm than component API docs.
+ */
+.sbdocs .sb-plus-intro-page {
+  margin-top: clamp(2.5rem, 4vw, 4rem) !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-ds-doc-section {
+  margin-top: clamp(2.25rem, 4vw, 3.25rem) !important;
+  margin-bottom: clamp(2.25rem, 4vw, 3.25rem) !important;
+  gap: 0.875rem;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
+  font-family: var(--font-family-header, 'Lato', sans-serif);
+  font-size: var(--font-size-display4, 56px);
+  font-weight: var(--font-weight-headline, 700);
+  line-height: 1.1;
+  margin: 0 0 0.75rem;
+  color: var(--color-on-surface, #191c1e);
+}
+
+.sbdocs .sb-plus-intro-page .sb-ds-doc-section:first-child {
+  margin-top: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-ds-doc-section:last-child {
+  margin-bottom: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-grid,
+.sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-sections-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
+  border: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 70%, transparent);
+  border-radius: var(--size-card-radius-sm);
+  background: color-mix(in srgb, var(--color-muted, #e0e3e7) 28%, transparent);
+  padding: 0.875rem;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-on-surface, #191c1e);
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-copy {
+  margin: 0.25rem 0 0.75rem;
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface-variant, #5c5c5c);
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .sbdocs.sbdocs-preview {
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div:first-child {
+  padding: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .innerZoomElementWrapper > * {
+  border: none !important;
+}
+
 /*
  * Preview well: flatten inner Storybook Canvas chrome; outer card only.
  */
@@ -213,11 +337,239 @@ a.sbdocs-a {
  * Default autodocs pages (no .sb-doc-shadcn): slightly calmer lead under the title.
  * Does not affect Canvas.
  */
-.sbdocs .sbdocs-subtitle {
+.sbdocs .sbdocs-subtitle,
+.sbdocs-title + p,
+.sbdocs-h1 + p,
+.sbdocs p.sbdocs-subtitle {
   opacity: 0.92;
+  margin-top: 1.5rem !important;
+  margin-bottom: 4rem !important;
+}
+
+/* Add margin under the main Title */
+.sbdocs h1,
+.sbdocs-title,
+.sbdocs-h1 {
+  margin-bottom: 1rem !important;
+}
+
+/*
+ * TOC "ON THIS PAGE" Heading
+ * Targeting aggressively as Storybook 8 TOC might lack .sbdocs-toc
+ */
+.sbdocs .sbdocs-toc h2,
+.toc-wrapper h2,
+.toc-container h2,
+.sbdocs-wrapper aside h2,
+h2.toc-title {
+  font-size: var(--font-size-body2, 14px) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.5rem !important;
+  color: var(--color-on-surface-variant, #5c5c5c) !important;
 }
 
 /* Hide scrollbar while maintaining scroll functionality */
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
+}
+
+/* Hide the AI agent's own floating button in Storybook preview because we use the NavFab */
+.sb-ai-agent__fab-wrapper {
+  display: none !important;
+}
+
+/* 
+ * FIX: Tailwind and Bootstrap Class Collision for '.collapse'
+ * Tailwind's `collapse` utility sets `visibility: collapse`, which hides 
+ * Bootstrap components like Accordion when they expand but keep the `.collapse` class.
+ */
+.accordion-collapse.collapse.show,
+.collapse.show {
+    visibility: visible !important;
+}
+
+/* 
+ * Global Fluent-like tweaks for canvas previews in "Forms" and "Components".
+ * Remove outer border, shadow.
+ */
+.sb-ds-docs-preview-well,
+.sb-button-docs-preview-well,
+.sbdocs.sbdocs-preview {
+    box-shadow: none !important;
+}
+
+.sb-ds-docs-preview-well .sbdocs.sbdocs-preview,
+.sb-button-docs-preview-well .sbdocs.sbdocs-preview {
+    background-color: transparent !important;
+    border-radius: 0 !important;
+}
+
+/* 
+ * Variant subheadings design within each story section.
+ * Differentiates from normal headers by using a subtle body-copy typography token feel.
+ */
+.docs-story section > h5,
+.docs-story section > h6 {
+    font-family: var(--font-family-body, 'Merriweather Sans', sans-serif) !important;
+    font-size: var(--font-size-body2, 14px) !important;
+    font-weight: 600 !important;
+    color: var(--color-neutral-text, var(--color-on-surface-variant, #5c5c5c)) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 0.75rem !important;
+    margin-top: 0 !important;
+}
+
+/*
+ * DocsCanvasShell attachSourceBelow: preview = rounded card only; code toggle + source sit below (attached).
+ * Matches “canvas + extension” layout (toggle associated with the code panel, not inside the muted well).
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root {
+    min-width: 0;
+}
+
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .sbdocs.sbdocs-preview {
+    margin: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+/*
+ * Overview preview: keep generous width but visually center in the docs column (padded layout is start-aligned by default).
+ * Cap ultra-wide viewports so line length stays sane; story roots may still use width:100% inside this frame.
+ * Flex centers shrink-wrapped heroes (e.g. a single Button); roots with inline width:100% still span the row.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper {
+    width: 100% !important;
+    max-width: min(100%, 112rem) !important;
+    min-width: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+}
+
+/*
+ * Preview row: match .sb-ds-docs-preview-well (muted fill only — no extra border/shadow).
+ * Rounded top only; bottom is straight so it meets the code strip flush.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    /* stretch: full-width column; innerZoomElementWrapper flex-row + justify:center centers shrink-wrap previews */
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    padding: 2rem clamp(1rem, 4vw, 2.5rem) !important;
+    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
+    background: color-mix(in srgb, var(--color-muted, #e0e3e7) 40%, transparent);
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
+    background: color-mix(in srgb, var(--color-muted, #3f4847) 25%, transparent);
+}
+
+/* Drop Storybook’s default preview chrome (border/shadow) inside attached canvases */
+/*
+ * Story root under zoom wrapper: Storybook injects a transform-wrapper div between innerZoomElementWrapper
+ * and the story JSX root. That wrapper has no explicit width, so flex-basis:auto resolves to content-size,
+ * collapsing any percentage-width child (e.g. Carousel/Accordion). Setting width:100% here gives the
+ * wrapper a definite size so its children's width:100% resolves correctly against the full column width.
+ * Small shrink-wrapped components (Badge, Button, Spinner) remain centered via Storybook's inner
+ * column-flex align-items:center on the transform wrapper.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper > * {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    border-width: 0 !important;
+    box-shadow: none !important;
+}
+
+/*
+ * Storybook ActionBar defaults to position:absolute; bottom:0 inside .docs-story (floating on the preview).
+ * Pull it into normal flow so it sits between the rounded canvas and the source block.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    left: auto !important;
+    top: auto !important;
+    max-width: none !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0.375rem 0.5rem !important;
+    background: var(--color-surface, #fffbfe) !important;
+    border: none !important;
+    border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 50%, transparent) !important;
+    border-radius: 0 !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+    z-index: 1;
+}
+
+/* Code collapsed: round the bottom of the toolbar to mirror the preview’s top radius */
+.sbdocs
+    .sb-ds-docs-canvas-shell--source-attached
+    .sb-ds-docs-canvas-attached-root
+    .sbdocs.sbdocs-preview:not(:has(pre))
+    .docs-story
+    > *:last-child:not(:only-child) {
+    border-radius: 0 0 var(--size-card-radius-sm) var(--size-card-radius-sm) !important;
+    border-bottom: none !important;
+}
+
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) button {
+    position: relative !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 55%, transparent) !important;
+    border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 55%, transparent) !important;
+    box-shadow: none !important;
+}
+
+.sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
+    background: var(--color-surface, #191c1e) !important;
+    border-top-color: color-mix(in srgb, var(--color-border, #8e918f) 40%, transparent) !important;
+}
+
+/* Code expanded: toolbar stays square-bottom; syntax block gets the bottom radius */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .sbdocs.sbdocs-preview pre {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: var(--size-card-radius-sm) !important;
+    border-bottom-right-radius: var(--size-card-radius-sm) !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
 }

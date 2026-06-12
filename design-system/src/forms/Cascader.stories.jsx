@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Cascader from './Cascader';
 
 export default {
@@ -14,15 +15,20 @@ export default {
         },
     },
     argTypes: {
-        value: {
-            control: 'object',
-            description: 'Array of selected values representing the current path',
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
+        contentPreset: {
+            control: 'select',
+            options: ['empty', 'preselected'],
+            description: 'Preset selection state for the interactive demo',
             table: { category: 'Content' },
         },
         options: {
-            control: 'object',
-            description: 'Hierarchical options structure with children arrays',
-            table: { category: 'Content' },
+            table: { disable: true, category: 'Development' },
+        },
+        value: {
+            table: { disable: true, category: 'Development' },
         },
         disabled: {
             control: 'boolean',
@@ -30,9 +36,7 @@ export default {
             table: { category: 'Behavior' },
         },
         onChange: {
-            action: 'changed',
-            description: 'Callback function when selection changes',
-            table: { category: 'Behavior' },
+            table: { disable: true, category: 'Development' },
         },
         placeholder: {
             control: 'text',
@@ -81,6 +85,27 @@ const sampleOptions = [
     },
 ];
 
+export const Overview = () => {
+    const [value, setValue] = useState([]);
+
+    return (
+        <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 360 }}>
+            <Cascader
+                id="cascader-overview"
+                value={value}
+                options={sampleOptions}
+                onChange={setValue}
+                placeholder="Please select"
+            />
+        </div>
+    );
+};
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.formCascader }
+    }
+};
+
 export const Content = () => {
     const [value1, setValue1] = useState([]);
     const [value2, setValue2] = useState(['zhejiang', 'hangzhou', 'westlake']);
@@ -88,14 +113,14 @@ export const Content = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
-                <h6 className="h6 mb-2">Empty selection</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">EMPTY SELECTION</span>
                 <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Opens the menu and builds a path from the hierarchy.
                 </p>
                 <Cascader id="cascader-basic" value={value1} options={sampleOptions} onChange={setValue1} />
             </div>
             <div>
-                <h6 className="h6 mb-2">Pre-selected path</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PRE-SELECTED PATH</span>
                 <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Value shown in the field; opening reveals columns up to the current level.
                 </p>
@@ -131,19 +156,24 @@ export const InteractionStates = () => {
 };
 
 export const Interactive = (args) => {
-    const [value, setValue] = useState(args.value || []);
+    const [value, setValue] = useState(args.contentPreset === 'preselected'
+        ? ['zhejiang', 'hangzhou', 'westlake']
+        : []);
+
+    useEffect(() => {
+        setValue(args.contentPreset === 'preselected'
+            ? ['zhejiang', 'hangzhou', 'westlake']
+            : []);
+    }, [args.contentPreset]);
 
     return (
         <div style={{ maxWidth: '600px' }}>
             <Cascader
                 id="cascader-interactive"
                 value={value}
-                options={args.options || sampleOptions}
+                options={sampleOptions}
                 onChange={(newValue) => {
                     setValue(newValue);
-                    if (args.onChange) {
-                        args.onChange(newValue);
-                    }
                 }}
                 disabled={args.disabled}
                 placeholder={args.placeholder}
@@ -158,8 +188,7 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    value: [],
-    options: sampleOptions,
+    contentPreset: 'empty',
     disabled: false,
     placeholder: 'Please select',
 };

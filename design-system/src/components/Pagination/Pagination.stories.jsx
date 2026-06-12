@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Pagination from './Pagination';
 
 export default {
@@ -13,33 +14,54 @@ export default {
         }
     },
     argTypes: {
+        children: { table: { disable: true } },
+        onClick: { table: { disable: true } },
+        style: { table: { disable: true } },
         type: {
             control: 'select',
             options: ['icon', 'text'],
-            description: 'Pagination type: icon (chevrons) or text (Previous/Next)'
+            description: 'Pagination type: icon (chevrons) or text (Previous/Next)',
+            table: { category: 'Content' }
         },
         size: {
             control: 'select',
             options: ['small', 'default', 'large'],
-            description: 'Pagination size'
+            description: 'Pagination size',
+            table: { category: 'Design' }
         },
         currentPage: {
             control: 'number',
-            description: 'Current active page'
+            description: 'Current active page',
+            table: { category: 'Behavior' }
         },
         totalPages: {
             control: 'number',
-            description: 'Total number of pages'
+            description: 'Total number of pages',
+            table: { category: 'Content' }
         },
         maxVisible: {
             control: 'number',
-            description: 'Maximum number of visible page numbers'
+            description: 'Maximum number of visible page numbers',
+            table: { category: 'Layout' }
+        },
+        id: {
+            control: false,
+            table: { disable: true, category: 'Development' }
+        },
+        className: {
+            control: false,
+            table: { disable: true, category: 'Development' }
         }
     }
 };
 
 const Template = (args) => {
     const [page, setPage] = useState(args.currentPage);
+
+    useEffect(() => {
+        setPage(args.currentPage);
+    }, [args.currentPage]);
+
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
@@ -55,29 +77,21 @@ function PaginationContentDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Icon type</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Chevron-only previous/next controls with numeric page items.
-                </p>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
-                        totalPages={20}
+                        totalPages={10}
                         type="icon"
                         size="default"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
             </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Text type</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Uses explicit Previous/Next labels for stronger textual affordance.
-                </p>
+            <section style={{ marginTop: '24px' }}>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
-                        totalPages={20}
+                        totalPages={10}
                         type="text"
                         size="default"
                         prevText="Previous"
@@ -94,7 +108,7 @@ function PaginationSizesDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Icon type sizes</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON TYPE SIZES</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Small, default, and large icon pagination.
                 </p>
@@ -107,7 +121,7 @@ function PaginationSizesDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Text type sizes</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT TYPE SIZES</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Small, default, and large text pagination with Previous/Next labels.
                 </p>
@@ -127,7 +141,7 @@ function PaginationInteractionStatesDemos() {
     return (
         <>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>First page</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Previous control is disabled at the first page.
                 </p>
@@ -142,7 +156,7 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Last page</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Next control is disabled at the last page.
                 </p>
@@ -157,7 +171,7 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Middle page</h6>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Both previous and next controls are enabled.
                 </p>
@@ -193,22 +207,24 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div style={paginationCanvas}>
-        <PaginationContentDemos />
-        <PaginationSizesDemos />
-        <PaginationInteractionStatesDemos />
-    </div>
-);
+const paginationPlaygroundArgs = {
+    currentPage: 5,
+    totalPages: 10,
+    type: 'icon',
+    size: 'default',
+    maxVisible: 5
+};
+
+export const Overview = Template.bind({});
+Overview.args = { ...paginationPlaygroundArgs };
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.pagination }
+    }
+};
 
 /**
  * Interactive - Full controls for testing all props
  */
 export const Interactive = Template.bind({});
-Interactive.args = {
-    currentPage: 5,
-    totalPages: 20,
-    type: 'icon',
-    size: 'default',
-    maxVisible: 5
-};
+Interactive.args = { ...paginationPlaygroundArgs };

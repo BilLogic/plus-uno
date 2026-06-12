@@ -1,0 +1,74 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as DumbbellChartStories from './DumbbellChart.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DumbbellChartStories} />
+
+<Title />
+
+A dumbbell chart shows the **change or gap between two values** for each category.
+
+### Overview
+A dumbbell chart shows the **change or gap between two values** for each category.
+
+<Primary />
+
+---
+
+### How to Read
+- **Two dots** = start and end values
+- **Bar connecting** = range/change between them
+- Longer bars = bigger changes/gaps
+- Color can indicate direction (up/down)
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Before/after comparison</td><td>✅ Ideal</td></tr>
+    <tr><td>Range visualization</td><td>✅ Ideal</td></tr>
+    <tr><td>Gap analysis</td><td>✅ Ideal</td></tr>
+    <tr><td>Single values</td><td>❌ Use Lollipop</td></tr>
+    <tr><td>Time series</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### PLUS Context
+
+<table>
+  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>**Score Changes**</td><td>Pre-test vs Post-test scores</td></tr>
+    <tr><td>**Progress Tracking**</td><td>Start vs Current level</td></tr>
+    <tr><td>**Salary Bands**</td><td>Min vs Max pay by role</td></tr>
+    <tr><td>**Goal Tracking**</td><td>Target vs Actual performance</td></tr>
+  </tbody>
+</table>
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Sort by gap size for impact
+✅ Use horizontal for long labels
+✅ Color-code improvements vs declines
+✅ Add value labels at both ends
+
+**Avoid:**
+❌ Too many categories (>15)
+❌ Negative value ranges
+❌ Missing context labels
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={DumbbellChartStories.Interactive} />

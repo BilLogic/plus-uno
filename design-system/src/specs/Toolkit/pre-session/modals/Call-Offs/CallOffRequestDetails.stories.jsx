@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from '../../../../../components/Modal';
 import Button from '../../../../../components/Button';
 import Select from '@/forms/Select';
-import TextareaVer2 from '@/forms/TextareaVer2';
+import Textarea from '@/forms/Textarea';
 import Switch from '@/forms/Switch';
 
 // Import CTA button components from Tutor View
@@ -141,7 +141,7 @@ const AdditionalDetailsTextarea = ({ value, onChange }) => (
             </span>
             <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
         </div>
-        <TextareaVer2
+        <Textarea
             placeholder="Placeholder"
             value={value}
             onChange={onChange}
@@ -182,7 +182,7 @@ const WithdrawToggle = ({ checked, onChange }) => (
  * - Modal (plus-ds)
  * - Button (plus-ds)
  * - Select (plus-ds/forms)
- * - TextareaVer2 (plus-ds/forms)
+ * - Textarea (plus-ds/forms)
  * - Switch (plus-ds/forms)
  * - CallOffAlert (local component)
  * 

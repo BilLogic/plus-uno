@@ -1,4 +1,5 @@
 import React from 'react';
+import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 
 /**
  * Label — form label with optional required asterisk.
@@ -130,6 +131,25 @@ export default {
     },
 };
 
+export const Overview = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-element-gap-xs)',
+            maxWidth: '480px',
+        }}
+    >
+        <Label text="Field label" required />
+        <Caption text="Helper or validation copy beneath the label." state="default" icon="square-plus" />
+    </div>
+);
+Overview.parameters = {
+    docs: {
+        source: { language: 'jsx', code: webAppSourceSnippets.formLabelCaption }
+    }
+};
+
 export const LabelContent = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
         <section>
@@ -140,32 +160,36 @@ export const LabelContent = () => (
             <h6 className="h6 mb-3">Without required indicator</h6>
             <Label text="Label" required={false} />
         </section>
-        <section>
-            <h6 className="h6 mb-3">Custom copy</h6>
-            <Label text="Email Address" required />
-        </section>
     </div>
 );
 
 export const CaptionVariants = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-        <section>
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 'var(--size-section-gap-md)',
+            alignItems: 'flex-start',
+        }}
+    >
+        <section style={{ minWidth: '160px' }}>
             <h6 className="h6 mb-3">Default</h6>
             <Caption text="caption" state="default" icon="square-plus" />
         </section>
-        <section>
+        <section style={{ minWidth: '160px' }}>
             <h6 className="h6 mb-3">Success</h6>
             <Caption text="caption" state="success" icon="circle-check" />
         </section>
-        <section>
+        <section style={{ minWidth: '160px' }}>
             <h6 className="h6 mb-3">Danger</h6>
             <Caption text="caption" state="danger" icon="circle-xmark" />
         </section>
-        <section>
+        <section style={{ minWidth: '160px' }}>
             <h6 className="h6 mb-3">Warning</h6>
             <Caption text="caption" state="warning" icon="triangle-exclamation" />
         </section>
-        <section>
+        <section style={{ minWidth: '160px' }}>
             <h6 className="h6 mb-3">Disabled</h6>
             <Caption text="caption" state="disabled" icon="square-plus" />
         </section>
