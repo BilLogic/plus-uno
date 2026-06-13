@@ -1,0 +1,152 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-06-13",
+  "playground": "playground/test-roundtrip",
+  "figmaTestFile": {
+    "fileKey": "mg1o1ybNMZOq4Kz7vn4r2M",
+    "url": "https://www.figma.com/design/mg1o1ybNMZOq4Kz7vn4r2M/Test-Roundtrip",
+    "page": "Page 1"
+  },
+  "figmaLibraryFile": {
+    "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+    "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
+  },
+  "writeBackFrame": {
+    "name": "Roundtrip Pilot",
+    "nodeId": "21:81",
+    "url": "https://www.figma.com/design/mg1o1ybNMZOq4Kz7vn4r2M/Test-Roundtrip?node-id=21-81"
+  },
+  "components": [
+    {
+      "codeImport": "@/components/Badge",
+      "codeProps": { "style": "info", "size": "b3", "children": "Roundtrip pilot" },
+      "registrySetId": "static-badges",
+      "componentSetNodeId": "25:568",
+      "libraryKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "figmaVariant": "type=b3, style=tertiary",
+      "figmaInstanceNodeId": "21:85",
+      "notes": "Figma Static Badges set has no style=info; code info maps to tertiary for write-back."
+    },
+    {
+      "codeImport": "@/components/Card",
+      "codeProps": {
+        "title": "Send a note",
+        "subtitle": "Share a quick update with your coach before the next session."
+      },
+      "registrySetId": "card",
+      "componentSetNodeId": "4241:27817",
+      "libraryKey": "8f398812b980ce87c669a6427a35eba840a63896",
+      "figmaInstanceNodeId": "21:103"
+    },
+    {
+      "codeImport": "@/components/Alert",
+      "codeProps": {
+        "style": "info",
+        "title": "Registry test",
+        "children": "This alert confirms the Alert set maps correctly through component-registry.json."
+      },
+      "registrySetId": "alert",
+      "componentSetNodeId": "11:324",
+      "libraryKey": "f11ba4c5d7dc477077f7e37c663e40d43301cdf7",
+      "figmaVariant": "style=info",
+      "figmaInstanceNodeId": "22:374"
+    },
+    {
+      "codeImport": "@/forms/Input",
+      "codeProps": { "label": "Your name", "placeholder": "Alex Morgan" },
+      "registrySetId": "input",
+      "componentSetNodeId": "39:4802",
+      "libraryKey": "1effcb43356ff2de1a06cfa6ccba425f8583713f",
+      "figmaVariant": "state=default, input=placeholder, validation=none",
+      "figmaInstanceNodeId": "22:395"
+    },
+    {
+      "codeImport": "@/forms/Textarea",
+      "codeProps": {
+        "label": "Message",
+        "variant": "short",
+        "rows": 3,
+        "placeholder": "What went well today?"
+      },
+      "registrySetId": "form-short-textarea",
+      "componentSetNodeId": "13543:5904",
+      "libraryKey": "3c25c07664d6c19faeb64baf450ba18b81325293",
+      "figmaVariant": "state=default, input=placeholder, validation=Default",
+      "figmaInstanceNodeId": "22:419"
+    },
+    {
+      "codeImport": "@/components/Button",
+      "codeProps": { "fill": "filled", "style": "primary", "text": "Submit" },
+      "registrySetId": "filled-buttons",
+      "componentSetNodeId": "33:2470",
+      "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67",
+      "figmaVariant": "size=medium (default), style=primary, state=rest (default)",
+      "figmaInstanceNodeId": "22:426"
+    },
+    {
+      "codeImport": "@/components/Button",
+      "codeProps": { "fill": "outline", "style": "secondary", "text": "Cancel" },
+      "registrySetId": "outlined-buttons",
+      "componentSetNodeId": "968:18597",
+      "libraryKey": "c486535e5e6140a60b619f22967fa2445f585cda",
+      "figmaVariant": "size=medium (default), style=secondary, state=rest (default)",
+      "figmaInstanceNodeId": "22:440"
+    }
+  ],
+  "tokenBindings": [
+    {
+      "codeToken": "var(--color-surface)",
+      "figmaVariableName": "Neutral Colors/surface",
+      "key": "0fa65f9e6b100853fd8e72466c9017e750b32590",
+      "appliedTo": "Roundtrip Pilot frame fill"
+    },
+    {
+      "codeToken": "var(--color-on-surface)",
+      "figmaVariableName": "Neutral Colors/on-surface",
+      "key": "276bd82733cce667bb6b1a9ed355dda43404ed60",
+      "appliedTo": "Title / Quick check-in text fill"
+    },
+    {
+      "codeToken": "var(--color-on-surface-variant)",
+      "figmaVariableName": "Neutral Colors/on-surface-variant",
+      "key": "5798cab1bf150b4370eb3eab8c0b5478535ee1b8",
+      "appliedTo": "Subtitle text fill"
+    },
+    {
+      "codeToken": "var(--size-surface-pad-x)",
+      "figmaVariableName": "Surface/pad-x",
+      "key": "afd52d7b0bf5852773c860d471f799185d1633b9",
+      "appliedTo": "Roundtrip Pilot paddingLeft/paddingRight"
+    },
+    {
+      "codeToken": "var(--size-surface-pad-y)",
+      "figmaVariableName": "Surface/pad-y",
+      "key": "1c115eedcae8828a31d6bf72be222e9afbfbe0b2",
+      "appliedTo": "Roundtrip Pilot paddingTop/paddingBottom"
+    },
+    {
+      "codeToken": "var(--size-spacing-between-components-3)",
+      "figmaVariableName": "Surface/gap-md",
+      "key": "1c2c8e8bfdbcf45bcff6c8e67771ab78af899acd",
+      "appliedTo": "Roundtrip Pilot itemSpacing, Form itemSpacing"
+    },
+    {
+      "codeToken": "var(--size-spacing-between-components-1)",
+      "figmaVariableName": "Surface/gap-sm",
+      "key": "28f8f3c0b6bf4a7c03be57cf52c4f5dde915a268",
+      "appliedTo": "Header itemSpacing"
+    },
+    {
+      "codeToken": "h3",
+      "figmaTextStyleName": "Headline/H3",
+      "key": "c5a9b4e2a1ae1075ed582a7c3c0d51e8128f9757",
+      "appliedTo": "Title / Quick check-in"
+    },
+    {
+      "codeToken": "body2-txt",
+      "figmaTextStyleName": "Body/B2/Regular",
+      "key": "74d2f8680d204055ae945e338ec665c74677f078",
+      "appliedTo": "Subtitle"
+    }
+  ]
+}

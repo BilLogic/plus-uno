@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sourceOfTruth": "figma-variables",
+  "syncCommand": "npm run sync:tokens && npm run generate:tokens",
+  "codeTokenRoot": "design-system/src/tokens/",
+  "humanReference": ".agent/skills/uno-prototype/references/figma-token-mapping.md",
+  "mappings": {
+    "colors": {
+      "Primary/500": "var(--color-primary)",
+      "Primary Container": "var(--color-primary-container)",
+      "On Primary": "var(--color-on-primary)",
+      "Secondary": "var(--color-secondary)",
+      "Danger": "var(--color-danger)",
+      "Success": "var(--color-success)",
+      "Warning": "var(--color-warning)",
+      "Info": "var(--color-info)",
+      "Surface": "var(--color-surface)",
+      "On Surface": "var(--color-on-surface)",
+      "On Surface Variant": "var(--color-on-surface-variant)",
+      "Outline": "var(--color-outline)",
+      "Outline Variant": "var(--color-outline-variant)"
+    },
+    "typography": {
+      "Display 1": "var(--font-size-display1)",
+      "Headline": "var(--font-size-headline)",
+      "Title": "var(--font-size-title)",
+      "Body 1": "var(--font-size-body1)",
+      "Body 2": "var(--font-size-body2)"
+    },
+    "spacing": {
+      "Spacing/16": "var(--size-spacing-between-components-3)"
+    }
+  },
+  "notes": [
+    "Extend mappings from figma-token-mapping.md as variables are verified in Figma.",
+    "Agents must not use a token unless it appears in cheat-sheet.md or generated SCSS."
+  ]
+}

@@ -2,6 +2,19 @@
 
 # Figma MCP Reference Guide
 
+## Component alignment (Figma ↔ code)
+
+Before implementing or writing back, load:
+
+- `design-system/figma/component-registry.json` — code import ↔ Figma component set ↔ props
+- `design-system/figma/component-alignment.md` — implement + write-back rules
+- `design-system/figma/token-registry.json` — Figma variable ↔ `var(--*)`
+
+**Figma → code:** resolve library instances via `get_code_connect_map` / registry; never hallucinate components.  
+**Code → Figma:** place component **instances** from registry; never redraw mapped components as raw frames.
+
+Pilot: `Button` tonal set (`979:20977`). See `design-system/figma/README.md`.
+
 ## Available Tools
 
 | Tool | Purpose | Rate-Limited? |
@@ -25,7 +38,7 @@ When implementing a design from a Figma link, follow all 7 steps:
 2. **Fetch design context** — `get_design_context(fileKey, nodeId)` → layout, typography, colors, component structure, spacing
 3. **Capture screenshot** — `get_screenshot(fileKey, nodeId)` → visual reference for validation throughout
 4. **Download assets** — Retrieve images, icons, SVGs from MCP assets endpoint. DO NOT install new icon packages — all assets come from Figma payload
-5. **Translate to PLUS conventions** — Map Figma output to PLUS tokens, components, and patterns. Use the Cheat Sheet as law. See token mapping below
+5. **Translate to PLUS conventions** — Map Figma output to PLUS tokens, components, and patterns. Use the Cheat Sheet as law. Resolve components via `component-registry.json` + Code Connect. See token mapping below
 6. **Achieve visual parity** — Implement pixel-perfect matching. Use PLUS design tokens, not raw Figma values
 7. **Validate against source** — Compare implementation against the captured screenshot. Check: layout, typography, colors, states, spacing, assets, accessibility
 
@@ -58,9 +71,11 @@ Use `create_new_file` only when:
 - The user explicitly requests generating a Figma design from code
 - Always confirm with the user before writing to Figma (treat like forbidden pattern #8 — no unsanctioned writes)
 
-## Code Connect (Future)
+## Code Connect (pilot)
 
-`@figma/code-connect` is NOT installed. When Code Connect tools return empty results, fall back to `docs/context/design-system/components/components-index.json` for component discovery. See plan-005 for the implementation roadmap.
+`@figma/code-connect` is **not yet installed** in `package.json`. Pilot mapping lives in `design-system/src/components/Button/Button.figma.js` (publish after install).
+
+When Code Connect tools return empty results, fall back to `design-system/figma/component-registry.json` and `docs/context/design-system/components/components-index.json`.
 
 ## Known Limitations
 
@@ -72,8 +87,9 @@ Use `create_new_file` only when:
 - **Rate limiting**: MCP tools are rate-limited. Batch operations (e.g., 67+ `search_design_system` calls for drift analysis) should use `get_metadata` for bulk inventory first, then targeted searches
 
 ### Code Connect
-- `@figma/code-connect` is NOT installed. Code Connect tools (`get_code_connect_map`, `add_code_connect_map`, `send_code_connect_mappings`) will return empty results
-- Fall back to `docs/context/design-system/components/components-index.json` for component discovery
+- `@figma/code-connect` is not installed until `npm install -D @figma/code-connect` and `npx figma connect publish`
+- Until published, use `design-system/figma/component-registry.json` for mapped components (Button tonal pilot)
+- Fall back to `components-index.json` for unmapped components only
 
 ## MCP Fallback
 
