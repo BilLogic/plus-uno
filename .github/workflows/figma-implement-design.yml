@@ -211,9 +211,10 @@ jobs:
             -d "{\"channel\": \"$CHANNEL\", \"name\": \"$EMOJI\", \"timestamp\": \"$MESSAGE_TS\"}" || true
 
       - name: Notify Slack
-        if: always() && steps.payload.outputs.thread_ts
+        if: always() && steps.payload.outputs.channel
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CHANNEL: ${{ steps.payload.outputs.channel }}
           JOB_STATUS: ${{ job.status }}
           SLUG: ${{ steps.implement.outputs.slug }}
           BRANCH: ${{ steps.commit.outputs.branch }}
@@ -242,7 +243,14 @@ jobs:
           fi
 
           MSG="$(printf '%b' "$MSG")"
-          PAYLOAD="$(jq -n --arg text "$MSG" --arg thread "$THREAD_TS" '{text: $text, thread_ts: $thread}')"
-          curl -s -X POST "$SLACK_WEBHOOK_URL" \
-            -H 'Content-Type: application/json' \
+          # Post to the thread via the bot token (chat.postMessage) — reliable and
+          # works in any channel, unlike a single-channel incoming webhook.
+          if [ -n "$THREAD_TS" ]; then
+            PAYLOAD="$(jq -n --arg channel "$CHANNEL" --arg text "$MSG" --arg thread "$THREAD_TS" '{channel: $channel, text: $text, thread_ts: $thread, mrkdwn: true}')"
+          else
+            PAYLOAD="$(jq -n --arg channel "$CHANNEL" --arg text "$MSG" '{channel: $channel, text: $text, mrkdwn: true}')"
+          fi
+          curl -s -X POST "https://slack.com/api/chat.postMessage" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
             -d "$PAYLOAD" || true
