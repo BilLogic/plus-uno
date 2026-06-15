@@ -224,8 +224,9 @@ jobs:
           THREAD_TS: ${{ steps.payload.outputs.thread_ts }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          # Report each phase honestly. Values arrive via env (not inline ${{ }}) so
-          # an error with quotes/newlines can't break the shell, and jq escapes it.
+          # Report each phase honestly. Values arrive via env (not inline GHA
+          # expressions) so an error with quotes/newlines can't break the shell,
+          # and jq escapes it.
           if [ "$JOB_STATUS" = "failure" ]; then
             MSG=":x: *Prototype scaffold failed*\n"
             if [ -n "$BRANCH" ]; then
