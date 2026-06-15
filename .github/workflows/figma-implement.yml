@@ -115,7 +115,6 @@ jobs:
             const component = '${{ steps.payload.outputs.component }}';
             const branch = '${{ steps.branch.outputs.branch }}';
             const prdUrl = '${{ steps.payload.outputs.notion_prd_url }}';
-            const hasChanges = '${{ steps.commit.outputs.changes }}' === 'true';
 
             const body = [
               `## Figma DS Update: ${component}`,
@@ -133,28 +132,44 @@ jobs:
               '- [ ] DS manager approved',
             ].filter(Boolean).join('\n');
 
-            const pr = await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `feat: Figma DS update — ${component}`,
-              head: branch,
-              base: 'main',
-              body,
-              draft: true
-            });
-            console.log(`Draft PR created: #${pr.data.number}`);
-            core.setOutput('pr_number', pr.data.number);
-            core.setOutput('pr_url', pr.data.html_url);
+            // Don't let a PR-create failure crash the job — the branch + code have
+            // already succeeded and been pushed. Capture the error so the Slack
+            // notify step can report exactly what failed (e.g. the org policy
+            // "Actions is not permitted to create or approve pull requests") while
+            // still crediting what worked, and pointing to a manual-PR recovery.
+            try {
+              const pr = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `feat: Figma DS update — ${component}`,
+                head: branch,
+                base: 'main',
+                body,
+                draft: true
+              });
+              console.log(`Draft PR created: #${pr.data.number}`);
+              core.setOutput('pr_created', 'true');
+              core.setOutput('pr_number', pr.data.number);
+              core.setOutput('pr_url', pr.data.html_url);
 
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.data.number,
-              labels: ['design-system', 'figma-sync']
-            });
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.data.number,
+                  labels: ['design-system', 'figma-sync']
+                });
+              } catch (e) {
+                core.warning('Could not add labels: ' + (e.message || e));
+              }
+            } catch (err) {
+              core.setOutput('pr_created', 'false');
+              core.setOutput('pr_error', err.message || String(err));
+              core.warning('PR creation failed: ' + (err.message || err));
+            }
 
       - name: Update Notion PRD status
-        if: steps.commit.outputs.changes == 'true'
+        if: steps.create-pr.outputs.pr_created == 'true'
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_PRD_ID: ${{ steps.payload.outputs.notion_prd_id }}
@@ -173,52 +188,72 @@ jobs:
         if: always() && steps.payload.outputs.channel && steps.payload.outputs.message_ts
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          JOB_STATUS: ${{ job.status }}
+          HAS_CHANGES: ${{ steps.commit.outputs.changes }}
+          PR_CREATED: ${{ steps.create-pr.outputs.pr_created }}
+          CHANNEL: ${{ steps.payload.outputs.channel }}
+          MESSAGE_TS: ${{ steps.payload.outputs.message_ts }}
         run: |
-          HAS_CHANGES="${{ steps.commit.outputs.changes }}"
-          JOB_STATUS="${{ job.status }}"
-
           # Remove gear reaction
           curl -s -X POST "https://slack.com/api/reactions.remove" \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"gear\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
+            -d "{\"channel\": \"$CHANNEL\", \"name\": \"gear\", \"timestamp\": \"$MESSAGE_TS\"}" || true
 
-          # Add result reaction
-          if [ "$JOB_STATUS" = "success" ] && [ "$HAS_CHANGES" = "true" ]; then
-            EMOJI="white_check_mark"
-          elif [ "$JOB_STATUS" = "success" ]; then
-            EMOJI="information_source"
-          else
+          # Result reaction: success (code + PR), warning (code but no PR),
+          # info (nothing to change), or x (the run crashed before committing).
+          if [ "$JOB_STATUS" = "failure" ]; then
             EMOJI="x"
+          elif [ "$HAS_CHANGES" = "true" ] && [ "$PR_CREATED" = "true" ]; then
+            EMOJI="white_check_mark"
+          elif [ "$HAS_CHANGES" = "true" ]; then
+            EMOJI="warning"
+          else
+            EMOJI="information_source"
           fi
 
           curl -s -X POST "https://slack.com/api/reactions.add" \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"channel\": \"${{ steps.payload.outputs.channel }}\", \"name\": \"$EMOJI\", \"timestamp\": \"${{ steps.payload.outputs.message_ts }}\"}" || true
+            -d "{\"channel\": \"$CHANNEL\", \"name\": \"$EMOJI\", \"timestamp\": \"$MESSAGE_TS\"}" || true
 
       - name: Notify Slack
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          JOB_STATUS: ${{ job.status }}
+          COMPONENT: ${{ steps.payload.outputs.component }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          HAS_CHANGES: ${{ steps.commit.outputs.changes }}
+          PR_CREATED: ${{ steps.create-pr.outputs.pr_created }}
+          PR_URL: ${{ steps.create-pr.outputs.pr_url }}
+          PR_ERROR: ${{ steps.create-pr.outputs.pr_error }}
+          THREAD_TS: ${{ steps.payload.outputs.thread_ts }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          PR_URL="${{ steps.create-pr.outputs.pr_url }}"
-          COMPONENT="${{ steps.payload.outputs.component }}"
-          HAS_CHANGES="${{ steps.commit.outputs.changes }}"
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          THREAD_TS="${{ steps.payload.outputs.thread_ts }}"
-
-          if [ "$HAS_CHANGES" = "true" ]; then
-            MSG=":white_check_mark: *Claude implemented ${COMPONENT}*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nFiles have been updated. Please review the diff and verify visual parity with Figma."
+          # Report each phase honestly. Values come in via env (not inline ${{ }})
+          # so an error message with quotes/newlines can't break the shell, and jq
+          # builds the JSON so it's always correctly escaped.
+          if [ "$JOB_STATUS" = "failure" ]; then
+            MSG=":x: *Implement ${COMPONENT} failed*\n"
+            if [ -n "$BRANCH" ]; then
+              MSG="${MSG}• :white_check_mark: Branch \`${BRANCH}\` created\n"
+            fi
+            MSG="${MSG}• :x: The run failed before changes were committed — most likely code generation.\n<${RUN_URL}|Open the run log to see the error>"
+          elif [ "$HAS_CHANGES" = "true" ] && [ "$PR_CREATED" = "true" ]; then
+            MSG=":white_check_mark: *Implemented ${COMPONENT}*\n• Branch \`${BRANCH}\` pushed\n• Code generated by Claude\n• Draft PR opened: <${PR_URL}|review the PR>\n\nPlease review the diff and verify visual parity with Figma."
+          elif [ "$HAS_CHANGES" = "true" ]; then
+            MSG=":warning: *Implemented ${COMPONENT} — but the PR could not be opened*\n• :white_check_mark: Branch \`${BRANCH}\` pushed\n• :white_check_mark: Code generated by Claude (committed to the branch)\n• :x: Draft PR failed: ${PR_ERROR}\n\n_Recover: open a PR from \`${BRANCH}\` in GitHub, or fix the setting (Settings → Actions → General → \"Allow GitHub Actions to create and approve pull requests\"). <${RUN_URL}|Run log>_"
           else
-            MSG=":information_source: *Claude analyzed ${COMPONENT}*\nNo code changes needed — component already matches Figma design.\n<${RUN_URL}|View action log>"
+            MSG=":information_source: *Analyzed ${COMPONENT}* — no code changes needed (already matches Figma).\n<${RUN_URL}|View the run log>"
           fi
 
-          # Build JSON payload — include thread_ts if available for thread reply
+          # Convert the \n escapes to real newlines, then let jq encode safely.
+          MSG="$(printf '%b' "$MSG")"
           if [ -n "$THREAD_TS" ]; then
-            PAYLOAD="{\"text\": \"${MSG}\", \"thread_ts\": \"${THREAD_TS}\"}"
+            PAYLOAD="$(jq -n --arg text "$MSG" --arg thread "$THREAD_TS" '{text: $text, thread_ts: $thread}')"
           else
-            PAYLOAD="{\"text\": \"${MSG}\"}"
+            PAYLOAD="$(jq -n --arg text "$MSG" '{text: $text}')"
           fi
 
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
