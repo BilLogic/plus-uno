@@ -1,0 +1,165 @@
+@use "sass:map";
+
+/**
+ * SwitchButton Component Styles
+ * Implements the Form Switch Button Figma spec using design tokens.
+ *
+ * Track dimensions from Figma: 25×12px (internal component), padding 2px, cornerRadius 999
+ * Full component (with label): 22px tall, 8px gap between track and label
+ *
+ * Color mapping:
+ *   checked/on   fill  → --color-primary          (rgba(4,114,168,1)  ≈ #0472a8)
+ *   checked/on   thumb → --color-on-primary        (rgba(255,255,255,1))
+ *   unchecked    fill  → --color-surface            (rgba(249,249,252,1) ≈ #f9f9fc)
+ *   unchecked    border→ --color-primary            (rgba(4,114,168,1))
+ *   unchecked    thumb → --color-primary            (rgba(4,114,168,1))
+ *   disabled     fill  → --color-surface            (rgba(249,249,252,1))
+ *   disabled     border→ --color-on-surface         (rgba(25,28,30,1)  ≈ #191c1e)
+ *   disabled     thumb → --color-on-surface         (rgba(25,28,30,1))
+ *   read-only    fill  → --color-surface-variant    (rgba(221,227,234,1) ≈ #dde3ea)
+ *   label text   color → --color-on-surface-variant (rgba(63,72,74,1)  ≈ #3f484a on checked read-only)
+ *                      → --color-on-surface         (rgba(25,28,30,1)  on unchecked read-only)
+ *   required *   color → --color-danger             (rgba(186,26,26,1) ≈ #ba1a1a)
+ */
+
+// Track dimensions (from Figma: 25×12px outer, 2px padding → 8px thumb diameter)
+$switch-track-width: 25px;
+$switch-track-height: 12px;
+$switch-track-padding: 2px;
+$switch-thumb-size: $switch-track-height - ($switch-track-padding * 2); // 8px
+$switch-thumb-travel: $switch-track-width - $switch-thumb-size - ($switch-track-padding * 2); // 13px
+
+.plus-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm); // 8px — matches Figma itemSpacing: 8
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+
+    // --- Hidden native input ---
+    &__input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        margin: 0;
+        pointer-events: none;
+    }
+
+    // --- Track ---
+    &__track {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        width: $switch-track-width;
+        height: $switch-track-height;
+        padding: $switch-track-padding;
+        border-radius: var(--size-element-radius-full); // 999px — matches Figma cornerRadius: 999
+        border: var(--size-element-border) solid var(--color-primary); // 1px solid primary (unchecked default)
+        background-color: var(--color-surface); // unchecked default fill (#f9f9fc)
+        transition: background-color 0.2s, border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    // --- Thumb ---
+    &__thumb {
+        display: block;
+        width: $switch-thumb-size;
+        height: $switch-thumb-size;
+        border-radius: 50%;
+        background-color: var(--color-primary); // unchecked default thumb color
+        transform: translateX(0);
+        transition: transform 0.2s, background-color 0.2s;
+        flex-shrink: 0;
+    }
+
+    // --- Label ---
+    &__label {
+        color: var(--color-on-surface);
+        line-height: var(--font-line-height-body2);
+    }
+
+    // --- Required asterisk ---
+    &__required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+
+    // =========================================================
+    // CHECKED STATE
+    // =========================================================
+    &--checked {
+        .plus-switch__track {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .plus-switch__thumb {
+            background-color: var(--color-on-primary);
+            transform: translateX($switch-thumb-travel);
+        }
+    }
+
+    // =========================================================
+    // DISABLED STATE
+    // =========================================================
+    &--disabled {
+        cursor: not-allowed;
+        opacity: var(--color-disabled-opacity); // 0.38 — matches MD3 disabled pattern
+
+        .plus-switch__track {
+            background-color: var(--color-surface);
+            border-color: var(--color-on-surface);
+        }
+
+        .plus-switch__thumb {
+            background-color: var(--color-on-surface);
+        }
+    }
+
+    // =========================================================
+    // READ-ONLY STATE
+    // =========================================================
+    &--readonly {
+        cursor: default;
+        pointer-events: none;
+
+        .plus-switch__track {
+            background-color: var(--color-surface-variant); // rgba(221,227,234,1) ≈ #dde3ea
+            border-color: var(--color-surface-variant);
+        }
+
+        .plus-switch__thumb {
+            background-color: var(--color-on-surface-variant);
+        }
+
+        .plus-switch__label {
+            color: var(--color-on-surface-variant);
+        }
+
+        // Read-only checked: thumb travels to end position
+        &.plus-switch--checked {
+            .plus-switch__thumb {
+                transform: translateX($switch-thumb-travel);
+                background-color: var(--color-on-surface-variant);
+            }
+        }
+    }
+
+    // =========================================================
+    // FOCUS VISIBLE (keyboard accessibility)
+    // =========================================================
+    &__input:focus-visible ~ .plus-switch__track,
+    &:focus-within .plus-switch__track {
+        outline: var(--size-element-stroke-md) solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    &--disabled,
+    &--readonly {
+        &:focus-within .plus-switch__track {
+            outline: none;
+        }
+    }
+}
