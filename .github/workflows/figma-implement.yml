@@ -231,9 +231,9 @@ jobs:
           THREAD_TS: ${{ steps.payload.outputs.thread_ts }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          # Report each phase honestly. Values come in via env (not inline ${{ }})
-          # so an error message with quotes/newlines can't break the shell, and jq
-          # builds the JSON so it's always correctly escaped.
+          # Report each phase honestly. Values come in via env (not inline GHA
+          # expressions) so an error message with quotes/newlines can't break the
+          # shell, and jq builds the JSON so it's always correctly escaped.
           if [ "$JOB_STATUS" = "failure" ]; then
             MSG=":x: *Implement ${COMPONENT} failed*\n"
             if [ -n "$BRANCH" ]; then
