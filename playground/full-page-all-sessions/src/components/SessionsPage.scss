@@ -1,0 +1,58 @@
+.sessions-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md);
+    width: 100%;
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    box-sizing: border-box;
+    background-color: var(--color-surface-container);
+    min-height: 100%;
+}
+
+/* ── Header row ── */
+.sessions-page__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-md);
+}
+
+.sessions-page__title {
+    margin: 0;
+    font-family: var(--font-family-header);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-h2);
+    line-height: var(--font-line-height-h2);
+    color: var(--color-on-surface);
+}
+
+/* Fill in button – primary filled style matching Figma (dark teal) */
+.sessions-page__fill-in-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--size-element-radius-md);
+    cursor: pointer;
+    font-family: var(--font-family-header);
+    font-size: var(--font-size-h6);
+    font-weight: var(--font-weight-semibold-2);
+    line-height: var(--font-line-height-h6);
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+
+    i {
+        font-size: var(--font-size-fa-h6-solid);
+    }
+
+    &:hover {
+        background-color: var(--color-primary-text);
+    }
+
+    &:active {
+        background-color: var(--color-on-primary-container);
+    }
+}

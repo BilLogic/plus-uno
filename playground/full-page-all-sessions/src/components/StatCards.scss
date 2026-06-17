@@ -1,0 +1,50 @@
+/* Three equal-width stat summary cards */
+.stat-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--size-section-gap-md);
+    width: 100%;
+}
+
+.stat-card {
+    background-color: var(--color-surface-container-lowest);
+    border-radius: var(--size-card-radius-sm);
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-card-gap-sm);
+    box-shadow: var(--elevation-light-1);
+}
+
+/* Top row: label + icon */
+.stat-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-element-gap-sm);
+}
+
+.stat-card__label {
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-body2-regular);
+    line-height: var(--font-line-height-body2);
+}
+
+.stat-card__icon {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-fa-h4-solid);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Large numeric value – h1 weight */
+.stat-card__value {
+    font-family: var(--font-family-header);
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--font-line-height-h1);
+    color: var(--color-on-surface);
+    margin: 0;
+}
