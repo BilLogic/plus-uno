@@ -1,0 +1,31 @@
+name: Marketplace Add (stub)
+
+# Triggered by uno-bot v2 via repository_dispatch when a designer confirms
+# a "marketplace_add" proposal. This stub just logs the payload and posts a
+# construction notice to the Slack thread. The real implementation (edit
+# prototypes-data.js + open a draft PR) lands in v2.x.
+
+on:
+  repository_dispatch:
+    types: [marketplace-add]
+
+jobs:
+  acknowledge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log payload
+        run: |
+          echo "marketplace-add dispatch received"
+          echo '${{ toJson(github.event.client_payload) }}'
+
+      - name: Post acknowledgment to Slack thread
+        if: ${{ github.event.client_payload.channel && github.event.client_payload.thread_ts }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CHANNEL: ${{ github.event.client_payload.channel }}
+          THREAD_TS: ${{ github.event.client_payload.thread_ts }}
+        run: |
+          curl -s -X POST "https://slack.com/api/chat.postMessage" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$(jq -nc --arg c "$CHANNEL" --arg t "$THREAD_TS" '{channel:$c, thread_ts:$t, text:":construction: Marketplace add stub fired. Real workflow (edit prototypes-data.js + open PR) is coming in v2.x."}')" || true
