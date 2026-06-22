@@ -14,7 +14,10 @@
     "figma:component-meta": "node scripts/figma-component-meta.js",
     "generate:tokens": "node scripts/generate-all-tokens.js",
     "generate:previews": "node scripts/generate-prototype-previews.js",
-    "generate:component-registry": "node scripts/generate-component-registry-from-storybook.js --write",
+    "generate:component-registry": "node scripts/generate-component-registry-from-storybook.js",
+    "check:component-registry": "node scripts/generate-component-registry-from-storybook.js --check",
+    "generate:token-registry": "node scripts/generate-token-registry.mjs",
+    "check:token-registry": "node scripts/generate-token-registry.mjs --check",
     "start": "vite",
     "dev:react": "vite",
     "build:react": "vite build",
@@ -29,11 +32,12 @@
     "dev:toolkit-ia-revision": "vite --config playground/toolkit-ia-revision/vite.config.js",
     "dev:test-tutor-feedback": "vite --config playground/test-tutor-feedback/vite.config.js",
     "dev:test-roundtrip": "vite --config playground/test-roundtrip/vite.config.js",
+    "dev:test-1": "vite --config playground/test-1/vite.config.js",
+    "dev:test-2": "vite --config playground/test-2/vite.config.js",
     "figma:poll": "node scripts/poll-figma-library.js",
     "figma:poll:init": "node scripts/poll-figma-library.js --init",
     "figma:fetch-component": "node scripts/fetch-figma-component.js",
     "figma:write-back": "node scripts/figma-write-back.js",
-    "figma:publish-code-connect": "figma connect publish",
     "notify:slack": "node scripts/notify-slack.js"
   },
   "keywords": [
@@ -45,7 +49,6 @@
   "author": "PLUS Design Team",
   "license": "ISC",
   "devDependencies": {
-    "@figma/code-connect": "^1.4.8",
     "@storybook/addon-docs": "^10.2.7",
     "@storybook/addon-links": "^10.2.7",
     "@storybook/builder-vite": "^10.2.4",

@@ -2,6 +2,10 @@
 
 # Figma Token Mapping Reference
 
+> **This file is the SOURCE OF TRUTH for token mappings.** `design-system/figma/token-registry.json` is generated from the tables below via `npm run generate:token-registry`, and every `var(--*)` is validated against `design-system/src/tokens/*.scss`. Edit the tables here — never hand-edit the JSON. If you reference a token that does not exist in SCSS, the generator reports it and `npm run check:token-registry` fails.
+
+For quick machine lookups, agents may read `token-registry.json` (read-only); use this doc for the authoritative tables, extended cases, and notes.
+
 Use this reference when encoding PLUS token conventions into Figma via `create_design_system_rules`, or when translating Figma design context output to PLUS CSS tokens.
 
 ## Color Tokens
@@ -42,8 +46,8 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Display 2 | `var(--font-size-display2)` |
 | Display 3 | `var(--font-size-display3)` |
 | Display 4 | `var(--font-size-display4)` |
-| Headline | `var(--font-size-headline)`, `var(--font-weight-headline)` |
-| Title | `var(--font-size-title)`, `var(--font-weight-title)` |
+| Headline (H1–H3) | `var(--font-size-h1)`, `var(--font-weight-headline)`, `var(--font-family-headline)` — Headline has no single size token; use the H-scale |
+| Title | `var(--font-weight-title)`, `var(--font-weight-semibold-2)` — Title has no dedicated size token; pair with an H-scale size |
 | H1–H6 | `var(--font-size-h1)` through `var(--font-size-h6)` |
 | Body 1 | `var(--font-size-body1)`, `var(--font-weight-body1-regular)` |
 | Body 2 | `var(--font-size-body2)` |

@@ -1,4 +1,4 @@
-i <!-- ~900 tokens | Load for: production-ready implementation with all states and accessibility -->
+<!-- ~900 tokens | Load for: production-ready implementation with all states and accessibility -->
 
 # Finalization Mode Reference
 
@@ -48,11 +48,13 @@ For exhaustive lookup paths/globs/commands, load `docs/context/design-system/ind
 
 4. Design-tool integration
 - `.agent/skills/uno-prototype/references/figma-mcp-guide.md` — full Figma MCP tool reference and implement-design 7-step workflow
+- `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` — mandatory `component-registry.json` + `token-registry.json` load gate
 - `.agent/skills/uno-prototype/references/figma-workflow.md` — token sync, extraction process, Figma-to-CSS mapping
+- `design-system/figma/component-registry.json` — Figma component set ↔ code import (primary mapping source)
+- `design-system/figma/token-registry.json` — Figma variable ↔ `var(--*)`
 - `scripts/sync-figma-tokens.js`
 - Figma MCP tools: `get_design_context`, `get_screenshot`, `get_variable_defs`, `search_design_system`
 - `get_variable_defs` for real-time token verification during implementation (complements daily sync)
-- Code Connect not yet available — fall back to `docs/context/design-system/components/components-index.json` for component discovery
 - Stitch MCP for early wireframe handoff context when finalization follows consulting/iteration
 
 5. Accessibility expectations

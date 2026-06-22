@@ -34,6 +34,22 @@ Do not suggest if the user is working on an existing prototype (use the appropri
 - `docs/context/design-system/foundations/layout.md` — understand the atomic hierarchy
 - `docs/context/design-system/components/cheat-sheet.md` — available components
 
+## Tier 2 Context — Mandatory Load (~5K budget)
+
+Load **before Phase 3 Build** (and before any Figma implement-design work):
+
+| Order | File | Required |
+|-------|------|----------|
+| 1 | `design-system/figma/component-registry.json` | **MANDATORY** |
+| 2 | `design-system/figma/token-registry.json` | **MANDATORY** |
+| 3 | `references/figma-registry-mandatory-load.md` | **MANDATORY** (load gate) |
+| 4 | `docs/context/design-system/components/cheat-sheet.md` | **MANDATORY** |
+| 5 | `references/figma-mcp-guide.md` | When Figma link or MCP tools used |
+| 6 | `docs/context/design-system/components/layout-cheat-sheet.md` | When building a page |
+| 7 | `.agent/handoffs/plans/{feature-slug}.md` | When handoff exists |
+
+**Gate:** Do not write JSX mapping Figma nodes to components until `component-registry.json` is loaded. Do not apply visual tokens until `token-registry.json` is loaded.
+
 ## Phase 1: Scope
 
 1. Ask: What feature or area is this prototype for?
@@ -60,11 +76,15 @@ Do not suggest if the user is working on an existing prototype (use the appropri
 
 ## Phase 3: Build
 
-1. Read `docs/context/design-system/components/cheat-sheet.md` (MANDATORY)
-2. Read `docs/context/design-system/components/layout-cheat-sheet.md` if building a page
-3. Use design system components — check `@/components/`, `@/forms/`, `@/specs/`
-4. Apply tokens for all visual values
-5. Use `<PageLayout>` from specs/Universal for page structure
+1. Read `design-system/figma/component-registry.json` (MANDATORY)
+2. Read `design-system/figma/token-registry.json` (MANDATORY)
+3. Read `references/figma-registry-mandatory-load.md` — confirm load gate
+4. Read `docs/context/design-system/components/cheat-sheet.md` (MANDATORY)
+5. Read `docs/context/design-system/components/layout-cheat-sheet.md` if building a page
+6. If Figma input: read `references/figma-mcp-guide.md` and follow implement-design workflow
+7. Use design system components — check `@/components/`, `@/forms/`, `@/specs/`
+8. Apply tokens for all visual values (resolve via `token-registry.json` first)
+9. Use `<PageLayout>` from specs/Universal for page structure
 
 ## Phase 4: Validate
 

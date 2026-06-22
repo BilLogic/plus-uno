@@ -2,15 +2,23 @@
 
 # Figma MCP Reference Guide
 
-## Component alignment (Figma ↔ code)
+## MANDATORY load gate (before any MCP call or JSX)
 
-Before implementing or writing back, load:
+Read in this order — **do not skip**:
+
+1. `design-system/figma/component-registry.json`
+2. `design-system/figma/token-registry.json`
+3. `references/figma-registry-mandatory-load.md` (enforcement checklist)
+
+Then load `design-system/figma/component-alignment.md` for implement + write-back rules.
+
+## Component alignment (Figma ↔ code)
 
 - `design-system/figma/component-registry.json` — code import ↔ Figma component set ↔ props
 - `design-system/figma/component-alignment.md` — implement + write-back rules
 - `design-system/figma/token-registry.json` — Figma variable ↔ `var(--*)`
 
-**Figma → code:** resolve library instances via `get_code_connect_map` / registry; never hallucinate components.  
+**Figma → code:** resolve library instances via `component-registry.json` + `search_design_system`; never hallucinate components.  
 **Code → Figma:** place component **instances** from registry; never redraw mapped components as raw frames.
 
 Pilot: `Button` tonal set (`979:20977`). See `design-system/figma/README.md`.
@@ -24,10 +32,8 @@ Pilot: `Button` tonal set (`979:20977`). See `design-system/figma/README.md`.
 | `get_metadata` | XML overview of node structure (IDs, names, positions) | Yes |
 | `get_variable_defs` | Inspect design tokens/variables with semantic context | Yes |
 | `search_design_system` | Search connected design systems for existing components | Yes |
-| `get_code_connect_suggestions` | AI suggestions for component-to-code mapping | Yes |
 | `create_design_system_rules` | Encode project conventions as machine-readable rules | No |
 | `create_new_file` | Generate Figma designs from code/descriptions (canvas write-back) | No |
-| `add_code_connect_map` | Create Figma-to-code component mappings | No |
 | `whoami` | Verify authentication and plan tier | No |
 
 ## implement-design Workflow (7 Steps)
@@ -38,7 +44,7 @@ When implementing a design from a Figma link, follow all 7 steps:
 2. **Fetch design context** — `get_design_context(fileKey, nodeId)` → layout, typography, colors, component structure, spacing
 3. **Capture screenshot** — `get_screenshot(fileKey, nodeId)` → visual reference for validation throughout
 4. **Download assets** — Retrieve images, icons, SVGs from MCP assets endpoint. DO NOT install new icon packages — all assets come from Figma payload
-5. **Translate to PLUS conventions** — Map Figma output to PLUS tokens, components, and patterns. Use the Cheat Sheet as law. Resolve components via `component-registry.json` + Code Connect. See token mapping below
+5. **Translate to PLUS conventions** — Map Figma output to PLUS tokens, components, and patterns. Use the Cheat Sheet as law. Resolve components via `component-registry.json`. See token mapping below
 6. **Achieve visual parity** — Implement pixel-perfect matching. Use PLUS design tokens, not raw Figma values
 7. **Validate against source** — Compare implementation against the captured screenshot. Check: layout, typography, colors, states, spacing, assets, accessibility
 
@@ -48,10 +54,10 @@ When implementing a design from a Figma link, follow all 7 steps:
 |-------|-----------|
 | `Primary/500` | `var(--color-primary)` |
 | `Display 1` | `var(--font-size-display1)` |
-| `Spacing/16` | `var(--size-spacing-between-components-3)` |
+| Spacing (contextual) | Pick by layer: `var(--size-card-pad-{x\|y}-{sm\|md\|lg})`, `var(--size-element-gap-{xs\|sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
 | Surface tokens | `var(--color-surface-*)` — prefer `-container` over `-state-08` for elevated surfaces |
 
-For the full token reference, load `docs/context/design-system/components/cheat-sheet.md`.
+For the full token reference, load `docs/context/design-system/components/cheat-sheet.md` and `design-system/figma/token-registry.json`.
 
 ## When to Use Which Tool
 
@@ -59,8 +65,8 @@ For the full token reference, load `docs/context/design-system/components/cheat-
 |----------|-------------|----------|
 | Implementing a Figma design | `get_design_context` | `get_screenshot`, `get_variable_defs` |
 | Understanding file structure | `get_metadata` | — |
-| Verifying token values | `get_variable_defs` | Compare against `design-system/src/tokens/*.scss` |
-| Finding existing DS components | `search_design_system` | Also check `docs/context/design-system/components/components-index.json` |
+| Verifying token values | `get_variable_defs` | `token-registry.json`, `design-system/src/tokens/*.scss` |
+| Finding existing DS components | `component-registry.json` | `search_design_system`, `components-index.json` for unmapped |
 | Encoding PLUS conventions | `create_design_system_rules` | Reference AGENTS.md forbidden patterns |
 | Writing designs back to Figma | `create_new_file` | Requires explicit user approval |
 
@@ -71,11 +77,13 @@ Use `create_new_file` only when:
 - The user explicitly requests generating a Figma design from code
 - Always confirm with the user before writing to Figma (treat like forbidden pattern #8 — no unsanctioned writes)
 
-## Code Connect (pilot)
+## Component resolution fallback
 
-`@figma/code-connect` is **not yet installed** in `package.json`. Pilot mapping lives in `design-system/src/components/Button/Button.figma.js` (publish after install).
+1. **Primary:** `design-system/figma/component-registry.json` — import path, props, Figma set node IDs (generated from each component's MDX `figmaMeta`; read-only — edit MDX to change a mapping)
+2. **Secondary:** `search_design_system` MCP — confirm library instance names
+3. **Tertiary:** `docs/context/design-system/components/components-index.json` — unmapped components only
 
-When Code Connect tools return empty results, fall back to `design-system/figma/component-registry.json` and `docs/context/design-system/components/components-index.json`.
+If a node is not in the registry, flag as a gap. Do not invent imports or props.
 
 ## Known Limitations
 
@@ -86,14 +94,10 @@ When Code Connect tools return empty results, fall back to `design-system/figma/
 - **Workaround**: If the user cannot open the desktop app, fall back to `get_screenshot` + `get_metadata` for structure, and repo-native token files for values
 - **Rate limiting**: MCP tools are rate-limited. Batch operations (e.g., 67+ `search_design_system` calls for drift analysis) should use `get_metadata` for bulk inventory first, then targeted searches
 
-### Code Connect
-- `@figma/code-connect` is not installed until `npm install -D @figma/code-connect` and `npx figma connect publish`
-- Until published, use `design-system/figma/component-registry.json` for mapped components (Button tonal pilot)
-- Fall back to `components-index.json` for unmapped components only
-
 ## MCP Fallback
 
 If Figma MCP is unavailable at runtime, state it explicitly and continue with:
+- `design-system/figma/component-registry.json` and `token-registry.json`
 - Repo-native stories/specs in `design-system/src/`
 - Token files in `design-system/src/tokens/`
 - Screenshots or exports provided by the user

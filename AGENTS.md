@@ -29,7 +29,7 @@ See docs/knowledge/INDEX.md
 4. **Never hallucinate props**: Always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
 5. Never skip reading component source + story + styles before using unfamiliar components.
 6. Use PLUS components first — only fall back to generic React-Bootstrap when no PLUS equivalent exists.
-7. When Figma design input exists, follow the full implement-design workflow (see `.agent/skills/uno-prototype/references/figma-mcp-guide.md`): extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
+7. When Figma design input exists, follow the full implement-design workflow (see `.agent/skills/uno-prototype/references/figma-mcp-guide.md`): **MANDATORY load** `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` first (see `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md`) → extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
 8. Never install new packages without explicit user approval.
 9. Never introduce non-Bootstrap UI frameworks (no Material UI, no Ant Design, no Tailwind).
 10. Never deep-import from `design-system/src/` — use barrel exports from `@` alias.
@@ -38,6 +38,7 @@ See docs/knowledge/INDEX.md
 13. Always validate in Storybook when component behavior is touched.
 14. Confirm implementation plan and touched files before large or risky edits.
 15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free.
+16. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
 
 ## Skills
 
@@ -85,7 +86,7 @@ Load docs on-demand based on what comes up in conversation:
 |---------|------|
 | Building UI, using components or tokens | `docs/context/design-system/components/cheat-sheet.md` (MANDATORY) |
 | Building new pages, dashboards, layouts | `docs/context/design-system/components/layout-cheat-sheet.md` (MANDATORY) |
-| Figma link or implement-design workflow | `.agent/skills/uno-prototype/references/figma-mcp-guide.md` (PRIMARY) |
+| Figma link, implement-design, or design-to-code mapping | `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` (MANDATORY — load first); then `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` + `figma-mcp-guide.md` |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Build, preview, or deployment | `.agent/skills/uno-prototype/references/local-preview.md` |
 | Exact file paths or env vars needed | Relevant `*-index.json` in skill references |

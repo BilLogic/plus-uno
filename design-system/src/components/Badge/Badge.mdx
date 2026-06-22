@@ -4,6 +4,94 @@ import * as BadgeStories from './Badge.stories.jsx';
 import * as BadgeSubStories from './Badge.Subcomponents.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "style": {
+      "type": "enum",
+      "values": [
+        "primary",
+        "secondary",
+        "tertiary",
+        "success",
+        "warning",
+        "danger",
+        "info",
+        "social-emotional",
+        "mastering-content",
+        "advocacy",
+        "relationship",
+        "technology-tools"
+      ]
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "b1",
+        "b2",
+        "b3"
+      ]
+    },
+    "dismissible": {
+      "type": "boolean"
+    },
+    "counter": {
+      "type": "string|number"
+    }
+  },
+  "sets": [
+    {
+      "id": "storybook-resources",
+      "name": "Badge docs page (MDX link)",
+      "componentSetNodeId": "3497:19481",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481",
+      "source": "storybook-mdx",
+      "status": "docs-page",
+      "notes": "Verified 2026-06-13: Badge documentation overview — not a single component set."
+    },
+    {
+      "id": "static-badges",
+      "name": "Static Badges",
+      "componentSetNodeId": "25:568",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=25-568",
+      "codeDefaults": {
+        "dismissible": false
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13"
+    },
+    {
+      "id": "dismissible-badges",
+      "name": "Dismissible Badges",
+      "componentSetNodeId": "1056:32356",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356",
+      "codeDefaults": {
+        "dismissible": true
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13"
+    },
+    {
+      "id": "counter-badges",
+      "name": "Counter",
+      "componentSetNodeId": "3998:68735",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3998-68735",
+      "codeDefaults": {
+        "dismissible": false
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13",
+      "notes": "Maps to Badge with counter prop set. variantProps TBD — add from Figma variant inspection."
+    }
+  ]
+};
+
 <Meta of={BadgeStories} />
 
 <Title />

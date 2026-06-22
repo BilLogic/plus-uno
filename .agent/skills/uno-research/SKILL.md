@@ -39,6 +39,7 @@ Load on-demand based on the research question:
 |---------|------|
 | Product/domain questions | `docs/context/product/*` |
 | Component/token discovery | `references/component-discovery.md` |
+| Figma ↔ code audit or mapping | `design-system/figma/component-registry.json`, `design-system/figma/token-registry.json` (MANDATORY); `../uno-prototype/references/figma-registry-mandatory-load.md` |
 | Prior knowledge check | `docs/knowledge/INDEX.md` → relevant domain files |
 | Learning/orientation | `references/learning.md` |
 | Existing solutions | `docs/knowledge/lessons/` → relevant category |

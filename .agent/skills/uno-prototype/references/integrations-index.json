@@ -5,11 +5,16 @@
     {
       "name": "Figma MCP",
       "usage": "Design-context extraction for design-tool-driven implementation",
+      "mandatory_registry_load": [
+        "design-system/figma/component-registry.json",
+        "design-system/figma/token-registry.json",
+        ".agent/skills/uno-prototype/references/figma-registry-mandatory-load.md"
+      ],
       "common_calls": [
         "get_design_context",
         "get_screenshot",
-        "get_code_connect_map",
-        "get_variable_defs"
+        "get_variable_defs",
+        "search_design_system"
       ]
     },
     {
@@ -18,6 +23,8 @@
     }
   ],
   "design_workflow_docs": [
+    ".agent/skills/uno-prototype/references/figma-registry-mandatory-load.md",
+    ".agent/skills/uno-prototype/references/figma-mcp-guide.md",
     ".agent/skills/uno-prototype/references/figma-workflow.md",
     "docs/context/conventions/integrations.md"
   ],

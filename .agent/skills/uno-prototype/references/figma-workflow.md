@@ -61,4 +61,6 @@ The design system supports automatic syncing of tokens from Figma via GitHub Act
 | :--- | :--- |
 | `Primary/500` | `var(--color-primary)` |
 | `Display 1` | `var(--font-size-display1)` |
-| `Spacing/16` | `var(--size-spacing-between-components-3)` |
+| Spacing (contextual) | Pick by layer: `var(--size-card-pad-{x\|y}-{sm\|md\|lg})`, `var(--size-element-gap-{xs\|sm\|md\|lg})`, `var(--size-section-pad-{x\|y}-{sm\|md\|lg})`, etc. No single `Spacing/N` token. |
+
+> See `design-system/figma/token-registry.json` and `figma-token-mapping.md` for the full, validated mapping.

@@ -1,5 +1,8 @@
 {
   "version": "1.0.0",
+  "generated": true,
+  "generatedBy": "scripts/generate-component-registry-from-storybook.js",
+  "note": "DO NOT EDIT BY HAND. Source of truth is each component MDX `export const figmaMeta`. Run `npm run generate:component-registry` to regenerate.",
   "figmaFile": {
     "fileKey": "zAecJNRdvJzAUOcjV32tRX",
     "name": "Design System - BS4 Foundation Component Library",
@@ -23,7 +26,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -54,7 +57,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD from Dev Mode."
+            "notes": "variantProps TBD — add from Figma variant inspection."
           }
         ]
       }
@@ -69,16 +72,40 @@
           "style": {
             "type": "enum",
             "values": [
-              "primary", "secondary", "tertiary", "success", "warning", "danger", "info",
-              "social-emotional", "mastering-content", "advocacy", "relationship", "technology-tools"
+              "primary",
+              "secondary",
+              "tertiary",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "social-emotional",
+              "mastering-content",
+              "advocacy",
+              "relationship",
+              "technology-tools"
             ]
           },
           "size": {
             "type": "enum",
-            "values": ["h1", "h2", "h3", "h4", "h5", "h6", "b1", "b2", "b3"]
+            "values": [
+              "h1",
+              "h2",
+              "h3",
+              "h4",
+              "h5",
+              "h6",
+              "b1",
+              "b2",
+              "b3"
+            ]
           },
-          "dismissible": { "type": "boolean" },
-          "counter": { "type": "string|number" }
+          "dismissible": {
+            "type": "boolean"
+          },
+          "counter": {
+            "type": "string|number"
+          }
         }
       },
       "figma": {
@@ -98,7 +125,9 @@
             "name": "Static Badges",
             "componentSetNodeId": "25:568",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=25-568",
-            "codeDefaults": { "dismissible": false },
+            "codeDefaults": {
+              "dismissible": false
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13"
           },
@@ -107,7 +136,9 @@
             "name": "Dismissible Badges",
             "componentSetNodeId": "1056:32356",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356",
-            "codeDefaults": { "dismissible": true },
+            "codeDefaults": {
+              "dismissible": true
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13"
           },
@@ -116,10 +147,12 @@
             "name": "Counter",
             "componentSetNodeId": "3998:68735",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3998-68735",
-            "codeDefaults": { "dismissible": false },
+            "codeDefaults": {
+              "dismissible": false
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "Maps to Badge with counter prop set. variantProps TBD from Dev Mode."
+            "notes": "Maps to Badge with counter prop set. variantProps TBD — add from Figma variant inspection."
           }
         ]
       }
@@ -141,7 +174,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -207,23 +240,48 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
             "source": "storybook-mdx",
             "status": "docs-page",
-            "notes": "Verified 2026-06-13: opens Buttons overview with all component sets — not a single component set. Use fill-specific sets below for write-back / Code Connect."
+            "notes": "Verified 2026-06-13: opens Buttons overview with all component sets — not a single component set. Use fill-specific sets below for write-back."
           },
           {
             "id": "filled-buttons",
             "name": "Filled buttons",
             "componentSetNodeId": "33:2470",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=33-2470",
-            "codeDefaults": { "fill": "filled" },
-            "variantProps": { "size": "size", "style": "style", "state": "state" },
+            "codeDefaults": {
+              "fill": "filled"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
             "variantValueMap": {
-              "size": { "small": "small", "medium (default)": "medium", "large": "large" },
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
               "state": {
-                "rest (default)": { "disabled": false, "active": false },
-                "hover": { "disabled": false, "active": false },
-                "pressed": { "disabled": false, "active": true },
-                "focus": { "disabled": false, "active": false },
-                "disabled": { "disabled": true, "active": false }
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
               }
             },
             "status": "verified",
@@ -234,16 +292,41 @@
             "name": "Tonal buttons",
             "componentSetNodeId": "979:20977",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-20977",
-            "codeDefaults": { "fill": "tonal" },
-            "variantProps": { "size": "size", "style": "style", "state": "state" },
+            "codeDefaults": {
+              "fill": "tonal"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
             "variantValueMap": {
-              "size": { "small": "small", "medium (default)": "medium", "large": "large" },
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
               "state": {
-                "rest (default)": { "disabled": false, "active": false },
-                "hover": { "disabled": false, "active": false },
-                "pressed": { "disabled": false, "active": true },
-                "focus": { "disabled": false, "active": false },
-                "disabled": { "disabled": true, "active": false }
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
               }
             },
             "status": "verified",
@@ -254,16 +337,41 @@
             "name": "Outlined buttons",
             "componentSetNodeId": "968:18597",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=968-18597",
-            "codeDefaults": { "fill": "outline" },
-            "variantProps": { "size": "size", "style": "style", "state": "state" },
+            "codeDefaults": {
+              "fill": "outline"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
             "variantValueMap": {
-              "size": { "small": "small", "medium (default)": "medium", "large": "large" },
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
               "state": {
-                "rest (default)": { "disabled": false, "active": false },
-                "hover": { "disabled": false, "active": false },
-                "pressed": { "disabled": false, "active": true },
-                "focus": { "disabled": false, "active": false },
-                "disabled": { "disabled": true, "active": false }
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
               }
             },
             "status": "verified",
@@ -274,16 +382,41 @@
             "name": "Text buttons",
             "componentSetNodeId": "979:19814",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-19814",
-            "codeDefaults": { "fill": "text" },
-            "variantProps": { "size": "size", "style": "style", "state": "state" },
+            "codeDefaults": {
+              "fill": "text"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
             "variantValueMap": {
-              "size": { "small": "small", "medium (default)": "medium", "large": "large" },
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
               "state": {
-                "rest (default)": { "disabled": false, "active": false },
-                "hover": { "disabled": false, "active": false },
-                "pressed": { "disabled": false, "active": true },
-                "focus": { "disabled": false, "active": false },
-                "disabled": { "disabled": true, "active": false }
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
               }
             },
             "status": "verified",
@@ -294,16 +427,42 @@
             "name": "Vertical outlined buttons",
             "componentSetNodeId": "7204:9586",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-9586",
-            "codeDefaults": { "fill": "outline", "vertical": true },
-            "variantProps": { "size": "size", "style": "style", "state": "state" },
+            "codeDefaults": {
+              "fill": "outline",
+              "vertical": true
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
             "variantValueMap": {
-              "size": { "small": "small", "medium (default)": "medium", "large": "large" },
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
               "state": {
-                "rest (default)": { "disabled": false, "active": false },
-                "hover": { "disabled": false, "active": false },
-                "pressed": { "disabled": false, "active": true },
-                "focus": { "disabled": false, "active": false },
-                "disabled": { "disabled": true, "active": false }
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
               }
             },
             "status": "verified",
@@ -330,7 +489,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -361,7 +520,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817",
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD from Dev Mode."
+            "notes": "variantProps TBD — add from Figma variant inspection."
           }
         ]
       }
@@ -383,7 +542,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -405,7 +564,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-5947",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -427,7 +586,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -449,7 +608,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -471,7 +630,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -493,7 +652,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -515,7 +674,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -537,7 +696,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -559,7 +718,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -581,7 +740,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -612,7 +771,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD from Dev Mode."
+            "notes": "variantProps TBD — add from Figma variant inspection."
           }
         ]
       }
@@ -634,7 +793,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -656,7 +815,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -678,7 +837,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -700,7 +859,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -722,7 +881,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245484",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -753,7 +912,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20229",
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD from Dev Mode."
+            "notes": "variantProps TBD — add from Figma variant inspection."
           }
         ]
       }
@@ -775,7 +934,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -797,7 +956,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -819,7 +978,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -841,7 +1000,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -863,7 +1022,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -885,7 +1044,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -907,7 +1066,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -929,7 +1088,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -951,7 +1110,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -973,7 +1132,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -995,7 +1154,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1017,7 +1176,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1039,7 +1198,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1070,7 +1229,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD from Dev Mode."
+            "notes": "variantProps TBD — add from Figma variant inspection."
           }
         ]
       }
@@ -1092,7 +1251,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1114,7 +1273,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1136,7 +1295,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1148,11 +1307,31 @@
         "mdxPath": "design-system/src/forms/Textarea.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms",
         "props": {
-          "variant": { "type": "enum", "values": ["long", "short"] },
-          "size": { "type": "enum", "values": ["small", "medium", "large"] },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "long",
+              "short"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
           "state": {
             "type": "enum",
-            "values": ["default", "focus", "error", "success", "readonly", "disabled"]
+            "values": [
+              "default",
+              "focus",
+              "error",
+              "success",
+              "readonly",
+              "disabled"
+            ]
           }
         }
       },
@@ -1165,7 +1344,9 @@
             "componentSetNodeId": "13543:5904",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
             "source": "storybook-mdx",
-            "codeDefaults": { "variant": "short" },
+            "codeDefaults": {
+              "variant": "short"
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13",
             "notes": "Verified 2026-06-13: MDX figmaLink points directly to Form Short Textarea component set (not a docs page)."
@@ -1175,17 +1356,21 @@
             "name": "Form Textarea",
             "componentSetNodeId": "13541:10731",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
-            "codeDefaults": { "variant": "long" },
+            "codeDefaults": {
+              "variant": "long"
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD from Dev Mode."
+            "notes": "variantProps TBD — add from Figma variant inspection."
           },
           {
             "id": "form-short-textarea",
             "name": "Form Short Textarea",
             "componentSetNodeId": "13543:5904",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
-            "codeDefaults": { "variant": "short" },
+            "codeDefaults": {
+              "variant": "short"
+            },
             "status": "verified",
             "verifiedAt": "2026-06-13",
             "notes": "Same node as storybook-resources MDX link."
@@ -1210,7 +1395,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }
@@ -1232,7 +1417,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486",
             "source": "storybook-mdx",
             "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after Dev Mode check."
+            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
           }
         ]
       }

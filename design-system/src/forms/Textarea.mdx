@@ -3,6 +3,77 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as TextareaStories from './Textarea.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": [
+        "long",
+        "short"
+      ]
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "small",
+        "medium",
+        "large"
+      ]
+    },
+    "state": {
+      "type": "enum",
+      "values": [
+        "default",
+        "focus",
+        "error",
+        "success",
+        "readonly",
+        "disabled"
+      ]
+    }
+  },
+  "sets": [
+    {
+      "id": "storybook-resources",
+      "name": "Form Short Textarea (MDX link)",
+      "componentSetNodeId": "13543:5904",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
+      "source": "storybook-mdx",
+      "codeDefaults": {
+        "variant": "short"
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13",
+      "notes": "Verified 2026-06-13: MDX figmaLink points directly to Form Short Textarea component set (not a docs page)."
+    },
+    {
+      "id": "form-textarea",
+      "name": "Form Textarea",
+      "componentSetNodeId": "13541:10731",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
+      "codeDefaults": {
+        "variant": "long"
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13",
+      "notes": "variantProps TBD — add from Figma variant inspection."
+    },
+    {
+      "id": "form-short-textarea",
+      "name": "Form Short Textarea",
+      "componentSetNodeId": "13543:5904",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
+      "codeDefaults": {
+        "variant": "short"
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13",
+      "notes": "Same node as storybook-resources MDX link."
+    }
+  ]
+};
+
 <Meta of={TextareaStories} />
 
 <Title />

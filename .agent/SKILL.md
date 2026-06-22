@@ -15,10 +15,10 @@ description: Tier-aware skill router for the PLUS Design System. Routes requests
 
 | Skill | Trigger | Tier 2 Context (loaded on invoke) | Budget |
 |-------|---------|-----------------------------------|--------|
-| [uno-research](skills/uno-research/SKILL.md) | "what is", "how does", "explore", "audit" | `docs/context/product/*`, `docs/knowledge/INDEX.md` → domain files, `references/component-discovery.md` | ~3K |
-| [uno-plan](skills/uno-plan/SKILL.md) | "plan", "scope", "how should we build" | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief | ~4K |
-| [uno-prototype](skills/uno-prototype/SKILL.md) | "scaffold", "prototype", "build", Figma link | `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, handoff plan | ~5K |
-| [uno-review](skills/uno-review/SKILL.md) | "review", "check", "validate" | `docs/context/design-system/foundations/accessibility.md`, `docs/knowledge/preferences.md` | ~3K |
+| [uno-research](skills/uno-research/SKILL.md) | "what is", "how does", "explore", "audit" | `docs/context/product/*`, `docs/knowledge/INDEX.md` → domain files, `references/component-discovery.md`; **Figma audit:** `design-system/figma/component-registry.json`, `token-registry.json` | ~3K |
+| [uno-plan](skills/uno-plan/SKILL.md) | "plan", "scope", "how should we build" | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief; **Figma input:** `design-system/figma/component-registry.json`, `token-registry.json` | ~4K |
+| [uno-prototype](skills/uno-prototype/SKILL.md) | "scaffold", "prototype", "build", Figma link | `design-system/figma/component-registry.json`, `token-registry.json` (MANDATORY), `references/figma-registry-mandatory-load.md`, `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, handoff plan | ~5K |
+| [uno-review](skills/uno-review/SKILL.md) | "review", "check", "validate" | `docs/context/design-system/foundations/accessibility.md`, `docs/knowledge/preferences.md`; **Figma-derived work:** `design-system/figma/component-registry.json`, `token-registry.json` | ~3K |
 | [uno-post](skills/uno-post/SKILL.md) | "submit", "publish" | `references/marketplace-schema.md` | ~1K |
 | [uno-compound](skills/uno-compound/SKILL.md) | "document", "compound", session ending | `docs/knowledge/INDEX.md`, target domain file, `references/solution-schema.md` | ~3K |
 
@@ -61,7 +61,7 @@ agent: Explore                    # Subagent type (uno-research)
 
 ## Grounding Rules
 
-0. **Figma link → full implement-design workflow**: Load `.agent/skills/uno-prototype/references/figma-mcp-guide.md` and follow all 7 steps.
+0. **Figma link → mandatory registry load + implement-design workflow**: Read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` first (see `skills/uno-prototype/references/figma-registry-mandatory-load.md`). Then load `skills/uno-prototype/references/figma-mcp-guide.md` and follow all 7 steps.
 1. Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
 2. **THE CHEAT SHEET IS LAW:** Before writing any React component or CSS token, read `docs/context/design-system/components/cheat-sheet.md`.
 3. **NEVER HALLUCINATE LAYOUTS:** Read `docs/context/design-system/components/layout-cheat-sheet.md` before building pages.
@@ -87,6 +87,9 @@ See `.agent/AGENT.md` for full handoff format and lifecycle.
 
 Skills reference shared context via absolute repo-relative paths:
 
+- `design-system/figma/component-registry.json` — **MANDATORY** Figma component set ↔ code import (design-to-code)
+- `design-system/figma/token-registry.json` — **MANDATORY** Figma variable ↔ CSS token
+- `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` — load gate and skill enforcement
 - `docs/context/design-system/components/cheat-sheet.md` — component quick reference
 - `docs/context/design-system/components/layout-cheat-sheet.md` — layout formulas
 - `docs/context/design-system/components/components-index.json` — component registry

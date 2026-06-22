@@ -38,12 +38,13 @@ Suggest once per work session — do not repeat if declined.
 Use routing rules before running checks:
 
 1. If target is implementation code (UI/prototype/spec files), run the standard `uno-review` checklist and scripts.
-2. If target is skill documentation (`.agent/skills/**/SKILL.md` or skill reference docs), run the embedded Skill Quality Audit workflow from:
+2. If target is Figma-derived or playground work with design mapping, **MUST** load `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` first — verify imports and tokens match registry entries.
+3. If target is skill documentation (`.agent/skills/**/SKILL.md` or skill reference docs), run the embedded Skill Quality Audit workflow from:
    - `references/skill-quality/checklist.md`
    - `references/skill-quality/output-template.md`
    - `references/skill-quality/audit-workflow.md`
    - `references/skill-quality/audit-examples.md`
-3. If request includes both code review and skill-doc review, run both paths and present results in separate sections.
+4. If request includes both code review and skill-doc review, run both paths and present results in separate sections.
 
 ## Checklist
 

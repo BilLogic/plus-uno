@@ -11,6 +11,292 @@ import {
     SizesDocDescription
 } from './button-segmented-demos.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "style": {
+      "type": "enum",
+      "values": [
+        "primary",
+        "secondary",
+        "tertiary",
+        "success",
+        "warning",
+        "danger",
+        "info",
+        "default",
+        "social-emotional",
+        "mastering-content",
+        "advocacy",
+        "relationship",
+        "technology-tools"
+      ]
+    },
+    "fill": {
+      "type": "enum",
+      "values": [
+        "filled",
+        "tonal",
+        "outline",
+        "ghost",
+        "text"
+      ]
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "small",
+        "medium",
+        "large"
+      ]
+    },
+    "disabled": {
+      "type": "boolean"
+    },
+    "text": {
+      "type": "string"
+    }
+  },
+  "sets": [
+    {
+      "id": "storybook-resources",
+      "name": "Buttons docs page (MDX link)",
+      "componentSetNodeId": "3497:19482",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
+      "source": "storybook-mdx",
+      "status": "docs-page",
+      "notes": "Verified 2026-06-13: opens Buttons overview with all component sets — not a single component set. Use fill-specific sets below for write-back."
+    },
+    {
+      "id": "filled-buttons",
+      "name": "Filled buttons",
+      "componentSetNodeId": "33:2470",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=33-2470",
+      "codeDefaults": {
+        "fill": "filled"
+      },
+      "variantProps": {
+        "size": "size",
+        "style": "style",
+        "state": "state"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        },
+        "state": {
+          "rest (default)": {
+            "disabled": false,
+            "active": false
+          },
+          "hover": {
+            "disabled": false,
+            "active": false
+          },
+          "pressed": {
+            "disabled": false,
+            "active": true
+          },
+          "focus": {
+            "disabled": false,
+            "active": false
+          },
+          "disabled": {
+            "disabled": true,
+            "active": false
+          }
+        }
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13"
+    },
+    {
+      "id": "tonal-buttons",
+      "name": "Tonal buttons",
+      "componentSetNodeId": "979:20977",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-20977",
+      "codeDefaults": {
+        "fill": "tonal"
+      },
+      "variantProps": {
+        "size": "size",
+        "style": "style",
+        "state": "state"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        },
+        "state": {
+          "rest (default)": {
+            "disabled": false,
+            "active": false
+          },
+          "hover": {
+            "disabled": false,
+            "active": false
+          },
+          "pressed": {
+            "disabled": false,
+            "active": true
+          },
+          "focus": {
+            "disabled": false,
+            "active": false
+          },
+          "disabled": {
+            "disabled": true,
+            "active": false
+          }
+        }
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13"
+    },
+    {
+      "id": "outlined-buttons",
+      "name": "Outlined buttons",
+      "componentSetNodeId": "968:18597",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=968-18597",
+      "codeDefaults": {
+        "fill": "outline"
+      },
+      "variantProps": {
+        "size": "size",
+        "style": "style",
+        "state": "state"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        },
+        "state": {
+          "rest (default)": {
+            "disabled": false,
+            "active": false
+          },
+          "hover": {
+            "disabled": false,
+            "active": false
+          },
+          "pressed": {
+            "disabled": false,
+            "active": true
+          },
+          "focus": {
+            "disabled": false,
+            "active": false
+          },
+          "disabled": {
+            "disabled": true,
+            "active": false
+          }
+        }
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13"
+    },
+    {
+      "id": "text-buttons",
+      "name": "Text buttons",
+      "componentSetNodeId": "979:19814",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-19814",
+      "codeDefaults": {
+        "fill": "text"
+      },
+      "variantProps": {
+        "size": "size",
+        "style": "style",
+        "state": "state"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        },
+        "state": {
+          "rest (default)": {
+            "disabled": false,
+            "active": false
+          },
+          "hover": {
+            "disabled": false,
+            "active": false
+          },
+          "pressed": {
+            "disabled": false,
+            "active": true
+          },
+          "focus": {
+            "disabled": false,
+            "active": false
+          },
+          "disabled": {
+            "disabled": true,
+            "active": false
+          }
+        }
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13"
+    },
+    {
+      "id": "vertical-outlined-buttons",
+      "name": "Vertical outlined buttons",
+      "componentSetNodeId": "7204:9586",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-9586",
+      "codeDefaults": {
+        "fill": "outline",
+        "vertical": true
+      },
+      "variantProps": {
+        "size": "size",
+        "style": "style",
+        "state": "state"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        },
+        "state": {
+          "rest (default)": {
+            "disabled": false,
+            "active": false
+          },
+          "hover": {
+            "disabled": false,
+            "active": false
+          },
+          "pressed": {
+            "disabled": false,
+            "active": true
+          },
+          "focus": {
+            "disabled": false,
+            "active": false
+          },
+          "disabled": {
+            "disabled": true,
+            "active": false
+          }
+        }
+      },
+      "status": "verified",
+      "verifiedAt": "2026-06-13",
+      "notes": "Maps to Button with fill=outline and vertical=true."
+    }
+  ]
+};
+
 <Meta of={ButtonStories} />
 
 <Title />
