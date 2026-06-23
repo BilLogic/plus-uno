@@ -86,7 +86,7 @@ export const Overview = () => {
 };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formChoiceGrid }
+        source: { language: 'jsx', code: webAppSourceSnippets.formChoiceGrid }
     }
 };
 

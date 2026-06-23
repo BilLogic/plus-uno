@@ -146,7 +146,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formLabelCaption }
+        source: { language: 'jsx', code: webAppSourceSnippets.formLabelCaption }
     }
 };
 

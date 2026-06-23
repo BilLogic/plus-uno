@@ -67,7 +67,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formSwitch }
+        source: { language: 'jsx', code: webAppSourceSnippets.formSwitch }
     }
 };
 

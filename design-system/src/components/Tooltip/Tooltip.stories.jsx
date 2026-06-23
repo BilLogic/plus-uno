@@ -167,7 +167,7 @@ export const Overview = {
     ),
     parameters: {
         docs: {
-            source: { language: 'html', code: webAppSourceSnippets.tooltip }
+            source: { language: 'jsx', code: webAppSourceSnippets.tooltip }
         }
     }
 };

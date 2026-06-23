@@ -185,7 +185,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.listGroup }
+        source: { language: 'jsx', code: webAppSourceSnippets.listGroup }
     }
 };
 

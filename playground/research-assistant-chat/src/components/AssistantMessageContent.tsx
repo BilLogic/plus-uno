@@ -30,7 +30,7 @@ function PartRenderer({ part }: { part: any }): React.ReactElement | null {
         }}
       >
         {shouldType ? (
-          <TypingText text={part.text} speed={40} />
+          <TypingText text={part.text} speed={14} />
         ) : (
           part.text
         )}

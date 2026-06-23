@@ -327,7 +327,7 @@ export const Overview = {
     ...Interactive,
     parameters: {
         docs: {
-            source: { language: 'html', code: webAppSourceSnippets.modal }
+            source: { language: 'jsx', code: webAppSourceSnippets.modal }
         }
     }
 };

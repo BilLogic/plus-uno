@@ -194,7 +194,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.mediaObject }
+        source: { language: 'jsx', code: webAppSourceSnippets.mediaObject }
     }
 };
 

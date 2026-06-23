@@ -119,7 +119,7 @@ const preview = {
       storySort: {
         order: [
           'PLUS Docs',
-          ['Introduction', 'How are Components Organized?', 'What are tokens?'],
+          ['Introduction'],
           'Styles',
           ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
           'Assets',

@@ -257,7 +257,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.collapse }
+        source: { language: 'jsx', code: webAppSourceSnippets.collapse }
     }
 };
 

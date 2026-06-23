@@ -16,7 +16,7 @@
   "docsFirstTag": "!dev",
   "storySortOrder": [
     "PLUS Docs",
-    ["Introduction", "How are Components Organized?", "What are tokens?"],
+    ["Introduction"],
     "Styles",
     [
       "Introduction",

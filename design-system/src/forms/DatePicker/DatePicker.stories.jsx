@@ -65,7 +65,7 @@ export const Overview = () => (
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formDatePicker }
+        source: { language: 'jsx', code: webAppSourceSnippets.formDatePicker }
     }
 };
 

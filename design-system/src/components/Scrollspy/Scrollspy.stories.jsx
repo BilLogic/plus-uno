@@ -142,7 +142,7 @@ export const Layout = () => <ScrollspyLayoutDemo />;
 export const Overview = () => <ScrollspyLayoutDemo sectionCount={1} idPrefix="scrollspy-docs-overview" />;
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.scrollspy }
+        source: { language: 'jsx', code: webAppSourceSnippets.scrollspy }
     }
 };
 

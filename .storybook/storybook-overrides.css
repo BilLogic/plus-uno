@@ -235,6 +235,99 @@ a.sbdocs-a {
 }
 
 /*
+ * PLUS Docs Introduction: tighter narrative rhythm than component API docs.
+ */
+.sbdocs .sb-plus-intro-page {
+  margin-top: clamp(2.5rem, 4vw, 4rem) !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-ds-doc-section {
+  margin-top: clamp(2.25rem, 4vw, 3.25rem) !important;
+  margin-bottom: clamp(2.25rem, 4vw, 3.25rem) !important;
+  gap: 0.875rem;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
+  font-family: var(--font-family-header, 'Lato', sans-serif);
+  font-size: var(--font-size-display4, 56px);
+  font-weight: var(--font-weight-headline, 700);
+  line-height: 1.1;
+  margin: 0 0 0.75rem;
+  color: var(--color-on-surface, #191c1e);
+}
+
+.sbdocs .sb-plus-intro-page .sb-ds-doc-section:first-child {
+  margin-top: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-ds-doc-section:last-child {
+  margin-bottom: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-grid,
+.sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-sections-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
+  border: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 70%, transparent);
+  border-radius: var(--size-card-radius-sm);
+  background: color-mix(in srgb, var(--color-muted, #e0e3e7) 28%, transparent);
+  padding: 0.875rem;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-on-surface, #191c1e);
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-copy {
+  margin: 0.25rem 0 0.75rem;
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface-variant, #5c5c5c);
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .sbdocs.sbdocs-preview {
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div:first-child {
+  padding: 0 !important;
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .innerZoomElementWrapper > * {
+  border: none !important;
+}
+
+/*
  * Preview well: flatten inner Storybook Canvas chrome; outer card only.
  */
 .sbdocs .sb-ds-docs-preview-well .sbdocs.sbdocs-preview,

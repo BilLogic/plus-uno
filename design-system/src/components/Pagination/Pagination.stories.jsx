@@ -219,7 +219,7 @@ export const Overview = Template.bind({});
 Overview.args = { ...paginationPlaygroundArgs };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.pagination }
+        source: { language: 'jsx', code: webAppSourceSnippets.pagination }
     }
 };
 

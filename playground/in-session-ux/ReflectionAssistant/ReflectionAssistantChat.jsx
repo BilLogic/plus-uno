@@ -5,7 +5,7 @@ import { QuestionFlow, ParameterSlider } from './ToolUI';
 /**
  * TypewriterText - character by character reveal with cursor
  */
-const TypewriterText = ({ text, speed = 15, onComplete }) => {
+const TypewriterText = ({ text, speed = 14, onComplete }) => {
     const [displayed, setDisplayed] = useState('');
     const [isComplete, setIsComplete] = useState(false);
     const indexRef = useRef(0);
@@ -137,11 +137,11 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                     clearInterval(interval);
                     resolve();
                 }
-            }, 20); // 20ms per char speed (150% faster)
+            }, 14); // per-char auto-typing speed (shared consistent pace)
         });
 
         // Small pause after typing before sending
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 150));
         handleSend(text);
         setInput('');
         setIsAutoTyping(false);
@@ -317,6 +317,9 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                 type: 'text',
                 text: "Hi! I'm your Reflection Assistant. Let's start by selecting the student you'd like to reflect on."
             });
+            // Demo: clicking the message input auto-types an answer to this first
+            // question (selecting Arlene McCoy) instead of requiring real typing.
+            setPendingAutoResponse("Let's reflect on Arlene McCoy from today's session.");
             // Add student selection question flow
             // Longer delay for smoother progressive disclosure
             const timer = setTimeout(() => {
@@ -394,7 +397,7 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                                 }}
                             >
                                 {msg.role === 'assistant' ? (
-                                    <TypewriterText text={msg.content.text} speed={8} />
+                                    <TypewriterText text={msg.content.text} speed={14} />
                                 ) : (
                                     <span>{msg.content.text}</span>
                                 )}
@@ -447,7 +450,9 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                         type="text"
                         placeholder="Type a message..."
                         value={input}
+                        readOnly
                         onFocus={handleInputFocus}
+                        onClick={handleInputFocus}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                         style={{
@@ -456,7 +461,8 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                             border: 'none',
                             outline: 'none',
                             fontSize: '14px',
-                            color: '#111'
+                            color: '#111',
+                            cursor: 'pointer'
                         }}
                     />
                     <button

@@ -266,7 +266,7 @@ export const Overview = {
     args: { ...buttonGroupOverviewArgs },
     parameters: {
         docs: {
-            source: { language: 'html', code: webAppSourceSnippets.buttonGroup }
+            source: { language: 'jsx', code: webAppSourceSnippets.buttonGroup }
         }
     }
 };

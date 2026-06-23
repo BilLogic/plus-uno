@@ -207,7 +207,7 @@ export const Overview = {
     ),
     parameters: {
         docs: {
-            source: { language: 'html', code: webAppSourceSnippets.formSelect }
+            source: { language: 'jsx', code: webAppSourceSnippets.formSelect }
         }
     }
 };

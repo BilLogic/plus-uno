@@ -71,7 +71,7 @@ export const Overview = () => {
 };
 Overview.parameters = {
     docs: {
-        source: { language: 'html', code: webAppSourceSnippets.formRating }
+        source: { language: 'jsx', code: webAppSourceSnippets.formRating }
     }
 };
 
