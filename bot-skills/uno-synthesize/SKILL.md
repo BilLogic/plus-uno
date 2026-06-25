@@ -14,8 +14,10 @@ model_default: claude-sonnet-4-6
 status: new
 covers: >
   The "#uno-synthesize" phase of the "Starting from Nothing" flow — turn context
-  into findings → user flows → screen list → PRD. (Future: write the full result
-  to "uno-blueprint" once that destination exists; for now the PRD files to the
+  into findings → user flows → screen list → PRD. Also the Design Ops "Component
+  Update Request" flow — generate the PRD once the context is complete, and produce
+  the update summary uno-bot posts to Slack. (Future: write the full result to
+  "uno-blueprint" once that destination exists; for now the PRD files to the
   Roadmap board via create_prd.)
 ---
 
@@ -28,7 +30,8 @@ stuff" to "here's the requirement."
 > **Shared concept.** The in-IDE `.agent/skills/uno-synthesize/SKILL.md` (Plus
 > UNO) has the same goal and writes a fuller blueprint doc; this bot version
 > works from the Slack thread and files the PRD via `create_prd`. Keep the output
-> structure in sync.
+> structure in sync — same findings → flows → screens → PRD, the same PRD
+> structure, and the same **update-summary** shape.
 >
 > **Absorbs `uno-prd`.** PRD drafting + filing is part of this skill now — there
 > is no separate uno-prd skill. The `create_prd` / `delete_prd` *tools* remain
@@ -55,6 +58,13 @@ create_prd.)*
   findings + user flows + screen list (conversational, structured).
 - **"draft a PRD from this" / "turn this into a PRD/spec" / "file it"** → produce
   the synthesis, then draft the PRD and, on approval, call `create_prd`.
+- **"summarize what changed" / "write the update summary" / "post the component
+  update"** → produce a tight **update summary** (template below) for the finished
+  DS component update — the `#figma-sync` notification shape, not a PRD.
+
+**Enough context first.** Before synthesizing, check there's enough to work with
+(the flow's "enough context?" / "is the context complete?" gate). If the thread is
+too thin, say what's missing and offer to pull it in — don't synthesize prematurely.
 
 **Not for:**
 - Plus-fact / project-status questions → `uno-qa`.
@@ -106,6 +116,24 @@ When the designer wants a PRD ("draft a PRD", "make a PRD", "file it"):
 The full arc: **distill → findings/flows/screens → (worth pursuing?) → draft &
 file the PRD via create_prd → then `implement_design` to build a prototype.**
 
+## Update summary (Design Ops — the component-update notification)
+
+When a DS component update lands and the designer wants it announced, synthesize a
+tight **update summary** — a retrospective of what shipped (not a forward-looking
+PRD). This is the message the bot posts to `#figma-sync`. Slack mrkdwn, drop empty
+lines:
+
+```
+*Component update — {component}*
+*What changed* • {variants / states / tokens / props touched}
+*Why* • {the PRD/Figma reason}  <{link}|PRD>
+*Impact* • {visual/behavioral; migration note, or "drop-in"}
+*See it* • <{storybook}|Storybook> · <{pr}|PR>
+```
+
+Only changes the PRD / PR / Figma actually show — never invent change items. No new
+tool: this posts as a normal threaded reply (the same shape the polling bot uses).
+
 ## Grounding Rules
 
 - **Faithful to the context.** Synthesize what's actually there — never invent
@@ -128,7 +156,9 @@ file the PRD via create_prd → then `implement_design` to build a prototype.**
 ## Related Skills / Tools
 
 - **`.agent/skills/uno-synthesize`** — the in-IDE counterpart (writes the fuller
-  blueprint doc; same goal).
+  blueprint doc + the "Update Summary" section; same goal, kept in sync).
+- **Update summary** — feeds the `#figma-sync` Slack notification at the end of the
+  Design Ops component-update flow. No dedicated tool; posts as a normal reply.
 - **`create_prd` / `delete_prd` (tools)** — file / archive the PRD on the
   Roadmap board. Governed by this skill now (uno-prd was merged in).
 - **`uno-research` / `find_experts`** — earlier in the flow: find people to
