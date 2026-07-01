@@ -60,7 +60,11 @@ export type AgentResult =
       messageToUser?: string;
     };
 
-const MAX_ITERATIONS = 5;
+// Raised from 5: grounding questions legitimately chain several read-only
+// searches (e.g. blueprint_search across a multi-step flow) before the model
+// has enough to answer. If this is still exhausted, we fall back to a final
+// tools-disabled synthesis pass (below) rather than erroring out.
+const MAX_ITERATIONS = 8;
 const MAX_TOKENS = 2048;
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
@@ -213,7 +217,30 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     return finish({ kind: "text", text: `(internal: unexpected stop_reason: ${response.stop_reason})` });
   }
 
-  return finish({ kind: "text", text: "(internal: agent loop exceeded max iterations)" });
+  // Iteration budget exhausted — the model kept calling read-only tools (usually
+  // several grounding searches) without ever synthesizing. Rather than surfacing
+  // an internal error, make one final pass with tools DISABLED so it must answer
+  // from the tool results it already gathered (which are already in `messages`).
+  const finalResponse = await client.messages.create({
+    model,
+    max_tokens: MAX_TOKENS,
+    system: systemBlocks as Anthropic.TextBlockParam[],
+    messages,
+  });
+  iterations++;
+  inputTokens += finalResponse.usage?.input_tokens ?? 0;
+  outputTokens += finalResponse.usage?.output_tokens ?? 0;
+  const finalText = finalResponse.content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n")
+    .trim();
+  return finish({
+    kind: "text",
+    text:
+      finalText ||
+      "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?",
+  });
 }
 
 /**
