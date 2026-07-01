@@ -16,9 +16,9 @@ covers: >
   The "#uno-synthesize" phase of the "Starting from Nothing" flow — turn context
   into findings → user flows → screen list → PRD. Also the Design Ops "Component
   Update Request" flow — generate the PRD once the context is complete, and produce
-  the update summary uno-bot posts to Slack. (Future: write the full result to
-  "uno-blueprint" once that destination exists; for now the PRD files to the
-  Roadmap board via create_prd.)
+  the update summary uno-bot posts to Slack. Ground status/product facts in the
+  uno-blueprint (Supabase) via blueprint_search and cite it; the PRD files to the
+  Roadmap board via create_prd.
 ---
 
 # uno-synthesize (bot)
@@ -46,9 +46,9 @@ Distill the gathered context into, in order of depth:
 4. **PRD** — the requirement, drafted and (on approval) filed via `create_prd`.
 
 Not every request needs all four. Match the depth to what the designer asked
-(see below). *(Future: the full result will be written to "uno-blueprint" — that
-destination isn't built yet, so for now summarize in Slack and file the PRD via
-create_prd.)*
+(see below). Ground product/status facts in the **uno-blueprint** via
+`blueprint_search` and cite the rows; summarize in Slack and file the PRD via
+`create_prd`.
 
 ## When to Use / depth
 

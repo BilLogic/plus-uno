@@ -58,6 +58,57 @@ export async function addReaction(
   return slackCall<SlackResponse>(env, "reactions.add", { channel, timestamp: ts, name });
 }
 
+// Confirmed tools that produce a reviewable artifact (a draft PR or a new PRD)
+// and so warrant a heads-up in #plus-design for team review (D5). delete_prd is
+// a removal — no review-request.
+const REVIEW_REQUEST_TOOLS: ReadonlySet<string> = new Set([
+  "implement",
+  "implement_design",
+  "marketplace_add",
+  "marketplace_edit",
+  "create_prd",
+]);
+
+export function warrantsReviewRequest(toolName: string): boolean {
+  return REVIEW_REQUEST_TOOLS.has(toolName);
+}
+
+const REVIEW_VERB: Record<string, string> = {
+  implement: "component implementation PR",
+  implement_design: "new prototype scaffold PR",
+  marketplace_add: "marketplace entry PR",
+  marketplace_edit: "marketplace edit PR",
+  create_prd: "new PRD",
+};
+
+export interface ReviewRequestInput {
+  toolName: string;
+  requesterUserId: string;
+  /** Channel/thread where the work was requested, for a back-link. */
+  originChannel: string;
+  /** Artifact link (PR/Notion url) if the executor surfaced one. */
+  artifactUrl?: string;
+  /** Optional reviewer Slack ids to tag (from find_experts, when available). */
+  reviewerUserIds?: string[];
+}
+
+// Announce a reviewable artifact to #plus-design: right place (the design
+// channel), right person (@-mention the requester + any reviewers), right time
+// (fired at completion). No-ops when PLUS_DESIGN_CHANNEL_ID is unset.
+export async function postReviewRequest(env: Env, input: ReviewRequestInput) {
+  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  if (!channel) return; // fan-out disabled
+  const what = REVIEW_VERB[input.toolName] ?? input.toolName;
+  const reviewers = (input.reviewerUserIds ?? []).map((id) => `<@${id}>`).join(" ");
+  const lines = [
+    `:eyes: *Review request* — a ${what} is ready.`,
+    input.artifactUrl ? `Artifact: ${input.artifactUrl}` : "",
+    `Requested by <@${input.requesterUserId}> · thread in <#${input.originChannel}>`,
+    reviewers ? `Suggested reviewers: ${reviewers}` : "",
+  ].filter(Boolean);
+  return postMessage(env, { channel, text: lines.join("\n") });
+}
+
 export interface ConversationsRepliesResult extends SlackOk {
   messages: Array<{
     type: string;

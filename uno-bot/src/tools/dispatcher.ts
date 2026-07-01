@@ -13,6 +13,7 @@ import { executeDeletePrd } from "./delete-prd";
 import { executeMarketplaceAdd } from "./marketplace-add";
 import { executeMarketplaceEdit } from "./marketplace-edit";
 import { executeMarketplaceSearch } from "./marketplace-search";
+import { executeSendEmail } from "./send-email";
 
 export interface SlackContext {
   channel: string;
@@ -47,6 +48,8 @@ export async function executeTool(
       return executeMarketplaceAdd(env, input, slack);
     case "marketplace_edit":
       return executeMarketplaceEdit(env, input, slack);
+    case "send_email":
+      return executeSendEmail(env, input, slack);
     default:
       return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
   }

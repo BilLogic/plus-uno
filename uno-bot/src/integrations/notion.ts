@@ -166,8 +166,10 @@ export async function createRoadmapPrdCard(env: Env, input: PrdInput): Promise<C
 // ─── Team Member Database (read-only, for find_experts) ─────────────────────
 // Schema (verified): Name (title), Group (select), Primary Role (rich_text),
 // Short Bio (rich_text), Affiliation (select), LinkedIn / Personal Website /
-// Google Scholar (url). No Slack id/email — so the bot suggests people, it
-// can't @-mention them.
+// Google Scholar (url). Historically no Slack id — so the bot suggested people
+// by name. If a "Slack ID" text property is later added to the DB, we read it
+// here so find_experts can @-mention the right person (D5 "right person"); when
+// absent we fall back to name-only suggestions (unchanged behavior).
 
 type NotionRichText = { plain_text?: string }[];
 interface TeamMemberProps {
@@ -179,6 +181,7 @@ interface TeamMemberProps {
   LinkedIn?: { url?: string | null };
   "Personal Website"?: { url?: string | null };
   "Google Scholar"?: { url?: string | null };
+  "Slack ID"?: { rich_text?: NotionRichText };
 }
 
 export interface TeamMember {
@@ -189,6 +192,14 @@ export interface TeamMember {
   affiliation?: string;
   linkedin?: string;
   website?: string;
+  /** Slack user id (e.g. "U0123ABC"), if the DB carries one — enables @-mention. */
+  slackUserId?: string;
+}
+
+/** Normalize a raw "Slack ID" cell to a bare user id: strip <@…>, leading @. */
+function normalizeSlackId(raw: string): string | undefined {
+  const m = raw.match(/[UW][A-Z0-9]{6,}/);
+  return m ? m[0] : undefined;
 }
 
 const plain = (rt?: NotionRichText): string =>
@@ -238,6 +249,7 @@ export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
           affiliation: p.Affiliation?.select?.name ?? undefined,
           linkedin: p.LinkedIn?.url ?? undefined,
           website: p["Personal Website"]?.url ?? p["Google Scholar"]?.url ?? undefined,
+          slackUserId: normalizeSlackId(plain(p["Slack ID"]?.rich_text)) ?? undefined,
         });
       }
       cursor = data.has_more ? data.next_cursor : undefined;

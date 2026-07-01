@@ -13,6 +13,7 @@ import {
 import { addReaction, conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
+import { preflight } from "../agent/preflight";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 
 export interface SlackMessageEvent {
@@ -271,27 +272,24 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
 
   // ----- new side-effect proposal -----
 
-  // A component implement MUST be tied to a Notion PRD. Resolve it from the
-  // thread root (the polling bot's notification) or a link the designer pasted
-  // (the model puts that in input.notion_prd_url). If neither exists, ASK for it
-  // here in the Worker instead of proposing — so this never depends on the model
-  // remembering to ask, and a component is never implemented PRD-less.
+  // Resolve the PRD url for `implement` (thread root notification or a link the
+  // designer pasted); it feeds both the clarify gate and the proposal preview.
   let implementPrdUrl: string | undefined;
   if (result.toolName === "implement") {
     const inputPrdUrl =
       typeof result.input.notion_prd_url === "string" ? result.input.notion_prd_url.trim() : "";
     implementPrdUrl = prd?.url ?? (inputPrdUrl || undefined);
-    if (!prd?.id && !implementPrdUrl) {
-      const ask =
-        ":memo: Before I implement a component I need its *Notion PRD* — the polling bot creates one and posts it in #figma-sync.\n" +
-        "• Run `implement` from *that* PRD-notification thread, or\n" +
-        "• paste the PRD link here and I'll use it.\n\n" +
-        "I won't implement a component without a PRD.";
-      await postMessage(env, { channel, thread_ts: threadTs, text: ask });
-      await appendHistory(env, channel, threadTs, { role: "user", content: userText });
-      await appendHistory(env, channel, threadTs, { role: "assistant", content: ask });
-      return;
-    }
+  }
+
+  // Clarify-vs-act (D3): if the tool call is missing what it needs, ask here in
+  // the Worker instead of staging a proposal — so gating never depends on the
+  // model remembering to ask (e.g. a component is never implemented PRD-less).
+  const gate = preflight(result.toolName, result.input, { prd, implementPrdUrl });
+  if (gate) {
+    await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
+    await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+    await appendHistory(env, channel, threadTs, { role: "assistant", content: gate.ask });
+    return;
   }
 
   // If there's already a pending proposal in this thread, supersede it.
@@ -413,6 +411,7 @@ function proposalVerb(toolName: string): string {
     case "delete_prd": return "archive (delete) a PRD card from the Design HQ → Product board";
     case "marketplace_add": return "add a new marketplace entry";
     case "marketplace_edit": return "edit a marketplace entry";
+    case "send_email": return "send an email via Gmail";
     default: return toolName;
   }
 }

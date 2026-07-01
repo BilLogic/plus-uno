@@ -15,12 +15,15 @@ export async function executeFindExperts(
 
   try {
     const members = await findTeamMembers(env);
+    const anySlackIds = members.some((m) => m.slackUserId);
     return JSON.stringify({
       ok: true,
       topic: topic || undefined,
       count: members.length,
       members,
-      note: "Match these people to the topic using their role + bio; present the best 2-4 fits with role + a one-line reason + LinkedIn, then suggest reaching out. No Slack handles available — name who to contact, do NOT @-mention.",
+      note: anySlackIds
+        ? "Match these people to the topic using their role + bio; present the best 2-4 fits with role + a one-line reason + LinkedIn. When a person has a slackUserId, @-mention them as <@slackUserId>; otherwise name them (no handle available)."
+        : "Match these people to the topic using their role + bio; present the best 2-4 fits with role + a one-line reason + LinkedIn, then suggest reaching out. No Slack handles available — name who to contact, do NOT @-mention.",
     });
   } catch (err) {
     return JSON.stringify({

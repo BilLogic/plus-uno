@@ -19,6 +19,13 @@ NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
 # Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
 # that find_experts queries to suggest collaborators/SMEs for a topic.
 NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
+# uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
+# read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
+SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
+# #plus-design channel id. Confirmed reviewable artifacts (PRs from implement /
+# implement_design / marketplace_*, and new PRDs) are announced here for team
+# review (D5). Leave blank to disable fan-out (replies stay in-thread).
+PLUS_DESIGN_CHANNEL_ID = ""
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET
@@ -30,6 +37,12 @@ NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
 #                          fetch in events.ts — Phase 4)
 #   NOTION_API_KEY        (Notion internal integration token, connected to the
 #                          Roadmap board; used by create_prd to add PRD cards)
+#   GMAIL_SENDER          (the authorized "From" mailbox for send_email)
+#   GMAIL_CLIENT_ID       (Google OAuth client id)
+#   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
+#   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)
+#   SUPABASE_ANON_KEY     (publishable/anon read key; blueprint_search is read-only)
+#   (SUPABASE_URL is a non-secret [vars] entry above, not a secret)
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.
 [[durable_objects.bindings]]

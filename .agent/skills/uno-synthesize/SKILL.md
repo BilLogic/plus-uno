@@ -14,8 +14,8 @@ allowed-tools: Read, Grep, Glob, Write, mcp__notion-plus__*
 
 Distill raw, gathered context into a structured blueprint — **findings, user
 flows, a screen list, and a PRD** — the bridge between research/discovery and a
-buildable requirement. *(Future: write the full result to "uno-blueprint" once
-that destination exists.)*
+buildable requirement. The synthesized result is grounded in the **uno-blueprint**
+(the Plus product/design source of truth in Supabase); cite it and don't fabricate.
 
 > **Shared skill.** `uno-synthesize` exists in both skill libraries with the
 > **same goal and structure** — findings → user flows → screen list → PRD. This

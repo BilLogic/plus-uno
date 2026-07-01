@@ -20,5 +20,7 @@ export function knownToolName(name: string): name is ToolName {
     || name === "find_experts"
     || name === "marketplace_search"
     || name === "marketplace_add"
-    || name === "marketplace_edit";
+    || name === "marketplace_edit"
+    || name === "send_email"
+    || name === "blueprint_search";
 }

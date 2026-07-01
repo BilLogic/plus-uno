@@ -20,7 +20,9 @@ export type ToolName =
   | "find_experts"
   | "marketplace_search"
   | "marketplace_add"
-  | "marketplace_edit";
+  | "marketplace_edit"
+  | "send_email"
+  | "blueprint_search";
 
 // Tools whose execution opens a PR / fires a GitHub Action. These route
 // through the confirmation gate (Step 7): the Worker posts a proposal and
@@ -32,6 +34,7 @@ export const SIDE_EFFECT_TOOLS: ReadonlySet<ToolName> = new Set<ToolName>([
   "delete_prd",
   "marketplace_add",
   "marketplace_edit",
+  "send_email",
 ]);
 
 export function isSideEffectTool(name: string): name is ToolName {

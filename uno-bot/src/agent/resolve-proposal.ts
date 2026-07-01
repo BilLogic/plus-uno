@@ -10,7 +10,7 @@
 //   4. Delete the pending proposal from the DO
 
 import type { Env } from "../types";
-import { addReaction, postMessage } from "../slack/api";
+import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
 import { appendHistory, deletePendingProposal, type PendingProposal } from "../thread-state-client";
 import { executeTool } from "../tools/dispatcher";
 
@@ -58,6 +58,21 @@ export async function resolveProposal(
       role: "assistant",
       content: outcomeNote(pending.toolName, result),
     });
+
+    // D5: announce a successful reviewable artifact to #plus-design (right place
+    // + person + time). Best-effort — never let a fan-out failure break the flow.
+    if (warrantsReviewRequest(pending.toolName) && isOkResult(result)) {
+      try {
+        await postReviewRequest(env, {
+          toolName: pending.toolName,
+          requesterUserId: pending.requesterUserId,
+          originChannel: pending.channel,
+          artifactUrl: resultUrl(result),
+        });
+      } catch (err) {
+        console.warn(`[gate] review-request fan-out failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
   } else {
     await appendHistory(env, pending.channel, pending.threadTs, {
       role: "assistant",
@@ -66,6 +81,25 @@ export async function resolveProposal(
   }
 
   await deletePendingProposal(env, pending.proposalTs);
+}
+
+/** True unless the executor explicitly reported ok:false. */
+function isOkResult(resultJson: string): boolean {
+  try {
+    return (JSON.parse(resultJson) as { ok?: boolean }).ok !== false;
+  } catch {
+    return false;
+  }
+}
+
+/** Pull an artifact URL (PR/Notion link) out of a tool result, if present. */
+function resultUrl(resultJson: string): string | undefined {
+  try {
+    const r = JSON.parse(resultJson) as { url?: string; pr_url?: string };
+    return r.url ?? r.pr_url ?? undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Human-readable history note for a confirmed tool execution. Surfaces the

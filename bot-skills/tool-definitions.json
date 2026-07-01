@@ -220,6 +220,51 @@
     }
   },
   {
+    "name": "blueprint_search",
+    "description": "READ-ONLY. Query the uno-blueprint (the Plus product/design source of truth in Supabase) for grounded facts about product state, features, decisions, and status. Use this to answer or justify factual and 'where are we on X' questions from the blueprint FIRST, before relying on loaded docs, and ALWAYS cite the row(s) you used. If it returns no rows or reports it isn't configured, say so and fall back to cited docs or 'I don't know' — never fabricate. Safe to call freely (no side effect, no confirmation gate).",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["query"],
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Free-text query describing what you need from the blueprint, e.g. 'Tutor Admin redesign status', 'decisions about empty states'."
+        }
+      }
+    }
+  },
+  {
+    "name": "send_email",
+    "description": "Send an email via Gmail on the design team's behalf. Side effect: sends a real email — routed through the confirmation gate. Use for outward notifications a Slack message can't cover: emailing an external SME/collaborator, sending a PRD or prototype summary to a stakeholder, or a follow-up the designer explicitly asks to send by email. Draft the email conversationally first (recipient, subject, body) and let the designer refine it; only invoke send_email once they approve sending. Never invent recipient addresses — ask for them if unknown. Prefer Slack for anything that can stay in Slack.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["to", "subject", "body"],
+      "properties": {
+        "to": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Recipient email address(es). Never invent — use addresses the designer provided."
+        },
+        "cc": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional CC email address(es)."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Email subject line."
+        },
+        "body": {
+          "type": "string",
+          "description": "Plain-text email body. Write it out fully — no placeholders."
+        }
+      }
+    }
+  },
+  {
     "name": "resolve_pending_proposal",
     "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it. Examples that should trigger this: 'go ahead', 'yes do it', 'looks good, ship it', 'no, cancel', 'actually nevermind'. If the user asks an unrelated question or seems to be discussing without deciding, do NOT invoke this tool — reply conversationally and the proposal will sit until ✅, ❌, or 15-minute expiry. If the system prompt indicates the current message sender is NOT the original requester, do NOT invoke this tool — reply explaining that only the requester can confirm.",
     "input_schema": {

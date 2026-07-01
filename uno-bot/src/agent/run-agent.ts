@@ -24,9 +24,10 @@ import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { makeAnthropicClient, MODEL } from "./anthropic-client";
+import { makeAnthropicClient, pickModel } from "./anthropic-client";
 import { executeMarketplaceSearch } from "../tools/marketplace-search";
 import { executeFindExperts } from "../tools/find-experts";
+import { executeBlueprintSearch } from "../tools/blueprint-search";
 import type { SlackContext } from "../tools/dispatcher";
 
 export type { HistoryTurn };
@@ -66,6 +67,24 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending } = input;
   const client = makeAnthropicClient(env);
 
+  // D2: pick the model tier from the message intent once per request.
+  const { tier, model } = pickModel({ userText, hasPending: pending !== null });
+
+  // D7: per-request turn/token telemetry. One structured line per request,
+  // visible via `wrangler tail`, so cost + iteration economy is observable.
+  const startedAt = Date.now();
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let iterations = 0;
+  const finish = (result: AgentResult): AgentResult => {
+    console.log(
+      `[uno-bot] request done tier=${tier} model=${model} iterations=${iterations} ` +
+        `tokens_in=${inputTokens} tokens_out=${outputTokens} ms=${Date.now() - startedAt} ` +
+        `outcome=${result.kind}`,
+    );
+    return result;
+  };
+
   const pendingForSystem = pending
     ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
     : null;
@@ -75,12 +94,16 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
 
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
     const response = await client.messages.create({
-      model: MODEL,
+      model,
       max_tokens: MAX_TOKENS,
       system: systemBlocks as Anthropic.TextBlockParam[],
       tools: TOOLS as Anthropic.Tool[],
       messages,
     });
+
+    iterations++;
+    inputTokens += response.usage?.input_tokens ?? 0;
+    outputTokens += response.usage?.output_tokens ?? 0;
 
     if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
       const text = response.content
@@ -88,7 +111,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
         .map((b) => b.text)
         .join("\n")
         .trim();
-      return { kind: "text", text: text || "(empty response)" };
+      return finish({ kind: "text", text: text || "(empty response)" });
     }
 
     if (response.stop_reason === "tool_use") {
@@ -146,12 +169,12 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
           });
           continue;
         }
-        return {
+        return finish({
           kind: "resolved",
           decision: inp.decision,
           pending,
           messageToUser: inp.message_to_user,
-        };
+        });
       }
 
       // (b) Side-effect tool: stage as a proposal.
@@ -166,14 +189,14 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
           .map((b) => b.text)
           .join("\n")
           .trim();
-        return {
+        return finish({
           kind: "proposal",
           toolName: sideEffect.name,
           input: (sideEffect.input as Record<string, unknown>) ?? {},
           toolUseId: sideEffect.id,
           assistantContent: response.content,
           previewText: previewText || undefined,
-        };
+        });
       }
 
       // (c) Read-only tools only: execute and feed results back.
@@ -187,10 +210,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       continue;
     }
 
-    return { kind: "text", text: `(internal: unexpected stop_reason: ${response.stop_reason})` };
+    return finish({ kind: "text", text: `(internal: unexpected stop_reason: ${response.stop_reason})` });
   }
 
-  return { kind: "text", text: "(internal: agent loop exceeded max iterations)" };
+  return finish({ kind: "text", text: "(internal: agent loop exceeded max iterations)" });
 }
 
 /**
@@ -225,5 +248,6 @@ async function executeReadOnlyTool(
 ): Promise<string> {
   if (name === "marketplace_search") return executeMarketplaceSearch(env, input);
   if (name === "find_experts") return executeFindExperts(env, input);
+  if (name === "blueprint_search") return executeBlueprintSearch(env, input);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }
