@@ -116,24 +116,38 @@ function buildChildren(input: PrdInput): unknown[] {
   return children;
 }
 
+export type PrdBoard = "roadmap" | "component";
+
 /**
- * Create a PRD card on the Roadmap board in the "Need PRD / Under Playground"
- * column. Throws on failure (caller surfaces the error to Slack).
+ * Create a PRD card. `board` selects the destination Notion DB:
+ *   - "roadmap"   → the Design HQ Product board (feature PRDs); sets that board's
+ *                   Design Status / Current Team / Product Pillar properties.
+ *   - "component" → the DS Component PRDs DB. Its schema differs, so we set only
+ *                   the title (Name) + body and leave the rest for owners to fill,
+ *                   to avoid failing on properties that don't exist there.
+ * Throws on failure (caller surfaces the error to Slack).
  */
-export async function createRoadmapPrdCard(env: Env, input: PrdInput): Promise<CreatedPrd> {
+export async function createPrdCard(
+  env: Env,
+  input: PrdInput,
+  board: PrdBoard = "roadmap",
+): Promise<CreatedPrd> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
+  const databaseId = board === "component" ? env.NOTION_DS_COMPONENT_DB_ID : env.NOTION_ROADMAP_DB_ID;
+  if (!databaseId) throw new Error(`${board} PRD database id not configured`);
   if (!input.title?.trim()) throw new Error("PRD title is required");
 
   const properties: Record<string, unknown> = {
     Name: { title: richText(input.title.trim()) },
-    "Design Status": { status: { name: DESIGN_STATUS_NEED_PRD } },
-    // Current Team = "Design" is what the Design HQ -> Product view filters on;
-    // without it the card only shows in the unfiltered Product HQ -> Roadmap home.
-    "Current Team": { multi_select: [{ name: "Design" }] },
   };
-  if (input.productPillar?.trim()) {
-    properties["Product Pillar"] = { multi_select: [{ name: input.productPillar.trim() }] };
+  if (board === "roadmap") {
+    // Properties specific to the Design HQ Product board's schema.
+    properties["Design Status"] = { status: { name: DESIGN_STATUS_NEED_PRD } };
+    // Current Team = "Design" is what the Design HQ -> Product view filters on.
+    properties["Current Team"] = { multi_select: [{ name: "Design" }] };
+    if (input.productPillar?.trim()) {
+      properties["Product Pillar"] = { multi_select: [{ name: input.productPillar.trim() }] };
+    }
   }
 
   const controller = new AbortController();
@@ -147,7 +161,7 @@ export async function createRoadmapPrdCard(env: Env, input: PrdInput): Promise<C
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        parent: { database_id: env.NOTION_ROADMAP_DB_ID },
+        parent: { database_id: databaseId },
         properties,
         children: buildChildren(input),
       }),
@@ -161,6 +175,11 @@ export async function createRoadmapPrdCard(env: Env, input: PrdInput): Promise<C
   } finally {
     clearTimeout(timer);
   }
+}
+
+/** Back-compat: file a feature PRD to the Roadmap board. */
+export function createRoadmapPrdCard(env: Env, input: PrdInput): Promise<CreatedPrd> {
+  return createPrdCard(env, input, "roadmap");
 }
 
 // ─── Team Member Database (read-only, for find_experts) ─────────────────────
@@ -318,6 +337,127 @@ export async function archiveRoadmapCard(env: Env, pageId: string): Promise<Arch
       throw new Error(`Notion ${patchRes.status}: ${err.message ?? "archive failed"}`);
     }
     return { id: pageId, title };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ─── Read a Notion page (for read_source / linked-source grounding) ──────────
+// Returns the page title, its properties rendered to strings (so the model can
+// read an Owner/Assignee/Status field), and the page's block text. Read-only.
+
+const READ_BLOCK_PAGES = 3; // cap pagination so a huge page can't blow the budget
+const READ_TEXT_CAP = 8000;
+
+export interface NotionPageContent {
+  id: string;
+  title: string;
+  /** Property name → rendered value (people joined by ", "; select/status by name). */
+  properties: Record<string, string>;
+  /** People-typed property values, keyed by property name (e.g. Owner → ["Jane"]). */
+  people: Record<string, string[]>;
+  /** Flattened block text. */
+  text: string;
+}
+
+interface NotionProperty {
+  type: string;
+  title?: NotionRichText;
+  rich_text?: NotionRichText;
+  people?: { name?: string; id?: string }[];
+  select?: { name?: string } | null;
+  status?: { name?: string } | null;
+  multi_select?: { name?: string }[];
+  date?: { start?: string; end?: string | null } | null;
+  url?: string | null;
+  email?: string | null;
+  checkbox?: boolean;
+  number?: number | null;
+}
+
+function renderProperty(p: NotionProperty): string {
+  switch (p.type) {
+    case "title": return plain(p.title);
+    case "rich_text": return plain(p.rich_text);
+    case "people": return (p.people ?? []).map((u) => u.name ?? u.id ?? "").filter(Boolean).join(", ");
+    case "select": return p.select?.name ?? "";
+    case "status": return p.status?.name ?? "";
+    case "multi_select": return (p.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean).join(", ");
+    case "date": return p.date?.start ? (p.date.end ? `${p.date.start} → ${p.date.end}` : p.date.start) : "";
+    case "url": return p.url ?? "";
+    case "email": return p.email ?? "";
+    case "checkbox": return p.checkbox ? "true" : "false";
+    case "number": return p.number != null ? String(p.number) : "";
+    default: return "";
+  }
+}
+
+function blockText(block: Record<string, unknown>): string {
+  const type = block.type as string;
+  const body = block[type] as { rich_text?: NotionRichText } | undefined;
+  const txt = plain(body?.rich_text);
+  if (!txt) return "";
+  if (type === "bulleted_list_item" || type === "numbered_list_item") return `• ${txt}`;
+  if (type === "to_do") return `☐ ${txt}`;
+  if (type.startsWith("heading")) return `\n${txt}`;
+  return txt;
+}
+
+/**
+ * Read a Notion page: title + rendered properties (incl. people/Owner) + block
+ * text. Throws on failure so read_source can report it honestly. Read-only.
+ */
+export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const headers = {
+    Authorization: `Bearer ${env.NOTION_API_KEY}`,
+    "Notion-Version": NOTION_VERSION,
+    "Content-Type": "application/json",
+  };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const pageRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
+    const page = (await pageRes.json()) as {
+      id?: string; message?: string; code?: string;
+      properties?: Record<string, NotionProperty>;
+    };
+    if (!pageRes.ok || !page.id) {
+      throw new Error(`Notion ${pageRes.status}${page.code ? ` ${page.code}` : ""}: ${page.message ?? "page not found"}`);
+    }
+
+    const properties: Record<string, string> = {};
+    const people: Record<string, string[]> = {};
+    let title = "(untitled)";
+    for (const [name, prop] of Object.entries(page.properties ?? {})) {
+      const rendered = renderProperty(prop);
+      if (prop.type === "title" && rendered) title = rendered;
+      if (rendered) properties[name] = rendered;
+      if (prop.type === "people") {
+        people[name] = (prop.people ?? []).map((u) => u.name ?? u.id ?? "").filter(Boolean);
+      }
+    }
+
+    // Block text — paginate a few pages of top-level children.
+    const lines: string[] = [];
+    let cursor: string | undefined;
+    for (let i = 0; i < READ_BLOCK_PAGES; i++) {
+      const qs = new URLSearchParams({ page_size: "100" });
+      if (cursor) qs.set("start_cursor", cursor);
+      const bRes = await fetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
+      if (!bRes.ok) break;
+      const bData = (await bRes.json()) as {
+        results?: Record<string, unknown>[]; has_more?: boolean; next_cursor?: string;
+      };
+      for (const block of bData.results ?? []) {
+        const line = blockText(block);
+        if (line) lines.push(line);
+      }
+      if (!bData.has_more || !bData.next_cursor) break;
+      cursor = bData.next_cursor;
+    }
+
+    return { id: pageId, title, properties, people, text: lines.join("\n").slice(0, READ_TEXT_CAP) };
   } finally {
     clearTimeout(timer);
   }

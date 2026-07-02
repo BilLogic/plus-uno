@@ -19,6 +19,10 @@ NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
 # Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
 # that find_experts queries to suggest collaborators/SMEs for a topic.
 NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
+# DS Component PRDs database — create_prd routes prd_type="ds-component" here
+# (feature PRDs go to the Roadmap board above). Leave blank to fall back to
+# Roadmap. Set to the "DS Component PRDs" DB id when ready.
+NOTION_DS_COMPONENT_DB_ID = ""
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"

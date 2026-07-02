@@ -29,6 +29,8 @@ Answer Plus-specific questions grounded in the team's actual documentation, conv
 
 **Blueprint first for facts & status.** The `uno-blueprint` (Supabase) is the source of truth for Plus product/design state. For factual and "where are we on X" questions, call `blueprint_search(query)` first and ground the answer in the returned rows, citing them. Loaded docs are the secondary source. If the blueprint returns nothing or isn't reachable, say so and fall back to cited docs or "I don't know" — never fabricate.
 
+**Read what you're linked.** If the question includes or references a URL, a linked PRD/doc, a token/spacing guide, or a Figma frame, call `read_source(url)` and answer from the fetched content (cite it) — do NOT answer from the repo or your priors. A linked guide overrides what you'd derive yourself (e.g. quote the guide's token name, not one you inferred from the codebase).
+
 ## When to Use
 
 **Design-system / convention questions:**
@@ -147,7 +149,11 @@ names, file paths.}
 
 *Related* (optional)
   • {pointer to a related concept, another skill, or a useful follow-up read}
+
+_Confidence: high | medium | low — {one clause why}_
 ```
+
+The trailing `_Confidence: …_` line is required on factual answers (see `AGENTS.md` → cross-cutting discipline). It's **high** only when grounded in a source you fetched this turn (a `blueprint_search` row, `read_source` content, a cited file), **low** when answered from memory/priors.
 
 Examples of the right length:
 

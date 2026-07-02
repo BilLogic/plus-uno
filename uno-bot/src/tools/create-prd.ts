@@ -8,7 +8,7 @@
 import type { Env } from "../types";
 import type { SlackContext } from "./dispatcher";
 import { postMessage } from "../slack/api";
-import { createRoadmapPrdCard, type PrdSection } from "../integrations/notion";
+import { createPrdCard, type PrdSection, type PrdBoard } from "../integrations/notion";
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
@@ -39,24 +39,37 @@ export async function executeCreatePrd(
     return JSON.stringify({ ok: false, error: "missing 'title' for the PRD" });
   }
 
+  // Route by PRD type: DS-component PRDs go to the DS Component PRDs DB; feature
+  // PRDs (default) go to the Roadmap board. Fall back to Roadmap if the
+  // component DB isn't configured yet.
+  const requestedType = asString(input.prd_type).toLowerCase();
+  let board: PrdBoard = requestedType === "ds-component" ? "component" : "roadmap";
+  let fellBack = false;
+  if (board === "component" && !env.NOTION_DS_COMPONENT_DB_ID) {
+    console.warn("[create_prd] NOTION_DS_COMPONENT_DB_ID unset — filing ds-component PRD to Roadmap");
+    board = "roadmap";
+    fellBack = true;
+  }
+  const boardName = board === "component" ? "DS Component PRDs" : "Design HQ → Product (Roadmap)";
+
   try {
-    const created = await createRoadmapPrdCard(env, {
+    const created = await createPrdCard(env, {
       title,
       summary: asString(input.summary) || undefined,
       sections: asSections(input.sections),
       acceptanceCriteria: asStringArray(input.acceptance_criteria),
       productPillar: asString(input.product_pillar) || undefined,
       sourceUrl: asString(input.source_url) || undefined,
-    });
+    }, board);
 
     // The page is live now — post the link to the thread (no Action will).
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:memo: PRD created on the *Design HQ → Product* board (*Need PRD / Under Playground*): <${created.url}|${title}>`,
+      text: `:memo: PRD created on *${boardName}*${fellBack ? " (DS Component PRDs DB not configured — filed to Roadmap)" : ""}: <${created.url}|${title}>`,
     });
 
-    return JSON.stringify({ ok: true, status: "created", url: created.url, message: `PRD '${title}' created on the Roadmap board.` });
+    return JSON.stringify({ ok: true, status: "created", url: created.url, board, message: `PRD '${title}' created on ${boardName}.` });
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     await postMessage(env, {

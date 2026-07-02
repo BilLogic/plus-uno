@@ -87,6 +87,11 @@
           "type": "string",
           "description": "Optional. One Roadmap Product Pillar if clearly implied: Universal, Admin, Toolkit, Training, Help Center, Tutoring, Goal-Setting, LID, Social Media, Website, Intercom, Others. Omit if unsure."
         },
+        "prd_type": {
+          "type": "string",
+          "enum": ["feature", "ds-component"],
+          "description": "Where to file the PRD. 'feature' (default) → the Design HQ Product/Roadmap board (product/feature work). 'ds-component' → the DS Component PRDs DB (a design-system component add/update). Pick based on what the PRD is about; when unsure, ask or default to 'feature'."
+        },
         "source_url": {
           "type": "string",
           "description": "Optional. Link back to the source — a Slack permalink to the discussion, or a Figma link if one was provided."
@@ -220,6 +225,21 @@
     }
   },
   {
+    "name": "read_source",
+    "description": "READ-ONLY. Fetch the actual CONTENT of a link before answering — a Notion page (returns title + properties incl. Owner/people + block text), a Figma frame (returns node name/type + text layers), a GitHub/raw file, or any web URL (returns text). Use this WHENEVER the request contains or references a URL, a linked PRD/doc/guide, or a Figma frame: read it and ground your answer in the returned content, then cite it. Never answer a question about a linked source from memory/priors. For 'who owns/should review this' questions, read the page and use its Owner/people property rather than guessing from roles or LinkedIn. Safe to call freely (no side effect, no gate).",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The full http(s) URL to read (Notion, Figma, GitHub, or any web page)."
+        }
+      }
+    }
+  },
+  {
     "name": "blueprint_search",
     "description": "READ-ONLY. Query the uno-blueprint (the Plus product/design source of truth in Supabase) for grounded facts about product state, features, decisions, and status. Use this to answer or justify factual and 'where are we on X' questions from the blueprint FIRST, before relying on loaded docs, and ALWAYS cite the row(s) you used. If it returns no rows or reports it isn't configured, say so and fall back to cited docs or 'I don't know' — never fabricate. Safe to call freely (no side effect, no confirmation gate).",
     "input_schema": {
@@ -260,6 +280,34 @@
         "body": {
           "type": "string",
           "description": "Plain-text email body. Write it out fully — no placeholders."
+        }
+      }
+    }
+  },
+  {
+    "name": "share_for_feedback",
+    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design: what it is, a link back, a feedback prompt, and @-mentioned reviewers. Side effect (it pings people) — routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback ('publish this for feedback', 'share this out', 'get feedback on this'), and use marketplace_add ONLY when they want to formally register a prototype in the catalog. Draft the shareout text conversationally first; invoke once they approve.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary"],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "One or two sentences: what is being shared and what feedback is wanted."
+        },
+        "link": {
+          "type": "string",
+          "description": "Link to the artifact (prototype URL, Figma frame, PR, or PRD)."
+        },
+        "reviewers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional reviewers to tag. Slack user ids (U…) get @-mentioned; plain names are shown as-is. Use find_experts / the PRD Owner to pick real people."
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Optional human-readable feedback deadline, e.g. 'EOD Friday'."
         }
       }
     }

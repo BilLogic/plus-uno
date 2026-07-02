@@ -28,6 +28,7 @@ import { makeAnthropicClient, pickModel } from "./anthropic-client";
 import { executeMarketplaceSearch } from "../tools/marketplace-search";
 import { executeFindExperts } from "../tools/find-experts";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
+import { executeReadSource } from "../tools/read-source";
 import type { SlackContext } from "../tools/dispatcher";
 
 export type { HistoryTurn };
@@ -276,5 +277,6 @@ async function executeReadOnlyTool(
   if (name === "marketplace_search") return executeMarketplaceSearch(env, input);
   if (name === "find_experts") return executeFindExperts(env, input);
   if (name === "blueprint_search") return executeBlueprintSearch(env, input);
+  if (name === "read_source") return executeReadSource(env, input);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }

@@ -14,6 +14,7 @@ import { executeMarketplaceAdd } from "./marketplace-add";
 import { executeMarketplaceEdit } from "./marketplace-edit";
 import { executeMarketplaceSearch } from "./marketplace-search";
 import { executeSendEmail } from "./send-email";
+import { executeShareForFeedback } from "./share-for-feedback";
 
 export interface SlackContext {
   channel: string;
@@ -50,6 +51,8 @@ export async function executeTool(
       return executeMarketplaceEdit(env, input, slack);
     case "send_email":
       return executeSendEmail(env, input, slack);
+    case "share_for_feedback":
+      return executeShareForFeedback(env, input, slack);
     default:
       return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
   }

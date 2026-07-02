@@ -9,6 +9,68 @@ import type { Env } from "../types";
 
 const FIGMA_API = "https://api.figma.com";
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
+const NODE_FETCH_TIMEOUT_MS = 8000;
+const MAX_TEXT_LAYERS = 200;
+
+export interface FigmaNodeContent {
+  name: string;
+  type: string;
+  /** Flattened text-layer strings, in document order. */
+  texts: string[];
+}
+
+interface FigmaNode {
+  name?: string;
+  type?: string;
+  characters?: string;
+  children?: FigmaNode[];
+}
+
+function collectText(node: FigmaNode, out: string[]): void {
+  if (out.length >= MAX_TEXT_LAYERS) return;
+  if (node.type === "TEXT" && typeof node.characters === "string") {
+    const t = node.characters.trim();
+    if (t) out.push(t);
+  }
+  for (const child of node.children ?? []) collectText(child, out);
+}
+
+/**
+ * Read a Figma node's structure + text layers via the REST API (for review /
+ * inspection — distinct from the PNG preview). Throws on a missing token or a
+ * non-2xx/err response so the caller can surface an honest "couldn't read it".
+ */
+export async function fetchFigmaNode(
+  env: Env,
+  fileKey: string,
+  nodeId: string,
+): Promise<FigmaNodeContent> {
+  if (!env.FIGMA_ACCESS_TOKEN) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
+
+  const url = `${FIGMA_API}/v1/files/${fileKey}/nodes?ids=${encodeURIComponent(nodeId)}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), NODE_FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
+      signal: controller.signal,
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      err?: string | null;
+      nodes?: Record<string, { document?: FigmaNode } | undefined>;
+    };
+    if (!res.ok || data.err) {
+      throw new Error(`Figma nodes ${res.status}${data.err ? `: ${data.err}` : ""}`);
+    }
+    const doc = data.nodes?.[nodeId]?.document;
+    if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
+    const texts: string[] = [];
+    collectText(doc, texts);
+    return { name: doc.name ?? "(unnamed)", type: doc.type ?? "NODE", texts };
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 export interface FigmaUrlParts {
   fileKey: string;

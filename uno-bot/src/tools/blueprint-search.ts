@@ -33,7 +33,7 @@ export async function executeBlueprintSearch(
       rows,
       note:
         rows.length > 0
-          ? "Ground your answer in these rows and cite the blueprint (e.g. row title/id). Do not add facts that aren't here."
+          ? "Ground your answer ONLY in these rows and cite the blueprint. For 'cell' rows, attribute each activity to its `layer` (the actor/stage — e.g. 'Regular Tutor', 'Lead Tutor', 'Partner Action: Teacher', 'Back Stage Actions') and order by `step`; do NOT attribute one actor's activities to another. Do not add facts that aren't here."
           : "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing; you may fall back to cited docs.",
     });
   } catch (err) {

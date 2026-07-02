@@ -215,13 +215,31 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   // parent message for a Notion PRD URL — that's how v1 carried PRD context
   // from the polling bot's notification into the implement workflow.
   const isThreadReply = !!event.thread_ts && event.thread_ts !== event.ts;
-  const [history, pending, prd] = await Promise.all([
-    buildThreadHistory(env, channel, threadTs, userMsgTs),
-    loadPendingProposalByThread(env, channel, threadTs),
-    isThreadReply
-      ? extractPrdFromThreadRoot(env, channel, threadTs)
-      : Promise.resolve(null),
-  ]);
+
+  // Loading thread context runs BEFORE the agent call, so a throw here (Slack
+  // history read, DO lookup, Notion PRD extraction) must not be silent — post a
+  // visible error instead of letting the async handler die quietly.
+  let history: Awaited<ReturnType<typeof buildThreadHistory>>;
+  let pending: Awaited<ReturnType<typeof loadPendingProposalByThread>>;
+  let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
+  try {
+    [history, pending, prd] = await Promise.all([
+      buildThreadHistory(env, channel, threadTs, userMsgTs),
+      loadPendingProposalByThread(env, channel, threadTs),
+      isThreadReply
+        ? extractPrdFromThreadRoot(env, channel, threadTs)
+        : Promise.resolve(null),
+    ]);
+  } catch (err) {
+    console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
+    await postMessage(env, {
+      channel,
+      thread_ts: threadTs,
+      text: ":x: Something went wrong on my end. Try again in a moment?",
+    });
+    await addReaction(env, channel, userMsgTs, "x").catch(() => {});
+    return;
+  }
 
   let result: AgentResult;
   try {
@@ -412,6 +430,7 @@ function proposalVerb(toolName: string): string {
     case "marketplace_add": return "add a new marketplace entry";
     case "marketplace_edit": return "edit a marketplace entry";
     case "send_email": return "send an email via Gmail";
+    case "share_for_feedback": return "share this for feedback in #plus-design";
     default: return toolName;
   }
 }

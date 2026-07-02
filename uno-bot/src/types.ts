@@ -9,6 +9,10 @@ export interface Env {
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;
+  // DS Component PRDs database (feature PRDs → Roadmap; DS-component PRDs → here).
+  // Optional — when unset, create_prd(prd_type:"ds-component") falls back to the
+  // Roadmap board and logs a note.
+  NOTION_DS_COMPONENT_DB_ID?: string;
   // Channel that reviewable artifacts (PRs, new PRDs) are announced to for team
   // review (D5 communication routing). Optional — when unset, no fan-out happens
   // and replies stay in-thread.
