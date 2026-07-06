@@ -87,6 +87,7 @@ Load docs on-demand based on what comes up in conversation:
 | Building UI, using components or tokens | `docs/context/design-system/components/cheat-sheet.md` (MANDATORY) |
 | Building new pages, dashboards, layouts | `docs/context/design-system/components/layout-cheat-sheet.md` (MANDATORY) |
 | Figma link, implement-design, or design-to-code mapping | `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` (MANDATORY — load first); then `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` + `figma-mcp-guide.md` |
+| Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Build, preview, or deployment | `.agent/skills/uno-prototype/references/local-preview.md` |
 | Exact file paths or env vars needed | Relevant `*-index.json` in skill references |

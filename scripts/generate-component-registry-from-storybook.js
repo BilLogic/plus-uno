@@ -28,6 +28,7 @@ const CANONICAL_FILE = {
 };
 
 const GITHUB_URL_RE = /githubLink\s*=\s*["']([^"']+)["']/;
+const FIGMA_LINK_RE = /figmaLink\s*=\s*["']([^"']+)["']/;
 
 function deriveImportPath(mdxAbsPath) {
   const rel = path.relative(DS_ROOT, mdxAbsPath).replace(/\\/g, '/');
@@ -101,6 +102,7 @@ function extractFromMdx(mdxPath) {
   if (!figmaMeta) return null;
 
   const githubMatch = content.match(GITHUB_URL_RE);
+  const figmaLinkMatch = content.match(FIGMA_LINK_RE);
   const name = componentNameFromMdx(mdxPath);
 
   const code = {
@@ -111,14 +113,18 @@ function extractFromMdx(mdxPath) {
   };
   if (figmaMeta.props) code.props = figmaMeta.props;
 
+  const figma = {
+    fileKey: figmaMeta.fileKey || CANONICAL_FILE.fileKey,
+    sets: figmaMeta.sets || [],
+  };
+  // The Figma link shown in each docs page's Resources card (ResourcesBlock figmaLink prop).
+  if (figmaLinkMatch) figma.docsPageUrl = figmaLinkMatch[1];
+
   return {
     name,
     entry: {
       code,
-      figma: {
-        fileKey: figmaMeta.fileKey || CANONICAL_FILE.fileKey,
-        sets: figmaMeta.sets || [],
-      },
+      figma,
     },
   };
 }

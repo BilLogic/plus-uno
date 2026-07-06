@@ -20,15 +20,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13265:5813",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "accordion",
+            "name": "accordion",
+            "componentSetNodeId": "13667:6004",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13667-6004",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
     "Alert": {
@@ -42,24 +42,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Alert docs page (MDX link)",
-            "componentSetNodeId": "3496:1444",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "Verified 2026-06-13: Alert documentation overview — not a single component set."
-          },
-          {
             "id": "alert",
-            "name": "Alert",
+            "name": "alert",
             "componentSetNodeId": "11:324",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
       }
     },
     "Badge": {
@@ -154,7 +145,8 @@
             "verifiedAt": "2026-06-13",
             "notes": "Maps to Badge with counter prop set. variantProps TBD — add from Figma variant inspection."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481"
       }
     },
     "Breadcrumb": {
@@ -168,15 +160,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19484",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "breadcrumb",
+            "name": "Breadcrumb",
+            "componentSetNodeId": "27:618",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=27-618",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484"
       }
     },
     "Button": {
@@ -469,7 +461,8 @@
             "verifiedAt": "2026-06-13",
             "notes": "Maps to Button with fill=outline and vertical=true."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
       }
     },
     "ButtonGroup": {
@@ -483,15 +476,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19489",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "button-group",
+            "name": "Button Group",
+            "componentSetNodeId": "34:5212",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-5212",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
       }
     },
     "Card": {
@@ -505,24 +498,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Card docs page (MDX link)",
-            "componentSetNodeId": "3497:19497",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19497",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "Verified 2026-06-13: Card documentation overview — not a single component set."
-          },
-          {
             "id": "card",
             "name": "Card",
             "componentSetNodeId": "4241:27817",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817",
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "overview-card",
+            "name": "Overview Card",
+            "componentSetNodeId": "12785:189314",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=12785-189314",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19497"
       }
     },
     "Carousel": {
@@ -536,15 +528,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19498",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "carousel",
+            "name": "Carousel",
+            "componentSetNodeId": "34:8261",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-8261",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498"
       }
     },
     "Cascader": {
@@ -558,15 +550,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13266:5947",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-5947",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "cascade-list",
+            "name": "Cascade list",
+            "componentSetNodeId": "13584:55731",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13584-55731",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-5947"
       }
     },
     "Checkbox": {
@@ -580,15 +572,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19493",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "form-checkbox",
+            "name": "Form Checkbox",
+            "componentSetNodeId": "42:5857",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5857",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
       }
     },
     "ChoiceGrid": {
@@ -602,15 +594,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13317:2958",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "multiple-choice-grid",
+            "name": "Multiple Choice Grid",
+            "componentSetNodeId": "13541:9229",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "checkbox-grid",
+            "name": "CheckBox Grid",
+            "componentSetNodeId": "13541:9240",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9240",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
       }
     },
     "Collapse": {
@@ -624,15 +624,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19499",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "collapse",
+            "name": "Collapse",
+            "componentSetNodeId": "59:16038",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=59-16038",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
       }
     },
     "DateAndTimePicker": {
@@ -646,15 +646,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13549:6703",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "month-date-picker",
+            "name": "Month (Date Picker)",
+            "componentSetNodeId": "13574:1150",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "time-date-picker",
+            "name": "Time (Date Picker)",
+            "componentSetNodeId": "16560:4508",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
       }
     },
     "DatePicker": {
@@ -668,15 +676,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "9279:4480",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "date-picker-single-date",
+            "name": "Date Picker (Single Date)",
+            "componentSetNodeId": "9413:1764",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1764",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "date-picker-range",
+            "name": "Date Picker (Range)",
+            "componentSetNodeId": "9538:17087",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9538-17087",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
       }
     },
     "Divider": {
@@ -690,15 +706,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "4992:30871",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "divider",
+            "name": "Divider",
+            "componentSetNodeId": "10:174",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-174",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871"
       }
     },
     "Dropdown": {
@@ -712,15 +728,31 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
+            "id": "dropdown-button",
+            "name": "Dropdown button",
             "componentSetNodeId": "37:4513",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "dropdown-list",
+            "name": "Dropdown List",
+            "componentSetNodeId": "9109:14766",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "dropdown",
+            "name": "Dropdown",
+            "componentSetNodeId": "4457:25458",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4457-25458",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
       }
     },
     "FileUpload": {
@@ -734,15 +766,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13337:2288",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "file-upload",
+            "name": "File Upload",
+            "componentSetNodeId": "13696:8299",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
       }
     },
     "Input": {
@@ -756,24 +788,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Input explanatory frame (MDX link)",
-            "componentSetNodeId": "13611:14133",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133",
-            "source": "storybook-mdx",
-            "status": "docs-frame",
-            "notes": "Verified 2026-06-13: in-file explanatory frame — not the Input component set."
-          },
-          {
             "id": "input",
             "name": "Input",
             "componentSetNodeId": "39:4802",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
       }
     },
     "InputGroup": {
@@ -787,15 +810,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19496",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "input-group",
+            "name": "Input Group",
+            "componentSetNodeId": "13671:3218",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
       }
     },
     "Jumbotron": {
@@ -809,15 +832,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19500",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "jumbotron",
+            "name": "Jumbotron",
+            "componentSetNodeId": "42:5949",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5949",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500"
       }
     },
     "LabelAndCaption": {
@@ -831,15 +854,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13265:5813",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "label",
+            "name": "Label",
+            "componentSetNodeId": "14851:17069",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "form-caption",
+            "name": "_Form Caption",
+            "componentSetNodeId": "13726:9599",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
     "ListGroup": {
@@ -853,15 +884,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19501",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "list-group",
+            "name": "List Group",
+            "componentSetNodeId": "69:16193",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16193",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "list-group-item-contextual",
+            "name": "List Group Item Contextual",
+            "componentSetNodeId": "5173:6149",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=5173-6149",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501"
       }
     },
     "MediaObject": {
@@ -875,15 +914,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3548:245484",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245484",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "media-object-alignment",
+            "name": "Media Object Alignment",
+            "componentSetNodeId": "53:20424",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20424",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "media-object-level",
+            "name": "Media Object Level",
+            "componentSetNodeId": "53:20312",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20312",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245484"
       }
     },
     "Modal": {
@@ -897,24 +944,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Modal docs page (MDX link)",
-            "componentSetNodeId": "3497:19502",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "Verified 2026-06-13: Modal documentation overview — not a single component set."
-          },
-          {
             "id": "modal",
             "name": "Modal",
             "componentSetNodeId": "53:20229",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20229",
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
       }
     },
     "MultipleChoice": {
@@ -928,15 +966,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13332:2508",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "multiple-choice-radio",
+            "name": "Multiple Choice (Radio)",
+            "componentSetNodeId": "13540:9207",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9207",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "multiple-choice-checkbox",
+            "name": "Multiple Choice (Checkbox)",
+            "componentSetNodeId": "13540:9717",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9717",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508"
       }
     },
     "NavPills": {
@@ -950,15 +996,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19503",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "nav-pills",
+            "name": "Nav Pills",
+            "componentSetNodeId": "69:16745",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16745",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "pill-dropdown",
+            "name": "Pill Dropdown",
+            "componentSetNodeId": "4209:29770",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29770",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
       }
     },
     "NavTabs": {
@@ -972,15 +1026,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19503",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "nav-tabs",
+            "name": "Nav Tabs",
+            "componentSetNodeId": "69:16779",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "tab-dropdown",
+            "name": "Tab Dropdown",
+            "componentSetNodeId": "4209:29375",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
       }
     },
     "NumberInput": {
@@ -994,15 +1056,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13265:5812",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "number-input-group-button",
+            "name": "Number Input Group Button",
+            "componentSetNodeId": "13644:11268",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
       }
     },
     "Pagination": {
@@ -1016,15 +1078,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19505",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "pagination",
+            "name": "Pagination",
+            "componentSetNodeId": "53:19822",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505"
       }
     },
     "Popover": {
@@ -1038,15 +1100,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19506",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "popovers",
+            "name": "Popovers",
+            "componentSetNodeId": "49:19534",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
       }
     },
     "Progress": {
@@ -1060,15 +1122,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13265:5813",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "progress-bar",
+            "name": "Progress Bar",
+            "componentSetNodeId": "49:6872",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
     "Radio": {
@@ -1082,15 +1144,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "14876:12005",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "form-radio-button",
+            "name": "Form Radio Button",
+            "componentSetNodeId": "42:5858",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
       }
     },
     "RadioButtonGroup": {
@@ -1104,15 +1166,31 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "14876:12005",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "scale-radio-button",
+            "name": "Scale Radio Button",
+            "componentSetNodeId": "13536:6785",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-6785",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "scale-options",
+            "name": "Scale Options",
+            "componentSetNodeId": "13536:9084",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9084",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "linear-scale",
+            "name": "Linear Scale",
+            "componentSetNodeId": "13611:16853",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-16853",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
       }
     },
     "Range": {
@@ -1126,15 +1204,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13265:5813",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "form-range-input",
+            "name": "Form Range Input",
+            "componentSetNodeId": "42:5756",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5756",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
     "Rating": {
@@ -1148,15 +1226,23 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13266:7763",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "rating-system-disclosure",
+            "name": "Rating System (disclosure)",
+            "componentSetNodeId": "13526:17774",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17774",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "rating-system-with-text",
+            "name": "Rating System (with text)",
+            "componentSetNodeId": "13536:196",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-196",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
       }
     },
     "RichTextEditor": {
@@ -1170,15 +1256,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "9662:17308",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "rich-text-editor",
+            "name": "Rich Text Editor",
+            "componentSetNodeId": "10010:37927",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
       }
     },
     "Scrollspy": {
@@ -1192,15 +1278,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "72:16516",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "scrollspy",
+            "name": "Scrollspy",
+            "componentSetNodeId": "72:16776",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16776",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516"
       }
     },
     "Select": {
@@ -1214,24 +1300,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Select docs page (MDX link)",
-            "componentSetNodeId": "9094:10266",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "Verified 2026-06-13: Select documentation overview — not a single component set."
-          },
-          {
             "id": "select",
             "name": "Select",
             "componentSetNodeId": "8583:12093",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
       }
     },
     "SidebarTab": {
@@ -1242,18 +1319,18 @@
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/SidebarTab"
       },
       "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "13265:5813",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "side-bar-tab",
+            "name": "Side Bar Tab",
+            "componentSetNodeId": "111:227838",
+            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227838",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227838"
       }
     },
     "Spinner": {
@@ -1267,15 +1344,39 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19485",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "spinner-animation",
+            "name": "Spinner Animation",
+            "componentSetNodeId": "44:4872",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "loading-animations-1-growing",
+            "name": "Loading Animations 1 - Growing",
+            "componentSetNodeId": "9296:3061",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "loading-animations-2-rotating",
+            "name": "Loading Animations 2 - rotating",
+            "componentSetNodeId": "9297:3104",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "loading-animations-3-stacking",
+            "name": "Loading Animations 3 - stacking",
+            "componentSetNodeId": "9297:3156",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
       }
     },
     "Switch": {
@@ -1289,15 +1390,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "14876:12006",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "form-switch-button",
+            "name": "Form Switch Button",
+            "componentSetNodeId": "82:16570",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
       }
     },
     "Textarea": {
@@ -1375,7 +1476,8 @@
             "verifiedAt": "2026-06-13",
             "notes": "Same node as storybook-resources MDX link."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
       }
     },
     "Toast": {
@@ -1389,15 +1491,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3548:245993",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "toast",
+            "name": "Toast",
+            "componentSetNodeId": "44:4803",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
       }
     },
     "Tooltip": {
@@ -1411,15 +1513,15 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Storybook Resources (MDX)",
-            "componentSetNodeId": "3497:19486",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486",
-            "source": "storybook-mdx",
-            "status": "needs-review",
-            "notes": "Verify this node is a component set (not a docs frame). Add variantProps after manual review."
+            "id": "tooltip",
+            "name": "Tooltip",
+            "componentSetNodeId": "42:6020",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-6020",
+            "source": "node-chart",
+            "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486"
       }
     }
   }
