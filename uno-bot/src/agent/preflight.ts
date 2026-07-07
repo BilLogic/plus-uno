@@ -86,6 +86,19 @@ export function preflight(
       return null;
     }
 
+    case "share_for_feedback": {
+      // A shareout needs real substance — don't ping the design channel with a
+      // placeholder blurb and nothing to look at.
+      const summary = typeof input.summary === "string" ? input.summary.trim() : "";
+      if (summary.length < 15) {
+        return {
+          ask:
+            ":mega: Before I share this out, give me one or two sentences on *what it is and what feedback you want* (a link to the prototype/frame/PRD helps too).",
+        };
+      }
+      return null;
+    }
+
     default:
       return null;
   }

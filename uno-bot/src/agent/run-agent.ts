@@ -220,12 +220,23 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
 
   // Iteration budget exhausted — the model kept calling read-only tools (usually
   // several grounding searches) without ever synthesizing. Rather than surfacing
-  // an internal error, make one final pass with tools DISABLED so it must answer
-  // from the tool results it already gathered (which are already in `messages`).
+  // an internal error, make one final pass with tool_choice "none" so it must
+  // answer from the tool results it already gathered. NOTE: `tools` must still
+  // be passed — the API rejects messages containing tool_use/tool_result blocks
+  // when no tools are defined, so omitting it here would 400 on exactly the
+  // multi-search requests this fallback exists for. (The `as` cast is because
+  // this SDK version's types predate tool_choice "none"; the API accepts it.)
+  messages.push({
+    role: "user",
+    content:
+      "(system: tool budget exhausted — answer the original question NOW from the tool results above; do not request more tools. If the results are insufficient, say what's missing.)",
+  });
   const finalResponse = await client.messages.create({
     model,
     max_tokens: MAX_TOKENS,
     system: systemBlocks as Anthropic.TextBlockParam[],
+    tools: TOOLS as Anthropic.Tool[],
+    tool_choice: { type: "none" } as unknown as Anthropic.MessageCreateParams["tool_choice"],
     messages,
   });
   iterations++;
