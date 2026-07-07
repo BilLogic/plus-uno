@@ -61,7 +61,24 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
     if (/(^|\.)notion\.so$/.test(host) || /(^|\.)notion\.site$/.test(host)) {
       const pageId = parseNotionPageId(url);
       if (!pageId) return JSON.stringify({ ok: false, error: "couldn't extract a Notion page id from that URL" });
-      const page = await readNotionPage(env, pageId);
+      let page;
+      try {
+        page = await readNotionPage(env, pageId);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        // Notion 404s pages that exist but aren't shared with the integration
+        // (object_not_found) — by far the most common cause. Make the failure
+        // actionable so the designer can self-serve the fix.
+        if (/404|object_not_found/i.test(msg)) {
+          return JSON.stringify({
+            ok: false,
+            error: `Notion page not accessible: ${msg}`,
+            note:
+              "Most likely this page isn't shared with the bot's Notion integration (Notion returns 404 for unshared pages). Tell the user: anyone with edit access can fix it — open the page in Notion → ••• menu → Connections → add the uno-bot integration — then ask again. Do NOT answer about this page from memory.",
+          });
+        }
+        throw err;
+      }
       return JSON.stringify({
         ok: true,
         source_type: "notion",
