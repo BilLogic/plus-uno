@@ -13,6 +13,7 @@ const SKILL_PATHS = [
   "AGENTS.md",
   "uno-qa/SKILL.md",
   "uno-synthesize/SKILL.md",
+  "uno-maintain/SKILL.md",
   "uno-research/SKILL.md",
   "uno-implement/SKILL.md",
   "uno-implement-design/SKILL.md",
@@ -61,11 +62,12 @@ async function getStableSystem(env: Env): Promise<string> {
   if (!cachedSystemPromise) {
     cachedSystemPromise = (async () => {
       const parts = await Promise.all(SKILL_PATHS.map((p) => fetchSkillFile(env, p)));
-      const [agents = "", qa = "", synth = "", research = "", impl = "", implDesign = "", mp = ""] = parts;
+      const [agents = "", qa = "", synth = "", maintain = "", research = "", impl = "", implDesign = "", mp = ""] = parts;
       return [
         agents,
         "\n\n---\n\n# Skill: uno-qa (default conversational mode)\n\n" + qa,
         "\n\n---\n\n# Skill: uno-synthesize (summarize + PRD via create_prd)\n\n" + synth,
+        "\n\n---\n\n# Skill: uno-maintain (maintain the harness; review/approval)\n\n" + maintain,
         "\n\n---\n\n# Skill: uno-research (find_experts tool)\n\n" + research,
         "\n\n---\n\n# Skill: uno-implement (tool)\n\n" + impl,
         "\n\n---\n\n# Skill: uno-implement-design (tool)\n\n" + implDesign,
@@ -105,6 +107,8 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
     sender ? `- current message sender: <@${sender.userId}>` : "",
     "",
     "If the user's current message clearly confirms or cancels this proposal, invoke the `resolve_pending_proposal` tool. Otherwise reply conversationally and the proposal will sit until ✅, ❌, or 15-minute expiry.",
+    "",
+    `IMPORTANT: while this proposal is pending, do NOT invoke \`${p.toolName}\` (or any side-effect tool) again for the same action. An approval is handled ONLY by resolve_pending_proposal with decision "confirm" — re-invoking the tool re-stages a duplicate confirmation card instead of executing, which reads as ignoring the user's approval.`,
     "",
     sender && !senderIsRequester
       ? `The current sender (<@${sender.userId}>) is NOT the requester (<@${p.requesterUserId}>) — do NOT invoke resolve_pending_proposal. Reply explaining that only the original requester can confirm.`

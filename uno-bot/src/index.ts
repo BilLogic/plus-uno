@@ -1,13 +1,14 @@
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
+import { BUILD } from "./version";
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (request.method === "GET" && url.pathname === "/health") {
-      return new Response("uno-bot ok", { status: 200 });
+      return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
     }
 
     if (request.method === "POST" && url.pathname === "/slack/events") {

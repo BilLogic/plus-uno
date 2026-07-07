@@ -9,7 +9,11 @@
 //
 // This generalizes the original `implement`-only PRD check.
 
+import type { Env } from "../types";
+import { listDsComponents, matchComponent, closestComponents } from "../integrations/ds-components";
+
 export interface PreflightCtx {
+  env: Env;
   /** Notion PRD resolved from the thread root, if any. */
   prd: { id?: string; url?: string } | null;
   /** For `implement`: the PRD url resolved from the thread or pasted by the designer. */
@@ -20,13 +24,28 @@ export interface PreflightAsk {
   ask: string;
 }
 
-export function preflight(
+export async function preflight(
   toolName: string,
   input: Record<string, unknown>,
   ctx: PreflightCtx,
-): PreflightAsk | null {
+): Promise<PreflightAsk | null> {
   switch (toolName) {
     case "implement": {
+      // The component must actually exist in the DS library — R2 staged confirm
+      // cards for invented names ("Surface", "SpacingToken"). Fail-open when the
+      // list can't be fetched: this is a guard, not a wall.
+      const component = typeof input.component === "string" ? input.component.trim() : "";
+      const known = await listDsComponents(ctx.env);
+      if (component && known && !matchComponent(component, known)) {
+        const near = closestComponents(component, known);
+        return {
+          ask:
+            `:mag: I don't find a *${component}* component in the design-system library` +
+            (near.length ? ` — closest matches: ${near.map((n) => `\`${n}\``).join(", ")}.` : ".") +
+            "\nWhich component did you mean? (If this is genuinely new, it needs a PRD + review first — I won't scaffold a library component from scratch.)",
+        };
+      }
+
       // A component implement MUST be tied to a Notion PRD (thread root or pasted).
       if (!ctx.prd?.id && !ctx.implementPrdUrl) {
         return {

@@ -30,6 +30,7 @@ import { executeFindExperts } from "../tools/find-experts";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import type { SlackContext } from "../tools/dispatcher";
+import { BUILD } from "../version";
 
 export type { HistoryTurn };
 
@@ -67,6 +68,13 @@ export type AgentResult =
 // tools-disabled synthesis pass (below) rather than erroring out.
 const MAX_ITERATIONS = 8;
 const MAX_TOKENS = 2048;
+// Cap on individual read-only tool executions per request. Each execution costs
+// Workers subrequests (a blueprint fallback search alone is ~4 fetches), and the
+// free plan allows 50 per request — blowing it kills the request mid-flight so
+// hard that even the error post fails ("reacted :eyes: then silence"). The cap
+// keeps us far from the cliff; past it the model is told to answer with what
+// it has (and the iteration cap's tool_choice-none fallback backstops that).
+const READONLY_TOOL_BUDGET = 6;
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending } = input;
@@ -81,9 +89,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   let inputTokens = 0;
   let outputTokens = 0;
   let iterations = 0;
+  let toolCallsUsed = 0;
   const finish = (result: AgentResult): AgentResult => {
     console.log(
-      `[uno-bot] request done tier=${tier} model=${model} iterations=${iterations} ` +
+      `[uno-bot] request done build=${BUILD} tier=${tier} model=${model} iterations=${iterations} ` +
         `tokens_in=${inputTokens} tokens_out=${outputTokens} ms=${Date.now() - startedAt} ` +
         `outcome=${result.kind}`,
     );
@@ -204,10 +213,23 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
         });
       }
 
-      // (c) Read-only tools only: execute and feed results back.
+      // (c) Read-only tools only: execute and feed results back (within budget).
       messages.push({ role: "assistant", content: response.content });
       const toolResults: Anthropic.ToolResultBlockParam[] = [];
       for (const tu of toolUses) {
+        if (toolCallsUsed >= READONLY_TOOL_BUDGET) {
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: tu.id,
+            content: JSON.stringify({
+              ok: false,
+              error: "tool budget exhausted for this request",
+              note: "Answer NOW from the tool results you already have. If they're insufficient, say exactly what's missing — do not fabricate.",
+            }),
+          });
+          continue;
+        }
+        toolCallsUsed++;
         const resultText = await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>);
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }

@@ -232,12 +232,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     ]);
   } catch (err) {
     console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postMessage(env, {
-      channel,
-      thread_ts: threadTs,
-      text: ":x: Something went wrong on my end. Try again in a moment?",
-    });
-    await addReaction(env, channel, userMsgTs, "x").catch(() => {});
+    await postVisibleFailure(env, channel, threadTs, userMsgTs);
     return;
   }
 
@@ -260,21 +255,23 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postMessage(env, {
-      channel,
-      thread_ts: threadTs,
-      text: ":x: Something went wrong on my end. Try again in a moment?",
-    });
-    await addReaction(env, channel, userMsgTs, "x");
+    await postVisibleFailure(env, channel, threadTs, userMsgTs);
     return;
   }
 
   // ----- text-only response -----
   if (result.kind === "text") {
-    await postMessage(env, { channel, thread_ts: threadTs, text: result.text });
+    const delivery = await postTextVerified(env, channel, threadTs, result.text);
     await appendHistory(env, channel, threadTs, { role: "user", content: userText });
-    await appendHistory(env, channel, threadTs, { role: "assistant", content: result.text });
-    await addReaction(env, channel, userMsgTs, "white_check_mark");
+    if (delivery.ok) {
+      // Record what was actually posted (capped/placeholder), not the raw text.
+      await appendHistory(env, channel, threadTs, { role: "assistant", content: delivery.text });
+      await addReaction(env, channel, userMsgTs, "white_check_mark");
+    } else {
+      // Never ✅ a reply that was never delivered.
+      console.error("[slack] reply delivery failed after retry");
+      await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    }
     return;
   }
 
@@ -302,7 +299,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   // Clarify-vs-act (D3): if the tool call is missing what it needs, ask here in
   // the Worker instead of staging a proposal — so gating never depends on the
   // model remembering to ask (e.g. a component is never implemented PRD-less).
-  const gate = preflight(result.toolName, result.input, { prd, implementPrdUrl });
+  const gate = await preflight(result.toolName, result.input, { env, prd, implementPrdUrl });
   if (gate) {
     await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
     await appendHistory(env, channel, threadTs, { role: "user", content: userText });
@@ -310,7 +307,51 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     return;
   }
 
-  // If there's already a pending proposal in this thread, supersede it.
+  // Gate idempotency (R2 regressions): approvals must not re-gate, and cancels
+  // must stick.
+  //
+  // (a) The model re-issued the SAME proposal while one is pending (typically it
+  // answered an approval with a fresh tool call instead of resolve_pending_
+  // proposal). Superseding would delete + re-post the identical card — R2's
+  // PRD-CREATE re-gated 4× this way. Point back at the existing card instead.
+  if (
+    pending &&
+    pending.toolName === result.toolName &&
+    stableStringify(pending.input) === stableStringify(result.input)
+  ) {
+    const remind =
+      `:hourglass: That exact *${proposalVerb(result.toolName)}* proposal is already waiting on you — ` +
+      `react :white_check_mark: / :x: on it, or say "go ahead" / "cancel". I won't post a duplicate card.`;
+    await postMessage(env, { channel, thread_ts: threadTs, text: remind });
+    await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+    await appendHistory(env, channel, threadTs, { role: "assistant", content: remind });
+    return;
+  }
+
+  // (b) The user JUST cancelled this same action (the DO history's outcome note
+  // is authoritative — the live-thread history only shows the narrative text).
+  // Don't re-card a cancelled action; require an explicit revival. The check
+  // window is the last few turns, so one clarifying exchange clears it.
+  try {
+    const doHistory = await loadHistory(env, channel, threadTs);
+    const justCancelled = doHistory
+      .slice(-3)
+      .some((t) => t.role === "assistant" && t.content.includes(`(Cancelled the proposed ${result.toolName}`));
+    if (justCancelled) {
+      const ask =
+        `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
+        `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
+      await postMessage(env, { channel, thread_ts: threadTs, text: ask });
+      await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+      await appendHistory(env, channel, threadTs, { role: "assistant", content: ask });
+      return;
+    }
+  } catch (err) {
+    // Guard is best-effort — a DO hiccup shouldn't block a legitimate proposal.
+    console.warn(`[slack] recent-cancel check failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  // If there's already a (different) pending proposal in this thread, supersede it.
   if (pending) {
     await deletePendingProposal(env, pending.proposalTs);
   }
@@ -362,6 +403,70 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
 
 function stripBotMentions(text: string): string {
   return text.replace(/<@[A-Z0-9]+>/g, "").trim();
+}
+
+// Key-order-independent JSON compare, so two generations of the same tool input
+// register as identical even if the model emitted fields in a different order.
+function stableStringify(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(stableStringify).join(",")}]`;
+  if (v !== null && typeof v === "object") {
+    return `{${Object.entries(v as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, val]) => `${JSON.stringify(k)}:${stableStringify(val)}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(v);
+}
+
+// Make failure VISIBLE, resiliently: try the ❌ reaction first (cheapest call —
+// most likely to still succeed if the request is out of subrequest budget),
+// then the error text. Every step is .catch-wrapped so a failure inside the
+// failure path can never re-throw into silence (R2's ":eyes: then nothing").
+async function postVisibleFailure(
+  env: Env,
+  channel: string,
+  threadTs: string,
+  userMsgTs: string,
+): Promise<void> {
+  await addReaction(env, channel, userMsgTs, "x").catch(() => {});
+  await postMessage(env, {
+    channel,
+    thread_ts: threadTs,
+    text: ":x: Something went wrong on my end. Try again in a moment?",
+  }).catch(() => {});
+}
+
+// Slack chat.postMessage hard-fails past 40k chars and renders poorly long
+// before that; AGENTS.md tells the model to keep it short, but the Worker
+// enforces it. Truncation note lets the user ask for the rest.
+const MAX_POST_CHARS = 3900;
+
+function capText(text: string): string {
+  if (text.length <= MAX_POST_CHARS) return text;
+  return `${text.slice(0, MAX_POST_CHARS)}\n_…truncated — ask me for the rest._`;
+}
+
+/**
+ * Post a text reply and report whether Slack actually accepted it. Guards the
+ * R2 "✅ + empty body" defect: empty text gets an honest placeholder, oversized
+ * text is capped, a failed post is retried once, and the caller only ✅-reacts
+ * when this returns true.
+ */
+async function postTextVerified(
+  env: Env,
+  channel: string,
+  threadTs: string,
+  text: string,
+): Promise<{ ok: boolean; text: string }> {
+  const body = text.trim()
+    ? capText(text)
+    : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
+  let posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
+  if (!posted.ok) {
+    console.warn("[slack] text post failed; retrying once");
+    posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
+  }
+  return { ok: !!posted.ok, text: body };
 }
 
 // Build the bot's memory from the ACTUAL Slack thread, so it sees every message

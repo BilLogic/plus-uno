@@ -41,6 +41,12 @@ export function isBlueprintConfigured(env: Env): boolean {
   return Boolean(env.SUPABASE_URL && env.SUPABASE_ANON_KEY);
 }
 
+// Per-isolate result cache (same pattern as marketplace-search). A multi-step
+// question often re-searches near-identical queries; serving repeats from cache
+// costs zero subrequests — which matters on the free plan's 50/request cap.
+const CACHE_TTL_MS = 60_000;
+const searchCache = new Map<string, { at: number; rows: BlueprintRow[] }>();
+
 function headers(key: string): Record<string, string> {
   return { apikey: key, authorization: `Bearer ${key}` };
 }
@@ -65,15 +71,22 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
   const q = query.trim();
   if (!q) return [];
 
+  const cacheKey = terms(q).sort().join(" ");
+  const hit = searchCache.get(cacheKey);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.rows;
+
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const key = env.SUPABASE_ANON_KEY!;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     const rpc = await tryRpc(base, key, q, controller.signal);
-    if (rpc !== null) return rpc.slice(0, MAX_ROWS);
-    // RPC absent → direct-query fallback.
-    return (await searchViaTables(base, key, q, controller.signal)).slice(0, MAX_ROWS);
+    const rows = rpc !== null
+      ? rpc.slice(0, MAX_ROWS)
+      // RPC absent → direct-query fallback.
+      : (await searchViaTables(base, key, q, controller.signal)).slice(0, MAX_ROWS);
+    searchCache.set(cacheKey, { at: Date.now(), rows });
+    return rows;
   } finally {
     clearTimeout(timer);
   }
