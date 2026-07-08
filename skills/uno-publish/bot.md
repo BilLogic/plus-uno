@@ -3,25 +3,25 @@
 
 Loads: references/method.md (the rails + gates) · docs/conventions/terminology.md
 
-Get work in front of people: feedback share-outs (`share_for_feedback`), handoff sign-off collection, marketplace catalog operations (`marketplace_search/add/edit`), outward email (`send_email`).
+Get work in front of people: feedback share-outs (`shareout_post`), handoff sign-off collection, marketplace catalog search (`notion_search`, scope: "marketplace"), outward email (`email_send`). Publishing/editing catalog entries is no longer a bot tool — it runs in-IDE via `writers/notion` (see Execute).
 
 ## Route first
 
-- "share this", "post for feedback", "get eyes on this" → feedback rail: `share_for_feedback`, bundle gate applies.
-- "register this prototype", "add to the marketplace/catalog" → `marketplace_add`. Never route a share-out into `marketplace_add`.
+- "share this", "post for feedback", "get eyes on this" → feedback rail: `shareout_post`, bundle gate applies.
+- "register this prototype", "add to the marketplace/catalog" → marketplace publishing runs in-IDE via `writers/notion`, not a bot tool; the Worker only *searches* the catalog. Never route a share-out into catalog publishing.
 - "post this in slack", other ambiguity → ask which they mean; a plain message is ordinary conversation, no publish machinery.
 - Rails never re-merge (method.md) — one request, one rail.
 
 ## Execute
 
-- **`share_for_feedback(summary, link?, reviewers?, deadline?)`** — gated (it pings people). Posts the share-out per docs/conventions/slack.md (shape, ≤3 questions + NOT-looking-for line, channel). **The bundle gate is enforced here, at post time:** a prototype share-out missing any required bundle piece (contract: method.md) does not post; gather the missing links conversationally, and route replica creation to the IDE face (the Worker can't build Figma frames). Draft the post text first; invoke once approved. `reviewers`: Slack user ids (U…) get @-mentioned — pick real people via `find_experts` or the PRD Owner.
-- **Handoff sign-offs (H4b):** uno-bot collects the dev + PM + stakeholder ✅ in the handoff thread (reviewer-verdict convention, slack.md). Report status on request; never mark the gate passed with fewer than three, never proxy one.
+- **`shareout_post(summary, link?, reviewers?, deadline?)`** — gated (it pings people). Posts the share-out per docs/conventions/slack.md (shape, ≤3 questions + NOT-looking-for line, channel). **The bundle gate is a hard rule you must apply before invoking:** a prototype share-out missing any required bundle piece (contract: method.md) does not post; gather the missing links conversationally, and route replica creation to the IDE face (the Worker can't build Figma frames). (Worker backstop is minimal — it only rejects an empty/trivial summary — so bundle completeness is on the composing agent, not code-enforced.) Draft the post text first; invoke once approved. `reviewers`: Slack user ids (U…) get @-mentioned — pick real people via `notion_search` (scope: "team") or the PRD Owner.
+- **Handoff sign-offs (H4b):** uno-bot collects the dev + PM + stakeholder ✅ in the handoff thread (reviewer-verdict convention, slack.md). Use `slack_thread_read` to tally the sign-offs / reviewer verdicts from the thread. Report status on request; never mark the gate passed with fewer than three, never proxy one.
 - **Sync feedback session:** logistics only — offer scheduling and recording/transcription setup. Study guide → uno-research; transcript synthesis → uno-synthesize. Decline to write guides or analyze sessions.
-- **`marketplace_search(query)`** — read-only, no gate, call freely (including before an edit). Matches title, description, pillar, stage, creators, contributors, id, case-insensitively.
-- **`marketplace_add({ metadata })`** — gated; opens a draft PR appending to `prototypes-data.js`. Required: `title`, `description`, `stage` (`low|mid|high`), `productPillar` (`admin|home|login|profile|toolkit|training|universal`), `creators` (≥1), `repoPath` (ends with `/`). Optional: `contributors`, `deploymentUrl`, `notionCardUrl`, `notionCardId`, `loomVideoUrl`. Worker auto-assigns `id`, `localPath`, `lastUpdated` — never hand-pick. Missing required fields → ask, don't invent. Validate enums; reject malformed input rather than shipping a broken entry.
-- **`marketplace_edit(id, fields)`** — gated; draft PR, partial update, existing 4-digit id only (`marketplace_search` first if unsure). Not editable: `id`, `lastUpdated`, `upvotes`. No-op requests → decline the pointless PR.
-- **No delete, no bulk** — catalog removal is a manual PR; one gated call per prototype.
-- **`send_email(to, subject, body, cc?)`** — gated; real Gmail. Slack-first: only for recipients outside Slack or on explicit ask. Never invent an address; write the body fully, no placeholders.
+- **`notion_search(scope: "marketplace", query)`** — read-only, no gate, call freely. Matches title, description, pillar, stage, creators, contributors, id, case-insensitively.
+- **Catalog publishing is not a bot tool.** The marketplace now lives in a Notion DB whose write is complex (a Project-card relation + rollups + a dual-write to the JS catalog), so adding a prototype runs in-IDE via `writers/notion` on the uno-publish handoff rail — the Worker searches the catalog but never creates entries. Metadata still expected at handoff: `title`, `description`, `stage` (`low|mid|high`), `productPillar` (`admin|home|login|profile|toolkit|training|universal`), `creators` (≥1), `repoPath` (ends with `/`); optional `contributors`, `deploymentUrl`, `notionCardUrl`, `notionCardId`, `loomVideoUrl`. `id`, `localPath`, `lastUpdated` stay system-owned. Missing required fields → gather before handing off; don't invent.
+- **Editing a catalog entry** is likewise an in-IDE `writers/notion` operation (partial update by existing id) — not a bot tool. `id`, `lastUpdated`, `upvotes` are never editable.
+- **No delete, no bulk** — catalog removal is a manual PR; one entry at a time.
+- **`email_send(to, subject, body, cc?)`** — gated; real Gmail. Slack-first: only for recipients outside Slack or on explicit ask. Never invent an address; write the body fully, no placeholders.
 - The confirmation gate is non-negotiable even for fully-specified requests — the friction is the feature. ❌ or corrections → fix and re-propose.
 
 ## Output
@@ -31,6 +31,6 @@ Slack mrkdwn. Search results: `*{id} — {title}* ({stage}, {pillar})` + creator
 ## Hand-offs
 
 - Componentize/spec, Handoff Spec drafting, replica frames, rails propagation → IDE face (`SKILL.md`) — the Worker only distributes, collects sign-offs, and touches the catalog.
-- Code generation → **uno-prototype**. Reviewer picking → **uno-research** (`find_experts`) or the PRD Owner.
+- Code generation → **uno-prototype**. Reviewer picking → **uno-research** (`notion_search`, scope: "team") or the PRD Owner.
 - "What's the marketplace schema?" → conversational answer, no tool.
 - DM-originated reviewable artifacts → propose posting to the share-out channel, post only on approval (a DM stays a DM).

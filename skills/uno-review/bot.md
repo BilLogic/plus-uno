@@ -8,8 +8,8 @@ Review / critique a design, prototype, spec, or frame from Slack. Method rules a
 ## Worker delta
 
 - **No sub-agent dispatch.** The Worker applies the lenses itself in one context — still one lens at a time, in-lane, at the manifest's fidelity depth. It fetches the same rule docs method.md names per lens.
-- **Inspect before judging.** First `read_source` (read-only, no gate) the linked Figma frame AND any linked PRD/spec, then diagnose from the fetched content. Never critique from priors or speculatively.
-- Manifest missing → ask once in-thread for the one-liner (fidelity / tools / PRD link). Still missing, or the target is unfetchable (no link, `read_source` fails) → say so plainly, **record the intake**, route to a human. No generic DIY instructions, no from-memory review.
+- **Inspect before judging.** First `source_read` (read-only, no gate) the linked Figma frame AND any linked PRD/spec, then diagnose from the fetched content. Never critique from priors or speculatively.
+- Manifest missing → ask once in-thread for the one-liner (fidelity / tools / PRD link). Still missing, or the target is unfetchable (no link, `source_read` fails) → say so plainly, **record the intake**, route to a human. No generic DIY instructions, no from-memory review.
 - Design QA runs arrive via the RTT trigger with the Roadmap card — resolve RM-ID → `[spec]` file per method.md before walking the build.
 
 ## Output — threaded Slack mrkdwn

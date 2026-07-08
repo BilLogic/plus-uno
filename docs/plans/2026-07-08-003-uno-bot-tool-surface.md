@@ -1,6 +1,6 @@
 # uno-bot Tool Surface — the canonical registry (v4: touchpoint-grounded)
 
-- **Status:** in progress — `tool-definitions.json` rewritten to v4 on `feat/uno-bot-tools-v4`; TS bodies + wiring are the compile-in-the-loop step (needs Bill's `tsc`). Merge **after** the pending `wrangler deploy` of the current harness is confirmed healthy.
+- **Status:** TS cascade **typecheck-green** on `feat/uno-bot-tools-v4`, and the 6 `bot.md` faces updated to v4 names. Remaining: `wrangler dev`/deploy — merges to `main` **after** the current harness deploy is confirmed healthy.
 - **Date:** 2026-07-08
 - **Owner:** Bill
 - **Supersedes:** the v3 task-tool draft and the ad-hoc 13-tool registry.
@@ -44,7 +44,7 @@ Domain first (the estate/deliverable, never the backend), verb from a controlled
 
 | Tool | Touchpoint | Inputs | Absorbs / notes |
 |---|---|---|---|
-| `notion_create` | Notion | `surface`, `title`, `summary?`, `sections?`, `acceptance_criteria?`, `properties?`, `source_url?` | ⭐ generic CRUD-create. `surface ∈ {prd, ds-component-prd, intake, research, marketplace}`. Absorbs `create_prd`, `marketplace_add`, + the intake/findings writes. |
+| `notion_create` | Notion | `surface`, `title`, `summary?`, `sections?`, `acceptance_criteria?`, `properties?`, `source_url?` | ⭐ generic CRUD-create. `surface ∈ {prd, ds-component-prd, intake, research}`. Absorbs `create_prd` + intake/findings writes. **Marketplace publish is NOT here** — its relation + rollup + dual-write shape is an in-IDE `writers/notion` op; the bot only *searches* the catalog. |
 | `notion_update` | Notion | `page_url`, `properties?`, `append?` | ⭐ generic CRUD-update. Property changes (roadmap status, marketplace edit) + narrative append (decision log, findings). Absorbs `roadmap_update`, `marketplace_edit`, `decision_append`, `findings` appends. |
 | `notion_archive` | Notion | `page_url` | rename of `delete_prd`; keeps the hard parent-DB guard, now covers any allowlisted card. |
 | `component_implement` | GitHub | `component`, `notion_prd_url?`, `notes?` | rename of `implement`. Kept as its own tool (not folded into a generic `github_dispatch`) because its PRD-required guard + distinct schema are real safety. |
@@ -86,7 +86,7 @@ Every conversation class someone can open with @uno-bot → its tool chain:
 | "did dev/PM/stakeholder sign off?" | review/publish | `slack_thread_read` | — |
 | "share the checkout prototype for feedback" | publish | `source_read`(bundle liveness) → `shareout_post` | ✅ |
 | "close this feedback round" | publish | `slack_thread_read` → `notion_update(append)` | ✅ |
-| "publish it to the marketplace" | publish | `notion_search(marketplace)` → `notion_create(marketplace)` | ✅ |
+| "publish it to the marketplace" | publish | `notion_search(scope:marketplace)` dedup → in-IDE `writers/notion` publish | ✅ |
 | "fix the stale link in the toolkit doc" | maintain | `source_read` → `notion_create(intake)` | ✅ |
 | "email the summary to our SME" | publish | `email_send` | ✅ |
 | "go ahead" / "cancel" | gate | `proposal_resolve` | requester-only |
@@ -108,6 +108,7 @@ State in `AGENT.md` so the bot routes instead of refusing awkwardly: blueprint *
 7. **Env** (`types.ts`, `wrangler.toml`): add `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`; marketplace DB id + data-source id (already in `notion.md`).
 8. **The six `bot.md` faces** name the new tools — update in the same commit.
 9. **Regression:** rerun R1–R12 (`docs/evals/scenarios/uno-bot.md`); `npm run typecheck`; `wrangler dev`; deploy.
+10. **Bundle-completeness gate for `shareout_post`** (from the Sonnet stress round). Today `preflight.ts` only checks `summary` length, so the "hard gate" (`skills/uno-publish` method.md — Loom · live preview · decision log · Figma replica) is agent-enforced only (the docs are now honest about this). Expand `shareout_post`'s input to carry the bundle refs (or a `bundle` manifest), enforce their presence in `preflight.ts` per the bundle contract, and add an R13 regression that a partial bundle is refused.
 
 **Sequencing:** merge to `main` and deploy **after** the current harness build is confirmed live-healthy — never bundle a tool-surface change with the pending infra cutover, so a regression is isolable.
 
