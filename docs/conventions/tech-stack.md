@@ -56,3 +56,12 @@
 | `@` | `design-system/src` |
 | `@plus-ds` | `design-system/src` |
 | `~` | `node_modules` |
+
+## Infrastructure (added 2026-07-08, plan Phase 2)
+
+| Technology | Purpose |
+|---|---|
+| Cloudflare Workers + Durable Objects | uno-bot Slack runtime (`agents/uno-bot/`) |
+| Supabase (Postgres / PostgREST) | uno-blueprint — product source of truth; candidate dummy backend for prototypes |
+| Netlify | hosting + PR deploy previews (plus-uno.netlify.app) |
+| GitHub Actions | codegen automations (`scripts/prompts/`; registry: `docs/conventions/automations.md`) |

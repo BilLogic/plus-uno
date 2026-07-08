@@ -3,7 +3,7 @@
 Use the following repository-local examples as style references for report tone and structure:
 
 - `references/skill-quality/examples/uno-research-audit-example.md`
-- `references/skill-quality/examples/uno-plan-audit-example.md`
+- `references/skill-quality/examples/uno-plan-audit-example.md` *(historical specimen — uno-plan was dissolved 2026-07-07 (ADR-016); the report style is the point)*
 
 Optional local-only sources (may not exist on other machines):
 

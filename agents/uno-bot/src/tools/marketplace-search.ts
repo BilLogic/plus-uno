@@ -6,7 +6,7 @@
 // catalog format (single-quoted strings, unquoted keys, trailing commas, no
 // apostrophes in values). If the catalog grows template literals or
 // embedded apostrophes, swap this for a JSON mirror generated at commit
-// time. See bot-skills/uno-marketplace/SKILL.md for the contract.
+// time. See skills/uno-publish/bot.md (marketplace tools) for the contract.
 
 import type { Env } from "../types";
 

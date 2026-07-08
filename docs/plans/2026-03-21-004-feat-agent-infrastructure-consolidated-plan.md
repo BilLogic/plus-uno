@@ -1,7 +1,7 @@
 ---
 title: "feat: Consolidated agent infrastructure — AGENTS.md, docs, skills, compound loop"
 type: feat
-status: active
+status: completed — superseded
 date: 2026-03-21
 supersedes:
   - docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan.md
@@ -568,3 +568,7 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
    - `patterns-index.json` → references `references/tokens-guide.md`, `guidelines/guides/Storybook.md`, `guidelines/guides/figma-workflow.md`
    - `README.md` → references `.agent/references/`
    - **All of these must be updated to `docs/design-system/` paths during Phase 4.**
+
+## Outcome (2026-07-08 plans sweep)
+
+.agent/ infrastructure built as planned, then dissolved by ADR-013 (2026-07-07); history preserved in docs/knowledge/archive/.

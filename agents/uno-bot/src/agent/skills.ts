@@ -25,6 +25,7 @@ const SKILL_PATHS = [
   "skills/uno-review/bot.md",
   "skills/uno-maintain/references/method.md",
   "skills/uno-maintain/bot.md",
+  "docs/conventions/terminology.md",
   "docs/conventions/notion.md",
   "docs/conventions/figma-workspace.md",
   "docs/conventions/slack.md",

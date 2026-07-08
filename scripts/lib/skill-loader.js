@@ -172,7 +172,7 @@ export function stripMetaSections(body) {
 
 /**
  * Load a skill's full system prompt:
- *   1. Read bot-skills/{skillName}/SKILL.md
+ *   1. Read scripts/prompts/{skillName}/SKILL.md
  *   2. Strip meta sections from the body
  *   3. For each context flag that's true AND keyed in `references_when`,
  *      read the referenced file and append to the prompt

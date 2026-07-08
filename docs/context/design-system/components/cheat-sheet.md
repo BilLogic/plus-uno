@@ -1,4 +1,4 @@
-<!-- Tier: 2 -->
+<!-- Tier: 2 | generated mirror — index over skill-local cheat files (plan Phase 2b) -->
 # PLUS Cheat Sheet — Index
 
 Load only the section you need:

@@ -9,8 +9,9 @@ agent's system prompt at runtime).
 
 ## Status
 
-Week 2 scaffold. Not yet wired to Slack/Anthropic/GitHub — see the todo list
-in `~/.claude/plans/piped-riding-melody.md`.
+**Live** — serving Slack traffic since June 2026 (Pipedream→Worker cutover recorded
+in ADR-014, `docs/knowledge/decisions.md`). Deploy via `wrangler deploy` (DEPLOY.md);
+verify the running build with `GET /health` → `uno-bot ok <BUILD>`.
 
 ## Local dev
 
@@ -58,12 +59,16 @@ Set in `wrangler.toml` `[vars]`:
 
 ```
 uno-bot/
+├── AGENT.md              Persona delta (Slack embodiment; the constitution is repo-root AGENTS.md)
+├── tool-definitions.json Tool schemas (imported by src/agent/tool-definitions.ts)
 ├── wrangler.toml         Worker + Durable Object config
-├── package.json
-├── tsconfig.json
-├── src/
-│   ├── index.ts          Top-level fetch handler / route dispatch
-│   ├── types.ts          Env interface
-│   └── thread-state.ts   Durable Object (stub for now)
-└── README.md
+├── DEPLOY.md             Deploy runbook · REGRESSION.md → docs/evals/scenarios/uno-bot.md
+├── package.json / tsconfig.json
+└── src/
+    ├── index.ts          Top-level fetch handler / route dispatch
+    ├── agent/            Claude loop · SKILL_PATHS prompt assembly · preflight · model tiering
+    ├── slack/            Events · proposal gate · signature verify · API
+    ├── tools/            Tool implementations (dispatcher + tools)
+    ├── integrations/     Notion · Figma · blueprint (Supabase) · gmail · ds-components
+    └── thread-state.ts   Durable Object (per-thread conversation state)
 ```

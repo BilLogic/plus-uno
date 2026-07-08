@@ -4,7 +4,7 @@
 
 Two files load always; everything else loads on demand or is retrieved live. Budgets are targets, not suggestions — a tier that bloats defeats the tier.
 
-## Tier 1 — always loaded (~250 lines total)
+## Tier 1 — always loaded (~210 lines total)
 
 | File | Role | Budget |
 |---|---|---|
@@ -34,4 +34,4 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 ## Runtime notes
 
 - **Worker (uno-bot):** no on-demand loading — `agents/uno-bot/src/agent/skills.ts` `SKILL_PATHS` concats AGENTS.md + AGENT.md + all `skills/*/bot.md` + methods + conventions into one prompt-cached block. Keep bot.md files ≤60 lines for this reason.
-- **GitHub Actions:** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline — this is why conventions are mirrored, not linked.
+- **GitHub Actions:** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline — fine, because conventions are repo-canonical (ADR-017) and load as plain files.

@@ -6,4 +6,4 @@ alwaysApply: true
 # PLUS Agent
 
 Read `AGENTS.md` at the project root as the entry point for all agent instructions.
-It covers product context, design system modes, forbidden patterns, skills, and conventions.
+It covers identity, the six-skill roster, forbidden patterns, agents, and conventions.

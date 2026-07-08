@@ -116,15 +116,15 @@ The token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.scss`, 
 2. **Study the Figma frame.** Inspect the screenshot (multimodal) and the node design-properties JSON. Identify layout structure, components, typography, and the token mappings you'll need.
 3. **Plan the file set.** Decide whether `App.jsx` alone suffices or whether to split into `src/components/*`. Keep it minimal but readable.
 4. **Scaffold the boilerplate.** Emit `index.html`, `vite.config.js`, `src/main.jsx`, `src/index.css`, `src/styles/plus-tokens.scss` adapted from the reference per "Reference Scaffold" above.
-5. **Build the prototype.** Write `App.jsx` (and any components) translating the Figma frame into PLUS components + tokens. Apply the Token Mapping Rules. Use Plus terminology (`docs/context/conventions/terminology.md`).
+5. **Build the prototype.** Write `App.jsx` (and any components) translating the Figma frame into PLUS components + tokens. Apply the Token Mapping Rules. Use Plus terminology (`docs/conventions/terminology.md`).
 6. **(Orchestration post-step.)** `figma-implement-design.yml` writes your blocks under `playground/{slug}/`, injects the `dev:{slug}` root-package.json script, commits, opens a draft PR, and posts the PR link back to the Slack thread with a ✅/❌ reaction.
 
 ## References (Load on Every Invocation)
 
 - `docs/context/design-system/components/inventory.md` — the component catalog: purpose, props API, and usage for every component (MANDATORY — if a component isn't here, it doesn't exist)
 - `docs/context/design-system/components/layout-cheat-sheet.md` — page layout formulas (MANDATORY for page-level frames)
-- `docs/context/conventions/coding.md` — file naming, imports, token usage
-- `docs/context/conventions/terminology.md` — Plus vocabulary
+- `docs/conventions/coding.md` — file naming, imports, token usage
+- `docs/conventions/terminology.md` — Plus vocabulary
 - `playground/home-redesign/` — the reference scaffold (structure to mirror)
 
 ## Output Format

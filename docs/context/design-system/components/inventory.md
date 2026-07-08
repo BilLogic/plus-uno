@@ -1,4 +1,4 @@
-<!-- Tier: 2 -->
+<!-- Tier: 2 | generated mirror — generated from design-system/src — regenerate, don't hand-edit (plan Phase 2b) -->
 
 # PLUS Design System Component Guidelines
 

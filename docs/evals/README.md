@@ -4,7 +4,7 @@ Criteria, tests, results — one folder, one loop.
 
 | Dir | Holds | Rule |
 |---|---|---|
-| `rubrics/` | what "good" means, one rubric per artifact type (PRD, prototype, share-out, lesson, skill, agent-spec, bot-answer D1–D8) | YAML criteria + prose rationale; applied by `reviewers/rubric-applier` |
+| `rubrics/` | what "good" means, one rubric per artifact type (PRD, prototype, share-out, lesson, skill, agent-spec, bot-answer D1–D9) | YAML criteria + prose rationale; applied by `reviewers/rubric-applier` |
 | `scenarios/` | `<skill>.md` — ≥3 scenarios (query + expected behavior) per skill | **written BEFORE the skill body** (evals-first); baseline without the skill, then write the minimal skill that passes |
 | `runs/` | `*.jsonl` — one line per scored run, plus `apply-log.jsonl` (one row per executed Flow-5 verdict: target · verdict link · timestamp) | interim store until the Notion Eval Runs DB exists; written at flow exits |
 

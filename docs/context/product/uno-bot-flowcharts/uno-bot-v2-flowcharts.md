@@ -29,7 +29,7 @@ flowchart TB
     PollAction["figma-library-poll.yml<br/>(cron, every 15 min)"]
     ImplAction["figma-implement.yml"]
     MarketplaceAction["marketplace-add.yml<br/>marketplace-edit.yml<br/>(NEW in v2)"]
-    Skills["bot-skills/SKILL.md files<br/>(fetched via GitHub Raw)"]
+    Skills["skills/*/bot.md + method.md<br/>(fetched via GitHub Raw)"]
   end
 
   Figma -->|"polled every 15 min"| PollAction
@@ -65,7 +65,7 @@ sequenceDiagram
   participant F as Figma
   participant Cron as figma-library-poll.yml<br/>(15 min cron)
   participant N as Notion (PRD)
-  participant S as Slack #figma-sync
+  participant S as Slack #uno-bot
   participant Bot as UNO Bot (Cloudflare Worker)
   participant Claude
   participant GH as figma-implement.yml
@@ -139,7 +139,7 @@ sequenceDiagram
 
 Notes:
 - Steps 4-5 are the **thread memory** — every Q&A call loads prior turns so "now do the same for Button" works.
-- Steps 7-11 are the **two-pass classify-then-fetch pattern** from `uno-qa/SKILL.md`. First call: Claude decides whether tools are needed and which docs to read. Second call: Claude composes the answer with the fetched docs in context.
+- Steps 7-11 are the **two-pass classify-then-fetch pattern** from the AGENT.md conversational default (formerly uno-qa). First call: Claude decides whether tools are needed and which docs to read. Second call: Claude composes the answer with the fetched docs in context.
 - No tool call = no confirmation gate. Q&A is the bot's "default" mode.
 
 ---

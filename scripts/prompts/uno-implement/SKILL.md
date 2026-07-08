@@ -8,7 +8,7 @@ description: >
   fires via repository_dispatch.
 trigger_types:
   - slack_keyword          # Designer types "implement <component>" in Slack
-  - github_dispatch        # repository_dispatch from Pipedream OR manual workflow_dispatch
+  - github_dispatch        # repository_dispatch from the uno-bot Worker OR manual workflow_dispatch
                            # (NOT the polling cron itself — polling creates the Notion PRD;
                            # the designer initiates implementation from Slack)
 model_default: claude-sonnet-4-6
@@ -35,7 +35,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 - A designer types `implement <component>` in `#uno-bot` after reviewing a Notion PRD (the primary live trigger — registry row in [docs/conventions/automations.md](../../../docs/conventions/automations.md))
 - A designer triggers a component implement in Slack — **always tied to its Notion PRD** (the polling bot creates the PRD and posts it; the designer implements from that thread). A component implement is never done without a PRD; if none is in the thread, the bot asks for the link first.
-- A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by Pipedream (downstream of Slack) or a manual GitHub-UI workflow run
+- A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by the uno-bot Worker (downstream of Slack) or a manual GitHub-UI workflow run
 
 > **Note:** the Figma library polling cron (`figma-library-poll.yml`) does **not** invoke this skill directly. It creates the Notion PRD and posts a Slack notification; the designer initiates implementation from Slack.
 
@@ -49,7 +49,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 | Input | Source | Required? |
 |-------|--------|-----------|
-| Component name (parsed from `implement <component>` message) OR direct spec (PRD link, change description) | Slack message text → Pipedream → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
+| Component name (parsed from `implement <component>` message) OR direct spec (PRD link, change description) | Slack message text → uno-bot Worker → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
 | Notion PRD (from the polling notification in the thread, or the designer's pasted link; the Action also falls back to `findPRDByComponent()`) | Notion database | **Yes — required** |
 | Target branch | Always a new `ds-review/{component}-{date}-{time}` branch (uniform with the live `figma-implement.yml` convention — do NOT diverge) | No |
 
@@ -93,7 +93,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/forms/`, specs in `design-system/src/specs/`. Confirm the target component exists in `docs/context/design-system/components/cheat-sheet.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
 3. **Verify props and styles.** Read the existing `.jsx` and `.stories.jsx` for any component you'll touch. Don't hallucinate props. Don't change a prop's type without flagging it in the PR description.
 4. **Plan the change.** List the files that will be modified — **including** the corresponding stories file. If the change touches a prop or variant, the stories MUST be updated in the same pass; do not ship code-only or stories-only. If >5 files total, stop and escalate to the in-IDE agent.
-5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `docs/context/conventions/terminology.md`. Follow Storybook conventions from [.agent/skills/uno-review/references/storybook.md](../../.agent/skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive playground; preset selectors over raw data editing).
+5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `docs/conventions/terminology.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive playground; preset selectors over raw data editing).
 6. **Commit and open the draft PR.** The orchestration layer (`figma-implement.yml`) handles branch creation and PR opening — you produce the file contents in the exact output format below.
 7. **(Orchestration layer post-step)** Slack reaction emoji swaps to ✅/ℹ️/❌ based on outcome; PR link posts back to the originating thread.
 
@@ -101,15 +101,15 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 
 - `docs/context/design-system/components/cheat-sheet.md` — component existence check (MANDATORY)
 - `docs/context/design-system/components/layout-cheat-sheet.md` — page layout formulas (if change touches a page)
-- `docs/context/conventions/coding.md` — file naming, imports, token usage, git conventions
-- `docs/context/conventions/terminology.md` — Plus vocabulary
+- `docs/conventions/coding.md` — file naming, imports, token usage, git conventions
+- `docs/conventions/terminology.md` — Plus vocabulary
 
 ## References (Load When Relevant)
 
 - **`references/new-component-scaffolding.md`** — auto-loaded by the skill-loader when `isNewComponent` is true. Contains scaffolding rules for creating a brand-new component from scratch, with the reference Badge component pattern.
 - `docs/context/design-system/foundations/tokens.md` — token semantics for visual changes
-- `.agent/skills/uno-prototype/references/figma-mcp-guide.md` — if spec includes a Figma link
-- `.agent/skills/uno-review/references/storybook.md` — if change touches `.stories.jsx`
+- `skills/uno-prototype/references/figma-mcp-guide.md` — if spec includes a Figma link
+- `skills/uno-review/references/storybook.md` — if change touches `.stories.jsx`
 - The target component's existing `.jsx` and `.stories.jsx` — always read before modifying
 
 ## Output Format
@@ -190,12 +190,12 @@ Per invocation, the script loads:
 - Up to 5 Figma screenshots (multimodal — costs vary)
 - The five token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.scss`, `_elevation.scss`, `_fonts.scss` — ~6-10K tokens combined)
 
-Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$0.30-0.60** for a new component (more reference content + reference Badge files). Significantly higher than `uno-critique` ($0.02-0.05) and `uno-assist` ($0.01-0.03) because of the multimodal Figma input and the large token-file payload. Watch the §4.10 metrics; if average cost climbs past $0.50/invocation, audit which tokens files are genuinely needed per call (likely only `_colors.scss` and `_spacing_semantics.scss` are touched in most invocations).
+Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$0.30-0.60** for a new component (more reference content + reference Badge files). Significantly higher than `uno-critique` ($0.02-0.05) and the bot's conversational Q&A ($0.01-0.03) because of the multimodal Figma input and the large token-file payload. Watch the §4.10 metrics; if average cost climbs past $0.50/invocation, audit which tokens files are genuinely needed per call (likely only `_colors.scss` and `_spacing_semantics.scss` are touched in most invocations).
 
 ## Migration TODO (Week 2)
 
 - [ ] Verify the SKILL.md body when stripped of meta sections produces equivalent system-prompt content to the live script's inline prompt at `scripts/implement-figma-changes.js` lines 475-527. Side-by-side diff is the regression check.
-- [ ] Confirm both invocation paths the pipeline supports — keyword-triggered (`implement <component>` in Slack → Pipedream → `repository_dispatch`) and manual dispatch (GitHub UI → workflow run) — produce equivalent outputs.
+- [ ] Confirm both invocation paths the pipeline supports — keyword-triggered (`implement <component>` in Slack → uno-bot Worker → `repository_dispatch`) and manual dispatch (GitHub UI → workflow run) — produce equivalent outputs.
 - [ ] Regression test: invoke this skill against 2-3 past PRs' specs and verify the output is structurally similar to what was merged. Allow stylistic variation; flag structural divergence.
 - [ ] Update `figma-implement.yml` to set the working PR title to match `feat: Figma DS update — {component}` (already matches the script's `PR_TITLE` env var). No yaml change needed if the env var is already wired.
 - [ ] Confirm `model_default: claude-sonnet-4-6` is the right model ID and is supported by the Anthropic API at runtime (script currently uses `claude-sonnet-4-20250514` — bumping is part of this migration).
@@ -203,7 +203,7 @@ Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$
 ## Related Skills
 
 - **`uno-critique`** — evaluates an artifact against Plus standards. After critique surfaces fixable issues, the designer can pivot to `implement <component>` to apply them via this skill.
-- **`uno-assist`** — answers Plus-specific questions. If a designer asks "how would I implement X?" they probably want this skill instead; the router should route to `uno-implement` for action-oriented requests.
+- **Conversational Q&A (uno-bot default mode)** — answers Plus-specific questions. If a designer asks "how would I implement X?" they probably want this skill instead; the router should route to `uno-implement` for action-oriented requests.
 
 ## Sample Invocations
 

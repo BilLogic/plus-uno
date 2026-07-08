@@ -1,5 +1,7 @@
 <!-- Tier: 2 -->
 
+<!-- Descriptive foundation (product tone rationale). The NORMATIVE voice rules every writer obeys live in docs/conventions/writing-style.md — on conflict, that file wins. -->
+
 # Content and Voice
 
 > **Status: DRAFT** — This file needs design leadership iteration before finalizing.
@@ -35,7 +37,7 @@ Say what happened, what the user can do, and never assign blame.
 
 ## Terminology
 
-Use PLUS vocabulary consistently. See `docs/context/conventions/terminology.md` for the canonical list. When in doubt, use the term students and tutors already use in conversation.
+Use PLUS vocabulary consistently. See `docs/conventions/terminology.md` for the canonical list. When in doubt, use the term students and tutors already use in conversation.
 
 ## Capitalization
 

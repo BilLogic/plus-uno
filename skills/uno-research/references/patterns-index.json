@@ -22,7 +22,7 @@
       "name": "story_driven_verification",
       "rule": "Update and validate stories for behavior/state changes.",
       "references": [
-        ".agent/skills/uno-review/references/storybook.md"
+        "skills/uno-review/references/storybook.md"
       ]
     },
     {

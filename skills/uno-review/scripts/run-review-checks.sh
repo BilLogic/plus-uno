@@ -3,10 +3,10 @@
 # run-review-checks.sh — Run PLUS convention checks against a directory.
 #
 # Usage:
-#   bash .agent/skills/uno-review/scripts/run-review-checks.sh <target-dir>
+#   bash skills/uno-review/scripts/run-review-checks.sh <target-dir>
 #
 # Example:
-#   bash .agent/skills/uno-review/scripts/run-review-checks.sh playground/home-redesign/src
+#   bash skills/uno-review/scripts/run-review-checks.sh playground/home-redesign/src
 #
 # Output: PASS / WARN / FAIL for each check.
 

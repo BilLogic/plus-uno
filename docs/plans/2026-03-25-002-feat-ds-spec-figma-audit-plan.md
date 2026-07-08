@@ -1,7 +1,7 @@
 ---
 title: "feat: Design System Spec File Audit via Figma MCP"
 type: feat
-status: pending
+status: stale — needs owner review (2026-07-08)
 date: 2026-03-25
 scope: comprehensive
 figma_file: W0qzhXWxFsMwSJzkdV2yal
@@ -90,3 +90,7 @@ Test the agent's ability to audit, analyze, and improve the PLUS design system's
 1. Score each MCP tool for audit use (1-5)
 2. Document audit workflow and manual intervention needed
 3. Write findings via `/uno:compound`
+
+## Outcome (2026-07-08 plans sweep)
+
+Never started ('pending' since March); owner to re-scope or close.

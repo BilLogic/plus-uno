@@ -20,7 +20,7 @@ Create all four files in `design-system/src/components/ComponentName/`:
 3. **`ComponentName.stories.jsx`** — Storybook stories
    - `title: "Components/ComponentName"` (MANDATORY — places the story in the Components section of the sidebar)
    - Include all Figma variants as stories with proper `argTypes` and `controls`
-   - Categorize `argTypes` using `table: { category: 'Design' | 'Content' | 'Behavior' | 'Development' }` per `.agent/skills/uno-review/references/storybook.md`
+   - Categorize `argTypes` using `table: { category: 'Design' | 'Content' | 'Behavior' | 'Development' }` per `skills/uno-review/references/storybook.md`
 4. **`index.js`** — barrel re-export
    - Re-export the component as default AND named export so consumers can use either `import Badge from '@/components/Badge'` or `import { Badge } from '@/components/Badge'`
 

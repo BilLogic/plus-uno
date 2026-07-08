@@ -23,7 +23,7 @@ export async function executeImplement(
   }
 
   // A component implement MUST be tied to a Notion PRD — the polling bot creates
-  // one upstream and posts it in #figma-sync. Resolve the PRD from the thread
+  // one upstream and posts it in #uno-bot. Resolve the PRD from the thread
   // root (the poll notification) if present, else one the designer pasted. If
   // neither exists, refuse so the bot asks for it rather than implementing blind.
   const fromInput = inputPrdUrl ? extractNotionPrdFromText(inputPrdUrl) : null;

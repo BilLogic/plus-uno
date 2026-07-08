@@ -1,3 +1,9 @@
+> **CLOSED 2026-07-08.** Cutover confirmed by evidence — outcome recorded in **ADR-014**
+> (`docs/knowledge/decisions.md`); eval rounds 1–3 ran through Slack against the Worker.
+> One follow-up remains for a Slack-app admin: retire the v1 Pipedream workflow (out of the
+> serving path either way). Note: the "#figma-sync" channel named below is actually `#uno-bot`
+> (`C0ARJ2A3A69`) — see `docs/conventions/slack.md`. Kept as a historical checklist.
+
 # uno-bot v2 → #figma-sync cutover checklist
 
 Replace the v1 bot (Pipedream) with v2 (Cloudflare Worker) in **#figma-sync**, as a

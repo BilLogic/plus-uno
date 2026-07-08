@@ -72,7 +72,7 @@ description: >
 ```md
 | Trigger | Load |
 |---------|------|
-| Any plan | `docs/context/conventions/tech-stack.md` |
+| Any plan | `docs/conventions/tech-stack.md` |
 ```
 - Improvement suggestion:
   - Add a trigger row for unclear layout/IA cases that maps to consulting reference.

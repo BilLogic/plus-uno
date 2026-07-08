@@ -87,8 +87,10 @@ old_patterns=(
   "docs/project/"
   "docs/foundations/"
   "docs/design-system/"
-  "\.agent/assets/"
-  "\.agent/references/"
+  "docs/context/conventions/"
+  "\.agent/"
+  "bot-skills/"
+  "/uno:"
 )
 
 for pattern in "${old_patterns[@]}"; do

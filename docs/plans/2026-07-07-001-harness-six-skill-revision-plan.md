@@ -1,6 +1,6 @@
 # Harness Revision Plan — Six-Skill Alignment + Tool Conventions
 
-- **Status:** in progress — tranche 1 (IA restructure) executed 2026-07-07 (`959e9c74`, `7a4ec4c0`, `4b3b3b2c`); tranche 2 (evals-first skill-body rewrites, agent roster files, rubrics + scenarios, ADR backfill) executed later same day. Open: §6 Q7 (cutover check) + D1/D4 rubric definitions; Q3/Q8-split/Q9/Q10 resolved 2026-07-07.
+- **Status:** in progress — tranche 1 (IA restructure) executed 2026-07-07 (`959e9c74`, `7a4ec4c0`, `4b3b3b2c`); tranche 2 (evals-first skill-body rewrites, agent roster files, rubrics + scenarios, ADR backfill) executed later same day. All §6 decisions resolved (Q7 + D1/D4 closed 2026-07-08); completeness-audited 2026-07-08 (two independent auditors), gaps fixed. Remaining beyond this plan: one live run per rewritten skill; Worker deploy after merge.
 - **Date:** 2026-07-07
 - **Source:** five-agent audit (skill best-practices research · .agent/skills audit · bot-estate audit · context/tool-reference audit · knowledge/eval audit), run against `main` @ post-2026-07-07 pull
 - **Owner:** Bill

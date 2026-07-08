@@ -1,7 +1,7 @@
 ---
 title: "refactor: Consolidate docs/ directory into 3-directory structure"
 type: refactor
-status: active
+status: completed — superseded
 date: 2026-03-21
 origin: docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan.md
 ---
@@ -191,3 +191,7 @@ AGENTS.md (THE entry point)
 - Current `.agent/references/`: 16 files + index.md
 - Current `packages/plus-ds/guidelines/`: 16 files (stays untouched)
 - Current `docs/`: ideation/ (1 file) + plans/ (3 files)
+
+## Outcome (2026-07-08 plans sweep)
+
+Consolidation executed; ontology since revised by plan 2026-07-07-001 Phase 2b (context/conventions split, evals/, knowledge archive).

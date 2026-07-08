@@ -1,7 +1,7 @@
 [
   {
     "name": "implement",
-    "description": "Trigger the figma-implement.yml GitHub Action to open a draft pull request that implements a Figma component change. Use ONLY when the designer has clearly asked for a specific named component to be implemented (e.g., 'implement Badge', 'go ahead with the Badge change'). A component implement REQUIRES a Notion PRD — the polling bot creates one and posts it in #figma-sync. Before invoking: if the thread already has that PRD notification, proceed (the Worker reads the PRD from the thread). If there is NO PRD in the thread, do NOT invoke — ask the designer for the PRD link first, then pass it as notion_prd_url. Never implement a component without a PRD, and never invent the component name or PRD URL.",
+    "description": "Trigger the figma-implement.yml GitHub Action to open a draft pull request that implements a Figma component change. Use ONLY when the designer has clearly asked for a specific named component to be implemented (e.g., 'implement Badge', 'go ahead with the Badge change'). A component implement REQUIRES a Notion PRD — the polling bot creates one and posts it in #uno-bot. Before invoking: if the thread already has that PRD notification, proceed (the Worker reads the PRD from the thread). If there is NO PRD in the thread, do NOT invoke — ask the designer for the PRD link first, then pass it as notion_prd_url. Never implement a component without a PRD, and never invent the component name or PRD URL.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

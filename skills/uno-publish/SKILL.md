@@ -73,7 +73,7 @@ Summoned writers load their own conventions (`notion.md`, `figma-workspace.md`) 
 
 ## Quality bar
 
-`docs/evals/rubrics/uno-publish.md`, applied by `reviewers/rubric-applier` via `skills/uno-maintain` audits. Headlines: bundle completeness 100% (the gate held), ≥70% first-pass DS/UNO/a11y, ≤2 dev clarification requests per handoff, each shipped handoff names a user-behavior hypothesis checked ~30 days post-ship.
+`docs/evals/rubrics/uno-publish.md`, applied by `reviewers/rubric-applier` via `skills/uno-maintain` audits; golden scenarios: `docs/evals/scenarios/uno-publish.md`. Headlines: bundle completeness 100% (the gate held), ≥70% first-pass DS/UNO/a11y, ≤2 dev clarification requests per handoff, each shipped handoff names a user-behavior hypothesis checked ~30 days post-ship.
 
 ## Constraints
 

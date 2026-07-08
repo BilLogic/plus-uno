@@ -34,4 +34,4 @@ Reusable prototype starters organized by product area.
 
 These are **static HTML reference templates** that predate the React + DS prototyping workflow. They use Bootstrap CDN and raw HTML — they are NOT DS-compliant prototypes.
 
-For creating new React prototypes using the PLUS Design System, use the `/uno:prototype` skill which scaffolds from `playground/starter/`.
+For creating new React prototypes using the PLUS Design System, use the `uno-prototype` skill which scaffolds from `playground/starter/`.
