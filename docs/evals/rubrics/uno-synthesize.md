@@ -15,7 +15,7 @@ dimensions:
     definition: PRD claims trace to documented findings (target 100% of key claims)
 hard_gates:
   - blueprint write is schema-valid (automated check once the Supabase schema lands)
-  - PRD and blueprint update TOGETHER — a lone write to either fails (docs/conventions/supabase.md)
+  - PRD and blueprint update TOGETHER — a lone write to either fails, UNLESS the blueprint half is flagged ⏳ pending per supabase.md's MCP-unavailable fallback with the intake filed
 benchmark: >
   Fixed bundle of 3 sources (Slack thread + transcript + analytics pull) →
   findings doc + PRD; diff against a reference synthesis for coverage.

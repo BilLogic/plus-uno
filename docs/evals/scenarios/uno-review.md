@@ -1,6 +1,6 @@
 # uno-review — eval scenarios
 
-<!-- written 2026-07-07, before the Phase-1 body rewrite (evals-first). Rubric: docs/evals/rubrics/uno-review.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-review.md -->
 
 ## S1 — stage-lens review, stage-appropriate
 - **Trigger:** "review this" + a mid-fi prototype
@@ -8,7 +8,7 @@
   - Requires the one-line artifact manifest first (fidelity / tools / PRD link) — no manifest, no review
   - Summons reviewers/ds-lens + uno-lens + a11y-lens in parallel; each stays in-lens and stage-appropriate
   - "Issues? = Yes" verdict only at severity major+ — minors travel as advisory notes
-- **Fails if:** token nits on a low-fi artifact · lenses bleed into each other's lane · minors block the flow
+- **Fails if:** lenses bleed into each other's lane · minors block the flow · (run a low-fi variant of this trigger too:) token nits on a low-fi artifact
 
 ## S2 — Design QA at Ready-for-QA
 - **Trigger:** Roadmap card flips to `Dev Status: Ready for QA (RTT)`
@@ -21,6 +21,6 @@
 - **Fails if:** the review pass touches the artifact at all
 
 ## S4 — golden defect set
-- **Trigger:** quarterly benchmark: artifact with N planted flaws per fidelity level
+- **Trigger:** quarterly benchmark against the defect fixture (`docs/evals/fixtures/README.md` § uno-review — currently `playground/home-redesign/src`, answer key in the 2026-07-08 run)
 - **Expected:** recall ≥80% and precision ≥80%; each finding names severity + re-entry point
 - **Fails if:** planted flaws slip through below the bar · phantom findings drag precision under 80%

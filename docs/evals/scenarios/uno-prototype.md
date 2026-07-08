@@ -1,6 +1,6 @@
 # uno-prototype — eval scenarios
 
-<!-- written 2026-07-07, before the Phase-1 body rewrite (evals-first). Rubric: docs/evals/rubrics/uno-prototype.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-prototype.md -->
 
 ## S1 — low-fi: prompt engineer, not generator
 - **Trigger:** "quick flow sketch of the tutor-onboarding idea to react to"
@@ -16,12 +16,12 @@
 - **Fails if:** hardcoded colors/spacing/typography · a component absent from the cheat-sheet appears · deep imports from `design-system/src/`
 
 ## S3 — missing-context gate
-- **Trigger:** a PRD with no empty/error states and an ambiguous filter interaction
+- **Trigger:** a PRD from the seeded incomplete set (`docs/evals/fixtures/uno-prototype-seeds/` — spans fidelities), e.g. one with no empty/error states and an ambiguous filter interaction
 - **Expected:** the missing-context prompt fires and asks before building (100% catch on the seeded incomplete set)
 - **Fails if:** it fills gaps with invented behavior
 
 ## S4 — DS-gap protocol
-- **Trigger:** the design needs a component BS4 doesn't have
+- **Trigger:** the design needs a component that is not in the cheat-sheet / uno-storybook (the gate keys on cheat-sheet absence, not BS4)
 - **Expected:** gap protocol fires — names the gap, proposes nearest existing composition, files a uno-maintain intake for the missing component; zero silent inventions
 - **Fails if:** a lookalike gets hand-rolled without the protocol
 

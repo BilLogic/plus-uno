@@ -12,9 +12,13 @@ description: >
   summarizing prior studies, ingesting pasted context, or drafting PRDs — that
   is uno-synthesize.
 context: fork
-agent: Explore
-allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__*
+user-invocable: true
+argument-hint: [question / hunch / who-knows-X]
+allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__API-post-search, mcp__notion-plus__API-retrieve-page-markdown, mcp__notion-plus__API-get-block-children, mcp__notion-plus__API-query-data-source
 ---
+<!-- context: fork runs this skill in a forked context with the DEFAULT agent — it must keep Task
+     (it dispatches researchers/* and writers/notion). Notion tools are the READ set only; the one
+     write (study guide) goes through writers/notion, so write scopes live there, not here. -->
 
 # uno-research — IDE face
 
@@ -48,12 +52,18 @@ writers/notion.
 3. **Org-evidence questions** (Slack history, analytics, research DBs) → Task
    `researchers/source-miner`, naming the source types worth mining. Empty
    sweeps come back as findings.
-4. **People path** — the order is a hard gate:
-   1. Draft the study guide per method.md; `writers/notion` writes it to the
-      Research & notes DB. Read `docs/conventions/notion.md` before the write —
-      allowlisted surfaces only, never create select options.
-   2. Only then Task `researchers/people-scout` for ranked candidates plus an
-      intro draft. The human sends the intro and runs the conversation.
+4. **People path** — the gate binds before outreach, not before identification:
+   1. Identification-only asks ("who knows X?", no conversation planned) may
+      Task `researchers/people-scout` directly for ranked candidates.
+   2. Before any intro draft is sent or conversation planned: draft the study
+      guide per method.md; `writers/notion` writes it to the Research & notes
+      DB. Read `docs/conventions/notion.md` before the write — allowlisted
+      surfaces only, never create select options. **Notion unreachable?** Draft
+      the guide locally, flag it `⏳ pending Notion write`, and say so — the
+      gate is satisfied by the guide existing and being shown, never by
+      pretending the write happened.
+   3. Only then people-scout's intro draft goes out — sent by the human, who
+      runs the conversation.
 5. **Data path** → preliminary analysis scoped to the go/no-go question
    (method.md gate 2). No connected source for the data needed? Ask the user for
    an export — never fabricate a pull.

@@ -3,7 +3,7 @@ name: uno-maintain
 description: >
   Keeps the harness itself current. Captures a flagged issue — improvement,
   inaccuracy, inconsistency, or bug — routes it across the three estates
-  (codebase, Figma, Notion) to one of ten targets, drafts the fix, and runs the
+  (codebase, Figma, Notion) to one of eleven targets, drafts the fix, and runs the
   tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
   directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
@@ -26,7 +26,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 | Human spot | "this is wrong / stale / off" — any of the four trigger types |
 | Auditor sweep | `reviewers/auditor` files intakes from a named registry checklist |
 | DS gap from prototyping | `uno-prototype` hits a missing/broken component or token |
-| Mirror drift | a live Notion/Figma read contradicts a `docs/conventions/*` mirror (method §6) |
+| Legacy-source conflict | a legacy Notion/Figma page contradicts repo-canonical `docs/conventions/*` (method §6) |
 | Post-ship reconciliation | a handoff shipped; DS + harness reconcile against built reality |
 
 ## Workflow (execution over method.md)
@@ -43,8 +43,8 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 
 ## Sweeps & audits
 
-- Summon `reviewers/auditor` with a named checklist from the registry — `docs/conventions/automations.md` owns the sweep names (shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions staleness · comment sweep). The auditor inspects and files intakes; writers fix.
-- Staleness sweep checklist: [`references/staleness-sweep.md`](references/staleness-sweep.md) (`synced:` vs source `last_edited_time` + agents↔docs cross-references + path integrity).
+- Summon `reviewers/auditor` with a named checklist from the registry — `docs/conventions/automations.md` owns the sweep names (shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity · comment sweep). The auditor inspects and files intakes; writers fix.
+- Integrity sweep checklist: [`references/staleness-sweep.md`](references/staleness-sweep.md) (canonicality headers + agents↔docs cross-references + path integrity).
 - Scored audits (rubric against an artifact) → summon `reviewers/rubric-applier`.
 - Skill-quality audit (a skill is the target artifact): run [`references/skill-quality/audit-workflow.md`](references/skill-quality/audit-workflow.md) with [`references/skill-quality/checklist.md`](references/skill-quality/checklist.md) as criteria; report per `output-template.md`.
 
@@ -61,7 +61,7 @@ Rubric: `docs/evals/rubrics/uno-maintain.md` (applied by `reviewers/rubric-appli
 
 ## Agents it summons
 
-`reviewers/auditor` · `reviewers/rubric-applier` · `writers/notion` · `writers/figma` · `writers/blueprint` — defined in `agents/` (see `agents/README.md`). Summoned by this skill, never by users.
+`reviewers/auditor` · `reviewers/rubric-applier` · `researchers/source-miner` (intake evidence: did it happen, how often) · `writers/notion` · `writers/figma` · `writers/blueprint` — defined in `agents/` (see `agents/README.md`). Summoned by this skill, never by users.
 
 ## Constraints
 

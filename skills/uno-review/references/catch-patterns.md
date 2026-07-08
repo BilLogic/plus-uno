@@ -18,7 +18,7 @@ Sample output: `../examples/review-output-example.md`.
 grep -rn '#[0-9a-fA-F]\{3,8\}' --include="*.jsx" --include="*.scss" --include="*.css" <dir>
 ```
 
-Use `var(--color-*)` tokens. Exceptions: comments, SVG fills that intentionally override tokens.
+Use `var(--color-*)` tokens. Exceptions: comments · SVG fills that intentionally override tokens · `var(--token, #hex)` fallback values (the token is the source; the hex is a safety net) · pre-mount crash/error screens that render before the token sheet loads.
 
 ## Hardcoded sizes in inline styles (FP-1)
 

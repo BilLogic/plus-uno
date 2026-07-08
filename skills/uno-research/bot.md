@@ -9,7 +9,7 @@ Triggers: "who should I talk to about X", "find me SMEs/collaborators for X", "w
 ## Execute
 
 - **Instrument gate (method.md):** if the ask is part of a user study, check that the study guide already exists in Notion — if not, say so and point the designer at composing it first (in-IDE uno-research); the guide comes before any conversation.
-- Call `find_experts(topic)` — READ-ONLY, no confirmation gate, safe to call freely. Returns the team roster from the Notion Team Member Database: `{ name, group, role, bio, affiliation, linkedin, website }`.
+- Call `find_experts(topic)` — READ-ONLY, no confirmation gate, safe to call freely. Returns the team roster from the Notion Team Member Database: `{ name, group, role, bio, affiliation, linkedin, website, slackUserId }`.
 - Match the topic against each person's `role` + `bio` per method.md — evidence, not assumption (the bios say what people actually work on, e.g. "AI Student Insights", "0-1 AI tools").
 - Present the best **2–4 fits**, strongest first: name · role · one-line reason drawn from their bio · LinkedIn link.
 - **@-mention rule:** if a returned person has a `slackUserId`, tag them as `<@slackUserId>`; if they don't (the DB historically has no Slack handles or emails), name them and share their LinkedIn — never invent a handle, never DM anyone you can't resolve.

@@ -1,4 +1,6 @@
-# Skill Quality Audit Workflow (Embedded in uno-review)
+# Skill Quality Audit Workflow (uno-maintain audit path — moved from uno-review 2026-07-07)
+
+Report style references: [audit-examples.md](audit-examples.md).
 
 Use this workflow when the review target is skill documentation.
 

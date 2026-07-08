@@ -1,6 +1,6 @@
 # uno-synthesize — eval scenarios
 
-<!-- written 2026-07-07, before the Phase-1 body rewrite (evals-first). Rubric: docs/evals/rubrics/uno-synthesize.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-synthesize.md -->
 
 ## S1 — three-source synthesis, then STOP
 - **Trigger:** "synthesize these: [Slack thread] + [interview transcript] + [analytics pull]"
@@ -13,7 +13,7 @@
 ## S2 — PRD acceptance: the paired write
 - **Trigger:** designer approves the PRD direction
 - **Expected:** PRD instantiated from the template via writers/notion; stories/flows/screen-list written to uno-blueprint via writers/blueprint **in the same action**; Roadmap card → `Design Status: Ready for Design`
-- **Fails if:** PRD lands without the blueprint write (or vice versa) · a select option / pillar / feature relation gets created rather than exact-matched
+- **Fails if:** PRD lands without the blueprint write (or vice versa) — unless the blueprint half is flagged ⏳ pending per supabase.md's MCP-unavailable fallback with the intake filed · a select option / pillar / feature relation gets created rather than exact-matched · the Roadmap card ships with a blank Contributor (notion.md property rules)
 
 ## S3 — routing edge: a plain summary is still synthesize
 - **Trigger:** "what did people say in this thread?"

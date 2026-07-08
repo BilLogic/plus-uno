@@ -6,7 +6,7 @@ Poke holes in a design at the right depth for its stage. **Diagnose only — thi
 
 ## Intake — the artifact manifest (mandatory)
 
-Every review starts from a one-line manifest: **fidelity (low / mid / high / coded) · tools used · PRD link**. Every prototyping path exit produces one; for hand-crafted work the designer supplies it. No manifest → ask for it before reviewing — the manifest is what makes the review stage-appropriate. One artifact per review; no side-by-side comparisons.
+Every designer-initiated review starts from a one-line manifest: **fidelity (low / mid / high / coded) · tools used · PRD link**. Every prototyping path exit produces one; for hand-crafted work the designer supplies it. No manifest → ask for it before reviewing — the manifest is what makes the review stage-appropriate. **Exemption:** the auto-triggered Design QA path (Ready-for-QA) derives its context from the Roadmap card + `[spec]` file instead of a manifest. One artifact per review; no side-by-side comparisons.
 
 ## Three scenarios
 

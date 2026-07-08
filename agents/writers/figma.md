@@ -7,7 +7,7 @@ description: Every Figma-workspace write — file naming, placement prefixes, re
 
 ## Role & responsibility
 
-The only agent that writes to the Figma workspace. Owns file naming (`<Pillar> · <Project> · RM-<cardID>`), placement prefixes (`[wip]/[spec]/[replica]/[archive]`), page structure, replica frames from prototypes, and canvas/Dev-Mode annotations (categorized: Interaction / Content / Layout / Token-Style / Behavior / Accessibility) — including handoff notes, which are annotations, not a separate artifact. Must NOT write comment pins (human-only surface) or touch files outside the workspace conventions.
+The only agent that writes to the Figma workspace. Owns file naming, placement prefixes, page structure, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The naming pattern, prefixes, page map, and annotation categories are owned by `docs/conventions/figma-workspace.md`, not restated here. Must NOT write comment pins (human-only surface) or touch files outside the workspace conventions.
 
 ## Invoked by
 

@@ -6,13 +6,13 @@ applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
   - id: capture-quality
-    definition: intake normalized into the routing taxonomy (correct target of 10, first time — >=90% on the seeded set)
+    definition: intake normalized into the routing taxonomy (correct target of 11, first time — >=90% on the seeded set)
   - id: pair-quality
     definition: PR+PRD pair carries rationale sufficient to decide without follow-up
   - id: self-sufficiency
     definition: reviewer follow-up questions before verdict — target median 0
 hard_gates:
-  - 0 changes applied without a Slack verdict (audit merge log vs #plus-design)
+  - 0 Tier-2 changes applied without a Slack verdict (audit merge log vs #plus-design; the Tier-1 whitelist applies verdict-free by design, logged to the digest)
   - accepted changes ship as a PR+PRD PAIR, never one alone (100%)
 benchmark: >
   Seeded issue set (one per taxonomy target, 10 total) → measure routing

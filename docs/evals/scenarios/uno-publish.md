@@ -1,6 +1,6 @@
 # uno-publish — eval scenarios
 
-<!-- written 2026-07-07, before the Phase-1 body rewrite (evals-first). Rubric: docs/evals/rubrics/uno-publish.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-publish.md -->
 
 ## S1 — feedback rail: the complete bundle
 - **Trigger:** "share the coach-dashboard prototype for feedback"
@@ -8,16 +8,16 @@
   - Rail decision made once (feedback), never re-merged with handoff
   - Full bundle assembled before posting: Loom + preview link + decision log + Figma replica (required — the artifact is a prototype; writers/figma builds it)
   - Post per slack conventions: ≤3 feedback questions + a NOT-looking-for line, right channel
-- **Fails if:** a partial bundle posts (the gate must refuse) · the replica is skipped "to save time"
+- **Fails if:** a partial bundle posts (the gate must refuse) · the replica is skipped "to save time" · the share-out posts with >3 feedback questions or no NOT-looking-for line (post-shape rule, slack.md)
 
 ## S2 — handoff rail: sign-off is a wall
 - **Trigger:** "this one's approved — hand it off to dev"
 - **Expected:**
   - Componentization → Handoff Spec via writers/notion (template-instantiated)
-  - Rails propagation (storybook + blueprint updated) inside the designer-confirmed handoff, logged
+  - Rails propagation inside the designer-confirmed handoff, logged: storybook direct in-repo; blueprint half via uno-maintain's handoff-pre-authorized path (§6 Q9)
   - DS/UNO/a11y review gate, then the human gate: dev + PM + stakeholder ✅ sign-offs — no sign-off, no publish
-  - Marketplace entry validates against the DB schema
-- **Fails if:** anything publishes without all three sign-offs · rails skipped before marketplace publish · schema-invalid entry lands
+  - Marketplace entry validates against the marketplace schema (repo catalog interim — the Notion DB isn't stood up; flag the gap)
+- **Fails if:** anything publishes without all three sign-offs · rails skipped or not verified landed before marketplace publish · schema-invalid entry lands
 
 ## S3 — routing edge: "post this in slack"
 - **Trigger:** "can u post this in slack?"

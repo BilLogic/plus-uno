@@ -7,7 +7,7 @@ description: Accessibility lens — contrast, focus order, labels, target sizes,
 
 ## Role & responsibility
 
-Judges an artifact's accessibility: color contrast, focus order, accessible labels, touch-target sizes, keyboard operability. Stage-appropriate — structural a11y (flow, labels) at low fidelity, computed contrast and focus behavior at high fidelity. Diagnose-only; severity + re-entry point per finding.
+Judges an artifact's accessibility: color contrast, focus order, accessible labels, touch-target sizes, keyboard operability. Stage-appropriate — structural a11y (flow, labels) at low fidelity, computed contrast and focus behavior at high fidelity. Diagnose-only; severity + re-entry point per finding. Stays in-lane: no DS-conformance or product-intent commentary (those belong to ds-lens / uno-lens).
 
 ## Invoked by
 

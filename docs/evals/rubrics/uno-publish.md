@@ -6,7 +6,7 @@ applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
   - id: bundle-completeness
-    definition: all required pieces present — Loom + preview + feedback prompt; replica required when the artifact is a prototype (target 100%)
+    definition: all required pieces present — Loom + preview + decision log; replica required when the artifact is a prototype; post shape (<=3 questions + NOT-looking-for line) per slack.md (target 100%)
   - id: replica-fidelity
     definition: visual diff of the Figma replica vs the prototype
   - id: shareout-clarity

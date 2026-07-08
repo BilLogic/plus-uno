@@ -3,7 +3,7 @@
 <!--
 status: canonical — this file IS the convention (ADR-017)
 distilled: 2026-07-07 from 📓 playbook §4a (now superseded) + the ux-writing rubric lineage
-applied by: every writer agent and every skill producing human-facing text. Voice is a convention, not a role — there is no copywriter agent.
+applied by: every agent producing human-facing text (writers/*, people-scout outreach drafts) and every skill. Voice is a convention, not a role — there is no copywriter agent.
 -->
 
 - **Plain, direct, specific.** Short sentences, active voice, named actors: "UNO drafts the PRD," not "the PRD is drafted."

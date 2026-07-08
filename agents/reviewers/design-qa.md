@@ -7,7 +7,7 @@ description: Design QA at Ready-for-QA — compares the dev build against the Fi
 
 ## Role & responsibility
 
-Catches spec-vs-implementation drift before ship: walks the QA site against the `[spec]` Figma file for the Roadmap card, using the Design QA checklist (Flow 3 H7). Target: ≥80% of drift caught pre-prod. Diagnose-only — files findings with severity verdicts; devs fix. Uses the RM-ID as the Figma↔Notion join key to find the right spec file.
+Catches spec-vs-implementation drift before ship: walks the QA site against the `[spec]` Figma file for the Roadmap card, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/conventions/figma-workspace.md` (RM-ID join key) and `docs/evals/rubrics/uno-review.md`.
 
 ## Invoked by
 
@@ -18,7 +18,7 @@ Catches spec-vs-implementation drift before ship: walks the QA site against the 
 
 1. Resolve the Roadmap card → RM-ID → `[spec]` Figma file (per figma-workspace conventions).
 2. Walk the QA build against the spec: layout, tokens, states, behaviors, content; run the H7 checklist (Notion Templates).
-3. Post findings with severity (blocker / should-fix / nit) + screenshots/links; log the run for the drift-catch metric.
+3. Post findings with severity (blocker / major / minor — the review method's vocabulary) + screenshots/links; log the run for the drift-catch metric.
 
 ## Conventions it obeys
 

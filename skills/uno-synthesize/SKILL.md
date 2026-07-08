@@ -9,7 +9,9 @@ description: >
   "draft the PRD", "write the update summary", or has collected raw context
   that needs distilling toward a build/no-build decision. Ingests existing
   context only — running new queries against raw data is uno-research.
-allowed-tools: Read, Grep, Glob, Write, mcp__notion-plus__*
+user-invocable: true
+argument-hint: [sources-to-distill | "draft the PRD"]
+allowed-tools: Read, Grep, Glob, Write, Task, mcp__notion-plus__*
 ---
 
 # uno-synthesize — IDE face

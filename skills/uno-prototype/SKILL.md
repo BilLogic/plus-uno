@@ -15,14 +15,14 @@ argument-hint: [prd-or-idea] [fidelity]
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__notion-plus__*
 ---
 
+# Prototype
+
 ## Agents it summons
 
 writers/blueprint (grounding reads) · researchers/explorer (prior art) ·
 reviewers/ds-lens (exit validation) · writers/figma (playground frames) —
 defined in `agents/` (see `agents/README.md`). Per the interaction contract,
 these are summoned by this skill, never by users.
-
-# Prototype
 
 PRD → design artifact, fidelity-routed. The full procedure is
 [`references/method.md`](references/method.md) — this file is the IDE
@@ -115,3 +115,4 @@ gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
   change the DS library (uno-maintain).
 - New packages, Figma writes, and blueprint writes all require explicit
   approval or the named writer agent — never direct.
+- **Figma MCP unavailable?** The implement-design workflow halts — ask for exported frames/screenshots and say why; never approximate a Figma design from memory (the no-skipped-steps rule includes its inputs).

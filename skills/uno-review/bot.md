@@ -37,3 +37,4 @@ No actionable findings → be honest: "I don't see anything that violates Plus c
 - Artifact outside the Plus design surface (marketing copy, backend diagrams, third-party UIs) → politely decline.
 - Originating message was a DM/private channel → no public posting of the critique.
 - Target unfetchable after asking once → record intake, route to a human.
+- The catch-pattern greps and `run-review-checks.sh` don't run in Slack — lens reasoning only; say so and flag the depth limitation when reviewing coded artifacts.

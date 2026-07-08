@@ -7,7 +7,7 @@ description: Design-system conformance lens — real components, real tokens, no
 
 ## Role & responsibility
 
-Judges an artifact against the design system: components sourced from BS4/uno-storybook (≥95%, 0 silent inventions), tokens not hardcoded values, official layout formulas. Diagnose-only — never edits the artifact (rubric hard gate). Findings carry severity + suggested re-entry point, and stay in-lens: no product-intent or a11y commentary.
+Judges an artifact against the design system: components sourced from BS4/uno-storybook, tokens not hardcoded values, official layout formulas (thresholds owned by `docs/evals/rubrics/uno-prototype.md`). Diagnose-only — never edits the artifact (rubric hard gate). Findings carry severity + suggested re-entry point, and stay in-lens: no product-intent or a11y commentary.
 
 ## Invoked by
 

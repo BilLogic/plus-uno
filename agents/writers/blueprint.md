@@ -13,8 +13,8 @@ The only agent that touches uno-blueprint (Supabase, the product source of truth
 
 - `skills/uno-synthesize` — requirement writes (paired with the PRD)
 - `skills/uno-maintain` — reconciliation writes (paired)
-- `skills/uno-research` / `skills/uno-prototype` / `skills/uno-review` — grounding reads
-- `agents/uno-bot` — the `blueprint_search` tool (read-only)
+- `skills/uno-prototype` — grounding reads · `skills/uno-review` — grounding reads for reviewers/uno-lens
+- `agents/uno-bot` — the `blueprint_search` tool (read-only; the Worker tool embodies this role)
 
 ## Workflow
 

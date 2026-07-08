@@ -12,7 +12,7 @@ Identifies who holds the knowledge (SME) or who fits the participant criteria, u
 ## Invoked by
 
 - `skills/uno-research` — SME identification, participant sourcing
-- `agents/uno-bot` — the `find_experts` tool
+- `agents/uno-bot` — the `find_experts` tool (the Worker tool embodies this role)
 
 ## Workflow
 

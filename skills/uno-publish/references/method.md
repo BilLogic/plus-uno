@@ -26,7 +26,7 @@ The unit of async sharing is a complete bundle, never a lone link:
 | Decision log (Notion) | the whys, so rounds compound | always |
 | Figma replica | a surface to mark up | when the artifact is a prototype (interactive or coded); static/low-fi shares may omit |
 
-**Completeness is a hard gate: a partial bundle never posts.** A missing piece gets produced, not waived — the only legitimate omission is the replica on a non-prototype artifact. The replica is a feedback surface, not a source of truth: the coded prototype stays the real artifact. Don't confuse it with the handoff rail's componentized Figma spec, which *is* contractual.
+Before posting, the replica gets a visual diff against the coded prototype — drift there defeats its feedback purpose (rubric dimension: replica-fidelity). **Completeness is a hard gate: a partial bundle never posts.** A missing piece gets produced, not waived — the only legitimate omission is the replica on a non-prototype artifact. The replica is a feedback surface, not a source of truth: the coded prototype stays the real artifact. Don't confuse it with the handoff rail's componentized Figma spec, which *is* contractual.
 
 ### Sync — logistics only
 
@@ -52,13 +52,14 @@ Linear and gated; the order is load-bearing.
 
 1. **Componentize & spec.** Decompose the prototype into components with explicit tokens, states, and behaviors — design-system vocabulary becomes contractual here.
 2. **Handoff Spec (Notion).** Instantiate from the team template: Figma shows what it looks like; the spec holds how it behaves and what "done" means. Optional: a longer recorded walkthrough for the dev team (distinct from the feedback rail's short Loom).
-3. **Rails propagation.** Update both sources of truth — `uno-storybook` (design system) and `uno-blueprint` (product) — **before** review and publish, so the next project grounds on what this one shipped. Gate rules:
-   - Pre-authorized **only** inside an active, designer-confirmed handoff — the rail decision is the authorization. Rails writes outside a live handoff route through `skills/uno-maintain` instead.
+3. **Rails propagation.** Update both sources of truth — `uno-storybook` (design system) and `uno-blueprint` (product) — **before** review and publish, so the next project grounds on what this one shipped. Gate rules (§6 Q9, 2026-07-07):
+   - The **storybook half** is a direct in-repo write by this skill, pre-authorized only inside an active, designer-confirmed handoff — the rail decision is the authorization.
+   - The **blueprint half always routes through `skills/uno-maintain`** (this skill holds no blueprint write access), citing the confirmed handoff as pre-authorization — maintain's handoff-pre-authorized path applies (its method §6). Paired-write rules: `docs/conventions/supabase.md`.
    - Every propagation gets an apply-log row.
-   - Blueprint writes obey `docs/conventions/supabase.md` (paired PRD + blueprint, `writers/blueprint` only).
+   - Rails writes with **no** live handoff are ordinary maintain intakes — full human gate, no pre-authorization.
 4. **Review gate — DS / UNO / a11y.** Run through `skills/uno-review`: design-system compliance, harness consistency (the spec agrees with what step 3 just wrote), accessibility. Review diagnoses; fixes go back through prototyping — they don't happen here.
 5. **Sign-off — the human gate.** The developer, the PM, and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/conventions/slack.md`). **No sign-off, no publish.** Two of three is not enough, and nobody proxies a missing one.
-6. **Marketplace entry.** Register the finished package. The entry is schema-validated before it lands — all required fields present, enums exact-match. ⚠️ Known hard dependency: the notion-marketplace DB is this rail's official destination and isn't stood up yet (`docs/conventions/notion.md`); until it exists, register in the repo catalog and flag the gap rather than inventing a destination.
+6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake shows applied in the apply log); propagation in flight blocks registration. Then register the finished package. The entry is schema-validated before it lands — all required fields present, enums exact-match. ⚠️ Known hard dependency: the notion-marketplace DB is this rail's official destination and isn't stood up yet (`docs/conventions/notion.md`); until it exists, register in the repo catalog and flag the gap rather than inventing a destination.
 
 ## Boundaries
 

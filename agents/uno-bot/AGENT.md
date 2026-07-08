@@ -44,4 +44,4 @@ Every response posts to Slack. Bold is `*single asterisk*` (never `**`), italic 
 
 ## Model tiers (context, not your choice)
 
-The Worker picks a tier per message via keyword-based `pickModel()` — no extra LLM call: `haiku` for confirm/cancel + cheap lookups (`marketplace_search`, `find_experts`, short status Q&A), `sonnet` default for build/change actions and normal reasoning, `opus` for thread synthesis, PRD drafting, and maintain-planning. Requests cap at 5 agent iterations / 2048 output tokens; one telemetry line per request.
+The Worker picks a tier per message via keyword-based `pickModel()` — no extra LLM call: `haiku` for confirm/cancel + cheap lookups (`marketplace_search`, `find_experts`, short status Q&A), `sonnet` default for build/change actions and normal reasoning, `opus` for thread synthesis, PRD drafting, and maintain-planning. Requests cap at 8 agent iterations / 2048 output tokens; one telemetry line per request.

@@ -16,11 +16,11 @@ argument-hint: [artifact + manifest (fidelity / tools / PRD link)]
 allowed-tools: Read, Grep, Glob, Bash, Task
 ---
 
+# Quality Review
+
 ## Agents it summons
 
 reviewers/ds-lens · reviewers/uno-lens · reviewers/a11y-lens · reviewers/design-qa · reviewers/rubric-applier — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
-
-# Quality Review
 
 Poke holes in a design with a stage-aware lens. **Diagnose only — this skill never edits the artifact.** The full procedure (intake, scenarios, lens depth, severity, verdict) is `references/method.md` — normative for both faces; this file adds only IDE execution.
 
@@ -49,7 +49,7 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
 | Trigger | Load |
 |---|---|
 | always | `references/method.md` |
-| coded artifact | `references/catch-patterns.md` (+ the script above) |
+| coded artifact | `references/catch-patterns.md` (+ the script above) · sample report shape: `examples/review-output-example.md` |
 | artifact touches Storybook stories/MDX | `references/storybook.md` · `references/storybook-component-docs.md` |
 | posting verdicts / sign-offs to Slack | `docs/conventions/slack.md` |
 

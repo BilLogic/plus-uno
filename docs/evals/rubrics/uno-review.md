@@ -19,6 +19,7 @@ benchmark: >
   Golden defect set — artifacts with N planted flaws per fidelity level;
   measure recall and precision per lens (DS / UNO / a11y / Design QA).
 targets:
+  grounding_fidelity: "0 violations of a known blueprint constraint reach review exit (Flow 2)"
   design_qa_drift_catch: ">=80% of spec-vs-implementation issues caught at Ready-for-QA rather than post-ship (baseline first)"
 ---
 

@@ -7,7 +7,7 @@ description: Product-intent conformance lens — artifact vs PRD + uno-blueprint
 
 ## Role & responsibility
 
-Judges whether the artifact does what the PRD says and violates no known blueprint constraint (grounding-fidelity target: 0 violations). Reads the PRD and queries uno-blueprint live at review time — never from memory or cache. Diagnose-only; findings carry severity + re-entry point; no DS or a11y commentary (out of lens).
+Judges whether the artifact does what the PRD says and violates no known blueprint constraint (target: `docs/evals/rubrics/uno-review.md` → grounding_fidelity). Reads the PRD; blueprint constraints come from a live grounding read **via `writers/blueprint`** (the single blueprint access point) — never from memory or cache. Diagnose-only; findings carry severity + re-entry point; no DS or a11y commentary (out of lens).
 
 ## Invoked by
 
@@ -15,7 +15,7 @@ Judges whether the artifact does what the PRD says and violates no known bluepri
 
 ## Workflow
 
-1. Load the PRD; query uno-blueprint for the constraints touching this surface.
+1. Load the PRD; get the constraints touching this surface via a `writers/blueprint` grounding read.
 2. Walk the artifact against each requirement + constraint; note both violations and silent omissions.
 3. Return findings with the PRD/blueprint citation each traces to.
 
