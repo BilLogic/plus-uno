@@ -32,7 +32,7 @@ export async function executeShareForFeedback(
 
   if (!summary) return JSON.stringify({ ok: false, error: "missing 'summary' of what's being shared" });
 
-  const target = env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  const target = env.PLUS_DESIGN_FEEDBACK_CHANNEL_ID?.trim();
   const channel = target || slack.channel;
   const requester = slack.requestedBy ? `<@${slack.requestedBy}>` : "A designer";
 
@@ -54,7 +54,7 @@ export async function executeShareForFeedback(
     if (!posted.ok) {
       return JSON.stringify({ ok: false, status: "post_failed", detail: (posted as { error?: string }).error ?? "unknown" });
     }
-    const where = target ? "#plus-design" : "this thread";
+    const where = target ? "#plus-design-feedback" : "this thread";
     return JSON.stringify({
       ok: true,
       status: "shared",

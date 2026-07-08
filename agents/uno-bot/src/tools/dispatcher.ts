@@ -8,10 +8,9 @@
 import type { Env } from "../types";
 import { executeImplement } from "./implement";
 import { executeImplementDesign } from "./implement-design";
-import { executeCreatePrd } from "./create-prd";
-import { executeDeletePrd } from "./delete-prd";
-import { executeMarketplaceAdd } from "./marketplace-add";
-import { executeMarketplaceEdit } from "./marketplace-edit";
+import { executeNotionCreate } from "./notion-create";
+import { executeNotionUpdate } from "./notion-update";
+import { executeNotionArchive } from "./notion-archive";
 import { executeSendEmail } from "./send-email";
 import { executeShareForFeedback } from "./share-for-feedback";
 
@@ -20,9 +19,8 @@ export interface SlackContext {
   threadTs: string;
   userMsgTs: string;
   requestedBy?: string;
-  /** Optional Notion PRD reference, extracted from the thread root when the
-   *  designer replied to a polling-bot PRD notification. Forwarded to the
-   *  figma-implement workflow so Claude gets PRD context during code-gen. */
+  /** Notion PRD reference resolved at proposal time, forwarded to the GitHub
+   *  implement/scaffold workflows so codegen gets PRD context. */
   notionPrdId?: string;
   notionPrdUrl?: string;
 }
@@ -34,22 +32,20 @@ export async function executeTool(
   slack: SlackContext,
 ): Promise<string> {
   switch (name) {
-    case "implement":
+    case "notion_create":
+      return executeNotionCreate(env, input, slack);
+    case "notion_update":
+      return executeNotionUpdate(env, input, slack);
+    case "notion_archive":
+      return executeNotionArchive(env, input, slack);
+    case "component_implement":
       return executeImplement(env, input, slack);
-    case "implement_design":
+    case "prototype_scaffold":
       return executeImplementDesign(env, input, slack);
-    case "create_prd":
-      return executeCreatePrd(env, input, slack);
-    case "delete_prd":
-      return executeDeletePrd(env, input, slack);
-    case "marketplace_add":
-      return executeMarketplaceAdd(env, input, slack);
-    case "marketplace_edit":
-      return executeMarketplaceEdit(env, input, slack);
-    case "send_email":
-      return executeSendEmail(env, input, slack);
-    case "share_for_feedback":
+    case "shareout_post":
       return executeShareForFeedback(env, input, slack);
+    case "email_send":
+      return executeSendEmail(env, input, slack);
     default:
       return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
   }

@@ -25,10 +25,11 @@ import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { makeAnthropicClient, pickModel } from "./anthropic-client";
-import { executeMarketplaceSearch } from "../tools/marketplace-search";
-import { executeFindExperts } from "../tools/find-experts";
+import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
+import { executeGithubRead } from "../tools/github-read";
+import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import type { SlackContext } from "../tools/dispatcher";
 import { BUILD } from "../version";
 
@@ -135,7 +136,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
 
       // (a) Resolve a pending proposal. Worker enforces requester authorization
       // here even though the system prompt already tells Claude — defense in depth.
-      const resolveCall = toolUses.find((tu) => tu.name === "resolve_pending_proposal");
+      const resolveCall = toolUses.find((tu) => tu.name === "proposal_resolve");
       if (resolveCall) {
         if (!pending) {
           messages.push({ role: "assistant", content: response.content });
@@ -307,9 +308,10 @@ async function executeReadOnlyTool(
   name: string,
   input: Record<string, unknown>,
 ): Promise<string> {
-  if (name === "marketplace_search") return executeMarketplaceSearch(env, input);
-  if (name === "find_experts") return executeFindExperts(env, input);
+  if (name === "notion_search") return executeNotionSearch(env, input);
   if (name === "blueprint_search") return executeBlueprintSearch(env, input);
-  if (name === "read_source") return executeReadSource(env, input);
+  if (name === "source_read") return executeReadSource(env, input);
+  if (name === "github_read") return executeGithubRead(env, input);
+  if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }

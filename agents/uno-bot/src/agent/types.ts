@@ -13,30 +13,33 @@ export interface Tool {
 }
 
 export type ToolName =
-  | "implement"
-  | "implement_design"
-  | "create_prd"
-  | "delete_prd"
-  | "find_experts"
-  | "marketplace_search"
-  | "marketplace_add"
-  | "marketplace_edit"
-  | "send_email"
+  // reads (ungated)
+  | "notion_search"
+  | "source_read"
   | "blueprint_search"
-  | "read_source"
-  | "share_for_feedback";
+  | "github_read"
+  | "slack_thread_read"
+  // writes (gated)
+  | "notion_create"
+  | "notion_update"
+  | "notion_archive"
+  | "component_implement"
+  | "prototype_scaffold"
+  | "shareout_post"
+  | "email_send"
+  // control
+  | "proposal_resolve";
 
 // Tools whose execution opens a PR / fires a GitHub Action. These route
 // through the confirmation gate: the Worker posts a proposal and waits for ✅
 // before invoking the tool body. Membership is checked directly via
 // SIDE_EFFECT_TOOLS.has(...) in run-agent.ts.
 export const SIDE_EFFECT_TOOLS: ReadonlySet<ToolName> = new Set<ToolName>([
-  "implement",
-  "implement_design",
-  "create_prd",
-  "delete_prd",
-  "marketplace_add",
-  "marketplace_edit",
-  "send_email",
-  "share_for_feedback",
+  "notion_create",
+  "notion_update",
+  "notion_archive",
+  "component_implement",
+  "prototype_scaffold",
+  "shareout_post",
+  "email_send",
 ]);

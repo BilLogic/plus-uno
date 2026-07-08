@@ -62,11 +62,9 @@ export async function addReaction(
 // and so warrant a heads-up in #plus-design for team review (D5). delete_prd is
 // a removal — no review-request.
 const REVIEW_REQUEST_TOOLS: ReadonlySet<string> = new Set([
-  "implement",
-  "implement_design",
-  "marketplace_add",
-  "marketplace_edit",
-  "create_prd",
+  "component_implement",
+  "prototype_scaffold",
+  "notion_create",
 ]);
 
 export function warrantsReviewRequest(toolName: string): boolean {
@@ -74,11 +72,9 @@ export function warrantsReviewRequest(toolName: string): boolean {
 }
 
 const REVIEW_VERB: Record<string, string> = {
-  implement: "component implementation PR",
-  implement_design: "new prototype scaffold PR",
-  marketplace_add: "marketplace entry PR",
-  marketplace_edit: "marketplace edit PR",
-  create_prd: "new PRD",
+  component_implement: "component implementation PR",
+  prototype_scaffold: "new prototype scaffold PR",
+  notion_create: "new PRD / card",
 };
 
 export interface ReviewRequestInput {

@@ -290,7 +290,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   // Resolve the PRD url for `implement` (thread root notification or a link the
   // designer pasted); it feeds both the clarify gate and the proposal preview.
   let implementPrdUrl: string | undefined;
-  if (result.toolName === "implement") {
+  if (result.toolName === "component_implement") {
     const inputPrdUrl =
       typeof result.input.notion_prd_url === "string" ? result.input.notion_prd_url.trim() : "";
     implementPrdUrl = prd?.url ?? (inputPrdUrl || undefined);
@@ -358,11 +358,11 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
 
   let proposalText: string;
   let proposalBlocks: unknown[] | undefined;
-  if (result.toolName === "implement_design") {
+  if (result.toolName === "prototype_scaffold") {
     const built = await buildImplementDesignProposal(env, result.input, userId, result.previewText);
     proposalText = built.text;
     proposalBlocks = built.blocks;
-  } else if (result.toolName === "implement") {
+  } else if (result.toolName === "component_implement") {
     // Show which PRD this implement is tied to, so the requester can see it.
     const preview = implementPrdUrl ? `Using the PRD for this change: ${implementPrdUrl}` : result.previewText;
     proposalText = formatProposal(result.toolName, result.input, userId, preview);
@@ -528,14 +528,13 @@ function formatProposal(
 
 function proposalVerb(toolName: string): string {
   switch (toolName) {
-    case "implement": return "implement";
-    case "implement_design": return "scaffold a new prototype from this Figma design";
-    case "create_prd": return "create a PRD card on the Design HQ → Product board (Need PRD / Under Playground)";
-    case "delete_prd": return "archive (delete) a PRD card from the Design HQ → Product board";
-    case "marketplace_add": return "add a new marketplace entry";
-    case "marketplace_edit": return "edit a marketplace entry";
-    case "send_email": return "send an email via Gmail";
-    case "share_for_feedback": return "share this for feedback in #plus-design";
+    case "component_implement": return "implement this component";
+    case "prototype_scaffold": return "scaffold a new prototype from this Figma design";
+    case "notion_create": return "create this card in Notion";
+    case "notion_update": return "update this Notion page";
+    case "notion_archive": return "archive this Notion card";
+    case "shareout_post": return "share this for feedback in #plus-design-feedback";
+    case "email_send": return "send an email via Gmail";
     default: return toolName;
   }
 }
@@ -552,7 +551,7 @@ async function buildImplementDesignProposal(
   requesterUserId: string,
   previewText: string | undefined,
 ): Promise<{ text: string; blocks?: unknown[] }> {
-  const text = formatProposal("implement_design", input, requesterUserId, previewText);
+  const text = formatProposal("prototype_scaffold", input, requesterUserId, previewText);
 
   const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
   const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
@@ -575,7 +574,7 @@ async function buildImplementDesignProposal(
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `:warning: About to *${proposalVerb("implement_design")}*:\n${params}`,
+      text: `:warning: About to *${proposalVerb("prototype_scaffold")}*:\n${params}`,
     },
   });
   blocks.push({

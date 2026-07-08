@@ -13,10 +13,16 @@ export interface Env {
   // Optional — when unset, create_prd(prd_type:"ds-component") falls back to the
   // Roadmap board and logs a note.
   NOTION_DS_COMPONENT_DB_ID?: string;
-  // Channel that reviewable artifacts (PRs, new PRDs) are announced to for team
-  // review (D5 communication routing). Optional — when unset, no fan-out happens
-  // and replies stay in-thread.
+  // Research & notes database — notion_create(surface:"research") files findings
+  // / study guides here. Optional — unset → that surface reports "not configured".
+  NOTION_RESEARCH_DB_ID?: string;
+  // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
+  // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;
+  // #plus-design-feedback — shareout_post posts feedback bundles here (distinct
+  // from the reviews channel above). Optional — unset → shareout_post falls back
+  // to the origin thread.
+  PLUS_DESIGN_FEEDBACK_CHANNEL_ID?: string;
   // Gmail send (D6 connector). All optional — when unset, send_email fails
   // gracefully with a "not configured" error instead of sending.
   GMAIL_SENDER?: string;

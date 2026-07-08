@@ -521,3 +521,272 @@ export async function notionSearch(
     clearTimeout(timer);
   }
 }
+
+// ─── Generic create across allowlisted surfaces (for notion_create) ──────────
+// The mechanical half of a Notion create: resolve the destination DB + the
+// surface's base properties, build the body, POST. The editorial half (what a
+// good PRD says, which pillar) lives in the conventions the bot loads. Marketplace
+// is intentionally NOT here — its relation + rollup + dual-write shape is an
+// in-IDE writers/notion operation, not a one-shot Worker write.
+
+export type NotionCreateSurface = "prd" | "ds-component-prd" | "intake" | "research";
+
+export interface NotionCreateInput {
+  title: string;
+  summary?: string;
+  sections?: PrdSection[];
+  acceptanceCriteria?: string[];
+  productPillar?: string;
+  sourceUrl?: string;
+  /** Surface-specific extras rendered into the body (e.g. evidence link, tier). */
+  extras?: Record<string, string>;
+}
+
+interface SurfacePlan {
+  databaseId?: string;
+  properties: Record<string, unknown>;
+  label: string;
+}
+
+function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreateInput): SurfacePlan {
+  switch (surface) {
+    case "prd": {
+      const properties: Record<string, unknown> = {
+        "Design Status": { status: { name: DESIGN_STATUS_NEED_PRD } },
+        "Current Team": { multi_select: [{ name: "Design" }] },
+      };
+      if (input.productPillar?.trim()) {
+        properties["Product Pillar"] = { multi_select: [{ name: input.productPillar.trim() }] };
+      }
+      return { databaseId: env.NOTION_ROADMAP_DB_ID, properties, label: "Design HQ → Product (Roadmap)" };
+    }
+    case "ds-component-prd":
+      // The DS Component PRDs DB schema differs — set only the title, leave the
+      // rest for owners (avoids failing on properties that don't exist there).
+      return { databaseId: env.NOTION_DS_COMPONENT_DB_ID, properties: {}, label: "DS Component PRDs" };
+    case "intake":
+      // Maintenance intake card on the Roadmap board. Universal pillar; leave
+      // "Intake Status" for a human to set — writing an unverified option name
+      // would trip Notion's silent select auto-create (notion.md footgun).
+      return {
+        databaseId: env.NOTION_ROADMAP_DB_ID,
+        properties: { "Product Pillar": { multi_select: [{ name: "Universal" }] } },
+        label: "Roadmap (maintenance intake)",
+      };
+    case "research":
+      return { databaseId: env.NOTION_RESEARCH_DB_ID, properties: {}, label: "Research & notes" };
+  }
+}
+
+export async function notionCreate(
+  env: Env,
+  surface: NotionCreateSurface,
+  input: NotionCreateInput,
+): Promise<CreatedPrd & { label: string }> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  if (!input.title?.trim()) throw new Error("a title is required");
+
+  const plan = planSurface(env, surface, input);
+  if (!plan.databaseId) {
+    throw new Error(`${surface}: destination database not configured on the Worker`);
+  }
+
+  // Fold surface-specific extras into a body section so nothing is silently lost.
+  const sections = [...(input.sections ?? [])];
+  if (input.extras && Object.keys(input.extras).length) {
+    const body = Object.entries(input.extras)
+      .filter(([, v]) => v?.trim())
+      .map(([k, v]) => `${k}: ${v.trim()}`)
+      .join("\n");
+    if (body) sections.push({ heading: "Details", body });
+  }
+
+  // PRD-shaped surfaces get the Acceptance Criteria + Implementation Notes body
+  // that fetchNotionPRD reads downstream; intake/research get a plain body.
+  const isPrdShaped = surface === "prd" || surface === "ds-component-prd";
+  const children = buildChildren({
+    title: input.title.trim(),
+    summary: input.summary,
+    sections,
+    acceptanceCriteria: isPrdShaped ? input.acceptanceCriteria : undefined,
+    sourceUrl: input.sourceUrl,
+  });
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${NOTION_API}/pages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.NOTION_API_KEY}`,
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        parent: { database_id: plan.databaseId },
+        properties: { Name: { title: richText(input.title.trim()) }, ...plan.properties },
+        children,
+      }),
+      signal: controller.signal,
+    });
+    const data = (await res.json()) as { id?: string; url?: string; message?: string; code?: string };
+    if (!res.ok || !data.id) {
+      throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "create failed"}`);
+    }
+    return {
+      id: data.id,
+      url: data.url ?? `https://www.notion.so/${data.id.replace(/-/g, "")}`,
+      label: plan.label,
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ─── Update an existing card: properties and/or narrative append (notion_update)
+// Properties are formatted by a KNOWN-name map only — writing an arbitrary
+// {name: value} without knowing its Notion type would be wrong, and guessing a
+// select/status option name would trip the silent auto-create footgun. Unknown
+// property names are skipped and reported (the caller surfaces them). This covers
+// the real Worker use — Roadmap status/pillar moves. `append` adds body blocks.
+
+const KNOWN_PROP_FORMATTERS: Record<string, (v: string) => unknown> = {
+  "Design Status": (v) => ({ status: { name: v } }),
+  "Intake Status": (v) => ({ status: { name: v } }),
+  "Dev Status": (v) => ({ status: { name: v } }),
+  "Current Team": (v) => ({ multi_select: v.split(",").map((s) => ({ name: s.trim() })).filter((o) => o.name) }),
+  "Product Pillar": (v) => ({ multi_select: v.split(",").map((s) => ({ name: s.trim() })).filter((o) => o.name) }),
+  "Priority": (v) => ({ select: { name: v } }),
+};
+
+export interface NotionUpdateInput {
+  properties?: Record<string, string>;
+  append?: { sections?: PrdSection[]; text?: string };
+}
+
+export interface NotionUpdateResult {
+  id: string;
+  updated: string[];
+  skipped: string[];
+  appended: number;
+}
+
+export async function notionUpdate(
+  env: Env,
+  pageId: string,
+  input: NotionUpdateInput,
+): Promise<NotionUpdateResult> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const headers = {
+    Authorization: `Bearer ${env.NOTION_API_KEY}`,
+    "Notion-Version": NOTION_VERSION,
+    "Content-Type": "application/json",
+  };
+  const updated: string[] = [];
+  const skipped: string[] = [];
+  let appended = 0;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    // 1) Property changes (known names only).
+    if (input.properties && Object.keys(input.properties).length) {
+      const props: Record<string, unknown> = {};
+      for (const [name, value] of Object.entries(input.properties)) {
+        const fmt = KNOWN_PROP_FORMATTERS[name];
+        if (fmt && typeof value === "string" && value.trim()) {
+          props[name] = fmt(value.trim());
+          updated.push(name);
+        } else {
+          skipped.push(name);
+        }
+      }
+      if (Object.keys(props).length) {
+        const res = await fetch(`${NOTION_API}/pages/${pageId}`, {
+          method: "PATCH",
+          headers,
+          body: JSON.stringify({ properties: props }),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const err = (await res.json().catch(() => ({}))) as { message?: string };
+          throw new Error(`Notion ${res.status}: ${err.message ?? "property update failed"}`);
+        }
+      }
+    }
+
+    // 2) Narrative append.
+    const children: unknown[] = [];
+    for (const s of input.append?.sections ?? []) {
+      if (!s?.heading?.trim()) continue;
+      children.push(heading(s.heading.trim()));
+      if (s.body?.trim()) children.push(...bodyToParagraphs(s.body));
+    }
+    if (input.append?.text?.trim()) children.push(...bodyToParagraphs(input.append.text));
+    if (children.length) {
+      const res = await fetch(`${NOTION_API}/blocks/${pageId}/children`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ children }),
+        signal: controller.signal,
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { message?: string };
+        throw new Error(`Notion ${res.status}: ${err.message ?? "append failed"}`);
+      }
+      appended = children.length;
+    }
+
+    return { id: pageId, updated, skipped, appended };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Archive a card parented by an ALLOWLISTED database (widened from the
+// Roadmap-only archiveRoadmapCard): Roadmap, DS Component PRDs, or Research.
+// Refuses anything else, so notion_archive can't nuke arbitrary Notion pages.
+export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCard> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const headers = {
+    Authorization: `Bearer ${env.NOTION_API_KEY}`,
+    "Notion-Version": NOTION_VERSION,
+    "Content-Type": "application/json",
+  };
+  const allow = [env.NOTION_ROADMAP_DB_ID, env.NOTION_DS_COMPONENT_DB_ID, env.NOTION_RESEARCH_DB_ID]
+    .filter((x): x is string => !!x)
+    .map((x) => x.replace(/-/g, "").toLowerCase());
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const getRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
+    const page = (await getRes.json()) as {
+      id?: string; message?: string; code?: string;
+      parent?: { database_id?: string };
+      properties?: { Name?: { title?: { plain_text?: string }[] } };
+    };
+    if (!getRes.ok || !page.id) {
+      throw new Error(`Notion ${getRes.status}${page.code ? ` ${page.code}` : ""}: ${page.message ?? "page not found"}`);
+    }
+    const parentDb = (page.parent?.database_id ?? "").replace(/-/g, "").toLowerCase();
+    if (!parentDb || !allow.includes(parentDb)) {
+      throw new Error("that page isn't a card in an allowlisted database — refusing to archive it");
+    }
+    const title = page.properties?.Name?.title?.[0]?.plain_text ?? "(untitled)";
+
+    const patchRes = await fetch(`${NOTION_API}/pages/${pageId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ archived: true }),
+      signal: controller.signal,
+    });
+    if (!patchRes.ok) {
+      const err = (await patchRes.json().catch(() => ({}))) as { message?: string };
+      throw new Error(`Notion ${patchRes.status}: ${err.message ?? "archive failed"}`);
+    }
+    return { id: pageId, title };
+  } finally {
+    clearTimeout(timer);
+  }
+}

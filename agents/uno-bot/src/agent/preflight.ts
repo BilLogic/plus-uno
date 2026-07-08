@@ -30,7 +30,7 @@ export async function preflight(
   ctx: PreflightCtx,
 ): Promise<PreflightAsk | null> {
   switch (toolName) {
-    case "implement": {
+    case "component_implement": {
       // The component must actually exist in the DS library — R2 staged confirm
       // cards for invented names ("Surface", "SpacingToken"). Fail-open when the
       // list can't be fetched: this is a guard, not a wall.
@@ -59,7 +59,7 @@ export async function preflight(
       return null;
     }
 
-    case "implement_design": {
+    case "prototype_scaffold": {
       // Need a Figma frame with a specific node selected, else the scaffold has nothing to build.
       const figmaUrl = typeof input.figma_url === "string" ? input.figma_url.trim() : "";
       if (!figmaUrl || !/node-id=/.test(figmaUrl)) {
@@ -72,31 +72,13 @@ export async function preflight(
       return null;
     }
 
-    case "marketplace_add": {
-      // Every required metadata field must be present before we open a catalog PR.
-      const md = (input.metadata ?? {}) as Record<string, unknown>;
-      const required = ["title", "description", "stage", "productPillar", "creators", "repoPath"];
-      const missing = required.filter((k) => {
-        const v = md[k];
-        if (Array.isArray(v)) return v.length === 0;
-        return typeof v !== "string" || v.trim() === "";
-      });
-      if (missing.length > 0) {
-        return {
-          ask:
-            ":shopping_trolley: Before I add a marketplace entry I still need: " +
-            missing.map((m) => `*${m}*`).join(", ") +
-            ".\nSend those and I'll stage the entry.",
-        };
-      }
-      return null;
-    }
-
-    case "create_prd": {
-      // Don't file a card off a one-liner — ask for enough substance.
+    case "notion_create": {
+      // Only PRD-shaped surfaces need the substance check — an intake or a
+      // research note can legitimately be short.
+      const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
       const title = typeof input.title === "string" ? input.title.trim() : "";
       const summary = typeof input.summary === "string" ? input.summary.trim() : "";
-      if (!title || summary.length < 30) {
+      if ((surface === "prd" || surface === "ds-component-prd") && (!title || summary.length < 30)) {
         return {
           ask:
             ":memo: That PRD is a little thin to file. Give me a clear *title* and a couple of sentences of *summary* (what it is + why), and I'll draft the card.",
@@ -105,7 +87,7 @@ export async function preflight(
       return null;
     }
 
-    case "share_for_feedback": {
+    case "shareout_post": {
       // A shareout needs real substance — don't ping the design channel with a
       // placeholder blurb and nothing to look at.
       const summary = typeof input.summary === "string" ? input.summary.trim() : "";
