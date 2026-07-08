@@ -1,6 +1,6 @@
 # Harness Revision Plan — Six-Skill Alignment + Tool Conventions
 
-- **Status:** proposed (awaiting Bill's decisions on §6)
+- **Status:** in progress — tranche 1 (IA restructure) executed 2026-07-07 (`959e9c74`, `7a4ec4c0`, `4b3b3b2c`); tranche 2 (evals-first skill-body rewrites, agent roster files, rubrics + scenarios, ADR backfill) executed later same day. Open: §6 Q3 (conventions sync), Q7 (cutover check), Q9–Q10 below.
 - **Date:** 2026-07-07
 - **Source:** five-agent audit (skill best-practices research · .agent/skills audit · bot-estate audit · context/tool-reference audit · knowledge/eval audit), run against `main` @ post-2026-07-07 pull
 - **Owner:** Bill
@@ -178,6 +178,8 @@ Automation logic is currently welded into wherever it happened to be built (Figm
    - Pillar→channel map: Universal → `#plus-universal` `C072E8SFLKV` · Admin → `#plus-admin` `C089A3E9CCW` · Toolkit → `#plus-toolkit` `C08925VDFF1` · Training → `#plus-training` `C07L5RZV6DR` · Marketing → `#plus-marketing` `C052BG9NE86`. Tutoring + Help Center pillars: no channel yet (flag at retro).
    - ⚠️ All pillar channels are **private** — uno-bot must be invited to each before posting/@here works.
    - ⚠️ **No `#figma-sync` channel exists** — the Figma-sync channel is actually `#uno-bot` `C0ARJ2A3A69`. Docs referencing #figma-sync need correcting.
+9. ⏳ **Handoff blueprint-write ownership** (found during the uno-publish rewrite): the flow spec puts rails propagation's blueprint write inside publish, but `supabase.md` + the constitution's Summons column scope `writers/blueprint` to synthesize/maintain. Current implementation routes it through uno-maintain with the confirmed handoff as pre-authorization — bless this, or add writers/blueprint to publish's row.
+10. ⏳ **Apply-log home** (found during the uno-maintain rewrite): Flow 5 requires an apply-log row per executed verdict (target · verdict link · timestamp); no concrete store exists. Recommended: `docs/evals/runs/apply-log.jsonl` interim, migrating with the Eval Runs DB. Also: bot-answer rubric dimensions **D1/D4 definitions unrecovered** — fill from the original external eval doc (docs/evals/rubrics/bot-answer.md).
 
 ## 7. Sequencing & effort
 

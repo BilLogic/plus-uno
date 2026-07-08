@@ -101,3 +101,33 @@ tags: [architecture, conventions]
 **Supersedes.** ADR-001 (AGENTS.md entry point — strengthened: now the *only* one), ADR-007 (skills agent-agnostic under .agent/ — now top-level skills/ with per-runtime faces), ADR-008 (compound loop via uno-compound — now uno-maintain), the .agent/SKILL.md mode/pipeline router.
 
 **Pending.** ADR for the Pipedream→Cloudflare cutover outcome (Bill to confirm the Slack app's Event Subscriptions URL); skill-body rewrites (plan Phase 1) land separately with evals-first scenarios.
+
+## ADR-014: uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history)
+
+**Original date:** 2026-06-17/18 (`fff9ca43` bot-skills to main "Tier B cutover prep", `b2a7cfee` Worker source to main).
+
+**Decision.** The Slack bot's runtime moved from Pipedream workflows to a Cloudflare Worker (`agents/uno-bot/`, formerly `uno-bot/`): Slack events → Worker → Anthropic API with tool dispatch, thread state, and a proposal gate (side-effect tools stage a confirmation card; only the requester's ✅ executes, via `resolve_pending_proposal`). Skills load by raw-fetching repo files from GitHub at runtime (`SKILLS_BASE_URL`), prompt-cached per isolate — deploys decouple from guidance edits. Model tiering (`pickModel()`: intent → haiku/sonnet/opus, keyword-based) landed 2026-07-01 (`d892346f`, rubric dimension D2).
+
+**Why.** Rationale not recorded in-repo; inferred from the archived Pipedream docs (`docs/knowledge/archive/`) and eval commits: Pipedream limited control over tool orchestration, state, and observability; the Worker gives one TypeScript codebase, telemetry (`c48e1c30` build tags — round-2 evals unknowingly tested a stale deployment), and subrequest-budget control.
+
+**Status.** Live per eval rounds 1–3 (2026-07-01 → 07-07). Cutover *confirmation* still open (plan 2026-07-07-001 §6 Q7): verify the Slack app's Event Subscriptions URL points at `*.workers.dev`, not `pipedream.net`, and record the outcome here.
+
+## ADR-015: uno-blueprint on Supabase as the product source of truth (backfilled 2026-07-07 from git history)
+
+**Original date:** ≤2026-07-01 (`d892346f` D8 grounding: read-only `blueprint_search` over "the uno-blueprint Supabase"; hardened 2026-07-02 `0864cb54` with a `search_blueprint()` RPC and layer/step/scenario cell attribution).
+
+**Decision.** Product truth (actors, stages, steps, scenarios, requirements) lives in a Supabase-hosted blueprint, queried at task time — never cached into repo docs. All agent answers about product behavior cite blueprint cells; gaps are stated, not filled ("blueprint gap honesty", scenario R11). On any requirement change, PRD and blueprint update **together** — the paired-writes contract now codified in `docs/conventions/supabase.md` and enforced by `agents/writers/blueprint.md`.
+
+**Why.** Rationale not recorded; inferred: Notion docs drifted from reality and are slow to query programmatically; a structured store makes grounding citable (row-level) and machine-checkable, and gives prototypes a dummy-backend candidate.
+
+**Consequences.** The Supabase schema is a hard dependency for uno-synthesize's blueprint write (rubric hard gate "schema-valid" activates when it lands). The Worker's blueprint access is read-only; writes happen in-IDE via writers/blueprint.
+
+## ADR-016: The six-skill pivot (backfilled 2026-07-07)
+
+**Original date:** decided early July 2026; first repo appearance 2026-07-02 (`0864cb54`: publish/share-out routing split), fully structural 2026-07-07 (ADR-013).
+
+**Decision.** The capability set is six stage-scoped skills — research · synthesize · prototype · publish · review · maintain — mapped onto the five flows of the product-development cycle (Notion "PLUS Uno Skills Upgrade" hub, FigJam board as visual source). Replaces the seven-verb set: uno-plan dissolved (PRD/scoping → synthesize; implementation planning → prototype), uno-post → uno-publish (share-out + handoff rails, not just marketplace), uno-compound → uno-maintain (intake + tiers + sweeps + knowledge capture).
+
+**Why.** The old verbs split by artifact, not by stage — plan/post/compound had no clean flow homes, and the bot grew parallel prose rules (bot-skills/AGENTS.md 2.4/2.6/2.7) to compensate. Stage-scoping gives every flow decision node exactly one owning skill.
+
+**Trace.** Decision lived only in Notion + prose rules until 2026-07-07; this backfill closes the gap flagged in plan 2026-07-07-001 §0.2/§5.
