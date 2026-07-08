@@ -1,4 +1,6 @@
-<!-- Template for docs/knowledge/lessons/YYYY-MM-DD-slug.md (method.md §7). Fill and file; then update docs/knowledge/INDEX.md. -->
+<!-- Template for docs/knowledge/lessons/YYYY-MM-DD-slug.md (method.md §7). Fill and file; then update docs/knowledge/INDEX.md.
+Capture bar: file a lesson for a non-trivial fix, a gotcha, or a decision worth preserving. Do NOT file one for routine changes or for issues already covered in docs/conventions/ — that's noise, not compounding.
+A good lesson is: Specific (exact problem, exact fix — not vague advice) · Searchable (title + tags findable by future agents) · Actionable (paths and snippets, not prose alone) · Preventive (how to avoid it, not just how it was fixed). -->
 ---
 title: "What was learned, one specific line"
 date: YYYY-MM-DD

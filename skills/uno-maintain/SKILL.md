@@ -33,7 +33,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 
 1. **Normalize** (method §1): classify trigger type → estate → target; record the Roadmap intake card via `writers/notion`; name evidence + suggested tier. Cross-estate disagreement → flag it, don't improvise.
 2. **Draft the fix** (method §2), fix-first judge-second:
-   - Repo targets (context docs, skills, persona, DS source, bot) — edit files directly in a branch.
+   - Repo targets (context docs, skills, persona, DS source, bot) — edit files directly in a branch. DS-source and Figma↔DS reconcile targets: execution runbook [`references/ds-fix.md`](references/ds-fix.md) (who executes what · workflows · script inventory).
    - Notion writes → `writers/notion` · Figma writes → `writers/figma` · requirement changes → `writers/blueprint` (paired PRD+blueprint, never one alone).
 3. **Human gate** (method §3): present the 3-line impact / effort / risk brief; the spotter answers. Never answer it yourself.
 4. **Tier and apply** (method §4–5):
