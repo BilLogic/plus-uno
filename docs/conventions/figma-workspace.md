@@ -1,9 +1,9 @@
 # Figma Workspace Conventions
 
 <!--
-source: https://app.notion.com/p/396b7cca49828171a4ffcd841c4d0d2f  (🎨 Figma Workspace Playbook — canonical; ⏳ pending reconcile with the "How we Fig" deck)
-synced: 2026-07-07
-rule: if the live Notion playbook contradicts this file, prefer Notion and file a uno-maintain intake.
+status: canonical — this file IS the convention (ADR-017; the Notion 🎨 Figma Workspace Playbook is superseded; ⏳ still pending reconcile with the "How we Fig" deck)
+distilled: 2026-07-07 from https://app.notion.com/p/396b7cca49828171a4ffcd841c4d0d2f
+rule: on conflict with any legacy Notion playbook page, this file wins — file a uno-maintain intake to banner the page as superseded.
 applied by: agents/writers/figma
 -->
 

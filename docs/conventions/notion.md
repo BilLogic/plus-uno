@@ -1,9 +1,9 @@
 # Notion Conventions
 
 <!--
-source: https://app.notion.com/p/396b7cca498281d1b1e7e47072166a4e  (📓 Notion Doc-Management Playbook — canonical)
-synced: 2026-07-07
-rule: if a live Notion read contradicts this file, prefer Notion and file a uno-maintain intake to refresh this mirror.
+status: canonical — this file IS the convention (ADR-017; the Notion 📓 Doc-Management Playbook is superseded)
+distilled: 2026-07-07 from https://app.notion.com/p/396b7cca498281d1b1e7e47072166a4e
+rule: on conflict with any legacy Notion playbook page, this file wins — file a uno-maintain intake to banner the page as superseded.
 applied by: agents/writers/notion
 -->
 

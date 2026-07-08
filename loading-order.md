@@ -29,7 +29,7 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 |---|---|---|
 | product (features, requirements, screens) | `uno-blueprint` (Supabase) | `writers/blueprint` / `blueprint_search` |
 | design system (components, styles, docs) | `uno-storybook` (stories + MDX in `design-system/`) | read source + stories directly |
-| team conventions (canonical) | Notion playbooks | mirrors in `docs/conventions/` carry `source:`/`synced:`; prefer live Notion on conflict |
+| — | team conventions are NOT Tier 3: `docs/conventions/` is canonical in-repo (ADR-017) | loaded at Tier 2 |
 
 ## Runtime notes
 

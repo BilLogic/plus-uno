@@ -22,4 +22,4 @@ benchmark: >
 
 Scores the research skill's outputs. Scored 1–5 per dimension by one human reviewer (two at the annual calibration run); results land in `docs/evals/runs/` until the Notion Eval Runs DB exists. Golden scenarios: `docs/evals/scenarios/uno-research.md`.
 
-If a live read of the source page contradicts this file, prefer the source and file a uno-maintain intake.
+Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

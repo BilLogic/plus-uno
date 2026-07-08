@@ -43,9 +43,9 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Conventions — what agents obey
 
-`docs/conventions/` is normative: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `writing-style.md` · `terminology.md` · `coding.md` · `tech-stack.md` · `automations.md` (the standing-automation registry — every row names its agent) · `integrations.md` (tool index). Mirrored files carry `source:` / `synced:` provenance — if a live source contradicts the mirror, prefer the source and file a uno-maintain intake.
+`docs/conventions/` is normative: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `writing-style.md` · `terminology.md` · `coding.md` · `tech-stack.md` · `automations.md` (the standing-automation registry — every row names its agent) · `integrations.md` (tool index). Conventions are **canonical in this repo** (ADR-017; the Notion playbooks they were distilled from are superseded) — headers carry `status: canonical` + `distilled:` lineage; on conflict with a legacy page, the repo wins and the page gets a superseded banner via uno-maintain.
 
-**Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← Notion (mirrored with provenance). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
+**Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← `docs/conventions/` (canonical here). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 
 ## Forbidden patterns
 

@@ -28,4 +28,4 @@ targets:
 
 Scores synthesis outputs. Faithfulness is the spine: one invented finding fails the run regardless of other scores. Golden scenarios: `docs/evals/scenarios/uno-synthesize.md`.
 
-If a live read of the source page contradicts this file, prefer the source and file a uno-maintain intake.
+Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

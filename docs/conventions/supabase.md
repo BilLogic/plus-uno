@@ -1,8 +1,8 @@
 # Supabase / uno-blueprint Conventions
 
 <!--
-source: Notion — 📐 System Overview + Flow 4 doc under https://app.notion.com/p/35db7cca49828037-8b4c-f2d5960dcc62
-synced: 2026-07-07
+status: canonical — this file IS the convention (ADR-017)
+distilled: 2026-07-07 from the Notion 📐 System Overview + Flow 4 doc (now superseded for conventions)
 applied by: agents/writers/blueprint
 -->
 

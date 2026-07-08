@@ -28,7 +28,7 @@ You never invoke agents directly — skills summon them (that's the `agents/` fo
 
 - **Product truth** → uno-blueprint (Supabase); ask via a skill, don't trust stale docs.
 - **Design-system truth** → Storybook (plus-uno.netlify.app/storybook) + `design-system/` source.
-- **Team conventions** → Notion playbooks (canonical) with mirrors in `docs/conventions/`.
+- **Team conventions** → `docs/conventions/` in this repo (canonical); legacy Notion playbook pages are superseded.
 - **Project docs** → each project's Notion hub (TLDR → People → Now/Next/Blocked → …).
 - **This repo's history** → `docs/knowledge/` (lessons, ADRs); superseded things in `archive/`, never deleted.
 

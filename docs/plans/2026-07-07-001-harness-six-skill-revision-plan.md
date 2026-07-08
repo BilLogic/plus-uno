@@ -1,6 +1,6 @@
 # Harness Revision Plan — Six-Skill Alignment + Tool Conventions
 
-- **Status:** in progress — tranche 1 (IA restructure) executed 2026-07-07 (`959e9c74`, `7a4ec4c0`, `4b3b3b2c`); tranche 2 (evals-first skill-body rewrites, agent roster files, rubrics + scenarios, ADR backfill) executed later same day. Open: §6 Q3 (conventions sync), Q7 (cutover check), Q9–Q10 below.
+- **Status:** in progress — tranche 1 (IA restructure) executed 2026-07-07 (`959e9c74`, `7a4ec4c0`, `4b3b3b2c`); tranche 2 (evals-first skill-body rewrites, agent roster files, rubrics + scenarios, ADR backfill) executed later same day. Open: §6 Q7 (cutover check) + D1/D4 rubric definitions; Q3/Q8-split/Q9/Q10 resolved 2026-07-07.
 - **Date:** 2026-07-07
 - **Source:** five-agent audit (skill best-practices research · .agent/skills audit · bot-estate audit · context/tool-reference audit · knowledge/eval audit), run against `main` @ post-2026-07-07 pull
 - **Owner:** Bill
@@ -167,19 +167,19 @@ Automation logic is currently welded into wherever it happened to be built (Figm
 
 1. ✅ **Dissolve `uno-plan`** — synthesize takes PRD/scoping, prototype takes implementation planning.
 2. ✅ **Resolved by the Phase-3 dissolution** (Bill, 2026-07-07): every capability's runtime-neutral core lives at `.agent/skills/uno-<skill>/references/method.md`, loaded by both faces (SKILL.md and bot.md) of the same folder. No parallel copies exist to sync.
-3. ⏳ **Convention-file sync** — recommended: manual-on-edit (rule written into each Notion playbook) + monthly `uno-maintain` staleness sweep (compare page `last_edited_time` vs mirror `synced:` date, file intake on drift). Automated Notion-poll job (figma-library-poll pattern) deferred unless drift bites twice. Awaiting Bill's confirm after options articulation.
+3. ✅ **Convention-file sync — dissolved by canonicality flip** (Bill, 2026-07-07): the harness lives on GitHub; `docs/conventions/` is canonical and the Notion playbook material is obsoleted (ADR-017). No sync problem remains — the monthly sweep becomes an *integrity* sweep (canonicality headers, cross-references, superseded banners on legacy pages).
 4. ✅ **Rubrics: rebuild from scratch** (don't salvage the broken-linked starters) and wire into uno-review. **Delete `hd-config.md`.** Commit the 2026-04-19 audit lesson (accurate history).
 5. ✅ **Delete `.agent/handoffs/`** + its references in the three orchestration docs.
 6. ✅ **Eval runs: repo JSONL interim store now**; migrate to the Notion Eval Runs DB when created.
 7. ⏳ **Cutover confirmation** — Bill to check Slack app admin → Event Subscriptions URL (`*.workers.dev` = Worker live; `pipedream.net` = v1 still answering). Record outcome as an ADR either way.
 8. ✅ **Config values resolved** (Slack + Notion lookups, 2026-07-07):
-   - `PLUS_DESIGN_CHANNEL_ID` → `#plus-design` `C03FC8AS69K` (review fan-out). Share-out feedback threads historically live in `#plus-design-feedback` `C074QG2V7DJ` — slack.md should split: review requests → #plus-design, share-out bundles → #plus-design-feedback (confirm with Bill).
+   - `PLUS_DESIGN_CHANNEL_ID` → `#plus-design` `C03FC8AS69K` (review fan-out). ✅ Split CONFIRMED (Bill, 2026-07-07): review requests/verdicts → #plus-design, share-out bundles → #plus-design-feedback `C074QG2V7DJ` — slack.md stays as written; add a share-out channel var when Flow 3 posting is wired.
    - `NOTION_DS_COMPONENT_DB_ID` → database `342b7cca-4982-80b1-b305-f9e0e581ef48` (data_source `342b7cca-4982-80b9-9cf7-000b8cc726a5` — use whichever the Worker's parent param expects).
    - Pillar→channel map: Universal → `#plus-universal` `C072E8SFLKV` · Admin → `#plus-admin` `C089A3E9CCW` · Toolkit → `#plus-toolkit` `C08925VDFF1` · Training → `#plus-training` `C07L5RZV6DR` · Marketing → `#plus-marketing` `C052BG9NE86`. Tutoring + Help Center pillars: no channel yet (flag at retro).
    - ⚠️ All pillar channels are **private** — uno-bot must be invited to each before posting/@here works.
    - ⚠️ **No `#figma-sync` channel exists** — the Figma-sync channel is actually `#uno-bot` `C0ARJ2A3A69`. Docs referencing #figma-sync need correcting.
-9. ⏳ **Handoff blueprint-write ownership** (found during the uno-publish rewrite): the flow spec puts rails propagation's blueprint write inside publish, but `supabase.md` + the constitution's Summons column scope `writers/blueprint` to synthesize/maintain. Current implementation routes it through uno-maintain with the confirmed handoff as pre-authorization — bless this, or add writers/blueprint to publish's row.
-10. ⏳ **Apply-log home** (found during the uno-maintain rewrite): Flow 5 requires an apply-log row per executed verdict (target · verdict link · timestamp); no concrete store exists. Recommended: `docs/evals/runs/apply-log.jsonl` interim, migrating with the Eval Runs DB. Also: bot-answer rubric dimensions **D1/D4 definitions unrecovered** — fill from the original external eval doc (docs/evals/rubrics/bot-answer.md).
+9. ✅ **Handoff blueprint-write ownership** (Bill, 2026-07-07): keep the maintain routing — publish hands the blueprint update to uno-maintain as a pre-authorized action inside the designer-confirmed handoff; writers/blueprint stays scoped to synthesize/maintain.
+10. ✅ **Apply-log home** (Bill, 2026-07-07): `docs/evals/runs/apply-log.jsonl` interim, migrating with the Eval Runs DB — wired into maintain method §5 + evals README. Still open: bot-answer rubric dimensions **D1/D4 definitions unrecovered** — Bill to fill (docs/evals/rubrics/bot-answer.md).
 
 ## 7. Sequencing & effort
 

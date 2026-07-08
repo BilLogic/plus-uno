@@ -27,4 +27,4 @@ targets:
 
 Scores prototypes per fidelity tier. The two gates are the skill's reason to exist: ask when context is missing, escalate when the design system has a gap — never silently invent. Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
-If a live read of the source page contradicts this file, prefer the source and file a uno-maintain intake.
+Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

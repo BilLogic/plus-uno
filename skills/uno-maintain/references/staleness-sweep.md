@@ -1,14 +1,14 @@
-<!-- Load for: the conventions-staleness sweep (monthly, at retro). Registry row: docs/conventions/automations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
+<!-- Load for: the conventions-integrity sweep (monthly, at retro). Registry row: docs/conventions/automations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
 
-# Staleness sweep checklist
+# Integrity sweep checklist
 
 One intake per finding (evidence + suggested tier), through the normal pipeline in `method.md`. Tier 1 only for pure path/date/link rot; anything touching skills, persona, DS, or requirements is Tier 2.
 
-## A. Mirror provenance
+## A. Canonicality headers (conventions are repo-canonical — ADR-017)
 
-- [ ] Every `docs/conventions/*.md` mirror carries `source:` + `synced:` in its header.
-- [ ] For each mirror, compare `synced:` against the source page's `last_edited_time` — drift → intake to re-sync (update body *and* `synced:` date).
-- [ ] The staleness rule line ("prefer the source, file an intake") is present in each mirror.
+- [ ] Every `docs/conventions/*.md` header declares `status: canonical` with a `distilled:` lineage date.
+- [ ] No conventions file still carries a "prefer Notion on conflict" rule line.
+- [ ] Legacy Notion playbook pages duplicating a conventions file carry a superseded banner pointing at the repo — missing banner → intake for writers/notion.
 
 ## B. Agents ↔ docs cross-references (both ways)
 

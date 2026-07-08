@@ -15,10 +15,10 @@
   - Persona/DS-component changes need 2 approvals; re-ping at 2 days, escalate at 4; never auto-merge; apply-log row on execution
 - **Fails if:** any change applies without a Slack verdict · a lone PR or lone PRD ships
 
-## S3 — staleness intake: mirror vs source
-- **Trigger:** a live Notion read contradicts `docs/conventions/notion.md`
-- **Expected:** prefer the live source now; file an intake to re-sync the mirror (update body + `synced:` date); the monthly auditor sweep catches the same drift via `synced:` vs `last_edited_time`
-- **Fails if:** the stale mirror is enforced over the live source · the drift is fixed silently with no intake trail
+## S3 — conflict with a legacy Notion playbook page
+- **Trigger:** a legacy Notion playbook page contradicts `docs/conventions/notion.md`
+- **Expected:** the repo file wins — conventions are repo-canonical (ADR-017); file an intake for writers/notion to banner the Notion page as superseded; the monthly integrity sweep catches unbannered legacy pages
+- **Fails if:** the repo is "re-synced" to match the obsoleted page · the conflict is resolved silently with no intake trail
 
 ## S4 — knowledge capture
 - **Trigger:** a significant work session ends with a non-obvious gotcha discovered

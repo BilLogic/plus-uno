@@ -49,13 +49,13 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
 2. **Review post** to `#plus-design`: self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
 3. **Verdict** (machine-parseable — `docs/conventions/slack.md`, gate 2): ✅ approve · 🔁 request changes · ❌ reject, from a routed reviewer. **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
-4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row**: target · verdict link · timestamp. Non-code applies have no merge log — this row is what makes the audit measurable.
+4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row** (target · verdict link · timestamp) to `docs/evals/runs/apply-log.jsonl` — interim store until the Notion Eval Runs DB exists. Non-code applies have no merge log — this row is what makes the audit measurable.
 5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
 
 ## 6 · Standing intake paths
 
-- **Mirror vs source:** when a live read contradicts a mirrored convention file, **prefer the live source now** and file an intake to re-sync the mirror (update the body *and* its `synced:` date). Never enforce a stale mirror; never fix the drift silently.
-- **Standing sweeps:** named in `docs/conventions/automations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions staleness (`synced:` vs source `last_edited_time`, plus agents↔docs cross-references both ways) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
+- **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (via writers/notion); never "re-sync" the repo to match it, never fix the drift silently.
+- **Standing sweeps:** named in `docs/conventions/automations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
 - **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness against built reality — routine, not exceptional.
 
 ## 7 · Knowledge capture

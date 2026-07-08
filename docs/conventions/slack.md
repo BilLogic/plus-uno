@@ -1,8 +1,8 @@
 # Slack Conventions
 
 <!--
-source: Notion — 🧭 Flow 3/5 docs + 🧩 Templates #4 (share-out) under https://app.notion.com/p/35db7cca49828037-8b4c-f2d5960dcc62
-synced: 2026-07-07
+status: canonical — this file IS the convention (ADR-017)
+distilled: 2026-07-07 from the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 (now superseded for conventions)
 applied by: agents/uno-bot (the embodiment IS the Slack actor — no separate writer)
 -->
 

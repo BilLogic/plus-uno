@@ -12,12 +12,12 @@ The standing-sweep role: given a named checklist (shipped watchdog, conventions 
 ## Invoked by
 
 - `skills/uno-maintain` — sweeps and retro audits
-- Automations: shipped watchdog · weekly Tier-1 digest · Figma hygiene sweep · conventions staleness sweep (`docs/conventions/automations.md`)
+- Automations: shipped watchdog · weekly Tier-1 digest · Figma hygiene sweep · conventions integrity sweep (`docs/conventions/automations.md`)
 
 ## Workflow
 
-1. Load the named checklist (each sweep's checklist lives with its convention file — e.g. hygiene in `figma-workspace.md`, staleness rule in each mirror's header).
-2. Walk the estate; for staleness sweeps compare `synced:` dates vs source `last_edited_time`, and check agents↔docs cross-references both ways.
+1. Load the named checklist (each sweep's checklist lives with its convention file — e.g. hygiene in `figma-workspace.md`, integrity in `skills/uno-maintain/references/staleness-sweep.md`).
+2. Walk the estate; for the conventions integrity sweep check canonicality headers, agents↔docs cross-references both ways, and superseded banners on legacy Notion playbook pages (conventions are repo-canonical, ADR-017).
 3. File one uno-maintain intake per finding; produce the digest summary when the sweep is digest-bearing.
 
 ## Conventions it obeys

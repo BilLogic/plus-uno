@@ -1,8 +1,8 @@
 # Writing Style — the voice, once
 
 <!--
-source: https://app.notion.com/p/396b7cca498281d1b1e7e47072166a4e §4a  (+ ux-writing rubric in docs/evals/rubrics/)
-synced: 2026-07-07
+status: canonical — this file IS the convention (ADR-017)
+distilled: 2026-07-07 from 📓 playbook §4a (now superseded) + the ux-writing rubric lineage
 applied by: every writer agent and every skill producing human-facing text. Voice is a convention, not a role — there is no copywriter agent.
 -->
 

@@ -1,7 +1,7 @@
 # Automations Registry
 
 <!--
-The machine-side mirror of the Notion playbook's "Standing rituals" table (source: 📓 playbook §6, synced 2026-07-07).
+THE standing-automation registry — canonical (ADR-017; distilled 2026-07-07 from 📓 playbook §6, now superseded).
 Rule: every automation names its agent — an automation without an agent is unowned by definition.
 Rule: an automation invokes a skill's method; it never embeds its own copy of the logic. Migrate opportunistically as each is next touched.
 An automation absent from this table is undocumented by definition.
@@ -17,6 +17,6 @@ An automation absent from this table is undocumented by definition.
 | Shipped watchdog | weekly | uno-maintain (reconciliation check) | reviewers/auditor | ❌ not built | — | planned |
 | Weekly Tier-1 digest | weekly | uno-maintain (digest of auto-applied fixes) | reviewers/auditor → uno-bot posts | ❌ not built | — | planned |
 | Figma hygiene sweep | monthly | uno-maintain (hygiene checklist in `figma-workspace.md`) | reviewers/auditor | ❌ not built | — | planned |
-| Conventions staleness sweep | monthly (retro) | uno-maintain (compare `synced:` vs source `last_edited_time`; check agent↔doc cross-references) | reviewers/auditor | ❌ not built | — | planned |
+| Conventions integrity sweep | monthly (retro) | uno-maintain (canonicality headers; agent↔doc cross-references both ways; superseded banners on legacy Notion playbook pages) | reviewers/auditor | ❌ not built | — | planned |
 | Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built | — | planned |
 | Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | — | planned |
