@@ -1,9 +1,9 @@
-// Central tool executor. Called from:
-//   - run-agent.ts (for read-only tools during the agentic loop)
-//   - Step 7's confirmation-gate handler (for side-effect tools after ✅)
+// Central tool executor for side-effect tools after the ✅ gate. Called from
+// resolve-proposal.ts once a pending proposal is confirmed. (Read-only tools
+// run separately via executeReadOnlyTool in run-agent.ts during the loop.)
 //
-// All four tool bodies return a JSON string that goes straight into a
-// tool_result content block.
+// Each tool body returns a JSON string that goes straight into a tool_result
+// content block.
 
 import type { Env } from "../types";
 import { executeImplement } from "./implement";
@@ -12,7 +12,6 @@ import { executeCreatePrd } from "./create-prd";
 import { executeDeletePrd } from "./delete-prd";
 import { executeMarketplaceAdd } from "./marketplace-add";
 import { executeMarketplaceEdit } from "./marketplace-edit";
-import { executeMarketplaceSearch } from "./marketplace-search";
 import { executeSendEmail } from "./send-email";
 import { executeShareForFeedback } from "./share-for-feedback";
 
@@ -35,8 +34,6 @@ export async function executeTool(
   slack: SlackContext,
 ): Promise<string> {
   switch (name) {
-    case "marketplace_search":
-      return executeMarketplaceSearch(env, input);
     case "implement":
       return executeImplement(env, input, slack);
     case "implement_design":

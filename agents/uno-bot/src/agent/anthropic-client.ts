@@ -12,9 +12,6 @@ export const MODELS: Record<ModelTier, string> = {
   opus: "claude-opus-4-8",
 };
 
-// Back-compat default used anywhere a tier isn't chosen explicitly.
-export const MODEL = MODELS.sonnet;
-
 // Heuristic router: map the user's message (and any pending proposal) to a tier.
 // Deliberately keyword-based — no extra LLM call — to preserve turn/token
 // economy (D7). Bias to sonnet whenever intent is unclear.

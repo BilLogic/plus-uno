@@ -1,5 +1,5 @@
 // Local types for the agentic loop. The Tool shape is structurally compatible
-// with @anthropic-ai/sdk's Tool type; in Step 4 we swap this for the SDK type.
+// with @anthropic-ai/sdk's Tool type (run-agent.ts casts `TOOLS as Anthropic.Tool[]`).
 
 export interface Tool {
   name: string;
@@ -27,8 +27,9 @@ export type ToolName =
   | "share_for_feedback";
 
 // Tools whose execution opens a PR / fires a GitHub Action. These route
-// through the confirmation gate (Step 7): the Worker posts a proposal and
-// waits for ✅ before actually invoking the tool body.
+// through the confirmation gate: the Worker posts a proposal and waits for ✅
+// before invoking the tool body. Membership is checked directly via
+// SIDE_EFFECT_TOOLS.has(...) in run-agent.ts.
 export const SIDE_EFFECT_TOOLS: ReadonlySet<ToolName> = new Set<ToolName>([
   "implement",
   "implement_design",
@@ -39,7 +40,3 @@ export const SIDE_EFFECT_TOOLS: ReadonlySet<ToolName> = new Set<ToolName>([
   "send_email",
   "share_for_feedback",
 ]);
-
-export function isSideEffectTool(name: string): name is ToolName {
-  return SIDE_EFFECT_TOOLS.has(name as ToolName);
-}

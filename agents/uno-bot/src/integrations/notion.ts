@@ -177,11 +177,6 @@ export async function createPrdCard(
   }
 }
 
-/** Back-compat: file a feature PRD to the Roadmap board. */
-export function createRoadmapPrdCard(env: Env, input: PrdInput): Promise<CreatedPrd> {
-  return createPrdCard(env, input, "roadmap");
-}
-
 // ─── Team Member Database (read-only, for find_experts) ─────────────────────
 // Schema (verified): Name (title), Group (select), Primary Role (rich_text),
 // Short Bio (rich_text), Affiliation (select), LinkedIn / Personal Website /
