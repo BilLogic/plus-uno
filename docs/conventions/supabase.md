@@ -20,7 +20,7 @@ applied by: agents/writers/blueprint
 |---|---|---|---|
 | Read (Worker `blueprint_search`) | `SUPABASE_ANON_KEY` (read-only anon) | Cloudflare secret (`wrangler secret put`); `SUPABASE_URL` is a non-secret var | ✅ live |
 | Read (in-IDE grounding) | Supabase MCP connector | user's Claude Code MCP config | per designer |
-| **Write (in-IDE, writers/blueprint)** | write-capable key — Bill to provide (2026-07-08). Prefer a key/role scoped to blueprint tables over raw `service_role` | local env only (`agents/uno-bot/.dev.vars` pattern / MCP config) — **never in the repo, never in a committed file** | ⏳ pending key |
-| Write (Worker — only if an acceptance-in-thread write tool ships, plan §6 note) | same key as Cloudflare secret | `wrangler secret put SUPABASE_WRITE_KEY` | not built |
+| **Write (in-IDE, writers/blueprint)** | **Supabase MCP connector** (decision: Bill, 2026-07-08 — MCP over raw keys; the team sets it up properly). If the MCP is unavailable/unauthorized in a session, the agent **requests access** rather than improvising — never asks for or handles a raw key in chat | user's Claude Code MCP config; no key files in the repo, ever | MCP route |
+| Write (Worker — only if an acceptance-in-thread write tool ships, plan §6 note) | scoped key as Cloudflare secret, requested from whoever administers Supabase | `wrangler secret put SUPABASE_WRITE_KEY` | not built |
 
-Until the write key lands, the paired write's blueprint half runs through the authorized Supabase MCP in-IDE (or is flagged as pending in the PRD); the synthesize rubric's schema-valid hard gate activates once the blueprint schema + key both exist.
+If a session lacks the authorized MCP, the paired write's blueprint half is flagged `⏳ pending` in the PRD and filed as a uno-maintain intake; the synthesize rubric's schema-valid hard gate activates once the blueprint schema exists.
