@@ -1,122 +1,7 @@
 [
   {
-    "name": "implement",
-    "description": "Trigger the figma-implement.yml GitHub Action to open a draft pull request that implements a Figma component change. Use ONLY when the designer has clearly asked for a specific named component to be implemented (e.g., 'implement Badge', 'go ahead with the Badge change'). A component implement REQUIRES a Notion PRD — the polling bot creates one and posts it in #uno-bot. Before invoking: if the thread already has that PRD notification, proceed (the Worker reads the PRD from the thread). If there is NO PRD in the thread, do NOT invoke — ask the designer for the PRD link first, then pass it as notion_prd_url. Never implement a component without a PRD, and never invent the component name or PRD URL.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["component"],
-      "properties": {
-        "component": {
-          "type": "string",
-          "description": "The component name as it appears in the Figma library, using the exact casing (e.g., 'Badge', 'Button', 'CardSurface')."
-        },
-        "notion_prd_url": {
-          "type": "string",
-          "description": "The Notion PRD link for this component change. Usually the Worker reads it automatically from the polling-bot notification in the thread — only set this when the designer pastes a PRD link themselves. Required overall: if no PRD is in the thread and the designer hasn't given one, ask before invoking."
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional free-form implementation notes from the designer. Pass through verbatim if present in the conversation; omit otherwise."
-        }
-      }
-    }
-  },
-  {
-    "name": "implement_design",
-    "description": "Trigger the figma-implement-design.yml GitHub Action to scaffold a NEW playground prototype from a Figma design (page/screen/flow). Use when the designer pastes a Figma URL and asks for a prototype to be built (e.g., 'implement this design <figma.com/...>', 'scaffold a playground for this Figma frame'). A Notion PRD link is OPTIONAL but preferred: first ask the designer if they have a PRD link to include for better context — if they don't, offer to skip it and build straight from the Figma frame, and on their OK invoke this tool with notion_prd_url omitted. Never invent a PRD URL. Do NOT use this tool for DS library component work — that is `implement`, which is for named components downstream of the polling bot's PRD notification.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["figma_url"],
-      "properties": {
-        "figma_url": {
-          "type": "string",
-          "description": "Full Figma URL the designer pasted, e.g. 'https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725'. Must contain a node-id query param."
-        },
-        "notion_prd_url": {
-          "type": "string",
-          "description": "Optional. Full notion.so URL of a PRD for this prototype, if the designer has one — gives the build better context. Never invent it. Ask first; if they don't have one and choose to skip, omit this field."
-        },
-        "slug": {
-          "type": "string",
-          "description": "Optional kebab-case folder name for playground/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, the script derives one from the Figma node name."
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional free-form implementation notes from the designer. Pass through verbatim."
-        }
-      }
-    }
-  },
-  {
-    "name": "create_prd",
-    "description": "Create a design PRD as a new card on the Design HQ → Product board in Notion (the 'Roadmap' database), placed in the 'Need PRD / Under Playground' column and tagged for the Design team. Use when a designer asks to draft/write a PRD from a description, meeting notes, or a pasted discussion. WORKFLOW: first draft the PRD conversationally (as a text reply) and let the designer refine it — do NOT call this tool yet. Only invoke create_prd once the designer approves creating it (e.g. 'looks good, create it', 'make the PRD'). Pass the structured PRD content you drafted. Keep it grounded in the provided notes — put genuine unknowns under an 'Open Questions' section rather than inventing requirements.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["title", "summary"],
-      "properties": {
-        "title": {
-          "type": "string",
-          "description": "Short feature/PRD title — becomes the Roadmap card name."
-        },
-        "summary": {
-          "type": "string",
-          "description": "1-3 sentence overview of what this is and why."
-        },
-        "sections": {
-          "type": "array",
-          "description": "PRD body sections in order, e.g. Problem / Context, Goals & Non-goals, Users & Scenarios, Requirements & Scope, Open Questions. Each body may contain multiple paragraphs (separate with blank lines).",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["heading", "body"],
-            "properties": {
-              "heading": { "type": "string" },
-              "body": { "type": "string" }
-            }
-          }
-        },
-        "acceptance_criteria": {
-          "type": "array",
-          "description": "Checklist of acceptance criteria — rendered as Notion to-do checkboxes.",
-          "items": { "type": "string" }
-        },
-        "product_pillar": {
-          "type": "string",
-          "description": "Optional. One Roadmap Product Pillar if clearly implied: Universal, Admin, Toolkit, Training, Help Center, Tutoring, Goal-Setting, LID, Social Media, Website, Intercom, Others. Omit if unsure."
-        },
-        "prd_type": {
-          "type": "string",
-          "enum": ["feature", "ds-component"],
-          "description": "Where to file the PRD. 'feature' (default) → the Design HQ Product/Roadmap board (product/feature work). 'ds-component' → the DS Component PRDs DB (a design-system component add/update). Pick based on what the PRD is about; when unsure, ask or default to 'feature'."
-        },
-        "source_url": {
-          "type": "string",
-          "description": "Optional. Link back to the source — a Slack permalink to the discussion, or a Figma link if one was provided."
-        }
-      }
-    }
-  },
-  {
-    "name": "delete_prd",
-    "description": "Archive (delete) a PRD card on the Design HQ → Product board in Notion — use to undo/remove a PRD the bot just created when the designer asks ('delete that PRD', 'remove that card', 'undo that'). Pass the Notion URL of the card (the bot posted it when it created the PRD; or the designer pastes it). Archiving moves the card to Notion's trash (recoverable). Only works on cards in that board's database.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["notion_url"],
-      "properties": {
-        "notion_url": {
-          "type": "string",
-          "description": "The Notion URL (or page id) of the Roadmap card to archive — typically the link the bot posted when it created the PRD."
-        }
-      }
-    }
-  },
-  {
-    "name": "marketplace_search",
-    "description": "Search the Prototype Market catalog (prototypes-data.js). Use when the designer wants to find prototypes, list entries by some criterion, or look up a specific entry. Examples: 'show me toolkit prototypes', 'list high-fi prototypes', 'who built 1008?', \"find Bill's prototypes\". Read-only — safe to call freely, including before marketplace_edit to verify an entry exists.",
+    "name": "notion_search",
+    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL — 'find the PRD for tutor-matching', 'what did we decide about onboarding', 'is there a study guide for X', 'who should I talk to about assessments', 'show me toolkit prototypes'. Returns matching page titles + Notion URLs (plus key properties); follow up with source_read to pull a specific page's full content. Prefer a narrow `scope` when you know which surface you want — a scoped query against a known database is far more reliable than an open workspace search. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -124,109 +9,19 @@
       "properties": {
         "query": {
           "type": "string",
-          "description": "Free-form query. Matched case-insensitively against title, description, productPillar, stage, creators, contributors, and id."
-        }
-      }
-    }
-  },
-  {
-    "name": "find_experts",
-    "description": "READ-ONLY. Returns the team roster (name, role, bio, LinkedIn) from the Notion Team Member Database so you can suggest collaborators / subject-matter experts for a research topic. Use when a designer asks 'who should I talk to about X', 'find me SMEs/collaborators for X', or is sourcing context from people. After it returns, match the topic against each person's role + bio and present the best 2-4 fits with their role + a one-line reason + LinkedIn, then suggest reaching out. The DB has NO Slack handles/emails, so you cannot @-mention or DM anyone — name who to contact and share their LinkedIn; never tag. Safe to call freely (no side effect, no confirmation gate).",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["topic"],
-      "properties": {
-        "topic": {
-          "type": "string",
-          "description": "The research topic / area to find people for, e.g. 'AI student insights', 'onboarding for no-toolkit institutions'."
-        }
-      }
-    }
-  },
-  {
-    "name": "marketplace_add",
-    "description": "Open a draft pull request that appends a new entry to the Prototype Market catalog. Use when the designer wants to register a new prototype. All required metadata fields MUST be present in the conversation before invoking — if any is missing, reply conversationally asking for it instead of calling this tool. Do not invent values. The Worker auto-assigns the 4-digit id, localPath, and lastUpdated; do not include those.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["metadata"],
-      "properties": {
-        "metadata": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["title", "description", "stage", "productPillar", "creators", "repoPath"],
-          "properties": {
-            "title": { "type": "string" },
-            "description": { "type": "string" },
-            "stage": { "type": "string", "enum": ["low", "mid", "high"] },
-            "productPillar": {
-              "type": "string",
-              "enum": ["admin", "home", "login", "profile", "toolkit", "training", "universal"]
-            },
-            "creators": {
-              "type": "array",
-              "items": { "type": "string" },
-              "minItems": 1,
-              "description": "Slack display names of the prototype's creators."
-            },
-            "contributors": {
-              "type": "array",
-              "items": { "type": "string" },
-              "description": "Optional. Slack display names of contributors beyond the creators."
-            },
-            "repoPath": {
-              "type": "string",
-              "description": "Path to the prototype directory in the plus-uno repo, e.g. 'playground/quick-add-modal/'."
-            },
-            "deploymentUrl": { "type": ["string", "null"], "description": "Optional. Deployed URL, or null." },
-            "notionCardUrl":  { "type": ["string", "null"] },
-            "notionCardId":   { "type": ["string", "null"] },
-            "loomVideoUrl":   { "type": ["string", "null"] }
-          }
-        }
-      }
-    }
-  },
-  {
-    "name": "marketplace_edit",
-    "description": "Open a draft pull request that updates an existing Prototype Market entry. Use when the designer wants to change one or more fields of an existing entry. The id MUST reference an existing prototype — call marketplace_search first if you are uncertain. The fields object is a partial update; include only what should change.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "fields"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Existing 4-digit prototype id, e.g. '1008'."
+          "description": "What to find, in plain words, e.g. 'PRD for tutor matching', 'onboarding decision', 'high-fi toolkit prototypes'."
         },
-        "fields": {
-          "type": "object",
-          "additionalProperties": false,
-          "minProperties": 1,
-          "properties": {
-            "title": { "type": "string" },
-            "description": { "type": "string" },
-            "stage": { "type": "string", "enum": ["low", "mid", "high"] },
-            "productPillar": {
-              "type": "string",
-              "enum": ["admin", "home", "login", "profile", "toolkit", "training", "universal"]
-            },
-            "creators": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-            "contributors": { "type": "array", "items": { "type": "string" } },
-            "repoPath": { "type": "string" },
-            "deploymentUrl": { "type": ["string", "null"] },
-            "notionCardUrl":  { "type": ["string", "null"] },
-            "notionCardId":   { "type": ["string", "null"] },
-            "loomVideoUrl":   { "type": ["string", "null"] }
-          }
+        "scope": {
+          "type": "string",
+          "enum": ["roadmap", "marketplace", "team", "research", "any"],
+          "description": "Which surface to search. 'roadmap' = the Design HQ Product board (PRDs/cards); 'marketplace' = the Prototype Market DB; 'team' = the Team Member roster (people/SMEs — returns Slack ids for @-mention when present); 'research' = Research & notes (findings/study guides); 'any' = open workspace search (weakest — only when the surface is genuinely unknown). Default 'any'."
         }
       }
     }
   },
   {
-    "name": "read_source",
-    "description": "READ-ONLY. Fetch the actual CONTENT of a link before answering — a Notion page (returns title + properties incl. Owner/people + block text), a Figma frame (returns node name/type + text layers), a GitHub/raw file, or any web URL (returns text). Use this WHENEVER the request contains or references a URL, a linked PRD/doc/guide, or a Figma frame: read it and ground your answer in the returned content, then cite it. Never answer a question about a linked source from memory/priors. For 'who owns/should review this' questions, read the page and use its Owner/people property rather than guessing from roles or LinkedIn. Safe to call freely (no side effect, no gate).",
+    "name": "source_read",
+    "description": "READ-ONLY. Fetch the actual CONTENT of a link before answering — a Notion page (returns title + properties incl. Owner/people + block text), a Figma frame (returns node name/type + text layers), a GitHub/raw file, or any web URL (returns text). Use this WHENEVER the request contains or references a URL, a linked PRD/doc/guide, or a Figma frame: read it and ground your answer in the returned content, then cite it. Never answer a question about a linked source from memory/priors. For 'who owns/should review this' questions, read the page and use its Owner/people property rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -241,7 +36,7 @@
   },
   {
     "name": "blueprint_search",
-    "description": "READ-ONLY. Query the uno-blueprint (the Plus product/design source of truth in Supabase) for grounded facts about product state, features, decisions, and status. Use this to answer or justify factual and 'where are we on X' questions from the blueprint FIRST, before relying on loaded docs, and ALWAYS cite the row(s) you used. If it returns no rows or reports it isn't configured, say so and fall back to cited docs or 'I don't know' — never fabricate. Safe to call freely (no side effect, no confirmation gate).",
+    "description": "READ-ONLY. Query the uno-blueprint (the Plus product/design source of truth in Supabase) for grounded facts about product state, features, decisions, and status. Use this to answer or justify factual and 'where are we on X' questions from the blueprint FIRST, before relying on loaded docs, and ALWAYS cite the row(s) you used. If it returns no rows or reports it isn't configured, say so and fall back to cited docs or 'I don't know' — never fabricate. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -255,38 +50,205 @@
     }
   },
   {
-    "name": "send_email",
-    "description": "Send an email via Gmail on the design team's behalf. Side effect: sends a real email — routed through the confirmation gate. Use for outward notifications a Slack message can't cover: emailing an external SME/collaborator, sending a PRD or prototype summary to a stakeholder, or a follow-up the designer explicitly asks to send by email. Draft the email conversationally first (recipient, subject, body) and let the designer refine it; only invoke send_email once they approve sending. Never invent recipient addresses — ask for them if unknown. Prefer Slack for anything that can stay in Slack.",
+    "name": "github_read",
+    "description": "READ-ONLY. Read from the plus-uno GitHub repo — fetch a file's contents by repo-relative path (DS cheat-sheets, rule docs, AGENTS.md, a component's source), or list a directory (set list:true) to check what EXISTS. Use it to confirm a design-system component before proposing component_implement (list `design-system/src/components`), or to ground a review in the actual rule docs rather than memory. For an arbitrary GitHub URL a designer pasted, prefer source_read; use github_read when you know the path or need a directory listing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["to", "subject", "body"],
+      "required": ["path"],
       "properties": {
-        "to": {
-          "type": "array",
-          "items": { "type": "string" },
-          "minItems": 1,
-          "description": "Recipient email address(es). Never invent — use addresses the designer provided."
-        },
-        "cc": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Optional CC email address(es)."
-        },
-        "subject": {
+        "path": {
           "type": "string",
-          "description": "Email subject line."
+          "description": "Repo-relative path, e.g. 'design-system/src/components', 'docs/conventions/accessibility.md'."
         },
-        "body": {
+        "list": {
+          "type": "boolean",
+          "description": "If true, list the directory entries at `path` instead of returning file contents (use to check whether something exists)."
+        },
+        "ref": {
           "type": "string",
-          "description": "Plain-text email body. Write it out fully — no placeholders."
+          "description": "Optional git ref (branch/tag/sha). Defaults to the repo's default branch."
         }
       }
     }
   },
   {
-    "name": "share_for_feedback",
-    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design: what it is, a link back, a feedback prompt, and @-mentioned reviewers. Side effect (it pings people) — routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback ('publish this for feedback', 'share this out', 'get feedback on this'), and use marketplace_add ONLY when they want to formally register a prototype in the catalog. Draft the shareout text conversationally first; invoke once they approve.",
+    "name": "slack_thread_read",
+    "description": "READ-ONLY. Read the messages of a Slack thread you were given a link to (outside this conversation's own memory) — to tally handoff sign-offs (dev/PM/stakeholder ✅), read reviewer verdicts, or pull a source discussion to synthesize into findings. Pass the Slack message/thread permalink. The bot must be a member of the channel. Safe to call freely (read-only, no gate).",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["link"],
+      "properties": {
+        "link": {
+          "type": "string",
+          "description": "A Slack message or thread permalink, e.g. 'https://plus-team.slack.com/archives/C03FC8AS69K/p1720000000000000'."
+        }
+      }
+    }
+  },
+  {
+    "name": "notion_create",
+    "description": "Create a new page or card in an allowlisted Notion surface — SIDE EFFECT, routed through the confirmation gate. `surface` selects WHERE and WHAT is created: 'prd' (a design PRD on the Roadmap board), 'ds-component-prd' (DS Component PRDs DB), 'intake' (a maintenance intake card on the Roadmap board), 'research' (a Findings & Takeaways / study-guide page in Research & notes), 'marketplace' (a Prototype Market entry). Draft the content conversationally first and let the designer refine it; only invoke once they approve. Follow docs/conventions/notion.md for each surface's required properties and body shape — NEVER create select options / pillars / OKRs; exact-match existing option names. Keep content grounded in the conversation; put genuine unknowns under an 'Open Questions' section rather than inventing.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "title"],
+      "properties": {
+        "surface": {
+          "type": "string",
+          "enum": ["prd", "ds-component-prd", "intake", "research", "marketplace"],
+          "description": "Which allowlisted surface to create in. Determines the destination database and the required properties (see docs/conventions/notion.md)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Page/card title (the Notion 'Name' property)."
+        },
+        "summary": {
+          "type": "string",
+          "description": "1-3 sentence overview, rendered as the opening of the body."
+        },
+        "sections": {
+          "type": "array",
+          "description": "Body sections in order (Problem/Context, Goals, Users & Scenarios, Requirements, Open Questions, etc.). Each body may contain multiple paragraphs (separate with blank lines).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["heading", "body"],
+            "properties": {
+              "heading": { "type": "string" },
+              "body": { "type": "string" }
+            }
+          }
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "description": "For 'prd'/'ds-component-prd': checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold).",
+          "items": { "type": "string" }
+        },
+        "properties": {
+          "type": "object",
+          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (e.g. PRD: product_pillar; intake: evidence_link, suggested_tier; marketplace: stage, product_pillar, creators, contributors, repo_path, deployment_url, loom_video_url). Only include what the conversation supports; never invent option names.",
+          "additionalProperties": true
+        },
+        "source_url": {
+          "type": "string",
+          "description": "Optional link back to the source — a Slack permalink to the discussion, or a Figma link."
+        }
+      }
+    }
+  },
+  {
+    "name": "notion_update",
+    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Two uses, combinable: (1) change PROPERTIES via `properties` — e.g. move a Roadmap card to 'Design Status: Ready for Design', set an Intake Status, update links, edit a marketplace entry's fields; (2) APPEND narrative via `append` — e.g. log a conclusion to a project Decision Log, add a findings section to a doc. Pass the page URL. Follow docs/conventions/notion.md: fetch the schema and EXACT-MATCH existing option names before writing any select/status property (Notion silently auto-creates options on a mismatch). Append rather than overwrite a human-owned body.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_url"],
+      "properties": {
+        "page_url": {
+          "type": "string",
+          "description": "The Notion URL (or page id) of the card/page to update."
+        },
+        "properties": {
+          "type": "object",
+          "description": "Property changes as key→value, exact-matched against the live schema by the tool (status/select options must already exist).",
+          "additionalProperties": true
+        },
+        "append": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Narrative blocks to append to the end of the page body.",
+          "properties": {
+            "sections": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["heading", "body"],
+                "properties": {
+                  "heading": { "type": "string" },
+                  "body": { "type": "string" }
+                }
+              }
+            },
+            "text": {
+              "type": "string",
+              "description": "A single block of text to append (use when no heading is needed, e.g. a dated Decision Log entry)."
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "notion_archive",
+    "description": "Archive (soft-delete) a Notion card the bot created — SIDE EFFECT, routed through the confirmation gate. Use to undo a PRD / intake / marketplace entry when the designer asks ('delete that', 'remove that card', 'undo'). Archiving moves the page to Notion's trash (recoverable). SAFETY: only works on cards parented by an allowlisted database — it will refuse anything else. Pass the page URL (typically the link the bot posted when it created the card).",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_url"],
+      "properties": {
+        "page_url": {
+          "type": "string",
+          "description": "The Notion URL (or page id) of the card to archive."
+        }
+      }
+    }
+  },
+  {
+    "name": "component_implement",
+    "description": "Open a draft PR that implements a named design-system component change, by triggering the figma-implement GitHub Action — SIDE EFFECT, routed through the confirmation gate. Use ONLY when the designer clearly asks for a specific named component (e.g. 'implement Badge', 'go ahead with the Badge change'). REQUIRES a Notion PRD: the polling bot creates one and posts it in #uno-bot. If the thread already has that PRD notification, proceed (the Worker reads it from the thread); if there is NO PRD, do NOT invoke — ask for the PRD link first, then pass notion_prd_url. Confirm the component exists first with github_read (list design-system/src/components) if unsure. Never invent the component name or PRD URL. For a NEW prototype from a Figma frame, use prototype_scaffold instead.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component"],
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "The component name as it appears in the Figma library, exact casing (e.g. 'Badge', 'Button', 'CardSurface')."
+        },
+        "notion_prd_url": {
+          "type": "string",
+          "description": "The Notion PRD link for this change. Usually read automatically from the polling-bot notification in the thread — only set this when the designer pastes a PRD link themselves."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional free-form implementation notes from the designer. Pass through verbatim if present; omit otherwise."
+        }
+      }
+    }
+  },
+  {
+    "name": "prototype_scaffold",
+    "description": "Scaffold a NEW playground prototype from a Figma design (page/screen/flow), by triggering the figma-implement-design GitHub Action to open a draft PR — SIDE EFFECT, routed through the confirmation gate. Use when the designer pastes a Figma URL and asks for a prototype (e.g. 'scaffold a playground for this frame', 'build this design <figma.com/...>'). A Notion PRD link is OPTIONAL but preferred — ask if they have one for better context; if not, offer to build straight from the frame and, on their OK, invoke with notion_prd_url omitted. Never invent a PRD URL. Do NOT use for named DS-library component work — that is component_implement.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["figma_url"],
+      "properties": {
+        "figma_url": {
+          "type": "string",
+          "description": "Full Figma URL the designer pasted, e.g. 'https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725'. Must contain a node-id query param."
+        },
+        "notion_prd_url": {
+          "type": "string",
+          "description": "Optional. Full notion.so URL of a PRD for this prototype, if the designer has one. Never invent it; omit if they choose to skip."
+        },
+        "slug": {
+          "type": "string",
+          "description": "Optional kebab-case folder name for playground/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional free-form implementation notes from the designer. Pass through verbatim."
+        }
+      }
+    }
+  },
+  {
+    "name": "shareout_post",
+    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback, and use notion_create(surface:'marketplace') only when they want to formally register a prototype in the catalog. Draft the shareout text conversationally first; invoke once they approve.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -303,7 +265,7 @@
         "reviewers": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Optional reviewers to tag. Slack user ids (U…) get @-mentioned; plain names are shown as-is. Use find_experts / the PRD Owner to pick real people."
+          "description": "Optional reviewers to tag. Slack user ids (U…) get @-mentioned; plain names are shown as-is. Use notion_search(scope:'team') / the PRD Owner to pick real people."
         },
         "deadline": {
           "type": "string",
@@ -313,8 +275,35 @@
     }
   },
   {
-    "name": "resolve_pending_proposal",
-    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it. Examples that should trigger this: 'go ahead', 'yes do it', 'looks good, ship it', 'no, cancel', 'actually nevermind'. If the user asks an unrelated question or seems to be discussing without deciding, do NOT invoke this tool — reply conversationally and the proposal will sit until ✅, ❌, or 15-minute expiry. If the system prompt indicates the current message sender is NOT the original requester, do NOT invoke this tool — reply explaining that only the requester can confirm.",
+    "name": "email_send",
+    "description": "Send an email via Gmail on the design team's behalf — SIDE EFFECT (sends a real email), routed through the confirmation gate. Use for outward notifications a Slack message can't cover: emailing an external SME/collaborator, sending a PRD or prototype summary to a stakeholder, or a follow-up the designer explicitly asks to send by email. Draft the email conversationally first (recipient, subject, body) and let the designer refine it; only invoke once they approve. Never invent recipient addresses — ask for them if unknown. Prefer Slack for anything that can stay in Slack.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["to", "subject", "body"],
+      "properties": {
+        "to": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Recipient email address(es). Never invent — use addresses the designer provided."
+        },
+        "cc": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional CC email address(es)."
+        },
+        "subject": { "type": "string", "description": "Email subject line." },
+        "body": {
+          "type": "string",
+          "description": "Plain-text email body. Write it out fully — no placeholders."
+        }
+      }
+    }
+  },
+  {
+    "name": "proposal_resolve",
+    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). If the user asks an unrelated question or is still discussing without deciding, do NOT invoke — reply conversationally and the proposal sits until ✅, ❌, or 15-minute expiry. If the system prompt indicates the current sender is NOT the original requester, do NOT invoke — reply that only the requester can confirm.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -323,11 +312,11 @@
         "decision": {
           "type": "string",
           "enum": ["confirm", "cancel"],
-          "description": "'confirm' if the user wants to proceed with the proposed action as-is. 'cancel' if the user wants to stop, change direction, or modify parameters (if they want to change parameters, follow up with a fresh proposal in the same turn or wait for the user to clarify)."
+          "description": "'confirm' to proceed with the proposed action as-is. 'cancel' to stop or change direction (for a parameter change, cancel then stage a fresh proposal)."
         },
         "message_to_user": {
           "type": "string",
-          "description": "Short Slack-formatted (mrkdwn) message to post alongside the resolution. Examples: 'Got it — firing the implement workflow for Badge now.' or 'Sure, cancelled. Let me know what you'd like to do instead.' Keep to one or two sentences."
+          "description": "Short Slack mrkdwn message to post alongside the resolution, e.g. 'Got it — firing the implement for Badge now.' Keep to one or two sentences."
         }
       }
     }
