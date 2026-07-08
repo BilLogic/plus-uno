@@ -1,92 +1,117 @@
 ---
 name: uno-prototype
 description: >
-  Scaffold a new playground prototype with proper PLUS design system integration.
-  Use when the user asks to "create a prototype", "scaffold a new project",
-  "set up a playground", "start a new experiment", "build a proof-of-concept",
-  or needs a standalone prototype for user testing.
+  Turns a PRD or direction into a design artifact at a chosen fidelity —
+  grounds the brief against uno-blueprint, then either engineers prompt-specs
+  for external generative tools (low/mid fidelity) or builds hi-fi directly on
+  the design system in the playground. Use when the user says "prototype this",
+  "sketch the flow", "map the data flow", "generate a draft to validate",
+  "build this PRD", "scaffold a playground", "implement this Figma design",
+  or has an approved requirement and needs a reviewable artifact. Not for
+  critique (uno-review), sharing/handoff (uno-publish), or writing the PRD
+  itself (uno-synthesize).
 user-invocable: true
-argument-hint: [project-name]
+argument-hint: [prd-or-idea] [fidelity]
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__notion-plus__*
 ---
-> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
 
 ## Agents it summons
 
-researchers/explorer (grounding) · reviewers/ds-lens (validate phase) — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+writers/blueprint (grounding reads) · researchers/explorer (prior art) ·
+reviewers/ds-lens (exit validation) · writers/figma (playground frames) —
+defined in `agents/` (see `agents/README.md`). Per the interaction contract,
+these are summoned by this skill, never by users.
 
+# Prototype
 
-# Scaffold Prototype
+PRD → design artifact, fidelity-routed. The full procedure is
+[`references/method.md`](references/method.md) — this file is the IDE
+execution layer over it.
 
-Create a new playground prototype project with proper DS integration.
+## When to use / when NOT
 
-## When to Use
+**Use when** a requirement (usually a PRD from uno-synthesize) needs to become
+an artifact: a flow sketch, a data-flow map, an interactive draft, a working-UI
+proof, or a hi-fi playground build.
 
-- Designer wants to explore a new feature idea
-- Need a standalone prototype for user testing
-- Building a proof-of-concept for a product pillar
+**Not for:** critiquing an artifact (→ `skills/uno-review`) · sharing,
+replicas, or handoff (→ `skills/uno-publish`) · drafting the PRD
+(→ `skills/uno-synthesize`) · DS-library component maintenance
+(→ `skills/uno-maintain`) · hand-crafted work — the designer's manual path
+carries no skill; it re-joins at review.
 
-## Auto-Suggest
+## Fidelity routing
 
-Proactively suggest this skill when:
-- The user describes a new feature idea that doesn't have an existing prototype
-- The user wants to explore or validate a concept visually
-- A new `playground/` project needs to be set up from scratch
+Method §2 in brief — the designer chooses, UNO routes, no gold-plating:
 
-Do not suggest if the user is working on an existing prototype (use the appropriate mode instead).
+| Ask | Fidelity | UNO's role |
+|---|---|---|
+| "sketch / map / work through the flow" | low | prompt engineer — diagram-shaped spec for FigJam / Stitch |
+| "validate / prove it works" | mid | prompt engineer — interactive/functional spec for Claude design / Figma Make / Stitch / v0 / Google AI Studio |
+| "build it" (approved PRD) | high | builder — DS-compliant playground build against uno-storybook |
+| designer draws it themselves | hand-craft | none — stay out of the way |
 
-## Prerequisites
+## Workflow (IDE execution of method.md)
 
-- `docs/context/product/features.md` — understand which product pillar this relates to
-- `docs/context/design-system/foundations/layout.md` — understand the atomic hierarchy
-- `docs/context/design-system/components/cheat-sheet.md` — available components
+1. **Ground** (method §1 — unconditional, scoped to the card).
+   Summon **writers/blueprint** for the grounding read: this card's flows,
+   constraints, current-state context + global constraints. Summon
+   **researchers/explorer** for prior art in the repo (components, specs,
+   `playground/` prototypes). Record the grounding snapshot in the working
+   notes. On re-entry: diff first, re-ground only on change (method §1).
+2. **Gate: missing context** (method §5). Empty/error states, ambiguous
+   interactions, missing Figma target or DS expectations → ask before building.
+3. **Route by fidelity** (method §2).
+   - **Low/mid** → write the prompt-spec in the matching mode (method §3) and
+     hand it to the designer for the external tool. Do not generate.
+   - **High** → build in `playground/`:
+     a. Scaffold from `playground/starter/` per
+        [`references/template-selection-guide.md`](references/template-selection-guide.md)
+        (vite config: [`examples/vite-config-example.js`](examples/vite-config-example.js)).
+     b. Load the DS cheat-sheets (Tier-2 table below) **before any component
+        or token use**; verify props against source + stories.
+     c. **Confirm the implementation plan + touched files** with the user
+        before large edits (method §4).
+     d. Figma input? Follow the full implement-design workflow in
+        [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) —
+        no skipped steps; translate values per
+        [`references/figma-token-mapping.md`](references/figma-token-mapping.md).
+     e. Playground frames or wip placement in Figma → summon **writers/figma**
+        (obeys `docs/conventions/figma-workspace.md`).
+4. **Gate: DS gap** (method §5). Needed component not in the cheat-sheet →
+   name it, propose the nearest existing composition, file a uno-maintain
+   intake. Never hand-roll a lookalike.
+5. **Validate & exit** (method §6). Hi-fi: run
+   `bash skills/uno-prototype/scripts/validate-prototype.sh playground/{project}`.
+   All fidelities: summon **reviewers/ds-lens** for the conformance pass,
+   write the one-line artifact manifest (fidelity · tools · PRD link), then
+   hand to `skills/uno-review` for the stage lens.
 
-## Phase 1: Scope
+## Tier-2 loads (mirrors AGENTS.md § Progressive loading)
 
-1. Ask: What feature or area is this prototype for?
-2. Ask: What product pillar? (admin, home, toolkit, training, profile, login, universal)
-3. Ask: What fidelity? (low/mid/high)
-4. Check: Does a relevant spec already exist in `design-system/src/specs/`? If so, use it as a starting point.
-5. **Gate**: Confirm project name and scope before scaffolding.
+| Trigger | Load |
+|---|---|
+| Building UI, using components or tokens | `docs/context/design-system/components/cheat-sheet.md` (MANDATORY) — content sections: [`references/cheat-components.md`](references/cheat-components.md) · [`references/cheat-forms.md`](references/cheat-forms.md) · [`references/cheat-tokens.md`](references/cheat-tokens.md) |
+| Building new pages, dashboards, layouts | `docs/context/design-system/components/layout-cheat-sheet.md` (MANDATORY) |
+| Figma link / implement-design workflow | [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) (PRIMARY) |
+| Grounding read / any blueprint touch | `docs/conventions/supabase.md` |
+| Writing frames/annotations to Figma | `docs/conventions/figma-workspace.md` |
+| Exhaustive lookup: prior-art roots · token sources · tool wiring | [`references/examples-index.json`](references/examples-index.json) · [`references/tokens-index.json`](references/tokens-index.json) · [`references/integrations-index.json`](references/integrations-index.json) |
 
-## Phase 2: Scaffold
+## Quality bar
 
-1. Create `playground/{project-name}/` directory
-2. Copy the minimal starter structure:
-   ```
-   playground/{project-name}/
-   ├── index.html
-   ├── src/
-   │   ├── App.jsx
-   │   └── main.jsx
-   ├── vite.config.js    (with @ alias → ../../design-system/src)
-   └── package.json
-   ```
-3. Add dev script to root `package.json`: `"dev:{project-name}": "vite --config playground/{project-name}/vite.config.js"`
-4. Ensure vite.config.js has proper SCSS loadPaths for tokens
+Scored against `docs/evals/rubrics/uno-prototype.md` (grounding-completeness ·
+prompt-spec-quality · ds-compliance · fidelity-appropriateness; the two hard
+gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
-## Phase 3: Build
+## Constraints
 
-1. Read `docs/context/design-system/components/cheat-sheet.md` (MANDATORY)
-2. Read `docs/context/design-system/components/layout-cheat-sheet.md` if building a page
-3. Use design system components — check `@/components/`, `@/forms/`, `@/specs/`
-4. Apply tokens for all visual values
-5. Use `<PageLayout>` from specs/Universal for page structure
-
-## Phase 4: Validate
-
-- [ ] Imports resolve (`@` alias works)
-- [ ] Token-driven styling (no hardcoded colors/spacing)
-- [ ] Uses DS components (not raw Bootstrap)
-- [ ] Dev server runs (`npm run dev:{project-name}`)
-
-## Phase 5: Register
-
-1. Add entry to `src/pages/PrototypeMarket/prototypes-data.js`
-2. Or use `/uno:post` skill for guided submission
-
-## Next Step
-
-After completing the prototype:
-→ Suggest `/uno:review` to check DS compliance before shipping. Pass the prototype's directory path as the argument.
-
-These are suggestions — the user may choose to skip steps.
+- Grounding is never skipped — not even for "just a quick sketch".
+- Low/mid: output is the prompt-spec, never the generated artifact.
+- Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,
+  cheat-sheet is law, no deep imports from `design-system/src/`, PLUS
+  components first, FA Free icons only.
+- This skill builds; it does not judge (uno-review), share (uno-publish), or
+  change the DS library (uno-maintain).
+- New packages, Figma writes, and blueprint writes all require explicit
+  approval or the named writer agent — never direct.

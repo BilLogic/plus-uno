@@ -12,11 +12,18 @@ import type { Env } from "../types";
 const SKILL_PATHS = [
   "AGENTS.md", // the constitution (repo root)
   "agents/uno-bot/AGENT.md", // this embodiment's persona delta
+  // Per skill: references/method.md (runtime-neutral core) then bot.md (Worker delta)
+  "skills/uno-research/references/method.md",
   "skills/uno-research/bot.md",
+  "skills/uno-synthesize/references/method.md",
   "skills/uno-synthesize/bot.md",
+  "skills/uno-prototype/references/method.md",
   "skills/uno-prototype/bot.md",
+  "skills/uno-publish/references/method.md",
   "skills/uno-publish/bot.md",
+  "skills/uno-review/references/method.md",
   "skills/uno-review/bot.md",
+  "skills/uno-maintain/references/method.md",
   "skills/uno-maintain/bot.md",
   "docs/conventions/notion.md",
   "docs/conventions/figma-workspace.md",
@@ -67,17 +74,16 @@ async function getStableSystem(env: Env): Promise<string> {
   if (!cachedSystemPromise) {
     cachedSystemPromise = (async () => {
       const parts = await Promise.all(SKILL_PATHS.map((p) => fetchSkillFile(env, p)));
-      const [agents = "", qa = "", synth = "", maintain = "", research = "", impl = "", implDesign = "", mp = ""] = parts;
-      return [
-        agents,
-        "\n\n---\n\n# Skill: uno-qa (default conversational mode)\n\n" + qa,
-        "\n\n---\n\n# Skill: uno-synthesize (summarize + PRD via create_prd)\n\n" + synth,
-        "\n\n---\n\n# Skill: uno-maintain (maintain the harness; review/approval)\n\n" + maintain,
-        "\n\n---\n\n# Skill: uno-research (find_experts tool)\n\n" + research,
-        "\n\n---\n\n# Skill: uno-implement (tool)\n\n" + impl,
-        "\n\n---\n\n# Skill: uno-implement-design (tool)\n\n" + implDesign,
-        "\n\n---\n\n# Skill: uno-marketplace (3 tools)\n\n" + mp,
-      ].join("");
+      // Generic assembly: each fetched file gets a divider headed by its repo
+      // path, so the prompt is self-describing and adding/removing a path can
+      // never desync from a hand-maintained label list (the v1 destructuring
+      // bug: labels ran in the old 8-entry order and dropped the tail).
+      return parts
+        .map((text, i) => {
+          if (!text) return "";
+          return i === 0 ? text : `\n\n---\n\n<!-- ${SKILL_PATHS[i]} -->\n\n${text}`;
+        })
+        .join("");
     })().catch((err) => {
       cachedSystemPromise = null;
       throw err;

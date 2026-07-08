@@ -1,130 +1,91 @@
 ---
 name: uno-research
 description: >
-  Discover context, audit assets, surface prior knowledge. Use when the user asks
-  "What is...", "How does...", "Where is...", or needs to understand the codebase
-  before building.
+  Gathers context that does not exist yet: preliminary data analysis, user-study
+  guides, SME and participant sourcing, Slack/analytics evidence sweeps, and
+  codebase/design-system discovery. Instrument-first — the study guide is
+  written before any conversation — and it hands cited findings to
+  uno-synthesize rather than concluding. Use for fuzzy hunches ("tutors seem to
+  churn — can we look into it?"), discovery questions ("do we already have a
+  component for X", "where is", "how does"), sourcing knowledge-holders ("who
+  actually knows how Y works?"), or evidence toward a go/no-go. Not for
+  summarizing prior studies, ingesting pasted context, or drafting PRDs — that
+  is uno-synthesize.
 context: fork
 agent: Explore
-allowed-tools: Read, Grep, Glob, WebSearch, mcp__notion-plus__*
+allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__*
 ---
-> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+# uno-research — IDE face
+
+Gather context that doesn't exist yet. The procedure lives in
+[`references/method.md`](references/method.md) — **read it first**. This file
+adds only IDE execution: which agents to summon, and what to load when.
+
+## When to use / when not
+
+- **Use** for the fuzzy front end (no requirement yet, evidence needed),
+  codebase/DS discovery, SME or participant sourcing, and preliminary data passes.
+- **Don't use** when the context already exists — summarizing a prior study,
+  ingesting pasted notes, or drafting a PRD routes to `uno-synthesize`. Edge
+  cases fall to method.md's data rule: ingesting a prior analysis → synthesize;
+  running new queries on raw data → research.
 
 ## Agents it summons
 
-researchers/explorer · researchers/source-miner · researchers/people-scout — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+researchers/explorer · researchers/source-miner · researchers/people-scout —
+defined in `agents/` (see `agents/README.md`). Per the interaction contract,
+these are summoned by this skill, never by users. Study-guide writes go through
+writers/notion.
 
+## Workflow — method.md spine, IDE execution
 
-# Research & Discovery
+1. **Inventory first** (method.md gate 1). Read `docs/knowledge/INDEX.md`; check
+   the Research & notes DB for prior studies via `mcp__notion-plus__*`. Context
+   already exists → route to `uno-synthesize` and stop.
+2. **Repo/DS questions** → Task `researchers/explorer`. It owns the heavy reads
+   and returns `path:line`-cited findings, never file dumps.
+3. **Org-evidence questions** (Slack history, analytics, research DBs) → Task
+   `researchers/source-miner`, naming the source types worth mining. Empty
+   sweeps come back as findings.
+4. **People path** — the order is a hard gate:
+   1. Draft the study guide per method.md; `writers/notion` writes it to the
+      Research & notes DB. Read `docs/conventions/notion.md` before the write —
+      allowlisted surfaces only, never create select options.
+   2. Only then Task `researchers/people-scout` for ranked candidates plus an
+      intro draft. The human sends the intro and runs the conversation.
+5. **Data path** → preliminary analysis scoped to the go/no-go question
+   (method.md gate 2). No connected source for the data needed? Ask the user for
+   an export — never fabricate a pull.
+6. **Compile the findings brief** (method.md output shape) and hand to
+   `uno-synthesize`. Do not conclude.
 
-Surface existing knowledge, audit assets, and build context before any implementation begins.
-
-## When to Use
-
-- The user asks discovery questions: "What is...", "How does...", "Where is..."
-- The user needs to explore the codebase before building
-- Auditing which components, tokens, or patterns already exist for a given area
-- Understanding product context, user flows, or domain terminology
-- Checking whether prior solutions or learnings apply to a new problem
-
-## Auto-Suggest
-
-Proactively suggest this skill when:
-- The user jumps into building without understanding what exists
-- A new feature area is mentioned that may already have prior art
-- The user asks a question that requires cross-referencing multiple sources
-- Before `/uno:plan` if the problem space is unclear
-
-Do not suggest if the user already has clear context and is ready to plan or build.
-
-## Tier 2 Context (~3K tokens budget)
-
-Load on-demand based on the research question:
+## Tier-2 loads
 
 | Trigger | Load |
-|---------|------|
-| Product/domain questions | `docs/context/product/*` |
-| Component/token discovery | `references/component-discovery.md` |
-| Prior knowledge check | `docs/knowledge/INDEX.md` → relevant domain files |
-| Learning/orientation | `references/learning.md` |
-| Existing solutions | `docs/knowledge/lessons/` → relevant category |
+|---|---|
+| always, on invocation | `references/method.md` |
+| component / pattern / token discovery, before dispatching explorer | `references/component-discovery.md` |
+| scoping an explorer dispatch — repo layout, key paths, commands | `references/foundations-index.json` |
+| DS usage-pattern questions | `references/patterns-index.json` |
+| prior-knowledge check | `docs/knowledge/INDEX.md` → the relevant lesson file |
+| writing the study guide (via writers/notion) | `docs/conventions/notion.md` |
+| pointing source-miner at Slack | `docs/conventions/slack.md` (channel map) |
 
-Stay within ~3K tokens of Tier 2 context. Load the INDEX first, then only the specific files needed.
+## Quality bar
 
-## Workflow
-
-### Step 1: Check Prior Knowledge
-
-Read `docs/knowledge/INDEX.md` to determine if prior knowledge exists for the topic. If a relevant domain file exists, load it before searching further.
-
-### Step 2: Search Codebase
-
-Search for existing artifacts related to the query:
-- Components: `design-system/src/components/`, `design-system/src/specs/`
-- Stories: `design-system/src/**/*.stories.jsx`
-- Tokens: `design-system/src/tokens/`
-- Playground prototypes: `playground/`
-- Solution docs: `docs/knowledge/lessons/`
-
-Use Glob for file discovery, Grep for content matching. Cast a wide net first, then narrow.
-
-### Step 3: Search Notion (if relevant)
-
-When the question relates to product decisions, roadmap, or design rationale, use `mcp__notion-plus__*` tools to search the PLUS Notion workspace. Only invoke if the codebase alone cannot answer the question.
-
-### Step 4: Check Existing Solutions
-
-Scan `docs/knowledge/lessons/` for related findings from previous work sessions. Past learnings often apply to new problems.
-
-### Step 5: Synthesize Findings
-
-Compile findings into a structured research brief with:
-- Direct answers to the user's question
-- Source citations (file paths, Notion page titles)
-- Related assets discovered during search
-- Gaps: what was NOT found that might be needed
-
-## Output Format
-
-Present findings as a structured research brief:
-
-```
-## Research Brief: {topic}
-
-### Findings
-- {finding 1} — source: `{file path or Notion page}`
-- {finding 2} — source: `{file path}`
-
-### Related Assets
-- {component/token/prototype that is relevant}
-
-### Gaps
-- {what does not exist yet that may be needed}
-
-### Recommendations
-- {suggested next step: plan, build, or investigate further}
-```
-
-## Handoff
-
-If the research reveals that planning or building is needed next:
-1. Write the research brief to `.agent/handoffs/briefs/{topic-slug}.md`
-2. Suggest `/uno:plan` to scope the implementation
-
-If the user only needed an answer (no follow-up work), skip the handoff file.
+Rubric: `docs/evals/rubrics/uno-research.md` (study-guide-quality ·
+analysis-scoping · sme-precision; hard gate: guide in Notion before any SME
+conversation). Golden scenarios: `docs/evals/scenarios/uno-research.md` — a
+change to this skill must keep all five passing.
 
 ## Constraints
 
-- **Read-only**: This skill does NOT create files (except handoff briefs), modify code, or make design decisions.
-- **Cite sources**: Every finding must include a file path or external reference.
-- **No speculation**: If information is not found, say so. Do not guess.
-- **Stay scoped**: Answer the question asked. Do not expand into adjacent topics unless they directly impact the answer.
-
-## Next Step
-
-After completing research:
-- If implementation is needed → Suggest `/uno:plan` to scope the work.
-- If the user just needed an answer → No further skill needed.
-- If a gotcha or learning was discovered → Suggest `/uno:compound` to document it.
-
-These are suggestions — the user may choose to skip steps.
+- **Read-only, one exception:** the study guide (and research notes), written
+  via writers/notion to allowlisted Notion surfaces only.
+- **Cite everything** — a finding without a citation doesn't ship.
+- **Never contact people** — people-scout sources and drafts; humans send.
+- **Never conclude** — no takeaways, no go/no-go, no PRD. Hand the brief to
+  `uno-synthesize`.
+- **Stay scoped** to the question asked; expand into adjacent topics only when
+  they change the answer.

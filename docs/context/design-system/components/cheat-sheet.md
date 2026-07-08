@@ -3,6 +3,8 @@
 
 Load only the section you need:
 
-- [Components](cheat-components.md) — 35 UI components
-- [Forms](cheat-forms.md) — Form elements
-- [Tokens](cheat-tokens.md) — Spacing, typography, color, elevation tokens
+- [Components](../../../../skills/uno-prototype/references/cheat-components.md) — 35 UI components
+- [Forms](../../../../skills/uno-prototype/references/cheat-forms.md) — Form elements
+- [Tokens](../../../../skills/uno-prototype/references/cheat-tokens.md) — Spacing, typography, color, elevation tokens
+
+<!-- Content lives with its heaviest consumer (skills/uno-prototype); this index stays here because AGENTS.md forbidden pattern #2 points at it. -->

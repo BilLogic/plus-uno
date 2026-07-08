@@ -19,7 +19,7 @@ Use the starter template in `playground/starter/` as the base for all new protot
 | `index.html` | Entry HTML with DS stylesheet |
 | `src/App.jsx` | Root component with DS import examples |
 | `src/main.jsx` | React 19 entry point |
-| `vite.config.js` | Aliases (`@` → design-system/src), SCSS config, ESM-safe `__dirname` |
+| `vite.config.js` | Aliases (`@` → design-system/src), SCSS config, ESM-safe `__dirname` — annotated canonical copy: `../examples/vite-config-example.js` |
 
 ### Alias Configuration
 

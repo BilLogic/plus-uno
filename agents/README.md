@@ -4,7 +4,7 @@ Agents are roles skills summon — **never taught to users, never invoked direct
 
 ## The three kinds + the embodiment
 
-| Kind | Does | Roster (target — built on first invocation) |
+| Kind | Does | Roster (defined 2026-07-07, at their first invocation sites — the Phase-1 skill bodies) |
 |---|---|---|
 | `researchers/` | gather — isolated heavy reads, return findings not file dumps | `explorer` (codebase) · `source-miner` (Slack/analytics/research-DB) · `people-scout` (SME + participant sourcing) |
 | `reviewers/` | judge — parallel lenses, checklists, rubrics | `ds-lens` · `uno-lens` · `a11y-lens` · `design-qa` (Figma spec vs QA site) · `rubric-applier` (any rubric → scored verdict → eval run) · `auditor` (registry checklists → intakes) |
@@ -26,7 +26,7 @@ agents/<kind>/<name>.md         (a folder when the agent has an executable body 
 
 ## Rules
 
-1. **Creation rule:** a new agent needs ≥2 invocation sites or a demonstrated isolated-context benefit (heavy reads, parallel lenses, headless execution). Never speculative — this roster is a target map, not a build list.
+1. **Creation rule:** a new agent needs ≥2 invocation sites or a demonstrated isolated-context benefit (heavy reads, parallel lenses, headless execution). Never speculative — every file in this folder names its invocation sites; a role that loses all of them gets archived.
 2. **Voice is a convention, not a role:** every writer and skill applies `docs/conventions/writing-style.md` to human-facing text. There is no copywriter agent.
 3. **The auditor inspects and files; writers fix.**
 4. **Agents ↔ docs, no duplication:** agents point to the docs they enforce; docs may carry a one-line "applied by `agents/<kind>/<name>`" pointer back. A rule lives exactly once. The uno-maintain staleness sweep checks these cross-references both ways.

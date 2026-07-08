@@ -33,7 +33,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 ## When to Use
 
-- A designer types `implement <component>` in `#figma-sync` after reviewing a Notion PRD (the primary live trigger — see [docs/figma-sync-workflow.md](../../docs/figma-sync-workflow.md))
+- A designer types `implement <component>` in `#uno-bot` after reviewing a Notion PRD (the primary live trigger — registry row in [docs/conventions/automations.md](../../../docs/conventions/automations.md))
 - A designer triggers a component implement in Slack — **always tied to its Notion PRD** (the polling bot creates the PRD and posts it; the designer implements from that thread). A component implement is never done without a PRD; if none is in the thread, the bot asks for the link first.
 - A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by Pipedream (downstream of Slack) or a manual GitHub-UI workflow run
 

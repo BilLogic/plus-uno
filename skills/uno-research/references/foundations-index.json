@@ -17,7 +17,7 @@
     "npm run generate:tokens"
   ],
   "key_paths": {
-    "agent_system": ".agent/",
+    "agent_system": "AGENTS.md + skills/ + agents/",
     "design_system_source": "design-system/src/",
     "design_system_docs": "docs/context/design-system/",
     "storybook_config": ".storybook/",

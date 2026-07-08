@@ -1,42 +1,31 @@
+<!-- Template for docs/knowledge/lessons/YYYY-MM-DD-slug.md (method.md §7). Fill and file; then update docs/knowledge/INDEX.md. -->
 ---
-title: "Description of what was solved"
-category: ui-bugs
+title: "What was learned, one specific line"
 date: YYYY-MM-DD
 tags: [tag1, tag2]
-modules: [affected-module]
-severity: medium
-symptom: "What the user or agent observed"
-root_cause: "Why it happened"
+rule_candidate: false # true if this should become a standing rule (rule adoption = changelog line + Tier-2 proposal)
 ---
 
-# Title
+# {Title}
 
 ## Problem
 
-What went wrong. Include the exact error message or visual symptom if applicable.
+What went wrong or surprised us — exact error message / visual symptom / wrong assumption.
 
-## Root Cause
+## Root cause
 
-Why it happened. Trace it to the specific file, line, or configuration that caused the issue.
+Why — traced to the specific file, config, or convention gap.
 
-## Solution
+## Fix
 
-How it was fixed. Include code examples if applicable:
-
-```jsx
-// Before (broken)
-// ...
-
-// After (fixed)
-// ...
-```
+What resolved it. Include the load-bearing snippet or file paths, not prose alone.
 
 ## Prevention
 
-How to avoid this in the future. Could be a lint rule, a convention, a checklist item, or a note to add to the cheat sheet.
+How future sessions avoid it: a convention line, checklist item, or rubric check. If it warrants a standing rule, set `rule_candidate: true` and propose via the Tier-2 gate.
 
-## Files Modified
+## Files touched
 
 | File | Change |
-|------|--------|
-| `path/to/file` | What changed |
+|---|---|
+| `path/to/file` | what changed |

@@ -3,7 +3,7 @@
 # validate-prototype.sh — Quick sanity check for a playground prototype.
 #
 # Usage:
-#   bash .agent/skills/uno-prototype/scripts/validate-prototype.sh playground/my-project
+#   bash skills/uno-prototype/scripts/validate-prototype.sh playground/my-project
 #
 # Checks:
 #   1. src/App.jsx exists

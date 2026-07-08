@@ -7,8 +7,8 @@ Use the following repository-local examples as style references for report tone 
 
 Optional local-only sources (may not exist on other machines):
 
-- `/Users/cynthialu/Downloads/Skill_Audit_-_Uno_Research.pdf`
-- `/Users/cynthialu/Downloads/Skill_Audit_-_Uno_Plan.pdf`
+- `<local-path>`
+- `<local-path>`
 
 ## How to Use These Examples
 

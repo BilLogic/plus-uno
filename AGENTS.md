@@ -45,7 +45,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 `docs/conventions/` is normative: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `writing-style.md` · `terminology.md` · `coding.md` · `tech-stack.md` · `automations.md` (the standing-automation registry — every row names its agent) · `integrations.md` (tool index). Mirrored files carry `source:` / `synced:` provenance — if a live source contradicts the mirror, prefer the source and file a uno-maintain intake.
 
-**Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← Notion (mirrored with provenance).
+**Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← Notion (mirrored with provenance). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 
 ## Forbidden patterns
 

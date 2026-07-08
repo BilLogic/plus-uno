@@ -1,74 +1,72 @@
 ---
 name: uno-maintain
 description: >
-  Document a solution or learning from work just completed. Creates a searchable
-  solution doc in docs/knowledge/lessons/. Use when the user says "document this",
-  "write it up", "save this learning", "compound", or after fixing a non-trivial
-  bug, discovering a gotcha, or making a design decision worth preserving.
-user-invocable: true
-argument-hint: [brief-description]
+  Keeps the harness itself current. Captures a flagged issue — improvement,
+  inaccuracy, inconsistency, or bug — routes it across the three estates
+  (codebase, Figma, Notion) to one of ten targets, drafts the fix, and runs the
+  tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
+  directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
+  through Slack review to a verdict. Also runs the standing sweeps (staleness,
+  hygiene, shipped watchdog) and captures lessons into docs/knowledge/. Use when
+  the user says "file an intake", "this doc is stale", "the spec and Storybook
+  disagree", "the skill/persona is off", "fix this typo", "run the staleness
+  sweep", "document this", "capture this lesson", or after a feature ships and
+  the DS/harness need reconciling.
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 ---
-> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+# uno-maintain — IDE face
+
+Fix the harness, not project design work. The shared procedure — taxonomy, tiers, gates — lives in **[`references/method.md`](references/method.md)**; load it first. This file adds in-IDE execution.
+
+## Intake sources
+
+| Source | Arrives as |
+|---|---|
+| Human spot | "this is wrong / stale / off" — any of the four trigger types |
+| Auditor sweep | `reviewers/auditor` files intakes from a named registry checklist |
+| DS gap from prototyping | `uno-prototype` hits a missing/broken component or token |
+| Mirror drift | a live Notion/Figma read contradicts a `docs/conventions/*` mirror (method §6) |
+| Post-ship reconciliation | a handoff shipped; DS + harness reconcile against built reality |
+
+## Workflow (execution over method.md)
+
+1. **Normalize** (method §1): classify trigger type → estate → target; record the Roadmap intake card via `writers/notion`; name evidence + suggested tier. Cross-estate disagreement → flag it, don't improvise.
+2. **Draft the fix** (method §2), fix-first judge-second:
+   - Repo targets (context docs, skills, persona, DS source, bot) — edit files directly in a branch.
+   - Notion writes → `writers/notion` · Figma writes → `writers/figma` · requirement changes → `writers/blueprint` (paired PRD+blueprint, never one alone).
+3. **Human gate** (method §3): present the 3-line impact / effort / risk brief; the spotter answers. Never answer it yourself.
+4. **Tier and apply** (method §4–5):
+   - **Tier 1** (whitelist absolute): apply, then add the one-line row for the weekly digest.
+   - **Tier 2**: open the PR (git), pair the PRD (`writers/notion`), post the review request, wait for the ✅/🔁/❌ verdict. On ✅: merge/apply and write the apply-log row. Never auto-merge.
+5. **Capture** (method §7): file the lesson, update `docs/knowledge/INDEX.md`, changelog line on rule adoption. Template: [`examples/lesson-template.md`](examples/lesson-template.md).
+
+## Sweeps & audits
+
+- Summon `reviewers/auditor` with a named checklist from the registry — `docs/conventions/automations.md` owns the sweep names (shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions staleness · comment sweep). The auditor inspects and files intakes; writers fix.
+- Staleness sweep checklist: [`references/staleness-sweep.md`](references/staleness-sweep.md) (`synced:` vs source `last_edited_time` + agents↔docs cross-references + path integrity).
+- Scored audits (rubric against an artifact) → summon `reviewers/rubric-applier`.
+- Skill-quality audit (a skill is the target artifact): run [`references/skill-quality/audit-workflow.md`](references/skill-quality/audit-workflow.md) with [`references/skill-quality/checklist.md`](references/skill-quality/checklist.md) as criteria; report per `output-template.md`.
+
+## Loads for Tier 2
+
+- `docs/conventions/notion.md` — intake card + PRD mechanics
+- `docs/conventions/slack.md` — the two gates; verdict convention is gate 2
+- `docs/conventions/writing-style.md` — any human-facing text
+- `docs/conventions/automations.md` — before touching anything a standing automation owns
+
+## Quality bar
+
+Rubric: `docs/evals/rubrics/uno-maintain.md` (applied by `reviewers/rubric-applier`) · golden scenarios: `docs/evals/scenarios/uno-maintain.md`. The hard gates are absolute: zero changes applied without a Slack verdict, and accepted changes ship as a PR+PRD pair — a failed gate fails the run regardless of scores.
 
 ## Agents it summons
 
-reviewers/auditor · reviewers/rubric-applier · writers/notion · writers/figma · writers/blueprint — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+`reviewers/auditor` · `reviewers/rubric-applier` · `writers/notion` · `writers/figma` · `writers/blueprint` — defined in `agents/` (see `agents/README.md`). Summoned by this skill, never by users.
 
+## Constraints
 
-# Compound Learning
-
-Capture what was learned during recent work so future agent sessions benefit.
-
-## When to Use
-
-- After fixing a non-trivial bug
-- After discovering a gotcha or unintuitive behavior
-- After a design decision that others should know about
-- After any work where you learned something not obvious from the code
-
-## Auto-Suggest
-
-Proactively suggest this skill when:
-- The conversation involved debugging or fixing an error
-- The user discovered a gotcha or unintuitive behavior
-- Significant code changes were made (3+ files modified)
-- The session is ending after non-trivial work
-- `/uno:review` found violations that were then fixed (the fix is worth documenting)
-
-Suggest once at the end of a work session — do not interrupt mid-task.
-
-## Steps
-
-### 1. Summarize
-
-What was done? What broke? What was the root cause? What was the fix?
-
-### 2. Create Solution Doc
-
-Append an atomic entry to the appropriate file in `docs/knowledge/lessons/`. Match by domain:
-
-| Domain | File |
-|--------|------|
-| DS compliance, tokens, forbidden patterns | `lessons/ds-compliance.md` |
-| Storybook, Netlify, Figma, MCP | `lessons/integration.md` |
-| Agent infra, skills, context loading | `lessons/agent-patterns.md` |
-| React, Vite, UI architecture | `lessons/ui-patterns.md` |
-
-Use the atomic entry format (YAML frontmatter + markdown body). See `references/solution-schema.md` for field descriptions.
-
-For the full schema and field descriptions, see `references/solution-schema.md`.
-
-### 3. Check for Pattern Escalation
-
-Ask: Should this learning update broader docs? See `references/escalation-rules.md` for the full decision table.
-
-### 4. Update if Warranted (Requires Approval)
-
-**GATE:** Show the proposed change to the user and wait for explicit approval before modifying any agent instruction file. These files govern agent behavior across all future sessions on all platforms — changes must be intentional.
-
-If approved, make the update and cite the solution doc as the source.
-
-## Next Step
-
-This is the terminal skill in the pipeline. No further skill follows.
-Optionally suggest committing the solution doc and any updated instruction files.
+- Never self-approve a substantive change; never answer the worth-incorporating gate; never auto-merge on silence.
+- The Tier-1 whitelist is absolute — skills, persona, DS components, and requirements are always Tier 2.
+- A lone PR or lone PRD never ships; every execution writes its apply-log row.
+- Lessons go under `docs/knowledge/` — never `docs/solutions/` (reserved for other tools).
+- Maintains the harness only — design-work fixes route back through `uno-prototype`; diagnosis-only reviews stay in `uno-review`.

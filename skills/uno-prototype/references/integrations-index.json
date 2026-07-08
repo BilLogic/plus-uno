@@ -18,8 +18,8 @@
     }
   ],
   "design_workflow_docs": [
-    ".agent/skills/uno-prototype/references/figma-workflow.md",
-    "docs/context/conventions/integrations.md"
+    "skills/uno-prototype/references/figma-mcp-guide.md",
+    "docs/conventions/integrations.md"
   ],
   "storybook": {
     "command": "npm run storybook",

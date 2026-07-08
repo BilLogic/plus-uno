@@ -1,109 +1,72 @@
 ---
 name: uno-review
 description: >
-  Quality gate before shipping. Reviews work against PLUS conventions,
-  forbidden patterns, and design system rules. Use when the user asks to
-  "review my work", "check this", "run quality checks", "validate before
-  shipping", before committing significant UI changes or submitting
-  to the marketplace, or when a skill-definition quality audit is needed.
+  Diagnose-only design review with three scenarios: (1) stage-lens review of any
+  artifact exiting prototyping — DS, product-intent (UNO), and accessibility
+  lenses in parallel at stage-appropriate depth; (2) the handoff gate (DS / UNO /
+  a11y) before a package publishes; (3) Design QA — Figma spec vs the QA build
+  when a Roadmap card hits Ready for QA. Use when the user says "review this",
+  "critique", "check against the design system", "poke holes", "run design QA",
+  when an artifact exits uno-prototype, before uno-publish hands off, or when
+  Dev Status flips to Ready for QA (RTT). Mandatory input: a one-line artifact
+  manifest (fidelity / tools / PRD link). It never fixes what it finds — fixes
+  route to uno-prototype (artifact) or uno-maintain (harness/docs).
 user-invocable: true
-argument-hint: [files-or-description]
+argument-hint: [artifact + manifest (fidelity / tools / PRD link)]
 ---
-> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
 
 ## Agents it summons
 
 reviewers/ds-lens · reviewers/uno-lens · reviewers/a11y-lens · reviewers/design-qa · reviewers/rubric-applier — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
 
-
 # Quality Review
 
-Review work against PLUS conventions before shipping.
+Poke holes in a design with a stage-aware lens. **Diagnose only — this skill never edits the artifact.** The full procedure (intake, scenarios, lens depth, severity, verdict) is `references/method.md` — normative for both faces; this file adds only IDE execution.
 
-## When to Use
+## When it fires
 
-- Before committing significant UI work
-- Before submitting a prototype to marketplace
-- When unsure if implementation follows DS patterns
-- As a final check before a PR
-- When reviewing one or multiple `SKILL.md` files for quality and readiness
+1. **Stage-lens review** — an artifact exits any `uno-prototype` path (including hand-crafted work), or the user asks for a review/critique.
+2. **Handoff gate** — a handoff package is about to publish via `uno-publish`: after rails propagation, before sign-off.
+3. **Design QA** — auto-triggered when the Roadmap card hits `Dev Status: Ready for QA (RTT)`; also on request ("run design QA on X").
 
-## Auto-Suggest
+Suggest proactively when the user says "done", "ready to share", or is about to invoke `uno-publish` — once per work session, don't repeat if declined.
 
-Proactively suggest this skill when:
-- The user says "done", "finished", "ready to ship", or "looks good"
-- Before any git commit that touches files under `playground/` or `design-system/src/specs/`
-- Before the user invokes `/uno:post` (review should precede publishing)
-- After completing work in Prototyping or Finalization mode
-- When the user asks to audit skill quality, validate a skill against a checklist, or improve `SKILL.md` structure
+## Workflow
 
-Suggest once per work session — do not repeat if declined.
+1. **Collect the manifest** — fidelity (low / mid / high / coded) · tools · PRD link. Missing → ask for it; no manifest, no review (method.md § Intake).
+2. **Load `references/method.md`** and identify the scenario (method.md § Three scenarios).
+3. **Dispatch the lenses:**
+   - Stage-lens / handoff gate → summon **reviewers/ds-lens + reviewers/uno-lens + reviewers/a11y-lens in parallel**, each with the artifact + manifest. Each stays in-lane at the manifest's depth — no token nits on low-fi work.
+   - Design QA → summon **reviewers/design-qa** with the Roadmap card; it resolves RM-ID → `[spec]` Figma file and walks the QA build against it with the Design QA checklist.
+4. **Coded artifacts:** run `bash skills/uno-review/scripts/run-review-checks.sh <dir>` and hand the hits to ds-lens as evidence (patterns: `references/catch-patterns.md`).
+5. **Merge findings** — dedupe cross-lens overlaps, keep each finding's severity · lens · evidence · reference · re-entry point (method.md § Findings & severity).
+6. **Verdict** per method.md § Verdict & re-entry: `Issues? = Yes` only at severity major+; minors travel as advisory; Design QA blockers hold `Ready for Prod`.
+7. **Log the run** — summon **reviewers/rubric-applier** with `docs/evals/rubrics/uno-review.md`; it scores the dimensions and appends the eval-run entry.
 
-## Routing
+## Tier-2 loads
 
-Use routing rules before running checks:
+| Trigger | Load |
+|---|---|
+| always | `references/method.md` |
+| coded artifact | `references/catch-patterns.md` (+ the script above) |
+| artifact touches Storybook stories/MDX | `references/storybook.md` · `references/storybook-component-docs.md` |
+| posting verdicts / sign-offs to Slack | `docs/conventions/slack.md` |
 
-1. If target is implementation code (UI/prototype/spec files), run the standard `uno-review` checklist and scripts.
-2. If target is skill documentation (`.agent/skills/**/SKILL.md` or skill reference docs), run the embedded Skill Quality Audit workflow from:
-   - `references/skill-quality/checklist.md`
-   - `references/skill-quality/output-template.md`
-   - `references/skill-quality/audit-workflow.md`
-   - `references/skill-quality/audit-examples.md`
-3. If request includes both code review and skill-doc review, run both paths and present results in separate sections.
+Lens rule docs (DS cheat-sheets, `foundations/accessibility.md`, `figma-workspace.md`) are loaded by the summoned agents, not here.
 
-## Checklist
+## Quality bar
 
-### Design System Compliance
+Scored by `docs/evals/rubrics/uno-review.md`: recall ≥80% and precision ≥80% on the golden defect set, 0 out-of-lens findings, diagnose-only hard gate. Golden scenarios: `docs/evals/scenarios/uno-review.md`.
 
-- [ ] **No hardcoded values** — grep for hex colors (`#[0-9a-fA-F]`), px values in inline styles
-- [ ] **Using DS components** — no raw `<button>`, `<input>`, `<div className="card">` when PLUS equivalents exist
-- [ ] **Correct imports** — using `@/` alias, not deep paths into `design-system/src/`
-- [ ] **Token-driven styling** — CSS variables from token system, not literal values
-- [ ] **Props match source** — all component props verified against `.jsx` source files
+## Constraints
 
-### Layout & Structure
+- **Never edits the artifact, never offers to fix** — 0 tolerance. Fixes are explicit, separate asks: artifact → `uno-prototype`, harness/DS/docs → `uno-maintain`.
+- One artifact per review; product-direction questions ("should this exist?") escalate to Bill.
+- Skill-definition quality audits are **not** this skill — that path lives in `uno-maintain` (`skills/uno-maintain/references/skill-quality/`).
 
-- [ ] **PageLayout used** — pages use `<PageLayout>` from specs/Universal
-- [ ] **Context levels respected** — Elements → Cards → Sections → Pages (no skipping)
-- [ ] **Responsive** — works at standard breakpoints
+## Re-entry
 
-### Conventions
-
-- [ ] **File naming** — PascalCase components, kebab-case directories
-- [ ] **PLUS terminology** — no generic web terms (see `docs/context/conventions/terminology.md`)
-- [ ] **Storybook validated** — stories render correctly if component behavior was touched
-- [ ] **No new dependencies** — unless explicitly approved
-
-### Forbidden Pattern Scan
-
-Run the automated review script:
-
-```bash
-bash .agent/skills/uno-review/scripts/run-review-checks.sh <target-dir>
-```
-
-For individual grep patterns, see `references/catch-ds-compliance.md`.
-
-## Output
-
-Present findings as (see `examples/review-output-example.md` for format):
-- **Pass** — no violations found
-- **Warn** — minor issues, can ship with notes
-- **Fail** — violations that must be fixed before shipping
-
-For skill-quality audits routed through the embedded `uno-review` workflow, include:
-- Specific issue
-- Original code snippet
-- Improvement suggestion
-- Suggested revised code
-- Priority (`P0`/`P1`/`P2`)
-
-## Next Step
-
-- If **Pass** → Suggest `/uno:post` to register the prototype in the marketplace.
-- If **Warn** → Note the issues, then suggest `/uno:post` if the user wants to ship with notes.
-- If **Fail** → Help fix violations, then re-run the review.
-- If the review target is skill docs → Use the embedded skill-quality audit references and provide strict checklist-driven remediation with rewrite proposals.
-- After fixing violations → Suggest `/uno:compound` to document what was learned.
-
-These are suggestions — the user may choose to skip steps.
+- `Issues? = Yes` → back to the fidelity decision in `uno-prototype`; each finding names its suggested re-entry point.
+- Clean handoff gate → sign-off, then `uno-publish` proceeds.
+- Design QA findings → annotated issues to dev before `Ready for Prod`.
+- Lesson worth keeping surfaced by the review → `uno-maintain` knowledge capture.

@@ -1,99 +1,88 @@
 ---
 name: uno-publish
-description: Guides designers through submitting a prototype to the Prototype Market. Use when the user asks to "submit", "publish", "add to market", "list my prototype", or wants to deploy and register a prototype in the market index.
+description: >
+  Puts finished-enough design work in front of people, on one of two rails that
+  never re-merge: share for feedback (async bundle — Loom + live preview +
+  decision log + Figma replica — or a sync user study) or hand off to
+  development (componentize, Handoff Spec, rails propagation, DS/UNO/a11y
+  review, dev + PM + stakeholder sign-off, marketplace entry). Use when the
+  user says "share this for feedback", "post a share-out", "set up a feedback
+  session", "hand this off to dev", "publish", "submit to market", or
+  "register this prototype".
 user-invocable: true
-argument-hint: [prototype-name]
+argument-hint: [prototype-or-project]
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 ---
-> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+# Publish
+
+The method — rails, gates, contracts — is `references/method.md`. **Load it first**; this file adds only IDE execution. One decision up front: publishing for **feedback** or for **handoff**? The rails never re-merge, and "post this in Slack" gets clarified before any machinery runs (share-out → bundle rules; plain message → uno-bot conversation, not this skill).
 
 ## Agents it summons
 
-writers/notion · writers/figma — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+`writers/figma` (replica frames, spec promotion, handoff canvas annotations) · `writers/notion` (Decision Log, Handoff Spec, marketplace prose) — defined in `agents/` (see `agents/README.md`); summoned by this skill, never by users. The review gate is **not** summoned here: hand the package to `skills/uno-review`, which dispatches its own lenses.
 
+## Auto-suggest, never auto-run
 
-# Submit to Market
+Suggest this skill after `uno-review` passes a prototype. Every outward side effect — Slack post, Notion write, rails propagation, marketplace entry — needs the designer's explicit go-ahead first; show what will be written and wait.
 
-Walk a designer through registering their prototype in the Prototype Market so it appears on `/market`.
+## Feedback rail — execution
 
-## When to Use
+1. **Assemble the bundle** (method.md § bundle contract):
+   - Loom — the designer records; you supply a beat list of what to narrate.
+   - Live preview — if none exists, help deploy per `references/deployment-guide.md` (never auto-deploy).
+   - Decision log — summon `writers/notion` to create/append the project's Decision Log.
+   - Figma replica (prototypes only) — summon `writers/figma` to build `[replica]`-prefixed frames from the coded prototype.
+2. **Gate check.** Any required piece missing → produce it before going further. A partial bundle never posts.
+3. **Compose the share-out** per `docs/conventions/slack.md`: ≤3 stage-specific feedback questions + a NOT-looking-for line, all bundle links.
+4. **Distribute.** Posting and reviewer-tagging is uno-bot's job — hand it the composed post; if the bot is unavailable, give the designer the exact text to paste in the right channel.
+5. **Close the round.** Consolidate thread + replica markup into Decision Log entries (via `writers/notion`) before calling the round done. Acting on feedback → back to `skills/uno-prototype`.
 
-- Designer finished a prototype and wants it listed
-- Designer deployed to Netlify and wants to add the link
-- Designer asks to "submit to market", "publish my prototype", or "add to the index"
+**Sync session instead?** Logistics only: schedule, confirm participants, wire recording + transcription. Study guide comes from `skills/uno-research`; transcript synthesis from `skills/uno-synthesize`. Never write the guide or analyze the session yourself.
 
-## Auto-Suggest
+## Handoff rail — execution
 
-Proactively suggest this skill when:
-- `/uno:review` returned PASS on a prototype
-- The user completed a prototype and hasn't registered it in the marketplace yet
+1. **Componentize & spec** — decompose into DS components with explicit tokens, states, behaviors; summon `writers/figma` for spec promotion and Dev-Mode annotations.
+2. **Handoff Spec** — summon `writers/notion` to instantiate the team's Handoff Spec template on the project hub (template pointers: `docs/conventions/notion.md`).
+3. **Rails propagation** — inside the designer-confirmed handoff only, apply-logged:
+   - `uno-storybook`: update stories/MDX in `design-system/` directly (in-repo write; validate in Storybook).
+   - `uno-blueprint`: this skill holds no blueprint write access (`docs/conventions/supabase.md`) — route the paired PRD + blueprint update through `skills/uno-maintain`, citing the confirmed handoff as pre-authorization.
+4. **Review gate** — hand to `skills/uno-review` for DS / UNO / a11y. Findings route back to prototyping; re-review after fixes.
+5. **Human gate** — dev + PM + stakeholder ✅ sign-offs in the handoff thread (uno-bot collects). Verify all three exist before proceeding. **No sign-off, no publish.**
+6. **Marketplace entry** — see below.
 
-**Never auto-invoke this skill.** Always require the user to explicitly request publishing. This skill writes to the marketplace data file — it must be intentional.
+## Marketplace registration
 
-## Protocol
+Today's destination is the repo catalog (`src/pages/PrototypeMarket/prototypes-data.js`); the notion-marketplace DB is the official target once stood up — flag that gap on every handoff publish rather than inventing a destination.
 
-### Phase 1: Collect Metadata
+1. Build the entry: field-by-field contract in `references/marketplace-schema.md`, worked entries in `examples/marketplace-entry-example.md`. Auto-fill `id` (next number), `lastUpdated` (today), `upvotes: 0`; ask for the rest. Entry prose (title, description) goes through `writers/notion` voice rules only when it also lands in Notion — repo-catalog prose just follows `docs/conventions/writing-style.md`.
+2. **Validate before writing**: required fields present, `stage`/`productPillar` exact enum matches, `repoPath` ends with `/`. A schema-invalid entry never lands.
+3. Show the entry + target file, wait for confirmation, append, then verify `/market` renders the card (filters, modal, Loom embed, preview image — `npm run generate:previews` if missing).
 
-Gather the required fields. Use smart defaults where possible.
+## Tier-2 loads
 
-1. **Detect `repoPath`** — infer from the user's open files or current directory. Must be a path under `playground/{project}/`.
-2. **Ask the user** for the fields below. Present `stage` and `productPillar` as constrained choices (use AskQuestion if available). Auto-fill `lastUpdated` with today's date and auto-generate `id` from the project folder name.
+| When | Load |
+|---|---|
+| always | `references/method.md` |
+| helping deploy a preview | `references/deployment-guide.md` |
+| building the marketplace entry | `references/marketplace-schema.md` + `examples/marketplace-entry-example.md` |
+| composing the share-out or checking sign-offs | `docs/conventions/slack.md` |
+| any human-facing text | `docs/conventions/writing-style.md` |
 
-| Field | Type | How to get |
-|-------|------|------------|
-| `id` | string | Auto: `{project-folder-name}` |
-| `title` | string | Ask user |
-| `description` | string | Ask user (1-2 sentences) |
-| `deploymentUrl` | string or null | Ask user; null if not deployed |
-| `notionCardUrl` | string or null | Ask user; null if none |
-| `notionCardId` | string or null | Ask user (e.g. `PLUS-42`); null if none |
-| `stage` | `low` / `mid` / `high` | Ask user (choice) |
-| `lastUpdated` | `YYYY-MM-DD` | Auto: today's date |
-| `creators` | string[] | Ask user |
-| `contributors` | string[] | Ask user; defaults to same as creators |
-| `productPillar` | enum | Ask user (choice): `admin`, `home`, `login`, `profile`, `toolkit`, `training`, `universal` |
-| `localPath` | string or null | Ask user; null if not wired into root app |
-| `repoPath` | string | Auto-detect or ask |
-| `loomVideoUrl` | string or null | Ask user; Loom share URL for walkthrough video (e.g. `https://www.loom.com/share/abc123`). Shown as embedded video in the popup detail modal. null if none |
-| `upvotes` | number | Auto: `0` (managed in-app; do not ask user) |
+Summoned writers load their own conventions (`notion.md`, `figma-workspace.md`) — don't restate those here.
 
-### Phase 2: Deployment Help (optional)
+## Quality bar
 
-If `deploymentUrl` is null, follow `references/deployment-guide.md` to help the designer deploy. Do **not** auto-deploy.
+`docs/evals/rubrics/uno-publish.md`, applied by `reviewers/rubric-applier` via `skills/uno-maintain` audits. Headlines: bundle completeness 100% (the gate held), ≥70% first-pass DS/UNO/a11y, ≤2 dev clarification requests per handoff, each shipped handoff names a user-behavior hypothesis checked ~30 days post-ship.
 
-### Phase 3: Submit
+## Constraints
 
-1. Generate the entry object (see Confirmation Template below).
-2. Show it to the designer. **Wait for confirmation before writing.**
-3. Append the entry to the `prototypes` array in `src/pages/PrototypeMarket/prototypes-data.js`.
-4. Suggest verifying at `http://localhost:4100/market`.
+- Rails never re-merge; re-entry means choosing again from the top.
+- A partial bundle never posts; a schema-invalid entry never lands; no sign-off, no publish.
+- Rails writes only inside a live, designer-confirmed handoff — otherwise `skills/uno-maintain`.
+- Publish doesn't judge (that's `uno-review`), doesn't act on feedback (re-enters prototyping), doesn't write study guides or synthesize transcripts.
+- Never auto-deploy; never post, write, or propagate without explicit confirmation.
 
-## Confirmation
+## Next steps
 
-Before writing to the file, show the designer the generated entry object and the target file path. See `examples/marketplace-entry-example.md` for the expected format. **Wait for explicit confirmation before writing.**
-
-## Post-Submit Checklist
-
-After appending:
-
-- [ ] Entry appears correctly in `prototypes-data.js`
-- [ ] `/market` page loads and shows the new card
-- [ ] Filters (stage, pillar) include the new entry
-- [ ] Deployment link works (if provided)
-- [ ] Click the card to open the popup detail modal — verify title, badges, description, links render correctly
-- [ ] Loom walkthrough video embeds correctly in popup detail modal (if `loomVideoUrl` provided)
-- [ ] Preview image loads in popup detail modal (run `npm run generate:previews` if missing)
-- [ ] Optionally commit the change
-
-## Next Step
-
-After publishing:
-→ Suggest `/uno:compound` if anything non-trivial was learned during the build or publishing process.
-
-These are suggestions — the user may choose to skip.
-
-## References
-
-- Data schema: `src/pages/PrototypeMarket/prototypes-data.js`
-- Market page: `src/pages/PrototypeMarket/PrototypeMarket.jsx` (includes popup detail modal with Loom embed, comments, preview image, upvotes)
-- Card component: `src/pages/PrototypeMarket/PrototypeCard.jsx`
-- Prototyping docs: `playground/README.md`
+Feedback in hand → `skills/uno-prototype` to iterate. Handoff shipped → Design QA fires via `skills/uno-review` at Ready-for-QA. Anything non-trivial learned → `skills/uno-maintain` knowledge capture.

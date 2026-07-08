@@ -60,7 +60,7 @@ Use `create_new_file` only when:
 
 ## Code Connect (Future)
 
-`@figma/code-connect` is NOT installed. When Code Connect tools return empty results, fall back to `docs/context/design-system/components/components-index.json` for component discovery. See plan-005 for the implementation roadmap.
+`@figma/code-connect` is NOT installed. When Code Connect tools return empty results, fall back to `docs/context/design-system/components/components-index.json` for component discovery.
 
 ## Known Limitations
 

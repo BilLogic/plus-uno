@@ -1,45 +1,30 @@
-<!-- ~300 tokens | Load for: staleness prevention checks on .agent docs -->
+<!-- Load for: the conventions-staleness sweep (monthly, at retro). Registry row: docs/conventions/automations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
 
-# Sync Checklist
+# Staleness sweep checklist
 
-Use this checklist to prevent `.agent` guidance from going stale.
+One intake per finding (evidence + suggested tier), through the normal pipeline in `method.md`. Tier 1 only for pure path/date/link rot; anything touching skills, persona, DS, or requirements is Tier 2.
 
-## A. Skill Routing Integrity
+## A. Mirror provenance
 
-- [ ] `.agent/SKILL.md` still lists exactly six skills (research, plan, prototype, review, post, compound).
-- [ ] Routing logic table maps signals to correct skills.
-- [ ] Each skill SKILL.md path in `.agent/skills/*/SKILL.md` exists.
+- [ ] Every `docs/conventions/*.md` mirror carries `source:` + `synced:` in its header.
+- [ ] For each mirror, compare `synced:` against the source page's `last_edited_time` — drift → intake to re-sync (update body *and* `synced:` date).
+- [ ] The staleness rule line ("prefer the source, file an intake") is present in each mirror.
 
-## B. Path Accuracy
+## B. Agents ↔ docs cross-references (both ways)
 
-- [ ] Every path referenced in `docs/context/design-system/` exists.
-- [ ] Every path referenced in nested reference files (for example mode references and core references) exists.
-- [ ] Skill `references/` directories contain only relevant index/guide files.
-- [ ] Import conventions still match `design-system/src` and Storybook alias config.
+- [ ] Every agent's "Conventions it obeys" pointers resolve to existing docs.
+- [ ] Every "applied by `agents/<kind>/<name>`" pointer in docs names an agent file that exists.
+- [ ] No agent restates a rule a doc owns (non-duplication rule, `agents/README.md`).
+- [ ] Every row in `docs/conventions/automations.md` still names an existing agent and an existing skill method.
 
-## C. Token Integrity
+## C. Routing & path integrity
 
-- [ ] Token docs align with `design-system/src/tokens/*.scss`.
-- [ ] Semantic token layer examples still valid.
-- [ ] No hardcoded-value guidance conflicts with source conventions.
+- [ ] `AGENTS.md` roster lists exactly six skills; each `skills/*/SKILL.md` + `bot.md` exists and both load `references/method.md`.
+- [ ] Reference links inside each `SKILL.md` resolve (run `scripts/validate-doc-links.sh`).
+- [ ] Paths referenced from `docs/context/design-system/` exist; index JSONs match current paths and commands.
 
-## D. Component Discovery Integrity
+## D. Token & DS integrity
 
-- [ ] Export barrel files still valid.
-- [ ] Representative story example paths still valid.
-- [ ] Spec directory references still valid.
-
-## E. Integration Integrity
-
-- [ ] Figma workflow links resolve.
-- [ ] Token sync scripts and env variable names still accurate.
-- [ ] CI workflow path and behavior still accurate.
-- [ ] Index JSON files in skill `references/` and `docs/context/design-system/` still match current paths and commands.
-
-## F. Suggested Drift Check Commands
-
-```bash
-rg --files .agent
-rg -n "design-system|playground|.storybook|scripts/" .agent
-.agent/scripts/validate-doc-links.sh
-```
+- [ ] Token docs align with `design-system/src/tokens/*.scss`; no guidance conflicts with generated sources.
+- [ ] Export barrels (`design-system/src/index.js`, `components/index.js`, `forms/index.js`) match the components docs reference.
+- [ ] Storybook story paths referenced in docs still resolve under `.storybook/main.js` config.

@@ -42,26 +42,20 @@ while IFS= read -r file; do
       status=1
     fi
   done < <(link_grep "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
-done < <(find skills agents docs/conventions -type f -name '*.md' | sort)
+done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md'; echo AGENTS.md; echo loading-order.md; } | sort)
 
-echo "[check] validating AGENTS.md 'See' references"
+echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 
-grep "^See " AGENTS.md | sed 's/^See //' | while read -r ref; do
-  ref="${ref%% *}"  # Strip trailing description
-  if [[ ! -f "$ref" ]]; then
-    echo "[missing] AGENTS.md -> $ref"
-    status=1
-  fi
-done
-
-echo "[check] validating SKILL.md skill links"
-
-grep -oE 'skills/uno-[a-z-]+' AGENTS.md | sort -u | while read -r ref; do
+# NB: process substitution, not a pipeline — status=1 must survive (a `| while`
+# subshell silently drops it). Same reason grep gets `|| true`: under
+# `set -euo pipefail` a matchless grep would kill the script with no message.
+while read -r ref; do
+  [[ -z "$ref" ]] && continue
   if [[ ! -f "$ref/SKILL.md" ]]; then
     echo "[missing] AGENTS.md -> $ref/SKILL.md"
     status=1
   fi
-done
+done < <(grep -oE 'skills/uno-[a-z-]+' AGENTS.md | sort -u || true)
 
 echo "[check] validating JSON index files"
 
@@ -69,10 +63,10 @@ required_indexes=(
   "docs/context/design-system/index-manifest.json"
   "docs/context/design-system/components/components-index.json"
   "skills/uno-research/references/foundations-index.json"
-  ".agent/skills/uno-research/references/patterns-index.json"
-  ".agent/skills/uno-prototype/references/tokens-index.json"
-  ".agent/skills/uno-prototype/references/examples-index.json"
-  ".agent/skills/uno-prototype/references/integrations-index.json"
+  "skills/uno-research/references/patterns-index.json"
+  "skills/uno-prototype/references/tokens-index.json"
+  "skills/uno-prototype/references/examples-index.json"
+  "skills/uno-prototype/references/integrations-index.json"
 )
 
 for idx in "${required_indexes[@]}"; do
@@ -98,8 +92,10 @@ old_patterns=(
 )
 
 for pattern in "${old_patterns[@]}"; do
-  count=$(grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" 2>/dev/null \
-    | grep -v "node_modules/" | grep -v "docs/plans/" | grep -v "docs/knowledge/" | grep -v "storybook-static/" \
+  # `|| true` inside the substitution: zero matches is the SUCCESS case, but under
+  # pipefail a matchless grep would fail the assignment and kill the script.
+  count=$({ grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" . 2>/dev/null || true; } \
+    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|storybook-static/" || true; } \
     | wc -l | tr -d ' ')
   if [[ "$count" -gt 0 ]]; then
     echo "[stale] $count references to old path pattern: $pattern"

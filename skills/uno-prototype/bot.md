@@ -1,7 +1,7 @@
 <!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. -->
 # uno-prototype — bot face
 
-Loads: references/method.md (the shared procedure) · docs/conventions/cheat-sheet.md · docs/conventions/layout-cheat-sheet.md
+Loads: references/method.md (the shared procedure — grounding ritual, fidelity routing, the two hard gates) · docs/context/design-system/components/cheat-sheet.md · docs/context/design-system/components/layout-cheat-sheet.md
 
 Propose gated implementation runs: DS-library component updates (`implement`) and new playground prototypes (`implement_design`). Both are side-effect tools — every invocation goes through the confirmation gate; the Worker stages the proposal and holds for ✅.
 

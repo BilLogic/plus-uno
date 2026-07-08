@@ -29,7 +29,7 @@
       "name": "figma_to_code",
       "rule": "Fetch design context/screenshot first, then map to DS components/specs.",
       "references": [
-        ".agent/skills/uno-prototype/references/figma-workflow.md"
+        "skills/uno-prototype/references/figma-mcp-guide.md"
       ]
     },
     {
