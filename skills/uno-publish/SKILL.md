@@ -1,9 +1,15 @@
 ---
-name: uno-post
+name: uno-publish
 description: Guides designers through submitting a prototype to the Prototype Market. Use when the user asks to "submit", "publish", "add to market", "list my prototype", or wants to deploy and register a prototype in the market index.
 user-invocable: true
 argument-hint: [prototype-name]
 ---
+> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+## Agents it summons
+
+writers/notion · writers/figma — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+
 
 # Submit to Market
 

@@ -1,64 +1,37 @@
-# Three-Tier Context Loading Contract
+# Loading Order — the tier contract
 
-This document defines what loads when, with token budgets and tier membership.
+<!-- Tier: 1 — doc #2 of exactly two always-loaded files. -->
 
-## Tier 1: Always-Loaded (Session Start)
+Two files load always; everything else loads on demand or is retrieved live. Budgets are targets, not suggestions — a tier that bloats defeats the tier.
 
-AGENTS.md itself is the always-loaded document: **94 lines, under the 200-line budget.**
+## Tier 1 — always loaded (~250 lines total)
 
-It contains plain "See" references to these Tier 1 context files. "See" references are **lazy-loaded** — agents read them on first relevant mention, not all at session start. This keeps the initial context small while making authoritative context discoverable.
+| File | Role | Budget |
+|---|---|---|
+| `AGENTS.md` | constitution: identity · roster · routing · forbidden patterns | ≤150 lines |
+| `loading-order.md` | this contract | ≤60 lines |
 
-| Reference | File | ~Lines | ~Tokens | Marker |
-|-----------|------|--------|---------|--------|
-| Identity | `docs/context/agent-persona.md` | 35 | 200 | Tier 1 |
-| Product | `docs/context/product/plus-app.md` | 70 | 400 | Tier 1 |
-| Conventions | `docs/context/conventions/coding.md` | 100 | 500 | Tier 1 |
-| Terminology | `docs/context/conventions/terminology.md` | 40 | 200 | Tier 1 |
-| Principles | `docs/context/design-system/foundations/principles.md` | 35 | 200 | Tier 1 |
-| Knowledge Index | `docs/knowledge/INDEX.md` | 30 | 150 | Tier 1 |
-| **Total available** | | **~310** | **~1,650** | |
+## Tier 2 — loaded on demand (the only Tier-2 table; nothing else may duplicate it)
 
-These files are marked `<!-- Tier: 1 -->` and are the authoritative product/conventions/identity truth. They differ from Tier 2 in that they are referenced from AGENTS.md (always-visible) rather than from skill SKILL.md files (skill-triggered).
+| Consumer | Loads | When |
+|---|---|---|
+| any skill, on invocation | its `skills/<name>/SKILL.md` (IDE) or `bot.md` (Worker) + `references/method.md` | always for that skill |
+| skill references | `skills/<name>/references/*.md` — one level deep, linked from SKILL.md | as linked |
+| any agent, on summon | its `agents/<kind>/<name>.md` + the conventions it names | always for that agent |
+| any estate write | the matching `docs/conventions/{notion,figma-workspace,slack,supabase}.md` | before writing |
+| any human-facing text | `docs/conventions/writing-style.md` | before writing |
+| UI building | DS cheat-sheets per AGENTS.md § Progressive loading | mandatory triggers |
+| orientation / product framing | `docs/context/*` | as needed |
 
-## Tier 2: On-Demand (Skill-Triggered)
+## Tier 3 — retrieved live, never cached
 
-Loaded when a skill is invoked. Each skill declares its Tier 2 context.
+| Truth | Source | Access |
+|---|---|---|
+| product (features, requirements, screens) | `uno-blueprint` (Supabase) | `writers/blueprint` / `blueprint_search` |
+| design system (components, styles, docs) | `uno-storybook` (stories + MDX in `design-system/`) | read source + stories directly |
+| team conventions (canonical) | Notion playbooks | mirrors in `docs/conventions/` carry `source:`/`synced:`; prefer live Notion on conflict |
 
-| Skill | Context Files | Budget |
-|-------|--------------|--------|
-| uno-research | `docs/context/product/*`, `docs/knowledge/INDEX.md` → domain files, `references/component-discovery.md`, `references/learning.md` | ~3K |
-| uno-plan | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief | ~4K |
-| uno-prototype | `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, `references/cheat-*.md`, handoff plan | ~5K |
-| uno-review | `docs/context/design-system/foundations/accessibility.md`, `docs/context/design-system/foundations/content-voice.md`, `docs/knowledge/preferences.md` | ~3K |
-| uno-post | `references/marketplace-schema.md`, `references/deployment-guide.md` | ~1K |
-| uno-compound | `docs/knowledge/INDEX.md`, target domain lesson file, `references/solution-schema.md` | ~3K |
+## Runtime notes
 
-**Per-skill cap:** 5K tokens. **Combined Tier 2 cap:** 25K tokens.
-
-Skills reference shared context (e.g., `docs/context/design-system/components/cheat-sheet.md`) via absolute repo-relative paths. This is shared infrastructure, not a cross-skill dependency.
-
-## Tier 3: Ephemeral (Context Window + Handoffs)
-
-- **Context window:** Tool outputs, exploration results, intermediate reasoning. Does NOT survive compaction.
-- **Handoff bridge:** `.agent/handoffs/` — structured artifacts written before `/compact`, read by next skill.
-  - Format: YAML frontmatter (`from`, `to`, `created`, `status`) + markdown body
-  - Lifecycle: pending → consumed → cleaned up by uno-compound
-  - **Gitignored** — local-only session state
-  - TTL: 7 days, then pruned
-
-## Tier Membership Markers
-
-Each file in `docs/context/` and `docs/knowledge/` has a tier marker comment in its first line:
-
-- `<!-- Tier: 1 -->` — referenced by AGENTS.md, loaded at session start
-- `<!-- Tier: 2 -->` — loaded by skills on demand
-
-`docs/knowledge/INDEX.md` is Tier 1. All other knowledge files are Tier 2.
-
-## Loading Rules
-
-1. Load the minimum context needed for the current task
-2. Do not bulk-load all Tier 2 files — load per skill trigger
-3. Once a reference is loaded in the current session, do not re-read it
-4. After skill selection, context from other skills is irrelevant
-5. If context window exceeds ~25K tokens of loaded docs, suggest `/compact`
+- **Worker (uno-bot):** no on-demand loading — `agents/uno-bot/src/agent/skills.ts` `SKILL_PATHS` concats AGENTS.md + AGENT.md + all `skills/*/bot.md` + methods + conventions into one prompt-cached block. Keep bot.md files ≤60 lines for this reason.
+- **GitHub Actions:** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline — this is why conventions are mirrored, not linked.

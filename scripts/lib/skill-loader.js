@@ -1,16 +1,16 @@
 /**
- * bot-skills/lib/skill-loader.js
+ * scripts/lib/skill-loader.js
  *
  * Loads a SKILL.md file and returns its content as a runtime system prompt
  * for Claude API calls. Used by scripts/implement-figma-changes.js and
  * (eventually, via copy-paste) Pipedream code steps.
  *
  * Anthropic Agent Skills convention:
- *   bot-skills/{skill}/SKILL.md         — entry point, always loaded
- *   bot-skills/{skill}/references/*.md  — loaded on demand based on context
+ *   scripts/prompts/{skill}/SKILL.md         — entry point, always loaded
+ *   scripts/prompts/{skill}/references/*.md  — loaded on demand based on context
  *
  * Usage:
- *   import { loadSkill } from '../bot-skills/lib/skill-loader.js';
+ *   import { loadSkill } from './lib/skill-loader.js';
  *   const systemPrompt = await loadSkill('uno-implement', {
  *     isNewComponent: false
  *   });
@@ -30,7 +30,7 @@ import { dirname, resolve, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const BOT_SKILLS_ROOT = resolve(__dirname, '..');
+const BOT_SKILLS_ROOT = resolve(__dirname, '../prompts');
 
 /**
  * Section headings that are metadata for humans and should not appear in the

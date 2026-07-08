@@ -1,25 +1,20 @@
 <!-- Tier: 2 -->
-<!-- ~120 tokens | Load for: deciding which MCP or integration path to use -->
+<!-- ~150 tokens | Load for: deciding which tool/integration path to use -->
 
-# Integrations Guide
+# Integrations Index
 
-## When to Load
-- Load this when deciding which integration/tool path to use.
-- For concrete scripts/env vars/commands/calls, load `.agent/skills/uno-prototype/references/integrations-index.json` and `.agent/skills/uno-prototype/references/tokens-index.json`.
+One row per connected tool: where its conventions live, what touches it. Concrete scripts/env vars: `skills/uno-prototype/references/integrations-index.json`.
 
-## Integration Routing Rules
-- **Figma MCP**: primary for design-tool-driven implementation. Full tool reference: `.agent/skills/uno-prototype/references/figma-mcp-guide.md`. Key tools: `get_design_context`, `get_screenshot`, `get_metadata`, `get_variable_defs`, `search_design_system`, `create_design_system_rules`, `create_new_file` (canvas write-back).
-- **Stitch MCP**: primary for consulting/iteration wireframe generation.
-- If runtime lacks an MCP, explicitly state the limitation and continue with repo-native stories/specs/scripts.
+| Tool | Conventions | Primary access | Written by |
+|---|---|---|---|
+| Notion | `docs/conventions/notion.md` | Notion MCP / API | `writers/notion` only |
+| Figma | `docs/conventions/figma-workspace.md` (workspace) · `skills/uno-prototype/references/figma-mcp-guide.md` (MCP pipeline) | Figma MCP (`get_design_context`, `get_screenshot`, `get_variable_defs`, `search_design_system`) | `writers/figma` only |
+| Slack | `docs/conventions/slack.md` | uno-bot Worker | the uno-bot embodiment |
+| Supabase (`uno-blueprint`) | `docs/conventions/supabase.md` | `blueprint_search` / PostgREST | `writers/blueprint` only |
+| Storybook (`uno-storybook`) | source of truth in `design-system/` stories; setup `.storybook/main.js` | read directly | skills (component work) |
+| Netlify | deploy notes: `docs/context/product/plus-uno.md` + `skills/uno-publish/references/deployment-guide.md` | `netlify.toml` | uno-publish |
+| Loom | share-out role: `docs/conventions/slack.md` (bundle) | manual recording; URL in bundle | humans |
+| Stitch MCP | wireframe generation for exploration | MCP | — |
+| Playwright MCP | external-site capture ("HTML to Design"), browser e2e | global `.claude.json` | — |
 
-## Canonical Repo Docs
-- Figma workflow: `.agent/skills/uno-prototype/references/figma-workflow.md`
-- Storybook setup: `.storybook/main.js`, `.storybook/preview.jsx`
-- Token sync CI: `.github/workflows/sync-figma-tokens.yml`
-- Playwright MCP: Global configuration in `.claude.json`
-
-## Playwright MCP Integration
-- **Use for:** Capturing external websites to Figma (via "HTML to Design" workflow) or running browser-based end-to-end tests.
-- **Installation:** Pre-configured in global `.claude.json`.
-- **Key capability:** Allows the agent to control a browser instance to interact with pages the agent cannot directly access or modify (e.g., third-party sites).
-- **Figma Workflow:** Required by the `generate_figma_design` tool when targeting external URLs.
+If a runtime lacks an MCP, state the limitation explicitly and continue with repo-native stories/specs/scripts.

@@ -10,14 +10,19 @@
 import type { Env } from "../types";
 
 const SKILL_PATHS = [
-  "AGENTS.md",
-  "uno-qa/SKILL.md",
-  "uno-synthesize/SKILL.md",
-  "uno-maintain/SKILL.md",
-  "uno-research/SKILL.md",
-  "uno-implement/SKILL.md",
-  "uno-implement-design/SKILL.md",
-  "uno-marketplace/SKILL.md",
+  "AGENTS.md", // the constitution (repo root)
+  "agents/uno-bot/AGENT.md", // this embodiment's persona delta
+  "skills/uno-research/bot.md",
+  "skills/uno-synthesize/bot.md",
+  "skills/uno-prototype/bot.md",
+  "skills/uno-publish/bot.md",
+  "skills/uno-review/bot.md",
+  "skills/uno-maintain/bot.md",
+  "docs/conventions/notion.md",
+  "docs/conventions/figma-workspace.md",
+  "docs/conventions/slack.md",
+  "docs/conventions/supabase.md",
+  "docs/conventions/writing-style.md",
 ] as const;
 
 let cachedSystemPromise: Promise<string> | null = null;

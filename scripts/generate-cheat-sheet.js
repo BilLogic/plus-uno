@@ -4,7 +4,7 @@ import path from 'path';
 const ROOT_DIR = path.resolve(import.meta.dirname, '../');
 const TOKENS_DIR = path.join(ROOT_DIR, 'design-system/src/tokens');
 const COMPONENTS_INDEX = path.join(ROOT_DIR, 'design-system/src/components/index.js');
-const ASSETS_DIR = path.join(ROOT_DIR, '.agent/assets');
+const ASSETS_DIR = path.join(ROOT_DIR, 'docs/context/design-system/generated');
 
 // Output files (split for dynamic context loading)
 const OUTPUT_COMPONENTS = path.join(ASSETS_DIR, 'cheat-components.md');

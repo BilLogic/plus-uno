@@ -12,7 +12,7 @@ compatibility_flags = ["nodejs_compat"]
 # where this worker dispatches to, you may want different values for the two.
 [vars]
 GITHUB_REPO = "BilLogic/plus-uno"
-SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main/bot-skills"
+SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
 # Notion "Roadmap" database (the Design HQ board). create_prd drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
@@ -22,14 +22,14 @@ NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
 # DS Component PRDs database — create_prd routes prd_type="ds-component" here
 # (feature PRDs go to the Roadmap board above). Leave blank to fall back to
 # Roadmap. Set to the "DS Component PRDs" DB id when ready.
-NOTION_DS_COMPONENT_DB_ID = ""
+NOTION_DS_COMPONENT_DB_ID = "342b7cca-4982-80b1-b305-f9e0e581ef48"
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 # #plus-design channel id. Confirmed reviewable artifacts (PRs from implement /
 # implement_design / marketplace_*, and new PRDs) are announced here for team
 # review (D5). Leave blank to disable fan-out (replies stay in-thread).
-PLUS_DESIGN_CHANNEL_ID = ""
+PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET

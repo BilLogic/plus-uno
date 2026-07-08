@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# link extraction with rg->grep fallback (rg is not guaranteed on every machine)
+link_grep() {
+  if command -v rg >/dev/null 2>&1; then rg -o '\[[^]]+\]\(([^)]+)\)' "$1"; else grep -oE '\[[^]]+\]\([^)]+\)' "$1"; fi
+}
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -37,8 +41,8 @@ while IFS= read -r file; do
       echo "[missing] $file -> $link (resolved: $target)"
       status=1
     fi
-  done < <(rg -o '\[[^]]+\]\(([^)]+)\)' "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
-done < <(find .agent -type f -name '*.md' | sort)
+  done < <(link_grep "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
+done < <(find skills agents docs/conventions -type f -name '*.md' | sort)
 
 echo "[check] validating AGENTS.md 'See' references"
 

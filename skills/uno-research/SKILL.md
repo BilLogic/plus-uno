@@ -8,6 +8,12 @@ context: fork
 agent: Explore
 allowed-tools: Read, Grep, Glob, WebSearch, mcp__notion-plus__*
 ---
+> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+## Agents it summons
+
+researchers/explorer · researchers/source-miner · researchers/people-scout — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+
 
 # Research & Discovery
 

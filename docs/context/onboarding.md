@@ -1,83 +1,41 @@
-# Setup Guide
+# Onboarding — humans start here
 
-Getting started with plus-uno for new team members and coding agents.
+New designer, PM, developer, or intern: this page + the six skills are all you memorize. (Agents entering the repo read `AGENTS.md` instead.)
 
-## Quick Start
+## Quick start
 
 ```bash
-# Clone and install
-git clone https://github.com/BilLogic/plus-uno.git
-cd plus-vibe-coding-starting-kit
-npm install
-
-# Start dev servers
-npm run dev          # Vite (4100) + Storybook (4200) concurrent
-npm run dev:vite     # Vite only on port 4100
-npm run storybook    # Storybook only on port 4200
+git clone https://github.com/BilLogic/plus-uno.git && cd plus-vibe-coding-starting-kit && npm install
+npm run dev          # Vite (4100) + Storybook (4200)
 ```
 
-## Recommended Compound Engineering Skills
+## The one thing to learn: six skills
 
-Install these CE skills for the best workflow. They integrate with the plus-uno agent system:
+You talk to **uno** (in the IDE, or @uno-bot in Slack) in terms of what you want. Either name the skill or just describe the task — the agent routes.
 
-| Skill | Command | Purpose |
-|-------|---------|---------|
-| Plan | `/ce:plan` | Create structured implementation plans in `docs/plans/` |
-| Work | `/ce:work` | Execute plans with task tracking and quality gates |
-| Review | `/ce:review` | Multi-agent code review before shipping |
-| Brainstorm | `/ce:brainstorm` | Explore requirements through collaborative dialogue |
-| Compound | `/ce:compound` | Document learnings in `docs/knowledge/lessons/` |
-| Ideate | `/ce:ideate` | Generate improvement ideas for the project |
+| Say / invoke | When you want |
+|---|---|
+| `uno-research` | context gathered: user studies, Slack history, analytics, codebase |
+| `uno-synthesize` | findings turned into takeaways and a PRD |
+| `uno-prototype` | a prototype built from a PRD (it picks the right fidelity) |
+| `uno-publish` | work shared for feedback, or handed off to dev (Handoff Spec + bundle) |
+| `uno-review` | design-system / product-intent / accessibility review, or Design QA vs the Figma spec |
+| `uno-maintain` | something's off — file it; small fixes auto-apply, big ones become PR + PRD |
 
-## MCP Server Setup
+You never invoke agents directly — skills summon them (that's the `agents/` folder; internal machinery).
 
-These MCP servers enhance the agent workflow:
+## Where things live
 
-### Figma MCP (Required for design work)
-Provides `get_design_context`, `get_screenshot`, `get_variable_defs` for design-to-code workflows.
+- **Product truth** → uno-blueprint (Supabase); ask via a skill, don't trust stale docs.
+- **Design-system truth** → Storybook (plus-uno.netlify.app/storybook) + `design-system/` source.
+- **Team conventions** → Notion playbooks (canonical) with mirrors in `docs/conventions/`.
+- **Project docs** → each project's Notion hub (TLDR → People → Now/Next/Blocked → …).
+- **This repo's history** → `docs/knowledge/` (lessons, ADRs); superseded things in `archive/`, never deleted.
 
-**Setup**: Add Figma API credentials to `.env`:
-```
-FIGMA_FILE_KEY=<your-figma-file-key>
-FIGMA_ACCESS_TOKEN=<your-figma-access-token>
-```
+## Tooling
 
-### Stitch MCP (Optional — for wireframe generation)
-Used in Consulting and Iteration modes for rapid wireframe generation from briefs.
+MCP servers used by the agent: Figma (required for design work), Notion, Slack (via uno-bot), Supabase. Setup lives with each tool's row in `docs/conventions/integrations.md`. Compound-engineering skills (`/ce:plan`, `/ce:work`, `/ce:review`, `/ce:compound`) remain useful for repo development work.
 
-### Playwright MCP (Optional — for browser testing)
-Browser automation for testing prototypes and capturing screenshots.
+## Your first week test
 
-### Notion MCP (Optional — for product context)
-Access Product HQ roadmap, PRDs, and meeting notes directly from the agent.
-
-## Platform Configuration
-
-### Claude Code
-`CLAUDE.md` at project root imports `@AGENTS.md`. No additional setup needed — Claude Code auto-loads it.
-
-### Cursor
-`.cursor/rules/plus-agent.mdc` (always-apply rule) points to `AGENTS.md`. Committed and shared with team.
-Legacy fallback: `cursorrules.md` at root.
-
-### Windsurf
-`.windsurfrules` at project root points to `AGENTS.md`.
-
-### Other Agents
-Point the agent's instruction file to `AGENTS.md` at the project root. See `.agent/platform-integration.md` for details.
-
-## Project Structure
-
-See `docs/context/product/plus-uno.md` for the full directory layout and tech stack.
-
-## Key Files for Agents
-
-| File | When to Load |
-|------|-------------|
-| `AGENTS.md` | Always (auto-loaded) |
-| `.agent/SKILL.md` | Design system work (mode routing) |
-| `.agent/AGENT.md` | Identity, skills table, grounding rules |
-| `docs/context/design-system/components/cheat-sheet.md` | Before writing any UI code (MANDATORY) |
-| `docs/context/design-system/components/layout-cheat-sheet.md` | Before building pages (MANDATORY) |
-| `docs/context/product/plus-app.md` | Understanding the PLUS product |
-| `docs/context/conventions/coding.md` | File naming, imports, gotchas |
+If you can't self-serve from a project's Notion hub + this page, that's a documentation bug — file it via `uno-maintain`.

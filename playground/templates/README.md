@@ -10,8 +10,8 @@ Reusable prototype starters organized by product area.
 
 ## Canonical References
 
-- Agent router: `.agent/SKILL.md`
-- Skill references: `.agent/skills/*/references/*.md`
+- Agent router: `AGENTS.md`
+- Skill references: `skills/*/references/*.md`
 - Token reference: `docs/context/design-system/foundations/tokens.md`
 - DS component docs: `docs/context/design-system/components/inventory.md`
 - DS token docs: `docs/context/design-system/styles/`

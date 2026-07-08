@@ -9,6 +9,12 @@ description: >
   collected raw context and needs it distilled into a buildable requirement.
 allowed-tools: Read, Grep, Glob, Write, mcp__notion-plus__*
 ---
+> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+## Agents it summons
+
+writers/notion · writers/blueprint — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+
 
 # Synthesize & Distill
 

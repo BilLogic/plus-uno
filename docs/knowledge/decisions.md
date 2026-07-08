@@ -91,3 +91,13 @@ tags: [architecture, conventions]
 - **Context**: Sidebar navigation required maintaining 3 parallel maps (`pathToTab`, `pathToUserType`, inline `onTabClick` if-chain). Every navigation change required code changes in 3+ locations.
 - **Decision**: Single declarative route manifest that drives routing, sidebar state, breadcrumbs, and user type. Dynamic sub-items register/unregister at runtime. Adding a new route requires only a manifest entry.
 - **Source**: docs/plans/2026-03-17-001-feat-toolkit-ia-revision-plan.md
+
+## ADR-013: Harness IA — one constitution, dual-face skills, derived agent roster (2026-07-07)
+
+**Decision.** (1) One constitution: root `AGENTS.md` is the only identity/routing doc; `loading-order.md` is tier-1 #2; CLAUDE.md removed (AGENTS.md is read natively). (2) Six dual-face skills at `skills/`: SKILL.md (IDE) + bot.md (Worker) + references/method.md (shared core). (3) `agents/` holds roles derived from a task×skill matrix — researchers/ · reviewers/ · writers/ (the only estate writers) + the uno-bot embodiment (definition + Worker body in one folder). (4) `docs/conventions/` (normative, incl. Notion mirrors with `source:`/`synced:` provenance) split from `docs/context/` (descriptive). (5) Interaction contract: humans speak in skills · skills summon agents · agents obey conventions. (6) Placement rule: content lives with its consumer; cache the foundation, retrieve the rest (uno-blueprint = product truth, uno-storybook = DS truth, Notion = convention truth).
+
+**Why.** The April three-tier harness drifted: the six-skill pivot existed only as prose in bot-skills/AGENTS.md; uno-synthesize was unrouteable; three skill surfaces had three loading semantics; Notion conventions had 13/20 items missing from the repo; the knowledge loop was dead since 2026-04-11. Full evidence: the 2026-07-07 plan §0.
+
+**Supersedes.** ADR-001 (AGENTS.md entry point — strengthened: now the *only* one), ADR-007 (skills agent-agnostic under .agent/ — now top-level skills/ with per-runtime faces), ADR-008 (compound loop via uno-compound — now uno-maintain), the .agent/SKILL.md mode/pipeline router.
+
+**Pending.** ADR for the Pipedream→Cloudflare cutover outcome (Bill to confirm the Slack app's Event Subscriptions URL); skill-body rewrites (plan Phase 1) land separately with evals-first scenarios.

@@ -33,21 +33,20 @@ plus-uno/
 │   │   ├── product/               # PLUS app landscape, users, features, flows
 │   │   ├── conventions/           # Coding standards, tech stack, terminology
 │   │   └── design-system/         # Foundations, components, styles
-│   ├── knowledge/                 # Compound loop — lessons, decisions, preferences
-│   ├── plans/                     # Implementation plans
-│   └── setup-guide.md             # Full onboarding guide
+│   ├── conventions/               # Normative rules — tool mirrors, voice, automations registry
+│   ├── evals/                     # Quality loop — rubrics, scenarios, runs
+│   ├── knowledge/                 # Append-only — lessons, ADRs, research, archive
+│   └── plans/                     # Dated implementation plans
 │
-├── .agent/                        # Agent infrastructure
-│   ├── SKILL.md                   # Skill router — 6 skills, routing logic
-│   ├── AGENT.md                   # Pipeline orchestration, compaction protocol
-│   ├── loading-order.md           # Three-tier loading contract
-│   └── skills/                    # Tier 2 — on-demand skill contexts
-│       ├── uno-research/          # Explore design system, components, patterns
-│       ├── uno-plan/              # Scope and plan implementation
-│       ├── uno-prototype/         # Build prototypes with DS conventions
-│       ├── uno-review/            # Quality gate before shipping
-│       ├── uno-post/              # Submit to Prototype Marketplace
-│       └── uno-compound/          # Document learnings for future sessions
+├── skills/                        # HOW — six capabilities, each with SKILL.md (IDE) + bot.md (Worker)
+│   ├── uno-research/              # Gather context, instrument-first
+│   ├── uno-synthesize/            # Findings → PRD; blueprint updates
+│   ├── uno-prototype/             # PRD → prototype, fidelity-routed
+│   ├── uno-publish/               # Share-out bundle · handoff · marketplace
+│   ├── uno-review/                # DS / UNO / a11y lenses · Design QA
+│   └── uno-maintain/              # Intake · Tier 1/2 · sync · knowledge capture
+│
+├── agents/                        # WHO — researchers/ · reviewers/ · writers/ + uno-bot/ (Worker)
 │
 └── Cross-agent pointers           # One source of truth, multiple editors
     ├── CLAUDE.md                  # Claude Code → @AGENTS.md
@@ -166,10 +165,10 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | `docs/context/product/plus-uno.md` | This repo's structure and inventory |
 | `docs/context/conventions/coding.md` | File naming, imports, git conventions |
 | `docs/context/design-system/` | DS foundations, components, styles |
-| `docs/context/conventions/terminology.md` | PLUS domain terminology |
-| `docs/context/conventions/tech-stack.md` | Full tech stack with versions |
+| `docs/conventions/terminology.md` | PLUS domain terminology |
+| `docs/conventions/tech-stack.md` | Full tech stack with versions |
 | `docs/knowledge/INDEX.md` | Knowledge base index (lessons, decisions, preferences) |
-| `.agent/platform-integration.md` | Cross-agent pointer file architecture |
+| `agents/README.md` | Agent roster, anatomy, creation rule |
 
 ## Contributing
 

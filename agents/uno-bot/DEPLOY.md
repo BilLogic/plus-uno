@@ -49,7 +49,7 @@ Notes:
 - Only `FIGMA_ACCESS_TOKEN` is new; the other secrets already exist on the live Worker.
 - `wrangler deploy` ships ALL of `uno-bot/src` on the current branch, not just
   `implement_design`. Confirm the branch's Worker code is production-ready first.
-- The Worker fetches skills from `SKILLS_BASE_URL` (raw `feat/uno-bot-v2-sandbox/bot-skills`)
+- The Worker fetches skills from `SKILLS_BASE_URL` (raw `main (repo root)`)
   per isolate; a fresh deploy picks up the latest pushed skills.
 
 ## Action half — get the workflow onto `main`
@@ -61,15 +61,15 @@ already on `main` (`scripts/create-notion-prd.js`, `docs/.../inventory.md`,
 Bring these 4 over:
 - `.github/workflows/figma-implement-design.yml`
 - `scripts/implement-design-from-figma.js`
-- `bot-skills/lib/skill-loader.js`
-- `bot-skills/uno-implement-design/SKILL.md`
+- `scripts/lib/skill-loader.js`
+- `scripts/prompts/uno-implement-design/SKILL.md`
 
 Two strategies:
 - **Full v2 merge** — merge `feat/uno-bot-v2-sandbox` → `main` (brings all of v2). The
   4 files ride along. Use when launching the whole v2 at once.
 - **Targeted PR (decoupled)** — a small PR bringing just those 4 files to `main`.
   Unblocks `implement_design` without the grand v2 merge. Additive and safe: the
-  existing `implement` flow uses inline prompts and is untouched; `bot-skills/` simply
+  existing `implement` flow uses inline prompts and is untouched; the skills/*/bot.md faces simply
   begins to exist on `main` (only `lib/` + `uno-implement-design/`).
 
 ## Smoke test before trusting it

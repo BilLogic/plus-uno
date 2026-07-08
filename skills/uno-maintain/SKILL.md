@@ -1,5 +1,5 @@
 ---
-name: uno-compound
+name: uno-maintain
 description: >
   Document a solution or learning from work just completed. Creates a searchable
   solution doc in docs/knowledge/lessons/. Use when the user says "document this",
@@ -8,6 +8,12 @@ description: >
 user-invocable: true
 argument-hint: [brief-description]
 ---
+> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+## Agents it summons
+
+reviewers/auditor · reviewers/rubric-applier · writers/notion · writers/figma · writers/blueprint — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+
 
 # Compound Learning
 

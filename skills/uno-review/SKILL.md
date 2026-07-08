@@ -9,6 +9,12 @@ description: >
 user-invocable: true
 argument-hint: [files-or-description]
 ---
+> ⚠️ Content rewrite pending (plan 2026-07-07-001 Phase 1) — structure is current, workflow text may predate the six-skill pivot.
+
+## Agents it summons
+
+reviewers/ds-lens · reviewers/uno-lens · reviewers/a11y-lens · reviewers/design-qa · reviewers/rubric-applier — defined in `agents/` (see `agents/README.md`). Per the interaction contract, these are summoned by this skill, never by users.
+
 
 # Quality Review
 

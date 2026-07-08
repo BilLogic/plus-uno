@@ -4,7 +4,7 @@ Runtime for the agentic UNO Bot. Receives Slack events, runs an agentic Claude
 loop with tool use, dispatches GitHub Actions for side-effects, and stores
 per-thread conversation state in a Durable Object.
 
-Companion content lives in `../bot-skills/` (skill markdown loaded into the
+Companion content lives in `../../skills/*/bot.md` + `docs/conventions/` (skill markdown loaded into the
 agent's system prompt at runtime).
 
 ## Status
