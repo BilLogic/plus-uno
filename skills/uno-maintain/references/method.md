@@ -7,7 +7,7 @@ Keep the harness itself current. One pass per issue: **capture → route → dra
 
 ## 1 · Intake — normalize the observation
 
-Every intake is one of four **trigger types** — improvement (could be better) · inaccuracy (says something wrong) · inconsistency (two sources disagree) · bug (behaves wrongly) — routed to one of **10 targets across 3 estates**:
+Every intake is one of four **trigger types** — improvement (could be better) · inaccuracy (says something wrong) · inconsistency (two sources disagree) · bug (behaves wrongly) — routed to one of **11 targets across 3 estates**:
 
 | Estate | Target | Fix action |
 |---|---|---|

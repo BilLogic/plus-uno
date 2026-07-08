@@ -15,7 +15,7 @@ hard_gates:
   - 0 Tier-2 changes applied without a Slack verdict (audit merge log vs #plus-design; the Tier-1 whitelist applies verdict-free by design, logged to the digest)
   - accepted changes ship as a PR+PRD PAIR, never one alone (100%)
 benchmark: >
-  Seeded issue set (one per taxonomy target, 10 total) → measure routing
+  Seeded issue set (one per taxonomy target, 11 total) → measure routing
   accuracy and proposal quality.
 targets:
   intake_to_proposal: "<=1 day"
