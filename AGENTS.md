@@ -21,11 +21,15 @@ See docs/context/design-system/foundations/principles.md
 
 See docs/knowledge/INDEX.md
 
+## Knowledge Architecture
+
+Design System knowledge lives in `design-system/docs/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/docs/discovery.md`; load only task-relevant docs. Workflow skills (uno-prototype, uno-review, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
+
 ## Forbidden Patterns
 
 1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.
-2. **Cheat Sheet is law**: Before writing any React component from `@plus-ds` or applying any CSS token, read `docs/context/design-system/components/cheat-sheet.md`. If it's not in the Cheat Sheet, it does not exist.
-3. **Never hallucinate layouts**: When building a new page, read `docs/context/design-system/components/layout-cheat-sheet.md` and use official structural React formulas (e.g., `<PageLayout>`).
+2. **DS knowledge is law**: Start at `design-system/docs/discovery.md`, then load only required docs (e.g., `design-system/agent-views/components/index.md`, `design-system/agent-views/foundations/tokens.md`). If a component is not listed, it does not exist.
+3. **Never hallucinate layouts**: When building a new page, read `design-system/docs/patterns/layout.md` and use official structural React formulas (e.g., `<PageLayout>`).
 4. **Never hallucinate props**: Always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
 5. Never skip reading component source + story + styles before using unfamiliar components.
 6. Use PLUS components first — only fall back to generic React-Bootstrap when no PLUS equivalent exists.
@@ -75,6 +79,7 @@ Read `docs/setup-guide.md` for onboarding: recommended CE skills, MCP server con
 | `npm run build-storybook` | Build Storybook static site |
 | `npm run sync:tokens` | Sync tokens from Figma |
 | `npm run generate:tokens` | Generate SCSS/JS from token source |
+| `npm run generate:agent` | Regenerate agent-views + Figma registries + audit |
 | `npm run dev:home-redesign` | Home redesign prototype |
 | `npm run dev:monthly-report` | Monthly report prototype |
 
@@ -84,8 +89,12 @@ Load docs on-demand based on what comes up in conversation:
 
 | Trigger | Load |
 |---------|------|
-| Building UI, using components or tokens | `docs/context/design-system/components/cheat-sheet.md` (MANDATORY) |
-| Building new pages, dashboards, layouts | `docs/context/design-system/components/layout-cheat-sheet.md` (MANDATORY) |
+| Any DS implementation task | `design-system/docs/discovery.md` (MANDATORY entry — route from here) |
+| Building UI, using components or tokens | `design-system/agent-views/components/{name}.md` if exists, else `index.md` + `foundations/tokens.md` |
+| Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
+| Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
+| Implementation setup (aliases, playground, Vite) | `design-system/docs/setup.md` |
+| Design philosophy / agent role | `design-system/docs/guidelines.md` |
 | Figma link, implement-design, or design-to-code mapping | `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` (MANDATORY — load first); then `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` + `figma-mcp-guide.md` |
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |

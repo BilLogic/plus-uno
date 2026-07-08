@@ -22,7 +22,11 @@ Open [localhost:4100](http://localhost:4100) for the Prototype Marketplace, [loc
 ```
 plus-uno/
 ├── AGENTS.md                      # Single source of truth for all AI agents
-├── design-system/src/             # Component library (44 components, 74 forms, 9 DataViz, 8 specs)
+├── design-system/
+│   ├── src/                       # Component library source + Storybook MDX
+│   ├── docs/                      # Hand-authored DS knowledge (discovery, patterns, token-mapping)
+│   ├── agent-views/               # Generated agent views (DO NOT EDIT BY HAND)
+│   └── figma/                     # Figma registries + alignment runbooks
 ├── playground/                    # 22 prototype projects — browse at /market
 ├── src/                           # Vite app entry + Prototype Marketplace
 ├── .storybook/                    # Storybook 10 configuration
@@ -113,7 +117,8 @@ The component library lives in `design-system/src/` with 44 components, 74 form 
 **Key rules for agents and contributors:**
 - Use PLUS components first — only fall back to React-Bootstrap when no PLUS equivalent exists
 - Never hardcode colors, spacing, or typography — use design tokens
-- Read the cheat sheet (`docs/context/design-system/components/cheat-sheet.md`) before building
+- Start at `design-system/docs/discovery.md` before building UI
+- After editing component MDX or token-mapping: `npm run generate:agent`
 - No Tailwind, Material UI, or Ant Design in components or prototypes (Bootstrap + SCSS only)
 
 Browse the component library at [localhost:4200](http://localhost:4200) (Storybook).

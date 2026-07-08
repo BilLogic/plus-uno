@@ -22,7 +22,7 @@ Agents **MUST** read both files below before:
 > Both registries are **generated, read-only artifacts** — never hand-edit them.
 >
 > - **`component-registry.json`** is generated from each component's MDX `export const figmaMeta`. To change a mapping, edit the component's MDX `figmaMeta` and run `npm run generate:component-registry`.
-> - **`token-registry.json`** is generated from `figma-token-mapping.md` and every `var(--*)` is validated against `design-system/src/tokens/*.scss`. To change a mapping, edit `figma-token-mapping.md` and run `npm run generate:token-registry`. If a token doesn't exist in SCSS, the generator reports it (and `check:token-registry` fails) — this is the guard against drift.
+> - **`token-registry.json`** is generated from `design-system/docs/foundations/token-mapping.md` and every `var(--*)` is validated against `design-system/src/tokens/*.scss`. To change a mapping, edit `token-mapping.md` and run `npm run generate:agent` (or `generate:token-registry`). If a token doesn't exist in SCSS, the generator reports it (and `check:token-registry` fails) — this is the guard against drift.
 
 ## Load gate (before writing JSX or SCSS)
 
@@ -35,7 +35,7 @@ Agents **MUST** read both files below before:
 
 - `design-system/figma/component-alignment.md` — implement + write-back rules
 - `.agent/skills/uno-prototype/references/figma-mcp-guide.md` — MCP workflow
-- `.agent/skills/uno-prototype/references/figma-token-mapping.md` — extended token tables
+- `design-system/docs/foundations/token-mapping.md` — extended token tables (authoritative source)
 
 ## Skills that enforce this load
 

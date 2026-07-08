@@ -1,26 +1,22 @@
-<!-- ~200 tokens | Load for: implementation guardrails, pattern rules, and example selection -->
+<!-- ~150 tokens | Load for: example selection when mirroring existing code -->
 
-# Implementation Guide
+# Implementation — Example Selection
 
-## When to Load
-- Load this when choosing an implementation approach or selecting an example to mirror.
-- For exhaustive pattern catalog and file references, load `.agent/skills/uno-research/references/patterns-index.json`.
-- For exhaustive story/spec/template locations, load `.agent/skills/uno-prototype/references/examples-index.json`.
+Load when choosing which existing code to mirror. For setup/aliases, load `design-system/docs/setup.md`.
 
-## Core Pattern Rules
-- Use tokens over literals.
-- Prefer PLUS components/specs before generic framework primitives.
-- Keep Storybook coverage in sync with behavior/state changes.
-- Fetch design context first when implementing from design tooling.
-- Verify responsive behavior and critical interactive states before finalization.
+## Workflow
 
-## Example Selection Workflow
-1. Start with nearest component story example.
-2. If implementing page-level behavior, check matching `specs/**` composition.
-3. If still exploratory, compare playground prototypes/templates.
-4. Copy structure and interaction model, then replace visual values with tokens.
+1. Start with the nearest component `*.stories.jsx` example
+2. For page-level work, check matching `design-system/src/specs/**` composition
+3. If exploratory, compare `playground/**` prototypes
+4. Copy structure and interaction model; replace visual values with tokens from `design-system/agent-views/foundations/tokens.md`
+
+## Indexes
+
+- Story/spec/template locations: `examples-index.json`
+- Pattern catalog: `../uno-research/references/patterns-index.json`
 
 ## Guardrails
-- Do not treat exploratory prototypes as source-of-truth over DS components/specs.
-- Keep imports and state handling aligned with the selected authoritative example.
-- If a pattern choice is ambiguous, cite two valid alternatives and ask for a directional decision.
+
+- Prototypes are not source-of-truth over DS components/specs
+- If ambiguous, cite two valid alternatives and ask for a directional decision

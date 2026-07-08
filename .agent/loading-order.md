@@ -28,14 +28,14 @@ Loaded when a skill is invoked. Each skill declares its Tier 2 context.
 |-------|--------------|--------|
 | uno-research | `docs/context/product/*`, `docs/knowledge/INDEX.md` → domain files, `references/component-discovery.md`, `references/learning.md`; **Figma audit:** `design-system/figma/component-registry.json`, `token-registry.json` | ~3K |
 | uno-plan | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief; **Figma input:** `design-system/figma/component-registry.json`, `token-registry.json` | ~4K |
-| uno-prototype | `design-system/figma/component-registry.json`, `token-registry.json` (MANDATORY), `references/figma-registry-mandatory-load.md`, `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, `references/cheat-*.md`, handoff plan | ~5K |
+| uno-prototype | `design-system/figma/component-registry.json`, `token-registry.json` (MANDATORY), `references/figma-registry-mandatory-load.md`, `design-system/docs/discovery.md` → task docs, `references/figma-mcp-guide.md`, handoff plan | ~5K |
 | uno-review | `docs/context/design-system/foundations/accessibility.md`, `docs/context/design-system/foundations/content-voice.md`, `docs/knowledge/preferences.md`; **Figma-derived work:** `design-system/figma/component-registry.json`, `token-registry.json` | ~3K |
 | uno-post | `references/marketplace-schema.md`, `references/deployment-guide.md` | ~1K |
 | uno-compound | `docs/knowledge/INDEX.md`, target domain lesson file, `references/solution-schema.md` | ~3K |
 
 **Per-skill cap:** 5K tokens. **Combined Tier 2 cap:** 25K tokens.
 
-Skills reference shared context (e.g., `docs/context/design-system/components/cheat-sheet.md`) via absolute repo-relative paths. This is shared infrastructure, not a cross-skill dependency.
+Skills reference shared context (e.g., `design-system/docs/discovery.md`) via absolute repo-relative paths. This is shared infrastructure, not a cross-skill dependency.
 
 ## Tier 3: Ephemeral (Context Window + Handoffs)
 

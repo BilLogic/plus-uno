@@ -28,7 +28,7 @@ Proactively suggest this skill when:
 - The user says "done", "finished", "ready to ship", or "looks good"
 - Before any git commit that touches files under `playground/` or `design-system/src/specs/`
 - Before the user invokes `/uno:post` (review should precede publishing)
-- After completing work in Prototyping or Finalization mode
+- After completing work in uno-prototype or before production-ready shipping
 - When the user asks to audit skill quality, validate a skill against a checklist, or improve `SKILL.md` structure
 
 Suggest once per work session — do not repeat if declined.
@@ -38,7 +38,7 @@ Suggest once per work session — do not repeat if declined.
 Use routing rules before running checks:
 
 1. If target is implementation code (UI/prototype/spec files), run the standard `uno-review` checklist and scripts.
-2. If target is Figma-derived or playground work with design mapping, **MUST** load `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` first — verify imports and tokens match registry entries.
+2. If target is Figma-derived or production-ready work, **MUST** load `design-system/figma/component-registry.json` and `token-registry.json` first — then apply `references/production-checklist.md` for states and accessibility.
 3. If target is skill documentation (`.agent/skills/**/SKILL.md` or skill reference docs), run the embedded Skill Quality Audit workflow from:
    - `references/skill-quality/checklist.md`
    - `references/skill-quality/output-template.md`

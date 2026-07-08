@@ -2,11 +2,11 @@
   "version": "1.0.0",
   "generated": true,
   "generatedBy": "scripts/generate-token-registry.mjs",
-  "note": "DO NOT EDIT BY HAND. Source of truth is figma-token-mapping.md; every token is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.",
+  "note": "DO NOT EDIT BY HAND. Source of truth is design-system/docs/foundations/token-mapping.md; every token is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "syncCommand": "npm run sync:tokens && npm run generate:tokens",
   "codeTokenRoot": "design-system/src/tokens/",
-  "humanReference": ".agent/skills/uno-prototype/references/figma-token-mapping.md",
+  "humanReference": "design-system/docs/foundations/token-mapping.md",
   "mappings": {
     "colors": {
       "Primary / Primary 500": "var(--color-primary)",

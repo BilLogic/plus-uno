@@ -6,7 +6,7 @@
       "name": "tokens_over_literals",
       "rule": "Use token variables for all visual values.",
       "references": [
-        "references/tokens-guide.md"
+        "design-system/agent-views/foundations/tokens.md"
       ]
     },
     {
@@ -29,7 +29,7 @@
       "name": "figma_to_code",
       "rule": "Fetch design context/screenshot first, then map to DS components/specs.",
       "references": [
-        ".agent/skills/uno-prototype/references/figma-workflow.md"
+        ".agent/skills/uno-prototype/references/figma-mcp-guide.md"
       ]
     },
     {

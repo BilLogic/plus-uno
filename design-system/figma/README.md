@@ -19,6 +19,8 @@ Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, a
 | `component-registry.json` | **Generated artifact** — code import ↔ Figma component set ↔ props. DO NOT EDIT BY HAND |
 | `component-alignment.md` | Workflow for agents and contributors (implement + write-back) |
 | `token-registry.json` | **Generated artifact** — Figma variable name ↔ CSS custom property, validated against SCSS. DO NOT EDIT BY HAND |
+| `component-figma-links.md` | **Generated** — Figma node links per component (from MDX) |
+| `knowledge-audit.md` | **Generated** — verification status (edit `design-system/docs/knowledge-audit.json`) |
 
 ## Source of truth: per-component MDX
 
@@ -46,30 +48,33 @@ export const figmaMeta = {
 - `component-registry.json` is regenerated from all `figmaMeta` exports.
 - `export const figmaMeta` is placed after imports and before `<Meta>`; Storybook does not render it.
 
-### Token source of truth: `figma-token-mapping.md`
+### Token source of truth: `token-mapping.md`
 
-`token-registry.json` is generated from `.agent/skills/uno-prototype/references/figma-token-mapping.md`. Every `var(--*)` is validated against `design-system/src/tokens/*.scss`, so a mapping to a non-existent token fails the check.
+`token-registry.json` is generated from `design-system/docs/foundations/token-mapping.md`. Every `var(--*)` is validated against `design-system/src/tokens/*.scss`, so a mapping to a non-existent token fails the check.
 
-- To change a token mapping, **edit `figma-token-mapping.md`**, not the registry.
+- To change a token mapping, **edit `design-system/docs/foundations/token-mapping.md`**, not the registry.
 - Spacing is **contextual** (per layer: element / card / section / modal / surface / table) — there is no single `Spacing/N` → one token.
 
-## Regenerating the registries
+## Regenerating agent + Figma artifacts
 
 ```bash
-# Rebuild component-registry.json from MDX figmaMeta exports
-npm run generate:component-registry
-npm run check:component-registry   # CI guard: fail if stale vs MDX
+# One command after editing MDX figmaMeta, token-mapping, or tokens SCSS
+npm run generate:agent
 
-# Rebuild token-registry.json from figma-token-mapping.md (+ validate vs SCSS)
+# Or individually:
+npm run generate:component-registry
+npm run check:component-registry
+
 npm run generate:token-registry
-npm run check:token-registry       # CI guard: fail if stale OR tokens missing from SCSS
+npm run check:token-registry
 ```
 
 ## Code-side source of truth
 
 - Components: `design-system/src/components/`, `forms/`, `specs/`
 - Tokens: `design-system/src/tokens/` (synced from Figma via `npm run sync:tokens`)
-- Agent cheat sheet: `docs/context/design-system/components/cheat-sheet.md`
+- Agent knowledge entry: `design-system/docs/discovery.md`
+- Agent views (generated): `design-system/agent-views/`
 
 ## Pilot status (Button)
 
@@ -86,7 +91,7 @@ npm run check:token-registry       # CI guard: fail if stale OR tokens missing f
 npm run generate:component-registry
 npm run check:component-registry
 
-# Regenerate token registry from figma-token-mapping.md (validated vs SCSS)
+# Regenerate token registry from token-mapping.md (validated vs SCSS)
 npm run generate:token-registry
 npm run check:token-registry
 
@@ -109,4 +114,4 @@ Then:
 
 4. `design-system/figma/component-alignment.md`
 5. `.agent/skills/uno-prototype/references/figma-mcp-guide.md`
-6. `.agent/skills/uno-prototype/references/figma-token-mapping.md`
+6. `design-system/docs/foundations/token-mapping.md`

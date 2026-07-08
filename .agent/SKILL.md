@@ -17,7 +17,7 @@ description: Tier-aware skill router for the PLUS Design System. Routes requests
 |-------|---------|-----------------------------------|--------|
 | [uno-research](skills/uno-research/SKILL.md) | "what is", "how does", "explore", "audit" | `docs/context/product/*`, `docs/knowledge/INDEX.md` → domain files, `references/component-discovery.md`; **Figma audit:** `design-system/figma/component-registry.json`, `token-registry.json` | ~3K |
 | [uno-plan](skills/uno-plan/SKILL.md) | "plan", "scope", "how should we build" | `docs/context/design-system/foundations/*`, `docs/context/conventions/tech-stack.md`, handoff brief; **Figma input:** `design-system/figma/component-registry.json`, `token-registry.json` | ~4K |
-| [uno-prototype](skills/uno-prototype/SKILL.md) | "scaffold", "prototype", "build", Figma link | `design-system/figma/component-registry.json`, `token-registry.json` (MANDATORY), `references/figma-registry-mandatory-load.md`, `docs/context/design-system/components/cheat-sheet.md`, `references/figma-mcp-guide.md`, handoff plan | ~5K |
+| [uno-prototype](skills/uno-prototype/SKILL.md) | "scaffold", "prototype", "build", Figma link | `design-system/figma/component-registry.json`, `token-registry.json` (MANDATORY), `references/figma-registry-mandatory-load.md`, `design-system/docs/discovery.md`, `references/figma-mcp-guide.md`, handoff plan | ~5K |
 | [uno-review](skills/uno-review/SKILL.md) | "review", "check", "validate" | `docs/context/design-system/foundations/accessibility.md`, `docs/knowledge/preferences.md`; **Figma-derived work:** `design-system/figma/component-registry.json`, `token-registry.json` | ~3K |
 | [uno-post](skills/uno-post/SKILL.md) | "submit", "publish" | `references/marketplace-schema.md` | ~1K |
 | [uno-compound](skills/uno-compound/SKILL.md) | "document", "compound", session ending | `docs/knowledge/INDEX.md`, target domain file, `references/solution-schema.md` | ~3K |
@@ -63,8 +63,8 @@ agent: Explore                    # Subagent type (uno-research)
 
 0. **Figma link → mandatory registry load + implement-design workflow**: Read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` first (see `skills/uno-prototype/references/figma-registry-mandatory-load.md`). Then load `skills/uno-prototype/references/figma-mcp-guide.md` and follow all 7 steps.
 1. Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
-2. **THE CHEAT SHEET IS LAW:** Before writing any React component or CSS token, read `docs/context/design-system/components/cheat-sheet.md`.
-3. **NEVER HALLUCINATE LAYOUTS:** Read `docs/context/design-system/components/layout-cheat-sheet.md` before building pages.
+2. **DS KNOWLEDGE IS LAW:** Start at `design-system/docs/discovery.md`, then load only required docs before writing components or tokens.
+3. **NEVER HALLUCINATE LAYOUTS:** Read `design-system/docs/patterns/layout.md` before building pages.
 4. **NEVER HALLUCINATE PROPS:** Check component `.jsx` or `.stories.jsx` before using unfamiliar components.
 5. Use PLUS components first; fall back to framework primitives only when no PLUS equivalent exists.
 6. Cite concrete repository file paths when proposing implementations.
@@ -90,8 +90,9 @@ Skills reference shared context via absolute repo-relative paths:
 - `design-system/figma/component-registry.json` — **MANDATORY** Figma component set ↔ code import (design-to-code)
 - `design-system/figma/token-registry.json` — **MANDATORY** Figma variable ↔ CSS token
 - `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` — load gate and skill enforcement
-- `docs/context/design-system/components/cheat-sheet.md` — component quick reference
-- `docs/context/design-system/components/layout-cheat-sheet.md` — layout formulas
+- `design-system/docs/discovery.md` — DS knowledge entry point (routes to agent-views, foundations, patterns)
+- `design-system/docs/guidelines.md` — design and implementation philosophy
+- `design-system/docs/setup.md` — aliases, playground, Vite, imports
 - `docs/context/design-system/components/components-index.json` — component registry
 - `docs/context/design-system/index-manifest.json` — master index of all indexes
 - `docs/knowledge/INDEX.md` — knowledge routing table

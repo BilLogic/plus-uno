@@ -1,4 +1,4 @@
-<!-- Tier: 2 -->
+<!-- Tier: 2 | Route: design-system/docs/discovery.md → patterns/layout.md -->
 # PLUS Design System: Layout Skeleton Cheat Sheet
 
 > **CRITICAL RULE**: When asked to build a new prototype, page, or feature, you MUST use one of these pre-approved structural skeletons. DO NOT invent your own raw HTML/CSS flexbox grids for the outer page structure.
@@ -100,7 +100,7 @@ export default function MyContentBlock() {
 ```
 
 ## How to Apply Spacing Properly
-When filling in the content blocks, ONLY use the semantic CSS variables from `PLUS_CHEAT_SHEET.md`:
+When filling in the content blocks, ONLY use semantic CSS variables from `design-system/agent-views/foundations/tokens.md`:
 *   `gap: 'var(--size-section-gap-md)'` -> Spacing between major page blocks (like two diff Cards).
 *   `gap: 'var(--size-element-gap-md)'` -> Spacing between elements inside a Card (like headers and text).
 *   Never use raw string pixels like `gap: '16px'`.

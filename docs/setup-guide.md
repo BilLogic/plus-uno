@@ -77,7 +77,7 @@ See `docs/context/product/plus-uno.md` for the full directory layout and tech st
 | `AGENTS.md` | Always (auto-loaded) |
 | `.agent/SKILL.md` | Design system work (mode routing) |
 | `.agent/AGENT.md` | Identity, skills table, grounding rules |
-| `docs/context/design-system/components/cheat-sheet.md` | Before writing any UI code (MANDATORY) |
-| `docs/context/design-system/components/layout-cheat-sheet.md` | Before building pages (MANDATORY) |
+| `design-system/docs/discovery.md` | Before any DS implementation (MANDATORY entry) |
+| `design-system/docs/patterns/layout.md` | Before building pages (MANDATORY) |
 | `docs/context/product/plus-app.md` | Understanding the PLUS product |
 | `docs/context/conventions/coding.md` | File naming, imports, gotchas |

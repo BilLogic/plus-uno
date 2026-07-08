@@ -1,5 +1,5 @@
 /**
- * Generate token-registry.json from figma-token-mapping.md (the human source of truth)
+ * Generate token-registry.json from design-system/docs/foundations/token-mapping.md (human source of truth)
  * and VALIDATE every referenced CSS token against the actual SCSS token definitions.
  *
  * This kills drift: the Figma↔code mapping is authored once (in the .md), the JSON is
@@ -18,7 +18,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const MD_SOURCE = path.join(REPO_ROOT, '.agent/skills/uno-prototype/references/figma-token-mapping.md');
+const MD_SOURCE = path.join(REPO_ROOT, 'design-system/docs/foundations/token-mapping.md');
 const TOKENS_DIR = path.join(REPO_ROOT, 'design-system/src/tokens');
 const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 
@@ -26,7 +26,7 @@ const STATIC = {
   figmaFileKey: 'zAecJNRdvJzAUOcjV32tRX',
   syncCommand: 'npm run sync:tokens && npm run generate:tokens',
   codeTokenRoot: 'design-system/src/tokens/',
-  humanReference: '.agent/skills/uno-prototype/references/figma-token-mapping.md',
+  humanReference: 'design-system/docs/foundations/token-mapping.md',
 };
 
 /** All `--token` names defined across the SCSS token files (existence truth). */
@@ -138,7 +138,7 @@ function build() {
     version: '1.0.0',
     generated: true,
     generatedBy: 'scripts/generate-token-registry.mjs',
-    note: 'DO NOT EDIT BY HAND. Source of truth is figma-token-mapping.md; every token is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
+    note: 'DO NOT EDIT BY HAND. Source of truth is design-system/docs/foundations/token-mapping.md; every token is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
     ...STATIC,
     mappings: { colors, typography, spacing, elevation },
     validation: {
@@ -167,7 +167,7 @@ function main() {
       failed = true;
     }
     if (unknown.size) {
-      console.error(`✗ ${unknown.size} token(s) referenced in figma-token-mapping.md do NOT exist in SCSS:`);
+      console.error(`✗ ${unknown.size} token(s) referenced in token-mapping.md do NOT exist in SCSS:`);
       [...unknown].sort().forEach((t) => console.error(`   - ${t}`));
       failed = true;
     }

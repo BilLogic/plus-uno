@@ -26,6 +26,7 @@
     ".agent/skills/uno-prototype/references/figma-registry-mandatory-load.md",
     ".agent/skills/uno-prototype/references/figma-mcp-guide.md",
     ".agent/skills/uno-prototype/references/figma-workflow.md",
+    "docs/figma-sync-workflow.md",
     "docs/context/conventions/integrations.md"
   ],
   "storybook": {

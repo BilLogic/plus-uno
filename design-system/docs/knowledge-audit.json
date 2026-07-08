@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Human verification status for agent knowledge docs. Designers edit this file; run npm run generate:agent to refresh the spreadsheet.",
+  "components": {
+    "Button": {
+      "knowledgeFile": "agent-views/components/button.md",
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
+    },
+    "Modal": {
+      "knowledgeFile": "agent-views/components/modal.md",
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
+    },
+    "Card": {
+      "knowledgeFile": "agent-views/components/card.md",
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
+    },
+    "Input": {
+      "knowledgeFile": "agent-views/components/input.md",
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
+    },
+    "Table": {
+      "knowledgeFile": "agent-views/components/table.md",
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
+    }
+  },
+  "tokens": {
+    "agent-views/foundations/tokens.md": {
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Generated from design-system/src/tokens/*.scss"
+    },
+    "docs/foundations/token-mapping.md": {
+      "verified": false,
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "notes": "Figma ↔ CSS mapping — hand-authored SSOT"
+    }
+  }
+}

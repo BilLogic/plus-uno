@@ -1,4 +1,4 @@
-<!-- Load when: encoding design system rules, verifying token mapping, create_design_system_rules -->
+<!-- Load when: Figma ↔ CSS token mapping | Route: design-system/docs/discovery.md → foundations/token-mapping.md -->
 
 # Figma Token Mapping Reference
 

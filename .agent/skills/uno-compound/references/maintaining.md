@@ -45,7 +45,7 @@ For exhaustive lookup paths/globs/commands, load `docs/context/design-system/ind
 3. Documentation patterns
 - `docs/context/design-system/*`
 - `.agent/skills/uno-review/references/storybook.md`
-- `.agent/skills/uno-prototype/references/figma-workflow.md`
+- `.agent/skills/uno-prototype/references/figma-mcp-guide.md`
 
 4. Integration setup
 - Storybook configuration: `.storybook/main.js`, `.storybook/preview.jsx`

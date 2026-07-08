@@ -8,12 +8,14 @@
 - For concrete scripts/env vars/commands/calls, load `.agent/skills/uno-prototype/references/integrations-index.json` and `.agent/skills/uno-prototype/references/tokens-index.json`.
 
 ## Integration Routing Rules
-- **Figma MCP**: primary for design-tool-driven implementation. Full tool reference: `.agent/skills/uno-prototype/references/figma-mcp-guide.md`. Key tools: `get_design_context`, `get_screenshot`, `get_metadata`, `get_variable_defs`, `search_design_system`, `create_design_system_rules`, `create_new_file` (canvas write-back).
+- **Figma MCP**: primary for design-tool-driven implementation. Full workflow: `.agent/skills/uno-prototype/references/figma-mcp-guide.md`. Index: `figma-workflow.md`.
 - **Stitch MCP**: primary for consulting/iteration wireframe generation.
 - If runtime lacks an MCP, explicitly state the limitation and continue with repo-native stories/specs/scripts.
 
 ## Canonical Repo Docs
-- Figma workflow: `.agent/skills/uno-prototype/references/figma-workflow.md`
+- Figma implement-design: `.agent/skills/uno-prototype/references/figma-mcp-guide.md`
+- Figma workflow index: `.agent/skills/uno-prototype/references/figma-workflow.md`
+- Human Figma sync pipeline: `docs/figma-sync-workflow.md`
 - Storybook setup: `.storybook/main.js`, `.storybook/preview.jsx`
 - Token sync CI: `.github/workflows/sync-figma-tokens.yml`
 - Playwright MCP: Global configuration in `.claude.json`

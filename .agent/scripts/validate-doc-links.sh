@@ -29,7 +29,7 @@ while IFS= read -r file; do
     if [[ "$link" == /* ]]; then
       target="${link#/}"
     else
-      target="$(cd "$(dirname "$file")" && realpath -m "$link")"
+      target="$(python3 -c "import os,sys; print(os.path.normpath(os.path.join(os.path.dirname(sys.argv[1]), sys.argv[2])))" "$file" "$link")"
       target="${target#$ROOT/}"
     fi
 
@@ -93,12 +93,37 @@ old_patterns=(
   "\.agent/references/"
 )
 
+deprecated_knowledge_patterns=(
+  "\.agent/knowledge/"
+  "docs/context/design-system/components/cheat-sheet\.md"
+  "docs/context/design-system/components/layout-cheat-sheet\.md"
+  "uno-prototype/references/cheat-components\.md"
+  "uno-prototype/references/cheat-forms\.md"
+  "uno-prototype/references/cheat-tokens\.md"
+  "uno-prototype/references/figma-token-mapping\.md"
+  "uno-prototype/references/prototyping\.md"
+  "uno-prototype/references/iteration\.md"
+  "uno-prototype/references/finalization\.md"
+  "uno-prototype/references/template-selection-guide\.md"
+  "uno-prototype/references/figma-sync-workflow\.md"
+)
+
 for pattern in "${old_patterns[@]}"; do
-  count=$(grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" 2>/dev/null \
-    | grep -v "node_modules/" | grep -v "docs/plans/" | grep -v "docs/knowledge/" | grep -v "storybook-static/" \
-    | wc -l | tr -d ' ')
+  count=$(rg -l "$pattern" --glob '*.md' --glob '*.jsx' --glob '*.json' --glob '*.mdc' \
+    -g '!docs/plans/**' -g '!docs/knowledge/**' -g '!node_modules/**' -g '!storybook-static/**' -g '!dist/**' 2>/dev/null | wc -l | tr -d ' ')
   if [[ "$count" -gt 0 ]]; then
     echo "[stale] $count references to old path pattern: $pattern"
+    status=1
+  fi
+done
+
+for pattern in "${deprecated_knowledge_patterns[@]}"; do
+  count=$(rg -l "$pattern" --glob '*.md' --glob '*.jsx' --glob '*.json' --glob '*.mdc' --glob '*.js' --glob '*.mjs' \
+    -g '!docs/plans/**' -g '!docs/knowledge/lessons/**' -g '!node_modules/**' -g '!storybook-static/**' -g '!dist/**' 2>/dev/null | wc -l | tr -d ' ')
+  if [[ "$count" -gt 0 ]]; then
+    echo "[stale] $count references to removed knowledge path: $pattern"
+    rg -l "$pattern" --glob '*.md' --glob '*.jsx' --glob '*.json' --glob '*.mdc' --glob '*.js' --glob '*.mjs' \
+      -g '!docs/plans/**' -g '!docs/knowledge/lessons/**' -g '!node_modules/**' -g '!storybook-static/**' -g '!dist/**' 2>/dev/null | head -5
     status=1
   fi
 done
