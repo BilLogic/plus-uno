@@ -47,16 +47,12 @@ plus-uno/
 │
 ├── agents/                        # WHO — researchers/ · reviewers/ · writers/ + uno-bot/ (Worker)
 │
-└── Cross-agent pointers           # One source of truth, multiple editors
-    │                              # (Claude Code reads AGENTS.md natively — no pointer file)
-    ├── .cursor/rules/plus-agent.mdc   # Cursor → AGENTS.md
-    ├── .windsurf/rules/agent.md       # Windsurf → AGENTS.md
-    └── .github/copilot-instructions.md # GitHub Copilot → AGENTS.md
+└── AGENTS.md                      # Read natively by Claude Code, Cursor, Windsurf, Copilot — no pointer files
 ```
 
 ## Agent System
 
-All AI coding agents (Claude Code natively; Cursor, Windsurf, GitHub Copilot via thin pointer files) read **`AGENTS.md`** — the single constitution: identity, the six-skill roster, forbidden patterns. No rules are duplicated anywhere. Loading tiers and budgets: `loading-order.md`.
+All AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot — all read the AGENTS.md standard natively) read **`AGENTS.md`** — the single constitution: identity, the six-skill roster, forbidden patterns. No rules are duplicated anywhere. Loading tiers and budgets: `loading-order.md`.
 
 **The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
 
