@@ -33,7 +33,7 @@ import {
 import { join, resolve, dirname, extname, relative, sep } from 'path';
 import https from 'https';
 import { fetchNotionPRD } from './create-notion-prd.js';
-import { loadSkill, loadSkillMetadata } from '../bot-skills/lib/skill-loader.js';
+import { loadSkill, loadSkillMetadata } from './lib/skill-loader.js';
 
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI */ }
@@ -362,7 +362,7 @@ async function main() {
   const skillMeta = await loadSkillMetadata('uno-implement-design');
   const claudeModel = skillMeta.model_default;
   if (!claudeModel) {
-    console.error('❌ bot-skills/uno-implement-design/SKILL.md is missing model_default');
+    console.error('❌ scripts/prompts/uno-implement-design/SKILL.md is missing model_default');
     process.exit(1);
   }
 

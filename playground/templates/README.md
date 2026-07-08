@@ -10,8 +10,8 @@ Reusable prototype starters organized by product area.
 
 ## Canonical References
 
-- Agent router: `.agent/SKILL.md`
-- Skill references: `.agent/skills/*/references/*.md`
+- Agent router: `AGENTS.md`
+- Skill references: `skills/*/references/*.md`
 - Token reference: `docs/context/design-system/foundations/tokens.md`
 - DS component docs: `docs/context/design-system/components/inventory.md`
 - DS token docs: `docs/context/design-system/styles/`
@@ -34,4 +34,4 @@ Reusable prototype starters organized by product area.
 
 These are **static HTML reference templates** that predate the React + DS prototyping workflow. They use Bootstrap CDN and raw HTML — they are NOT DS-compliant prototypes.
 
-For creating new React prototypes using the PLUS Design System, use the `/uno:prototype` skill which scaffolds from `playground/starter/`.
+For creating new React prototypes using the PLUS Design System, use the `uno-prototype` skill which scaffolds from `playground/starter/`.

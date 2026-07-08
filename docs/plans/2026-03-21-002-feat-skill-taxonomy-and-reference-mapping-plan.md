@@ -1,7 +1,7 @@
 ---
 title: "feat: Design /uno:xxx skill taxonomy with reference mapping for plus-uno"
 type: feat
-status: active
+status: superseded
 date: 2026-03-21
 origin: docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan.md
 ---
@@ -400,3 +400,7 @@ Skills never conflict with modes — they operate at different levels.
 - Anthropic skills docs: https://code.claude.com/docs/en/skills
 - Compound engineering playbook (cornerstone): "most projects need 1-3 skills, not 20"
 - Compound engineering guide: https://every.to/guides/compound-engineering
+
+## Outcome (2026-07-08 plans sweep)
+
+Seven-verb taxonomy replaced by the six-skill pivot (ADR-016) and plan 2026-07-07-001.

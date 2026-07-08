@@ -91,3 +91,52 @@ tags: [architecture, conventions]
 - **Context**: Sidebar navigation required maintaining 3 parallel maps (`pathToTab`, `pathToUserType`, inline `onTabClick` if-chain). Every navigation change required code changes in 3+ locations.
 - **Decision**: Single declarative route manifest that drives routing, sidebar state, breadcrumbs, and user type. Dynamic sub-items register/unregister at runtime. Adding a new route requires only a manifest entry.
 - **Source**: docs/plans/2026-03-17-001-feat-toolkit-ia-revision-plan.md
+
+## ADR-013: Harness IA — one constitution, dual-face skills, derived agent roster (2026-07-07)
+
+**Decision.** (1) One constitution: root `AGENTS.md` is the only identity/routing doc; `loading-order.md` is tier-1 #2; CLAUDE.md removed (AGENTS.md is read natively). (2) Six dual-face skills at `skills/`: SKILL.md (IDE) + bot.md (Worker) + references/method.md (shared core). (3) `agents/` holds roles derived from a task×skill matrix — researchers/ · reviewers/ · writers/ (the only estate writers) + the uno-bot embodiment (definition + Worker body in one folder). (4) `docs/conventions/` (normative, incl. Notion mirrors with `source:`/`synced:` provenance) split from `docs/context/` (descriptive). (5) Interaction contract: humans speak in skills · skills summon agents · agents obey conventions. (6) Placement rule: content lives with its consumer; cache the foundation, retrieve the rest (uno-blueprint = product truth, uno-storybook = DS truth, Notion = convention truth).
+
+**Why.** The April three-tier harness drifted: the six-skill pivot existed only as prose in bot-skills/AGENTS.md; uno-synthesize was unrouteable; three skill surfaces had three loading semantics; Notion conventions had 13/20 items missing from the repo; the knowledge loop was dead since 2026-04-11. Full evidence: the 2026-07-07 plan §0.
+
+**Supersedes.** ADR-001 (AGENTS.md entry point — strengthened: now the *only* one), ADR-007 (skills agent-agnostic under .agent/ — now top-level skills/ with per-runtime faces), ADR-008 (compound loop via uno-compound — now uno-maintain), the .agent/SKILL.md mode/pipeline router.
+
+**Pending.** ADR for the Pipedream→Cloudflare cutover outcome (Bill to confirm the Slack app's Event Subscriptions URL); skill-body rewrites (plan Phase 1) land separately with evals-first scenarios.
+
+## ADR-014: uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history)
+
+**Original date:** 2026-06-17/18 (`fff9ca43` bot-skills to main "Tier B cutover prep", `b2a7cfee` Worker source to main).
+
+**Decision.** The Slack bot's runtime moved from Pipedream workflows to a Cloudflare Worker (`agents/uno-bot/`, formerly `uno-bot/`): Slack events → Worker → Anthropic API with tool dispatch, thread state, and a proposal gate (side-effect tools stage a confirmation card; only the requester's ✅ executes, via `resolve_pending_proposal`). Skills load by raw-fetching repo files from GitHub at runtime (`SKILLS_BASE_URL`), prompt-cached per isolate — deploys decouple from guidance edits. Model tiering (`pickModel()`: intent → haiku/sonnet/opus, keyword-based) landed 2026-07-01 (`d892346f`, rubric dimension D2).
+
+**Why.** Rationale not recorded in-repo; inferred from the archived Pipedream docs (`docs/knowledge/archive/`) and eval commits: Pipedream limited control over tool orchestration, state, and observability; the Worker gives one TypeScript codebase, telemetry (`c48e1c30` build tags — round-2 evals unknowingly tested a stale deployment), and subrequest-budget control.
+
+**Status.** CONFIRMED live (closed 2026-07-08 by evidence): eval rounds 1–3 ran through Slack against the Worker — round 2 diagnosed a stale *Worker* deployment serving Slack traffic and added /health build tags in response (`c48e1c30`), which is only possible with Event Subscriptions already pointed at workers.dev. Follow-up for a Slack-app admin: retire the v1 Pipedream workflow (out of the serving path either way).
+
+## ADR-015: uno-blueprint on Supabase as the product source of truth (backfilled 2026-07-07 from git history)
+
+**Original date:** ≤2026-07-01 (`d892346f` D8 grounding: read-only `blueprint_search` over "the uno-blueprint Supabase"; hardened 2026-07-02 `0864cb54` with a `search_blueprint()` RPC and layer/step/scenario cell attribution).
+
+**Decision.** Product truth (actors, stages, steps, scenarios, requirements) lives in a Supabase-hosted blueprint, queried at task time — never cached into repo docs. All agent answers about product behavior cite blueprint cells; gaps are stated, not filled ("blueprint gap honesty", scenario R11). On any requirement change, PRD and blueprint update **together** — the paired-writes contract now codified in `docs/conventions/supabase.md` and enforced by `agents/writers/blueprint.md`.
+
+**Why.** Rationale not recorded; inferred: Notion docs drifted from reality and are slow to query programmatically; a structured store makes grounding citable (row-level) and machine-checkable, and gives prototypes a dummy-backend candidate.
+
+**Consequences.** The Supabase schema is a hard dependency for uno-synthesize's blueprint write (rubric hard gate "schema-valid" activates when it lands). The Worker's blueprint access is read-only; writes happen in-IDE via writers/blueprint.
+
+## ADR-016: The six-skill pivot (backfilled 2026-07-07)
+
+**Original date:** decided early July 2026; first repo appearance 2026-07-02 (`0864cb54`: publish/share-out routing split), fully structural 2026-07-07 (ADR-013).
+
+**Decision.** The capability set is six stage-scoped skills — research · synthesize · prototype · publish · review · maintain — mapped onto the five flows of the product-development cycle (Notion "PLUS Uno Skills Upgrade" hub, FigJam board as visual source). Replaces the seven-verb set: uno-plan dissolved (PRD/scoping → synthesize; implementation planning → prototype), uno-post → uno-publish (share-out + handoff rails, not just marketplace), uno-compound → uno-maintain (intake + tiers + sweeps + knowledge capture).
+
+**Why.** The old verbs split by artifact, not by stage — plan/post/compound had no clean flow homes, and the bot grew parallel prose rules (bot-skills/AGENTS.md 2.4/2.6/2.7) to compensate. Stage-scoping gives every flow decision node exactly one owning skill.
+
+**Trace.** Decision lived only in Notion + prose rules until 2026-07-07; this backfill closes the gap flagged in plan 2026-07-07-001 §0.2/§5.
+
+
+## ADR-017: Conventions are canonical in the repo; Notion playbook material obsoleted (2026-07-07)
+
+**Decision.** `docs/conventions/` is the single source of truth for team conventions. The Notion playbooks the files were distilled from (📓 Doc-Management, 🎨 Figma Workspace, the flow-doc convention fragments) are superseded — they get banners pointing at the repo, not maintenance. Headers flip from `source:/synced:` + "prefer Notion on conflict" to `status: canonical` + `distilled:` lineage. On any conflict with a legacy page, the repo wins and uno-maintain files an intake to banner the page (via writers/notion).
+
+**Why.** (Bill, 2026-07-07, resolving plan §6 Q3): the harness lives on GitHub; keeping a second normative copy in Notion recreates the exact mirror-rot this revision was fixing — the sync problem is best solved by not having two sources. Notion remains the estate for *work* (hubs, PRDs, roadmap, templates); it just no longer owns the *rules*.
+
+**Consequences.** The conventions-staleness sweep becomes a conventions-integrity sweep (canonicality headers, agents↔docs cross-references, superseded banners). The same treatment applies to `docs/evals/rubrics/` (distilled from the 📊 Evals page). Supersedes the mirror-provenance model in ADR-013 §(4) and the Phase-2 "middle path" in plan 2026-07-07-001 §3. One-time follow-up: banner the legacy Notion playbook pages.

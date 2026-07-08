@@ -1,7 +1,7 @@
 ---
 title: "feat: Toolkit Information Architecture Revision"
 type: feat
-status: active
+status: completed
 date: 2026-03-17
 origin: docs/ideation/2026-03-17-toolkit-ia-revision-ideation.md
 ---
@@ -462,3 +462,7 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Notion PRD: [Toolkit Information Architecture Revision](https://www.notion.so/plus-tutors/Toolkit-Information-Architecture-Revision-2eab7cca4982804fad5dd1768b7d3087) (ID 2198)
 - React Router DOM 7 nested routes: framework docs
 - React Bootstrap Collapse/Popover: framework docs
+
+## Outcome (2026-07-08 plans sweep)
+
+Toolkit IA shipped (route manifest adopted as ADR-012).

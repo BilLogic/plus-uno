@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 
 import { join, resolve } from 'path';
 import https from 'https';
 import { fetchNotionPRD, findPRDByComponent, updatePRDStatus } from './create-notion-prd.js';
-import { loadSkill, loadSkillMetadata } from '../bot-skills/lib/skill-loader.js';
+import { loadSkill, loadSkillMetadata } from './lib/skill-loader.js';
 
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI */ }
@@ -32,7 +32,7 @@ const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
 const PR_TITLE = process.env.PR_TITLE || '';
 const PR_BODY_FILE = process.env.PR_BODY_FILE;
 const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
-// CLAUDE_MODEL is loaded from bot-skills/uno-implement/SKILL.md frontmatter at runtime — see main()
+// CLAUDE_MODEL is loaded from scripts/prompts/uno-implement/SKILL.md frontmatter at runtime — see main()
 const COMPONENTS_DIR = resolve('design-system/src/components');
 const TOKENS_DIR = resolve('design-system/src/tokens');
 
@@ -332,7 +332,7 @@ async function main() {
   const skillMeta = await loadSkillMetadata('uno-implement');
   const claudeModel = skillMeta.model_default;
   if (!claudeModel) {
-    console.error('❌ bot-skills/uno-implement/SKILL.md is missing model_default in frontmatter');
+    console.error('❌ scripts/prompts/uno-implement/SKILL.md is missing model_default in frontmatter');
     process.exit(1);
   }
 
@@ -482,7 +482,7 @@ async function main() {
       .map(([file, content]) => `### ${file}\n\`\`\`scss\n${content}\n\`\`\``)
       .join('\n\n');
 
-    // System prompt loaded from bot-skills/uno-implement/SKILL.md (with the
+    // System prompt loaded from scripts/prompts/uno-implement/SKILL.md (with the
     // new-component scaffolding reference auto-appended when isNewComponent).
     // Single source of truth for the bot's implementation behavior.
     const systemPrompt = await loadSkill('uno-implement', { isNewComponent });

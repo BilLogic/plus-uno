@@ -81,7 +81,7 @@ Current template files in this directory:
 - Start from the specs documentation to understand component structure
 - Implement complete pages, not just individual components
 - Use existing PLUS components when possible
-- Follow coding standards from `../../../.agent/SKILL.md`
+- Follow coding standards from `../../../AGENTS.md`
 - Include proper accessibility attributes
 - Ensure responsive design
 - Reference: `../../../design-system/src/specs/Login/STRUCTURE.md` for complete component breakdown

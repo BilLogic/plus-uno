@@ -1,0 +1,60 @@
+name = "uno-bot"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Plain vars (non-secret). Override per-env below.
+#
+# IMPORTANT — both values below must point at the GitHub repo whose `main`
+# branch holds the harness (AGENTS.md, skills/*/bot.md + method.md,
+# docs/conventions/). The bot fetches those files from SKILLS_BASE_URL at
+# runtime (see src/agent/skills.ts SKILL_PATHS) and dispatches
+# repository_dispatch events against GITHUB_REPO.
+[vars]
+GITHUB_REPO = "BilLogic/plus-uno"
+SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
+# Notion "Roadmap" database (the Design HQ board). create_prd drops new PRD
+# cards here in the "Need PRD / Under Playground" Design Status column.
+NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
+# Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
+# that find_experts queries to suggest collaborators/SMEs for a topic.
+NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
+# DS Component PRDs database — create_prd routes prd_type="ds-component" here
+# (feature PRDs go to the Roadmap board above). Leave blank to fall back to
+# Roadmap. Set to the "DS Component PRDs" DB id when ready.
+NOTION_DS_COMPONENT_DB_ID = "342b7cca-4982-80b1-b305-f9e0e581ef48"
+# uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
+# read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
+SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
+# #plus-design channel id. Confirmed reviewable artifacts (PRs from implement /
+# implement_design / marketplace_*, and new PRDs) are announced here for team
+# review (D5). Leave blank to disable fan-out (replies stay in-thread).
+PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+
+# Secrets are set via `wrangler secret put`. Expected names:
+#   SLACK_SIGNING_SECRET
+#   SLACK_BOT_TOKEN
+#   ANTHROPIC_API_KEY
+#   GITHUB_TOKEN          (PAT with repo:dispatch scope)
+#   FIGMA_ACCESS_TOKEN    (Figma PAT with read access to the prototypes file;
+#                          used by implement_design's proposal-time screenshot
+#                          fetch in events.ts — Phase 4)
+#   NOTION_API_KEY        (Notion internal integration token, connected to the
+#                          Roadmap board; used by create_prd to add PRD cards)
+#   GMAIL_SENDER          (the authorized "From" mailbox for send_email)
+#   GMAIL_CLIENT_ID       (Google OAuth client id)
+#   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
+#   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)
+#   SUPABASE_ANON_KEY     (publishable/anon read key; blueprint_search is read-only)
+#   (SUPABASE_URL is a non-secret [vars] entry above, not a secret)
+
+# Durable Object — per-thread conversation state + pending tool-call proposals.
+[[durable_objects.bindings]]
+name = "THREAD_STATE"
+class_name = "ThreadState"
+
+# SQLite-backed Durable Object — works on Workers Free plan.
+# (new_classes is the legacy KV-backed migration that requires Workers Paid.)
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ThreadState"]

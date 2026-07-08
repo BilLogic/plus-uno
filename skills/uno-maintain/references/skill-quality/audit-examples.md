@@ -1,0 +1,29 @@
+# Audit Examples Reference
+
+Use the following repository-local examples as style references for report tone and structure:
+
+- `references/skill-quality/examples/uno-research-audit-example.md`
+- `references/skill-quality/examples/uno-plan-audit-example.md` *(historical specimen — uno-plan was dissolved 2026-07-07 (ADR-016); the report style is the point)*
+
+Optional local-only sources (may not exist on other machines):
+
+- `<local-path>`
+- `<local-path>`
+
+## How to Use These Examples
+
+- Mirror their report readability and evidence orientation.
+- Keep issue writeups concrete and actionable.
+- Preserve strict checklist-based judgment rather than opinion-based feedback.
+- Always include explicit priority and rewrite suggestions per issue.
+- Prefer repository-local markdown examples first for portability.
+
+## Important Constraint
+
+The template in `references/skill-quality/output-template.md` is the mandatory output structure.
+The PDF examples are style references, not a schema override.
+
+## Portability Rule
+
+- Never require absolute filesystem paths in references.
+- If a local-only file is mentioned, provide a repository-local fallback example.

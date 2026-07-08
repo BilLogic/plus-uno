@@ -13,4 +13,4 @@ Then open the route/path used by this template in your local Vite server.
 ## Notes
 
 - Do not use legacy `build:css` workflows in this repository.
-- Use `.agent/SKILL.md` and `.agent/skills/*/references/` for current implementation guidance.
+- Use `AGENTS.md` and `skills/*/references/` for current implementation guidance.
