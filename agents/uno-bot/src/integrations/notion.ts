@@ -457,3 +457,67 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     clearTimeout(timer);
   }
 }
+
+// ─── Notion workspace search (for notion_search grounding) ───────────────────
+// Keyword search via /v1/search when the bot has no URL to read. Only pages the
+// integration is CONNECTED to are visible — an empty result usually means the
+// page isn't shared with the uno-bot integration, not that it doesn't exist.
+// Read-only. Notion's search is title-weighted, so results are candidates to
+// then source_read, not authoritative content.
+
+export interface NotionSearchHit {
+  id: string;
+  title: string;
+  url: string;
+}
+
+export async function notionSearch(
+  env: Env,
+  query: string,
+  limit = 8,
+): Promise<NotionSearchHit[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${NOTION_API}/search`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.NOTION_API_KEY}`,
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        filter: { property: "object", value: "page" },
+        page_size: Math.min(Math.max(limit, 1), 20),
+      }),
+      signal: controller.signal,
+    });
+    const data = (await res.json()) as {
+      results?: Array<{ id?: string; url?: string; properties?: Record<string, NotionProperty> }>;
+      message?: string;
+      code?: string;
+    };
+    if (!res.ok) {
+      throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "search failed"}`);
+    }
+    const hits: NotionSearchHit[] = [];
+    for (const r of data.results ?? []) {
+      if (!r.id) continue;
+      let title = "(untitled)";
+      for (const prop of Object.values(r.properties ?? {})) {
+        if (prop.type === "title") {
+          const t = plain(prop.title);
+          if (t) title = t;
+          break;
+        }
+      }
+      const bareId = r.id.replace(/-/g, "");
+      hits.push({ id: bareId, title, url: r.url ?? `https://www.notion.so/${bareId}` });
+    }
+    return hits;
+  } finally {
+    clearTimeout(timer);
+  }
+}
