@@ -5,12 +5,12 @@ link_grep() {
 }
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 status=0
 
-echo "[check] validating markdown links in .agent/ docs"
+echo "[check] validating markdown links in skills/ agents/ docs/conventions/"
 
 while IFS= read -r file; do
   while IFS= read -r link; do
@@ -33,7 +33,7 @@ while IFS= read -r file; do
     if [[ "$link" == /* ]]; then
       target="${link#/}"
     else
-      target="$(cd "$(dirname "$file")" && realpath -m "$link")"
+      target="$(python3 -c 'import os,sys;print(os.path.normpath(os.path.join(sys.argv[1],sys.argv[2])))' "$(dirname "$file")" "$link")"
       target="${target#$ROOT/}"
     fi
 
@@ -56,9 +56,9 @@ done
 
 echo "[check] validating SKILL.md skill links"
 
-grep -oE 'skills/[a-z-]+/SKILL\.md' .agent/SKILL.md | while read -r ref; do
-  if [[ ! -f ".agent/$ref" ]]; then
-    echo "[missing] SKILL.md -> .agent/$ref"
+grep -oE 'skills/uno-[a-z-]+' AGENTS.md | sort -u | while read -r ref; do
+  if [[ ! -f "$ref/SKILL.md" ]]; then
+    echo "[missing] AGENTS.md -> $ref/SKILL.md"
     status=1
   fi
 done
@@ -68,7 +68,7 @@ echo "[check] validating JSON index files"
 required_indexes=(
   "docs/context/design-system/index-manifest.json"
   "docs/context/design-system/components/components-index.json"
-  ".agent/skills/uno-research/references/foundations-index.json"
+  "skills/uno-research/references/foundations-index.json"
   ".agent/skills/uno-research/references/patterns-index.json"
   ".agent/skills/uno-prototype/references/tokens-index.json"
   ".agent/skills/uno-prototype/references/examples-index.json"

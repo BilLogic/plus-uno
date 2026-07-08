@@ -337,7 +337,7 @@ Avoid making the page read like plugin or implementation documentation. The poin
 
 - [`.storybook/main.js`](../../../.storybook/main.js)
 - [`.storybook/preview.jsx`](../../../.storybook/preview.jsx)
-- [`.storybook/FORMS_DOCS_PLAN.md`](../../../.storybook/FORMS_DOCS_PLAN.md)
+- `.storybook/FORMS_DOCS_PLAN.md` (removed — see `.storybook/main.js` for current docs config)
 - [`storybook.md`](storybook.md)
 - [`design-system/src/storybook-docs/Introduction.mdx`](../../../design-system/src/storybook-docs/Introduction.mdx)
 - [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx)

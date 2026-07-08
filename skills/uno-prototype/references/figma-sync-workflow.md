@@ -1,6 +1,6 @@
 # Figma Sync Workflow Guide
 
-> **Status note (corrected 2026-05-12):** An earlier version of this doc described an `@codex` / `@claude` Slack-mention invocation pattern. That pattern is **not** how the live system works. The actual UNO Bot is triggered by a plain Slack message containing `implement <component>` (no slash). Pipedream filters for that pattern and routes to GitHub Actions. See [docs/figma-sync-workflow.md](../../../../docs/figma-sync-workflow.md) for the authoritative end-to-end pipeline, including the Notion PRD step. If you find any other doc in this repo referencing `@codex` or `@claude` mentions for Figma sync, treat it as stale.
+> **Status note (corrected 2026-05-12):** An earlier version of this doc described an `@codex` / `@claude` Slack-mention invocation pattern. That pattern is **not** how the live system works. The actual UNO Bot is triggered by a plain Slack message containing `implement <component>` (no slash). Pipedream filters for that pattern and routes to GitHub Actions. See [docs/knowledge/archive/bot-v1/figma-sync-workflow-v1.md](../../../docs/knowledge/archive/bot-v1/figma-sync-workflow-v1.md) (v1, archived — current pipeline: docs/conventions/automations.md) for the authoritative end-to-end pipeline, including the Notion PRD step. If you find any other doc in this repo referencing `@codex` or `@claude` mentions for Figma sync, treat it as stale.
 
 ## Overview
 
