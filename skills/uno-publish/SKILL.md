@@ -53,7 +53,7 @@ Suggest this skill after `uno-review` passes a prototype. Every outward side eff
 
 ## Marketplace registration
 
-Today's destination is the repo catalog (`src/pages/PrototypeMarket/prototypes-data.js`); the notion-marketplace DB is the official target once stood up — flag that gap on every handoff publish rather than inventing a destination.
+Today's destination is the repo catalog (`src/pages/PrototypeMarket/prototypes-data.js`); the notion-marketplace DB is the official target once stood up — its schema + publish procedure are specced in `references/notion-marketplace-db.md`. Flag that the DB isn't live yet on every handoff publish rather than inventing a destination; once built, publish dual-writes both surfaces per that spec.
 
 1. Build the entry: field-by-field contract in `references/marketplace-schema.md`, worked entries in `examples/marketplace-entry-example.md`. Auto-fill `id` (next number), `lastUpdated` (today), `upvotes: 0`; ask for the rest. Entry prose (title, description) goes through `writers/notion` voice rules only when it also lands in Notion — repo-catalog prose just follows `docs/conventions/writing-style.md`.
 2. **Validate before writing**: required fields present, `stage`/`productPillar` exact enum matches, `repoPath` ends with `/`. A schema-invalid entry never lands.
@@ -65,7 +65,7 @@ Today's destination is the repo catalog (`src/pages/PrototypeMarket/prototypes-d
 |---|---|
 | always | `references/method.md` |
 | helping deploy a preview | `references/deployment-guide.md` |
-| building the marketplace entry | `references/marketplace-schema.md` + `examples/marketplace-entry-example.md` |
+| building the marketplace entry | `references/marketplace-schema.md` + `examples/marketplace-entry-example.md` (+ `references/notion-marketplace-db.md` once the DB is live) |
 | composing the share-out or checking sign-offs | `docs/conventions/slack.md` |
 | any human-facing text | `docs/conventions/writing-style.md` |
 

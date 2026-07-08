@@ -18,7 +18,7 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 | Research & notes DB | uno writes; human reviews | findings, study guides |
 | Decision logs (per project) | uno logs at publish; human appends | thread conclusions land here before threads resolve |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
-| notion-marketplace DB | uno publishes entries | ⚠️ DB setup pending |
+| notion-marketplace DB | uno publishes entries | ⚠️ setup pending — schema + publish procedure specced in `skills/uno-publish/references/notion-marketplace-db.md`; live target once built |
 | Eval Runs DB | uno writes at flow exits | ⚠️ DB setup pending — interim: `docs/evals/runs/*.jsonl` |
 | DS Component PRDs DB (`342b7cca-4982-80b1-b305-f9e0e581ef48`) | UNO Bot auto-creates | Figma-sync pipeline |
 
@@ -33,10 +33,14 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 
 ## Project-hub golden sections (in order)
 
-TLDR (2–4 sentences, zero-history reader) → People (@-mentions + role labels + "Start here by role" line) → Now / Next / Blocked (owners, ⛔ blockers) → Latest progress (2–3 dated bullets, rewritten not accumulated) → Key references → Pages (inline subpages: PRD · Decision Log · Handoff Spec from handoff onward · Rollout · Archive) → **Doc Changelog** at the bottom, entries inside a *Show history* toggle. The Doc Changelog records the *document's* maintenance (restructures, pages added/moved/superseded) — never project progress, never formatting polish.
+**TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; a cold reader orients in 30s) → **People & entry points** (role-labelled @-mentions, one per line + a *Start here by role* quote line) → **Now / Next / Blocked** (owners, ⛔ blockers) → **Latest progress** (2–3 dated status-pulse bullets, newest first, rewritten not accumulated; older bullets fold into a *Show history* toggle) → **Key references** → **Pages** (inline subpages: PRD · Decision Log · Handoff Spec from handoff onward · Rollout · Archive) → **Doc Changelog** at the bottom, entries inside a *Show history* toggle.
 
-- Status lives in card **properties**, never a body callout. One callout = one alert; transient chatter → comments.
-- Don't restate properties in the body unless adding info (role labels). People = @-mentions; only workspace members are mentionable.
+- **TLDR holds orientation only** — no people, no links, no "start here" line; those are the *People & entry points* section directly below. Keep it the single thing a card-picker must read.
+- **Latest progress = status pulse, not rationale.** What changed / where it stands — no *whys*. Durable whys and rejected alternatives live in the **Decision Log** (cited by R-ID at handoff). The two never duplicate: a bullet that explains *why* belongs in the Decision Log, not here.
+- **Doc Changelog** records the *document's* maintenance (restructures, pages added/moved/superseded) — never project progress, never formatting polish.
+- Status lives in card **properties**, never a body callout or a header dot-spacer block. State owner/status/date once (in properties); the body adds only what properties can't — role labels, blockers, links. One callout = one **atomic** alert (multi-line callouts fragment on write); transient chatter → comments.
+- People = @-mentions, **one role per line** (never a `·`-spacer run); only workspace members are mentionable.
+- Structure with **dividers** between major sections, a single **callout** for a live alert, and a **quote** for the *Start here* line — sparingly. The skeleton in 🧩 Templates is the reference.
 - Templates (9) live in Notion 🧩 Templates — reference them, never duplicate their bodies.
 
 ## Comments protocol

@@ -11,7 +11,6 @@
     "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 4200 --host 0.0.0.0 --config-dir .storybook",
     "build-storybook": "storybook build --config-dir .storybook -o storybook-static && mkdir -p dist && rm -rf dist/storybook && mv storybook-static dist/storybook",
     "sync:tokens": "node scripts/sync-figma-tokens.js",
-    "figma:component-meta": "node scripts/figma-component-meta.js",
     "generate:tokens": "node scripts/generate-all-tokens.js",
     "generate:previews": "node scripts/generate-prototype-previews.js",
     "start": "vite",
@@ -28,9 +27,6 @@
     "dev:toolkit-ia-revision": "vite --config playground/toolkit-ia-revision/vite.config.js",
     "figma:poll": "node scripts/poll-figma-library.js",
     "figma:poll:init": "node scripts/poll-figma-library.js --init",
-    "figma:fetch-component": "node scripts/fetch-figma-component.js",
-    "figma:write-back": "node scripts/figma-write-back.js",
-    "figma:publish-code-connect": "node scripts/publish-code-connect.js",
     "notify:slack": "node scripts/notify-slack.js"
   },
   "keywords": [
