@@ -10,7 +10,7 @@ import { conversationsReplies } from "../slack/api";
 function parseSlackLink(link: string): { channel: string; ts: string } | null {
   const m = link.match(/\/archives\/([A-Z0-9]+)\/p(\d{10})(\d{6})/i);
   if (!m) return null;
-  return { channel: m[1], ts: `${m[2]}.${m[3]}` };
+  return { channel: m[1]!, ts: `${m[2]!}.${m[3]!}` };
 }
 
 export async function executeSlackThreadRead(env: Env, input: Record<string, unknown>): Promise<string> {
