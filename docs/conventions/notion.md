@@ -7,6 +7,15 @@ rule: on conflict with any legacy Notion playbook page, this file wins — file 
 applied by: agents/writers/notion
 -->
 
+## Access paths — reads vs writes (uno-bot Worker)
+
+Two separate credentials, two separate paths (ADR pending, Path B):
+
+- **Reads** → the **hosted Notion MCP connector** (`mcp.notion.com`), attached to the Anthropic API call with a read-only allowlist (`search`, `fetch`). MCP tools run server-side inside the model turn, so reads need no gate. Auth = an **OAuth bearer** (`NOTION_MCP_TOKEN`).
+- **Writes** → the bot's **own gated tools** (`create_prd`, `delete_prd`), intercepted by the proposal gate — nothing writes without the requester's ✅. Auth = the **`ntn_` REST integration key** (`NOTION_API_KEY`). **A Notion write tool is never exposed through the MCP connector** — that would bypass the gate.
+
+MCP auth ≠ REST auth: the two credentials are different token types and are not interchangeable. Wiring: `agents/uno-bot/src/agent/mcp.ts`. Inert until both `NOTION_MCP_URL` + `NOTION_MCP_TOKEN` are set.
+
 ## Write-surface allowlist
 
 The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintain change to this list, never an inline decision.
@@ -33,15 +42,17 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 
 ## Project-hub golden sections (in order)
 
-**TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; a cold reader orients in 30s) → **People & entry points** (role-labelled @-mentions, one per line + a *Start here by role* quote line) → **Now / Next / Blocked** (owners, ⛔ blockers) → **Latest progress** (2–3 dated status-pulse bullets, newest first, rewritten not accumulated; older bullets fold into a *Show history* toggle) → **Key references** → **Pages** (inline subpages: PRD · Decision Log · Handoff Spec from handoff onward · Rollout · Archive) → **Doc Changelog** at the bottom, entries inside a *Show history* toggle.
+**TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; the top anchor, a cold reader orients in 30s) → **People** (role-labelled @-mentions, one per line) → **Now / Next / Blocked** (one bold-labelled line each: current focus · following step · ⛔ what's stuck) → **Latest progress** (1–2 dated status-pulse bullets on top, the rest folded into a *Show history* toggle) → **Key references** → **Pages** (inline subpages: PRD · Decision Log · Handoff Spec from handoff onward · Rollout · Archive) → **Doc Changelog** at the bottom, inside a *Show history* toggle.
 
-- **TLDR holds orientation only** — no people, no links, no "start here" line; those are the *People & entry points* section directly below. Keep it the single thing a card-picker must read.
-- **Latest progress = status pulse, not rationale.** What changed / where it stands — no *whys*. Durable whys and rejected alternatives live in the **Decision Log** (cited by R-ID at handoff). The two never duplicate: a bullet that explains *why* belongs in the Decision Log, not here.
+- **TLDR is the top anchor** — orientation only, no people, no links, and no separate "start here" line (the *People* section makes entry points obvious). No placeholder callout above it; the TLDR heading is the read-me. Keep it the single thing a card-picker must read.
+- **The Decision Log is not a hub body section** — it lives as an inline subpage under **Pages**. The hub carries progress; the whys live in the linked Decision Log.
+- **Latest progress = status pulse, not rationale.** What changed / where it stands — no *whys*. Durable whys and rejected alternatives live in the Decision Log (cited by R-ID at handoff). A bullet that explains *why* belongs there, not here.
 - **Doc Changelog** records the *document's* maintenance (restructures, pages added/moved/superseded) — never project progress, never formatting polish.
-- Status lives in card **properties**, never a body callout or a header dot-spacer block. State owner/status/date once (in properties); the body adds only what properties can't — role labels, blockers, links. One callout = one **atomic** alert (multi-line callouts fragment on write); transient chatter → comments.
+- **Toggles:** title them plainly ("Show history") — Notion renders the arrow itself, so never prefix a ▸ (a double-arrow is the tell it's wrong).
+- Status lives in card **properties**, never a body callout or a header dot-spacer block. State owner/status/date once (in properties); the body adds only what properties can't — role labels, blockers, links.
 - People = @-mentions, **one role per line** (never a `·`-spacer run); only workspace members are mentionable.
-- Structure with **dividers** between major sections, a single **callout** for a live alert, and a **quote** for the *Start here* line — sparingly. The skeleton in 🧩 Templates is the reference.
-- Templates (9) live in Notion 🧩 Templates — reference them, never duplicate their bodies.
+- Structure with **dividers** between sections. A **callout** is reserved for a single **atomic** live alert (e.g. an active blocker) placed inline in *Now / Next / Blocked* — never a standing placeholder, never multi-line (it fragments on write). Transient chatter → comments.
+- Templates (9) live in Notion 🧩 Templates; the live **Project Hub — template seed** carries the real blocks. Reference them, never duplicate their bodies.
 
 ## Comments protocol
 

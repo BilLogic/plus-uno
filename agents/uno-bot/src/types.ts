@@ -28,5 +28,12 @@ export interface Env {
   // fabricating.
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
+  // Notion hosted-MCP connector (Path B — read-only grounding via the MCP
+  // connector on the Anthropic API call). BOTH must be set for the connector to
+  // attach; unset → the loop runs without MCP (inert). The token is an OAuth
+  // bearer for mcp.notion.com (NOT the ntn_ REST integration key — that stays
+  // NOTION_API_KEY for the gated write tools). See src/agent/mcp.ts.
+  NOTION_MCP_URL?: string;
+  NOTION_MCP_TOKEN?: string;
   THREAD_STATE: DurableObjectNamespace;
 }

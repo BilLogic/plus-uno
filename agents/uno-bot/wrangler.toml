@@ -30,6 +30,11 @@ SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 # implement_design / marketplace_*, and new PRDs) are announced here for team
 # review (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+# Notion hosted-MCP endpoint (Path B — read-only grounding via the MCP connector).
+# Non-secret URL; the OAuth bearer is the NOTION_MCP_TOKEN secret below. Leave
+# this line commented until the token is provisioned — the connector is inert
+# unless BOTH the URL and the token are set (src/agent/mcp.ts).
+# NOTION_MCP_URL = "https://mcp.notion.com/mcp"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET
@@ -39,8 +44,12 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 #   FIGMA_ACCESS_TOKEN    (Figma PAT with read access to the prototypes file;
 #                          used by implement_design's proposal-time screenshot
 #                          fetch in events.ts — Phase 4)
-#   NOTION_API_KEY        (Notion internal integration token, connected to the
-#                          Roadmap board; used by create_prd to add PRD cards)
+#   NOTION_API_KEY        (Notion internal integration ntn_ token, connected to
+#                          the Roadmap board; used by create_prd/delete_prd — the
+#                          GATED write path. NOT the MCP token.)
+#   NOTION_MCP_TOKEN      (OAuth bearer for mcp.notion.com — the READ path via the
+#                          MCP connector. Optional; unset → connector stays off.
+#                          Distinct from NOTION_API_KEY: MCP auth ≠ REST auth.)
 #   GMAIL_SENDER          (the authorized "From" mailbox for send_email)
 #   GMAIL_CLIENT_ID       (Google OAuth client id)
 #   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
