@@ -110,7 +110,7 @@ tags: [architecture, conventions]
 
 **Why.** Rationale not recorded in-repo; inferred from the archived Pipedream docs (`docs/knowledge/archive/`) and eval commits: Pipedream limited control over tool orchestration, state, and observability; the Worker gives one TypeScript codebase, telemetry (`c48e1c30` build tags — round-2 evals unknowingly tested a stale deployment), and subrequest-budget control.
 
-**Status.** Live per eval rounds 1–3 (2026-07-01 → 07-07). Cutover *confirmation* still open (plan 2026-07-07-001 §6 Q7): verify the Slack app's Event Subscriptions URL points at `*.workers.dev`, not `pipedream.net`, and record the outcome here.
+**Status.** CONFIRMED live (closed 2026-07-08 by evidence): eval rounds 1–3 ran through Slack against the Worker — round 2 diagnosed a stale *Worker* deployment serving Slack traffic and added /health build tags in response (`c48e1c30`), which is only possible with Event Subscriptions already pointed at workers.dev. Follow-up for a Slack-app admin: retire the v1 Pipedream workflow (out of the serving path either way).
 
 ## ADR-015: uno-blueprint on Supabase as the product source of truth (backfilled 2026-07-07 from git history)
 

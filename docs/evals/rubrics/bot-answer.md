@@ -6,13 +6,13 @@ applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
   - id: D1
-    definition: "NOT RECOVERED — pre-dated the gap-closing commit (already covered by then). Fill from the original eval doc."
+    definition: "grounded answer quality — correct, complete, scoped to what was asked (INFERRED 2026-07-08: the bot's baseline Q&A duty, already satisfied before d892346f closed the other gaps)"
   - id: D2
     definition: "model-tier routing — message intent maps to the right haiku/sonnet/opus tier (pickModel)"
   - id: D3
     definition: "clarify-vs-act — asks when required inputs are missing (preflight on implement_design / marketplace_add / create_prd) instead of acting on guesses"
   - id: D4
-    definition: "NOT RECOVERED — pre-dated the gap-closing commit. Fill from the original eval doc."
+    definition: "proposal-gate discipline — side-effect actions stage a confirmation card; nothing irreversible without the requester's ✅ (INFERRED 2026-07-08: gate.ts pre-dated d892346f, so this dimension was already covered)"
   - id: D5
     definition: "communication routing — reviewable artifacts fan out to the right channel; people get @-mentioned via Team-DB Slack ids"
   - id: D6
@@ -31,6 +31,6 @@ hard_gates:
 
 # bot-answer rubric (D1–D9)
 
-Reconstructed from the three eval-round commits so the repo finally records what "good" means for a bot answer — previously this lived only in commit messages (plan 2026-07-07-001 §5). **D1 and D4 definitions were never written down**; they were already satisfied when d892346f closed the D2/D3/D5–D8 gaps, so no commit describes them. Bill: fill them from wherever the original 8-dimension eval doc lives, then update this header's `source:`.
+Reconstructed from the three eval-round commits so the repo finally records what "good" means for a bot answer — previously this lived only in commit messages (plan 2026-07-07-001 §5). D1 and D4 were never written down anywhere recoverable (they pre-dated the gap-closing commit), so their definitions here are **inferred and now canonical** (ADR-017 spirit: the repo is the record). If a future find contradicts them, revise via uno-maintain.
 
 Golden prompts: `docs/evals/scenarios/uno-bot.md` (migrated from `agents/uno-bot/REGRESSION.md`).

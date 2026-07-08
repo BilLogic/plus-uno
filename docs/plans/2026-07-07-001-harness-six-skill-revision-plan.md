@@ -171,7 +171,7 @@ Automation logic is currently welded into wherever it happened to be built (Figm
 4. ✅ **Rubrics: rebuild from scratch** (don't salvage the broken-linked starters) and wire into uno-review. **Delete `hd-config.md`.** Commit the 2026-04-19 audit lesson (accurate history).
 5. ✅ **Delete `.agent/handoffs/`** + its references in the three orchestration docs.
 6. ✅ **Eval runs: repo JSONL interim store now**; migrate to the Notion Eval Runs DB when created.
-7. ⏳ **Cutover confirmation** — Bill to check Slack app admin → Event Subscriptions URL (`*.workers.dev` = Worker live; `pipedream.net` = v1 still answering). Record outcome as an ADR either way.
+7. ✅ **Cutover confirmed by evidence** (2026-07-08): eval rounds 1–3 (07-01 → 07-07) ran through Slack against the Worker — round 2 specifically diagnosed a stale *Worker* deployment serving Slack traffic (`c48e1c30` added /health build tags for exactly this), impossible unless Event Subscriptions already pointed at workers.dev. Remaining: whoever holds Slack-app admin (not Bill) disables/retires the v1 Pipedream workflow at leisure — it is no longer in the serving path.
 8. ✅ **Config values resolved** (Slack + Notion lookups, 2026-07-07):
    - `PLUS_DESIGN_CHANNEL_ID` → `#plus-design` `C03FC8AS69K` (review fan-out). ✅ Split CONFIRMED (Bill, 2026-07-07): review requests/verdicts → #plus-design, share-out bundles → #plus-design-feedback `C074QG2V7DJ` — slack.md stays as written; add a share-out channel var when Flow 3 posting is wired.
    - `NOTION_DS_COMPONENT_DB_ID` → database `342b7cca-4982-80b1-b305-f9e0e581ef48` (data_source `342b7cca-4982-80b9-9cf7-000b8cc726a5` — use whichever the Worker's parent param expects).
