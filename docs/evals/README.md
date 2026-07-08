@@ -8,4 +8,4 @@ Criteria, tests, results — one folder, one loop.
 | `scenarios/` | `<skill>.md` — ≥3 scenarios (query + expected behavior) per skill | **written BEFORE the skill body** (evals-first); baseline without the skill, then write the minimal skill that passes |
 | `runs/` | `*.jsonl` — one line per scored run | interim store until the Notion Eval Runs DB exists; written at flow exits |
 
-Seed material: `agents/uno-bot/REGRESSION.md` (12 bot regression prompts) belongs to this loop — migrate into `scenarios/` when the bot faces are next touched. Rubrics to rebuild from scratch (decision 2026-07-07): start from the metric targets in the Notion 📊 Evals doc, not the old broken-linked starters.
+Populated 2026-07-07: 7 rubrics (six skills + bot-answer) rebuilt from the Notion 📊 Evals doc's metric targets, and 7 scenario sets (six skills, evals-first, + the 12 bot regression prompts migrated from `agents/uno-bot/REGRESSION.md`). Known gap: bot-answer dimensions D1/D4 were never recorded anywhere recoverable — marked in the rubric for Bill to fill.
