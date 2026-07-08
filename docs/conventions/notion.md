@@ -7,6 +7,15 @@ rule: on conflict with any legacy Notion playbook page, this file wins — file 
 applied by: agents/writers/notion
 -->
 
+## Access paths — reads vs writes (uno-bot Worker)
+
+**One credential, REST for both** — the `ntn_` internal integration key (`NOTION_API_KEY`), workspace-scoped and non-expiring:
+
+- **Reads** (grounding: `find_experts`, source lookups) → the bot's REST read code. No gate needed — reads never mutate state.
+- **Writes** (`create_prd`, `delete_prd`) → the bot's **own gated tools**, intercepted by the proposal gate — nothing writes without the requester's ✅.
+
+**Why not the hosted Notion MCP connector for reads?** It was evaluated (Path B) and shelved: `mcp.notion.com` uses user-scoped OAuth built for interactive clients and needs token refresh the headless Worker can't do — a downgrade from the never-expiring REST key. Full reasoning + the revisit conditions live in `docs/plans/2026-07-08-002-uno-bot-sdk-mcp-connector.md`. The inert `agents/uno-bot/src/agent/mcp.ts` scaffolding stays off (connector builds only when `NOTION_MCP_URL` + `NOTION_MCP_TOKEN` are both set — they aren't). MCP connectors belong on *interactive* Claude (Bill's Claude Desktop / Claude Code), not the Worker.
+
 ## Write-surface allowlist
 
 The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintain change to this list, never an inline decision.
@@ -18,7 +27,7 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 | Research & notes DB | uno writes; human reviews | findings, study guides |
 | Decision logs (per project) | uno logs at publish; human appends | thread conclusions land here before threads resolve |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
-| notion-marketplace DB | uno publishes entries | ⚠️ setup pending — schema + publish procedure specced in `skills/uno-publish/references/notion-marketplace-db.md`; live target once built |
+| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes entries | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
 | Eval Runs DB | uno writes at flow exits | ⚠️ DB setup pending — interim: `docs/evals/runs/*.jsonl` |
 | DS Component PRDs DB (`342b7cca-4982-80b1-b305-f9e0e581ef48`) | UNO Bot auto-creates | Figma-sync pipeline |
 
@@ -33,15 +42,18 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 
 ## Project-hub golden sections (in order)
 
-**TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; a cold reader orients in 30s) → **People & entry points** (role-labelled @-mentions, one per line + a *Start here by role* quote line) → **Now / Next / Blocked** (owners, ⛔ blockers) → **Latest progress** (2–3 dated status-pulse bullets, newest first, rewritten not accumulated; older bullets fold into a *Show history* toggle) → **Key references** → **Pages** (inline subpages: PRD · Decision Log · Handoff Spec from handoff onward · Rollout · Archive) → **Doc Changelog** at the bottom, entries inside a *Show history* toggle.
+**TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; the top anchor, a cold reader orients in 30s) → **People** (role-labelled @-mentions, one per line) → **Now / Next / Blocked** (one bold-labelled line each: current focus · following step · ⛔ what's stuck) → **Latest progress** (all dated status-pulse bullets inside one *Progress log* accordion — nothing spills onto the page) → **Key references** → **Doc Changelog** (inside a *Show history* toggle) → **Pages** (the final section: a contiguous run of pre-created inline subpages — PRD · Decision Log · Handoff Spec · Rollout · Meeting Notes & Context · Archive).
 
-- **TLDR holds orientation only** — no people, no links, no "start here" line; those are the *People & entry points* section directly below. Keep it the single thing a card-picker must read.
-- **Latest progress = status pulse, not rationale.** What changed / where it stands — no *whys*. Durable whys and rejected alternatives live in the **Decision Log** (cited by R-ID at handoff). The two never duplicate: a bullet that explains *why* belongs in the Decision Log, not here.
+- **TLDR is the top anchor** — orientation only, no people, no links, and no separate "start here" line (the *People* section makes entry points obvious). No placeholder callout above it; the TLDR heading is the read-me. Keep it the single thing a card-picker must read.
+- **The Decision Log is not a hub body section** — it's one of the pre-created inline subpages under **Pages**. The hub carries progress; the whys live in the linked Decision Log.
+- **Latest progress = status pulse, not rationale — and all of it lives inside one *Progress log* accordion** (keeps the hub scannable; nothing spills onto the page). What changed / where it stands — no *whys*. Durable whys and rejected alternatives live in the Decision Log (cited by R-ID at handoff). A bullet that explains *why* belongs there, not here.
+- **Pages is the final section, and the template pre-creates every subpage** (PRD · Decision Log · Handoff Spec · Rollout · Meeting Notes & Context · Archive), each seeded with its own skeleton, as one contiguous run at the very bottom (child-page blocks can't interleave with text, and appended child pages land last). **Meeting Notes & Context** holds raw capture — meeting recordings, Zoom links, AI summaries, running scratch — distinct from the synthesized PRD/Findings and the Decision Log. Mark a not-yet-relevant subpage "N/A until [stage]" rather than deleting it.
 - **Doc Changelog** records the *document's* maintenance (restructures, pages added/moved/superseded) — never project progress, never formatting polish.
-- Status lives in card **properties**, never a body callout or a header dot-spacer block. State owner/status/date once (in properties); the body adds only what properties can't — role labels, blockers, links. One callout = one **atomic** alert (multi-line callouts fragment on write); transient chatter → comments.
+- **Toggles:** title them plainly ("Show history") — Notion renders the arrow itself, so never prefix a ▸ (a double-arrow is the tell it's wrong).
+- Status lives in card **properties**, never a body callout or a header dot-spacer block. State owner/status/date once (in properties); the body adds only what properties can't — role labels, blockers, links.
 - People = @-mentions, **one role per line** (never a `·`-spacer run); only workspace members are mentionable.
-- Structure with **dividers** between major sections, a single **callout** for a live alert, and a **quote** for the *Start here* line — sparingly. The skeleton in 🧩 Templates is the reference.
-- Templates (9) live in Notion 🧩 Templates — reference them, never duplicate their bodies.
+- Structure with **dividers** between sections. A **callout** is reserved for a single **atomic** live alert (e.g. an active blocker) placed inline in *Now / Next / Blocked* — never a standing placeholder, never multi-line (it fragments on write). Transient chatter → comments.
+- Templates (9) live in Notion 🧩 Templates; the live **Project Hub — template seed** carries the real blocks. Reference them, never duplicate their bodies.
 
 ## Comments protocol
 
@@ -49,6 +61,8 @@ Suggestions *about* existing content (including the agent's own) go in **comment
 
 ## Enhanced-markdown quirks (API writes)
 
+- **Page titles never carry an emoji** — set the page/DB **icon** field instead (the title text stays clean; the icon renders separately). Same for database titles. Emoji in section *headings* (body blocks) is fine — those have no icon field.
+- **Link to internal pages/docs with a page reference (mention), never a raw hyperlink.** Notion's page-mention styling (icon + live title, updates on rename) reads far better than a bare URL and never goes stale. Reserve markdown hyperlinks for external URLs.
 - Mentions: `<mention-user url="user://<user-id>"/>` — the `id=` attribute silently drops. Verify membership via the users API first.
 - Embeds are manual-only via API — write a plain link + 📌 placeholder; a human converts to embed. Always pair any embed with a plain link (embeds are unreadable via API).
 - Child-page blocks cannot interleave with text — group inline subpages in one contiguous run (the Pages section).
