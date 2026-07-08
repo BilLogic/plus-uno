@@ -23,13 +23,20 @@ NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
 # (feature PRDs go to the Roadmap board above). Leave blank to fall back to
 # Roadmap. Set to the "DS Component PRDs" DB id when ready.
 NOTION_DS_COMPONENT_DB_ID = "342b7cca-4982-80b1-b305-f9e0e581ef48"
+# Research & notes DB — notion_create(surface:"research") files findings/study
+# guides here. Leave blank → that surface reports "not configured". Set when ready.
+NOTION_RESEARCH_DB_ID = ""
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
-# #plus-design channel id. Confirmed reviewable artifacts (PRs from implement /
-# implement_design / marketplace_*, and new PRDs) are announced here for team
-# review (D5). Leave blank to disable fan-out (replies stay in-thread).
+# #plus-design channel id — reviewable artifacts (component_implement /
+# prototype_scaffold PRs, new PRDs from notion_create) are announced here for
+# team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+# #plus-design-feedback channel id — shareout_post drops feedback bundles here
+# (distinct from the reviews channel above). Leave blank → shareout falls back
+# to the origin thread.
+PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET
