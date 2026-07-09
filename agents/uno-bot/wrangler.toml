@@ -103,3 +103,10 @@ id = "587f85559dda488a89ff237bf117a5a6"
 [[kv_namespaces]]
 binding = "SLACK_OAUTH_KV"
 id = "18b58372d9bc430489d634c2c9a0b0c4"
+
+# KV — harness resilience: last-known-good system-prompt assembly + alert
+# throttle. When GitHub Raw fetches fail, the bot serves this copy and pings
+# #uno-bot instead of silently running with harness files missing.
+[[kv_namespaces]]
+binding = "HARNESS_KV"
+id = "10e5f980215e4f7e817bf55ac69dda43"

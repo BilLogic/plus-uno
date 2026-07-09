@@ -32,6 +32,11 @@ export interface Env {
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
   THREAD_STATE: DurableObjectNamespace;
+  // Harness resilience: stores the last fully-successful system-prompt assembly
+  // (all 20+ SKILL_PATHS files fetched clean) + the alert-throttle timestamp.
+  // Unset → behavior degrades to pre-KV (partial harness on fetch failures, no
+  // Slack alert). See agent/skills.ts.
+  HARNESS_KV?: KVNamespace;
   // --- Notion hosted-MCP (READS only) — grounding via mcp.notion.com ---------
   // mcp.notion.com is its own OAuth 2.1 server (PKCE + dynamic client
   // registration) — no manual Notion OAuth app and no client secret are needed;

@@ -33,7 +33,23 @@ const SKILL_PATHS = [
   "docs/conventions/writing-style.md",
 ] as const;
 
-let cachedSystemPromise: Promise<string> | null = null;
+// In-memory cache with a TTL: a merged harness change takes effect within
+// CACHE_TTL_MS on every isolate — previously the cache lived until the isolate
+// recycled (minutes to hours, unpredictable), which broke the "merge a doc PR =
+// reprogram the bot" contract. The assembled text is byte-stable between
+// refreshes, so Anthropic prompt caching still hits.
+const CACHE_TTL_MS = 5 * 60_000;
+let cachedSystem: { at: number; promise: Promise<string> } | null = null;
+
+// Last-known-good harness (KV) + loud failure alerting. fetchSkillFile degrades
+// a 404/transient failure to "" so one broken file can't take the bot down —
+// but silently running with pieces of the brain missing is its own failure
+// mode. So: every fully-successful assembly is stored in KV; when files come
+// back missing, we alert #uno-bot (throttled) and serve the KV copy instead.
+const KV_LAST_GOOD = "harness:last_good";
+const KV_ALERT_AT = "harness:alert_at";
+const ALERT_THROTTLE_MS = 60 * 60_000; // at most one alert per hour
+const UNO_BOT_CHANNEL = "C0ARJ2A3A69"; // #uno-bot (ops/alerts)
 
 export interface PendingContext {
   toolName: string;
@@ -71,26 +87,79 @@ async function fetchSkillFile(env: Env, path: string): Promise<string> {
   }
 }
 
+/** Alert #uno-bot that harness files failed to fetch — throttled via KV so an
+ *  outage produces one ping an hour, not one per message. Never throws. */
+async function alertHarnessDegraded(env: Env, missing: string[], usingFallback: boolean): Promise<void> {
+  try {
+    if (env.HARNESS_KV) {
+      const last = await env.HARNESS_KV.get(KV_ALERT_AT);
+      if (last && Date.now() - Number(last) < ALERT_THROTTLE_MS) return;
+      await env.HARNESS_KV.put(KV_ALERT_AT, String(Date.now()));
+    }
+    const { postMessage } = await import("../slack/api");
+    await postMessage(env, {
+      channel: UNO_BOT_CHANNEL,
+      text:
+        `:warning: *uno-bot harness fetch degraded* — ${missing.length} file(s) failed to load from GitHub Raw:\n` +
+        missing.map((p) => `• \`${p}\``).join("\n") +
+        `\n${usingFallback ? "Serving the last-known-good harness from KV." : "No KV fallback available — running with those files MISSING."}` +
+        ` Check GitHub Raw availability / recent renames of these paths.`,
+    });
+  } catch (err) {
+    console.warn(`[skills] alert failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+async function assembleSystem(env: Env): Promise<string> {
+  const parts = await Promise.all(SKILL_PATHS.map((p) => fetchSkillFile(env, p)));
+  const missing = SKILL_PATHS.filter((_, i) => !parts[i]);
+  // Generic assembly: each fetched file gets a divider headed by its repo
+  // path, so the prompt is self-describing and adding/removing a path can
+  // never desync from a hand-maintained label list (the v1 destructuring
+  // bug: labels ran in the old 8-entry order and dropped the tail).
+  const assembled = parts
+    .map((text, i) => {
+      if (!text) return "";
+      return i === 0 ? text : `\n\n---\n\n<!-- ${SKILL_PATHS[i]} -->\n\n${text}`;
+    })
+    .join("");
+
+  if (missing.length === 0) {
+    // Fully healthy — refresh the last-known-good copy (guarded; KV optional).
+    if (env.HARNESS_KV) {
+      try {
+        await env.HARNESS_KV.put(KV_LAST_GOOD, assembled);
+      } catch (err) {
+        console.warn(`[skills] KV put failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    return assembled;
+  }
+
+  // Degraded — prefer the last fully-good harness over a partial brain, and say
+  // so loudly in #uno-bot either way.
+  let fallback: string | null = null;
+  if (env.HARNESS_KV) {
+    try {
+      fallback = await env.HARNESS_KV.get(KV_LAST_GOOD);
+    } catch (err) {
+      console.warn(`[skills] KV get failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  console.warn(`[skills] harness degraded — missing: ${missing.join(", ")} (fallback: ${fallback ? "KV" : "none"})`);
+  await alertHarnessDegraded(env, [...missing], fallback !== null);
+  return fallback ?? assembled;
+}
+
 async function getStableSystem(env: Env): Promise<string> {
-  if (!cachedSystemPromise) {
-    cachedSystemPromise = (async () => {
-      const parts = await Promise.all(SKILL_PATHS.map((p) => fetchSkillFile(env, p)));
-      // Generic assembly: each fetched file gets a divider headed by its repo
-      // path, so the prompt is self-describing and adding/removing a path can
-      // never desync from a hand-maintained label list (the v1 destructuring
-      // bug: labels ran in the old 8-entry order and dropped the tail).
-      return parts
-        .map((text, i) => {
-          if (!text) return "";
-          return i === 0 ? text : `\n\n---\n\n<!-- ${SKILL_PATHS[i]} -->\n\n${text}`;
-        })
-        .join("");
-    })().catch((err) => {
-      cachedSystemPromise = null;
+  if (!cachedSystem || Date.now() - cachedSystem.at > CACHE_TTL_MS) {
+    const promise = assembleSystem(env).catch((err) => {
+      cachedSystem = null;
       throw err;
     });
+    cachedSystem = { at: Date.now(), promise };
   }
-  return cachedSystemPromise;
+  return cachedSystem.promise;
 }
 
 export async function buildSystemBlocks(
