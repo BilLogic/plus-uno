@@ -51,13 +51,11 @@ export interface Env {
   // add a Supabase write key here (blueprint writes route to the IDE).
   SUPABASE_MCP_TOKEN?: string;
 
-  // --- Figma hosted-MCP (READS only) — mcp.figma.com -------------------------
-  // Confidential OAuth 2.1 client (dynamic registration issues the client_secret;
-  // both id+secret cached in FIGMA_OAUTH_KV alongside the issued token). Only the
-  // redirect URI + KV are required. Unset → the Figma MCP stays off. The toolset
-  // enables only get_*/read tools — generation/write tools are never exposed.
-  FIGMA_OAUTH_REDIRECT_URI?: string;
-  FIGMA_OAUTH_KV?: KVNamespace;
+  // NOTE: Figma has NO hosted-MCP path for the bot — mcp.figma.com is a closed
+  // catalog (Claude Code / Cursor / VS Code only; a custom Worker 403s), and the
+  // local MCP needs the desktop app. So there are no FIGMA_OAUTH_* vars. The bot
+  // surfaces Figma context from Notion + routes real Figma work to the IDE.
+  // (FIGMA_ACCESS_TOKEN above still powers implement_design's screenshot fetch.)
 
   // --- Slack hosted-MCP (read + WRITE) — mcp.slack.com -----------------------
   // Slack has NO dynamic registration → a STATIC pre-registered client is used

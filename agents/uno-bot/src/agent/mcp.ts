@@ -20,7 +20,6 @@
 
 import type { Env } from "../types";
 import { getNotionAccessToken } from "../oauth/notion";
-import { getFigmaAccessToken } from "../oauth/figma";
 import { getSlackAccessToken } from "../oauth/slack";
 
 export const MCP_BETA = "mcp-client-2025-11-20";
@@ -76,23 +75,15 @@ const SUPABASE_MCP_READ_TOOLS = [
   "list_edge_functions",
 ];
 
-// ─── Figma (OAuth 2.1 token in KV; explicit READ allowlist) ──────────────────
-// READ tools ONLY. Every generation/write tool (use_figma, generate_figma_design,
-// create_new_file, add_code_connect_map, upload_assets, send_code_connect_mappings,
-// …) is intentionally EXCLUDED: Figma generation is gated and routed to the IDE,
-// so write tools are never enabled here.
-const FIGMA_SERVER = "figma";
-const FIGMA_URL = "https://mcp.figma.com/mcp";
-const FIGMA_MCP_READ_TOOLS = [
-  "get_design_context",
-  "get_screenshot",
-  "get_metadata",
-  "get_variable_defs",
-  "get_code",
-  "get_code_connect_map",
-  "get_figjam",
-  "whoami",
-];
+// ─── Figma — intentionally NOT attached ──────────────────────────────────────
+// Figma's hosted MCP (mcp.figma.com) is a CLOSED CATALOG: only Figma-approved
+// client apps (Claude Code, Cursor, VS Code, Xcode, Codex) can connect — a custom
+// Worker gets 403 at registration (verified live + confirmed in Figma's docs). The
+// local/desktop MCP needs the Figma app running on the same machine (127.0.0.1),
+// which a serverless Worker doesn't have. So the bot has NO Figma MCP. It surfaces
+// Figma context from Notion (where the links live) and routes real Figma work to
+// the IDE — where Claude Code IS a catalog client. (FIGMA_ACCESS_TOKEN is still
+// used elsewhere for implement_design's screenshot fetch.)
 
 // ─── Slack (OAuth 2.1 user token in KV; enable-ALL — read + WRITE) ────────────
 const SLACK_SERVER = "slack";
@@ -147,20 +138,7 @@ export async function buildMcp(env: Env): Promise<{ servers: McpServer[]; toolse
     });
   }
 
-  // Figma — active once the one-time OAuth consent has stored a token in KV.
-  // READ allowlist ONLY — generation/write tools are never enabled (gated to IDE).
-  const figmaToken = await getFigmaAccessToken(env);
-  if (figmaToken) {
-    servers.push({ type: "url", url: FIGMA_URL, name: FIGMA_SERVER, authorization_token: figmaToken });
-    const configs: Record<string, { enabled: true }> = {};
-    for (const t of FIGMA_MCP_READ_TOOLS) configs[t] = { enabled: true };
-    toolsets.push({
-      type: "mcp_toolset",
-      mcp_server_name: FIGMA_SERVER,
-      default_config: { enabled: false }, // allowlist: everything off, then read tools on
-      configs,
-    });
-  }
+  // Figma — deliberately absent (see the note above): closed catalog + no desktop.
 
   // Slack — active once the one-time OAuth consent has stored a user token in KV.
   // ENABLE-ALL (no allowlist): this is the ONE service where MCP writes are
