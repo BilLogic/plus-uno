@@ -96,8 +96,20 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const mcpOpts = mcpEnabled
     ? { headers: { "anthropic-beta": MCP_BETA } }
     : undefined;
+  // Anthropic server-side web search (runs on Anthropic's infra, READ-only, no
+  // beta header). Gives the bot web grounding — e.g. Figma usage/practice
+  // questions and external resources it can't reach any other way (Figma's own
+  // MCP is closed to us). Basic 20250305 variant: works across all three model
+  // tiers (haiku/sonnet/opus). ~$10 per 1k searches — max_uses caps per turn.
+  const WEB_SEARCH_TOOL = {
+    type: "web_search_20250305",
+    name: "web_search",
+    max_uses: 3,
+  } as unknown as Anthropic.Tool;
+
   const toolsWithMcp = [
     ...(TOOLS as Anthropic.Tool[]),
+    WEB_SEARCH_TOOL,
     ...(mcpToolsets as unknown as Anthropic.Tool[]),
   ];
 

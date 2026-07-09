@@ -10,7 +10,7 @@ Loads: `references/method.md` (the shared procedure — scope, findings toll gat
 - **"draft a PRD" / "turn this into a PRD" / "file it"** → the `notion_create` flow:
   1. Draft as plain text first (structure per method § 4) and let the designer refine — do NOT call `notion_create` yet.
   2. Only on approval ("looks good, create it") → `notion_create(surface, title, summary, sections?, acceptance_criteria?, product_pillar?, source_url?)` — `surface` + `title` + `summary` required; gated (✅); files a card on the Design HQ → Product board in "Need PRD / Under Playground", tagged Design.
-  3. `surface` routing: product/feature PRD → `"prd"` (default, Roadmap board); DS *component* PRD → `"ds-component-prd"` (DS Component PRDs DB). If genuinely unclear, ask.
+  3. `surface` routing: every PRD — product/feature AND DS component alike — goes to `"prd"` (the Roadmap board, the single command board). The old `"ds-component-prd"` surface is retired and the Worker rejects it; a DS-component PRD is just a feature PRD whose subject is a component.
   4. Undo via `notion_archive(notion_url)` — gated; pass the Notion link posted at creation (recoverable from Notion trash).
 - **"summarize what changed" / "write the update summary"** → the component-update notification shape below (method § Variant); no tool, posts as a normal threaded reply.
 - Ground product/status facts via `blueprint_search` (read-only, no gate) and cite the rows.
