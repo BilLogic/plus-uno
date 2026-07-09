@@ -1,14 +1,16 @@
 // notion_create executor — creates a page/card in an allowlisted Notion surface
-// (prd / ds-component-prd / intake / research), then posts the link. Side effect
-// → routed through the ✅ gate. Marketplace is NOT a surface here — its relation +
-// rollup + dual-write shape is an in-IDE writers/notion operation.
+// (prd / intake), then posts the link. Side effect → routed through the ✅ gate.
+// Marketplace is NOT a surface here — its relation + rollup + dual-write shape is
+// an in-IDE writers/notion operation. Component PRDs and research notes are not
+// bot surfaces: component PRDs are regular feature PRDs on the Roadmap, and deep
+// research is an IDE-only skill that writes to the project hub's Research page.
 
 import type { Env } from "../types";
 import type { SlackContext } from "./dispatcher";
 import { postMessage } from "../slack/api";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
 
-const SURFACES = new Set<NotionCreateSurface>(["prd", "ds-component-prd", "intake", "research"]);
+const SURFACES = new Set<NotionCreateSurface>(["prd", "intake"]);
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";

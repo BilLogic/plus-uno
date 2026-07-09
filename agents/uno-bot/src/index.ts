@@ -1,6 +1,9 @@
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
+import { startNotionOAuth, handleNotionOAuthCallback } from "./oauth/notion";
+import { startFigmaOAuth, handleFigmaOAuthCallback } from "./oauth/figma";
+import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { BUILD } from "./version";
 
 export default {
@@ -13,6 +16,32 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/slack/events") {
       return handleSlackEventsRequest(request, env, ctx);
+    }
+
+    // One-time Notion OAuth (hosted-MCP READ path). Visit /oauth/notion/start
+    // once as an admin/service Notion account to authorize; Notion redirects to
+    // /oauth/notion/callback, which exchanges the code and stores the token.
+    if (request.method === "GET" && url.pathname === "/oauth/notion/start") {
+      return startNotionOAuth(env);
+    }
+    if (request.method === "GET" && url.pathname === "/oauth/notion/callback") {
+      return handleNotionOAuthCallback(request, env);
+    }
+
+    // One-time Figma OAuth (hosted-MCP READ path). Same one-time-consent pattern.
+    if (request.method === "GET" && url.pathname === "/oauth/figma/start") {
+      return startFigmaOAuth(env);
+    }
+    if (request.method === "GET" && url.pathname === "/oauth/figma/callback") {
+      return handleFigmaOAuthCallback(request, env);
+    }
+
+    // One-time Slack OAuth (hosted-MCP read + write path).
+    if (request.method === "GET" && url.pathname === "/oauth/slack/start") {
+      return startSlackOAuth(env);
+    }
+    if (request.method === "GET" && url.pathname === "/oauth/slack/callback") {
+      return handleSlackOAuthCallback(request, env);
     }
 
     return new Response("not found", { status: 404 });

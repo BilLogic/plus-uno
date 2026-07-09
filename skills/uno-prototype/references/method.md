@@ -19,6 +19,14 @@ No path from PRD to prototyping skips grounding, at any fidelity.
   Summarize long records — grounding is scoped retrieval, never a blueprint dump.
 - Sweep for prior art: existing components, specs, and playground prototypes
   touching the same surface.
+- **Figma grounding when a frame is in play:** fetch design context, screenshots,
+  and variable defs to ground against the real design (`get_design_context`,
+  `get_screenshot`, `get_variable_defs`; see `figma-mcp-guide.md`). **Same tools,
+  two runtimes:** the **IDE** reads them via the Figma MCP (desktop app open) and
+  may write designs *back* (`create_new_file`, ✅-gated); **uno-bot** reads them
+  via the hosted `mcp.figma.com` (read-only) — generation is not a bot action, so
+  it runs the wall-ritual (synthesize into kanban cards · file a ticket · hand off
+  an IDE prompt).
 - Keep a grounding snapshot (what was read, when). Re-entry depends on it.
 
 **Re-grounding rule:** on every re-entry at the fidelity decision — review

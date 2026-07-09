@@ -14,7 +14,9 @@ applied by: agents/writers/notion
 - **Reads** (grounding: `find_experts`, source lookups) → the bot's REST read code. No gate needed — reads never mutate state.
 - **Writes** (`create_prd`, `delete_prd`) → the bot's **own gated tools**, intercepted by the proposal gate — nothing writes without the requester's ✅.
 
-**Why not the hosted Notion MCP connector for reads?** It was evaluated (Path B) and shelved: `mcp.notion.com` uses user-scoped OAuth built for interactive clients and needs token refresh the headless Worker can't do — a downgrade from the never-expiring REST key. Full reasoning + the revisit conditions live in `docs/plans/2026-07-08-002-uno-bot-sdk-mcp-connector.md`. The inert `agents/uno-bot/src/agent/mcp.ts` scaffolding stays off (connector builds only when `NOTION_MCP_URL` + `NOTION_MCP_TOKEN` are both set — they aren't). MCP connectors belong on *interactive* Claude (Bill's Claude Desktop / Claude Code), not the Worker.
+**Hosted Notion MCP — READS only (adopted 2026-07-09).** Reads may now come from the hosted Notion MCP (`mcp.notion.com`), attached to the Worker's Anthropic call **read-only** via an `mcp_toolset` allowlist (`agents/uno-bot/src/agent/mcp.ts`, beta `mcp-client-2025-11-20`) — the same rich Notion read surface the IDE uses. Auth is **OAuth 2.1** (`src/oauth/notion.ts`): `mcp.notion.com` is its own authorization server (PKCE + RFC-7591 dynamic client registration — verified via its `/.well-known/oauth-*` metadata and Notion's docs), so the classic `ntn_` token does **not** authenticate it. A human does the browser consent once at `/oauth/notion/start`; the access + refresh tokens live in KV and the Worker refreshes silently.
+
+⚠️ **The MCP-write principle (cross-service, not just Notion).** Inline MCP tools execute server-side during the turn, so any tool exposed via MCP bypasses the ✅ proposal gate. Therefore a write goes **direct via MCP only if it wouldn't need the gate anyway** — i.e. reversible + low-blast-radius, like Slack messaging (the bot's native medium, already ungated for replies) or a throwaway Figma frame. **Consequential / outward / irreversible writes stay hard-gated bot tools, never MCP:** Notion artifacts (`notion_create`/`update`/`archive`), email, and Supabase DB mutations (source of truth — a bad `DELETE` is unrecoverable, so blueprint writes are **double-gated**: ✅ + a second confirm echoing the exact diff). Per current decisions: **Slack** writes = direct MCP; **Figma** generation = gated (read tools only via MCP); **Notion** = gated; **Supabase** = double-gated. The `ntn_` REST key remains Notion's write path + the read fallback when the MCP token isn't set.
 
 ## Write-surface allowlist
 
@@ -24,12 +26,23 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 |---|---|---|
 | Roadmap DB (`2fc01241-1bb5-4770-af51-d5a050bddb75`, data source `7fba5c35-da73-4c40-ac42-1c13db7794de`) | human creates; uno updates status/properties/links | the single task board; design + dev kanbans are views |
 | PRD pages | uno drafts; human owns | PRD template, Stage: exploring / converging / committed |
-| Research & notes DB | uno writes; human reviews | findings, study guides |
+| Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — not a separate DB, and not a bot surface |
 | Decision logs (per project) | uno logs at publish; human appends | thread conclusions land here before threads resolve |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
 | notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes entries | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
 | Eval Runs DB | uno writes at flow exits | ⚠️ DB setup pending — interim: `docs/evals/runs/*.jsonl` |
-| DS Component PRDs DB (`342b7cca-4982-80b1-b305-f9e0e581ef48`) | UNO Bot auto-creates | Figma-sync pipeline |
+
+## Read radar — other workspace DBs (READ-only grounding, never written by uno)
+
+Under the workspace's **Content Management Systems** page — useful context for grounding (via Notion MCP reads), but uno never writes to them:
+
+| DB | ID | Use when grounding |
+|---|---|---|
+| Team Member Database | `134b7cca-4982-801d-a91d-d678e79d6e27` | roster / experts (already the `find_experts` source) |
+| News | `18ab7cca-4982-805d-b4ab-000b8277e344` (ds) | product announcements, what shipped |
+| Success Stories | `4e0c4f73-6bfb-4d13-a0cf-6fa7be0020cb` (ds) | customer proof, outcomes |
+| Research Papers | `84e77efd-02ef-4fa2-b181-f7381806f678` (ds) | prior research to cite before re-running it |
+| Banners | `36eb7cca-4982-8167-a9f9-000b31c6ec98` (ds) | live in-product banner copy/state |
 
 ## Roadmap DB rules (every card write)
 
@@ -38,7 +51,7 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 - `Feature / Initiative` + `OKR` — link the most relevant **existing** entry. If nothing fits, leave blank + flag in the body.
 - **Never create select options, pillars, features, or OKRs.** ⚠️ Notion silently auto-creates select options on any name mismatch — fetch the schema and exact-match option names before every write.
 - `Current Team` routes the card to kanbans; PRD accepted → move to `Design Status: Ready for Design`.
-- Urgency = existing `Priority: Critical` — no separate lane. Maintenance intake = card on this DB with `Product Pillar: Universal` + `Intake Status` property.
+- Urgency = existing `Priority: Critical` — no separate lane. Maintenance intake = card on this DB with `Product Pillar: Universal` + `Product Tag: Maintenance`, surfaced via a filtered view — **not** a separate DB. ⚠️ Both `Universal` and `Maintenance` must already exist as options on the schema (add `Maintenance` to the `Product Tag` multi-select in the Notion UI once); the bot exact-matches them and never auto-creates.
 
 ## Project-hub golden sections (in order)
 
