@@ -2,6 +2,7 @@
 // because we only need 3-4 methods and Workers prefers a small bundle.
 
 import type { Env } from "../types";
+import { toSlackMrkdwn } from "./mrkdwn";
 
 interface SlackOk {
   ok: true;
@@ -43,9 +44,14 @@ export interface PostMessageInput {
 }
 
 export async function postMessage(env: Env, input: PostMessageInput) {
+  // Coerce the body to valid Slack mrkdwn at the single egress point — the model
+  // slips into GitHub-flavored Markdown (## / **bold** / tables) under load, and
+  // Slack renders none of it. Idempotent on Worker-authored text. (blocks, when
+  // present, are Worker-built and already valid.)
   return slackCall<SlackResponse & { ts?: string; channel?: string }>(env, "chat.postMessage", {
     mrkdwn: true,
     ...input,
+    ...(input.text ? { text: toSlackMrkdwn(input.text) } : {}),
   });
 }
 
