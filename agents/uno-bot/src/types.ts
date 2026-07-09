@@ -43,4 +43,29 @@ export interface Env {
   // The registered client + issued token both live in NOTION_OAUTH_KV.
   NOTION_OAUTH_REDIRECT_URI?: string;
   NOTION_OAUTH_KV?: KVNamespace;
+
+  // --- Supabase hosted-MCP (READS only) — uno-blueprint grounding ------------
+  // Personal Access Token (static bearer). The Supabase MCP URL is pinned to
+  // read_only=true server-side, so this stays a read path even though the token
+  // itself may be broad. Unset → the Supabase MCP server is not attached. NEVER
+  // add a Supabase write key here (blueprint writes route to the IDE).
+  SUPABASE_MCP_TOKEN?: string;
+
+  // --- Figma hosted-MCP (READS only) — mcp.figma.com -------------------------
+  // Confidential OAuth 2.1 client (dynamic registration issues the client_secret;
+  // both id+secret cached in FIGMA_OAUTH_KV alongside the issued token). Only the
+  // redirect URI + KV are required. Unset → the Figma MCP stays off. The toolset
+  // enables only get_*/read tools — generation/write tools are never exposed.
+  FIGMA_OAUTH_REDIRECT_URI?: string;
+  FIGMA_OAUTH_KV?: KVNamespace;
+
+  // --- Slack hosted-MCP (read + WRITE) — mcp.slack.com -----------------------
+  // Slack has NO dynamic registration → a STATIC pre-registered client is used
+  // (client_id is a non-secret [vars] entry, client_secret is a wrangler secret).
+  // The issued user token lives in SLACK_OAUTH_KV. Unset → the Slack MCP stays
+  // off. Slack is the ONE service attached enable-all (writes intentional).
+  SLACK_MCP_CLIENT_ID?: string;
+  SLACK_MCP_CLIENT_SECRET?: string;
+  SLACK_OAUTH_REDIRECT_URI?: string;
+  SLACK_OAUTH_KV?: KVNamespace;
 }

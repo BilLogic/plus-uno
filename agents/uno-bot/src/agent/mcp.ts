@@ -20,6 +20,8 @@
 
 import type { Env } from "../types";
 import { getNotionAccessToken } from "../oauth/notion";
+import { getFigmaAccessToken } from "../oauth/figma";
+import { getSlackAccessToken } from "../oauth/slack";
 
 export const MCP_BETA = "mcp-client-2025-11-20";
 
@@ -56,6 +58,46 @@ export const NOTION_MCP_READ_TOOLS = [
 const GITHUB_SERVER = "github";
 const GITHUB_URL = "https://api.githubcopilot.com/mcp/x/repos/readonly";
 
+// ─── Supabase (Personal Access Token bearer; read_only enforced by the URL) ──
+// The URL pins read_only=true + a specific project_ref + a fixed feature set, so
+// the server itself REFUSES writes (execute_sql is SELECT-only under read_only).
+// Still, we allowlist an explicit READ toolset as defense-in-depth. No write key
+// is ever configured — blueprint writes route to the IDE.
+const SUPABASE_SERVER = "supabase";
+const SUPABASE_URL =
+  "https://mcp.supabase.com/mcp?read_only=true&project_ref=osybxeojvsqcwxkgnalm&features=database,docs,debugging";
+const SUPABASE_MCP_READ_TOOLS = [
+  "list_tables",
+  "list_extensions",
+  "list_migrations",
+  "execute_sql", // SELECT-only under read_only=true
+  "search_docs",
+  "get_advisors",
+  "list_edge_functions",
+];
+
+// ─── Figma (OAuth 2.1 token in KV; explicit READ allowlist) ──────────────────
+// READ tools ONLY. Every generation/write tool (use_figma, generate_figma_design,
+// create_new_file, add_code_connect_map, upload_assets, send_code_connect_mappings,
+// …) is intentionally EXCLUDED: Figma generation is gated and routed to the IDE,
+// so write tools are never enabled here.
+const FIGMA_SERVER = "figma";
+const FIGMA_URL = "https://mcp.figma.com/mcp";
+const FIGMA_MCP_READ_TOOLS = [
+  "get_design_context",
+  "get_screenshot",
+  "get_metadata",
+  "get_variable_defs",
+  "get_code",
+  "get_code_connect_map",
+  "get_figjam",
+  "whoami",
+];
+
+// ─── Slack (OAuth 2.1 user token in KV; enable-ALL — read + WRITE) ────────────
+const SLACK_SERVER = "slack";
+const SLACK_URL = "https://mcp.slack.com/mcp";
+
 /**
  * Build the MCP servers + their paired toolsets for the Anthropic call. Returns
  * empty arrays when nothing is configured, so the agent loop is unchanged until a
@@ -84,6 +126,52 @@ export async function buildMcp(env: Env): Promise<{ servers: McpServer[]; toolse
   if (env.GITHUB_TOKEN && env.GITHUB_MCP_ENABLED === "true") {
     servers.push({ type: "url", url: GITHUB_URL, name: GITHUB_SERVER, authorization_token: env.GITHUB_TOKEN });
     toolsets.push({ type: "mcp_toolset", mcp_server_name: GITHUB_SERVER }); // enable-all (URL is readonly)
+  }
+
+  // Supabase — active when SUPABASE_MCP_TOKEN is set. read_only URL + a READ
+  // allowlist (defense-in-depth). Static PAT bearer, no OAuth flow.
+  if (env.SUPABASE_MCP_TOKEN) {
+    servers.push({
+      type: "url",
+      url: SUPABASE_URL,
+      name: SUPABASE_SERVER,
+      authorization_token: env.SUPABASE_MCP_TOKEN,
+    });
+    const configs: Record<string, { enabled: true }> = {};
+    for (const t of SUPABASE_MCP_READ_TOOLS) configs[t] = { enabled: true };
+    toolsets.push({
+      type: "mcp_toolset",
+      mcp_server_name: SUPABASE_SERVER,
+      default_config: { enabled: false }, // allowlist: everything off, then read tools on
+      configs,
+    });
+  }
+
+  // Figma — active once the one-time OAuth consent has stored a token in KV.
+  // READ allowlist ONLY — generation/write tools are never enabled (gated to IDE).
+  const figmaToken = await getFigmaAccessToken(env);
+  if (figmaToken) {
+    servers.push({ type: "url", url: FIGMA_URL, name: FIGMA_SERVER, authorization_token: figmaToken });
+    const configs: Record<string, { enabled: true }> = {};
+    for (const t of FIGMA_MCP_READ_TOOLS) configs[t] = { enabled: true };
+    toolsets.push({
+      type: "mcp_toolset",
+      mcp_server_name: FIGMA_SERVER,
+      default_config: { enabled: false }, // allowlist: everything off, then read tools on
+      configs,
+    });
+  }
+
+  // Slack — active once the one-time OAuth consent has stored a user token in KV.
+  // ENABLE-ALL (no allowlist): this is the ONE service where MCP writes are
+  // intentional — Slack is a native medium for the bot, and the token's granted
+  // OAuth scopes are what actually bound read vs. write. (Every other MCP here is
+  // read-only precisely because writes would bypass the ✅ proposal gate; Slack is
+  // the deliberate exception.)
+  const slackToken = await getSlackAccessToken(env);
+  if (slackToken) {
+    servers.push({ type: "url", url: SLACK_URL, name: SLACK_SERVER, authorization_token: slackToken });
+    toolsets.push({ type: "mcp_toolset", mcp_server_name: SLACK_SERVER }); // enable-all (scopes bound it)
   }
 
   return { servers, toolsets };

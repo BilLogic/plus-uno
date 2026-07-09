@@ -45,6 +45,17 @@ PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
 # secret are needed (the Worker self-registers a public client, cached in KV).
 # Only this redirect URI is required; it must be reachable at the deployed Worker.
 NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback"
+# Figma hosted-MCP READ path. mcp.figma.com is its own OAuth 2.1 server with PKCE
+# + dynamic registration, but a CONFIDENTIAL client — registration issues a
+# client_secret (cached in FIGMA_OAUTH_KV alongside the token). Only this redirect
+# URI is required here.
+FIGMA_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/figma/callback"
+# Slack hosted-MCP (read + write) path. Slack has NO dynamic registration → a
+# STATIC pre-registered client is used. The client_id is non-secret (below); the
+# client_secret is a wrangler secret (see SLACK_MCP_CLIENT_SECRET). This redirect
+# URI must match the one registered on the Slack app.
+SLACK_MCP_CLIENT_ID = "12186538800.10808020289637"
+SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET
@@ -62,6 +73,10 @@ NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/not
 #   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)
 #   SUPABASE_ANON_KEY     (publishable/anon read key; blueprint_search is read-only)
 #   (SUPABASE_URL is a non-secret [vars] entry above, not a secret)
+#   SUPABASE_MCP_TOKEN    (Supabase Personal Access Token for the hosted MCP;
+#                          the MCP URL pins read_only=true so it's a read path)
+#   SLACK_MCP_CLIENT_SECRET (secret for the STATIC Slack MCP OAuth client whose
+#                          id is SLACK_MCP_CLIENT_ID above)
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.
 [[durable_objects.bindings]]
@@ -80,3 +95,16 @@ new_sqlite_classes = ["ThreadState"]
 [[kv_namespaces]]
 binding = "NOTION_OAUTH_KV"
 id = "587f85559dda488a89ff237bf117a5a6"
+
+# KV — Slack hosted-MCP: stores the STATIC client's issued user token (and PKCE
+# verifiers during the flow). Slack has no dynamic registration, so no client blob
+# is cached here — only the token.
+[[kv_namespaces]]
+binding = "SLACK_OAUTH_KV"
+id = "18b58372d9bc430489d634c2c9a0b0c4"
+
+# KV — Figma hosted-MCP: stores the dynamically-registered CONFIDENTIAL client
+# (client_id + client_secret) and the issued token.
+[[kv_namespaces]]
+binding = "FIGMA_OAUTH_KV"
+id = "2f829853072545868a526779a8f131f3"
