@@ -23,10 +23,13 @@ No path from PRD to prototyping skips grounding, at any fidelity.
   symmetric):** the **IDE** connects to Figma directly (`get_design_context`,
   `get_screenshot`, `get_variable_defs`, and can write back via `create_new_file`,
   ✅-gated; see `figma-mcp-guide.md`) — because Claude Code is a Figma-MCP catalog
-  client. **uno-bot has NO Figma connection at all:** the hosted Figma MCP is a
-  closed catalog that rejects a custom Worker (403), and the desktop MCP needs a
-  local Figma app. So the bot never reads Figma directly — it grounds a frame from
-  the **Notion doc/PRD that references it** (via the Notion MCP) and runs the
+  client. **uno-bot has no Figma MCP and no visual access — text-layer REST
+  reads only via `source_read`:** the hosted Figma MCP is a closed catalog that
+  rejects a custom Worker (403), and the desktop MCP needs a local Figma app.
+  What the bot CAN do is fetch a pasted frame's structure and text layers over
+  REST (labels, copy, hierarchy) — never pixels, computed contrast, spacing,
+  variables, or tokens. It grounds the rest of a frame's context from the
+  **Notion doc/PRD that references it** (via the Notion MCP) and runs the
   wall-ritual (surface the documented context + link · synthesize into kanban
   cards · file a ticket · hand off an IDE prompt where Figma actually connects).
 - Keep a grounding snapshot (what was read, when). Re-entry depends on it.

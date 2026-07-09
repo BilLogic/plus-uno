@@ -88,7 +88,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "message": {
       const msg = event as SlackMessageEvent;
       if (await shouldHandleMessage(env, msg)) {
-        await onMessage(env, msg);
+        await onMessageVisiblyFailing(env, msg);
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
@@ -96,7 +96,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     }
     case "app_mention":
       // Explicit @mention always engages.
-      await onMessage(env, appMentionToMessage(event as SlackAppMentionEvent));
+      await onMessageVisiblyFailing(env, appMentionToMessage(event as SlackAppMentionEvent));
       return;
     case "reaction_added":
       await handleReaction(env, event as SlackReactionAddedEvent);
@@ -104,6 +104,25 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     default:
       console.log(`[slack] unhandled event type: ${event.type}`);
       return;
+  }
+}
+
+// Outermost catch WITH channel/thread context. onMessage already posts a
+// visible ❌ for its known failure points (context load, agent call, delivery),
+// but an exception past those (preflight, DO history writes, proposal staging)
+// used to bubble to the waitUntil catch in index.ts — logged, invisible to the
+// user ("reacted 👀 then silence"). Backstop it here, best-effort; never throw
+// from the catch.
+async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promise<void> {
+  try {
+    await onMessage(env, msg);
+  } catch (err) {
+    console.error(`[slack] onMessage failed: ${err instanceof Error ? err.message : String(err)}`);
+    await postMessage(env, {
+      channel: msg.channel,
+      thread_ts: msg.thread_ts ?? msg.ts,
+      text: ":warning: I hit an internal error on that one — try again, and if it repeats flag it in #uno-bot.",
+    }).catch(() => {});
   }
 }
 

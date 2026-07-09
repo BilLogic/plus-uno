@@ -9,6 +9,7 @@ Review / critique a design, prototype, spec, or frame from Slack. Method rules a
 
 - **No sub-agent dispatch.** The Worker applies the lenses itself in one context — still one lens at a time, in-lane, at the manifest's fidelity depth. It fetches the same rule docs method.md names per lens.
 - **Inspect before judging.** First `source_read` (read-only, no gate) the linked Figma frame AND any linked PRD/spec, then diagnose from the fetched content. Never critique from priors or speculatively.
+- **Fidelity wall — genuine review is low/mid only.** From Slack the bot's Figma read is *text layers only* — no pixels, no computed contrast, no spacing, no tokens — so it can honestly review flow logic, structure, terminology, and PRD conformance, and that's intentional. High/coded fidelity (token fidelity, WCAG contrast, 44×44 targets, focus order) needs the IDE: `skills/uno-review` + Figma MCP + `run-review-checks.sh`. Say so plainly, still flag what the text-level reading shows *explicitly marked as partial*, and offer to file an intake or hand a ready-to-paste IDE prompt with the frame + PRD links pre-filled.
 - Manifest missing → ask once in-thread for the one-liner (fidelity / tools / PRD link). Still missing, or the target is unfetchable (no link, `source_read` fails) → say so plainly, **record the intake**, route to a human. No generic DIY instructions, no from-memory review.
 - Design QA runs arrive via the RTT trigger with the Roadmap card — resolve RM-ID → `[spec]` file per method.md before walking the build.
 
@@ -28,7 +29,7 @@ Omit empty severity sections; short critiques stay short:
 • {Specific strength + which doc/principle it matches}
 ```
 
-No actionable findings → be honest: "I don't see anything that violates Plus conventions — what were you specifically worried about?" Over ~1500 chars → 3-bullet summary inline + Gist link for the full critique. End with the confidence line (high only when grounded in sources fetched this turn).
+No actionable findings → be honest: "I don't see anything that violates Plus conventions — what were you specifically worried about?" Over ~1500 chars → 3-bullet summary inline + offer to append the full critique to the Notion card (`notion_update`, ✅) — the bot cannot create Gists. End with the confidence line (high only when grounded in sources fetched this turn).
 
 ## Hand-offs
 

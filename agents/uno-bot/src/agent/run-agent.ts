@@ -121,12 +121,26 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const startedAt = Date.now();
   let inputTokens = 0;
   let outputTokens = 0;
+  let cacheReadTokens = 0;
+  let cacheWriteTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
+  // Prompt-cache counters are nullable on the wire and absent from this SDK
+  // version's Usage type (0.32 predates them) — cast and guard every read.
+  const addUsage = (usage: Anthropic.Usage | undefined): void => {
+    inputTokens += usage?.input_tokens ?? 0;
+    outputTokens += usage?.output_tokens ?? 0;
+    const cache = usage as
+      | { cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null }
+      | undefined;
+    cacheReadTokens += cache?.cache_read_input_tokens ?? 0;
+    cacheWriteTokens += cache?.cache_creation_input_tokens ?? 0;
+  };
   const finish = (result: AgentResult): AgentResult => {
     console.log(
       `[uno-bot] request done build=${BUILD} tier=${tier} model=${model} iterations=${iterations} ` +
-        `tokens_in=${inputTokens} tokens_out=${outputTokens} ms=${Date.now() - startedAt} ` +
+        `tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
+        `cache_read=${cacheReadTokens} cache_write=${cacheWriteTokens} ms=${Date.now() - startedAt} ` +
         `outcome=${result.kind}`,
     );
     return result;
@@ -150,8 +164,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
 
     iterations++;
-    inputTokens += response.usage?.input_tokens ?? 0;
-    outputTokens += response.usage?.output_tokens ?? 0;
+    addUsage(response.usage);
 
     if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
       const text = response.content
@@ -297,8 +310,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     ...mcpParams,
   } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
   iterations++;
-  inputTokens += finalResponse.usage?.input_tokens ?? 0;
-  outputTokens += finalResponse.usage?.output_tokens ?? 0;
+  addUsage(finalResponse.usage);
   const finalText = finalResponse.content
     .filter((b): b is Anthropic.TextBlock => b.type === "text")
     .map((b) => b.text)
