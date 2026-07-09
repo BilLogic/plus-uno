@@ -45,11 +45,11 @@ PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
 # secret are needed (the Worker self-registers a public client, cached in KV).
 # Only this redirect URI is required; it must be reachable at the deployed Worker.
 NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback"
-# Figma hosted-MCP READ path. mcp.figma.com is its own OAuth 2.1 server with PKCE
-# + dynamic registration, but a CONFIDENTIAL client — registration issues a
-# client_secret (cached in FIGMA_OAUTH_KV alongside the token). Only this redirect
-# URI is required here.
-FIGMA_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/figma/callback"
+# NOTE: no Figma hosted-MCP path — mcp.figma.com is a closed catalog (only
+# Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker
+# 403s) and the local MCP needs the desktop app. The bot surfaces Figma context
+# from Notion + routes real Figma work to the IDE. FIGMA_ACCESS_TOKEN (secret,
+# below) still powers implement_design's screenshot fetch.
 # Slack hosted-MCP (read + write) path. Slack has NO dynamic registration → a
 # STATIC pre-registered client is used. The client_id is non-secret (below); the
 # client_secret is a wrangler secret (see SLACK_MCP_CLIENT_SECRET). This redirect
@@ -102,9 +102,3 @@ id = "587f85559dda488a89ff237bf117a5a6"
 [[kv_namespaces]]
 binding = "SLACK_OAUTH_KV"
 id = "18b58372d9bc430489d634c2c9a0b0c4"
-
-# KV — Figma hosted-MCP: stores the dynamically-registered CONFIDENTIAL client
-# (client_id + client_secret) and the issued token.
-[[kv_namespaces]]
-binding = "FIGMA_OAUTH_KV"
-id = "2f829853072545868a526779a8f131f3"

@@ -19,14 +19,16 @@ No path from PRD to prototyping skips grounding, at any fidelity.
   Summarize long records — grounding is scoped retrieval, never a blueprint dump.
 - Sweep for prior art: existing components, specs, and playground prototypes
   touching the same surface.
-- **Figma grounding when a frame is in play:** fetch design context, screenshots,
-  and variable defs to ground against the real design (`get_design_context`,
-  `get_screenshot`, `get_variable_defs`; see `figma-mcp-guide.md`). **Same tools,
-  two runtimes:** the **IDE** reads them via the Figma MCP (desktop app open) and
-  may write designs *back* (`create_new_file`, ✅-gated); **uno-bot** reads them
-  via the hosted `mcp.figma.com` (read-only) — generation is not a bot action, so
-  it runs the wall-ritual (synthesize into kanban cards · file a ticket · hand off
-  an IDE prompt).
+- **Figma grounding when a frame is in play — runtime matters (they are NOT
+  symmetric):** the **IDE** connects to Figma directly (`get_design_context`,
+  `get_screenshot`, `get_variable_defs`, and can write back via `create_new_file`,
+  ✅-gated; see `figma-mcp-guide.md`) — because Claude Code is a Figma-MCP catalog
+  client. **uno-bot has NO Figma connection at all:** the hosted Figma MCP is a
+  closed catalog that rejects a custom Worker (403), and the desktop MCP needs a
+  local Figma app. So the bot never reads Figma directly — it grounds a frame from
+  the **Notion doc/PRD that references it** (via the Notion MCP) and runs the
+  wall-ritual (surface the documented context + link · synthesize into kanban
+  cards · file a ticket · hand off an IDE prompt where Figma actually connects).
 - Keep a grounding snapshot (what was read, when). Re-entry depends on it.
 
 **Re-grounding rule:** on every re-entry at the fidelity decision — review
