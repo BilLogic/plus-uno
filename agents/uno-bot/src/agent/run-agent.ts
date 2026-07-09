@@ -25,7 +25,7 @@ import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { makeAnthropicClient, pickModel } from "./anthropic-client";
-import { notionMcpServers, MCP_BETA } from "./mcp";
+import { notionMcpServers, notionMcpToolsets, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
@@ -83,15 +83,24 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const client = makeAnthropicClient(env);
 
   // Notion hosted-MCP (READS ONLY). Empty until the one-time OAuth consent is
-  // done, so the loop is unchanged until then. PROVISIONAL: the mcp_servers param
-  // + beta header shape is an Anthropic beta — run `npm run typecheck` before
-  // deploy and, if the installed SDK exposes MCP via `client.beta.messages.create`,
-  // switch these two calls to that. Writes are never exposed (see agent/mcp.ts).
+  // done, so the loop is unchanged until then. Current beta shape
+  // (mcp-client-2025-11-20): mcp_servers carries connection details, and each
+  // server needs a matching `mcp_toolset` in the top-level `tools` array (the
+  // read allowlist). Passed as raw body + `anthropic-beta` header because the
+  // installed SDK (0.32.x) predates these beta params. Writes are never exposed
+  // (see agent/mcp.ts). When no token is stored, all of this is empty and the
+  // loop is identical to the pre-MCP behavior.
   const mcpServers = await notionMcpServers(env);
-  const mcpParams = mcpServers.length ? { mcp_servers: mcpServers } : {};
-  const mcpOpts = mcpServers.length
+  const mcpEnabled = mcpServers.length > 0;
+  const mcpParams = mcpEnabled ? { mcp_servers: mcpServers } : {};
+  const mcpToolsets = mcpEnabled ? notionMcpToolsets() : [];
+  const mcpOpts = mcpEnabled
     ? { headers: { "anthropic-beta": MCP_BETA } }
     : undefined;
+  const toolsWithMcp = [
+    ...(TOOLS as Anthropic.Tool[]),
+    ...(mcpToolsets as unknown as Anthropic.Tool[]),
+  ];
 
   // D2: pick the model tier from the message intent once per request.
   const { tier, model } = pickModel({ userText, hasPending: pending !== null });
@@ -124,7 +133,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       model,
       max_tokens: MAX_TOKENS,
       system: systemBlocks as Anthropic.TextBlockParam[],
-      tools: TOOLS as Anthropic.Tool[],
+      tools: toolsWithMcp,
       messages,
       ...mcpParams,
     } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
@@ -271,7 +280,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     model,
     max_tokens: MAX_TOKENS,
     system: systemBlocks as Anthropic.TextBlockParam[],
-    tools: TOOLS as Anthropic.Tool[],
+    tools: toolsWithMcp,
     tool_choice: { type: "none" } as unknown as Anthropic.MessageCreateParams["tool_choice"],
     messages,
     ...mcpParams,
