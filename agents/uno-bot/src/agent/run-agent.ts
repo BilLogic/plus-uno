@@ -25,7 +25,7 @@ import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { makeAnthropicClient, pickModel } from "./anthropic-client";
-import { notionMcpServers, notionMcpToolsets, MCP_BETA } from "./mcp";
+import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
@@ -90,10 +90,9 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // installed SDK (0.32.x) predates these beta params. Writes are never exposed
   // (see agent/mcp.ts). When no token is stored, all of this is empty and the
   // loop is identical to the pre-MCP behavior.
-  const mcpServers = await notionMcpServers(env);
+  const { servers: mcpServers, toolsets: mcpToolsets } = await buildMcp(env);
   const mcpEnabled = mcpServers.length > 0;
   const mcpParams = mcpEnabled ? { mcp_servers: mcpServers } : {};
-  const mcpToolsets = mcpEnabled ? notionMcpToolsets() : [];
   const mcpOpts = mcpEnabled
     ? { headers: { "anthropic-beta": MCP_BETA } }
     : undefined;

@@ -4,6 +4,10 @@ export interface Env {
   ANTHROPIC_API_KEY: string;
   GITHUB_TOKEN: string;
   GITHUB_REPO: string;
+  // Turn on the GitHub hosted-MCP read path (api.githubcopilot.com, read-only
+  // repos toolset, PAT bearer). "true" → attach it; anything else → stay on the
+  // bespoke github_read tool. Kept off until verified live. See agent/mcp.ts.
+  GITHUB_MCP_ENABLED?: string;
   SKILLS_BASE_URL: string;
   FIGMA_ACCESS_TOKEN: string;
   NOTION_API_KEY: string;

@@ -13,6 +13,11 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 GITHUB_REPO = "BilLogic/plus-uno"
 SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
+# Set to "true" to attach the GitHub hosted-MCP read path (read-only repos
+# toolset at api.githubcopilot.com, authenticated with GITHUB_TOKEN). Leave empty
+# to keep using the bespoke github_read tool. Flip to "true" only after a live
+# verification; then github_read can be retired.
+GITHUB_MCP_ENABLED = ""
 # Notion "Roadmap" database (the Design HQ board). create_prd drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
