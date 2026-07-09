@@ -19,13 +19,11 @@ NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
 # Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
 # that find_experts queries to suggest collaborators/SMEs for a topic.
 NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
-# DS Component PRDs database — create_prd routes prd_type="ds-component" here
-# (feature PRDs go to the Roadmap board above). Leave blank to fall back to
-# Roadmap. Set to the "DS Component PRDs" DB id when ready.
-NOTION_DS_COMPONENT_DB_ID = "342b7cca-4982-80b1-b305-f9e0e581ef48"
-# Research & notes DB — notion_create(surface:"research") files findings/study
-# guides here. Leave blank → that surface reports "not configured". Set when ready.
-NOTION_RESEARCH_DB_ID = ""
+# NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
+# surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
+# research is an IDE-only skill that writes to the project hub's Research page.
+# Maintenance intake is a Roadmap card (Product Pillar: Universal + Product Tag:
+# Maintenance), surfaced via a filtered view — not its own DB.
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
@@ -37,8 +35,13 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.
 PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
+# Notion OAuth (hosted-MCP READ path). Client id is non-secret; the secret is a
+# wrangler secret (below). Redirect URI must EXACTLY match the Notion OAuth app.
+NOTION_OAUTH_CLIENT_ID = "398d872b-594c-8184-80e1-003777cc01a9"
+NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback"
 
 # Secrets are set via `wrangler secret put`. Expected names:
+#   NOTION_OAUTH_CLIENT_SECRET  (Notion OAuth app secret; hosted-MCP READ path)
 #   SLACK_SIGNING_SECRET
 #   SLACK_BOT_TOKEN
 #   ANTHROPIC_API_KEY
@@ -65,3 +68,10 @@ class_name = "ThreadState"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["ThreadState"]
+
+# KV — stores the exchanged Notion OAuth token (hosted-MCP READ path). Create it
+# once: `npx wrangler kv namespace create NOTION_OAUTH_KV`, paste the returned id
+# below (add a `preview_id` too if you use `wrangler dev`).
+[[kv_namespaces]]
+binding = "NOTION_OAUTH_KV"
+id = "587f85559dda488a89ff237bf117a5a6"

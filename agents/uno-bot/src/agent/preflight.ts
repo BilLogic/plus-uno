@@ -78,7 +78,7 @@ export async function preflight(
       const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
       const title = typeof input.title === "string" ? input.title.trim() : "";
       const summary = typeof input.summary === "string" ? input.summary.trim() : "";
-      if ((surface === "prd" || surface === "ds-component-prd") && (!title || summary.length < 30)) {
+      if (surface === "prd" && (!title || summary.length < 30)) {
         return {
           ask:
             ":memo: That PRD is a little thin to file. Give me a clear *title* and a couple of sentences of *summary* (what it is + why), and I'll draft the card.",

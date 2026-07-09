@@ -9,13 +9,6 @@ export interface Env {
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;
-  // DS Component PRDs database (feature PRDs → Roadmap; DS-component PRDs → here).
-  // Optional — when unset, create_prd(prd_type:"ds-component") falls back to the
-  // Roadmap board and logs a note.
-  NOTION_DS_COMPONENT_DB_ID?: string;
-  // Research & notes database — notion_create(surface:"research") files findings
-  // / study guides here. Optional — unset → that surface reports "not configured".
-  NOTION_RESEARCH_DB_ID?: string;
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;
@@ -35,4 +28,17 @@ export interface Env {
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
   THREAD_STATE: DurableObjectNamespace;
+  // --- Notion hosted-MCP (READS only) — grounding via mcp.notion.com ---------
+  // OAuth app credentials (client id is a [vars] entry; the secret is a wrangler
+  // secret). Unset → the Notion MCP stays off and the bot falls back to the REST
+  // notion_* read tools. Writes are NEVER exposed via MCP (they'd bypass the ✅
+  // gate) — notion_create/update/archive stay as the bot's own gated tools.
+  NOTION_OAUTH_CLIENT_ID?: string;
+  NOTION_OAUTH_CLIENT_SECRET?: string;
+  // Must exactly match the redirect entered in the Notion OAuth app, e.g.
+  // https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback
+  NOTION_OAUTH_REDIRECT_URI?: string;
+  // KV namespace holding the exchanged Notion access token (+ refresh token if
+  // Notion issues a rotating one). Bound in wrangler.toml.
+  NOTION_OAUTH_KV?: KVNamespace;
 }

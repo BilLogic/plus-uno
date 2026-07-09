@@ -25,6 +25,7 @@ import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { makeAnthropicClient, pickModel } from "./anthropic-client";
+import { notionMcpServers, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
@@ -81,6 +82,17 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending } = input;
   const client = makeAnthropicClient(env);
 
+  // Notion hosted-MCP (READS ONLY). Empty until the one-time OAuth consent is
+  // done, so the loop is unchanged until then. PROVISIONAL: the mcp_servers param
+  // + beta header shape is an Anthropic beta — run `npm run typecheck` before
+  // deploy and, if the installed SDK exposes MCP via `client.beta.messages.create`,
+  // switch these two calls to that. Writes are never exposed (see agent/mcp.ts).
+  const mcpServers = await notionMcpServers(env);
+  const mcpParams = mcpServers.length ? { mcp_servers: mcpServers } : {};
+  const mcpOpts = mcpServers.length
+    ? { headers: { "anthropic-beta": MCP_BETA } }
+    : undefined;
+
   // D2: pick the model tier from the message intent once per request.
   const { tier, model } = pickModel({ userText, hasPending: pending !== null });
 
@@ -114,7 +126,8 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       system: systemBlocks as Anthropic.TextBlockParam[],
       tools: TOOLS as Anthropic.Tool[],
       messages,
-    });
+      ...mcpParams,
+    } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
 
     iterations++;
     inputTokens += response.usage?.input_tokens ?? 0;
@@ -261,7 +274,8 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     tools: TOOLS as Anthropic.Tool[],
     tool_choice: { type: "none" } as unknown as Anthropic.MessageCreateParams["tool_choice"],
     messages,
-  });
+    ...mcpParams,
+  } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
   iterations++;
   inputTokens += finalResponse.usage?.input_tokens ?? 0;
   outputTokens += finalResponse.usage?.output_tokens ?? 0;

@@ -1,6 +1,7 @@
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
+import { buildAuthorizeUrl, handleNotionOAuthCallback } from "./oauth/notion";
 import { BUILD } from "./version";
 
 export default {
@@ -13,6 +14,16 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/slack/events") {
       return handleSlackEventsRequest(request, env, ctx);
+    }
+
+    // One-time Notion OAuth (hosted-MCP READ path). Visit /oauth/notion/start
+    // once as an admin/service Notion account to authorize; Notion redirects to
+    // /oauth/notion/callback, which exchanges the code and stores the token.
+    if (request.method === "GET" && url.pathname === "/oauth/notion/start") {
+      return Response.redirect(buildAuthorizeUrl(env), 302);
+    }
+    if (request.method === "GET" && url.pathname === "/oauth/notion/callback") {
+      return handleNotionOAuthCallback(request, env);
     }
 
     return new Response("not found", { status: 404 });

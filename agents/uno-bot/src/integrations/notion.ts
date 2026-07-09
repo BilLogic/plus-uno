@@ -116,31 +116,24 @@ function buildChildren(input: PrdInput): unknown[] {
   return children;
 }
 
-export type PrdBoard = "roadmap" | "component";
-
 /**
- * Create a PRD card. `board` selects the destination Notion DB:
- *   - "roadmap"   → the Design HQ Product board (feature PRDs); sets that board's
- *                   Design Status / Current Team / Product Pillar properties.
- *   - "component" → the DS Component PRDs DB. Its schema differs, so we set only
- *                   the title (Name) + body and leave the rest for owners to fill,
- *                   to avoid failing on properties that don't exist there.
+ * Create a feature PRD card on the Design HQ Product (Roadmap) board — the single
+ * command board. Sets Design Status / Current Team / Product Pillar.
  * Throws on failure (caller surfaces the error to Slack).
  */
 export async function createPrdCard(
   env: Env,
   input: PrdInput,
-  board: PrdBoard = "roadmap",
 ): Promise<CreatedPrd> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const databaseId = board === "component" ? env.NOTION_DS_COMPONENT_DB_ID : env.NOTION_ROADMAP_DB_ID;
-  if (!databaseId) throw new Error(`${board} PRD database id not configured`);
+  const databaseId = env.NOTION_ROADMAP_DB_ID;
+  if (!databaseId) throw new Error(`Roadmap PRD database id not configured`);
   if (!input.title?.trim()) throw new Error("PRD title is required");
 
   const properties: Record<string, unknown> = {
     Name: { title: richText(input.title.trim()) },
   };
-  if (board === "roadmap") {
+  {
     // Properties specific to the Design HQ Product board's schema.
     properties["Design Status"] = { status: { name: DESIGN_STATUS_NEED_PRD } };
     // Current Team = "Design" is what the Design HQ -> Product view filters on.
@@ -529,7 +522,7 @@ export async function notionSearch(
 // is intentionally NOT here — its relation + rollup + dual-write shape is an
 // in-IDE writers/notion operation, not a one-shot Worker write.
 
-export type NotionCreateSurface = "prd" | "ds-component-prd" | "intake" | "research";
+export type NotionCreateSurface = "prd" | "intake";
 
 export interface NotionCreateInput {
   title: string;
@@ -560,21 +553,22 @@ function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreate
       }
       return { databaseId: env.NOTION_ROADMAP_DB_ID, properties, label: "Design HQ → Product (Roadmap)" };
     }
-    case "ds-component-prd":
-      // The DS Component PRDs DB schema differs — set only the title, leave the
-      // rest for owners (avoids failing on properties that don't exist there).
-      return { databaseId: env.NOTION_DS_COMPONENT_DB_ID, properties: {}, label: "DS Component PRDs" };
     case "intake":
-      // Maintenance intake card on the Roadmap board. Universal pillar; leave
-      // "Intake Status" for a human to set — writing an unverified option name
-      // would trip Notion's silent select auto-create (notion.md footgun).
+      // Maintenance intake card on the Roadmap board — the single command board
+      // (no separate maintenance DB). Universal pillar + the "Maintenance"
+      // Product Tag mark it for the filtered maintenance view.
+      // ⚠️ Both option names ("Universal", "Maintenance") MUST already exist on
+      // the Roadmap schema — writing an unknown name trips Notion's silent select
+      // auto-create (notion.md footgun). "Maintenance" is a Product Tag option
+      // added in the Notion UI; if you rename it, update this string.
       return {
         databaseId: env.NOTION_ROADMAP_DB_ID,
-        properties: { "Product Pillar": { multi_select: [{ name: "Universal" }] } },
+        properties: {
+          "Product Pillar": { multi_select: [{ name: "Universal" }] },
+          "Product Tag": { multi_select: [{ name: "Maintenance" }] },
+        },
         label: "Roadmap (maintenance intake)",
       };
-    case "research":
-      return { databaseId: env.NOTION_RESEARCH_DB_ID, properties: {}, label: "Research & notes" };
   }
 }
 
@@ -603,7 +597,7 @@ export async function notionCreate(
 
   // PRD-shaped surfaces get the Acceptance Criteria + Implementation Notes body
   // that fetchNotionPRD reads downstream; intake/research get a plain body.
-  const isPrdShaped = surface === "prd" || surface === "ds-component-prd";
+  const isPrdShaped = surface === "prd";
   const children = buildChildren({
     title: input.title.trim(),
     summary: input.summary,
@@ -743,9 +737,9 @@ export async function notionUpdate(
   }
 }
 
-// Archive a card parented by an ALLOWLISTED database (widened from the
-// Roadmap-only archiveRoadmapCard): Roadmap, DS Component PRDs, or Research.
-// Refuses anything else, so notion_archive can't nuke arbitrary Notion pages.
+// Archive a card parented by an ALLOWLISTED database (currently just the
+// Roadmap board — the single command board). Refuses anything else, so
+// notion_archive can't nuke arbitrary Notion pages.
 export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCard> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   const headers = {
@@ -753,7 +747,7 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
     "Notion-Version": NOTION_VERSION,
     "Content-Type": "application/json",
   };
-  const allow = [env.NOTION_ROADMAP_DB_ID, env.NOTION_DS_COMPONENT_DB_ID, env.NOTION_RESEARCH_DB_ID]
+  const allow = [env.NOTION_ROADMAP_DB_ID]
     .filter((x): x is string => !!x)
     .map((x) => x.replace(/-/g, "").toLowerCase());
 
