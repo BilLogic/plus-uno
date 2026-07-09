@@ -7,7 +7,7 @@ export default {
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Default = {

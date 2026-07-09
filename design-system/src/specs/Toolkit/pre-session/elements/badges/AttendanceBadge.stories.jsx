@@ -2,6 +2,7 @@ import React from 'react';
 import Badge from '../../../../../components/Badge/Badge';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Badges/Attendance Badge',
     component: Badge,
     parameters: {

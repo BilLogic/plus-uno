@@ -2,6 +2,7 @@ import React from 'react';
 import { TutorBadge, LeadBadge, CountBadge } from './TutorBadges.jsx';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Badges/Tutor Badges',
     parameters: {
         layout: 'centered',

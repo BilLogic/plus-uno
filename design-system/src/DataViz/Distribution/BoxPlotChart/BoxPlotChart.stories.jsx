@@ -4,7 +4,7 @@ import BoxPlotChart from './BoxPlotChart';
 export default {
     title: 'Data Visualizations/Distribution/BoxPlotChart',
     component: BoxPlotChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

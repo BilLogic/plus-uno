@@ -28,7 +28,7 @@ Two steppers side by side for setting the max number of regular tutors and lead 
             }
         }
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 /**

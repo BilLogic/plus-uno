@@ -12,7 +12,7 @@ import './GroupsTable.scss';
 export default {
     title: 'Specs/Admin/Group Admin/Tables/GroupsTable',
     component: GroupsTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -43,45 +43,6 @@ Node ID: 322-155598
             table: { category: 'Behavior' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for GroupsTable component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>GroupsTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying group information in the Group Admin section.
-                        Each row shows a group name (with expand/collapse), group size as an info badge,
-                        and action buttons for Edit and View Progress operations.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>groups</strong>: Array of group objects (id, name, size)</li>
-                        <li><strong>sortable</strong>: Enable sortable columns (default: true)</li>
-                        <li><strong>hover</strong>: Enable row hover effects (default: true)</li>
-                        <li><strong>onEditClick</strong>: Callback when Edit button is clicked</li>
-                        <li><strong>onViewProgressClick</strong>: Callback when View Progress is clicked</li>
-                        <li><strong>onExpandClick</strong>: Callback when expand/collapse is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 322-155598
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

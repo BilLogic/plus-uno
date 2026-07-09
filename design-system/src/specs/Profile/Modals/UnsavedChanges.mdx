@@ -1,0 +1,29 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as UnsavedChangesStories from './UnsavedChanges.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={UnsavedChangesStories} />
+
+<Title />
+
+Confirmation modal when leaving tutor profile with unsaved edits.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5696-13933&m=dev"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Profile/Modals/UnsavedChanges.stories.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary and secondary actions — discard edits or stay on the page.</>}>
+    <Canvas of={UnsavedChangesStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

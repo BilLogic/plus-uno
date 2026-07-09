@@ -15,7 +15,7 @@ import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 export default {
     title: 'Specs/Admin/Group Admin/Pages/GroupInfoPage',
     component: GroupInfoPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -66,49 +66,6 @@ Node ID: 258-263800
         },
     },
     args: {},
-};
-
-/**
- * Docs
- * Documentation for GroupInfoPage component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>GroupInfoPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for the Group Info section of Group Admin. Uses the PageLayout
-                        shell with TopBar and Sidebar. Contains tab navigation for switching between
-                        Group Info and Training Progress views, a title section with Add Group button,
-                        the groups table, and pagination footer.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>groups</strong>: Array of group objects (id, name, size)</li>
-                        <li><strong>currentPage</strong>: Current pagination page (default: 1)</li>
-                        <li><strong>totalPages</strong>: Total number of pages (default: 20)</li>
-                        <li><strong>totalEntries</strong>: Total number of entries (default: 200)</li>
-                        <li><strong>onPageChange</strong>: Callback when page changes</li>
-                        <li><strong>onTabChange</strong>: Callback when tab changes</li>
-                        <li><strong>onAddGroup</strong>: Callback when Add Group is clicked</li>
-                        <li><strong>onEditGroup</strong>: Callback when Edit is clicked</li>
-                        <li><strong>onViewProgress</strong>: Callback when View Progress is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 258-263800
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

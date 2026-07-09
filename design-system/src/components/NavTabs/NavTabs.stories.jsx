@@ -5,7 +5,7 @@ import NavTabs from './NavTabs';
 export default {
     title: 'Components/NavTabs',
     component: NavTabs,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

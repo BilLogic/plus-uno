@@ -44,7 +44,7 @@ const sampleLessons = [
 export default {
     title: 'Specs/Training/TrainingLessons/Pages/LessonsOverviewPage',
     component: LessonsOverviewPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -100,43 +100,6 @@ export default {
             table: { category: 'Content' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for LessonsOverviewPage component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>LessonsOverviewPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for Lessons Overview. Contains filter bar with TrainingLessonStatusSelect,
-                        SortControl, Expand All button, view toggle (list/grid), and expandable LessonsTable.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Features</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li>TopBar with breadcrumbs and user avatar</li>
-                        <li>Sidebar navigation</li>
-                        <li>Filter bar with status select, sort control, expand all, view toggle</li>
-                        <li>LessonsTable with expandable rows</li>
-                        <li>Horizontal scrolling for table when needed</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 63-178237
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

@@ -1,5 +1,7 @@
 <!-- Tier: 2 -->
 
+<!-- applied by agents/reviewers/a11y-lens (uno-review a11y lens) -->
+
 # Accessibility
 
 WCAG 2.1 AA is the minimum bar for all PLUS interfaces.

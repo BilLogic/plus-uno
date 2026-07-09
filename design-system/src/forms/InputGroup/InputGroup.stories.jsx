@@ -5,7 +5,7 @@ import InputGroup from './InputGroup';
 export default {
     title: 'Forms/Input Group',
     component: InputGroup,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

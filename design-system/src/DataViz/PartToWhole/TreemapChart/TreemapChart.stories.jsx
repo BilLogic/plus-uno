@@ -4,7 +4,7 @@ import TreemapChart from './TreemapChart';
 export default {
     title: 'Data Visualizations/PartToWhole/TreemapChart',
     component: TreemapChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

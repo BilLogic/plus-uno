@@ -12,7 +12,7 @@ import './AlertForSupervisors.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Cards/AlertForSupervisors',
     component: AlertForSupervisors,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -32,28 +32,6 @@ export default {
             table: { category: 'Content' }
         }
     }
-};
-
-/**
- * Docs
- * Documentation page
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
-            <h3 className="h3" style={{ marginBottom: '16px' }}>AlertForSupervisors</h3>
-            <p className="body2-txt" style={{ marginBottom: '24px' }}>
-                Alert card for supervisors reviewing student training performance. Shows whether AI-powered feedback
-                was enabled or disabled for the lesson.
-            </p>
-            <ul className="body2-txt" style={{ marginBottom: '24px', paddingLeft: '20px' }}>
-                <li>Info alert style when AI feature is enabled</li>
-                <li>Warning alert style when AI feature is disabled</li>
-                <li>Dynamic student name display</li>
-                <li>Bold status text (enabled/disabled)</li>
-            </ul>
-        </div>
-    )
 };
 
 /**

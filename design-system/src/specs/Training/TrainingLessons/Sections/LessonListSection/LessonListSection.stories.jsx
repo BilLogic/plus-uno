@@ -4,7 +4,7 @@ import LessonListSection from './LessonListSection';
 export default {
     title: 'Specs/Training/TrainingLessons/Sections/LessonListSection',
     component: LessonListSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

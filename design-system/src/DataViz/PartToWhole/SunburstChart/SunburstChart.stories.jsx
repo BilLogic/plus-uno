@@ -4,7 +4,7 @@ import SunburstChart from './SunburstChart';
 export default {
     title: 'Data Visualizations/PartToWhole/SunburstChart',
     component: SunburstChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

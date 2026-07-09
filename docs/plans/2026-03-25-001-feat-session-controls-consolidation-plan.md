@@ -1,7 +1,7 @@
 ---
 title: "feat: Session Controls Consolidation via Figma MCP (Card #2357)"
 type: feat
-status: active
+status: stale — needs owner review (2026-07-08)
 date: 2026-03-25
 scope: focused
 figma_file: V82FbevYtOTP7Cy1d0Dooa
@@ -132,3 +132,7 @@ design-system/src/specs/Toolkit/in-session/elements/
 | `specs/Toolkit/in-session/elements/SessionControlsConsolidated/SessionControlsConsolidated.stories.jsx` | Create |
 | `specs/Toolkit/in-session/elements/SessionControlsConsolidated/index.js` | Create |
 | `specs/Toolkit/in-session/elements/index.js` | Modify (add export) |
+
+## Outcome (2026-07-08 plans sweep)
+
+Ship state unverified at the 2026-07-08 plans sweep; owner to confirm or close.

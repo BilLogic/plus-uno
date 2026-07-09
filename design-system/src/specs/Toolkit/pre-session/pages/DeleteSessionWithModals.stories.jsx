@@ -13,6 +13,7 @@ import { One_Session_NA } from '../modals/Delete Session/OneSessionNA.stories';
 import { During_Specific_Day_Period } from '../modals/Delete Session/DuringSpecificDayPeriod.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Delete Session',
     parameters: {
         layout: 'padded',

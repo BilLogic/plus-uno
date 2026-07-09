@@ -13,7 +13,7 @@ import { LoginPortal } from '@/specs/Login/Cards';
 
 export default {
     title: 'Specs/Login/Pages',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'fullscreen',
         docs: {

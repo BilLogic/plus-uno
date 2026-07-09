@@ -38,7 +38,7 @@ const defaultTutors = [
 export default {
     title: 'Specs/Admin/Tutor Admin/Pages/TutorPerformancePage',
     component: TutorPerformancePage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -125,36 +125,6 @@ Node ID: 258-262669
         },
     },
     args: {},
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorPerformancePage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for the Tutor Performance section. Uses the PageLayout shell with
-                        TopBar and Sidebar. Contains tab navigation, action buttons, an overview section with
-                        filters and donut charts, and a performance details table with pagination. Default displays 9 rows.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Tabs</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Tutor Performance</strong>: Performance metrics and details</li>
-                        <li><strong>Status And Warnings</strong>: Tutor status and warnings</li>
-                        <li><strong>Tool Usage</strong>: Tool usage statistics</li>
-                        <li><strong>Training Progress</strong>: Training completion data</li>
-                    </ul>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

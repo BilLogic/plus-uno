@@ -4,7 +4,7 @@ import PieChart from './PieChart';
 export default {
     title: 'Data Visualizations/PartToWhole/PieChart',
     component: PieChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

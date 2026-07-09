@@ -13,6 +13,7 @@ import { Filled } from '../modals/Create New Session/Filled.stories';
 import { Unsaved_Warning } from '../modals/Create New Session/UnsavedWarning.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Create New Session',
     parameters: {
         layout: 'padded',

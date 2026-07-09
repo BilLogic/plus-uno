@@ -11,9 +11,12 @@ import * as SessionDetailsModals from '../modals/Session Details (All User)/Sess
 // Import Sign-Ups modals from Toolkit specs
 import * as SignUpsModals from '../modals/Sign-Ups/SignUps.stories';
 // Import Call-Offs modals from Toolkit specs
-import * as CallOffsModals from '../modals/Call-Offs/CallOffs.stories';
+import * as CallOffConfirmationStories from '../modals/Call-Offs/CallOffConfirmation.stories';
+import * as AutoExcuseConfirmationStories from '../modals/Call-Offs/AutoExcuseConfirmation.stories';
+import * as AutoApproveConfirmationStories from '../modals/Call-Offs/AutoApproveConfirmation.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/My Sessions',
     parameters: {
         layout: 'padded',
@@ -460,9 +463,9 @@ export const WithModals = () => {
             'onetime-pre-fillin': SessionDetailsModals.OneTimeSession_PreFillIn,
             'attendees-post-signup': SessionDetailsModals.SessionAttendees_PostSignUp_FillIn,
             'fillin-review': SessionDetailsModals.FillIn_ReviewChoices,
-            'calloff-confirmation': CallOffsModals.CallOff_Confirmation_PostSignUp,
-            'auto-excuse': CallOffsModals.AutoExcuse_Confirmation_PostSignUp,
-            'auto-approve': CallOffsModals.AutoApprove_Confirmation_PostSignUp,
+            'calloff-confirmation': CallOffConfirmationStories.CallOff_Confirmation,
+            'auto-excuse': AutoExcuseConfirmationStories.AutoExcuse_Confirmation,
+            'auto-approve': AutoApproveConfirmationStories.AutoApprove_Confirmation,
             'unregister': SessionDetailsModals.Unregister_PostSignUp,
         };
 

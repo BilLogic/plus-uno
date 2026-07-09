@@ -9,7 +9,7 @@ import React from 'react';
 
 export default {
     title: 'Specs/Universal',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

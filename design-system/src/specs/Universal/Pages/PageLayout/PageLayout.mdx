@@ -1,0 +1,52 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PageLayoutStories from './PageLayout.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PageLayoutStories} />
+
+<Title />
+
+App outer layout — wraps every page with Sidebar, TopBar, content slot, and Footer. Background is `surface-container` (#edeef0) with `gap-sm` (16px), `pad-x-sm` (16px), and `pad-y-sm` (12px). Sidebar collapses automatically below the 1024px breakpoint.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-ds-component-docs--page-fullbleed not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Standard page layout with Sidebar, TopBar, content area, and Footer.</>}
+>
+    <Canvas
+        of={PageLayoutStories.Overview}
+        story={{ inline: true }}
+        layout="fullscreen"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PageLayoutStories.Interactive}
+    description={<>Switch user type and edit the user name + notification counter inline. Use the MD / LG / XL toolbar above the preview to change viewport width.</>}
+/>
+
+</div>
+
+</div>

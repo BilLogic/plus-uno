@@ -1,0 +1,22 @@
+# Example secrets file for local development with `wrangler dev`.
+# Copy this to `.dev.vars` (gitignored) and fill in the real values.
+#
+# For production deploys, set each via `npx wrangler secret put <NAME>` instead;
+# DO NOT use this file for production secrets.
+
+# --- Slack ---
+# api.slack.com/apps -> your app -> Basic Information -> "Signing Secret"
+SLACK_SIGNING_SECRET=
+
+# api.slack.com/apps -> your app -> OAuth & Permissions -> "Bot User OAuth Token" (starts xoxb-)
+SLACK_BOT_TOKEN=
+
+# --- Anthropic ---
+# console.anthropic.com -> API Keys -> create one tagged "uno-bot v2"
+ANTHROPIC_API_KEY=
+
+# --- GitHub ---
+# github.com/settings/tokens -> Generate new (classic) with `repo` scope, OR
+# github.com/settings/personal-access-tokens with `Contents: Read` + `Actions: Read & Write`
+# scoped to the target repo (plus-uno-team/plus-uno)
+GITHUB_TOKEN=

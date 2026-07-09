@@ -2,6 +2,7 @@ import React from 'react';
 import PostSessionPage from './PostSessionPage';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Post-Session/Pages/Post Session Page',
     component: PostSessionPage,
     parameters: {

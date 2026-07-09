@@ -3,6 +3,7 @@ import BadgeClaimedPill from './BadgeClaimedPill';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements/BadgeClaimedPill',
+    tags: ['!dev', '!autodocs'],
     component: BadgeClaimedPill,
     parameters: {
         docs: {

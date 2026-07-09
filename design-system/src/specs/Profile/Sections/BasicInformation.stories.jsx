@@ -61,11 +61,18 @@ import Tooltip from '../../../components/Tooltip/Tooltip';
 import { Pronouns } from '../Elements/Pronouns.stories';
 
 export default {
-    title: 'Specs/Profile/Sections/Basic Information',
+    title: 'Specs/Profile/Sections/BasicInformation',
+    excludeStories: ['BasicInformationSection'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component:
+                    'Basic Information section on tutor profile — contact fields and Save / Update. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['autodocs'],
 };
 
 /**
@@ -317,48 +324,40 @@ export const BasicInformationSection = ({ changed = false }) => {
     );
 };
 
-/**
- * All States
- * Shows the Basic Information section in both states:
- * Default (unchanged, save disabled) and Changed (save active).
- */
-export const BasicInformationStory = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Default (unchanged) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default (Unchanged — Save Disabled)
-                </h6>
-                <BasicInformationSection changed={false} />
-            </div>
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <BasicInformationSection changed={false} />
+    </div>
+);
 
-            {/* State 2: Changed (save active) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Changed (Save Active)
-                </h6>
-                <BasicInformationSection changed={true} />
-            </div>
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <BasicInformationSection changed={false} />
+        <BasicInformationSection changed={true} />
+    </div>
+);
+
+export const Interactive = {
+    args: {
+        changed: false,
+    },
+    argTypes: {
+        changed: {
+            control: 'boolean',
+            description: 'Enables Save and Update when true',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <BasicInformationSection changed={args.changed} />
         </div>
-    );
+    ),
 };

@@ -5,7 +5,7 @@ import Radio from './Radio';
 export default {
     title: 'Forms/Radio',
     component: Radio,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

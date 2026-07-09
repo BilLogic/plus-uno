@@ -12,7 +12,7 @@ const sampleItems = [
 export default {
     title: 'Components/Breadcrumb',
     component: Breadcrumb,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

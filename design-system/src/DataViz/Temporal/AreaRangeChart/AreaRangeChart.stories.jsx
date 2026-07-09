@@ -4,7 +4,7 @@ import AreaRangeChart from './AreaRangeChart';
 export default {
     title: 'Data Visualizations/Temporal/AreaRangeChart',
     component: AreaRangeChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

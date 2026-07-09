@@ -4,7 +4,7 @@ import TrainingProgressCard from './TrainingProgressCard';
 export default {
     title: 'Specs/Home/Cards/TrainingProgressCard',
     component: TrainingProgressCard,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Overview = () => (

@@ -5,7 +5,7 @@ import RichTextEditor from './RichTextEditor';
 export default {
     title: 'Components/RichTextEditor',
     component: RichTextEditor,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

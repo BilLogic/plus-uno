@@ -1,0 +1,112 @@
+name = "uno-bot"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Plain vars (non-secret). Override per-env below.
+#
+# IMPORTANT — both values below must point at the GitHub repo whose `main`
+# branch holds the harness (AGENTS.md, skills/*/bot.md + method.md,
+# docs/conventions/). The bot fetches those files from SKILLS_BASE_URL at
+# runtime (see src/agent/skills.ts SKILL_PATHS) and dispatches
+# repository_dispatch events against GITHUB_REPO.
+[vars]
+GITHUB_REPO = "BilLogic/plus-uno"
+SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
+# Attaches the GitHub hosted-MCP read path (read-only repos toolset at
+# api.githubcopilot.com, authenticated with GITHUB_TOKEN). ENABLED 2026-07-09 after
+# a live auth check (a plain PAT completes the MCP initialize handshake — no Copilot
+# license needed). github_read is kept as a fallback for now; it can be retired once
+# the MCP is confirmed in real bot usage.
+GITHUB_MCP_ENABLED = "true"
+# Notion "Roadmap" database (the Design HQ board). create_prd drops new PRD
+# cards here in the "Need PRD / Under Playground" Design Status column.
+NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
+# Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
+# that find_experts queries to suggest collaborators/SMEs for a topic.
+NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
+# NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
+# surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
+# research is an IDE-only skill that writes to the project hub's Research page.
+# Maintenance intake is a Roadmap card (Product Pillar: Universal + Product Tag:
+# Maintenance), surfaced via a filtered view — not its own DB.
+# uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
+# read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
+SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
+# #plus-design channel id — reviewable artifacts (component_implement /
+# prototype_scaffold PRs, new PRDs from notion_create) are announced here for
+# team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
+PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
+# #plus-design-feedback channel id — shareout_post drops feedback bundles here
+# (distinct from the reviews channel above). Leave blank → shareout falls back
+# to the origin thread.
+PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
+# Notion hosted-MCP READ path. mcp.notion.com is its own OAuth 2.1 server with
+# PKCE + dynamic client registration — NO manual Notion OAuth app and NO client
+# secret are needed (the Worker self-registers a public client, cached in KV).
+# Only this redirect URI is required; it must be reachable at the deployed Worker.
+NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback"
+# NOTE: no Figma hosted-MCP path — mcp.figma.com is a closed catalog (only
+# Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker
+# 403s) and the local MCP needs the desktop app. The bot surfaces Figma context
+# from Notion + routes real Figma work to the IDE. FIGMA_ACCESS_TOKEN (secret,
+# below) still powers implement_design's screenshot fetch.
+# Slack hosted-MCP (read + write) path. Slack has NO dynamic registration → a
+# STATIC pre-registered client is used. The client_id is non-secret (below); the
+# client_secret is a wrangler secret (see SLACK_MCP_CLIENT_SECRET). This redirect
+# URI must match the one registered on the Slack app.
+SLACK_MCP_CLIENT_ID = "12186538800.10808020289637"
+SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback"
+
+# Secrets are set via `wrangler secret put`. Expected names:
+#   SLACK_SIGNING_SECRET
+#   SLACK_BOT_TOKEN
+#   ANTHROPIC_API_KEY
+#   GITHUB_TOKEN          (PAT with repo:dispatch scope)
+#   FIGMA_ACCESS_TOKEN    (Figma PAT with read access to the prototypes file;
+#                          used by implement_design's proposal-time screenshot
+#                          fetch in events.ts — Phase 4)
+#   NOTION_API_KEY        (Notion internal integration token, connected to the
+#                          Roadmap board; used by create_prd to add PRD cards)
+#   GMAIL_SENDER          (the authorized "From" mailbox for send_email)
+#   GMAIL_CLIENT_ID       (Google OAuth client id)
+#   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
+#   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)
+#   SUPABASE_ANON_KEY     (publishable/anon read key; blueprint_search is read-only)
+#   (SUPABASE_URL is a non-secret [vars] entry above, not a secret)
+#   SUPABASE_MCP_TOKEN    (Supabase Personal Access Token for the hosted MCP;
+#                          the MCP URL pins read_only=true so it's a read path)
+#   SLACK_MCP_CLIENT_SECRET (secret for the STATIC Slack MCP OAuth client whose
+#                          id is SLACK_MCP_CLIENT_ID above)
+
+# Durable Object — per-thread conversation state + pending tool-call proposals.
+[[durable_objects.bindings]]
+name = "THREAD_STATE"
+class_name = "ThreadState"
+
+# SQLite-backed Durable Object — works on Workers Free plan.
+# (new_classes is the legacy KV-backed migration that requires Workers Paid.)
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ThreadState"]
+
+# KV — stores the exchanged Notion OAuth token (hosted-MCP READ path). Create it
+# once: `npx wrangler kv namespace create NOTION_OAUTH_KV`, paste the returned id
+# below (add a `preview_id` too if you use `wrangler dev`).
+[[kv_namespaces]]
+binding = "NOTION_OAUTH_KV"
+id = "587f85559dda488a89ff237bf117a5a6"
+
+# KV — Slack hosted-MCP: stores the STATIC client's issued user token (and PKCE
+# verifiers during the flow). Slack has no dynamic registration, so no client blob
+# is cached here — only the token.
+[[kv_namespaces]]
+binding = "SLACK_OAUTH_KV"
+id = "18b58372d9bc430489d634c2c9a0b0c4"
+
+# KV — harness resilience: last-known-good system-prompt assembly + alert
+# throttle. When GitHub Raw fetches fail, the bot serves this copy and pings
+# #uno-bot instead of silently running with harness files missing.
+[[kv_namespaces]]
+binding = "HARNESS_KV"
+id = "10e5f980215e4f7e817bf55ac69dda43"

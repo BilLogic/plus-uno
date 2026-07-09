@@ -9,6 +9,7 @@ import ResponsiveFrame from '../../../../Universal/ResponsiveFrame';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Pages/TutorToolUsagePage',
+    tags: ['!dev', '!autodocs'],
     component: TutorToolUsagePage,
     parameters: {
         layout: 'fullscreen',
@@ -66,22 +67,6 @@ Full page layout for Tutor Tool Usage section.
             );
         },
     ],
-};
-
-export const Docs = {
-    args: {},
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorToolUsagePage</h2>
-            <p className="body2-txt" style={{ marginBottom: '16px' }}>
-                Full page layout for the Tool Usage section with multiple usage charts and
-                details table with search functionality.
-            </p>
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Figma Node: 258-263367
-            </p>
-        </div>
-    )
 };
 
 export const Overview = {

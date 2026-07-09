@@ -7,7 +7,7 @@ import Button from '@/components/Button/Button';
 export default {
     title: 'Components/Collapse',
     component: Collapse,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

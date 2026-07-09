@@ -4,7 +4,7 @@ import ComboChart from './ComboChart';
 export default {
     title: 'Data Visualizations/Temporal/ComboChart',
     component: ComboChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

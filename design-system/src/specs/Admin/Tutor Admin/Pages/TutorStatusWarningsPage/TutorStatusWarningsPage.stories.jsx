@@ -9,6 +9,7 @@ import ResponsiveFrame from '../../../../Universal/ResponsiveFrame';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Pages/TutorStatusWarningsPage',
+    tags: ['!dev', '!autodocs'],
     component: TutorStatusWarningsPage,
     parameters: {
         layout: 'fullscreen',
@@ -60,21 +61,6 @@ Full page layout for Tutor Status and Warnings section.
             );
         },
     ],
-};
-
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorStatusWarningsPage</h2>
-            <p className="body2-txt" style={{ marginBottom: '16px' }}>
-                Full page layout for the Status and Warnings section with status distribution chart,
-                trend graph, and status details table.
-            </p>
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Figma Node: 258-263229
-            </p>
-        </div>
-    ),
 };
 
 export const Overview = {

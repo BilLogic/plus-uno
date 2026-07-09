@@ -11,7 +11,7 @@ import Sidebar from './Sidebar';
 export default {
     title: 'Specs/Universal/Sections/Sidebar',
     component: Sidebar,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

@@ -4,7 +4,7 @@ import GaugeChart from './GaugeChart';
 export default {
     title: 'Data Visualizations/PartToWhole/GaugeChart',
     component: GaugeChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

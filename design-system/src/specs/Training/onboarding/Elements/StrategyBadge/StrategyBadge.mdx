@@ -1,0 +1,47 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as StrategyBadgeStories from './StrategyBadge.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={StrategyBadgeStories} />
+
+<Title />
+
+Strategy badge used on onboarding module cards — distinguishes between content types (video, document, etc.) with a colored pill.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=74-121913"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/onboarding/Elements/StrategyBadge"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>All strategy badge variants side-by-side.</>}
+>
+    <Canvas of={StrategyBadgeStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={StrategyBadgeStories.Interactive}
+    description={<>Switch the variant and label inline.</>}
+/>
+
+</div>
+
+</div>

@@ -4,7 +4,7 @@ import Select from '../../../../forms/Select';
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/School Dropdown',
     component: Select,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

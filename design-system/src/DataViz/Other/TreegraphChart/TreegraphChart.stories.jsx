@@ -4,7 +4,7 @@ import TreegraphChart from './TreegraphChart';
 export default {
     title: 'Data Visualizations/Other/TreegraphChart',
     component: TreegraphChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

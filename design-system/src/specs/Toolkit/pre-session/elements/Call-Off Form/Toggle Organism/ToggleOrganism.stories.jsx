@@ -6,6 +6,7 @@ import Checkbox from '@/forms/Checkbox';
 import Select from '@/forms/Select';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Toggle Organism',
     component: Form,
     parameters: {

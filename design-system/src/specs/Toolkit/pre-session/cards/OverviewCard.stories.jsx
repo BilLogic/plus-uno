@@ -1,6 +1,7 @@
 import React from 'react';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Cards/Overview Card',
     parameters: {
         layout: 'padded',

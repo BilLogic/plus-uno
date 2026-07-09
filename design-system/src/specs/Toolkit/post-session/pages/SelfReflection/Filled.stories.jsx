@@ -70,12 +70,12 @@ BreakpointPreview.defaultProps = {
 };
 
 export default {
-    title: 'Specs/Toolkit/Post-Session/Pages/SelfReflection',
+    title: 'Specs/Toolkit/Post-Session/Pages/Self Reflection/Filled',
     component: SelfReflectionFilled,
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Filled = {

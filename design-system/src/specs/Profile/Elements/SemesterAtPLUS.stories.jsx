@@ -1,57 +1,27 @@
 /**
  * Profile - Elements - Semester at PLUS
- * 
+ *
  * Read-only multi-select showing semesters the tutor has been at PLUS.
- * Re-uses the Label component (from forms) and Select component (from forms).
- * 
+ *
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5470-9151&m=dev
- * 
- * States:
- * - Filled (1 semester): one badge shown in read-only input
- * - Filled (multiple semesters): multiple badges shown in read-only input
- * 
- * Typography:
- * - Label: body3-txt (Merriweather Sans Regular, 12px, line-height 1.667) in --color-on-surface
- * - Badge text: body2-txt (Merriweather Sans Regular, 14px, line-height 1.571) in --color-secondary-text
- * 
- * Colors:
- * - Label: --color-on-surface
- * - Input background: --color-surface-variant (read-only/disabled state)
- * - Input border: --color-outline-variant
- * - Badge background: --color-secondary-state-08 (rgba(68,92,106,0.08))
- * - Badge text: --color-secondary-text
- * 
- * Spacing:
- * - Label-to-select gap: var(--size-spacing-space-050, 4px)
- * - Input padding: var(--size-element-pad-x-md, 10px) / var(--size-element-pad-y-md, 6px)
- * - Badge gap: var(--size-element-gap-xs, 4px)
- * - Badge padding: var(--size-element-pad-x-sm, 8px)
- * - Badge border-radius: var(--size-element-radius-full, 999px)
- * - Input border-radius: var(--size-border-radius-50, 2px)
- * 
- * Width: 400px (from Figma)
- * 
- * Select props:
- * - mode="multi" (multi-select with badges)
- * - displayMode="badges" (selected values shown as badges)
- * - readonly={true} (read-only, no interaction)
- * 
- * Options:
- * - Fall 2024
- * - Spring 2025
- * - Summer 2025
- * - Fall 2025
  */
 import React from 'react';
 import { Label } from '../../../forms/LabelAndCaption.stories';
 import Select from '../../../forms/Select';
 
 export default {
-    title: 'Specs/Profile/Elements/Semester at PLUS',
+    title: 'Specs/Profile/Elements/SemesterAtPLUS',
+    excludeStories: ['SemesterAtPLUS'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component:
+                    'Read-only semester badges for time at PLUS on tutor profile. Token notes are in the file header comment.',
+            },
+        },
     },
-    tags: ['autodocs'],
 };
 
 const semesterOptions = [
@@ -61,9 +31,7 @@ const semesterOptions = [
     { value: 'fall-2025', label: 'Fall 2025' },
 ];
 
-/**
- * Reusable Semester at PLUS component for use in sections and pages
- */
+/** Reusable Semester at PLUS component for use in sections and pages */
 export const SemesterAtPLUS = ({ id = 'semester-plus', value, onChange, defaultValue, label = 'Semester Tutored at PLUS', required = false, ...props }) => {
     return (
         <div
@@ -93,88 +61,72 @@ export const SemesterAtPLUS = ({ id = 'semester-plus', value, onChange, defaultV
     );
 };
 
-/**
- * All States
- * Shows the Semester at PLUS field in its different filled states.
- * This field is read-only — values are set by the system.
- */
-export const SemesterAtPLUSStory = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Filled (1 semester) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Filled (1 Semester)
-                </h6>
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 'var(--size-spacing-space-050, 4px)',
-                        width: '400px',
-                    }}
-                >
-                    <Label text="Semester Tutored at PLUS" required={false} />
-                    <Select
-                        id="semester-plus-uno"
-                        mode="multi"
-                        options={semesterOptions}
-                        defaultValue={['fall-2024']}
-                        placeholder="Select semester(s)"
-                        displayMode="badges"
-                        readonly={true}
-                        size="medium"
-                        style={{ width: '100%' }}
-                    />
-                </div>
-            </div>
+const semesterPresetDefaults = {
+    one: ['fall-2024'],
+    two: ['fall-2024', 'spring-2025'],
+    four: ['fall-2024', 'spring-2025', 'summer-2025', 'fall-2025'],
+};
 
-            {/* State 2: Filled (multiple semesters) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Filled (Multiple Semesters)
-                </h6>
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 'var(--size-spacing-space-050, 4px)',
-                        width: '400px',
-                    }}
-                >
-                    <Label text="Semester Tutored at PLUS" required={false} />
-                    <Select
-                        id="semester-plus-multi"
-                        mode="multi"
-                        options={semesterOptions}
-                        defaultValue={['fall-2024', 'spring-2025', 'summer-2025', 'fall-2025']}
-                        placeholder="Select semester(s)"
-                        displayMode="badges"
-                        readonly={true}
-                        size="medium"
-                        style={{ width: '100%' }}
-                    />
-                </div>
-            </div>
+export const Overview = () => (
+    <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <SemesterAtPLUS
+            id="semester-plus-overview"
+            defaultValue={semesterPresetDefaults.one}
+            label="Semester Tutored at PLUS"
+            required={false}
+        />
+    </div>
+);
+
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <div style={{ maxWidth: '400px', flex: '1 1 320px' }}>
+            <SemesterAtPLUS
+                id="semester-var-one"
+                defaultValue={semesterPresetDefaults.one}
+                label="Semester Tutored at PLUS"
+                required={false}
+            />
         </div>
-    );
+        <div style={{ maxWidth: '400px', flex: '1 1 320px' }}>
+            <SemesterAtPLUS
+                id="semester-var-four"
+                defaultValue={semesterPresetDefaults.four}
+                label="Semester Tutored at PLUS"
+                required={false}
+            />
+        </div>
+    </div>
+);
+
+export const Interactive = {
+    args: {
+        preset: 'four',
+    },
+    argTypes: {
+        preset: {
+            control: 'radio',
+            options: ['one', 'two', 'four'],
+            description: 'How many semester badges are shown (read-only)',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <SemesterAtPLUS
+                id="semester-plus-interactive"
+                key={args.preset}
+                defaultValue={semesterPresetDefaults[args.preset]}
+                label="Semester Tutored at PLUS"
+                required={false}
+            />
+        </div>
+    ),
 };

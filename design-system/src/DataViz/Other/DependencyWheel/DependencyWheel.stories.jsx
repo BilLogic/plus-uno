@@ -4,7 +4,7 @@ import DependencyWheel from './DependencyWheel';
 export default {
     title: 'Data Visualizations/Other/DependencyWheel',
     component: DependencyWheel,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

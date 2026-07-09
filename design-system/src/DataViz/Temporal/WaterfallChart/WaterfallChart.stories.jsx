@@ -4,7 +4,7 @@ import WaterfallChart from './WaterfallChart';
 export default {
     title: 'Data Visualizations/Temporal/WaterfallChart',
     component: WaterfallChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

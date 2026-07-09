@@ -6,7 +6,7 @@ import Button from '@/components/Button';
 export default {
     title: 'Components/Tooltip',
     component: Tooltip,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },

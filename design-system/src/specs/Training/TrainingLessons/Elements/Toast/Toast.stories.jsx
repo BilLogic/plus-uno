@@ -10,7 +10,7 @@ import Toast from './Toast';
 export default {
     title: 'Specs/Training/TrainingLessons/Elements/Toast',
     component: Toast,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

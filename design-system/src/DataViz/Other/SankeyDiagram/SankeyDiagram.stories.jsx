@@ -4,7 +4,7 @@ import SankeyDiagram from './SankeyDiagram';
 export default {
     title: 'Data Visualizations/Other/SankeyDiagram',
     component: SankeyDiagram,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

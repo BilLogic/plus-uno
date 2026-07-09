@@ -12,7 +12,7 @@ import './TutorDataCard.scss';
 export default {
     title: 'Specs/Admin/Tutor Admin/Cards/TutorDataCard',
     component: TutorDataCard,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -59,33 +59,6 @@ Node ID: 258-262197
             table: { category: 'State' },
         },
     },
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorDataCard</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Data card component for displaying tutor metrics with a donut chart visualization.
-                        Used in Tutor Admin pages for performance overview.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>States</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Default</strong>: Shows chart with data</li>
-                        <li><strong>Loading</strong>: Shows spinner animation</li>
-                    </ul>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

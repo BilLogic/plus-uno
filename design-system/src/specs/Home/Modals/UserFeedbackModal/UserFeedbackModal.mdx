@@ -1,0 +1,72 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as UserFeedbackModalStories from './UserFeedbackModal.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={UserFeedbackModalStories} />
+
+<Title />
+
+Unified user-feedback modal with three modes — `problem`, `question`, and `feedback`. Each mode swaps its rating icons (flag / clock / lightbulb) and textarea copy while sharing the same product-area dropdown, image upload, and contact-info footer.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-126557"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Modals/UserFeedbackModal"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    description={<>Open the trigger buttons to launch each of the three modal modes. Use the per-mode stories below to inspect each one inline.</>}
+>
+    <Canvas
+        of={UserFeedbackModalStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Problem mode
+
+<DocsInteractivePlayground
+    of={UserFeedbackModalStories.Problem}
+    description={<>"Report a problem" mode — flag-icon impact rating.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Question mode
+
+<DocsInteractivePlayground
+    of={UserFeedbackModalStories.Question}
+    description={<>"Ask a question" mode — clock-icon urgency rating.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Feedback mode
+
+<DocsInteractivePlayground
+    of={UserFeedbackModalStories.Feedback}
+    description={<>"Share an idea" mode — lightbulb-icon urgency rating.</>}
+/>
+
+</div>
+
+</div>

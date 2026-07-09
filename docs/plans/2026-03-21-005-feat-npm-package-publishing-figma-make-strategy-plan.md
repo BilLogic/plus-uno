@@ -1,7 +1,7 @@
 ---
 title: "feat: npm package publishing strategy with Figma Make and Code Connect"
 type: feat
-status: active
+status: superseded
 date: 2026-03-21
 related: docs/plans/2026-03-21-004-feat-agent-infrastructure-consolidated-plan.md
 ---
@@ -228,3 +228,7 @@ For when the team is ready to publish properly:
 - `packages/plus-ds/vite.config.js`: build configuration
 - `packages/plus-ds/README.md`: current consumer docs
 - Plan 004: `docs/plans/2026-03-21-004-feat-agent-infrastructure-consolidated-plan.md`
+
+## Outcome (2026-07-08 plans sweep)
+
+Direction reversed by plan 2026-03-21-006 (strip npm publishing).

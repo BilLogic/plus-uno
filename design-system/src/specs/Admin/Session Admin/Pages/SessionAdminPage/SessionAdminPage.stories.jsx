@@ -52,7 +52,7 @@ const defaultNineRows = [
 export default {
     title: 'Specs/Admin/Session Admin/Pages/SessionAdminPage',
     component: SessionAdminPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -121,49 +121,6 @@ Node ID: 987-128734
         },
     },
     args: {},
-};
-
-/**
- * Docs - Documentation for SessionAdminPage component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>SessionAdminPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for the Session Admin section. Uses the PageLayout shell with
-                        TopBar and Sidebar. Contains tab navigation, an overview section with filters and
-                        donut charts, and a session details section with table and pagination. Default displays 9 rows.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Tabs</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Warnings</strong>: Session warnings</li>
-                        <li><strong>Current Tutors</strong>: Currently active tutors</li>
-                        <li><strong>Incoming Tutors</strong>: Upcoming tutors</li>
-                        <li><strong>Details</strong>: Session details (default)</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Modal Controls</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>modalOpen</strong>: Show/hide the session breakdown modal</li>
-                        <li>Click a table row to open the modal</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 987-128734
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

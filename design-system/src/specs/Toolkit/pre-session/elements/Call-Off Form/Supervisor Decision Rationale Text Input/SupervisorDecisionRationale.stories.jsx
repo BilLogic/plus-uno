@@ -4,7 +4,7 @@ import Textarea from '@/forms/Textarea';
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Supervisor Decision Rationale Text Input',
     component: Textarea,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },

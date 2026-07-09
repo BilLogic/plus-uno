@@ -4,7 +4,7 @@ import NetworkGraph from './NetworkGraph';
 export default {
     title: 'Data Visualizations/Other/NetworkGraph',
     component: NetworkGraph,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

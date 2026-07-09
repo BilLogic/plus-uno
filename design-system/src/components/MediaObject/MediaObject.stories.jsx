@@ -5,7 +5,7 @@ import MediaObject from './MediaObject';
 export default {
     title: 'Components/MediaObject',
     component: MediaObject,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

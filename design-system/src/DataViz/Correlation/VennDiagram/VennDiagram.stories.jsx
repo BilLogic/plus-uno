@@ -4,7 +4,7 @@ import VennDiagram from './VennDiagram';
 export default {
     title: 'Data Visualizations/Correlation/VennDiagram',
     component: VennDiagram,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

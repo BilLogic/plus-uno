@@ -1,0 +1,51 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SmartBadgesStories from './SmartBadges.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SmartBadgesStories} />
+
+<Title />
+
+SMART competency badges — Socio-Emotional, Mastering Content, Advocacy, Relationships, and Technology & Tools — across nine typography sizes (`h1`–`h6`, `b1`–`b3`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/SmartBadges"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>All five SMART types, every size variant, and a size-comparison grid.</>}
+>
+    <Canvas
+        of={SmartBadgesStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SmartBadgesStories.Interactive}
+    description={<>Pick a SMART type and size inline.</>}
+/>
+
+</div>
+
+</div>

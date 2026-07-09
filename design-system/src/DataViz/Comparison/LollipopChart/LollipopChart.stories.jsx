@@ -4,7 +4,7 @@ import LollipopChart from './LollipopChart';
 export default {
     title: 'Data Visualizations/Comparison/LollipopChart',
     component: LollipopChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

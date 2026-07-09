@@ -15,6 +15,7 @@ import { Attendees_Recurring_Session } from '../modals/Confirm Session Availabil
 import { Session_Details_NA } from '../modals/Confirm Session Availability/SessionDetailsNA.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Confirm Session Availability',
     parameters: {
         layout: 'padded',

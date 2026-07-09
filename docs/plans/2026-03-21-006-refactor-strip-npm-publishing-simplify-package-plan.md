@@ -1,7 +1,7 @@
 ---
 title: "refactor: Strip npm publishing infrastructure and simplify package structure"
 type: refactor
-status: active
+status: completed
 date: 2026-03-21
 related:
   - docs/plans/2026-03-21-004-feat-agent-infrastructure-consolidated-plan.md
@@ -217,3 +217,7 @@ Plan 004 should also update its target architecture tree to note `packages/plus-
 - `packages/plus-ds/vite.config.js`: library mode build config
 - Root `vite.config.js`: alias resolution
 - Playground vite configs: relative path resolution to packages/plus-ds/src
+
+## Outcome (2026-07-08 plans sweep)
+
+Package simplified; @plus-ds consumed via alias, no npm publishing.

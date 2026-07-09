@@ -10,7 +10,7 @@ import { StudentAdminSpec } from './StudentAdminSpec';
 export default {
     title: 'Specs/Admin/Student Admin',
     component: StudentAdminSpec,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'fullscreen',
     },

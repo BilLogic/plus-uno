@@ -38,11 +38,17 @@ import React from 'react';
 import Button from '../../../components/Button/Button';
 
 export default {
-    title: 'Specs/Profile/Modals/Unsaved Changes',
+    title: 'Specs/Profile/Modals/UnsavedChanges',
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component:
+                    'Confirmation modal when leaving tutor profile with unsaved edits. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['autodocs'],
 };
 
 /**
@@ -140,33 +146,10 @@ const UnsavedChangesModal = () => {
     );
 };
 
-/**
- * All States
- * Shows the Unsaved Changes modal.
- */
-export const UnsavedChangesStory = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* Default State */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default
-                </h6>
-                <UnsavedChangesModal />
-            </div>
+export const Overview = {
+    render: () => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <UnsavedChangesModal />
         </div>
-    );
+    ),
 };

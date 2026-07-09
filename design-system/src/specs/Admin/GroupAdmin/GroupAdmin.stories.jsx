@@ -10,7 +10,7 @@ import { GroupAdminSpec } from './GroupAdminSpec';
 export default {
     title: 'Specs/Admin/Group Admin',
     component: GroupAdminSpec,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'fullscreen',
     },

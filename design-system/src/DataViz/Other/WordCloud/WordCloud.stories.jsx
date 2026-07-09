@@ -4,7 +4,7 @@ import WordCloud from './WordCloud';
 export default {
     title: 'Data Visualizations/Other/WordCloud',
     component: WordCloud,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

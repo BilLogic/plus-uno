@@ -16,7 +16,7 @@ const defaultTutors = [
 export default {
     title: 'Specs/Admin/Tutor Admin/Tables/TutorsToolUsageTable',
     component: TutorsToolUsageTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

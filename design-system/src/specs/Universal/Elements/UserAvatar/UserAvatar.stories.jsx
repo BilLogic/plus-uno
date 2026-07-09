@@ -10,7 +10,7 @@ import UserAvatar from './UserAvatar';
 export default {
     title: 'Specs/Universal/Elements/UserAvatar',
     component: UserAvatar,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

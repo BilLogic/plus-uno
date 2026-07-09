@@ -89,7 +89,7 @@ const defaultNineRows = [
 export default {
     title: 'Specs/Admin/Group Admin/Tables/GroupTrainingProgressTable',
     component: GroupTrainingProgressTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -126,53 +126,6 @@ Node ID: 1107-269190
             table: { category: 'Data' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for GroupTrainingProgressTable component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>GroupTrainingProgressTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying group training progress organized by SMART competency areas.
-                        Uses a hierarchical structure with three levels: competency area (Level 1), lessons (Level 2),
-                        and sub-lessons (Level 3). Each row shows circular progress indicators for completion,
-                        accuracy, and rating metrics. Default displays 9 rows.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>data</strong>: Array of hierarchical training progress objects</li>
-                        <li><strong>sortable</strong>: Enable sortable columns (default: true)</li>
-                        <li><strong>hover</strong>: Enable row hover effects (default: true)</li>
-                        <li><strong>onAssignClick</strong>: Callback when Assign button is clicked</li>
-                        <li><strong>onExpandClick</strong>: Callback when expand/collapse is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Data Structure</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Level 1</strong>: Competency areas (socio-emotional, mastering-content, etc.)</li>
-                        <li><strong>Level 2</strong>: Lessons within competency areas</li>
-                        <li><strong>Level 3</strong>: Sub-lessons within lessons</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 1107-269190
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

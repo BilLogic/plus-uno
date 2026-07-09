@@ -4,7 +4,7 @@ import Badge from '../../../../../components/Badge/Badge';
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Badges/Call-Off Lateness',
     component: Badge,
-    tags: ['!autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },

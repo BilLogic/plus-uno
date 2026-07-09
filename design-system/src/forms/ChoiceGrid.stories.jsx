@@ -5,7 +5,7 @@ import ChoiceGrid from './ChoiceGrid';
 export default {
     title: 'Forms/Choice Grid',
     component: ChoiceGrid,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

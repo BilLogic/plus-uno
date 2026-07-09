@@ -70,12 +70,12 @@ BreakpointPreview.defaultProps = {
 };
 
 export default {
-    title: 'Specs/Toolkit/Post-Session/Pages/FormFeedback',
+    title: 'Specs/Toolkit/Post-Session/Pages/Form Feedback/Filled',
     component: FormFeedbackFilled,
     parameters: {
         layout: 'padded',
     },
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 /**

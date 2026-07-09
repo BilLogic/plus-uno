@@ -1,7 +1,7 @@
 ---
 title: "feat: Floating navigation FAB + Storybook proxy on same port"
 type: feat
-status: active
+status: stale — needs owner review (2026-07-08)
 date: 2026-03-22
 ---
 
@@ -113,3 +113,7 @@ server: {
 - DS Tooltip: `design-system/src/components/Tooltip/Tooltip.jsx`
 - PageLayout floatingContent slot: `design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx:29`
 - Current BackToMarket: `src/App.jsx:10-25`, `src/App.scss:1-6`
+
+## Outcome (2026-07-08 plans sweep)
+
+Ship state unverified at the 2026-07-08 plans sweep; owner to confirm or close.

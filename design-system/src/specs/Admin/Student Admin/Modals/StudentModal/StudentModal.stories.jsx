@@ -13,7 +13,7 @@ import './StudentModal.scss';
 export default {
     title: 'Specs/Admin/Student Admin/Modals/StudentModal',
     component: StudentModal,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -50,52 +50,6 @@ Node ID: 317-126488
             table: { category: 'Variant' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for StudentModal component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>StudentModal</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Modal component for viewing and editing student information. Features two tabs:
-                        Student Info with form fields, and Sessions with a paginated table of session history.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>show</strong>: Whether the modal is visible</li>
-                        <li><strong>student</strong>: Student data object</li>
-                        <li><strong>sessions</strong>: Array of session objects</li>
-                        <li><strong>initialTab</strong>: Initial active tab ('info' or 'sessions')</li>
-                        <li><strong>onHide</strong>: Callback when modal is closed</li>
-                        <li><strong>onSave</strong>: Callback when save is clicked</li>
-                        <li><strong>onDelete</strong>: Callback when delete is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Variants (Tabs)</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Info (info)</strong>: Form fields for name, email, status, school, tutors</li>
-                        <li><strong>Sessions (sessions)</strong>: Table showing Day, Shift, School with pagination</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 317-126488
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

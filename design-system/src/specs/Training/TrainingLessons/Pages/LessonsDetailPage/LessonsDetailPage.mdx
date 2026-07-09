@@ -1,0 +1,62 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as LessonsDetailPageStories from './LessonsDetailPage.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={LessonsDetailPageStories} />
+
+<Title />
+
+Individual lesson page with variant-based rendering — drives the entire lesson flow from intro through assessment and the final congratulations screen.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-178289"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/TrainingLessons/Pages/LessonsDetailPage"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-ds-component-docs--page-fullbleed not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+The page renders five distinct lesson stages via the `variant` prop:
+
+<DocsCanvasShell description={<><strong className="text-foreground">P1 — Intro / Content</strong> with rating input.</>}>
+    <Canvas of={LessonsDetailPageStories.P1} story={{ inline: true }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">P2 — Research Says</strong> with pull-quote callouts.</>}>
+    <Canvas of={LessonsDetailPageStories.P2} story={{ inline: true }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">P3 — Conclusion & Feedback</strong>.</>}>
+    <Canvas of={LessonsDetailPageStories.P3} story={{ inline: true }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">P4 — Scenario / Assessment</strong>.</>}>
+    <Canvas of={LessonsDetailPageStories.P4} story={{ inline: true }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">P5 — Congratulations</strong> end-of-lesson screen.</>}>
+    <Canvas of={LessonsDetailPageStories.P5} story={{ inline: true }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={LessonsDetailPageStories.Interactive}
+    description={<>Switch the <code>variant</code> control to flip between the five stages inline.</>}
+/>
+
+</div>
+
+</div>

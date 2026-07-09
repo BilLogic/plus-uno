@@ -2,6 +2,7 @@ import React from 'react';
 import Alert from '../../../../components/Alert';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Cards/Tutor View Session Management',
     parameters: {
         layout: 'padded',

@@ -4,7 +4,7 @@ import PyramidChart from './PyramidChart';
 export default {
     title: 'Data Visualizations/PartToWhole/PyramidChart',
     component: PyramidChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

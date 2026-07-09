@@ -4,6 +4,7 @@ import Button from '../../../../components/Button';
 import Select from '../../../../forms/Select';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Modals/Add Modal',
     component: Modal,
     parameters: {

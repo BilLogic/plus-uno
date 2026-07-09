@@ -11,7 +11,7 @@ import { LoginNotificationsModal } from './index';
 
 export default {
     title: 'Specs/Login/Modals',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

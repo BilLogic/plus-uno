@@ -13,7 +13,7 @@ import './OnboardingOverviewPage.scss';
 export default {
     title: 'Specs/Training/Onboarding/Pages/OnboardingOverviewPage',
     component: OnboardingOverviewPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -55,44 +55,6 @@ export default {
         },
     },
     args: {},
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>OnboardingOverviewPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for Onboarding Overview. Contains two main sections:
-                        Featured Modules (horizontal carousel with navigation arrows) and
-                        All Modules (table with sorting dropdown).
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Features</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li>TopBar with breadcrumbs and user avatar</li>
-                        <li>Sidebar navigation</li>
-                        <li>Featured Modules carousel with arrow navigation</li>
-                        <li>Module cards with thumbnail, title, duration, badge, status</li>
-                        <li>All Modules table with sortable columns</li>
-                        <li>Sorting dropdown (Name, Duration, Progress)</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 74-121828
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

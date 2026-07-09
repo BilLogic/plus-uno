@@ -14,6 +14,7 @@ import * as SessionDetailsModals from '../modals/Session Details (All User)/Sess
 import * as OneTimeAttendeesCompletedModal from '../modals/Session Details (All User)/OneTimeAttendeesCompleted.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/All Sessions',
     parameters: {
         layout: 'padded',

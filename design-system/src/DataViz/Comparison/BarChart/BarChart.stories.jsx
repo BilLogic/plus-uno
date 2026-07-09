@@ -4,7 +4,7 @@ import BarChart from './BarChart';
 export default {
     title: 'Data Visualizations/Comparison/BarChart',
     component: BarChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

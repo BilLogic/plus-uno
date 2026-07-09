@@ -4,7 +4,7 @@ import Dropdown from '../../../../../../components/Dropdown/Dropdown';
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Capacity Filter',
     component: Dropdown,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },

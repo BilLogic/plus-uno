@@ -4,7 +4,7 @@ import StudentsOverviewSection from './StudentsOverviewSection';
 export default {
     title: 'Specs/Home/Sections/StudentsOverviewSection',
     component: StudentsOverviewSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 const defaultOverviewCards = [

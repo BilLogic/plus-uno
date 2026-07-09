@@ -761,7 +761,7 @@ const buildResponse = (actionId, pageContext) => {
                         <OnboardingLinkItem num="1" title={<span>🎨 <strong>DS Knowledge</strong></span>} desc="Components, tokens, patterns" path="design-system/docs/discovery.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
                         <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path="design-system/docs/patterns/layout.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
                         <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/context/product/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
-                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/context/conventions/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/conventions/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
                     </ul>
                 </div>
             );
@@ -853,49 +853,49 @@ const buildResponse = (actionId, pageContext) => {
                                 theme="prototype"
                                 num="1"
                                 titleLine={<>🧱 <strong className="sb-ai-agent__skill-card__name">uno-prototype</strong></>}
-                                path=".agent/skills/uno-prototype/SKILL.md"
+                                path="skills/uno-prototype/SKILL.md"
                                 trigger={'"scaffold", "new prototype", "create playground"'}
                             />
                             <SkillsRouterSkillCard
                                 theme="review"
                                 num="2"
                                 titleLine={<>🔍 <strong className="sb-ai-agent__skill-card__name">uno-review</strong></>}
-                                path=".agent/skills/uno-review/SKILL.md"
+                                path="skills/uno-review/SKILL.md"
                                 trigger={'"review", "check", "validate", "quality check"'}
                             />
                             <SkillsRouterSkillCard
                                 theme="post"
                                 num="3"
-                                titleLine={<>🚀 <strong className="sb-ai-agent__skill-card__name">uno-post</strong></>}
-                                path=".agent/skills/uno-post/SKILL.md"
-                                trigger={'"submit", "publish", "add to market"'}
+                                titleLine={<>🚀 <strong className="sb-ai-agent__skill-card__name">uno-publish</strong></>}
+                                path="skills/uno-publish/SKILL.md"
+                                trigger={'"share for feedback", "hand off", "publish", "add to market"'}
                             />
                             <SkillsRouterSkillCard
                                 theme="compound"
                                 num="4"
-                                titleLine={<>🧠 <strong className="sb-ai-agent__skill-card__name">uno-compound</strong></>}
-                                path=".agent/skills/uno-compound/SKILL.md"
-                                trigger={'"document", "write up", "compound", "save learning"'}
+                                titleLine={<>🧠 <strong className="sb-ai-agent__skill-card__name">uno-maintain</strong></>}
+                                path="skills/uno-maintain/SKILL.md"
+                                trigger={'"file an intake", "fix this", "save learning"'}
                             />
                             <SkillsRouterSkillCard
                                 theme="research"
                                 num="5"
                                 titleLine={<>🔬 <strong className="sb-ai-agent__skill-card__name">uno-research</strong></>}
-                                path=".agent/skills/uno-research/SKILL.md"
+                                path="skills/uno-research/SKILL.md"
                                 trigger={'"what is", "how does", "explore", "audit"'}
                             />
                             <SkillsRouterSkillCard
                                 theme="plan"
                                 num="6"
-                                titleLine={<>📋 <strong className="sb-ai-agent__skill-card__name">uno-plan</strong></>}
-                                path=".agent/skills/uno-plan/SKILL.md"
-                                trigger={'"plan", "scope", "how should we build"'}
+                                titleLine={<>📋 <strong className="sb-ai-agent__skill-card__name">uno-synthesize</strong></>}
+                                path="skills/uno-synthesize/SKILL.md"
+                                trigger={'"synthesize", "takeaways", "draft the PRD"'}
                             />
                         </ul>
                         <div className="sb-ai-agent__skills-router-pipeline">
                             <p className="sb-ai-agent__skills-router-pipeline-title">🔁 Recommended Pipeline (Flexible entry)</p>
                             <p className="sb-ai-agent__skills-router-pipeline-flow">
-                                uno-research → uno-plan → uno-prototype → uno-review → (iterate) → uno-post → uno-compound
+                                uno-research → uno-synthesize → uno-prototype → uno-review → (iterate) → uno-publish · uno-maintain throughout
                             </p>
                         </div>
                     </div>

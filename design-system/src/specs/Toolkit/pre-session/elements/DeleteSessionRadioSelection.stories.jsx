@@ -3,6 +3,7 @@ import Radio from '../../../../forms/Radio';
 import DatePicker from '../../../../forms/DatePicker';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Delete Session Radio Selection',
     parameters: {
         layout: 'padded',

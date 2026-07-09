@@ -4,7 +4,7 @@ import HomepageJumbotron from './HomepageJumbotron';
 export default {
     title: 'Specs/Home/Sections/HomepageJumbotron',
     component: HomepageJumbotron,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Overview = () => (

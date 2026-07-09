@@ -4,7 +4,7 @@ import SmartBarChart from './SmartBarChart';
 export default {
     title: 'Data Visualizations/Comparison/SmartBarChart',
     component: SmartBarChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

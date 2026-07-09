@@ -6,6 +6,7 @@ import { DeleteSessionRadioItem } from '../../elements/DeleteSessionRadioSelecti
 import { CancelButton, ConfirmCancelButton } from '../../elements/SupervisorManagementButtons.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Modals/Delete Session',
     component: Modal,
     parameters: {

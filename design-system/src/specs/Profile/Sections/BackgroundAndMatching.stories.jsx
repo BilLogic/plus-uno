@@ -57,11 +57,18 @@ import { MathLevel } from '../Elements/MathLevel.stories';
 import { LanguagePreferences } from '../Elements/LanguagePreferences.stories';
 
 export default {
-    title: 'Specs/Profile/Sections/Background and Matching',
+    title: 'Specs/Profile/Sections/BackgroundAndMatching',
+    excludeStories: ['BackgroundAndMatchingSection'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component:
+                    'Background & Matching section — academic fields and Save / Update. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -272,48 +279,40 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
     );
 };
 
-/**
- * All States
- * Shows the Background & Matching section in both states:
- * Default (unchanged, save disabled) and Changed (save active).
- */
-export const BackgroundAndMatchingStory = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Default (unchanged) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default (Unchanged — Save Disabled)
-                </h6>
-                <BackgroundAndMatchingSection changed={false} />
-            </div>
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <BackgroundAndMatchingSection changed={false} />
+    </div>
+);
 
-            {/* State 2: Changed (save active) */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Changed (Save Active)
-                </h6>
-                <BackgroundAndMatchingSection changed={true} />
-            </div>
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <BackgroundAndMatchingSection changed={false} />
+        <BackgroundAndMatchingSection changed={true} />
+    </div>
+);
+
+export const Interactive = {
+    args: {
+        changed: false,
+    },
+    argTypes: {
+        changed: {
+            control: 'boolean',
+            description: 'Enables Save and Update when true',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <BackgroundAndMatchingSection changed={args.changed} />
         </div>
-    );
+    ),
 };

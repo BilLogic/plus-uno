@@ -5,7 +5,7 @@ import Textarea from './Textarea';
 export default {
     title: 'Forms/Textarea',
     component: Textarea,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

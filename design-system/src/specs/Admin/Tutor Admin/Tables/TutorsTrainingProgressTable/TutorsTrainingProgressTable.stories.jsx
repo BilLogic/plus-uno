@@ -38,7 +38,7 @@ const defaultTutors = [
 export default {
     title: 'Specs/Admin/Tutor Admin/Tables/TutorsTrainingProgressTable',
     component: TutorsTrainingProgressTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

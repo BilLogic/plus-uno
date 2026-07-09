@@ -4,7 +4,7 @@ import BadgeCard from './BadgeCard';
 export default {
     title: 'Specs/Home/Cards/BadgeCard',
     component: BadgeCard,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Default = {

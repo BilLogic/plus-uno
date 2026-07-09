@@ -12,6 +12,7 @@ import {
 } from '../elements/CTATutorViewButtons.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Modals/Tutor Call-Off Details',
     component: Modal,
     parameters: {

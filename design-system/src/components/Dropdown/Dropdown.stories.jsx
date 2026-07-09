@@ -5,7 +5,7 @@ import Dropdown from './Dropdown';
 export default {
     title: 'Components/Dropdown',
     component: Dropdown,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

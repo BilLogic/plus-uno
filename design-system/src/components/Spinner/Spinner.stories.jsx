@@ -5,7 +5,7 @@ import Spinner from './Spinner';
 export default {
     title: 'Components/Loading',
     component: Spinner,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

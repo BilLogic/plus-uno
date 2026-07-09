@@ -104,6 +104,46 @@ html {
     padding-right: clamp(1.5rem, 3vw, 2.75rem) !important;
 }
 
+/*
+ * Page MDX with embedded `ResponsiveFrame` (Admin / Training full-page specs):
+ * widen the docs body so the 1440px XL frame doesn't get clipped, and tame the
+ * sticky toolbar / 100vh minimums that ResponsiveFrame uses for solo Canvas view.
+ *
+ * `:has()` is Chrome 105+ / Safari 15.4+ / Firefox 121+ — Storybook is typically viewed in Chromium.
+ */
+.sbdocs-wrapper:has(.sb-ds-component-docs--page-fullbleed) {
+    max-width: 112rem !important; /* ~1792px — fits 1440px frame + canvas padding with room to spare */
+}
+
+/* The breakpoint switcher pins itself to `top: 0` of the scroll container. In docs each Story
+   becomes a separate ResponsiveFrame and the docs body scrolls — multiple sticky toolbars would
+   pile on top of each other. Pin them to the start of their frame instead. */
+.sbdocs .sb-ds-component-docs--page-fullbleed .responsive-frame-toolbar {
+    position: static !important;
+}
+
+/* ResponsiveFrame: Fullscreen API — fill the physical display so MD/LG/XL previews can use full width */
+.responsive-frame-root:fullscreen,
+.responsive-frame-root:-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    box-sizing: border-box;
+}
+
+.responsive-frame-root--browser-fullscreen .responsive-frame-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+/* PageLayout relies on `height: 100%` resolving against its parent. ResponsiveFrame’s inner
+   provides that via `min-height: calc(100vh - 120px)`; in docs the docs body is the scroll
+   container, but the inner’s height still needs a definite floor so the in-page Sidebar /
+   Main flex column doesn’t collapse to 0 and disappear. The outer root’s `min-height: 100vh`
+   is fine — each page section stays one viewport tall, which matches the “full-page” intent. */
+
 @media (min-width: 768px) {
     .sbdocs-wrapper {
         scroll-padding-top: 6rem;

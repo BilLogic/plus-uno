@@ -33,63 +33,38 @@ plus-uno/
 ├── scripts/                       # Token sync, Figma automation, preview generation
 │
 ├── docs/
-│   ├── context/                   # Tier 1 — product, conventions, design system foundations
+│   ├── context/                   # Descriptive — product, design-system foundations, onboarding
 │   │   ├── product/               # PLUS app landscape, users, features, flows
-│   │   ├── conventions/           # Coding standards, tech stack, terminology
 │   │   └── design-system/         # Foundations, components, styles
-│   ├── knowledge/                 # Compound loop — lessons, decisions, preferences
-│   ├── plans/                     # Implementation plans
-│   └── setup-guide.md             # Full onboarding guide
+│   ├── conventions/               # Normative rules — tool mirrors, voice, automations registry
+│   ├── evals/                     # Quality loop — rubrics, scenarios, runs
+│   ├── knowledge/                 # Append-only — lessons, ADRs, research, archive
+│   └── plans/                     # Dated implementation plans
 │
-├── .agent/                        # Agent infrastructure
-│   ├── SKILL.md                   # Skill router — 6 skills, routing logic
-│   ├── AGENT.md                   # Pipeline orchestration, compaction protocol
-│   ├── loading-order.md           # Three-tier loading contract
-│   └── skills/                    # Tier 2 — on-demand skill contexts
-│       ├── uno-research/          # Explore design system, components, patterns
-│       ├── uno-plan/              # Scope and plan implementation
-│       ├── uno-prototype/         # Build prototypes with DS conventions
-│       ├── uno-review/            # Quality gate before shipping
-│       ├── uno-post/              # Submit to Prototype Marketplace
-│       └── uno-compound/          # Document learnings for future sessions
+├── skills/                        # HOW — six capabilities, each with SKILL.md (IDE) + bot.md (Worker)
+│   ├── uno-research/              # Gather context, instrument-first
+│   ├── uno-synthesize/            # Findings → PRD; blueprint updates
+│   ├── uno-prototype/             # PRD → prototype, fidelity-routed
+│   ├── uno-publish/               # Share-out bundle · handoff · marketplace
+│   ├── uno-review/                # DS / UNO / a11y lenses · Design QA
+│   └── uno-maintain/              # Intake · Tier 1/2 · sync · knowledge capture
 │
-└── Cross-agent pointers           # One source of truth, multiple editors
-    ├── CLAUDE.md                  # Claude Code → @AGENTS.md
-    ├── .cursor/rules/plus-agent.mdc   # Cursor → AGENTS.md
-    ├── .windsurf/rules/agent.md       # Windsurf → AGENTS.md
-    └── .github/copilot-instructions.md # GitHub Copilot → AGENTS.md
+├── agents/                        # WHO — researchers/ · reviewers/ · writers/ + uno-bot/ (Worker)
+│
+└── AGENTS.md                      # Read natively by Claude Code, Cursor, Windsurf, Copilot — no pointer files
 ```
 
 ## Agent System
 
-All AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot) read **`AGENTS.md`** as the entry point. Each platform has a thin pointer file that redirects to it — no rules are duplicated.
+All AI coding agents (Claude Code, Cursor, Windsurf, GitHub Copilot — all read the AGENTS.md standard natively) read **`AGENTS.md`** — the single constitution: identity, the six-skill roster, forbidden patterns. No rules are duplicated anywhere. Loading tiers and budgets: `loading-order.md`.
 
-### Three-Tier Context Architecture
+**The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
 
-| Tier | What | When Loaded | Budget |
-|------|------|-------------|--------|
-| **Tier 1** | Identity, conventions, principles, forbidden patterns | Always (via `AGENTS.md` "See" refs) | < 200 lines |
-| **Tier 2** | Skill-specific references (cheat sheets, indexes, guides) | On skill trigger | 3K–5K tokens per skill |
-| **Tier 3** | Handoff artifacts between skills | Ephemeral, gitignored | Session-only |
-
-### Skills Pipeline
-
-```
-uno-research → uno-plan → uno-prototype → uno-review → (iterate) → uno-post → uno-compound
-```
-
-| Skill | Trigger | What It Does |
-|-------|---------|-------------|
-| `uno-research` | "What is…", "How does…" | Explore DS components, patterns, conventions |
-| `uno-plan` | "Plan", "scope", "how should we build" | Create structured implementation plans |
-| `uno-prototype` | Build/scaffold work | Prototype with DS conventions and tokens |
-| `uno-review` | Quality check | Validate against DS rules before shipping |
-| `uno-post` | "Submit", "publish" | Register prototype in the Marketplace |
-| `uno-compound` | After significant work | Document learnings for future sessions |
+You invoke (or just describe your intent and get routed to) one of six skills — `uno-research` · `uno-synthesize` · `uno-prototype` · `uno-publish` · `uno-review` · `uno-maintain`. The canonical table with Use-when triggers lives in `AGENTS.md` § Skills — deliberately not duplicated here (single-source rule). Skills summon internal agents (`agents/` — researchers · reviewers · writers, plus the uno-bot Slack Worker); the conventions they obey live in `docs/conventions/`. New here? Start at `docs/context/onboarding.md`.
 
 ### Knowledge Compounding
 
-After completing work, agents document lessons in `docs/knowledge/` — patterns that worked, pitfalls to avoid, architecture decisions. Future sessions check this knowledge base before starting, so the team's institutional memory grows over time.
+After significant work, lessons land in `docs/knowledge/` via `uno-maintain` — patterns that worked, pitfalls, ADRs. Future sessions check this base before starting, so institutional memory compounds.
 
 ## Prototype Marketplace
 
@@ -99,7 +74,7 @@ The Marketplace at `/market` is the central hub for all design prototypes. Each 
 
 1. Copy `playground/starter/` as your template
 2. Build your prototype (use the design system components!)
-3. Run `/uno:post` to register it in the Marketplace
+3. Invoke `uno-publish` to register it in the Marketplace
 4. Open a PR against `main` — Netlify auto-generates a **Deploy Preview** link
 5. Share the preview link for feedback — no merge needed
 
@@ -166,15 +141,15 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 
 | Document | What |
 |----------|------|
-| `docs/setup-guide.md` | Full onboarding guide (recommended CE skills, MCP servers) |
+| `docs/context/onboarding.md` | Onboarding — the six skills + where things live |
 | `docs/context/product/plus-app.md` | PLUS product landscape (mission, users, features, flows) |
 | `docs/context/product/plus-uno.md` | This repo's structure and inventory |
-| `docs/context/conventions/coding.md` | File naming, imports, git conventions |
+| `docs/conventions/coding.md` | File naming, imports, git conventions |
 | `docs/context/design-system/` | DS foundations, components, styles |
-| `docs/context/conventions/terminology.md` | PLUS domain terminology |
-| `docs/context/conventions/tech-stack.md` | Full tech stack with versions |
+| `docs/conventions/terminology.md` | PLUS domain terminology |
+| `docs/conventions/tech-stack.md` | Full tech stack with versions |
 | `docs/knowledge/INDEX.md` | Knowledge base index (lessons, decisions, preferences) |
-| `.agent/platform-integration.md` | Cross-agent pointer file architecture |
+| `agents/README.md` | Agent roster, anatomy, creation rule |
 
 ## Contributing
 

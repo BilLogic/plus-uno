@@ -4,7 +4,7 @@ import BubbleChart from './BubbleChart';
 export default {
     title: 'Data Visualizations/Correlation/BubbleChart',
     component: BubbleChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

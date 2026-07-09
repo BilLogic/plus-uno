@@ -4,7 +4,7 @@ import StackedBarChart from './StackedBarChart';
 export default {
     title: 'Data Visualizations/Comparison/StackedBarChart',
     component: StackedBarChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

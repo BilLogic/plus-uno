@@ -5,7 +5,7 @@ import DatePicker from './DatePicker';
 export default {
     title: 'Forms/Date Picker',
     component: DatePicker,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

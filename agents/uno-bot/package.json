@@ -1,0 +1,21 @@
+{
+  "name": "uno-bot",
+  "version": "0.0.1",
+  "private": true,
+  "description": "UNO Bot v2 — agentic Slack bot for the Plus design system (Cloudflare Workers runtime).",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250101.0",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.97.0"
+  }
+}

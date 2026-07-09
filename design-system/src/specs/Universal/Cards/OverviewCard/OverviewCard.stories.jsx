@@ -13,7 +13,7 @@ import OverviewCard from './OverviewCard';
 export default {
     title: 'Specs/Universal/Cards/OverviewCard',
     component: OverviewCard,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

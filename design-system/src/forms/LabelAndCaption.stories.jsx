@@ -119,7 +119,7 @@ const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) 
 export default {
     title: 'Forms/Label and Caption',
     component: Label,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

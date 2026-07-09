@@ -5,7 +5,7 @@ import DateAndTimePicker from './DateAndTimePicker';
 export default {
     title: 'Forms/Time Picker',
     component: DateAndTimePicker,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

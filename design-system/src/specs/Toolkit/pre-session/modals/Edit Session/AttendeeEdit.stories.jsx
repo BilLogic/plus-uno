@@ -7,6 +7,7 @@ import { RosterItem } from '../../elements/EditingAttendanceRosterItems.stories'
 import { CancelButton, SaveChangesButton } from '../../elements/SupervisorManagementButtons.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Modals/Edit Session',
     component: Modal,
     parameters: {

@@ -1,0 +1,83 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as DaysDropdownStories from './pre-session/elements/DaysDropdown.stories.jsx';
+import * as MySessionsStories from './pre-session/pages/MySessions.stories.jsx';
+import * as StudentListStories from './in-session/tables/StudentList.stories.jsx';
+import * as MATHiaGoalStatusBannerStories from './in-session/elements/MATHiaGoalStatusBanner.stories.jsx';
+import * as SessionReflectionPart1Stories from './post-session/pages/SessionReflection/Part1.stories.jsx';
+import * as SelfReflectionUnfilledStories from './post-session/pages/SelfReflection/Unfilled.stories.jsx';
+
+import { DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta title="Specs/Toolkit" />
+
+<Title />
+
+# Toolkit
+
+Organism-level specs for scheduling (pre-session), live classroom UI (in-session), and reflection flows (post-session). This page is the **single scrollable overview**; every Toolkit component also has its **own docs page** in the sidebar under **Specs → Toolkit →** phase → category → component.
+
+## How documentation is organized
+
+- **One CSF file per component**: `*.stories.jsx` next to implementation or local demo wrappers.
+- **One MDX docs page per CSF file**: sibling `*.mdx` with **Overview**, **Variants** (only when the story file exports `Variants`), and **Interactive playground** — same pattern as **Profile** and **Components** docs (`sb-ds-component-docs--page`, inline canvases, `Resources` → GitHub).
+- **Sidebar**: Stories use `tags: ['!dev', '!autodocs']` so canvases do not clutter the tree; navigation is MDX-first.
+- **Merged Storybook titles**: Some modal/page families share one Storybook `title` across multiple files (e.g. several entries under one modal family). Each MDX uses `<Meta of={…} name="Toolkit Docs — …">` so docs pages stay distinct.
+- **Regenerate sibling MDX** after adding or renaming stories: run `node scripts/toolkit-spec-docs.mjs` from the repo root.
+
+Under each phase, specs follow **Elements**, **Cards**, **Tables**, **Modals**, **Sections**, and **Pages** (when present).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Sample previews
+
+Representative inline playgrounds below; open any leaf under **Toolkit** in the sidebar for the full doc page.
+
+### Pre-session
+
+#### Days Dropdown
+
+<DocsInteractivePlayground of={DaysDropdownStories.Interactive} />
+
+#### My Sessions
+
+<DocsInteractivePlayground of={MySessionsStories.Interactive} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### In-session
+
+#### Student list table
+
+<DocsInteractivePlayground of={StudentListStories.Interactive} />
+
+#### MATHia goal status banner
+
+<DocsInteractivePlayground of={MATHiaGoalStatusBannerStories.Interactive} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Post-session
+
+#### Session reflection (part 1)
+
+<DocsInteractivePlayground of={SessionReflectionPart1Stories.Part1} />
+
+#### Self reflection (unfilled)
+
+<DocsInteractivePlayground of={SelfReflectionUnfilledStories.Unfilled} />
+
+</div>
+
+</div>

@@ -12,7 +12,7 @@ import './TutorPerformanceSection.scss';
 export default {
     title: 'Specs/Admin/Tutor Admin/Sections/TutorPerformanceSection',
     component: TutorPerformanceSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -50,26 +50,6 @@ Node ID: 258-262208
             table: { category: 'State' },
         },
     },
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorPerformanceSection</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Section component displaying two donut charts for tutor performance overview
-                        (Attendance and Sign-Up Rate).
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

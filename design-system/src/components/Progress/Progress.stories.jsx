@@ -5,7 +5,7 @@ import Progress from '@/components/Progress';
 export default {
     title: 'Components/Progress',
     component: Progress,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },

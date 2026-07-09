@@ -1,7 +1,7 @@
 ---
 title: "feat: Add AGENTS.md entry point, consolidated docs, compound loop, and skills for plus-uno"
 type: feat
-status: active
+status: completed — superseded
 date: 2026-03-21
 ---
 
@@ -220,3 +220,7 @@ Create 4 skills with full directory structure. Each skill has SKILL.md + referen
 - Anthropic context engineering: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
 - Claude Code skills docs: https://code.claude.com/docs/en/skills
 - Claude Code best practices: https://code.claude.com/docs/en/best-practices
+
+## Outcome (2026-07-08 plans sweep)
+
+Executed in March; architecture superseded by ADR-013 (2026-07-07 harness IA: one constitution, skills/ + agents/ top-level, uno-compound → uno-maintain).

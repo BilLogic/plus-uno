@@ -4,7 +4,7 @@ import FunnelChart from './FunnelChart';
 export default {
     title: 'Data Visualizations/Other/FunnelChart',
     component: FunnelChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

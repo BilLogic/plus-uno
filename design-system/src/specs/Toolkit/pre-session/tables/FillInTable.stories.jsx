@@ -4,6 +4,7 @@ import Badge from '../../../../components/Badge';
 import Checkbox from '../../../../forms/Checkbox';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Tables/Fill-In',
     parameters: {
         layout: 'padded',

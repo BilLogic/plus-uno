@@ -11,7 +11,7 @@ import Footer from './Footer';
 export default {
     title: 'Specs/Universal/Sections/Footer',
     component: Footer,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

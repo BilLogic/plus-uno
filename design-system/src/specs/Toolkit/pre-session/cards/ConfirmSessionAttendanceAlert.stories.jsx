@@ -2,6 +2,7 @@ import React from 'react';
 import Alert from '../../../../components/Alert/Alert';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Cards/Confirm Session Attendance Alert (Tutor View)',
     component: Alert,
     parameters: {

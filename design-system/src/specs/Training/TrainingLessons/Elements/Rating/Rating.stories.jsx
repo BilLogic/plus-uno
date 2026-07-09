@@ -13,7 +13,7 @@ import '../RatingSingle/RatingSingle.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Elements/Rating',
     component: Rating,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

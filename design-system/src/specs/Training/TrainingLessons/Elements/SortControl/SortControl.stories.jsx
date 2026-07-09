@@ -12,7 +12,7 @@ import './SortControl.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Elements/SortControl',
     component: SortControl,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

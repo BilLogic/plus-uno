@@ -5,7 +5,7 @@ import Accordion from './Accordion';
 export default {
     title: 'Components/Accordion',
     component: Accordion,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

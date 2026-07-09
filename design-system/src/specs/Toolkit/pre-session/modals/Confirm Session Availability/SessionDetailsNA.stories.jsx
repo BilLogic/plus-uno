@@ -8,6 +8,7 @@ import { RequestCallOffButton, JoinSessionButton } from '../../elements/CTATutor
 import { SupervisorControlsDropdown } from '../../elements/Supervisor Controls/SupervisorControls.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Modals/Confirm Session Availability',
     component: Modal,
     parameters: {

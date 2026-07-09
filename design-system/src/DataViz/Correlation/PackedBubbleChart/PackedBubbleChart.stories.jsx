@@ -4,7 +4,7 @@ import PackedBubbleChart from './PackedBubbleChart';
 export default {
     title: 'Data Visualizations/Correlation/PackedBubbleChart',
     component: PackedBubbleChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

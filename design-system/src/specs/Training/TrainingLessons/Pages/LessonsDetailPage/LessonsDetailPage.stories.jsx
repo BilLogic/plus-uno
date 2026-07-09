@@ -16,7 +16,7 @@ import '../../Elements/RatingSingle/RatingSingle.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Pages/LessonsDetailPage',
     component: LessonsDetailPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>

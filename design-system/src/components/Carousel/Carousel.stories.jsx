@@ -5,7 +5,7 @@ import Carousel from './Carousel';
 export default {
     title: 'Components/Carousel',
     component: Carousel,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

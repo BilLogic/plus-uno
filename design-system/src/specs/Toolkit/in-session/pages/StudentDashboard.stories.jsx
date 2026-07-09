@@ -13,6 +13,7 @@ import { StartingZoomSession } from '../modals/StartingZoomSession.stories';
 import { AddTutor, AddStudent } from '../modals/AddModal.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Pages/Student Dashboard',
     parameters: {
         layout: 'padded',

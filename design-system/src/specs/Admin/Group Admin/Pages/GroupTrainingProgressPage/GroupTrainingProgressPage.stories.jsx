@@ -92,7 +92,7 @@ const defaultNineRows = [
 export default {
     title: 'Specs/Admin/Group Admin/Pages/GroupTrainingProgressPage',
     component: GroupTrainingProgressPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -140,55 +140,6 @@ Node ID: 531-62962
         },
     },
     args: {},
-};
-
-/**
- * Docs
- * Documentation for GroupTrainingProgressPage component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>GroupTrainingProgressPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for the Group Training Progress section of Group Admin.
-                        Uses the PageLayout shell with TopBar and Sidebar. Contains tab navigation,
-                        title section with group filter, overview cards showing key metrics, and a
-                        hierarchical training progress table organized by SMART competency areas.
-                        Default displays 9 table rows.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>trainingData</strong>: Array of hierarchical training progress data</li>
-                        <li><strong>selectedGroup</strong>: Currently selected group filter (default: "All Groups")</li>
-                        <li><strong>onTabChange</strong>: Callback when tab changes</li>
-                        <li><strong>onGroupFilterChange</strong>: Callback when group filter changes</li>
-                        <li><strong>onAssignClick</strong>: Callback when Assign button is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Overview Cards</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>Student Need</strong>: Shows SMART bar visualization with highest need area</li>
-                        <li><strong>Completion Rate</strong>: Shows percentage of completed lessons</li>
-                        <li><strong>Avg Accuracy Rate</strong>: Shows average accuracy on completed lessons</li>
-                        <li><strong>Avg Time Spent</strong>: Shows average time spent on training</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 531-62962
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

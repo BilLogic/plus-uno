@@ -3,6 +3,7 @@ import Button from '../../../../components/Button';
 import Badge from '../../../../components/Badge/Badge';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Tables/Student List Items',
     parameters: {
         layout: 'padded',

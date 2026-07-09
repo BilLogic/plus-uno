@@ -12,7 +12,7 @@ import './TutorChartsElement.scss';
 export default {
     title: 'Specs/Admin/Tutor Admin/Elements/TutorChartsElement',
     component: TutorChartsElement,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

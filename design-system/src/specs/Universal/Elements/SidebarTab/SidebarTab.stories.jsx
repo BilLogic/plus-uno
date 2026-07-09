@@ -10,7 +10,7 @@ import SidebarTab from './SidebarTab';
 export default {
     title: 'Specs/Universal/Elements/SidebarTab',
     component: SidebarTab,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

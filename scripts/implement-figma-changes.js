@@ -21,6 +21,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 
 import { join, resolve } from 'path';
 import https from 'https';
 import { fetchNotionPRD, findPRDByComponent, updatePRDStatus } from './create-notion-prd.js';
+import { loadSkill, loadSkillMetadata } from './lib/skill-loader.js';
 
 // Load .env locally; in CI env vars are injected directly
 try { const dotenv = await import('dotenv'); dotenv.config(); } catch { /* CI */ }
@@ -31,7 +32,7 @@ const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
 const PR_TITLE = process.env.PR_TITLE || '';
 const PR_BODY_FILE = process.env.PR_BODY_FILE;
 const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
-const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
+// CLAUDE_MODEL is loaded from scripts/prompts/uno-implement/SKILL.md frontmatter at runtime — see main()
 const COMPONENTS_DIR = resolve('design-system/src/components');
 const TOKENS_DIR = resolve('design-system/src/tokens');
 
@@ -86,9 +87,9 @@ async function figmaGet(endpoint) {
   return JSON.parse(res.data);
 }
 
-async function callClaude(messages, system) {
+async function callClaude(messages, system, model) {
   const body = JSON.stringify({
-    model: CLAUDE_MODEL,
+    model,
     max_tokens: 16000,
     system,
     messages
@@ -326,6 +327,15 @@ async function main() {
     process.exit(1);
   }
 
+  // Load skill metadata up-front so we fail fast if SKILL.md is malformed or
+  // the model_default field is missing. Single source of truth for the model.
+  const skillMeta = await loadSkillMetadata('uno-implement');
+  const claudeModel = skillMeta.model_default;
+  if (!claudeModel) {
+    console.error('❌ scripts/prompts/uno-implement/SKILL.md is missing model_default in frontmatter');
+    process.exit(1);
+  }
+
   const componentNames = parseComponentNames();
   const prBody = getPRBody();
   console.log(`🎨 Implementing changes for: ${componentNames.join(', ')}\n`);
@@ -472,59 +482,10 @@ async function main() {
       .map(([file, content]) => `### ${file}\n\`\`\`scss\n${content}\n\`\`\``)
       .join('\n\n');
 
-    const systemPrompt = [
-      'You are a senior React developer working on the PLUS design system.',
-      isNewComponent
-        ? 'Your job is to CREATE a new React component from a Figma design.'
-        : 'Your job is to update React components to match their latest Figma designs.',
-      '',
-      '## PLUS Design System Conventions',
-      '- Components use React-Bootstrap as base (e.g., RBBadge from react-bootstrap/Badge)',
-      '- Styling uses SCSS with CSS custom properties (design tokens), NOT CSS modules',
-      '- SCSS files use @use "sass:map" and SCSS mixins for theme variants',
-      '- Component class prefix: "plus-" (e.g., .plus-badge, .plus-button)',
-      '- BEM-like naming: .plus-component-element, .plus-component--modifier',
-      '- Typography uses utility classes: h1-h6, body1-txt, body2-txt, body3-txt',
-      '- Icons use Font Awesome Free only: fa-solid, fa-regular, fa-brands',
-      '',
-      '## Token Mapping Rules (CRITICAL)',
-      '- NEVER hardcode colors — use var(--color-*) tokens from _colors.scss',
-      '- NEVER hardcode spacing — use var(--size-element-*), var(--size-card-*) tokens',
-      '- NEVER hardcode border-radius — use var(--size-element-radius-*) tokens',
-      '- NEVER hardcode elevation — use var(--elevation-light-*) tokens',
-      '- NEVER hardcode font properties — use var(--font-*) tokens',
-      '- Map Figma fill colors to the CLOSEST matching token by comparing rgba values',
-      '- Map Figma spacing/padding values to the CLOSEST semantic spacing token',
-      '- Map Figma corner radius to the CLOSEST radius token',
-      '- The design token files are provided below — use ONLY tokens that exist in them',
-      '',
-      isNewComponent ? [
-        '',
-        '## New Component Scaffolding Rules',
-        '- Create these files: ComponentName.jsx, ComponentName.scss, ComponentName.stories.jsx, index.js',
-        '- The .jsx file should export a React component using React-Bootstrap as base where appropriate',
-        '- The .scss file should define all styles using design tokens (var(--color-*), var(--size-*))',
-        '- The .stories.jsx MUST have `title: "Components/ComponentName"` so it appears in Storybook sidebar under Components',
-        '- The .stories.jsx should include all Figma variants as stories with proper argTypes and controls',
-        '- The index.js file should re-export the component as default and named export',
-        '- Follow the same patterns as the reference Badge component provided below',
-      ].join('\n') : '',
-      '',
-      'Rules:',
-      '- Preserve existing component API (props, exports) unless the design clearly requires changes',
-      '- Follow existing code patterns and conventions exactly',
-      '- Update Storybook stories if the component API changes',
-      '- Do not add or remove comments unless necessary',
-      '- Return ONLY the updated file contents in the exact format specified',
-      '- If a file does not need changes, do not include it',
-      '',
-      'For each file you update, respond with:',
-      '---FILE: filename.ext---',
-      '(complete file contents)',
-      '---END FILE---',
-      '',
-      'Only include files that actually need changes.',
-    ].join('\n');
+    // System prompt loaded from scripts/prompts/uno-implement/SKILL.md (with the
+    // new-component scaffolding reference auto-appended when isNewComponent).
+    // Single source of truth for the bot's implementation behavior.
+    const systemPrompt = await loadSkill('uno-implement', { isNewComponent });
 
     const userContent = [];
 
@@ -582,10 +543,11 @@ async function main() {
       ].join('\n')
     });
 
-    console.log(`   🤖 Calling Claude (${CLAUDE_MODEL})...`);
+    console.log(`   🤖 Calling Claude (${claudeModel})...`);
     const response = await callClaude(
       [{ role: 'user', content: userContent }],
-      systemPrompt
+      systemPrompt,
+      claudeModel
     );
 
     // Parse response and write files

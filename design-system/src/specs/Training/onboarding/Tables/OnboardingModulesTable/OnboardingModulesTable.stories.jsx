@@ -14,7 +14,7 @@ import '../../Elements/CtaButtons/CtaButtons.scss';
 export default {
     title: 'Specs/Training/Onboarding/Tables/OnboardingModulesTable',
     component: OnboardingModulesTable,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
@@ -34,44 +34,6 @@ export default {
             table: { category: 'Behavior' },
         },
     },
-};
-
-/**
- * Docs
- * Documentation for OnboardingModulesTable component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>OnboardingModulesTable</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Table component for displaying onboarding modules with thumbnail, title, duration,
-                        progress status indicator (not started, in progress, completed), and action buttons.
-                        Uses a 6-column grid layout with the Module column spanning 3 columns.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>modules</strong>: Array of module objects (id, title, duration, stage, ctaState, imageUrl)</li>
-                        <li><strong>sortable</strong>: Enable sortable columns (default: true)</li>
-                        <li><strong>hover</strong>: Enable row hover effects (default: true)</li>
-                        <li><strong>onModuleClick</strong>: Callback when row is clicked</li>
-                        <li><strong>onCtaClick</strong>: Callback when CTA button is clicked</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 74-121873
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

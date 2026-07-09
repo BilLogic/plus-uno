@@ -9,6 +9,7 @@ import ResponsiveFrame from '../../../../Universal/ResponsiveFrame';
 
 export default {
     title: 'Specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage',
+    tags: ['!dev', '!autodocs'],
     component: TutorTrainingProgressPage,
     parameters: {
         layout: 'fullscreen',
@@ -85,21 +86,6 @@ Full page layout for Tutor Training Progress section.
             );
         },
     ],
-};
-
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>TutorTrainingProgressPage</h2>
-            <p className="body2-txt" style={{ marginBottom: '16px' }}>
-                Full page layout for the Training Progress section with overview cards,
-                view selector, and training details table.
-            </p>
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Figma Node: 367-146235
-            </p>
-        </div>
-    ),
 };
 
 export const Overview = {

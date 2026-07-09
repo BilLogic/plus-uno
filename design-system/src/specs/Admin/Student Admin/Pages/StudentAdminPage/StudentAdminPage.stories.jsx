@@ -37,7 +37,7 @@ const defaultNineRows = generateStudentData(9);
 export default {
     title: 'Specs/Admin/Student Admin/Pages/StudentAdminPage',
     component: StudentAdminPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -100,56 +100,6 @@ Node ID: 1006-258597
         },
     },
     args: {},
-};
-
-/**
- * Docs
- * Documentation for StudentAdminPage component
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>StudentAdminPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for the Student Admin section. Uses the PageLayout shell with
-                        TopBar and Sidebar. Contains an overview section with filters and charts,
-                        and a student details section with table and pagination. Default displays 9 rows.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Props</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>students</strong>: Array of student objects</li>
-                        <li><strong>needsData</strong>: Data for Needs Distribution chart</li>
-                        <li><strong>attendanceData</strong>: Data for Attendance chart</li>
-                        <li><strong>engagementData</strong>: Data for Engagement chart</li>
-                        <li><strong>currentPage</strong>: Current page number (default: 1)</li>
-                        <li><strong>totalPages</strong>: Total number of pages (default: 20)</li>
-                        <li><strong>totalEntries</strong>: Total entries count (default: 200)</li>
-                        <li><strong>selectedSchool</strong>: Selected school filter</li>
-                        <li><strong>modalOpen</strong>: Whether modal is open</li>
-                        <li><strong>modalVariant</strong>: Modal variant ('info' or 'sessions')</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Modal Controls</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li><strong>modalOpen</strong>: Show/hide the student modal</li>
-                        <li><strong>modalVariant</strong>: Switch between Info and Sessions tabs</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 1006-258597
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

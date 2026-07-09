@@ -1,0 +1,55 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as UpdateProfileToastStories from './UpdateProfileToast.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={UpdateProfileToastStories} />
+
+<Title />
+
+Toast prompting tutors to complete profile setup.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214381&m=dev"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Profile/Elements/UpdateProfileToast.stories.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Visible toast with primary action.</>}>
+    <Canvas of={UpdateProfileToastStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<>Shown vs hidden container state.</>}>
+    <DsCanvasQuiet of={UpdateProfileToastStories.Variants} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={UpdateProfileToastStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

@@ -10,7 +10,7 @@ import LoginPortal from './LoginPortal/LoginPortal';
 
 export default {
     title: 'Specs/Login/Cards',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

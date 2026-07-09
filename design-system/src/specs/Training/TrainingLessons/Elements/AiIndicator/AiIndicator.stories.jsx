@@ -12,7 +12,7 @@ import './AiIndicator.scss';
 export default {
     title: 'Specs/Training/TrainingLessons/Elements/AIIndicator',
     component: AIIndicator,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

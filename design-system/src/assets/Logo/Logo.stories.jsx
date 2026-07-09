@@ -4,7 +4,7 @@ import Logo from './Logo';
 export default {
     title: 'Assets/Logo',
     component: Logo,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         // Appearance Group
         style: {

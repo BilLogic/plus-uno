@@ -4,7 +4,7 @@ import Select from '@/forms/Select';
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Supervisor Selection Dropdown',
     component: Select,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },

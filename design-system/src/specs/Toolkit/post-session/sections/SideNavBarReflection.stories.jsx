@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from '../../../../components/Button';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Post-Session/Sections/Side Nav Bar Reflection',
     parameters: {
         layout: 'centered',

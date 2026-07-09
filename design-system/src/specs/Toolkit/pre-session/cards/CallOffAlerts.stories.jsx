@@ -2,6 +2,7 @@ import React from 'react';
 import Checkbox from '../../../../forms/Checkbox';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Cards/Call-off Alerts',
     parameters: {
         layout: 'padded',

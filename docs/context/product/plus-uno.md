@@ -8,8 +8,8 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 - **Design System** (`design-system/src/`) — 46 components, 61 form elements, 11 data viz, 10 composite specs, 9 token categories, 11 style files. Published internally as `@plus-ds` alias.
 - **Prototyping Workspace** (`playground/`) — 21 flat project directories for feature prototypes. Discoverable via the Marketplace at `/market`.
 - **Storybook** (`.storybook/`) — Interactive component documentation and visual testing. Deployed to Netlify.
-- **Agent Infrastructure** (`.agent/`, `AGENTS.md`) — Cross-agent routing, mode-based skills, JSON asset indexes, cheat sheets.
-- **Product Documentation** (`docs/`) — Product landscape, conventions, foundations, compound loop, plans, ideation.
+- **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
+- **Product Documentation** (`docs/`) — context (descriptive), conventions (normative), evals, knowledge, plans.
 
 ## Tech Stack
 
@@ -30,26 +30,22 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 
 ```
 plus-vibe-coding-starting-kit/
-├── AGENTS.md                  Cross-agent entry point
-├── CLAUDE.md                  @AGENTS.md pointer
+├── AGENTS.md                  The constitution (Tier 1 #1)
+├── loading-order.md           The loading contract (Tier 1 #2)
 ├── design-system/             Design system source (was packages/plus-ds/)
 │   └── src/                   Components, forms, DataViz, specs, tokens, styles
 ├── playground/                21 prototype projects (flat, project-oriented)
 ├── src/                       Vite app entry (App.jsx, main.jsx, index.css)
+├── skills/                    Six dual-face skills (SKILL.md + bot.md + references/method.md)
+├── agents/                    researchers/ · reviewers/ · writers/ · uno-bot/ (Worker)
 ├── docs/
-│   ├── context/               Three-tier context (Tier 1 + Tier 2)
-│   │   ├── product/           Product landscape, users, features, flows
-│   │   ├── design-system/     Foundations, styles, components
-│   │   └── conventions/       Coding, terminology, tech stack, integrations
-│   ├── knowledge/             Long-term memory (lessons, decisions, preferences)
-│   ├── plans/                 Implementation plans
-│   └── setup-guide.md         Onboarding
-├── .agent/
-│   ├── skills/                6 agent-agnostic skills (each owns references/)
-│   ├── handoffs/              Tier 3 bridge (gitignored, ephemeral)
-│   └── scripts/               Cross-cutting validation tools
+│   ├── context/               Descriptive — product, design-system foundation, onboarding
+│   ├── conventions/           Normative — notion, figma-workspace, slack, supabase, writing-style, automations
+│   ├── evals/                 rubrics/ + scenarios/ + runs/ (one quality loop)
+│   ├── knowledge/             Long-term memory (lessons, ADRs, changelog, archive/)
+│   └── plans/                 Dated implementation plans
 ├── .storybook/                Storybook configuration
-├── scripts/                   Token sync + generation
+├── scripts/                   Multi-consumer tooling: Actions codegen (prompts/, lib/), token sync, link guard
 └── .claude/                   Claude Code settings
 ```
 

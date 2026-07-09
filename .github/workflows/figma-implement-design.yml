@@ -144,24 +144,39 @@ jobs:
               '- [ ] FA Free icons only',
             ].filter(Boolean).join('\n');
 
-            const pr = await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `feat: prototype — ${slug}`,
-              head: branch,
-              base: 'main',
-              body,
-              draft: true,
-            });
-            console.log(`Draft PR created: #${pr.data.number}`);
-            core.setOutput('pr_url', pr.data.html_url);
+            // Don't let a PR-create failure crash the job — the prototype + branch
+            // already succeeded and were pushed. Capture the error so the notify
+            // step can report what failed (e.g. the org policy blocking Actions
+            // from creating PRs) while crediting the scaffolded code.
+            try {
+              const pr = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `feat: prototype — ${slug}`,
+                head: branch,
+                base: 'main',
+                body,
+                draft: true,
+              });
+              console.log(`Draft PR created: #${pr.data.number}`);
+              core.setOutput('pr_created', 'true');
+              core.setOutput('pr_url', pr.data.html_url);
 
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.data.number,
-              labels: ['prototype', 'playground', 'figma-sync'],
-            });
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.data.number,
+                  labels: ['prototype', 'playground', 'figma-sync'],
+                });
+              } catch (e) {
+                core.warning('Could not add labels: ' + (e.message || e));
+              }
+            } catch (err) {
+              core.setOutput('pr_created', 'false');
+              core.setOutput('pr_error', err.message || String(err));
+              core.warning('PR creation failed: ' + (err.message || err));
+            }
 
       - name: React to Slack message (result)
         if: always() && steps.payload.outputs.channel && steps.payload.outputs.message_ts
@@ -171,18 +186,23 @@ jobs:
           MESSAGE_TS: ${{ steps.payload.outputs.message_ts }}
           JOB_STATUS: ${{ job.status }}
           HAS_CHANGES: ${{ steps.commit.outputs.changes }}
+          PR_CREATED: ${{ steps.create-pr.outputs.pr_created }}
         run: |
           curl -s -X POST "https://slack.com/api/reactions.remove" \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
             -d "{\"channel\": \"$CHANNEL\", \"name\": \"gear\", \"timestamp\": \"$MESSAGE_TS\"}" || true
 
-          if [ "$JOB_STATUS" = "success" ] && [ "$HAS_CHANGES" = "true" ]; then
-            EMOJI="white_check_mark"
-          elif [ "$JOB_STATUS" = "success" ]; then
-            EMOJI="information_source"
-          else
+          # success (code + PR), warning (code but no PR), info (nothing built),
+          # or x (the run crashed before committing).
+          if [ "$JOB_STATUS" = "failure" ]; then
             EMOJI="x"
+          elif [ "$HAS_CHANGES" = "true" ] && [ "$PR_CREATED" = "true" ]; then
+            EMOJI="white_check_mark"
+          elif [ "$HAS_CHANGES" = "true" ]; then
+            EMOJI="warning"
+          else
+            EMOJI="information_source"
           fi
 
           curl -s -X POST "https://slack.com/api/reactions.add" \
@@ -191,20 +211,46 @@ jobs:
             -d "{\"channel\": \"$CHANNEL\", \"name\": \"$EMOJI\", \"timestamp\": \"$MESSAGE_TS\"}" || true
 
       - name: Notify Slack
-        if: always() && steps.payload.outputs.thread_ts
+        if: always() && steps.payload.outputs.channel
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          PR_URL: ${{ steps.create-pr.outputs.pr_url }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CHANNEL: ${{ steps.payload.outputs.channel }}
+          JOB_STATUS: ${{ job.status }}
           SLUG: ${{ steps.implement.outputs.slug }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
           HAS_CHANGES: ${{ steps.commit.outputs.changes }}
+          PR_CREATED: ${{ steps.create-pr.outputs.pr_created }}
+          PR_URL: ${{ steps.create-pr.outputs.pr_url }}
+          PR_ERROR: ${{ steps.create-pr.outputs.pr_error }}
           THREAD_TS: ${{ steps.payload.outputs.thread_ts }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          if [ "$HAS_CHANGES" = "true" ]; then
-            MSG=":white_check_mark: *Claude scaffolded the \`${SLUG}\` prototype*\n<${PR_URL}|Review the PR> · <${RUN_URL}|View action>\n\nRun it locally with \`npm run dev:${SLUG}\` and check visual parity against Figma."
+          # Report each phase honestly. Values arrive via env (not inline GHA
+          # expressions) so an error with quotes/newlines can't break the shell,
+          # and jq escapes it.
+          if [ "$JOB_STATUS" = "failure" ]; then
+            MSG=":x: *Prototype scaffold failed*\n"
+            if [ -n "$BRANCH" ]; then
+              MSG="${MSG}• :white_check_mark: Branch \`${BRANCH}\` created\n"
+            fi
+            MSG="${MSG}• :x: The run failed before the prototype was committed — most likely Figma fetch or code generation.\n<${RUN_URL}|Open the run log to see the error>"
+          elif [ "$HAS_CHANGES" = "true" ] && [ "$PR_CREATED" = "true" ]; then
+            MSG=":white_check_mark: *Scaffolded the \`${SLUG}\` prototype*\n• Branch \`${BRANCH}\` pushed\n• Files generated by Claude into \`playground/${SLUG}/\`\n• Draft PR opened: <${PR_URL}|review the PR>\n\nRun it locally with \`npm run dev:${SLUG}\` and check visual parity against Figma."
+          elif [ "$HAS_CHANGES" = "true" ]; then
+            MSG=":warning: *Scaffolded the \`${SLUG}\` prototype — but the PR could not be opened*\n• :white_check_mark: Branch \`${BRANCH}\` pushed\n• :white_check_mark: Files generated into \`playground/${SLUG}/\` (committed to the branch)\n• :x: Draft PR failed: ${PR_ERROR}\n\n_Recover: open a PR from \`${BRANCH}\` in GitHub, or fix the setting (Settings → Actions → General → \"Allow GitHub Actions to create and approve pull requests\"). <${RUN_URL}|Run log>_"
           else
-            MSG=":x: *Couldn't scaffold the prototype*\n<${RUN_URL}|View action log> for details."
+            MSG=":information_source: *Nothing to scaffold for \`${SLUG}\`*\n<${RUN_URL}|View the run log> for details."
           fi
-          curl -s -X POST "$SLACK_WEBHOOK_URL" \
-            -H 'Content-Type: application/json' \
-            -d "{\"text\": \"${MSG}\", \"thread_ts\": \"${THREAD_TS}\"}" || true
+
+          MSG="$(printf '%b' "$MSG")"
+          # Post to the thread via the bot token (chat.postMessage) — reliable and
+          # works in any channel, unlike a single-channel incoming webhook.
+          if [ -n "$THREAD_TS" ]; then
+            PAYLOAD="$(jq -n --arg channel "$CHANNEL" --arg text "$MSG" --arg thread "$THREAD_TS" '{channel: $channel, text: $text, thread_ts: $thread, mrkdwn: true}')"
+          else
+            PAYLOAD="$(jq -n --arg channel "$CHANNEL" --arg text "$MSG" '{channel: $channel, text: $text, mrkdwn: true}')"
+          fi
+          curl -s -X POST "https://slack.com/api/chat.postMessage" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$PAYLOAD" || true

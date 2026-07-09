@@ -4,7 +4,7 @@ import ResourceCard from './ResourceCard';
 export default {
     title: 'Specs/Home/Cards/ResourceCard',
     component: ResourceCard,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Overview = () => (

@@ -8,7 +8,7 @@ import React from 'react';
 
 export default {
     title: 'Specs/Admin',
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

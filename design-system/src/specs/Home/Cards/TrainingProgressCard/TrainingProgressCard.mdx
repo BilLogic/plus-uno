@@ -1,0 +1,39 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TrainingProgressCardStories from './TrainingProgressCard.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TrainingProgressCardStories} />
+
+<Title />
+
+Summary card showing overall training progress with per-competency breakdown. Available in `default` and `small` sizes; the small variant adds a per-SMART category breakdown.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-206909"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Cards/TrainingProgressCard"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default and small variants stacked, with sample SMART competency totals.</>}
+>
+    <Canvas
+        of={TrainingProgressCardStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

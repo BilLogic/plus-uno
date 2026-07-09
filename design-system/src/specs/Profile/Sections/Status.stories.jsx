@@ -55,13 +55,21 @@ import { Label } from '../../../forms/LabelAndCaption.stories';
 import Input from '../../../forms/Input';
 import Tooltip from '../../../components/Tooltip/Tooltip';
 import { SemesterAtPLUS } from '../Elements/SemesterAtPLUS.stories';
+import { ClearanceStatus } from '../Elements/ClearanceStatus.stories';
 
 export default {
     title: 'Specs/Profile/Sections/Status',
+    excludeStories: ['StatusSection'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component:
+                    'Status & Clearance read-only section on tutor profile. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['autodocs'],
 };
 
 /** Tooltip content with email link */
@@ -84,7 +92,7 @@ const InfoTooltipContent = () => (
 /**
  * Reusable Status & Clearance section component for use in pages
  */
-export const StatusSection = () => {
+export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'March 16, 2026' } = {}) => {
     return (
         <div
             style={{
@@ -274,70 +282,58 @@ export const StatusSection = () => {
             </div>
 
             {/* Clearance Status */}
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-small-gap-xs, 4px)',
-                }}
-            >
-                <Label text="Clearance Status" required={false} />
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 'var(--size-spacing-space-050, 4px)',
-                        alignItems: 'flex-start',
-                    }}
-                >
-                    <i
-                        className="fa-solid fa-circle-check"
-                        style={{
-                            fontSize: '10px',
-                            color: 'var(--color-success)',
-                            lineHeight: '20px',
-                        }}
-                    />
-                    <span
-                        className="body3-txt font-weight-light"
-                        style={{
-                            color: 'var(--color-success-text)',
-                        }}
-                    >
-                        Verified: March 16, 2026
-                    </span>
-                </div>
-            </div>
+            <ClearanceStatus status={clearanceStatus} date={clearanceDate} />
         </div>
     );
 };
 
-/**
- * All States
- * Shows the Status & Clearance section in its default state.
- */
-export const StatusStory = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* Default State */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default
-                </h6>
-                <StatusSection />
-            </div>
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <StatusSection />
+    </div>
+);
+
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <StatusSection clearanceStatus="verified" clearanceDate="March 16, 2026" />
+        <StatusSection clearanceStatus="expired" clearanceDate="Feb 16, 2026" />
+        <StatusSection clearanceStatus="in-progress" />
+    </div>
+);
+
+export const Interactive = {
+    args: {
+        clearanceStatus: 'verified',
+        clearanceDate: 'March 16, 2026',
+    },
+    argTypes: {
+        clearanceStatus: {
+            control: 'select',
+            options: ['verified', 'expired', 'in-progress'],
+            description: 'Clearance row driven by ClearanceStatus element',
+            table: { category: 'State' },
+        },
+        clearanceDate: {
+            control: 'text',
+            description: 'Date copy for verified / expired',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => (
+        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+            <StatusSection
+                clearanceStatus={args.clearanceStatus}
+                clearanceDate={
+                    args.clearanceStatus === 'in-progress' ? undefined : args.clearanceDate
+                }
+            />
         </div>
-    );
+    ),
 };

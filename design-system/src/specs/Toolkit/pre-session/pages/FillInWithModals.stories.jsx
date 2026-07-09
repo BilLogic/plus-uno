@@ -10,6 +10,7 @@ import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
 import * as FillInModals from '../modals/Session Fill-ins/SessionFillIns.stories';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Pages/Fill-In',
     parameters: {
         layout: 'padded',

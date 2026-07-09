@@ -2,6 +2,7 @@ import React from 'react';
 import Dropdown from '../../../../components/Dropdown/Dropdown';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Attendance List Items',
     component: Dropdown,
     parameters: {

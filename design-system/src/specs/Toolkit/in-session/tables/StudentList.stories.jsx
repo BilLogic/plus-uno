@@ -5,6 +5,7 @@ import { AttendanceDropdown } from '../elements/AttendanceDropdown.jsx';
 import { EngagementDropdown } from '../elements/EngagementDropdown.jsx';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Tables/Student List',
     parameters: {
         layout: 'padded',

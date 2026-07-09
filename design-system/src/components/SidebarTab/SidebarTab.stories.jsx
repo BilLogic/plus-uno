@@ -5,7 +5,7 @@ import SidebarTab from '@/components/SidebarTab';
 export default {
     title: 'Components/SidebarTab',
     component: SidebarTab,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },

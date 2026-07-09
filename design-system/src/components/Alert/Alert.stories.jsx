@@ -5,7 +5,7 @@ import Alert from './Alert';
 export default {
     title: 'Components/Alert',
     component: Alert,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

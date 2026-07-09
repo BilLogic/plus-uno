@@ -4,7 +4,7 @@ import HistogramChart from './HistogramChart';
 export default {
     title: 'Data Visualizations/Distribution/HistogramChart',
     component: HistogramChart,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

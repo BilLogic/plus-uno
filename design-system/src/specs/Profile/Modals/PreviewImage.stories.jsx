@@ -47,11 +47,17 @@ import Range from '../../../forms/Range';
 import Button from '../../../components/Button/Button';
 
 export default {
-    title: 'Specs/Profile/Modals/Preview Image',
+    title: 'Specs/Profile/Modals/PreviewImage',
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        docs: {
+            description: {
+                component:
+                    'Modal for previewing and adjusting profile photo zoom before save. Token notes are in the file header.',
+            },
+        },
     },
-    tags: ['autodocs'],
 };
 
 /** Placeholder profile image (circle with avatar illustration) */
@@ -324,76 +330,57 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
     );
 };
 
-/**
- * All States
- * Shows the Preview Image modal in all three states:
- * Default, Zoomed In, and Loading.
- */
-export const PreviewImageStory = () => {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                padding: 'var(--size-element-pad-y-lg, 12px)',
-            }}
-        >
-            {/* State 1: Default */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Default (Zoom ~49%)
-                </h6>
-                <PreviewImageModal zoomValue={49} />
-            </div>
+export const Overview = () => (
+    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <PreviewImageModal zoomValue={49} />
+    </div>
+);
 
-            {/* State 2: Zoomed In */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Zoomed In (~82%)
-                </h6>
-                <PreviewImageModal zoomValue={82} />
-            </div>
+export const Variants = () => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-xl, 32px)',
+            padding: 'var(--size-element-pad-y-lg, 12px)',
+        }}
+    >
+        <PreviewImageModal zoomValue={49} />
+        <PreviewImageModal zoomValue={82} />
+        <PreviewImageModal isLoading={true} />
+    </div>
+);
 
-            {/* State 3: Loading */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Loading
-                </h6>
-                <PreviewImageModal isLoading={true} />
+export const Interactive = {
+    args: {
+        preset: 'interactive',
+    },
+    argTypes: {
+        preset: {
+            control: 'select',
+            options: ['default', 'zoomedIn', 'loading', 'interactive'],
+            description: 'Static zoom presets vs draggable slider',
+            table: { category: 'State' },
+        },
+    },
+    render: (args) => {
+        const wrap = (child) => (
+            <div
+                key={args.preset}
+                style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}
+            >
+                {child}
             </div>
-
-            {/* Interactive */}
-            <div>
-                <h6
-                    className="h6"
-                    style={{
-                        color: 'var(--color-on-surface-variant)',
-                        marginBottom: 'var(--size-element-gap-md, 16px)',
-                    }}
-                >
-                    Interactive
-                </h6>
-                <PreviewImageModal zoomValue={49} interactive={true} />
-            </div>
-        </div>
-    );
+        );
+        switch (args.preset) {
+            case 'default':
+                return wrap(<PreviewImageModal zoomValue={49} />);
+            case 'zoomedIn':
+                return wrap(<PreviewImageModal zoomValue={82} />);
+            case 'loading':
+                return wrap(<PreviewImageModal isLoading={true} />);
+            default:
+                return wrap(<PreviewImageModal zoomValue={49} interactive={true} />);
+        }
+    },
 };

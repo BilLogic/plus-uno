@@ -1,0 +1,76 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorPerformanceSectionStories from './TutorPerformanceSection.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorPerformanceSectionStories} />
+
+<Title />
+
+Reusable performance section — Attendance and Sign-Up Rate donut metric cards wired to the admin filter bar. Used as the top half of the Tutor Performance page.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262208"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor%20Admin/Sections/TutorPerformanceSection"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={
+        <>
+            Default layout with two donut metric cards (<em>Attendance Rate</em> and{' '}
+            <em>Sign-Up Rate</em>) sitting under the admin filter bar.
+        </>
+    }
+>
+    <Canvas
+        of={TutorPerformanceSectionStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Loading state
+
+<DocsCanvasShell
+    description={<>Skeleton state when data is in flight.</>}
+>
+    <Canvas
+        of={TutorPerformanceSectionStories.Loading}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TutorPerformanceSectionStories.Interactive}
+    description={
+        <>
+            Toggle the loading state and adjust the metric values from the controls panel.
+        </>
+    }
+/>
+
+</div>
+
+</div>

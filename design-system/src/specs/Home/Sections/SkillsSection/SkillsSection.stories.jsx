@@ -4,7 +4,7 @@ import SkillsSection from './SkillsSection';
 export default {
     title: 'Specs/Home/Sections/SkillsSection',
     component: SkillsSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
 };
 
 export const Default = {};

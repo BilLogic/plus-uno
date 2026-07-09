@@ -13,7 +13,7 @@ import './OnboardingInnerPage.scss';
 export default {
     title: 'Specs/Training/Onboarding/Pages/OnboardingInnerPage',
     component: OnboardingInnerPage,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
             <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
@@ -69,46 +69,6 @@ export default {
         },
     },
     args: {},
-};
-
-/**
- * Docs
- */
-export const Docs = {
-    render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-            <h2 className="h2" style={{ marginBottom: '24px' }}>OnboardingInnerPage</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Description</h4>
-                    <p className="body2-txt">
-                        Full page layout for individual onboarding module. Contains resource description
-                        with ContentBlurb, dismissible alert card, iframe for embedded content (Google Sites),
-                        and reflection question form. Shows completion modal upon submission.
-                    </p>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Features</h4>
-                    <ul className="body2-txt" style={{ listStyle: 'disc', paddingLeft: '24px' }}>
-                        <li>TopBar with breadcrumbs (Home → Onboarding → Module Name)</li>
-                        <li>Sidebar navigation</li>
-                        <li>ContentBlurb with title, description, duration, badge, action button</li>
-                        <li>Illustration placeholder area</li>
-                        <li>Dismissible alert card reminding to complete module</li>
-                        <li>Iframe section for Google Sites content</li>
-                        <li>StrategyContentPromptModal for reflection question</li>
-                        <li>ModuleCompletionModal overlay on submission</li>
-                    </ul>
-                </section>
-                <section>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>Figma Reference</h4>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Node ID: 74-121860
-                    </p>
-                </section>
-            </div>
-        </div>
-    ),
 };
 
 /**

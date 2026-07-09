@@ -4,7 +4,7 @@ import LessonWelcomeSection from './LessonWelcomeSection';
 export default {
     title: 'Specs/Training/TrainingLessons/Sections/LessonWelcomeSection',
     component: LessonWelcomeSection,
-    tags: ['autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         docs: {

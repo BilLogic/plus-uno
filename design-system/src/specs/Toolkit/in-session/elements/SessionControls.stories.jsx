@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from '../../../../components/Button';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Session Controls',
     component: Button,
     parameters: {

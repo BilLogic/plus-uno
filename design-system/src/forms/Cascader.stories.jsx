@@ -5,7 +5,7 @@ import Cascader from './Cascader';
 export default {
     title: 'Forms/Cascader',
     component: Cascader,
-    tags: ['!dev'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
