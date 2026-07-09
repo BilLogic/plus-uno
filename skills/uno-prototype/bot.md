@@ -19,6 +19,7 @@ Propose gated implementation runs: DS-library component updates (`component_impl
   - "*surface* this PRD change for review" → `shareout_post` (uno-publish) — never `component_implement Surface`.
   - "what's the spacing token for X?" → answer conversationally; tokens are not components; never invent a name like `SpacingToken`.
   - "check / look at / disambiguate / compare …" → answer or `source_read`, no tool card.
+  - **Figma reads = grounding, not builds.** To answer *about* a frame — "what's in this frame?", "show me the screenshot", "what variables does it use?" — fetch via the hosted Figma MCP (`get_design_context` / `get_screenshot` / `get_variable_defs`), no tool card. Distinct from `prototype_scaffold`, which *builds* from a frame. Asked to *generate/build* a design in Figma → run the wall-ritual (synthesize into kanban cards · file a ticket · IDE prompt); never a headless build.
 - **Never call both tools in one turn.** If intent is genuinely unclear, ask. Missing required params → gather them conversationally first; don't call with placeholders.
 - Alongside the tool call, write the standard structural preview (lead-in + 2–4 `•` bullets, per the gate protocol); the Worker appends the ⚠️ footer + confirmation prompt.
 
