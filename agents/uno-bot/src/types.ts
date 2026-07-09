@@ -29,16 +29,14 @@ export interface Env {
   SUPABASE_ANON_KEY?: string;
   THREAD_STATE: DurableObjectNamespace;
   // --- Notion hosted-MCP (READS only) — grounding via mcp.notion.com ---------
-  // OAuth app credentials (client id is a [vars] entry; the secret is a wrangler
-  // secret). Unset → the Notion MCP stays off and the bot falls back to the REST
+  // mcp.notion.com is its own OAuth 2.1 server (PKCE + dynamic client
+  // registration) — no manual Notion OAuth app and no client secret are needed;
+  // the Worker self-registers a public client. Only the redirect URI + KV are
+  // required. Unset → the Notion MCP stays off and the bot falls back to the REST
   // notion_* read tools. Writes are NEVER exposed via MCP (they'd bypass the ✅
   // gate) — notion_create/update/archive stay as the bot's own gated tools.
-  NOTION_OAUTH_CLIENT_ID?: string;
-  NOTION_OAUTH_CLIENT_SECRET?: string;
-  // Must exactly match the redirect entered in the Notion OAuth app, e.g.
-  // https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback
+  //
+  // The registered client + issued token both live in NOTION_OAUTH_KV.
   NOTION_OAUTH_REDIRECT_URI?: string;
-  // KV namespace holding the exchanged Notion access token (+ refresh token if
-  // Notion issues a rotating one). Bound in wrangler.toml.
   NOTION_OAUTH_KV?: KVNamespace;
 }
