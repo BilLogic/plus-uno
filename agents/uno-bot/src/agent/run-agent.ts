@@ -36,6 +36,16 @@ import { BUILD } from "../version";
 
 export type { HistoryTurn };
 
+/** A base64-encoded image attached to the CURRENT user turn (Slack paste or a
+ *  rendered Figma frame). Never persisted to history — the Durable Object
+ *  stores a text marker instead (see events.ts). */
+export interface AgentImage {
+  /** One of the Anthropic-supported image media types (jpeg/png/gif/webp). */
+  media_type: string;
+  /** Raw base64 (no data: prefix). */
+  data: string;
+}
+
 export interface AgentInput {
   env: Env;
   userText: string;
@@ -43,6 +53,8 @@ export interface AgentInput {
   slack: SlackContext;
   currentSender: { userId: string };
   pending: PendingProposal | null;
+  /** Vision input for the current turn only. History turns stay plain text. */
+  images?: AgentImage[];
 }
 
 export type AgentResult =
@@ -68,18 +80,26 @@ export type AgentResult =
 // searches (e.g. blueprint_search across a multi-step flow) before the model
 // has enough to answer. If this is still exhausted, we fall back to a final
 // tools-disabled synthesis pass (below) rather than erroring out.
-const MAX_ITERATIONS = 8;
-const MAX_TOKENS = 2048;
+// dial raised 2026-07-09 — team prefers thorough over fast (user decision)
+const MAX_ITERATIONS = 16;
+// dial raised 2026-07-09 — team prefers thorough over fast (user decision):
+// users prefer complete+right over fast; Slack's hard cap is 40k chars, and
+// readability guidance (summary-first, thread the detail) still applies.
+const MAX_TOKENS = 8192;
 // Cap on individual read-only tool executions per request. Each execution costs
 // Workers subrequests (a blueprint fallback search alone is ~4 fetches), and the
 // free plan allows 50 per request — blowing it kills the request mid-flight so
-// hard that even the error post fails ("reacted :eyes: then silence"). The cap
-// keeps us far from the cliff; past it the model is told to answer with what
-// it has (and the iteration cap's tool_choice-none fallback backstops that).
-const READONLY_TOOL_BUDGET = 6;
+// hard that even the error post fails ("reacted :eyes: then silence"). Past
+// the cap the model is told to answer with what it has (and the iteration
+// cap's tool_choice-none fallback backstops that).
+// dial raised 2026-07-09 — team prefers thorough over fast (user decision).
+// NOTE: 12 sits closer to the subrequest cliff than the old 6 (worst case
+// ~4 fetches per blueprint fallback) — if "eyes then silence" recurs on
+// search-heavy turns, this is the first dial to look at.
+const READONLY_TOOL_BUDGET = 12;
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
-  const { env, userText, history, currentSender, pending } = input;
+  const { env, userText, history, currentSender, pending, images } = input;
   const client = makeAnthropicClient(env);
 
   // Notion hosted-MCP (READS ONLY). Empty until the one-time OAuth consent is
@@ -121,13 +141,43 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const startedAt = Date.now();
   let inputTokens = 0;
   let outputTokens = 0;
+  let cacheReadTokens = 0;
+  let cacheWriteTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
+  // Usage monitoring: which tools people actually exercise per request. Local
+  // tool_use + server_tool_use names in call order; MCP inline calls are a
+  // simple count (mcp:N) since their names are server-namespaced.
+  const toolNamesUsed: string[] = [];
+  let mcpCallsUsed = 0;
+  const recordToolUses = (content: Anthropic.ContentBlock[]): void => {
+    for (const block of content) {
+      const b = block as { type: string; name?: string };
+      if (b.type === "tool_use" || b.type === "server_tool_use") {
+        toolNamesUsed.push(b.name ?? "(unnamed)");
+      } else if (b.type === "mcp_tool_use") {
+        mcpCallsUsed++;
+      }
+    }
+  };
+  // Prompt-cache counters are nullable on the wire and absent from this SDK
+  // version's Usage type (0.32 predates them) — cast and guard every read.
+  const addUsage = (usage: Anthropic.Usage | undefined): void => {
+    inputTokens += usage?.input_tokens ?? 0;
+    outputTokens += usage?.output_tokens ?? 0;
+    const cache = usage as
+      | { cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null }
+      | undefined;
+    cacheReadTokens += cache?.cache_read_input_tokens ?? 0;
+    cacheWriteTokens += cache?.cache_creation_input_tokens ?? 0;
+  };
   const finish = (result: AgentResult): AgentResult => {
+    const toolsList = [...toolNamesUsed, ...(mcpCallsUsed > 0 ? [`mcp:${mcpCallsUsed}`] : [])];
     console.log(
       `[uno-bot] request done build=${BUILD} tier=${tier} model=${model} iterations=${iterations} ` +
-        `tokens_in=${inputTokens} tokens_out=${outputTokens} ms=${Date.now() - startedAt} ` +
-        `outcome=${result.kind}`,
+        `tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
+        `cache_read=${cacheReadTokens} cache_write=${cacheWriteTokens} ms=${Date.now() - startedAt} ` +
+        `tools=[${toolsList.join(",")}] outcome=${result.kind}`,
     );
     return result;
   };
@@ -137,7 +187,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     : null;
   const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender);
 
-  const messages = buildMessages(history, userText);
+  const messages = buildMessages(history, userText, images);
 
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
     const response = await client.messages.create({
@@ -150,8 +200,8 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
 
     iterations++;
-    inputTokens += response.usage?.input_tokens ?? 0;
-    outputTokens += response.usage?.output_tokens ?? 0;
+    addUsage(response.usage);
+    recordToolUses(response.content);
 
     if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
       const text = response.content
@@ -297,8 +347,8 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     ...mcpParams,
   } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
   iterations++;
-  inputTokens += finalResponse.usage?.input_tokens ?? 0;
-  outputTokens += finalResponse.usage?.output_tokens ?? 0;
+  addUsage(finalResponse.usage);
+  recordToolUses(finalResponse.content);
   const finalText = finalResponse.content
     .filter((b): b is Anthropic.TextBlock => b.type === "text")
     .map((b) => b.text)
@@ -318,8 +368,17 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
  * consecutive same-role turns, which the Anthropic API rejects — so merge
  * consecutive same-role turns and drop any leading assistant turns (the first
  * message must be from the user).
+ *
+ * Vision: when `images` are present, the CURRENT user turn is emitted as
+ * content blocks — image blocks first, then the text block — so the model can
+ * see pasted screenshots / rendered Figma frames. History turns stay plain
+ * text (base64 is never persisted; events.ts stores text markers instead).
  */
-function buildMessages(history: HistoryTurn[], userText: string): Anthropic.MessageParam[] {
+function buildMessages(
+  history: HistoryTurn[],
+  userText: string,
+  images?: AgentImage[],
+): Anthropic.MessageParam[] {
   const raw: { role: "user" | "assistant"; content: string }[] = [
     ...history.map((h) => ({ role: h.role, content: h.content })),
     { role: "user", content: userText },
@@ -334,7 +393,29 @@ function buildMessages(history: HistoryTurn[], userText: string): Anthropic.Mess
     }
   }
   while (merged.length > 0 && merged[0]!.role !== "user") merged.shift();
-  return merged as Anthropic.MessageParam[];
+  const result = merged as Anthropic.MessageParam[];
+
+  if (images && images.length > 0 && result.length > 0) {
+    // The current turn is always the last user message (merging may have
+    // folded history text into it — the images still belong to this turn).
+    const lastTurn = result[result.length - 1]!;
+    if (lastTurn.role === "user" && typeof lastTurn.content === "string") {
+      lastTurn.content = [
+        ...images.map(
+          (img): Anthropic.ImageBlockParam => ({
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: img.media_type as Anthropic.ImageBlockParam.Source["media_type"],
+              data: img.data,
+            },
+          }),
+        ),
+        { type: "text", text: lastTurn.content },
+      ];
+    }
+  }
+  return result;
 }
 
 async function executeReadOnlyTool(

@@ -24,6 +24,35 @@ export interface PreflightAsk {
   ask: string;
 }
 
+// ---- cheap, null-safe helpers (inputs are Record<string, unknown>) ----
+
+/** All string values in the payload, one level deep into arrays/objects —
+ *  enough to see summary, link, section bodies, recipients. */
+function collectStrings(input: Record<string, unknown>): string[] {
+  const out: string[] = [];
+  for (const v of Object.values(input)) {
+    if (typeof v === "string") out.push(v);
+    else if (Array.isArray(v)) {
+      for (const item of v) {
+        if (typeof item === "string") out.push(item);
+        else if (item && typeof item === "object") {
+          for (const nested of Object.values(item as Record<string, unknown>)) {
+            if (typeof nested === "string") out.push(nested);
+          }
+        }
+      }
+    } else if (v && typeof v === "object") {
+      for (const nested of Object.values(v as Record<string, unknown>)) {
+        if (typeof nested === "string") out.push(nested);
+      }
+    }
+  }
+  return out;
+}
+
+const PLACEHOLDER_RE = /\b(TBD|TODO|lorem|placeholder)\b/i;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function preflight(
   toolName: string,
   input: Record<string, unknown>,
@@ -84,6 +113,74 @@ export async function preflight(
             ":memo: That PRD is a little thin to file. Give me a clear *title* and a couple of sentences of *summary* (what it is + why), and I'll draft the card.",
         };
       }
+
+      // Placeholder scan: never file a card with TBD/TODO/lorem/placeholder in
+      // it — real content or no card.
+      const sections = Array.isArray(input.sections) ? input.sections : [];
+      const sectionStrings = sections.flatMap((s) => {
+        if (typeof s === "string") return [s];
+        if (s && typeof s === "object") {
+          return Object.values(s as Record<string, unknown>).filter(
+            (v): v is string => typeof v === "string",
+          );
+        }
+        return [];
+      });
+      const placeholderHits = [title, summary, ...sectionStrings]
+        .map((t) => t.match(PLACEHOLDER_RE)?.[0])
+        .filter((m): m is string => !!m);
+      if (placeholderHits.length > 0) {
+        const unique = [...new Set(placeholderHits.map((m) => m.toLowerCase()))];
+        return {
+          ask:
+            `:memo: This card still has placeholder content in it (${unique.map((m) => `\`${m}\``).join(", ")}). ` +
+            "Give me the real content for those spots and I'll file it — I won't create a card with placeholders.",
+        };
+      }
+
+      // PRD oversize backstop: thread drafts are for alignment — the document
+      // of record lives in Notion and is edited there / in the IDE. Fuller
+      // in-thread PRDs are welcome (iterate freely before filing); only a VERY
+      // large doc hands off to IDE-expand.
+      // dial raised 2026-07-09 — team prefers thorough over fast (user decision)
+      const sectionChars = sectionStrings.reduce((n, s) => n + s.length, 0);
+      if (surface === "prd" && (summary.length + sectionChars > 12000 || sections.length > 10)) {
+        return {
+          ask:
+            ":memo: That PRD is very large for a Slack-filed card — thread drafts are for alignment; the full document of record is edited in Notion or the IDE. " +
+            "Two options: I trim it to the essentials, file that card, and hand you a ready-to-paste IDE prompt for `skills/uno-synthesize` to expand it there — or we tighten it together first. Which do you want?",
+        };
+      }
+      return null;
+    }
+
+    case "email_send": {
+      // Sanity only — never invent addresses, never send a stub body.
+      const rawRecipients = [
+        ...(typeof input.to === "string" ? [input.to] : Array.isArray(input.to) ? input.to : []),
+        ...(typeof input.cc === "string" ? [input.cc] : Array.isArray(input.cc) ? input.cc : []),
+      ];
+      const bad = rawRecipients.filter(
+        (r) => typeof r !== "string" || !EMAIL_RE.test(r.trim()),
+      );
+      if (rawRecipients.length === 0 || bad.length > 0) {
+        const badList = bad
+          .filter((r): r is string => typeof r === "string")
+          .map((r) => `\`${r}\``)
+          .join(", ");
+        return {
+          ask:
+            `:e-mail: I can't send that yet — ${rawRecipients.length === 0 ? "there's no recipient" : `these recipients don't look like real email addresses: ${badList || "(non-string values)"}`}. ` +
+            "Give me the exact address(es) to send to — I never guess or invent one.",
+        };
+      }
+      const body = typeof input.body === "string" ? input.body.trim() : "";
+      if (body.length < 40) {
+        return {
+          ask:
+            ":e-mail: That email body is too thin to send. Write out (or dictate) the full message — a couple of real sentences minimum — and I'll stage it.",
+        };
+      }
       return null;
     }
 
@@ -96,6 +193,32 @@ export async function preflight(
           ask:
             ":mega: Before I share this out, give me one or two sentences on *what it is and what feedback you want* (a link to the prototype/frame/PRD helps too).",
         };
+      }
+
+      // Bundle check (uno-publish contract): a PROTOTYPE share-out must carry
+      // the full bundle — Loom walkthrough + live preview + decision-log links.
+      // The composing agent is told to gather these; this backstop makes it
+      // code-enforced instead of best-effort.
+      if (/prototype|playground|scaffold/i.test(summary)) {
+        const haystack = collectStrings(input).join("\n");
+        const missing: string[] = [];
+        if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) {
+          missing.push("a *Loom walkthrough* link (loom.com)");
+        }
+        if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev|vercel\.app)/i.test(haystack)) {
+          missing.push("a *live preview* link (netlify.app / workers.dev / vercel.app)");
+        }
+        if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
+          missing.push("a *decision-log / Notion* link");
+        }
+        if (missing.length > 0) {
+          return {
+            ask:
+              ":mega: A prototype share-out posts with the full bundle — this one is missing:\n" +
+              missing.map((m) => `• ${m}`).join("\n") +
+              "\nDrop those links in and I'll stage the post. (Replica creation + visual diff are IDE work — I only collect the links.)",
+          };
+        }
       }
       return null;
     }

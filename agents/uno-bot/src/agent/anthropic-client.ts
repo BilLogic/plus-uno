@@ -26,16 +26,18 @@ export function pickModel(opts: { userText: string; hasPending: boolean }): {
     return { tier: "haiku", model: MODELS.haiku };
   }
 
-  // Heavy multi-step reasoning: synthesis, PRD drafting, harness maintenance/planning.
+  // Heavy multi-step reasoning: synthesis, PRD drafting, review/critique, harness maintenance/planning.
   const heavy =
-    /\b(synthesi|summari[sz]e|draft (a )?prd|write (a )?prd|user flow|screen list|maintain|persona|refactor|plan|scope|architect)\b/.test(
+    /\b(synthesi|summari[sz]e|draft (a )?prd|write (a )?prd|user flow|screen list|maintain|persona|refactor|plan|scope|architect|review|critique|what's wrong|audit)\b/.test(
       text,
     );
   if (heavy) return { tier: "opus", model: MODELS.opus };
 
   // Simple lookups / short Q&A: marketplace search, expert lookup, status pings.
+  // (No bare "what's" here — it swallowed review asks like "what's wrong with
+  // this design?" into haiku; "what's wrong" now routes heavy above.)
   const light =
-    /\b(who (should|can) i (talk|reach)|find (an )?expert|search|show me|list|what is|what's|status|which prototype)\b/.test(
+    /\b(who (should|can) i (talk|reach)|find (an )?expert|search|show me|list|what is|status|which prototype)\b/.test(
       text,
     );
   if (light) return { tier: "haiku", model: MODELS.haiku };

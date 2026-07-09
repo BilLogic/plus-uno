@@ -64,7 +64,7 @@ export interface SenderContext {
 export interface SystemBlock {
   type: "text";
   text: string;
-  cache_control?: { type: "ephemeral" };
+  cache_control?: { type: "ephemeral"; ttl?: "5m" | "1h" };
 }
 
 async function fetchSkillFile(env: Env, path: string): Promise<string> {
@@ -168,8 +168,11 @@ export async function buildSystemBlocks(
   sender: SenderContext | null,
 ): Promise<SystemBlock[]> {
   const stable = await getStableSystem(env);
+  // 1h cache TTL on the stable block: design-team traffic gaps blow the 5-min
+  // cache TTL; 1h costs 2× on write, pays back on the first reuse within the
+  // hour. (ttl is post-SDK-0.32 — SystemBlock carries it; the API accepts it.)
   const blocks: SystemBlock[] = [
-    { type: "text", text: stable, cache_control: { type: "ephemeral" } },
+    { type: "text", text: stable, cache_control: { type: "ephemeral", ttl: "1h" } },
   ];
   if (pending) {
     blocks.push({ type: "text", text: renderPendingBlock(pending, sender) });
