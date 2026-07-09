@@ -1,5 +1,5 @@
 import type { Env } from "../types";
-import { runAgent, type AgentResult } from "../agent/run-agent";
+import { runAgent, type AgentImage, type AgentResult } from "../agent/run-agent";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -16,6 +16,16 @@ import { extractPrdFromThreadRoot } from "./notion-prd";
 import { preflight } from "../agent/preflight";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 
+/** Slack file attachment metadata as delivered on message/app_mention events.
+ *  Only the fields the vision path reads — everything else is ignored. */
+export interface SlackEventFile {
+  id?: string;
+  name?: string;
+  mimetype?: string;
+  url_private?: string;
+  size?: number;
+}
+
 export interface SlackMessageEvent {
   type: "message";
   channel: string;
@@ -25,6 +35,7 @@ export interface SlackMessageEvent {
   thread_ts?: string;
   bot_id?: string;
   subtype?: string;
+  files?: SlackEventFile[];
 }
 
 export interface SlackAppMentionEvent {
@@ -34,6 +45,7 @@ export interface SlackAppMentionEvent {
   text: string;
   ts: string;
   thread_ts?: string;
+  files?: SlackEventFile[];
 }
 
 export interface SlackReactionAddedEvent {
@@ -134,6 +146,7 @@ function appMentionToMessage(e: SlackAppMentionEvent): SlackMessageEvent {
     text: e.text,
     ts: e.ts,
     thread_ts: e.thread_ts,
+    files: e.files,
   };
 }
 
@@ -255,11 +268,16 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     return;
   }
 
+  // Vision: pasted images + a linked Figma frame become base64 image blocks on
+  // the current turn. Guarded inside — a failure degrades to text-only.
+  const vision = await collectVisionInputs(env, event, userText);
+
   let result: AgentResult;
   try {
     result = await runAgent({
       env,
-      userText,
+      userText: vision.modelText,
+      images: vision.images.length > 0 ? vision.images : undefined,
       history,
       slack: {
         channel,
@@ -281,7 +299,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   // ----- text-only response -----
   if (result.kind === "text") {
     const delivery = await postTextVerified(env, channel, threadTs, result.text);
-    await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
       await appendHistory(env, channel, threadTs, { role: "assistant", content: delivery.text });
@@ -299,7 +317,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     await resolveProposal(env, result.pending, result.decision, result.messageToUser);
     const finalText = result.messageToUser
       ?? (result.decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-    await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
     await appendHistory(env, channel, threadTs, { role: "assistant", content: finalText });
     return;
   }
@@ -321,7 +339,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   const gate = await preflight(result.toolName, result.input, { env, prd, implementPrdUrl });
   if (gate) {
     await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
-    await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
     await appendHistory(env, channel, threadTs, { role: "assistant", content: gate.ask });
     return;
   }
@@ -342,7 +360,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
       `:hourglass: That exact *${proposalVerb(result.toolName)}* proposal is already waiting on you — ` +
       `react :white_check_mark: / :x: on it, or say "go ahead" / "cancel". I won't post a duplicate card.`;
     await postMessage(env, { channel, thread_ts: threadTs, text: remind });
-    await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
     await appendHistory(env, channel, threadTs, { role: "assistant", content: remind });
     return;
   }
@@ -361,7 +379,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
         `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await postMessage(env, { channel, thread_ts: threadTs, text: ask });
-      await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+      await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
       await appendHistory(env, channel, threadTs, { role: "assistant", content: ask });
       return;
     }
@@ -422,6 +440,145 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
 
 function stripBotMentions(text: string): string {
   return text.replace(/<@[A-Z0-9]+>/g, "").trim();
+}
+
+// ---------------------------------------------------------------------------
+// Vision input (2026-07-09): Slack-pasted images + Figma frame screenshots are
+// attached to the CURRENT user turn as base64 image blocks so the model can
+// actually see them. Everything here is best-effort — any failure degrades to
+// text-only and must never break the reply. Base64 is NEVER persisted to the
+// Durable Object history; `historyText` carries text markers instead.
+// ---------------------------------------------------------------------------
+
+const MAX_IMAGE_ATTACHMENTS = 3;
+const MAX_IMAGE_BYTES = Math.floor(3.5 * 1024 * 1024); // Anthropic per-image limit is ~5MB; stay well under
+const IMAGE_FETCH_TIMEOUT_MS = 10_000;
+// The Anthropic API only accepts these four image media types — anything else
+// (svg, tiff, heic…) would 400 the whole request, so it's skipped like oversize.
+const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
+
+interface VisionInputs {
+  /** Base64 image blocks for the current turn (Slack files first, then the Figma frame). */
+  images: AgentImage[];
+  /** userText + model-visible notes (omitted files, figma fetch failure). */
+  modelText: string;
+  /** userText + plain-text markers for the stored history (no base64 ever). */
+  historyText: string;
+}
+
+async function collectVisionInputs(
+  env: Env,
+  event: SlackMessageEvent,
+  userText: string,
+): Promise<VisionInputs> {
+  const images: AgentImage[] = [];
+  const modelNotes: string[] = [];
+  const historyMarkers: string[] = [];
+
+  try {
+    // 1) Slack-pasted images: up to MAX_IMAGE_ATTACHMENTS supported image files.
+    const files = Array.isArray(event.files) ? event.files : [];
+    const imageFiles = files.filter(
+      (f) => typeof f?.mimetype === "string" && f.mimetype.startsWith("image/") && !!f.url_private,
+    );
+    let omitted = 0;
+    for (const f of imageFiles) {
+      if (
+        images.length >= MAX_IMAGE_ATTACHMENTS ||
+        !SUPPORTED_IMAGE_TYPES.has(f.mimetype!) ||
+        (typeof f.size === "number" && f.size > MAX_IMAGE_BYTES)
+      ) {
+        omitted++;
+        continue;
+      }
+      const bytes = await fetchBytes(f.url_private!, {
+        Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+      });
+      if (!bytes || bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) {
+        omitted++;
+        continue;
+      }
+      images.push({ media_type: f.mimetype!, data: bytesToBase64(bytes) });
+      historyMarkers.push(`[user attached image: ${f.name ?? "unnamed"}]`);
+    }
+    if (omitted > 0) {
+      modelNotes.push(`[${omitted} more image(s) omitted — too large or unsupported format]`);
+    }
+
+    // 2) Figma frame screenshot: first figma.com URL with a node-id in the text
+    // (cap: 1 frame per message). Reuses the same image-render endpoint the
+    // proposal cards use, then downloads the short-lived signed PNG.
+    const figmaParts = findFigmaFrameUrl(userText);
+    if (figmaParts) {
+      let attached = false;
+      const pngUrl = await fetchFigmaImagePngUrl(env, figmaParts.fileKey, figmaParts.nodeId, 1);
+      if (pngUrl) {
+        const png = await fetchBytes(pngUrl);
+        if (png && png.byteLength > 0 && png.byteLength <= MAX_IMAGE_BYTES) {
+          images.push({ media_type: "image/png", data: bytesToBase64(png) });
+          historyMarkers.push("[figma frame screenshot attached]");
+          attached = true;
+        }
+      }
+      if (!attached) modelNotes.push("[figma screenshot unavailable]");
+    }
+  } catch (err) {
+    // Vision is additive — never let it break the reply. Keep whatever was
+    // collected before the failure and continue text-first.
+    console.warn(
+      `[vision] collection failed, degrading: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
+  return {
+    images,
+    modelText: [userText, ...modelNotes].join("\n"),
+    historyText: [userText, ...historyMarkers].join("\n"),
+  };
+}
+
+/** First figma.com URL in the message that carries a node-id (Slack wraps links
+ *  as `<url>` or `<url|label>` — strip that before parsing). */
+function findFigmaFrameUrl(text: string): ReturnType<typeof parseFigmaUrl> {
+  const matches = text.match(/https?:\/\/[^\s<>|]+/g) ?? [];
+  for (const candidate of matches) {
+    const parts = parseFigmaUrl(candidate);
+    if (parts) return parts;
+  }
+  return null;
+}
+
+/** Timeout-guarded byte fetch; null on any failure. Slack serves an HTML login
+ *  page with a 200 when the token can't read the file — treat that as failure. */
+async function fetchBytes(
+  url: string,
+  headers?: Record<string, string>,
+): Promise<ArrayBuffer | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), IMAGE_FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { headers, signal: controller.signal });
+    if (!res.ok) return null;
+    const contentType = res.headers.get("content-type") ?? "";
+    if (contentType.includes("text/html")) return null;
+    return await res.arrayBuffer();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** ArrayBuffer -> base64, chunked so String.fromCharCode never overflows the
+ *  argument limit on multi-MB images. */
+function bytesToBase64(buf: ArrayBuffer): string {
+  const bytes = new Uint8Array(buf);
+  const CHUNK = 0x8000;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(binary);
 }
 
 // Key-order-independent JSON compare, so two generations of the same tool input

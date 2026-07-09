@@ -35,7 +35,8 @@ interface EventRecord {
   seenAt: number;
 }
 
-const MAX_HISTORY_TURNS = 20;
+// dial raised 2026-07-09 — team prefers thorough over fast (user decision)
+const MAX_HISTORY_TURNS = 50;
 const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;        // 7 days
 const PROPOSAL_TTL_MS = 15 * 60 * 1000;                // 15 min
 const EVENT_DEDUP_TTL_MS = 10 * 60 * 1000;             // 10 min — covers Slack's retry window

@@ -138,15 +138,17 @@ export async function preflight(
         };
       }
 
-      // PRD oversize: in-thread PRDs are compact by design (thread drafts are
-      // for alignment, not the document of record). A full multi-section PRD
-      // belongs in the IDE via skills/uno-synthesize.
+      // PRD oversize backstop: thread drafts are for alignment — the document
+      // of record lives in Notion and is edited there / in the IDE. Fuller
+      // in-thread PRDs are welcome (iterate freely before filing); only a VERY
+      // large doc hands off to IDE-expand.
+      // dial raised 2026-07-09 — team prefers thorough over fast (user decision)
       const sectionChars = sectionStrings.reduce((n, s) => n + s.length, 0);
-      if (surface === "prd" && (summary.length + sectionChars > 6000 || sections.length > 6)) {
+      if (surface === "prd" && (summary.length + sectionChars > 12000 || sections.length > 10)) {
         return {
           ask:
-            ":memo: That PRD is bigger than what I file from Slack — I draft *compact* cards here (title, summary, ≤4 short sections); a full multi-section PRD won't fit a Slack reply, and that's intentional. " +
-            "Two options: tighten the scope and I'll file the compact card now, or I file the compact card and hand you a ready-to-paste IDE prompt for `skills/uno-synthesize` to expand it there. Which do you want?",
+            ":memo: That PRD is very large for a Slack-filed card — thread drafts are for alignment; the full document of record is edited in Notion or the IDE. " +
+            "Two options: I trim it to the essentials, file that card, and hand you a ready-to-paste IDE prompt for `skills/uno-synthesize` to expand it there — or we tighten it together first. Which do you want?",
         };
       }
       return null;
