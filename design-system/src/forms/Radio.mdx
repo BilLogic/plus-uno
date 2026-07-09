@@ -3,6 +3,20 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as RadioStories from './Radio.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "form-radio-button",
+      "name": "Form Radio Button",
+      "componentSetNodeId": "42:5858",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={RadioStories} />
 
 <Title />
@@ -12,6 +26,8 @@ Use radio when a user needs to select one option from a list.
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

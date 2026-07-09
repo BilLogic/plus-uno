@@ -3,6 +3,20 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as InputStories from './Input.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "input",
+      "name": "Input",
+      "componentSetNodeId": "39:4802",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={InputStories} />
 
 <Title />
@@ -11,6 +25,8 @@ The labeled text input box allows users to enter textual inputs and receive vali
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

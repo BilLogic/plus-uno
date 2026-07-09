@@ -1,0 +1,102 @@
+{
+  "version": "1.0.0",
+  "generated": true,
+  "generatedBy": "scripts/generate-token-registry.mjs",
+  "note": "DO NOT EDIT BY HAND. Source of truth is design-system/docs/foundations/token-mapping.md; every token is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.",
+  "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "syncCommand": "npm run sync:tokens && npm run generate:tokens",
+  "codeTokenRoot": "design-system/src/tokens/",
+  "humanReference": "design-system/docs/foundations/token-mapping.md",
+  "mappings": {
+    "colors": {
+      "Primary / Primary 500": "var(--color-primary)",
+      "Primary Container": "var(--color-primary-container)",
+      "On Primary": "var(--color-on-primary)",
+      "Secondary": "var(--color-secondary)",
+      "Danger / Error": "var(--color-danger)",
+      "Success": "var(--color-success)",
+      "Warning": "var(--color-warning)",
+      "Info": "var(--color-info)",
+      "Surface": "var(--color-surface)",
+      "On Surface": "var(--color-on-surface)",
+      "On Surface Variant": "var(--color-on-surface-variant)",
+      "Outline": "var(--color-outline)",
+      "Outline Variant": "var(--color-outline-variant)",
+      "Mastering Content": "var(--color-mastering-content)",
+      "Relationship": "var(--color-relationship)",
+      "Social Emotional": "var(--color-social-emotional)",
+      "Advocacy": "var(--color-advocacy)",
+      "Technology Tools": "var(--color-technology-tools)"
+    },
+    "typography": {
+      "Display 1": [
+        "var(--font-size-display1)",
+        "var(--font-weight-display)",
+        "var(--font-line-height-display1)"
+      ],
+      "Display 2": [
+        "var(--font-size-display2)"
+      ],
+      "Display 3": [
+        "var(--font-size-display3)"
+      ],
+      "Display 4": [
+        "var(--font-size-display4)"
+      ],
+      "Headline (H1–H3)": [
+        "var(--font-size-h1)",
+        "var(--font-weight-headline)",
+        "var(--font-family-headline)"
+      ],
+      "Title": [
+        "var(--font-weight-title)",
+        "var(--font-weight-semibold-2)"
+      ],
+      "H1–H6": [
+        "var(--font-size-h1)",
+        "var(--font-size-h6)"
+      ],
+      "Body 1": [
+        "var(--font-size-body1)",
+        "var(--font-weight-body1-regular)"
+      ],
+      "Body 2": [
+        "var(--font-size-body2)"
+      ],
+      "Body 3": [
+        "var(--font-size-body3)"
+      ],
+      "Code": [
+        "var(--font-size-code)",
+        "var(--font-family-code)"
+      ]
+    },
+    "spacing": {
+      "Card padding": "var(--size-card-pad-{x|y}-{sm|md|lg})",
+      "Card gap": "var(--size-card-gap-{sm|md|lg})",
+      "Card radius": "var(--size-card-radius-{sm|md|full})",
+      "Element padding": "var(--size-element-pad-{x|y}-{sm|md|lg})",
+      "Element gap": "var(--size-element-gap-{xs|sm|md|lg})",
+      "Element radius": "var(--size-element-radius-{sm|md|lg|full})",
+      "Modal padding": "var(--size-modal-pad-{x|y}-{sm|md|lg})",
+      "Section padding": "var(--size-section-pad-{x|y}-{sm|md|lg})",
+      "Surface padding": "var(--size-surface-pad-{x|y})",
+      "Table cell": "var(--size-table-cell-{x|y|gap})"
+    },
+    "elevation": {
+      "Elevation Light/1 (subtle)": "var(--elevation-light-1)",
+      "Elevation Light/2 (cards, dropdowns)": "var(--elevation-light-2)",
+      "Elevation Light/3 (popovers, toasts)": "var(--elevation-light-3)",
+      "Elevation Light/4 (modals)": "var(--elevation-light-4)",
+      "Elevation Light/5 (dialogs)": "var(--elevation-light-5)"
+    }
+  },
+  "validation": {
+    "scssTokenCount": 446,
+    "unknownTokens": []
+  },
+  "notes": [
+    "Spacing is contextual: pick the layer-appropriate token family; there is no single Spacing/N token.",
+    "unknownTokens MUST be empty. A non-empty list means the .md references a token absent from SCSS."
+  ]
+}

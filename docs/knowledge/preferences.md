@@ -27,10 +27,10 @@ tags: [conventions, taste]
 - Prototype listings use 4-digit IDs (1001+) for clean URLs and zero naming collisions
 - Slug-based routing causes collisions when multiple contributors name things similarly
 
-## Cheat sheet is law (mandatory before UI code)
-- Before writing any React component from `@plus-ds` or applying any CSS token, read `docs/context/design-system/components/cheat-sheet.md`
-- If it is not in the cheat sheet, it does not exist
-- For page layouts, also read `docs/context/design-system/components/layout-cheat-sheet.md`
+## DS knowledge is law (mandatory before UI code)
+- Start at `design-system/docs/discovery.md`, then load only required docs (e.g. `components/index.md`, `foundations/tokens.md`)
+- If a component is not listed, it does not exist
+- For page layouts, load `design-system/docs/patterns/layout.md`
 
 ## Bootstrap-first (no Material UI, Ant Design, Tailwind)
 - PLUS design system is built on React-Bootstrap / Bootstrap 5.3

@@ -4,6 +4,20 @@ import * as AlertStories from './Alert.stories.jsx';
 import * as AlertSubStories from './Alert.Subcomponents.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "alert",
+      "name": "alert",
+      "componentSetNodeId": "11:324",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={AlertStories} />
 
 <Title />
@@ -12,6 +26,8 @@ Provide contextual feedback messages for typical user actions with the handful o
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Alert"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

@@ -3,6 +3,20 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as RichTextEditorStories from './RichTextEditor.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "rich-text-editor",
+      "name": "Rich Text Editor",
+      "componentSetNodeId": "10010:37927",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={RichTextEditorStories} />
 
 <Title />
@@ -10,6 +24,8 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/RichTextEditor"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

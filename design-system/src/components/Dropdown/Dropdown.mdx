@@ -3,6 +3,36 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as DropdownStories from './Dropdown.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "dropdown-button",
+      "name": "Dropdown button",
+      "componentSetNodeId": "37:4513",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513",
+      "source": "node-chart",
+      "status": "verified"
+    },
+    {
+      "id": "dropdown-list",
+      "name": "Dropdown List",
+      "componentSetNodeId": "9109:14766",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766",
+      "source": "node-chart",
+      "status": "verified"
+    },
+    {
+      "id": "dropdown",
+      "name": "Dropdown",
+      "componentSetNodeId": "4457:25458",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4457-25458",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={DropdownStories} />
 
 <Title />
@@ -11,6 +41,8 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Dropdown"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

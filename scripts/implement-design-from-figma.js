@@ -49,6 +49,7 @@ const PLAYGROUND_DIR = resolve('playground');
 const ROOT_PACKAGE_JSON = resolve('package.json');
 const TOKENS_DIR = resolve('design-system/src/tokens');
 const DOCS_DIR = resolve('docs/context/design-system/components');
+const KNOWLEDGE_LAYOUT = resolve('design-system/docs/patterns/layout.md');
 const REFERENCE_SLUG = 'home-redesign';
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,40}$/;
@@ -248,6 +249,15 @@ function readDocCapped(name) {
   return content;
 }
 
+function readRepoFileCapped(fp) {
+  if (!existsSync(fp)) return '';
+  let content = readFileSync(fp, 'utf8');
+  if (content.length > MAX_DOC_BYTES) {
+    content = content.slice(0, MAX_DOC_BYTES) + '\n\n…(truncated — read the full file in the repo)';
+  }
+  return content;
+}
+
 // ─── Output-block parsing + writing ──────────────────────────────────────────
 
 function normalizeRelPath(raw, slug) {
@@ -423,7 +433,7 @@ async function main() {
   const referenceScaffold = readReferenceScaffold();
   const tokenContext = readTokenFiles();
   const componentInventory = readDocCapped('inventory.md');
-  const layoutCheatSheet = readDocCapped('layout-cheat-sheet.md');
+  const layoutCheatSheet = readRepoFileCapped(KNOWLEDGE_LAYOUT);
   const prdContext = await loadPrdContext();
 
   const systemPrompt = await loadSkill('uno-implement-design');

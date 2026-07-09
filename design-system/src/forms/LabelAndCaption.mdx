@@ -3,6 +3,28 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
 import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "label",
+      "name": "Label",
+      "componentSetNodeId": "14851:17069",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069",
+      "source": "node-chart",
+      "status": "verified"
+    },
+    {
+      "id": "form-caption",
+      "name": "_Form Caption",
+      "componentSetNodeId": "13726:9599",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={LabelAndCaptionStories} />
 
 <Title />
@@ -10,6 +32,8 @@ import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

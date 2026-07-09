@@ -3,6 +3,28 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as TimePickerStories from './DateAndTimePicker.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "month-date-picker",
+      "name": "Month (Date Picker)",
+      "componentSetNodeId": "13574:1150",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
+      "source": "node-chart",
+      "status": "verified"
+    },
+    {
+      "id": "time-date-picker",
+      "name": "Time (Date Picker)",
+      "componentSetNodeId": "16560:4508",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
 <Meta of={TimePickerStories} />
 
 <Title />
@@ -11,6 +33,8 @@ Date and time pickers let people select a date or range of dates and/or a time f
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 

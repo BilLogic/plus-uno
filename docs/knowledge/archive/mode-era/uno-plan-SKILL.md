@@ -37,8 +37,10 @@ Load on-demand based on the planning scope:
 |---------|------|
 | Any plan | `docs/context/conventions/tech-stack.md` |
 | Layout/page planning | `docs/context/design-system/foundations/*` |
-| Component selection | `docs/context/design-system/components/inventory.md` |
-| Token selection | `docs/context/design-system/foundations/tokens.md` → `styles/` |
+| Comparing UI alternatives (3–5 options) | `references/iteration-options.md` |
+| Component selection | `design-system/docs/discovery.md` → `components/index.md` |
+| Token selection | `design-system/agent-views/foundations/tokens.md` |
+| Figma input or component mapping | `design-system/figma/component-registry.json`, `design-system/figma/token-registry.json` (MANDATORY); `../uno-prototype/references/figma-registry-mandatory-load.md` |
 | Research handoff exists | `.agent/handoffs/briefs/{relevant-brief}.md` |
 
 Stay within ~4K tokens of Tier 2 context. Load foundations first, then specifics.

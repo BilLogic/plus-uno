@@ -48,7 +48,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 | Assigned dev-server port | Computed by the orchestration (next free `30xx`), passed in the user message | Provided |
 | Figma design context: screenshot (multimodal), node design properties JSON | Figma REST API, fetched by the orchestration | Provided |
 | Reference scaffold: every file in `playground/home-redesign/` | Read by the orchestration, passed in the user message | Provided |
-| PLUS token files + component inventory + layout cheat-sheet | Repo, passed in the user message | Provided |
+| PLUS token files + component inventory + layout pattern | Repo, passed in the user message | Provided |
 
 ## Output Target
 
@@ -88,7 +88,7 @@ Follow these in every file (full rules in the shared `AGENTS.md`):
 - Styling is **SCSS with CSS custom properties (design tokens)** — never CSS modules, never Tailwind/MUI/Ant
 - Component class prefix is **`plus-`**; BEM-like `.plus-block__element`, `.plus-block--modifier`
 - Icons are **Font Awesome Free only**: `fa-solid`, `fa-regular`, `fa-brands` — never `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`
-- For full pages, use the official layout formulas (`<PageLayout>`, `<Card>`, `<Modal>`) — read `docs/context/design-system/components/layout-cheat-sheet.md`
+- For full pages, use the official layout formulas (`<PageLayout>`, `<Card>`, `<Modal>`) — read `design-system/docs/patterns/layout.md`
 - Never deep-import from `design-system/src/` — use the `@` barrel aliases
 
 ## Token Mapping Rules (CRITICAL)
@@ -121,8 +121,9 @@ The token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.scss`, 
 
 ## References (Load on Every Invocation)
 
-- `docs/context/design-system/components/inventory.md` — the component catalog: purpose, props API, and usage for every component (MANDATORY — if a component isn't here, it doesn't exist)
-- `docs/context/design-system/components/layout-cheat-sheet.md` — page layout formulas (MANDATORY for page-level frames)
+- `docs/context/design-system/components/inventory.md` — component catalog (MANDATORY)
+- `design-system/docs/patterns/layout.md` — page layout formulas (MANDATORY for page-level frames)
+- `design-system/docs/discovery.md` — route to component/token lists before coding
 - `docs/conventions/coding.md` — file naming, imports, token usage
 - `docs/conventions/terminology.md` — Plus vocabulary
 - `playground/home-redesign/` — the reference scaffold (structure to mirror)

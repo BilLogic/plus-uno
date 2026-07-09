@@ -1,0 +1,1528 @@
+{
+  "version": "1.0.0",
+  "generated": true,
+  "generatedBy": "scripts/generate-component-registry-from-storybook.js",
+  "note": "DO NOT EDIT BY HAND. Source of truth is each component MDX `export const figmaMeta`. Run `npm run generate:component-registry` to regenerate.",
+  "figmaFile": {
+    "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+    "name": "Design System - BS4 Foundation Component Library",
+    "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
+  },
+  "components": {
+    "Accordion": {
+      "code": {
+        "import": "@/components/Accordion",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Accordion/Accordion.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Accordion"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "accordion",
+            "name": "accordion",
+            "componentSetNodeId": "13667:6004",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13667-6004",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+      }
+    },
+    "Alert": {
+      "code": {
+        "import": "@/components/Alert",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Alert/Alert.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Alert"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "alert",
+            "name": "alert",
+            "componentSetNodeId": "11:324",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
+      }
+    },
+    "Badge": {
+      "code": {
+        "import": "@/components/Badge",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Badge/Badge.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Badge",
+        "props": {
+          "style": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "tertiary",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "social-emotional",
+              "mastering-content",
+              "advocacy",
+              "relationship",
+              "technology-tools"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "h1",
+              "h2",
+              "h3",
+              "h4",
+              "h5",
+              "h6",
+              "b1",
+              "b2",
+              "b3"
+            ]
+          },
+          "dismissible": {
+            "type": "boolean"
+          },
+          "counter": {
+            "type": "string|number"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "storybook-resources",
+            "name": "Badge docs page (MDX link)",
+            "componentSetNodeId": "3497:19481",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481",
+            "source": "storybook-mdx",
+            "status": "docs-page",
+            "notes": "Verified 2026-06-13: Badge documentation overview — not a single component set."
+          },
+          {
+            "id": "static-badges",
+            "name": "Static Badges",
+            "componentSetNodeId": "25:568",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=25-568",
+            "codeDefaults": {
+              "dismissible": false
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13"
+          },
+          {
+            "id": "dismissible-badges",
+            "name": "Dismissible Badges",
+            "componentSetNodeId": "1056:32356",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356",
+            "codeDefaults": {
+              "dismissible": true
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13"
+          },
+          {
+            "id": "counter-badges",
+            "name": "Counter",
+            "componentSetNodeId": "3998:68735",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3998-68735",
+            "codeDefaults": {
+              "dismissible": false
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13",
+            "notes": "Maps to Badge with counter prop set. variantProps TBD — add from Figma variant inspection."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481"
+      }
+    },
+    "Breadcrumb": {
+      "code": {
+        "import": "@/components/Breadcrumb",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Breadcrumb/Breadcrumb.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Breadcrumb"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "breadcrumb",
+            "name": "Breadcrumb",
+            "componentSetNodeId": "27:618",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=27-618",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484"
+      }
+    },
+    "Button": {
+      "code": {
+        "import": "@/components/Button",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Button/Button.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Button",
+        "props": {
+          "style": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "tertiary",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "default",
+              "social-emotional",
+              "mastering-content",
+              "advocacy",
+              "relationship",
+              "technology-tools"
+            ]
+          },
+          "fill": {
+            "type": "enum",
+            "values": [
+              "filled",
+              "tonal",
+              "outline",
+              "ghost",
+              "text"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "storybook-resources",
+            "name": "Buttons docs page (MDX link)",
+            "componentSetNodeId": "3497:19482",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
+            "source": "storybook-mdx",
+            "status": "docs-page",
+            "notes": "Verified 2026-06-13: opens Buttons overview with all component sets — not a single component set. Use fill-specific sets below for write-back."
+          },
+          {
+            "id": "filled-buttons",
+            "name": "Filled buttons",
+            "componentSetNodeId": "33:2470",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=33-2470",
+            "codeDefaults": {
+              "fill": "filled"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
+              "state": {
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
+              }
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13"
+          },
+          {
+            "id": "tonal-buttons",
+            "name": "Tonal buttons",
+            "componentSetNodeId": "979:20977",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-20977",
+            "codeDefaults": {
+              "fill": "tonal"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
+              "state": {
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
+              }
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13"
+          },
+          {
+            "id": "outlined-buttons",
+            "name": "Outlined buttons",
+            "componentSetNodeId": "968:18597",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=968-18597",
+            "codeDefaults": {
+              "fill": "outline"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
+              "state": {
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
+              }
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13"
+          },
+          {
+            "id": "text-buttons",
+            "name": "Text buttons",
+            "componentSetNodeId": "979:19814",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-19814",
+            "codeDefaults": {
+              "fill": "text"
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
+              "state": {
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
+              }
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13"
+          },
+          {
+            "id": "vertical-outlined-buttons",
+            "name": "Vertical outlined buttons",
+            "componentSetNodeId": "7204:9586",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-9586",
+            "codeDefaults": {
+              "fill": "outline",
+              "vertical": true
+            },
+            "variantProps": {
+              "size": "size",
+              "style": "style",
+              "state": "state"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              },
+              "state": {
+                "rest (default)": {
+                  "disabled": false,
+                  "active": false
+                },
+                "hover": {
+                  "disabled": false,
+                  "active": false
+                },
+                "pressed": {
+                  "disabled": false,
+                  "active": true
+                },
+                "focus": {
+                  "disabled": false,
+                  "active": false
+                },
+                "disabled": {
+                  "disabled": true,
+                  "active": false
+                }
+              }
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13",
+            "notes": "Maps to Button with fill=outline and vertical=true."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+      }
+    },
+    "ButtonGroup": {
+      "code": {
+        "import": "@/components/ButtonGroup",
+        "export": "default",
+        "mdxPath": "design-system/src/components/ButtonGroup/ButtonGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/ButtonGroup"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "button-group",
+            "name": "Button Group",
+            "componentSetNodeId": "34:5212",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-5212",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
+      }
+    },
+    "Card": {
+      "code": {
+        "import": "@/components/Card",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Card/Card.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Card"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "card",
+            "name": "Card",
+            "componentSetNodeId": "4241:27817",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "overview-card",
+            "name": "Overview Card",
+            "componentSetNodeId": "12785:189314",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=12785-189314",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19497"
+      }
+    },
+    "Carousel": {
+      "code": {
+        "import": "@/components/Carousel",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Carousel/Carousel.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Carousel"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "carousel",
+            "name": "Carousel",
+            "componentSetNodeId": "34:8261",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-8261",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498"
+      }
+    },
+    "Cascader": {
+      "code": {
+        "import": "@/forms/Cascader",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Cascader.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "cascade-list",
+            "name": "Cascade list",
+            "componentSetNodeId": "13584:55731",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13584-55731",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-5947"
+      }
+    },
+    "Checkbox": {
+      "code": {
+        "import": "@/forms/Checkbox",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Checkbox.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "form-checkbox",
+            "name": "Form Checkbox",
+            "componentSetNodeId": "42:5857",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5857",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
+      }
+    },
+    "ChoiceGrid": {
+      "code": {
+        "import": "@/forms/ChoiceGrid",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/ChoiceGrid.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "multiple-choice-grid",
+            "name": "Multiple Choice Grid",
+            "componentSetNodeId": "13541:9229",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "checkbox-grid",
+            "name": "CheckBox Grid",
+            "componentSetNodeId": "13541:9240",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9240",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
+      }
+    },
+    "Collapse": {
+      "code": {
+        "import": "@/components/Collapse",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Collapse/Collapse.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Collapse"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "collapse",
+            "name": "Collapse",
+            "componentSetNodeId": "59:16038",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=59-16038",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
+      }
+    },
+    "DateAndTimePicker": {
+      "code": {
+        "import": "@/forms/DateAndTimePicker",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/DateAndTimePicker.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "month-date-picker",
+            "name": "Month (Date Picker)",
+            "componentSetNodeId": "13574:1150",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "time-date-picker",
+            "name": "Time (Date Picker)",
+            "componentSetNodeId": "16560:4508",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
+      }
+    },
+    "DatePicker": {
+      "code": {
+        "import": "@/forms/DatePicker",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/DatePicker/DatePicker.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms/DatePicker"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "date-picker-single-date",
+            "name": "Date Picker (Single Date)",
+            "componentSetNodeId": "9413:1764",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1764",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "date-picker-range",
+            "name": "Date Picker (Range)",
+            "componentSetNodeId": "9538:17087",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9538-17087",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
+      }
+    },
+    "Divider": {
+      "code": {
+        "import": "@/components/Divider",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Divider/Divider.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Divider"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "divider",
+            "name": "Divider",
+            "componentSetNodeId": "10:174",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-174",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871"
+      }
+    },
+    "Dropdown": {
+      "code": {
+        "import": "@/components/Dropdown",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Dropdown/Dropdown.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Dropdown"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "dropdown-button",
+            "name": "Dropdown button",
+            "componentSetNodeId": "37:4513",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "dropdown-list",
+            "name": "Dropdown List",
+            "componentSetNodeId": "9109:14766",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "dropdown",
+            "name": "Dropdown",
+            "componentSetNodeId": "4457:25458",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4457-25458",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
+      }
+    },
+    "FileUpload": {
+      "code": {
+        "import": "@/forms/FileUpload",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/FileUpload.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "file-upload",
+            "name": "File Upload",
+            "componentSetNodeId": "13696:8299",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
+      }
+    },
+    "Input": {
+      "code": {
+        "import": "@/forms/Input",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Input.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "input",
+            "name": "Input",
+            "componentSetNodeId": "39:4802",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
+      }
+    },
+    "InputGroup": {
+      "code": {
+        "import": "@/forms/InputGroup",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/InputGroup/InputGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms/InputGroup"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "input-group",
+            "name": "Input Group",
+            "componentSetNodeId": "13671:3218",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
+      }
+    },
+    "Jumbotron": {
+      "code": {
+        "import": "@/components/Jumbotron",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Jumbotron/Jumbotron.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Jumbotron"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "jumbotron",
+            "name": "Jumbotron",
+            "componentSetNodeId": "42:5949",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5949",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500"
+      }
+    },
+    "LabelAndCaption": {
+      "code": {
+        "import": "@/forms/LabelAndCaption",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/LabelAndCaption.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "label",
+            "name": "Label",
+            "componentSetNodeId": "14851:17069",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "form-caption",
+            "name": "_Form Caption",
+            "componentSetNodeId": "13726:9599",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+      }
+    },
+    "ListGroup": {
+      "code": {
+        "import": "@/components/ListGroup",
+        "export": "default",
+        "mdxPath": "design-system/src/components/ListGroup/ListGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/ListGroup"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "list-group",
+            "name": "List Group",
+            "componentSetNodeId": "69:16193",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16193",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "list-group-item-contextual",
+            "name": "List Group Item Contextual",
+            "componentSetNodeId": "5173:6149",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=5173-6149",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501"
+      }
+    },
+    "MediaObject": {
+      "code": {
+        "import": "@/components/MediaObject",
+        "export": "default",
+        "mdxPath": "design-system/src/components/MediaObject/MediaObject.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/MediaObject"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "media-object-alignment",
+            "name": "Media Object Alignment",
+            "componentSetNodeId": "53:20424",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20424",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "media-object-level",
+            "name": "Media Object Level",
+            "componentSetNodeId": "53:20312",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20312",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245484"
+      }
+    },
+    "Modal": {
+      "code": {
+        "import": "@/components/Modal",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Modal/Modal.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Modal"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "modal",
+            "name": "Modal",
+            "componentSetNodeId": "53:20229",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20229",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
+      }
+    },
+    "MultipleChoice": {
+      "code": {
+        "import": "@/forms/MultipleChoice",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/MultipleChoice.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "multiple-choice-radio",
+            "name": "Multiple Choice (Radio)",
+            "componentSetNodeId": "13540:9207",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9207",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "multiple-choice-checkbox",
+            "name": "Multiple Choice (Checkbox)",
+            "componentSetNodeId": "13540:9717",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9717",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508"
+      }
+    },
+    "NavPills": {
+      "code": {
+        "import": "@/components/NavPills",
+        "export": "default",
+        "mdxPath": "design-system/src/components/NavPills/NavPills.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/NavPills"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "nav-pills",
+            "name": "Nav Pills",
+            "componentSetNodeId": "69:16745",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16745",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "pill-dropdown",
+            "name": "Pill Dropdown",
+            "componentSetNodeId": "4209:29770",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29770",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
+      }
+    },
+    "NavTabs": {
+      "code": {
+        "import": "@/components/NavTabs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/NavTabs/NavTabs.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/NavTabs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "nav-tabs",
+            "name": "Nav Tabs",
+            "componentSetNodeId": "69:16779",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "tab-dropdown",
+            "name": "Tab Dropdown",
+            "componentSetNodeId": "4209:29375",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
+      }
+    },
+    "NumberInput": {
+      "code": {
+        "import": "@/forms/NumberInput",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/NumberInput.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "number-input-group-button",
+            "name": "Number Input Group Button",
+            "componentSetNodeId": "13644:11268",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
+      }
+    },
+    "Pagination": {
+      "code": {
+        "import": "@/components/Pagination",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Pagination/Pagination.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Pagination"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "pagination",
+            "name": "Pagination",
+            "componentSetNodeId": "53:19822",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505"
+      }
+    },
+    "Popover": {
+      "code": {
+        "import": "@/components/Popover",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Popover/Popover.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Popover"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "popovers",
+            "name": "Popovers",
+            "componentSetNodeId": "49:19534",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
+      }
+    },
+    "Progress": {
+      "code": {
+        "import": "@/components/Progress",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Progress/Progress.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Progress"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "progress-bar",
+            "name": "Progress Bar",
+            "componentSetNodeId": "49:6872",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+      }
+    },
+    "Radio": {
+      "code": {
+        "import": "@/forms/Radio",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Radio.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "form-radio-button",
+            "name": "Form Radio Button",
+            "componentSetNodeId": "42:5858",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
+      }
+    },
+    "RadioButtonGroup": {
+      "code": {
+        "import": "@/forms/RadioButtonGroup",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/RadioButtonGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "scale-radio-button",
+            "name": "Scale Radio Button",
+            "componentSetNodeId": "13536:6785",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-6785",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "scale-options",
+            "name": "Scale Options",
+            "componentSetNodeId": "13536:9084",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9084",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "linear-scale",
+            "name": "Linear Scale",
+            "componentSetNodeId": "13611:16853",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-16853",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
+      }
+    },
+    "Range": {
+      "code": {
+        "import": "@/forms/Range",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Range.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "form-range-input",
+            "name": "Form Range Input",
+            "componentSetNodeId": "42:5756",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5756",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+      }
+    },
+    "Rating": {
+      "code": {
+        "import": "@/forms/Rating",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Rating.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "rating-system-disclosure",
+            "name": "Rating System (disclosure)",
+            "componentSetNodeId": "13526:17774",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17774",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "rating-system-with-text",
+            "name": "Rating System (with text)",
+            "componentSetNodeId": "13536:196",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-196",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
+      }
+    },
+    "RichTextEditor": {
+      "code": {
+        "import": "@/components/RichTextEditor",
+        "export": "default",
+        "mdxPath": "design-system/src/components/RichTextEditor/RichTextEditor.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/RichTextEditor"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "rich-text-editor",
+            "name": "Rich Text Editor",
+            "componentSetNodeId": "10010:37927",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
+      }
+    },
+    "Scrollspy": {
+      "code": {
+        "import": "@/components/Scrollspy",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Scrollspy/Scrollspy.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Scrollspy"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "scrollspy",
+            "name": "Scrollspy",
+            "componentSetNodeId": "72:16776",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16776",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516"
+      }
+    },
+    "Select": {
+      "code": {
+        "import": "@/forms/Select",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Select.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "select",
+            "name": "Select",
+            "componentSetNodeId": "8583:12093",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
+      }
+    },
+    "SidebarTab": {
+      "code": {
+        "import": "@/components/SidebarTab",
+        "export": "default",
+        "mdxPath": "design-system/src/components/SidebarTab/SidebarTab.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/SidebarTab"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "side-bar-tab",
+            "name": "Side Bar Tab",
+            "componentSetNodeId": "17118:127",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-127",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120"
+      }
+    },
+    "Spinner": {
+      "code": {
+        "import": "@/components/Spinner",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Spinner/Spinner.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Spinner"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "spinner-animation",
+            "name": "Spinner Animation",
+            "componentSetNodeId": "44:4872",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "loading-animations-1-growing",
+            "name": "Loading Animations 1 - Growing",
+            "componentSetNodeId": "9296:3061",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "loading-animations-2-rotating",
+            "name": "Loading Animations 2 - rotating",
+            "componentSetNodeId": "9297:3104",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104",
+            "source": "node-chart",
+            "status": "verified"
+          },
+          {
+            "id": "loading-animations-3-stacking",
+            "name": "Loading Animations 3 - stacking",
+            "componentSetNodeId": "9297:3156",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
+      }
+    },
+    "Switch": {
+      "code": {
+        "import": "@/forms/Switch",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Switch.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "form-switch-button",
+            "name": "Form Switch Button",
+            "componentSetNodeId": "82:16570",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
+      }
+    },
+    "Textarea": {
+      "code": {
+        "import": "@/forms/Textarea",
+        "export": "default",
+        "mdxPath": "design-system/src/forms/Textarea.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms",
+        "props": {
+          "variant": {
+            "type": "enum",
+            "values": [
+              "long",
+              "short"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "state": {
+            "type": "enum",
+            "values": [
+              "default",
+              "focus",
+              "error",
+              "success",
+              "readonly",
+              "disabled"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "storybook-resources",
+            "name": "Form Short Textarea (MDX link)",
+            "componentSetNodeId": "13543:5904",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
+            "source": "storybook-mdx",
+            "codeDefaults": {
+              "variant": "short"
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13",
+            "notes": "Verified 2026-06-13: MDX figmaLink points directly to Form Short Textarea component set (not a docs page)."
+          },
+          {
+            "id": "form-textarea",
+            "name": "Form Textarea",
+            "componentSetNodeId": "13541:10731",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
+            "codeDefaults": {
+              "variant": "long"
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13",
+            "notes": "variantProps TBD — add from Figma variant inspection."
+          },
+          {
+            "id": "form-short-textarea",
+            "name": "Form Short Textarea",
+            "componentSetNodeId": "13543:5904",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
+            "codeDefaults": {
+              "variant": "short"
+            },
+            "status": "verified",
+            "verifiedAt": "2026-06-13",
+            "notes": "Same node as storybook-resources MDX link."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
+      }
+    },
+    "Toast": {
+      "code": {
+        "import": "@/components/Toast",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Toast/Toast.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Toast"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "toast",
+            "name": "Toast",
+            "componentSetNodeId": "44:4803",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
+      }
+    },
+    "Tooltip": {
+      "code": {
+        "import": "@/components/Tooltip",
+        "export": "default",
+        "mdxPath": "design-system/src/components/Tooltip/Tooltip.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/Tooltip"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tooltip",
+            "name": "Tooltip",
+            "componentSetNodeId": "42:6020",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-6020",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486"
+      }
+    }
+  }
+}

@@ -39,7 +39,7 @@ Per-minute rate limits apply in addition to the daily tool call limits. The foll
 
 Rate limits apply to Figma MCP server tools that read data from Figma. Some tools, such as those that write to Figma files, are exempt from the rate limits. Exempt tools include:
 
-- `add_code_connect_map`
+- `create_new_file`
 - `generate_figma_design`
 - `whoami`
 

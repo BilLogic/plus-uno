@@ -11,4 +11,4 @@ After writing a solution doc, check if the learning should update broader docs:
 | New forbidden pattern | `AGENTS.md` forbidden patterns section |
 | New gotcha | `docs/context/conventions/coding.md` gotchas table |
 | Terminology confusion | `docs/context/conventions/terminology.md` |
-| Component API surprise | `docs/context/design-system/components/cheat-sheet.md` |
+| Component API surprise | `design-system/docs/discovery.md` → component source + stories |

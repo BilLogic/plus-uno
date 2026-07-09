@@ -47,15 +47,19 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 **Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← `docs/conventions/` (canonical here). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 
+## Knowledge Architecture
+
+Design System knowledge lives in `design-system/docs/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/docs/discovery.md`; load only task-relevant docs. Workflow skills (`skills/uno-prototype`, `skills/uno-review`, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
+
 ## Forbidden patterns
 
 1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.
-2. **Cheat Sheet is law**: before writing any React component from `@plus-ds` or applying any CSS token, read `docs/context/design-system/components/cheat-sheet.md`. If it's not in the Cheat Sheet, it does not exist.
-3. **Never hallucinate layouts**: when building a new page, read `docs/context/design-system/components/layout-cheat-sheet.md` and use official structural React formulas (e.g., `<PageLayout>`).
-4. **Never hallucinate props**: always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
+2. **DS knowledge is law**: Start at `design-system/docs/discovery.md`, then load only required docs (e.g., `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). If a component is not listed, it does not exist.
+3. **Never hallucinate layouts**: When building a new page, read `design-system/docs/patterns/layout.md` and use official structural React formulas (e.g., `<PageLayout>`).
+4. **Never hallucinate props**: Always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
 5. Never skip reading component source + story + styles before using unfamiliar components.
 6. Use PLUS components first — only fall back to generic React-Bootstrap when no PLUS equivalent exists.
-7. When Figma design input exists, follow the full implement-design workflow (`skills/uno-prototype/references/figma-mcp-guide.md`): extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
+7. When Figma design input exists, follow the full implement-design workflow (see `skills/uno-prototype/references/figma-mcp-guide.md`): **MANDATORY load** `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` first (see `skills/uno-prototype/references/figma-registry-mandatory-load.md`) → extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
 8. Never install new packages without explicit user approval.
 9. Never introduce non-Bootstrap UI frameworks (no Material UI, no Ant Design, no Tailwind).
 10. Never deep-import from `design-system/src/` — use barrel exports from `@` alias.
@@ -63,8 +67,9 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 12. Never edit generated token files directly — run `npm run generate:tokens` after changes.
 13. Always validate in Storybook when component behavior is touched.
 14. Confirm implementation plan and touched files before large or risky edits.
-15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`).
+15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free.
 16. Never write to a Notion surface outside the allowlist in `docs/conventions/notion.md`, and never create new select options, pillars, features, or OKRs there.
+17. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
 
 ## Knowledge
 
@@ -81,6 +86,7 @@ Check `docs/knowledge/INDEX.md` before starting work — past lessons may apply.
 | `npm run build-storybook` | Build Storybook static site |
 | `npm run sync:tokens` | Sync tokens from Figma |
 | `npm run generate:tokens` | Generate SCSS/JS from token source |
+| `npm run generate:agent` | Regenerate agent-views + Figma registries + audit |
 | `npm run dev:home-redesign` | Home redesign prototype |
 | `npm run dev:monthly-report` | Monthly report prototype |
 
@@ -90,9 +96,14 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 
 | Trigger | Load |
 |---------|------|
-| Building UI, using components or tokens | `docs/context/design-system/components/cheat-sheet.md` (MANDATORY) |
-| Building new pages, dashboards, layouts | `docs/context/design-system/components/layout-cheat-sheet.md` (MANDATORY) |
-| Figma link or implement-design workflow | `skills/uno-prototype/references/figma-mcp-guide.md` (PRIMARY) |
+| Any DS implementation task | `design-system/docs/discovery.md` (MANDATORY entry — route from here) |
+| Building UI, using components or tokens | `design-system/agent-views/components/{Name}/{Name}.md` if exists, else `components/index.md` + `tokens/tokens.md` |
+| Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
+| Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
+| Implementation setup (aliases, playground, Vite) | `design-system/docs/setup.md` |
+| Design philosophy / agent role | `design-system/docs/guidelines.md` |
+| Figma link, implement-design, or design-to-code mapping | `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` (MANDATORY — load first); then `skills/uno-prototype/references/figma-registry-mandatory-load.md` + `figma-mcp-guide.md` |
+| Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/conventions/*.md` |
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |

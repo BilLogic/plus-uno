@@ -42,10 +42,6 @@ This is a practical inventory of existing repository scripts and when to use the
   - Purpose: Post-merge Figma annotations (dev resources, comments).
   - Entrypoint: `npm run figma:write-back`
 
-- `scripts/publish-code-connect.js`
-  - Purpose: Publish Code Connect mappings to Figma Dev Mode.
-  - Entrypoint: `npm run figma:publish-code-connect`
-
 See `.agent/skills/uno-compound/references/` for related setup instructions.
 
 ## Used by CI

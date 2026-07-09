@@ -424,4 +424,20 @@ export const prototypes = [
     localPath: null,
     repoPath: 'playground/home-redesign/',
   },
+  {
+    id: '1029',
+    title: 'Test tutor feedback',
+    description:
+      'Session feedback review in the PLUS shell (Toolkit → Reports): awaiting-review badge and session id, session summary, two-column AI analysis (what went well vs opportunity to grow), coach note, Likert clarity scale, save draft / mark as reviewed.',
+    deploymentUrl: null,
+    notionCardUrl: null,
+    notionCardId: null,
+    stage: 'high',
+    lastUpdated: '2026-05-09',
+    creators: ['PLUS'],
+    contributors: ['PLUS'],
+    productPillar: 'toolkit',
+    localPath: '/1029',
+    repoPath: 'playground/test-tutor-feedback/',
+  },
 ];

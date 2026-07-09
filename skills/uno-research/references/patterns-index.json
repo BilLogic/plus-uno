@@ -6,7 +6,7 @@
       "name": "tokens_over_literals",
       "rule": "Use token variables for all visual values.",
       "references": [
-        "references/tokens-guide.md"
+        "design-system/agent-views/tokens/tokens.md"
       ]
     },
     {

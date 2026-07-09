@@ -4,7 +4,7 @@
 
 This guide is primarily for **designers** browsing Storybook to review shared UI. It explains how pages are organized today, why some entries differ, and what structure future docs should use so components feel easier to scan.
 
-This is not a low-level implementation guide for Storybook internals. For prop-table categorization, see [`storybook.md`](storybook.md). For current Storybook ordering and discovery, see [`.storybook/preview.jsx`](../../../.storybook/preview.jsx) and [`.storybook/main.js`](../../../.storybook/main.js).
+This is not a low-level implementation guide for Storybook internals. For prop-table categorization, see [`storybook.md`](storybook.md). For current Storybook ordering and discovery, see [`.storybook/preview.jsx`](../../../../.storybook/preview.jsx) and [`.storybook/main.js`](../../../../.storybook/main.js).
 
 ## How to read the sidebar
 
@@ -14,18 +14,18 @@ The default expectation is:
 - `Components/<Name>` and `Forms/<Name>` stay flat, not deeply nested
 - the visible page is usually an MDX docs page, not raw CSF story leaves
 
-That pattern is implemented with colocated `*.mdx` files, shared docs layout primitives in [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx), and `tags: ['!dev']` on the corresponding stories files so the docs page is the main surface. This docs-first pattern is also described in the knowledge/lessons archive (originally `docs/solutions/integration-issues/2026-03-23-storybook-mdx-autodocs-conflict-and-netlify-spa-static-coexistence.md`).
+That pattern is implemented with colocated `*.mdx` files, shared docs layout primitives in [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../../design-system/src/storybook-docs/ds-docs-layout.jsx), and `tags: ['!dev']` on the corresponding stories files so the docs page is the main surface. This docs-first pattern is also described in the knowledge/lessons archive (originally `docs/solutions/integration-issues/2026-03-23-storybook-mdx-autodocs-conflict-and-netlify-spa-static-coexistence.md`).
 
 ### Sidebar patterns in the current repo
 
 1. **Single entry, MDX-first**
-   Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../design-system/src/components/Button/Button.mdx), [`Checkbox.mdx`](../../../design-system/src/forms/Checkbox.mdx).
+   Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../../design-system/src/components/Button/Button.mdx), [`Checkbox.mdx`](../../../../design-system/src/forms/Checkbox.mdx).
 
 2. **Single entry, merged subcomponent stories**
-   Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Examples: [`Alert.mdx`](../../../design-system/src/components/Alert/Alert.mdx), [`NavPills.mdx`](../../../design-system/src/components/NavPills/NavPills.mdx).
+   Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Examples: [`Alert.mdx`](../../../../design-system/src/components/Alert/Alert.mdx), [`NavPills.mdx`](../../../../design-system/src/components/NavPills/NavPills.mdx).
 
 3. **Single entry, richer composed docs**
-   A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/Button/Button.mdx), which uses [`button-segmented-demos.jsx`](../../../design-system/src/components/Button/button-segmented-demos.jsx).
+   A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../../design-system/src/components/Button/Button.mdx), which uses [`button-segmented-demos.jsx`](../../../../design-system/src/components/Button/button-segmented-demos.jsx).
 
 4. **Stories-only outlier**
    Some forms still rely on a single story file and have no colocated MDX page yet. Current examples: `Forms/Rating`, `Forms/Input Group`, and `Forms/Scale`.
@@ -36,7 +36,7 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
    - `Forms/Scale` for `RadioButtonGroup`
    - `Forms/Time Picker` for `DateAndTimePicker`
 
-These aliases are acceptable when intentional, but they should be rare and kept in sync with [`storySort`](../../../.storybook/preview.jsx).
+These aliases are acceptable when intentional, but they should be rare and kept in sync with [`storySort`](../../../../.storybook/preview.jsx).
 
 ## Default section spine
 
@@ -108,7 +108,7 @@ Use it when:
 - those parts matter to how designers review or compose it
 - a plain `Content` section would blur “what goes in it” with “what it is made of”
 
-Strong current example: [`Alert.mdx`](../../../design-system/src/components/Alert/Alert.mdx).
+Strong current example: [`Alert.mdx`](../../../../design-system/src/components/Alert/Alert.mdx).
 
 #### `Behavior`
 
@@ -119,7 +119,7 @@ Use it when:
 - the component’s rules of operation are a major part of design review
 - `Interaction States` alone would only show screenshots, not explain the behavior model
 
-Strong current example: [`Accordion.mdx`](../../../design-system/src/components/Accordion/Accordion.mdx).
+Strong current example: [`Accordion.mdx`](../../../../design-system/src/components/Accordion/Accordion.mdx).
 
 #### `Types` (rare)
 
@@ -130,7 +130,7 @@ Use it when:
 - the component exposes distinct conceptual modes
 - calling them `Variants` would hide meaningful product intent
 
-Current example: [`Modal.mdx`](../../../design-system/src/components/Modal/Modal.mdx).
+Current example: [`Modal.mdx`](../../../../design-system/src/components/Modal/Modal.mdx).
 
 ### Headings that should usually be folded back into the default spine
 
@@ -267,7 +267,7 @@ The tables below summarize how current entries are organized today. The goal is 
    If a label is helpful but too specific to serve as a universal category, keep it lower in the page hierarchy rather than as a top-level section.
 
 6. **Aliases must be intentional**
-   If the sidebar label differs from the implementation name, make sure that is a deliberate designer-facing choice and keep it aligned with [`storySort`](../../../.storybook/preview.jsx).
+   If the sidebar label differs from the implementation name, make sure that is a deliberate designer-facing choice and keep it aligned with [`storySort`](../../../../.storybook/preview.jsx).
 
 ## Slot transition plan
 
@@ -339,8 +339,8 @@ Avoid making the page read like plugin or implementation documentation. The poin
 - [`.storybook/preview.jsx`](../../../.storybook/preview.jsx)
 - `.storybook/FORMS_DOCS_PLAN.md` (removed — see `.storybook/main.js` for current docs config)
 - [`storybook.md`](storybook.md)
-- [`design-system/src/storybook-docs/Introduction.mdx`](../../../design-system/src/storybook-docs/Introduction.mdx)
-- [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx)
-- [`design-system/src/components/Button/Button.mdx`](../../../design-system/src/components/Button/Button.mdx)
-- [`design-system/src/components/Alert/Alert.mdx`](../../../design-system/src/components/Alert/Alert.mdx)
-- [`design-system/src/components/NavPills/NavPills.mdx`](../../../design-system/src/components/NavPills/NavPills.mdx)
+- [`design-system/src/storybook-docs/Introduction.mdx`](../../../../design-system/src/storybook-docs/Introduction.mdx)
+- [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../../design-system/src/storybook-docs/ds-docs-layout.jsx)
+- [`design-system/src/components/Button/Button.mdx`](../../../../design-system/src/components/Button/Button.mdx)
+- [`design-system/src/components/Alert/Alert.mdx`](../../../../design-system/src/components/Alert/Alert.mdx)
+- [`design-system/src/components/NavPills/NavPills.mdx`](../../../../design-system/src/components/NavPills/NavPills.mdx)

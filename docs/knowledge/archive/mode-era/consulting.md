@@ -8,9 +8,9 @@
 - Layout-first wireframing where component detail is secondary.
 
 ### Decision Tree
-- If the user asks "what should we do" or "which structure works": use Consulting Mode.
-- If they ask for multiple styled options: use Iteration Mode.
-- If they ask for final production implementation: use Finalization Mode.
+- If the user asks "what should we do" or "which structure works": use **uno-plan** (consulting).
+- If they ask for multiple styled options: use **uno-plan** → `iteration-options.md`.
+- If they ask for final production implementation: use **uno-review** → `production-checklist.md`.
 
 ## Design Constraints
 - Greyscale only
@@ -36,7 +36,7 @@ For exhaustive lookup paths/globs/commands, load `docs/context/design-system/ind
 
 4. Structural examples
 - `playground/**/STRUCTURE.md`
-- `references/implementation-guide.md`
+- `../uno-prototype/references/implementation.md`
 
 5. Wireframe tooling (critical when available)
 - Stitch MCP for PRD/brief-to-wireframe generation and structural variants.
