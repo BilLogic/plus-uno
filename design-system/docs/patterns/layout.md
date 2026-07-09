@@ -100,7 +100,7 @@ export default function MyContentBlock() {
 ```
 
 ## How to Apply Spacing Properly
-When filling in the content blocks, ONLY use semantic CSS variables from `design-system/agent-views/foundations/tokens.md`:
+When filling in the content blocks, ONLY use semantic CSS variables from `design-system/agent-views/tokens/tokens.md`:
 *   `gap: 'var(--size-section-gap-md)'` -> Spacing between major page blocks (like two diff Cards).
 *   `gap: 'var(--size-element-gap-md)'` -> Spacing between elements inside a Card (like headers and text).
 *   Never use raw string pixels like `gap: '16px'`.

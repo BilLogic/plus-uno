@@ -36,7 +36,7 @@ import '@/styles/globals.scss';
 design-system/
   src/           # DS source (components, forms, specs, tokens, styles, MDX)
   docs/          # Hand-authored DS knowledge (discovery, patterns, token-mapping)
-  agent-views/   # Generated agent views (DO NOT EDIT BY HAND)
+  agent-views/   # Generated agent views — mirrors src/ layout (excludes storybook-docs, assets)
   figma/         # Registries + alignment runbooks
 playground/{name}/     # Standalone prototypes
 .storybook/            # Storybook config

@@ -18,8 +18,9 @@ Do **not** bulk-load all knowledge. Load 2–3 focused documents per task (~2,00
 | Topic | Path |
 |-------|------|
 | All UI components (index) | `design-system/agent-views/components/index.md` |
-| Per-component agent view | `design-system/agent-views/components/{name}.md` |
-| Form elements (index) | `design-system/agent-views/components/form.md` |
+| Per-component agent view | `design-system/agent-views/components/{Name}/{Name}.md` |
+| Form elements (index) | `design-system/agent-views/forms/index.md` |
+| Per-form agent view | `design-system/agent-views/forms/{Name}.md` or `forms/{Name}/{Name}.md` |
 | Component source + Storybook | `design-system/src/components/`, `design-system/src/forms/` |
 | Designer verification audit | `design-system/figma/knowledge-audit.md` |
 | Component architecture / inventory | `docs/context/design-system/components/inventory.md` |
@@ -29,7 +30,7 @@ Do **not** bulk-load all knowledge. Load 2–3 focused documents per task (~2,00
 
 | Topic | Path |
 |-------|------|
-| All tokens (generated list) | `design-system/agent-views/foundations/tokens.md` |
+| All tokens (generated list) | `design-system/agent-views/tokens/tokens.md` |
 | Figma ↔ CSS token mapping (authoritative) | `design-system/docs/foundations/token-mapping.md` |
 | Figma token registry (machine, read-only) | `design-system/figma/token-registry.json` |
 | Design principles (product-level) | `docs/context/design-system/foundations/principles.md` |
@@ -84,16 +85,16 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 ## Common Task Routes
 
 **Build UI with components**
-→ `agent-views/components/index.md` → `agent-views/foundations/tokens.md` (if styling)
+→ `agent-views/components/index.md` → `agent-views/tokens/tokens.md` (if styling)
 
 **Build a form**
-→ `docs/patterns/forms.md` → `agent-views/components/{field}.md` → `agent-views/foundations/tokens.md`
+→ `docs/patterns/forms.md` → `agent-views/forms/{Name}.md` → `agent-views/tokens/tokens.md`
 
 **Build a page / dashboard**
-→ `docs/patterns/layout.md` → task-specific `agent-views/components/{name}.md` → `agent-views/foundations/tokens.md`
+→ `docs/patterns/layout.md` → task-specific `agent-views/components/{Name}/{Name}.md` → `agent-views/tokens/tokens.md`
 
 **Dialog / Modal**
-→ `agent-views/components/modal.md` → `docs/patterns/layout.md` (Modal skeleton)
+→ `agent-views/components/Modal/Modal.md` → `docs/patterns/layout.md` (Modal skeleton)
 
 **Implement from Figma**
 → `design-system/figma/component-registry.json` + `token-registry.json` → `figma-mcp-guide.md` → `docs/foundations/token-mapping.md` → task-specific component/pattern docs

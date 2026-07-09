@@ -3,35 +3,35 @@
   "description": "Human verification status for agent knowledge docs. Designers edit this file; run npm run generate:agent to refresh the spreadsheet.",
   "components": {
     "Button": {
-      "knowledgeFile": "agent-views/components/button.md",
+      "knowledgeFile": "agent-views/components/Button/Button.md",
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
       "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
     },
     "Modal": {
-      "knowledgeFile": "agent-views/components/modal.md",
+      "knowledgeFile": "agent-views/components/Modal/Modal.md",
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
       "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
     },
     "Card": {
-      "knowledgeFile": "agent-views/components/card.md",
+      "knowledgeFile": "agent-views/components/Card/Card.md",
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
       "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
     },
     "Input": {
-      "knowledgeFile": "agent-views/components/input.md",
+      "knowledgeFile": "agent-views/forms/Input.md",
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
       "notes": "Generated from MDX/propTypes — add usage frontmatter to component MDX"
     },
     "Table": {
-      "knowledgeFile": "agent-views/components/table.md",
+      "knowledgeFile": "agent-views/components/Table/Table.md",
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
@@ -39,7 +39,7 @@
     }
   },
   "tokens": {
-    "agent-views/foundations/tokens.md": {
+    "agent-views/tokens/tokens.md": {
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
@@ -49,7 +49,7 @@
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,
-      "notes": "Figma ↔ CSS mapping — hand-authored SSOT"
+      "notes": "Hand-authored Figma ↔ CSS mapping"
     }
   }
 }

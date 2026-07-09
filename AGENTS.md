@@ -54,7 +54,7 @@ Design System knowledge lives in `design-system/docs/` (hand-authored) and `desi
 ## Forbidden patterns
 
 1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.
-2. **DS knowledge is law**: Start at `design-system/docs/discovery.md`, then load only required docs (e.g., `design-system/agent-views/components/index.md`, `design-system/agent-views/foundations/tokens.md`). If a component is not listed, it does not exist.
+2. **DS knowledge is law**: Start at `design-system/docs/discovery.md`, then load only required docs (e.g., `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). If a component is not listed, it does not exist.
 3. **Never hallucinate layouts**: When building a new page, read `design-system/docs/patterns/layout.md` and use official structural React formulas (e.g., `<PageLayout>`).
 4. **Never hallucinate props**: Always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
 5. Never skip reading component source + story + styles before using unfamiliar components.
@@ -97,7 +97,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Trigger | Load |
 |---------|------|
 | Any DS implementation task | `design-system/docs/discovery.md` (MANDATORY entry — route from here) |
-| Building UI, using components or tokens | `design-system/agent-views/components/{name}.md` if exists, else `index.md` + `foundations/tokens.md` |
+| Building UI, using components or tokens | `design-system/agent-views/components/{Name}/{Name}.md` if exists, else `components/index.md` + `tokens/tokens.md` |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
 | Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
 | Implementation setup (aliases, playground, Vite) | `design-system/docs/setup.md` |

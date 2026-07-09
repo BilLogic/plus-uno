@@ -1319,18 +1319,18 @@
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/SidebarTab"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "side-bar-tab",
             "name": "Side Bar Tab",
-            "componentSetNodeId": "111:227838",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227838",
+            "componentSetNodeId": "17118:127",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-127",
             "source": "node-chart",
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227838"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120"
       }
     },
     "Spinner": {

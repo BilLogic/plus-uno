@@ -57,7 +57,7 @@ When implementing a design from a Figma link, follow all 7 steps:
 | Spacing (contextual) | Pick by layer: `var(--size-card-pad-{x\|y}-{sm\|md\|lg})`, `var(--size-element-gap-{xs\|sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
 | Surface tokens | `var(--color-surface-*)` — prefer `-container` over `-state-08` for elevated surfaces |
 
-For the full token reference, load `design-system/agent-views/foundations/tokens.md` and `design-system/figma/token-registry.json`.
+For the full token reference, load `design-system/agent-views/tokens/tokens.md` and `design-system/figma/token-registry.json`.
 
 ## When to Use Which Tool
 

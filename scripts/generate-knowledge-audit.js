@@ -11,29 +11,16 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { listAgentViewMarkdown } from './agent-views-paths.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const DOCS_DIR = path.join(REPO_ROOT, 'design-system/docs');
-const AGENT_VIEWS_DIR = path.join(REPO_ROOT, 'design-system');
 const AUDIT_JSON = path.join(DOCS_DIR, 'knowledge-audit.json');
 const OUT_MD = path.join(REPO_ROOT, 'design-system/figma/knowledge-audit.md');
 
 function readJson(fp) {
   return JSON.parse(fs.readFileSync(fp, 'utf8'));
-}
-
-function listComponentAgentViews() {
-  const dir = path.join(AGENT_VIEWS_DIR, 'agent-views/components');
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith('.md') && !['index.md', 'form.md'].includes(f))
-    .map((f) => ({
-      slug: f.replace(/\.md$/, ''),
-      file: `agent-views/components/${f}`,
-      abs: path.join(dir, f),
-    }));
 }
 
 function listPatternFiles() {
@@ -62,13 +49,10 @@ function pathRef(rel) {
 
 function generate() {
   const audit = readJson(AUDIT_JSON);
-  const onDisk = listComponentAgentViews();
+  const onDisk = listAgentViewMarkdown();
   const patterns = listPatternFiles();
 
-  const componentRows = onDisk.map(({ slug, file, abs }) => {
-    const name =
-      Object.keys(audit.components || {}).find((k) => k.toLowerCase() === slug.toLowerCase()) ||
-      capitalize(slug);
+  const componentRows = onDisk.map(({ name, file, abs }) => {
     const entry = audit.components?.[name] || {};
     const stat = fs.statSync(abs);
     return [
@@ -100,7 +84,7 @@ function generate() {
   componentRows.sort((a, b) => a[0].localeCompare(b[0]));
 
   const tokenRows = Object.entries(audit.tokens || {}).map(([file, entry]) => {
-    const abs = path.join(REPO_ROOT, 'design-system', file.replace(/^docs\//, 'docs/'));
+    const abs = path.join(REPO_ROOT, 'design-system', file);
     const exists = fs.existsSync(abs);
     const mtime = exists ? fs.statSync(abs).mtime.toISOString().slice(0, 10) : '—';
     return [
@@ -165,10 +149,6 @@ ${mdTable(['Pattern', 'Path', 'Verified', 'Notes', 'File updated'], patternRows)
   fs.writeFileSync(OUT_MD, doc);
   console.log(`✓ ${OUT_MD}`);
   return doc;
-}
-
-function capitalize(s) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function main() {
