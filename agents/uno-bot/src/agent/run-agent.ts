@@ -27,6 +27,7 @@ import { buildSystemBlocks } from "./skills";
 import { makeAnthropicClient, routeRequest, MODELS } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
+import { executeRoadmapQuery } from "../tools/roadmap-query";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
@@ -623,6 +624,7 @@ async function executeReadOnlyTool(
   slack: SlackContext,
 ): Promise<string> {
   if (name === "notion_search") return executeNotionSearch(env, input);
+  if (name === "roadmap_query") return executeRoadmapQuery(env, input);
   if (name === "blueprint_search") return executeBlueprintSearch(env, input);
   if (name === "source_read") return executeReadSource(env, input);
   if (name === "github_read") return executeGithubRead(env, input);
