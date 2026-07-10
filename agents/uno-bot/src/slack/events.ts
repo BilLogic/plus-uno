@@ -101,7 +101,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "message": {
       const msg = event as SlackMessageEvent;
       if (await shouldHandleMessage(env, msg)) {
-        await onMessageVisiblyFailing(env, msg);
+        await enqueueAgentJob(env, msg);
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
@@ -109,7 +109,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     }
     case "app_mention":
       // Explicit @mention always engages.
-      await onMessageVisiblyFailing(env, appMentionToMessage(event as SlackAppMentionEvent));
+      await enqueueAgentJob(env, appMentionToMessage(event as SlackAppMentionEvent));
       return;
     case "reaction_added":
       await handleReaction(env, event as SlackReactionAddedEvent);
@@ -118,6 +118,37 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       console.log(`[slack] unhandled event type: ${event.type}`);
       return;
   }
+}
+
+// Hand the message to the per-thread AgentRunner DO instead of running it here:
+// this Worker invocation lives inside ctx.waitUntil(), which Cloudflare cancels
+// ~30s after the Slack ack — any longer agent run died silently mid-flight
+// ("👀 then silence", live incident 2026-07-09). DO alarms have no such cutoff.
+// Keyed per thread so runs within a thread stay ordered.
+async function enqueueAgentJob(env: Env, event: SlackMessageEvent): Promise<void> {
+  const threadKey = `${event.channel}:${event.thread_ts ?? event.ts}`;
+  const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
+  const res = await stub.fetch("https://do/enqueue", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ event, enqueuedAt: Date.now() }),
+  });
+  if (!res.ok) {
+    // Enqueue is the only step left in the Worker — a failure here IS the
+    // 👀-then-silence path, so make it visible instead.
+    console.error(`[slack] runner enqueue failed: ${res.status}`);
+    await postMessage(env, {
+      channel: event.channel,
+      thread_ts: event.thread_ts ?? event.ts,
+      text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
+    }).catch(() => {});
+  }
+}
+
+// Entry point the AgentRunner DO alarm calls: the full message pipeline with
+// the visible-failure backstop. Runs OUTSIDE waitUntil — no 30s cutoff.
+export async function onRunnerJob(env: Env, event: SlackMessageEvent): Promise<void> {
+  await onMessageVisiblyFailing(env, event);
 }
 
 // Outermost catch WITH channel/thread context. onMessage already posts a

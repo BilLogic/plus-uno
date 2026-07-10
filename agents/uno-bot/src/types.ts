@@ -32,6 +32,10 @@ export interface Env {
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
   THREAD_STATE: DurableObjectNamespace;
+  // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
+  // wall-clock cancellation that silently killed long agent runs (👀-then-
+  // silence, 2026-07-09). See agent-runner.ts.
+  AGENT_RUNNER: DurableObjectNamespace;
   // Harness resilience: stores the last fully-successful system-prompt assembly
   // (all 20+ SKILL_PATHS files fetched clean) + the alert-throttle timestamp.
   // Unset → behavior degrades to pre-KV (partial harness on fetch failures, no
