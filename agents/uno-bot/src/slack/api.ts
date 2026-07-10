@@ -35,6 +35,50 @@ async function slackCall<T extends SlackResponse>(
   return data;
 }
 
+// Slack READ methods reject JSON bodies (invalid_arguments — the
+// conversations.replies lesson, 2026-07-10): they take GET query params.
+async function slackGet<T extends SlackResponse>(
+  env: Env,
+  method: string,
+  params: Record<string, string>,
+): Promise<T> {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(`https://slack.com/api/${method}?${qs}`, {
+    headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
+  });
+  const data = (await res.json()) as T;
+  if (!data.ok) {
+    console.warn(`[slack] ${method} failed: ${(data as SlackErr).error}`);
+  }
+  return data;
+}
+
+export interface SlackUserInfo {
+  id: string;
+  name?: string;
+  real_name?: string;
+  profile?: { title?: string; email?: string; display_name?: string; status_text?: string };
+  tz?: string;
+  is_bot?: boolean;
+  deleted?: boolean;
+}
+
+/** users.info via the bot token — profile fields for one user id. */
+export async function usersInfo(env: Env, userId: string) {
+  return slackGet<SlackResponse & { user?: SlackUserInfo }>(env, "users.info", {
+    user: userId,
+  });
+}
+
+/** conversations.members via the bot token — member ids (first page). */
+export async function conversationsMembers(env: Env, channel: string, limit = 100) {
+  return slackGet<SlackResponse & { members?: string[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "conversations.members",
+    { channel, limit: String(limit) },
+  );
+}
+
 export interface PostMessageInput {
   channel: string;
   text: string;

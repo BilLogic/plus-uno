@@ -35,6 +35,7 @@ import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
+import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
 import { addReaction } from "../slack/api";
 import type { SlackContext } from "../tools/dispatcher";
 import { BUILD } from "../version";
@@ -644,6 +645,8 @@ export async function executeReadOnlyTool(
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
   if (name === "slack_search") return executeSlackSearch(env, input);
   if (name === "slack_react") return executeSlackReact(env, input, slack);
+  if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
+  if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }
 

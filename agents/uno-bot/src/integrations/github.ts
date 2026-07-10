@@ -75,3 +75,43 @@ export async function githubReadPath(
     clearTimeout(timer);
   }
 }
+
+export interface GithubCodeHit {
+  path: string;
+  url: string;
+}
+
+/**
+ * Code search within the configured repo (GET /search/code). Restores the
+ * code-search capability the hosted GitHub MCP provided, on the same PAT —
+ * needed in gemini mode (no server-side MCP) and useful as a lighter path
+ * everywhere. One subrequest. Throws on non-2xx.
+ */
+export async function githubSearchCode(env: Env, query: string): Promise<GithubCodeHit[]> {
+  if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
+    throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+  }
+  const q = `${query} repo:${env.GITHUB_REPO}`;
+  const url = `https://api.github.com/search/code?q=${encodeURIComponent(q)}&per_page=10`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      headers: {
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        accept: "application/vnd.github+json",
+        "user-agent": "uno-bot",
+      },
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`GitHub code search ${res.status}`);
+    const data = (await res.json()) as {
+      items?: Array<{ path?: string; html_url?: string }>;
+    };
+    return (data.items ?? [])
+      .map((i) => ({ path: i.path ?? "", url: i.html_url ?? "" }))
+      .filter((i) => i.path);
+  } finally {
+    clearTimeout(timer);
+  }
+}
