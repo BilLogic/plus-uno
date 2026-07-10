@@ -96,13 +96,12 @@ export async function classifyRoute(
     };
     const depth = parsed.depth ?? "standard";
     const grounding = parsed.grounding ?? "single";
-    // deep reasoning → opus; any multi-source grounding gets a sonnet FLOOR
-    // (the trial-A failure class); only quick+none stays on haiku.
+    // SONNET FLOOR for every real ask (user decision 2026-07-10: "the original
+    // way is terrible" — under-powering real requests is the failure class).
+    // The smart model orchestrates and DELEGATES mechanical lookups to haiku
+    // subagents via the `delegate` tool; haiku never owns a whole user request
+    // except the proposal-resolution fast-path above. deep → opus.
     if (depth === "deep") return { tier: "opus", model: MODELS.opus, reason: `classified:${depth}/${grounding}` };
-    if (grounding === "multi" || depth === "standard") {
-      return { tier: "sonnet", model: MODELS.sonnet, reason: `classified:${depth}/${grounding}` };
-    }
-    if (grounding === "none") return { tier: "haiku", model: MODELS.haiku, reason: `classified:${depth}/${grounding}` };
     return { tier: "sonnet", model: MODELS.sonnet, reason: `classified:${depth}/${grounding}` };
   } catch (err) {
     const fallback = pickModel(opts);

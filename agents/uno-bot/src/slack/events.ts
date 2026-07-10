@@ -331,16 +331,20 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
   }
 
-  // Interim status: long runs are now legal (streaming + MCP can take several
+  // Interim updates: long runs are now legal (streaming + MCP can take several
   // minutes), and ⏳ alone left people typing "any thing???" at the 8-minute
-  // mark. One plain-language note at ~75s says the silence is work, not death.
-  // Cleared as soon as the run finishes; costs one subrequest.
+  // mark. Two complementary signals, both as SEPARATE small messages (never
+  // folded into the final answer): (a) the model's own between-tool narration,
+  // filtered and capped by runAgent's onInterim, arrives as it works; (b) a
+  // generic note at ~75s backstops runs that produced no narration yet.
+  let interimPosted = false;
+  const postInterim = (text: string): void => {
+    interimPosted = true;
+    postMessage(env, { channel, thread_ts: threadTs, text: `:hourglass_flowing_sand: ${text}` }).catch(() => {});
+  };
   const interimTimer = setTimeout(() => {
-    postMessage(env, {
-      channel,
-      thread_ts: threadTs,
-      text: ":hourglass_flowing_sand: Still on it — this one needs a longer dig. The full answer will land right here.",
-    }).catch(() => {});
+    if (interimPosted) return;
+    postInterim("Still on it — this one needs a longer dig. The full answer will land right here.");
   }, 75_000);
 
   let result: AgentResult;
@@ -360,6 +364,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
       },
       currentSender: { userId },
       pending,
+      onInterim: postInterim,
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);

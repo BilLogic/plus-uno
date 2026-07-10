@@ -24,7 +24,7 @@ import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { makeAnthropicClient, classifyRoute } from "./anthropic-client";
+import { makeAnthropicClient, classifyRoute, MODELS } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
@@ -56,6 +56,10 @@ export interface AgentInput {
   pending: PendingProposal | null;
   /** Vision input for the current turn only. History turns stay plain text. */
   images?: AgentImage[];
+  /** Called with short, FILTERED progress lines (the model's between-tool
+   *  narration, capped + capped-count) so the Worker can post them as separate
+   *  interim messages. Never receives the full working monologue. */
+  onInterim?: (text: string) => void;
 }
 
 export type AgentResult =
@@ -152,21 +156,49 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // 524` after the DO runner had correctly kept it alive). Streaming keeps
   // bytes flowing for the whole run; finalMessage() returns the same
   // accumulated Message the non-streaming call would have.
+  // Interim progress: between-tool narration is surfaced to the user as SHORT
+  // separate messages (never in the final reply — see extractFinalText). Capped
+  // at 3 per request and ~280 chars each; only the first line of a narration
+  // block is used. The full monologue is never exposed (user decision
+  // 2026-07-10 after a delivered reply included seven paragraphs of it).
+  let interimSent = 0;
+  const emitInterim = (raw: string): void => {
+    if (!input.onInterim || interimSent >= 3) return;
+    const line = raw.trim().split("\n")[0]?.trim() ?? "";
+    if (line.length < 15) return; // too short to be informative
+    interimSent++;
+    input.onInterim(line.length > 280 ? `${line.slice(0, 277)}…` : line);
+  };
+  // Watch the stream: when a tool block completes AFTER a text block, that text
+  // was narration — surface it (filtered) while the run continues.
+  const attachInterimWatcher = (stream: ReturnType<typeof client.messages.stream>): void => {
+    let pendingNarration: string | null = null;
+    stream.on("contentBlock", (block: unknown) => {
+      const b = block as { type?: string; text?: string };
+      if (b.type === "text") {
+        pendingNarration = b.text ?? null;
+      } else if (pendingNarration) {
+        emitInterim(pendingNarration);
+        pendingNarration = null;
+      }
+    });
+  };
+
   const callClaude = async (
     params: Record<string, unknown>,
   ): Promise<Anthropic.Message> => {
     if (mcpActive) {
       try {
-        return await client.messages
-          .stream(
-            {
-              ...params,
-              tools: toolsWithMcp,
-              mcp_servers: mcpServers,
-            } as unknown as Anthropic.MessageStreamParams,
-            { headers: { "anthropic-beta": MCP_BETA } },
-          )
-          .finalMessage();
+        const stream = client.messages.stream(
+          {
+            ...params,
+            tools: toolsWithMcp,
+            mcp_servers: mcpServers,
+          } as unknown as Anthropic.MessageStreamParams,
+          { headers: { "anthropic-beta": MCP_BETA } },
+        );
+        attachInterimWatcher(stream);
+        return await stream.finalMessage();
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         if (!/MCP server/i.test(msg)) throw err;
@@ -176,12 +208,61 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
         );
       }
     }
-    return client.messages
-      .stream({
-        ...params,
-        tools: toolsPlain,
-      } as Anthropic.MessageStreamParams)
-      .finalMessage();
+    const stream = client.messages.stream({
+      ...params,
+      tools: toolsPlain,
+    } as Anthropic.MessageStreamParams);
+    attachInterimWatcher(stream);
+    return stream.finalMessage();
+  };
+
+  // ── Delegation (Phase 3): the orchestrator model stays on reasoning and
+  // synthesis; mechanical lookups fan out to cheap, fast haiku subagents that
+  // run IN PARALLEL with the MCP servers attached. Server-side MCP rounds cost
+  // zero Worker subrequests, so each subagent is exactly ONE Anthropic call —
+  // this is how "smart model delegates to cheaper models" fits the free tier.
+  const SUBAGENT_SYSTEM =
+    "You are a fast research subagent for the PLUS design team's assistant. Complete the ONE task you're given using the attached read tools (Notion, GitHub, Supabase, Slack). Output: compact bullet facts with links/IDs — no preamble, no narration, no recommendations. Explicitly flag anything you could NOT verify. If the task can't be done, say exactly what's missing in one line.";
+  const runDelegateTasks = async (rawInput: Record<string, unknown>): Promise<string> => {
+    if (!mcpActive) {
+      return JSON.stringify({
+        ok: false,
+        error: "delegation unavailable right now (no data sources attached) — do the lookups yourself",
+      });
+    }
+    const tasks = (Array.isArray(rawInput.tasks) ? rawInput.tasks : []).slice(0, 3) as Array<{
+      goal?: unknown;
+      context?: unknown;
+    }>;
+    if (tasks.length === 0) return JSON.stringify({ ok: false, error: "no tasks given" });
+    const results = await Promise.all(
+      tasks.map(async (t, i) => {
+        const goal = typeof t.goal === "string" ? t.goal.trim() : "";
+        const context = typeof t.context === "string" ? t.context.trim() : "";
+        if (!goal) return { task: i, ok: false as const, error: "missing goal" };
+        try {
+          const msg = await client.messages
+            .stream(
+              {
+                model: MODELS.haiku,
+                max_tokens: 1200,
+                system: SUBAGENT_SYSTEM,
+                messages: [{ role: "user", content: context ? `${goal}\n\nContext:\n${context}` : goal }],
+                tools: mcpToolsets,
+                mcp_servers: mcpServers,
+              } as unknown as Anthropic.MessageStreamParams,
+              { headers: { "anthropic-beta": MCP_BETA } },
+            )
+            .finalMessage();
+          addUsage(msg.usage);
+          recordToolUses(msg.content);
+          return { task: i, ok: true as const, result: extractFinalText(msg.content) || "(no result)" };
+        } catch (err) {
+          return { task: i, ok: false as const, error: err instanceof Error ? err.message.slice(0, 200) : String(err) };
+        }
+      }),
+    );
+    return JSON.stringify({ ok: true, results });
   };
 
   // D2 (Phase 3 revamp): route on how much GROUNDING the answer needs, not
@@ -260,12 +341,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     recordToolUses(response.content);
 
     if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
-      const text = response.content
-        .filter((b): b is Anthropic.TextBlock => b.type === "text")
-        .map((b) => b.text)
-        .join("\n")
-        .trim();
-      return finish({ kind: "text", text: text || "(empty response)" });
+      return finish({ kind: "text", text: extractFinalText(response.content) || "(empty response)" });
     }
 
     if (response.stop_reason === "tool_use") {
@@ -370,7 +446,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
           continue;
         }
         toolCallsUsed++;
-        const resultText = await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>, slack);
+        const resultText =
+          tu.name === "delegate"
+            ? await runDelegateTasks(tu.input as Record<string, unknown>)
+            : await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>, slack);
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }
       messages.push({ role: "user", content: toolResults });
@@ -403,17 +482,42 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   iterations++;
   addUsage(finalResponse.usage);
   recordToolUses(finalResponse.content);
-  const finalText = finalResponse.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
+  const finalText = extractFinalText(finalResponse.content);
   return finish({
     kind: "text",
     text:
       finalText ||
       "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?",
   });
+}
+
+/**
+ * The user-facing reply is ONLY the text after the last tool block. With MCP
+ * attached, one response interleaves narration and server-side tool rounds —
+ * `[text, mcp_tool_use, mcp_tool_result, text, …, final text]` — and joining
+ * every text block delivered the model's entire working monologue as the reply
+ * (live 2026-07-10: seven paragraphs of "Let me try…" before the answer).
+ * Narration reaches the user separately, filtered, via the interim watcher.
+ * Falls back to the all-text join when there are no tool blocks or nothing
+ * follows the last one.
+ */
+function extractFinalText(content: Anthropic.ContentBlock[]): string {
+  let lastToolIdx = -1;
+  content.forEach((b, i) => {
+    if (b.type !== "text") lastToolIdx = i;
+  });
+  const afterLastTool = content
+    .slice(lastToolIdx + 1)
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n")
+    .trim();
+  if (afterLastTool) return afterLastTool;
+  return content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n")
+    .trim();
 }
 
 /**

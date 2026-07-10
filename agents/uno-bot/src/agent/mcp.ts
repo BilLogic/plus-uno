@@ -34,15 +34,22 @@ const NOTION_URL = "https://mcp.notion.com/mcp";
 // AUTHORITATIVE hosted mcp.notion.com read tool names (confirmed against the live
 // connector registry — `notion-`-prefixed, not bare `search`/`fetch`, not the
 // raw-REST `notion-retrieve-a-*`). Zero write tools.
+//
+// PLAN-GATED TOOLS DELIBERATELY EXCLUDED (workspace is Notion Plus, NO AI
+// add-on — confirmed live 2026-07-10, both bounced with an upgrade error after
+// burning minutes discovering the wall):
+//   notion-query-data-sources  (SQL mode: Business+AI; timed out then gated)
+//   notion-query-database-view (view mode: Business+AI)
+//   notion-query-meeting-notes (Notion AI feature)
+// Excluding them here is the hard hook: the model never sees them, so it goes
+// straight to the plan-independent path (notion-search → notion-fetch cards →
+// read properties). Re-add ONLY if the workspace upgrades.
 export const NOTION_MCP_READ_TOOLS = [
   "notion-search",
   "notion-fetch",
   "notion-get-users",
   "notion-get-teams",
   "notion-get-comments",
-  "notion-query-data-sources",
-  "notion-query-database-view",
-  "notion-query-meeting-notes",
   "notion-get-async-task",
   "notion-download-attachment",
 ];
