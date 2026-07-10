@@ -11,6 +11,23 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 head_sampling_rate = 1
 
+# MCP health watchdog — see the scheduled() handler in src/index.ts. Probes all
+# attached MCP servers every 15 minutes; posts a throttled alert to #uno-bot on
+# failure.
+[triggers]
+crons = ["*/15 * * * *"]
+
+# ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
+# plan; design within these, don't fight them) ────────────────────────────────
+#   • 50 subrequests per invocation. One agent turn spends most of it (22
+#     harness fetches + Slack + DO + Anthropic), which is why the AgentRunner
+#     processes exactly ONE job per alarm firing (fresh budget each firing).
+#   • ~10ms CPU/request soft budget — agent work is I/O-bound, but keep
+#     CPU-heavy paths (base64 of images) modest.
+#   • Workers Logs: 200K events/day, then sampling.
+#   • ctx.waitUntil() work is cancelled ~30s after the response — anything
+#     longer runs in the AgentRunner Durable Object alarm instead.
+
 # Plain vars (non-secret). Override per-env below.
 #
 # IMPORTANT — both values below must point at the GitHub repo whose `main`

@@ -31,6 +31,7 @@ import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
+import { addReaction } from "../slack/api";
 import type { SlackContext } from "../tools/dispatcher";
 import { BUILD } from "../version";
 
@@ -99,7 +100,7 @@ const MAX_TOKENS = 8192;
 const READONLY_TOOL_BUDGET = 12;
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
-  const { env, userText, history, currentSender, pending, images } = input;
+  const { env, userText, history, currentSender, pending, images, slack } = input;
   const client = makeAnthropicClient(env);
 
   // Notion hosted-MCP (READS ONLY). Empty until the one-time OAuth consent is
@@ -364,7 +365,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
           continue;
         }
         toolCallsUsed++;
-        const resultText = await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>);
+        const resultText = await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>, slack);
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }
       messages.push({ role: "user", content: toolResults });
@@ -454,7 +455,7 @@ function buildMessages(
             type: "image",
             source: {
               type: "base64",
-              media_type: img.media_type as Anthropic.ImageBlockParam.Source["media_type"],
+              media_type: img.media_type as Anthropic.Base64ImageSource["media_type"],
               data: img.data,
             },
           }),
@@ -470,11 +471,39 @@ async function executeReadOnlyTool(
   env: Env,
   name: string,
   input: Record<string, unknown>,
+  slack: SlackContext,
 ): Promise<string> {
   if (name === "notion_search") return executeNotionSearch(env, input);
   if (name === "blueprint_search") return executeBlueprintSearch(env, input);
   if (name === "source_read") return executeReadSource(env, input);
   if (name === "github_read") return executeGithubRead(env, input);
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
+  if (name === "slack_react") return executeSlackReact(env, input, slack);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
+}
+
+// Reactions post AS UNO-BOT via the bot token — the Slack MCP was demoted to
+// reads-only because its user-token writes carried the consenting human's
+// identity (team decision 2026-07-10: everything visible is uno-bot). Ungated:
+// reactions are reversible, the same class as the bot's own replies.
+async function executeSlackReact(
+  env: Env,
+  input: Record<string, unknown>,
+  slack: SlackContext,
+): Promise<string> {
+  const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
+  if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
+  if (emoji === "white_check_mark" || emoji === "x") {
+    return JSON.stringify({
+      ok: false,
+      error: "white_check_mark and x are reserved for the requester's confirm/cancel on proposal cards",
+    });
+  }
+  const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;
+  try {
+    await addReaction(env, slack.channel, ts, emoji);
+    return JSON.stringify({ ok: true, reacted: emoji, message_ts: ts });
+  } catch (err) {
+    return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
+  }
 }

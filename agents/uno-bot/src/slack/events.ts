@@ -101,54 +101,71 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "message": {
       const msg = event as SlackMessageEvent;
       if (await shouldHandleMessage(env, msg)) {
-        await enqueueAgentJob(env, msg);
+        await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
       return;
     }
-    case "app_mention":
+    case "app_mention": {
       // Explicit @mention always engages.
-      await enqueueAgentJob(env, appMentionToMessage(event as SlackAppMentionEvent));
+      const msg = appMentionToMessage(event as SlackAppMentionEvent);
+      await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
       return;
-    case "reaction_added":
-      await handleReaction(env, event as SlackReactionAddedEvent);
+    }
+    case "reaction_added": {
+      // Reactions can confirm a proposal, which executes the real tool (Notion
+      // card, workflow dispatch, email) — same waitUntil() 30s-cancellation
+      // exposure as agent runs, so route through the runner too. Keyed by the
+      // reacted message so confirmations on one proposal stay ordered.
+      const r = event as SlackReactionAddedEvent;
+      await enqueueAgentJob(env, { kind: "reaction", event: r }, `${r.item.channel}:${r.item.ts}`);
       return;
+    }
     default:
       console.log(`[slack] unhandled event type: ${event.type}`);
       return;
   }
 }
 
-// Hand the message to the per-thread AgentRunner DO instead of running it here:
+// A unit of work for the AgentRunner DO: a user message (full agent pipeline)
+// or a reaction (proposal confirm/cancel, which may execute a gated tool).
+export type RunnerJobPayload =
+  | { kind: "message"; event: SlackMessageEvent }
+  | { kind: "reaction"; event: SlackReactionAddedEvent };
+
+// Hand the work to the per-thread AgentRunner DO instead of running it here:
 // this Worker invocation lives inside ctx.waitUntil(), which Cloudflare cancels
-// ~30s after the Slack ack — any longer agent run died silently mid-flight
+// ~30s after the Slack ack — any longer run died silently mid-flight
 // ("👀 then silence", live incident 2026-07-09). DO alarms have no such cutoff.
 // Keyed per thread so runs within a thread stay ordered.
-async function enqueueAgentJob(env: Env, event: SlackMessageEvent): Promise<void> {
-  const threadKey = `${event.channel}:${event.thread_ts ?? event.ts}`;
+async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
   const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
   const res = await stub.fetch("https://do/enqueue", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ event, enqueuedAt: Date.now() }),
+    body: JSON.stringify({ job, enqueuedAt: Date.now() }),
   });
-  if (!res.ok) {
+  if (!res.ok && job.kind === "message") {
     // Enqueue is the only step left in the Worker — a failure here IS the
     // 👀-then-silence path, so make it visible instead.
     console.error(`[slack] runner enqueue failed: ${res.status}`);
     await postMessage(env, {
-      channel: event.channel,
-      thread_ts: event.thread_ts ?? event.ts,
+      channel: job.event.channel,
+      thread_ts: job.event.thread_ts ?? job.event.ts,
       text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
   }
 }
 
-// Entry point the AgentRunner DO alarm calls: the full message pipeline with
-// the visible-failure backstop. Runs OUTSIDE waitUntil — no 30s cutoff.
-export async function onRunnerJob(env: Env, event: SlackMessageEvent): Promise<void> {
-  await onMessageVisiblyFailing(env, event);
+// Entry point the AgentRunner DO alarm calls. Runs OUTSIDE waitUntil — no 30s
+// cutoff, fresh subrequest budget per alarm invocation.
+export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<void> {
+  if (job.kind === "reaction") {
+    await handleReaction(env, job.event);
+    return;
+  }
+  await onMessageVisiblyFailing(env, job.event);
 }
 
 // Outermost catch WITH channel/thread context. onMessage already posts a
@@ -314,6 +331,18 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
   }
 
+  // Interim status: long runs are now legal (streaming + MCP can take several
+  // minutes), and ⏳ alone left people typing "any thing???" at the 8-minute
+  // mark. One plain-language note at ~75s says the silence is work, not death.
+  // Cleared as soon as the run finishes; costs one subrequest.
+  const interimTimer = setTimeout(() => {
+    postMessage(env, {
+      channel,
+      thread_ts: threadTs,
+      text: ":hourglass_flowing_sand: Still on it — this one needs a longer dig. The full answer will land right here.",
+    }).catch(() => {});
+  }, 75_000);
+
   let result: AgentResult;
   try {
     result = await runAgent({
@@ -336,6 +365,8 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
     await postVisibleFailure(env, channel, threadTs, userMsgTs);
     return;
+  } finally {
+    clearTimeout(interimTimer);
   }
 
   // ----- text-only response -----

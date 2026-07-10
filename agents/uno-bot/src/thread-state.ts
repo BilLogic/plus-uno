@@ -39,7 +39,11 @@ interface EventRecord {
 const MAX_HISTORY_TURNS = 50;
 const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;        // 7 days
 const PROPOSAL_TTL_MS = 15 * 60 * 1000;                // 15 min
-const EVENT_DEDUP_TTL_MS = 10 * 60 * 1000;             // 10 min — covers Slack's retry window
+// 24h — was 10 min ("covers Slack's retry window"), but agent runs can now
+// legally exceed 10 minutes (streaming + MCP; live 2026-07-10 run: 11 min),
+// after which the duplicate app_mention/message copy passed dedup and re-ran
+// the ENTIRE agent turn. One tiny record per user message — keep them a day.
+const EVENT_DEDUP_TTL_MS = 24 * 60 * 60 * 1000;
 
 export class ThreadState implements DurableObject {
   private storage: DurableObjectStorage;

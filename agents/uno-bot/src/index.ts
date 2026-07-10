@@ -3,7 +3,8 @@ import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
 import { startNotionOAuth, handleNotionOAuthCallback } from "./oauth/notion";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
-import { handleMcpHealth } from "./debug/mcp-health";
+import { handleMcpHealth, runScheduledMcpHealthCheck } from "./debug/mcp-health";
+import { postMessage } from "./slack/api";
 import { BUILD } from "./version";
 
 export default {
@@ -44,6 +45,20 @@ export default {
     }
 
     return new Response("not found", { status: 404 });
+  },
+
+  // Cron (wrangler.toml [triggers]): MCP health watchdog. Probes every attached
+  // server and posts a throttled alert to #uno-bot when one is down, so outages
+  // like the Slack-toggle incident (2026-07-09) surface in minutes, not on the
+  // next confused user.
+  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      runScheduledMcpHealthCheck(env, (e, args) =>
+        postMessage(e, { channel: args.channel, text: args.text }),
+      ).catch((err) => {
+        console.error(`[mcp-health] scheduled check failed: ${err instanceof Error ? err.message : String(err)}`);
+      }),
+    );
   },
 };
 

@@ -72,15 +72,55 @@ async function probeServer(name: string, url: string, token: string): Promise<Pr
   }
 }
 
-export async function handleMcpHealth(env: Env): Promise<Response> {
+export async function probeAllMcp(env: Env): Promise<{ ok: boolean; servers: ProbeResult[] }> {
   const { servers } = await buildMcp(env);
-  if (servers.length === 0) {
-    return Response.json({ ok: false, servers: [], note: "no MCP servers configured/authorized" });
-  }
+  if (servers.length === 0) return { ok: false, servers: [] };
   const results = await Promise.all(
     servers.map((s) =>
       probeServer(String(s.name), String(s.url), String(s.authorization_token ?? "")),
     ),
   );
-  return Response.json({ ok: results.every((r) => r.ok), servers: results });
+  return { ok: results.every((r) => r.ok), servers: results };
+}
+
+export async function handleMcpHealth(env: Env): Promise<Response> {
+  const report = await probeAllMcp(env);
+  if (report.servers.length === 0) {
+    return Response.json({ ...report, note: "no MCP servers configured/authorized" });
+  }
+  return Response.json(report);
+}
+
+// Cron entry point: probe every server on a schedule and post a plain-language
+// alert to #uno-bot when one is down — closing the loop the /debug/mcp endpoint
+// opened ("make sure all MCPs keep working", 2026-07-10). Alerts are throttled
+// to one per hour via HARNESS_KV so a long outage doesn't spam the channel.
+const ALERT_THROTTLE_MS = 60 * 60 * 1000;
+const ALERT_KV_KEY = "mcp_health_alert_at";
+const UNO_BOT_CHANNEL = "C0ARJ2A3A69";
+
+export async function runScheduledMcpHealthCheck(
+  env: Env,
+  postMessage: (env: Env, args: { channel: string; text: string }) => Promise<unknown>,
+): Promise<void> {
+  const report = await probeAllMcp(env);
+  const down = report.servers.filter((r) => !r.ok);
+  if (down.length === 0) return;
+
+  if (env.HARNESS_KV) {
+    const last = await env.HARNESS_KV.get(ALERT_KV_KEY);
+    if (last && Date.now() - Number(last) < ALERT_THROTTLE_MS) {
+      console.warn(`[mcp-health] still down (${down.map((d) => d.server).join(", ")}) — alert throttled`);
+      return;
+    }
+    await env.HARNESS_KV.put(ALERT_KV_KEY, String(Date.now()));
+  }
+
+  const lines = down
+    .map((d) => `• *${d.server}* — ${d.status ? `HTTP ${d.status}` : "no response"}${d.detail ? `: ${d.detail.slice(0, 150)}` : ""}`)
+    .join("\n");
+  await postMessage(env, {
+    channel: UNO_BOT_CHANNEL,
+    text: `:rotating_light: uno-bot lost its connection to ${down.length === 1 ? "a data source" : `${down.length} data sources`}:\n${lines}\nAnswers fall back to slower paths until this recovers — details at /debug/mcp.`,
+  }).catch?.(() => {});
 }
