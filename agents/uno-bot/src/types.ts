@@ -80,4 +80,18 @@ export interface Env {
   // game. Everything else private, and all DMs/group DMs, is hard-dropped by
   // the Worker before the model sees search results. Empty/unset → public only.
   SLACK_SEARCH_PRIVATE_ALLOWLIST?: string;
+  // --- Gemini provider (dual-provider adapter, phase 1) ----------------------
+  // MODEL_PROVIDER selects the runtime brain: "anthropic" (default) | "gemini".
+  // Phase 1 ships the credential layer + /debug/gemini smoke test only; the
+  // agent loop stays on Anthropic until the phase-2 adapter PR.
+  MODEL_PROVIDER?: string;
+  // Auth mode auto-selected by which credential exists (see gemini/client.ts):
+  // GEMINI_API_KEY (secret, Developer API — simplest) OR the service-account
+  // pair (secrets, Vertex AI): GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY.
+  GEMINI_API_KEY?: string;
+  GEMINI_SA_EMAIL?: string;
+  GEMINI_SA_PRIVATE_KEY?: string;
+  GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
+  GEMINI_REGION?: string; // Vertex only; default "global"
+  GEMINI_MODEL?: string; // default "gemini-3.5-flash"
 }
