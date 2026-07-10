@@ -153,7 +153,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
             ...params,
             tools: toolsWithMcp,
             mcp_servers: mcpServers,
-          } as Anthropic.MessageCreateParamsNonStreaming,
+          } as unknown as Anthropic.MessageCreateParamsNonStreaming,
           { headers: { "anthropic-beta": MCP_BETA } },
         );
       } catch (err) {
