@@ -111,11 +111,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // (see agent/mcp.ts). When no token is stored, all of this is empty and the
   // loop is identical to the pre-MCP behavior.
   const { servers: mcpServers, toolsets: mcpToolsets } = await buildMcp(env);
-  const mcpEnabled = mcpServers.length > 0;
-  const mcpParams = mcpEnabled ? { mcp_servers: mcpServers } : {};
-  const mcpOpts = mcpEnabled
-    ? { headers: { "anthropic-beta": MCP_BETA } }
-    : undefined;
+  const mcpServerNames = mcpServers.map((s) => String((s as Record<string, unknown>).name));
+  // Mutable: trips to false when the MCP attachment breaks THIS request (see
+  // callClaude below) so the retry + all later iterations run without MCP.
+  let mcpActive = mcpServers.length > 0;
   // Anthropic server-side web search (runs on Anthropic's infra, READ-only, no
   // beta header). Gives the bot web grounding — e.g. Figma usage/practice
   // questions and external resources it can't reach any other way (Figma's own
@@ -132,6 +131,45 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     WEB_SEARCH_TOOL,
     ...(mcpToolsets as unknown as Anthropic.Tool[]),
   ];
+  // Fallback tool set: everything EXCEPT the MCP toolsets (web_search is an
+  // Anthropic server tool, independent of MCP — it stays).
+  const toolsPlain = [...(TOOLS as Anthropic.Tool[]), WEB_SEARCH_TOOL];
+
+  // Resilient Anthropic call. If ANY attached MCP server fails to connect,
+  // the API 400s the WHOLE request ("Connection error while communicating
+  // with MCP server…") — one dead server must not take the bot down when the
+  // REST fallback tools still work. On that specific error: log which servers
+  // were attached, drop the MCP attachment for the REST OF THIS REQUEST, and
+  // retry. (Edge: if earlier iterations already produced mcp_tool_use blocks
+  // in `messages`, the MCP-less retry may itself be rejected — acceptable;
+  // the dominant failure mode is the FIRST call, before any MCP blocks exist.)
+  const callClaude = async (
+    params: Record<string, unknown>,
+  ): Promise<Anthropic.Message> => {
+    if (mcpActive) {
+      try {
+        return await client.messages.create(
+          {
+            ...params,
+            tools: toolsWithMcp,
+            mcp_servers: mcpServers,
+          } as Anthropic.MessageCreateParamsNonStreaming,
+          { headers: { "anthropic-beta": MCP_BETA } },
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!/MCP server/i.test(msg)) throw err;
+        mcpActive = false;
+        console.error(
+          `[agent] MCP attachment failed (servers: ${mcpServerNames.join(",")}) — retrying without MCP: ${msg.slice(0, 300)}`,
+        );
+      }
+    }
+    return client.messages.create({
+      ...params,
+      tools: toolsPlain,
+    } as Anthropic.MessageCreateParamsNonStreaming);
+  };
 
   // D2: pick the model tier from the message intent once per request.
   const { tier, model } = pickModel({ userText, hasPending: pending !== null });
@@ -177,7 +215,9 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       `[uno-bot] request done build=${BUILD} tier=${tier} model=${model} iterations=${iterations} ` +
         `tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
         `cache_read=${cacheReadTokens} cache_write=${cacheWriteTokens} ms=${Date.now() - startedAt} ` +
-        `tools=[${toolsList.join(",")}] outcome=${result.kind}`,
+        `tools=[${toolsList.join(",")}] ` +
+        `mcp=${mcpServerNames.length === 0 ? "off" : mcpActive ? mcpServerNames.join("+") : "FELL_BACK"} ` +
+        `outcome=${result.kind}`,
     );
     return result;
   };
@@ -190,14 +230,12 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const messages = buildMessages(history, userText, images);
 
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
-    const response = await client.messages.create({
+    const response = await callClaude({
       model,
       max_tokens: MAX_TOKENS,
       system: systemBlocks as Anthropic.TextBlockParam[],
-      tools: toolsWithMcp,
       messages,
-      ...mcpParams,
-    } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
+    });
 
     iterations++;
     addUsage(response.usage);
@@ -337,15 +375,13 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     content:
       "(system: tool budget exhausted — answer the original question NOW from the tool results above; do not request more tools. If the results are insufficient, say what's missing.)",
   });
-  const finalResponse = await client.messages.create({
+  const finalResponse = await callClaude({
     model,
     max_tokens: MAX_TOKENS,
     system: systemBlocks as Anthropic.TextBlockParam[],
-    tools: toolsWithMcp,
     tool_choice: { type: "none" } as unknown as Anthropic.MessageCreateParams["tool_choice"],
     messages,
-    ...mcpParams,
-  } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
+  });
   iterations++;
   addUsage(finalResponse.usage);
   recordToolUses(finalResponse.content);
