@@ -27,7 +27,10 @@ function transformSegment(seg: string): string {
   return seg
     .replace(/\*\*([^\n*]+?)\*\*/g, "*$1*") // **bold** → *bold*
     .replace(/__([^\n_]+?)__/g, "*$1*") // __bold__ → *bold*
-    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, "<$2|$1>"); // [label](url) → <url|label>
+    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, "<$2|$1>") // [label](url) → <url|label>
+    // A link wrapped in a code span renders as raw text, not a link (live
+    // 2026-07-10, gemini round: `<url|label>` reached users verbatim). Unwrap.
+    .replace(/`(<https?:\/\/[^`\n]+>)`/g, "$1");
 }
 
 function convertLine(line: string): string {
