@@ -350,6 +350,43 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     return;
   }
 
+  // Deterministic confirm/cancel fast-path — a BARE confirmation on a pending
+  // proposal never needs a model, on any provider. The reaction gate (✅/❌)
+  // was already deterministic; text now matches it. Live failure 2026-07-10
+  // (gemini): "go ahead" made the model re-stage an identical proposal and hit
+  // the duplicate guard instead of resolving — the user's approval bounced.
+  // Anything longer than a bare phrase still goes to the model (it may be a
+  // modification request, not a plain yes/no).
+  if (pending) {
+    const bare = userText.trim().toLowerCase().replace(/[.!?\s]+$/g, "");
+    const CONFIRM_PHRASES = new Set([
+      "go ahead", "yes", "yes please", "confirm", "confirmed", "do it",
+      "ship it", "approve", "approved", "sure", "ok", "okay", "lgtm",
+    ]);
+    const CANCEL_PHRASES = new Set([
+      "cancel", "no", "stop", "abort", "nevermind", "never mind",
+      "cancel it", "don't", "dont",
+    ]);
+    if (CONFIRM_PHRASES.has(bare) || CANCEL_PHRASES.has(bare)) {
+      if (userId !== pending.requesterUserId) {
+        await postMessage(env, {
+          channel,
+          thread_ts: threadTs,
+          text: `Only <@${pending.requesterUserId}> can confirm or cancel this one.`,
+        });
+        return;
+      }
+      const decision = CONFIRM_PHRASES.has(bare) ? "confirm" : "cancel";
+      await resolveProposal(env, pending, decision);
+      await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+      await appendHistory(env, channel, threadTs, {
+        role: "assistant",
+        content: decision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
+      });
+      return;
+    }
+  }
+
   // Vision: pasted images + a linked Figma frame become base64 image blocks on
   // the current turn. Guarded inside — a failure degrades to text-only.
   const vision = await collectVisionInputs(env, event, userText);
