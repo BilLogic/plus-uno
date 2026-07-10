@@ -77,6 +77,18 @@ Use `create_new_file` only when:
 - The user explicitly requests generating a Figma design from code
 - Always confirm with the user before writing to Figma (treat like forbidden pattern #8 — no unsanctioned writes)
 
+## Round-trip loop (code → Figma → code) — optional, opt-in
+
+For iterating a prototype between the repo and Figma (build here → designer tweaks on canvas → re-import). Never offer it unprompted as a mandatory step; it starts only when the user asks to push work to Figma, and every canvas write goes through **`writers/figma`** (placement, naming, and annotations per `docs/conventions/figma-workspace.md`).
+
+1. **Implement in the repo** — the normal hi-fi path (implement-design 7 steps if the source was Figma).
+2. **Write-back (gated)** — user opts in and names the target file/page. Load the official `figma-use` skill before ANY canvas write; place registry component **instances**, never redrawn frames (see Component alignment above). Capture the returned file URL + node ids in the thread.
+3. **Designer tweaks in Figma** — human work; the agent stays out.
+4. **Re-import** — treat the updated frame link as a fresh design handoff: run the full implement-design 7 steps again (registries first). No shortcuts because "it came from our own write-back".
+5. Repeat 2–4 until the user stops.
+
+**Keep one source of truth per iteration** — either "Figma wins this round" or "code wins"; never blind two-way sync without human review. If MCP write access is unavailable, say so and stay on Figma → code (or screenshots).
+
 ## Component resolution fallback
 
 1. **Primary:** `design-system/figma/component-registry.json` — import path, props, Figma set node IDs (generated from each component's MDX `figmaMeta`; read-only — edit MDX to change a mapping)
