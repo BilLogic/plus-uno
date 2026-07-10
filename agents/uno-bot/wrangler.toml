@@ -106,7 +106,10 @@ MODEL_PROVIDER = "gemini"
 # Vertex service-account path (project the SA belongs to; region "global").
 GEMINI_PROJECT_ID = "hcii-plus"
 GEMINI_REGION = "global"
-GEMINI_MODEL = "gemini-3.5-flash"
+# TRIAL 2026-07-10: gemini-3.1-flash-lite ($0.25/$1.50 per M vs 3.5-flash's
+# $1.50/$9) — A/B cost+quality comparison; revert to "gemini-3.5-flash" if
+# quality drops on the agentic loop (flash-lite runs minimal thinking).
+GEMINI_MODEL = "gemini-3.1-flash-lite"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET

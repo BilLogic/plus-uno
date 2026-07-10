@@ -129,7 +129,10 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // dials — one model keeps this simple and cache-friendly).
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
   const model = env.GEMINI_MODEL ?? "gemini-3.5-flash";
-  const thinkingLevel = tier === "haiku" ? "minimal" : "high";
+  // flash-lite is the minimal-thinking tier — it doesn't take the higher
+  // thinking_level dials the full flash/pro models do.
+  const isLite = model.includes("flash-lite");
+  const thinkingLevel = isLite || tier === "haiku" ? "minimal" : "high";
 
   const startedAt = Date.now();
   let inputTokens = 0;

@@ -411,9 +411,18 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     interimPosted = true;
     postMessage(env, { channel, thread_ts: threadTs, text: `:hourglass_flowing_sand: ${text}` }).catch(() => {});
   };
+  // Varied so heavy days don't read as the same canned line five times over
+  // (tone feedback, 2026-07-10). Picked by message ts — stable per run,
+  // different across runs.
+  const BACKSTOP_LINES = [
+    "Still on it — this one needs a longer dig. The full answer will land right here.",
+    "Still digging — there's more to check than usual. Answer coming in this thread.",
+    "Taking my time on this one so it's right. I'll post the full answer here.",
+  ];
   const interimTimer = setTimeout(() => {
     if (interimPosted) return;
-    postInterim("Still on it — this one needs a longer dig. The full answer will land right here.");
+    const pick = Math.abs(parseInt(userMsgTs.replace(".", "").slice(-6), 10)) % BACKSTOP_LINES.length;
+    postInterim(BACKSTOP_LINES[pick] ?? BACKSTOP_LINES[0]!);
   }, 75_000);
 
   let result: AgentResult;
