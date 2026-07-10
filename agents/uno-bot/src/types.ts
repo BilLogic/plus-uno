@@ -70,9 +70,14 @@ export interface Env {
   // Slack has NO dynamic registration → a STATIC pre-registered client is used
   // (client_id is a non-secret [vars] entry, client_secret is a wrangler secret).
   // The issued user token lives in SLACK_OAUTH_KV. Unset → the Slack MCP stays
-  // off. Slack is the ONE service attached enable-all (writes intentional).
+  // off (reads-only allowlist; writes go through the bot token).
   SLACK_MCP_CLIENT_ID?: string;
   SLACK_MCP_CLIENT_SECRET?: string;
   SLACK_OAUTH_REDIRECT_URI?: string;
   SLACK_OAUTH_KV?: KVNamespace;
+  // Visibility firewall for slack_search (tools/slack-search.ts): comma-
+  // separated PRIVATE channel IDs whose content is team-designated as fair
+  // game. Everything else private, and all DMs/group DMs, is hard-dropped by
+  // the Worker before the model sees search results. Empty/unset → public only.
+  SLACK_SEARCH_PRIVATE_ALLOWLIST?: string;
 }

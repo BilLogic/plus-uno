@@ -125,6 +125,23 @@
     }
   },
   {
+    "name": "slack_search",
+    "description": "Search Slack workspace messages. Results are PRE-CLEARED for sharing: public channels plus the team-designated private channels only \u2014 DMs and other private spaces are filtered out before you see them, so everything returned is safe to quote in your reply. The response includes withheld_private_matches (a count of hits that existed in non-shareable spaces); if it's >0 and relevant, you may say matches exist in private spaces you can't surface \u2014 never speculate about their content. Use for 'find the discussion about X', sign-off tallies across channels, locating past decisions. READ-ONLY, ungated.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query"
+      ],
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Slack search query. Supports operators like in:#channel, from:@user, before:/after: dates."
+        }
+      }
+    }
+  },
+  {
     "name": "delegate",
     "description": "Fan out up to 3 independent research subtasks to fast subagents that run IN PARALLEL \u2014 each one can search and read Notion, GitHub, Supabase, and Slack on its own. Use whenever grounding needs several separate lookups (fetch specific cards and report their status; find a person's roster page; pull a doc and extract fields) so you stay focused on reasoning and synthesis instead of doing every lookup serially yourself. Each task must be a SELF-CONTAINED goal with the names/links/IDs the subagent needs. Results come back as compact bullet facts with links. READ-ONLY; ungated; counts as one tool call.",
     "input_schema": {

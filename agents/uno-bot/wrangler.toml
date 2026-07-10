@@ -82,6 +82,13 @@ NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/not
 # URI must match the one registered on the Slack app.
 SLACK_MCP_CLIENT_ID = "12186538800.10808020289637"
 SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback"
+# Visibility firewall for workspace search (src/tools/slack-search.ts). The
+# search credential sees the consenting admin's FULL Slack (DMs, private
+# channels) — the Worker hard-filters results before the model sees them:
+# public passes; private passes ONLY if its channel ID is listed here (the
+# team-designated, well-organized private channels); DMs/group DMs never pass.
+# Comma-separated channel IDs, e.g. "C0AAA11111,C0BBB22222". Empty = public only.
+SLACK_SEARCH_PRIVATE_ALLOWLIST = ""
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET

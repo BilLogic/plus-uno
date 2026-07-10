@@ -102,9 +102,15 @@ const SUPABASE_MCP_READ_TOOLS = [
 // (postMessage / addReaction / the slack_react tool), which post as uno-bot.
 const SLACK_SERVER = "slack";
 const SLACK_URL = "https://mcp.slack.com/mcp";
+// MESSAGE search is deliberately absent: MCP search results reach the model
+// server-side with the admin token's FULL visibility (DMs, private channels)
+// and only a harness rule between them and the channel. Workspace search now
+// runs through the bot's own `slack_search` tool, where the Worker hard-drops
+// DMs and non-allowlisted private hits BEFORE the model sees them (see
+// tools/slack-search.ts — the visibility firewall). What stays here: directory
+// searches (channels/users/emojis — metadata, not messages) and pull-by-ID
+// reads, which can't trawl private content without already having an ID.
 const SLACK_MCP_READ_TOOLS = [
-  "slack_search_public",
-  "slack_search_public_and_private",
   "slack_search_channels",
   "slack_search_users",
   "slack_search_emojis",
