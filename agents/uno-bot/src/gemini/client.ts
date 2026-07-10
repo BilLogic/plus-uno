@@ -43,6 +43,48 @@ export function geminiConfigured(env: Env): "api-key" | "service-account" | null
   return null;
 }
 
+// Resolve endpoint + auth headers for a generateContent call on either access
+// path (Developer API key, or Vertex with a service-account OAuth token).
+async function geminiEndpoint(
+  env: Env,
+  model: string,
+): Promise<{ url: string; headers: Record<string, string> }> {
+  const mode = geminiConfigured(env);
+  if (!mode) throw new Error("no Gemini credential configured");
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (mode === "api-key") {
+    headers["x-goog-api-key"] = env.GEMINI_API_KEY!;
+    return {
+      url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      headers,
+    };
+  }
+  const project = env.GEMINI_PROJECT_ID ?? "";
+  const region = env.GEMINI_REGION ?? "global";
+  const host = region === "global" ? "aiplatform.googleapis.com" : `${region}-aiplatform.googleapis.com`;
+  headers.authorization = `Bearer ${await getGoogleAccessToken(env)}`;
+  return {
+    url: `https://${host}/v1/projects/${project}/locations/${region}/publishers/google/models/${model}:generateContent`,
+    headers,
+  };
+}
+
+/**
+ * Low-level generateContent: caller owns the full request body (contents,
+ * systemInstruction, tools, generationConfig, …) and gets the raw parsed
+ * response back. The agent loop in agent/gemini-agent.ts builds on this.
+ */
+export async function geminiGenerateRaw(
+  env: Env,
+  model: string,
+  body: Record<string, unknown>,
+): Promise<{ status: number; data: unknown }> {
+  const { url, headers } = await geminiEndpoint(env, model);
+  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  const data = (await res.json().catch(() => ({}))) as unknown;
+  return { status: res.status, data };
+}
+
 export async function geminiGenerate(
   env: Env,
   opts: {

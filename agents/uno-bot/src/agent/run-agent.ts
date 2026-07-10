@@ -28,11 +28,14 @@ import { makeAnthropicClient, routeRequest, MODELS } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeRoadmapQuery } from "../tools/roadmap-query";
+import { geminiConfigured } from "../gemini/client";
+import { runGeminiAgent } from "./gemini-agent";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
+import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
 import { addReaction } from "../slack/api";
 import type { SlackContext } from "../tools/dispatcher";
 import { BUILD } from "../version";
@@ -110,6 +113,14 @@ const READONLY_TOOL_BUDGET = 12;
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack } = input;
+
+  // Provider switch (phase 2): MODEL_PROVIDER="gemini" routes the whole turn
+  // through the Gemini loop (agent/gemini-agent.ts) — same AgentResult contract,
+  // so everything downstream (gate, delivery, history) is provider-blind.
+  if ((env.MODEL_PROVIDER ?? "anthropic").toLowerCase() === "gemini" && geminiConfigured(env)) {
+    return runGeminiAgent(input);
+  }
+
   const client = makeAnthropicClient(env);
 
   // D2 (Phase 3 final): three fixed lanes, no classifier — the dynamic part is
@@ -617,7 +628,10 @@ function buildMessages(
   return result;
 }
 
-async function executeReadOnlyTool(
+// Exported for the Gemini loop (agent/gemini-agent.ts) — one dispatcher, two
+// providers. (The mutual import between the two agent files is benign: both
+// only reference each other's functions at call time.)
+export async function executeReadOnlyTool(
   env: Env,
   name: string,
   input: Record<string, unknown>,
@@ -631,6 +645,8 @@ async function executeReadOnlyTool(
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
   if (name === "slack_search") return executeSlackSearch(env, input);
   if (name === "slack_react") return executeSlackReact(env, input, slack);
+  if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
+  if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }
 
