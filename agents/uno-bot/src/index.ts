@@ -90,3 +90,4 @@ async function handleSlackEventsRequest(
 }
 
 export { ThreadState } from "./thread-state";
+export { AgentRunner } from "./agent-runner";
