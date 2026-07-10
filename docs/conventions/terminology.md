@@ -53,3 +53,20 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Tier 1 / Tier 2** (maintenance) | trivial auto-applied fix vs PR+PRD through a Slack verdict | — |
 | **Tier 1 / Tier 2** (loading) | always-loaded docs vs on-demand loads (`loading-order.md`) | — |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
+
+## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management (added 2026-07-10)
+
+Two estates describe the product in **different languages**, and the words are NOT interchangeable. Mixing them is a defect: never describe results from one estate in the other's vocabulary, and never search one estate for the other's concepts.
+
+| | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
+|---|---|---|
+| What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
+| Its words | **phase** (Application · Onboarding · Pre-session · In-session · Post-session) · **service scenario** (Goal Setting, Call-off Request, Fill-in Request, Warm-Up, Wrap-Up, Session Sign Up, …) · **path** (Happy / Sad / Alternate / edge case) · **step** · **layer** = the actor row (Regular Tutor, Lead Tutor, Partner Action: Teacher, Front/Back Stage Actions, Front/Back Stage Tech, Support Actions, Visual) · **cell** = one activity at layer × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "layer", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
+
+**Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
+
+- card / status / pillar / owner / RM-ID / "where are we on X" / "what's WIP or under review" → **Roadmap** (Notion), full stop.
+- who-does-what / flow / scenario / actor / step / "what happens when" → **blueprint** (Supabase), full stop.
+
+**Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows. Blueprint scenarios, steps, or research notes must never be presented as things found "on the Roadmap", and Roadmap cards must never be called scenarios, steps, or cells.
