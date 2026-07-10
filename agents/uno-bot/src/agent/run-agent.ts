@@ -24,7 +24,7 @@ import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { makeAnthropicClient, pickModel } from "./anthropic-client";
+import { makeAnthropicClient, classifyRoute } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
@@ -184,8 +184,13 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       .finalMessage();
   };
 
-  // D2: pick the model tier from the message intent once per request.
-  const { tier, model } = pickModel({ userText, hasPending: pending !== null });
+  // D2 (Phase 3 revamp): route on how much GROUNDING the answer needs, not
+  // what verbs the message uses — one tiny haiku classifier call, with keyword
+  // fast-paths and a keyword fallback (see classifyRoute).
+  const { tier, model, reason: routeReason } = await classifyRoute(client, {
+    userText,
+    hasPending: pending !== null,
+  });
 
   // D7: per-request turn/token telemetry. One structured line per request,
   // visible via `wrangler tail`, so cost + iteration economy is observable.
@@ -225,7 +230,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const finish = (result: AgentResult): AgentResult => {
     const toolsList = [...toolNamesUsed, ...(mcpCallsUsed > 0 ? [`mcp:${mcpCallsUsed}`] : [])];
     console.log(
-      `[uno-bot] request done build=${BUILD} tier=${tier} model=${model} iterations=${iterations} ` +
+      `[uno-bot] request done build=${BUILD} tier=${tier} route=${routeReason} model=${model} iterations=${iterations} ` +
         `tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
         `cache_read=${cacheReadTokens} cache_write=${cacheWriteTokens} ms=${Date.now() - startedAt} ` +
         `tools=[${toolsList.join(",")}] ` +

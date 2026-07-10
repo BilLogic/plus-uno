@@ -46,6 +46,73 @@ export function pickModel(opts: { userText: string; hasPending: boolean }): {
   return { tier: "sonnet", model: MODELS.sonnet };
 }
 
+// ─── Grounding-aware router (Phase 3, 2026-07-10) ────────────────────────────
+// pickModel() greps for verbs, which misjudges effort: "what's on the roadmap?"
+// — short, no fancy verbs — landed on haiku for a task needing multi-step MCP
+// grounding across Notion. classifyRoute() replaces it in the agent path: one
+// tiny tool-less haiku call (~1s, fraction of a cent) classifies the request on
+// the two axes that actually predict cost — reasoning depth and how much
+// grounding the ANSWER needs — then maps to a tier. Keyword fast-paths keep
+// confirm/cancel and explicit escalations free, and any failure falls back to
+// pickModel(), so routing can never take the bot down. events.ts still uses
+// pickModel() for the instant ⏳ preview (no latency before the receipt).
+interface RouteDecision {
+  tier: ModelTier;
+  model: string;
+  reason: string;
+}
+
+const ROUTER_SYSTEM = `You route requests for a design-team assistant. Classify the request on two axes and answer ONLY with JSON, no prose:
+{"depth":"quick|standard|deep","grounding":"none|single|multi"}
+
+depth — reasoning needed: quick = lookup/ack/one-liner; standard = normal question or small task; deep = synthesis, drafting a document (PRD/spec), multi-part analysis, review/critique, planning.
+grounding — sources the ANSWER must consult: none = answerable from the conversation; single = one lookup (one page, one thread, one search); multi = several sources or several lookups (board + cards, search + fetch chains, cross-referencing people/projects/status).`;
+
+export async function classifyRoute(
+  client: Anthropic,
+  opts: { userText: string; hasPending: boolean },
+): Promise<RouteDecision> {
+  const text = opts.userText.toLowerCase();
+
+  // Fast paths — no classifier call needed.
+  if (opts.hasPending && /\b(go ahead|yes|confirm|do it|cancel|no|stop|nope|abort)\b/.test(text)) {
+    return { tier: "haiku", model: MODELS.haiku, reason: "proposal-resolution" };
+  }
+  if (/\bthink (hard|deeply)\b/.test(text)) {
+    return { tier: "opus", model: MODELS.opus, reason: "explicit-escalation" };
+  }
+
+  try {
+    const res = await client.messages.create({
+      model: MODELS.haiku,
+      max_tokens: 60,
+      system: ROUTER_SYSTEM,
+      messages: [{ role: "user", content: opts.userText.slice(0, 1500) }],
+    });
+    const raw = res.content.find((b) => b.type === "text")?.text ?? "";
+    const parsed = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)) as {
+      depth?: string;
+      grounding?: string;
+    };
+    const depth = parsed.depth ?? "standard";
+    const grounding = parsed.grounding ?? "single";
+    // deep reasoning → opus; any multi-source grounding gets a sonnet FLOOR
+    // (the trial-A failure class); only quick+none stays on haiku.
+    if (depth === "deep") return { tier: "opus", model: MODELS.opus, reason: `classified:${depth}/${grounding}` };
+    if (grounding === "multi" || depth === "standard") {
+      return { tier: "sonnet", model: MODELS.sonnet, reason: `classified:${depth}/${grounding}` };
+    }
+    if (grounding === "none") return { tier: "haiku", model: MODELS.haiku, reason: `classified:${depth}/${grounding}` };
+    return { tier: "sonnet", model: MODELS.sonnet, reason: `classified:${depth}/${grounding}` };
+  } catch (err) {
+    const fallback = pickModel(opts);
+    console.warn(
+      `[route] classifier failed (${err instanceof Error ? err.message : String(err)}) — keyword fallback → ${fallback.tier}`,
+    );
+    return { ...fallback, reason: "keyword-fallback" };
+  }
+}
+
 export function makeAnthropicClient(env: Env): Anthropic {
   return new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 }

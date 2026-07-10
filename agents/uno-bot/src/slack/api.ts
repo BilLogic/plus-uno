@@ -129,12 +129,23 @@ export async function conversationsReplies(
   thread_ts: string,
   limit = 20,
 ) {
-  return slackCall<ConversationsRepliesResult>(env, "conversations.replies", {
+  // conversations.replies is a READ method — Slack rejects application/json
+  // bodies on it with `invalid_arguments` (the long-standing warn in our logs).
+  // Read methods take URL-encoded query params.
+  const params = new URLSearchParams({
     channel,
     ts: thread_ts,
-    limit,
-    inclusive: true,
+    limit: String(limit),
+    inclusive: "true",
   });
+  const res = await fetch(`https://slack.com/api/conversations.replies?${params}`, {
+    headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
+  });
+  const data = (await res.json()) as ConversationsRepliesResult;
+  if (!data.ok) {
+    console.warn(`[slack] conversations.replies failed: ${(data as { error?: string }).error}`);
+  }
+  return data;
 }
 
 // The bot's own identity, used to tag which thread messages are the bot's
