@@ -64,7 +64,9 @@ export async function geminiGenerate(
     contents: [{ role: "user", parts: [{ text: opts.prompt }] }],
     generationConfig: {
       maxOutputTokens: opts.maxTokens ?? 2048,
-      ...(opts.thinkingLevel ? { thinkingLevel: opts.thinkingLevel } : {}),
+      // thinking_level nests under thinkingConfig on the REST generateContent
+      // surface (live 400 confirmed it's not a direct generationConfig field).
+      ...(opts.thinkingLevel ? { thinkingConfig: { thinkingLevel: opts.thinkingLevel } } : {}),
     },
     ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
   };
