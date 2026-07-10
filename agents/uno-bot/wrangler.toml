@@ -96,11 +96,13 @@ SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slac
 #   plus-marketing C052BG9NE86 · plus-training C07L5RZV6DR ·
 #   plus-universal C072E8SFLKV
 SLACK_SEARCH_PRIVATE_ALLOWLIST = "C03DVDS4LN9,C07PZJD3HD5,C09EPEJEQ9K,C07LU2K8DQW,C089A3E9CCW,C074QG2V7DJ,C052BG9NE86,C07L5RZV6DR,C072E8SFLKV"
-# ── Dual-provider adapter (phase 1: credential layer + /debug/gemini) ────────
-# MODEL_PROVIDER: "anthropic" (default) | "gemini". Phase 1 does NOT switch the
-# agent loop — it validates credentials and reachability; the loop rewire is
-# the phase-2 PR after the current branch is verified live.
-MODEL_PROVIDER = "anthropic"
+# ── Dual-provider adapter ─────────────────────────────────────────────────────
+# MODEL_PROVIDER: "anthropic" | "gemini". Flipping this var IS the switch —
+# runAgent dispatches the whole turn to the matching loop (src/agent/
+# gemini-agent.ts for gemini: client-side tool loop, local tools only — Gemini
+# has no server-side MCP; hosted-MCP reach returns when switching back).
+# Switched to "gemini" 2026-07-10 (Anthropic budget exhausted — user decision).
+MODEL_PROVIDER = "gemini"
 # Vertex service-account path (project the SA belongs to; region "global").
 GEMINI_PROJECT_ID = "hcii-plus"
 GEMINI_REGION = "global"
