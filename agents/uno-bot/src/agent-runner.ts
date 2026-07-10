@@ -20,10 +20,13 @@
 // visible-failure posts remain the user-facing error path.
 
 import type { Env } from "./types";
-import { onRunnerJob, type SlackMessageEvent } from "./slack/events";
+import {
+  onRunnerJob,
+  type RunnerJobPayload,
+} from "./slack/events";
 
 interface RunnerJob {
-  event: SlackMessageEvent;
+  job: RunnerJobPayload;
   enqueuedAt: number;
 }
 
@@ -54,10 +57,16 @@ export class AgentRunner {
   }
 
   async alarm(): Promise<void> {
-    const jobs = await this.state.storage.list<RunnerJob>({ prefix: JOB_PREFIX });
+    // ONE job per alarm invocation — free-tier Workers cap subrequests at 50
+    // per invocation, and a single agent turn spends most of that budget
+    // (22 harness fetches + Slack + DO + Anthropic). Processing a second job
+    // in the same invocation blew the cap live (2026-07-10: "Too many
+    // subrequests"), killing the first job's reply delivery. Each alarm
+    // firing gets a FRESH budget, so drain the queue one job per firing.
+    const jobs = await this.state.storage.list<RunnerJob>({ prefix: JOB_PREFIX, limit: 1 });
     for (const [key, job] of jobs) {
       try {
-        await onRunnerJob(this.env, job.event);
+        await onRunnerJob(this.env, job.job);
       } catch (err) {
         // Never rethrow: alarm retries would re-run the agent turn.
         console.error(`[runner] job failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -65,7 +74,8 @@ export class AgentRunner {
         await this.state.storage.delete(key);
       }
     }
-    // Jobs enqueued while this pass was running: drain them in a fresh alarm.
+    // More queued (the drained job's sibling duplicate, or new arrivals):
+    // process them in a fresh invocation with a fresh subrequest budget.
     const remaining = await this.state.storage.list({ prefix: JOB_PREFIX, limit: 1 });
     if (remaining.size > 0) {
       await this.state.storage.setAlarm(Date.now());

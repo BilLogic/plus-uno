@@ -48,6 +48,13 @@ let cachedSystem: { at: number; promise: Promise<string> } | null = null;
 // back missing, we alert #uno-bot (throttled) and serve the KV copy instead.
 const KV_LAST_GOOD = "harness:last_good";
 const KV_ALERT_AT = "harness:alert_at";
+// Fresh-assembly KV cache: on an in-memory miss (fresh isolate — which is what
+// every AgentRunner alarm invocation may be), serving the harness costs ONE KV
+// read instead of 22 GitHub Raw fetches. On the free tier's 50-subrequest
+// budget that's the difference between a comfortable turn and a blown one
+// (live incident 2026-07-10). Same 5-min freshness as the in-memory cache, so
+// "merge a doc PR = reprogram the bot within minutes" still holds.
+const KV_CACHE = "harness:cache";
 const ALERT_THROTTLE_MS = 60 * 60_000; // at most one alert per hour
 const UNO_BOT_CHANNEL = "C0ARJ2A3A69"; // #uno-bot (ops/alerts)
 
@@ -125,10 +132,12 @@ async function assembleSystem(env: Env): Promise<string> {
     .join("");
 
   if (missing.length === 0) {
-    // Fully healthy — refresh the last-known-good copy (guarded; KV optional).
+    // Fully healthy — refresh the last-known-good copy AND the fresh cache
+    // (guarded; KV optional).
     if (env.HARNESS_KV) {
       try {
         await env.HARNESS_KV.put(KV_LAST_GOOD, assembled);
+        await env.HARNESS_KV.put(KV_CACHE, JSON.stringify({ at: Date.now(), text: assembled }));
       } catch (err) {
         console.warn(`[skills] KV put failed: ${err instanceof Error ? err.message : String(err)}`);
       }
@@ -153,13 +162,33 @@ async function assembleSystem(env: Env): Promise<string> {
 
 async function getStableSystem(env: Env): Promise<string> {
   if (!cachedSystem || Date.now() - cachedSystem.at > CACHE_TTL_MS) {
-    const promise = assembleSystem(env).catch((err) => {
+    const promise = loadSystem(env).catch((err) => {
       cachedSystem = null;
       throw err;
     });
     cachedSystem = { at: Date.now(), promise };
   }
   return cachedSystem.promise;
+}
+
+// In-memory miss: try the KV fresh-cache (1 subrequest) before the full 22-fetch
+// assembly. Any KV problem falls straight through to assembly — the cache is an
+// optimization, never a dependency.
+async function loadSystem(env: Env): Promise<string> {
+  if (env.HARNESS_KV) {
+    try {
+      const raw = await env.HARNESS_KV.get(KV_CACHE);
+      if (raw) {
+        const cached = JSON.parse(raw) as { at?: number; text?: string };
+        if (cached.text && cached.at && Date.now() - cached.at < CACHE_TTL_MS) {
+          return cached.text;
+        }
+      }
+    } catch (err) {
+      console.warn(`[skills] KV cache read failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  return assembleSystem(env);
 }
 
 export async function buildSystemBlocks(

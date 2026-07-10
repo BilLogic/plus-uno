@@ -1,6 +1,6 @@
 import type { Env } from "../types";
 import { runAgent, type AgentImage, type AgentResult } from "../agent/run-agent";
-import { pickModel } from "../agent/anthropic-client";
+import { routeRequest } from "../agent/anthropic-client";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -101,54 +101,71 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "message": {
       const msg = event as SlackMessageEvent;
       if (await shouldHandleMessage(env, msg)) {
-        await enqueueAgentJob(env, msg);
+        await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
       return;
     }
-    case "app_mention":
+    case "app_mention": {
       // Explicit @mention always engages.
-      await enqueueAgentJob(env, appMentionToMessage(event as SlackAppMentionEvent));
+      const msg = appMentionToMessage(event as SlackAppMentionEvent);
+      await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
       return;
-    case "reaction_added":
-      await handleReaction(env, event as SlackReactionAddedEvent);
+    }
+    case "reaction_added": {
+      // Reactions can confirm a proposal, which executes the real tool (Notion
+      // card, workflow dispatch, email) — same waitUntil() 30s-cancellation
+      // exposure as agent runs, so route through the runner too. Keyed by the
+      // reacted message so confirmations on one proposal stay ordered.
+      const r = event as SlackReactionAddedEvent;
+      await enqueueAgentJob(env, { kind: "reaction", event: r }, `${r.item.channel}:${r.item.ts}`);
       return;
+    }
     default:
       console.log(`[slack] unhandled event type: ${event.type}`);
       return;
   }
 }
 
-// Hand the message to the per-thread AgentRunner DO instead of running it here:
+// A unit of work for the AgentRunner DO: a user message (full agent pipeline)
+// or a reaction (proposal confirm/cancel, which may execute a gated tool).
+export type RunnerJobPayload =
+  | { kind: "message"; event: SlackMessageEvent }
+  | { kind: "reaction"; event: SlackReactionAddedEvent };
+
+// Hand the work to the per-thread AgentRunner DO instead of running it here:
 // this Worker invocation lives inside ctx.waitUntil(), which Cloudflare cancels
-// ~30s after the Slack ack — any longer agent run died silently mid-flight
+// ~30s after the Slack ack — any longer run died silently mid-flight
 // ("👀 then silence", live incident 2026-07-09). DO alarms have no such cutoff.
 // Keyed per thread so runs within a thread stay ordered.
-async function enqueueAgentJob(env: Env, event: SlackMessageEvent): Promise<void> {
-  const threadKey = `${event.channel}:${event.thread_ts ?? event.ts}`;
+async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
   const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
   const res = await stub.fetch("https://do/enqueue", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ event, enqueuedAt: Date.now() }),
+    body: JSON.stringify({ job, enqueuedAt: Date.now() }),
   });
-  if (!res.ok) {
+  if (!res.ok && job.kind === "message") {
     // Enqueue is the only step left in the Worker — a failure here IS the
     // 👀-then-silence path, so make it visible instead.
     console.error(`[slack] runner enqueue failed: ${res.status}`);
     await postMessage(env, {
-      channel: event.channel,
-      thread_ts: event.thread_ts ?? event.ts,
+      channel: job.event.channel,
+      thread_ts: job.event.thread_ts ?? job.event.ts,
       text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
   }
 }
 
-// Entry point the AgentRunner DO alarm calls: the full message pipeline with
-// the visible-failure backstop. Runs OUTSIDE waitUntil — no 30s cutoff.
-export async function onRunnerJob(env: Env, event: SlackMessageEvent): Promise<void> {
-  await onMessageVisiblyFailing(env, event);
+// Entry point the AgentRunner DO alarm calls. Runs OUTSIDE waitUntil — no 30s
+// cutoff, fresh subrequest budget per alarm invocation.
+export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<void> {
+  if (job.kind === "reaction") {
+    await handleReaction(env, job.event);
+    return;
+  }
+  await onMessageVisiblyFailing(env, job.event);
 }
 
 // Outermost catch WITH channel/thread context. onMessage already posts a
@@ -304,15 +321,30 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   // the current turn. Guarded inside — a failure degrades to text-only.
   const vision = await collectVisionInputs(env, event, userText);
 
-  // Wait signal: heavier tiers and vision runs take noticeably longer than a
-  // quick lookup, and the requester has no other cue until the single reply
-  // lands. ⏳ next to 👀 says "bigger think underway — this one's worth the
-  // wait" before the model even starts. pickModel is a cheap keyword check;
-  // runAgent re-runs it identically for the real routing.
-  const { tier: previewTier } = pickModel({ userText, hasPending: pending !== null });
+  // Wait signal: real requests (everything but the confirm/cancel fast-path)
+  // run on the sonnet lane with grounding and can take a while — ⏳ next to 👀
+  // says "bigger think underway" before the model starts. routeRequest is the
+  // same zero-cost lane check runAgent uses.
+  const { tier: previewTier } = routeRequest({ userText, hasPending: pending !== null });
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
   }
+
+  // Interim updates: long runs are now legal (streaming + MCP can take several
+  // minutes), and ⏳ alone left people typing "any thing???" at the 8-minute
+  // mark. Two complementary signals, both as SEPARATE small messages (never
+  // folded into the final answer): (a) the model's own between-tool narration,
+  // filtered and capped by runAgent's onInterim, arrives as it works; (b) a
+  // generic note at ~75s backstops runs that produced no narration yet.
+  let interimPosted = false;
+  const postInterim = (text: string): void => {
+    interimPosted = true;
+    postMessage(env, { channel, thread_ts: threadTs, text: `:hourglass_flowing_sand: ${text}` }).catch(() => {});
+  };
+  const interimTimer = setTimeout(() => {
+    if (interimPosted) return;
+    postInterim("Still on it — this one needs a longer dig. The full answer will land right here.");
+  }, 75_000);
 
   let result: AgentResult;
   try {
@@ -331,11 +363,14 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
       },
       currentSender: { userId },
       pending,
+      onInterim: postInterim,
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
     await postVisibleFailure(env, channel, threadTs, userMsgTs);
     return;
+  } finally {
+    clearTimeout(interimTimer);
   }
 
   // ----- text-only response -----
