@@ -174,7 +174,11 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     const body: Record<string, unknown> = {
       contents,
       systemInstruction: { parts: [{ text: systemText }] },
-      tools: [{ functionDeclarations }],
+      // google_search = Gemini's built-in web grounding, running on Google's
+      // infra (zero Worker subrequests) — the web_search replacement in this
+      // mode (user directive 2026-07-10: "we definitely must incorporate").
+      // Gemini 3 supports mixing built-in tools with function declarations.
+      tools: [{ functionDeclarations }, { googleSearch: {} }],
       ...(disableTools
         ? { toolConfig: { functionCallingConfig: { mode: "NONE" } } }
         : {}),
