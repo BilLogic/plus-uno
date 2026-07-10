@@ -9,9 +9,10 @@
 //     reaction is naturally excluded because the bot isn't the requester).
 
 import type { Env } from "../types";
-import { loadPendingProposal } from "../thread-state-client";
+import { loadPendingProposalDetailed } from "../thread-state-client";
 import { resolveProposal, type Decision } from "../agent/resolve-proposal";
 import type { SlackReactionAddedEvent } from "./events";
+import { postMessage } from "./api";
 
 const CONFIRM_REACTIONS = new Set(["white_check_mark", "heavy_check_mark", "+1", "thumbsup"]);
 const CANCEL_REACTIONS = new Set(["x", "negative_squared_cross_mark", "no_entry_sign"]);
@@ -28,11 +29,25 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
 
   if (event.item.type !== "message") return;
 
-  const pending = await loadPendingProposal(env, event.item.ts);
-  if (!pending) {
+  const lookup = await loadPendingProposalDetailed(env, event.item.ts);
+  if (lookup.state === "expired") {
+    // A delayed ✅/❌ on a proposal that timed out. Never swallow this — the
+    // person believes they just confirmed something (live 2026-07-10: a
+    // delayed reaction met pure silence and read as "the bot is broken").
+    await postMessage(env, {
+      channel: event.item.channel,
+      thread_ts: event.item.ts,
+      text:
+        `:hourglass: <@${event.user}> that proposal had already expired when your reaction landed — nothing was executed. ` +
+        `Proposals stay live for an hour. Ask me again and I'll set the same thing up fresh.`,
+    }).catch(() => {});
+    return;
+  }
+  if (lookup.state !== "found") {
     // Reaction wasn't on a tracked proposal message; could be on anything else.
     return;
   }
+  const pending = lookup.payload;
 
   if (event.user !== pending.requesterUserId) {
     // Cross-user reaction. Silently ignore (Slack reactions are low-stakes;

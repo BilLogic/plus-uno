@@ -76,11 +76,28 @@ export async function savePendingProposal(env: Env, p: PendingProposal): Promise
 }
 
 export async function loadPendingProposal(env: Env, ts: string): Promise<PendingProposal | null> {
-  const res = await call(env, `/proposals?ts=${encodeURIComponent(ts)}`);
-  if (res.status === 404 || res.status === 410) return null;
-  if (!res.ok) return null;
-  const body = (await res.json()) as { ok: boolean; payload?: PendingProposal };
-  return body.payload ?? null;
+  const detailed = await loadPendingProposalDetailed(env, ts);
+  return detailed.state === "found" ? detailed.payload : null;
+}
+
+// Distinguishes "this ts was a proposal but it EXPIRED" (410) from "not a
+// proposal at all" (404) — the gate must tell the requester their delayed
+// ✅/❌ hit an expired card instead of ignoring it silently (live 2026-07-10).
+export type ProposalLookup =
+  | { state: "found"; payload: PendingProposal }
+  | { state: "expired" }
+  | { state: "none" };
+
+export async function loadPendingProposalDetailed(env: Env, ts: string): Promise<ProposalLookup> {
+  try {
+    const res = await call(env, `/proposals?ts=${encodeURIComponent(ts)}`);
+    if (res.status === 410) return { state: "expired" };
+    if (!res.ok) return { state: "none" };
+    const body = (await res.json()) as { ok: boolean; payload?: PendingProposal };
+    return body.payload ? { state: "found", payload: body.payload } : { state: "none" };
+  } catch {
+    return { state: "none" };
+  }
 }
 
 export async function loadPendingProposalByThread(

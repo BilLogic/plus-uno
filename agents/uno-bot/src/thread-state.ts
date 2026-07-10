@@ -40,7 +40,10 @@ interface EventRecord {
 // dial raised 2026-07-09 — team prefers thorough over fast (user decision)
 const MAX_HISTORY_TURNS = 50;
 const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;        // 7 days
-const PROPOSAL_TTL_MS = 15 * 60 * 1000;                // 15 min
+// 60 min — was 15, but the gate waits on a HUMAN: live 2026-07-10 a designer's
+// delayed ✅ landed on an expired card and nothing happened. An hour tolerates
+// meetings/stepping away; the gate (not the clock) is still the safety.
+const PROPOSAL_TTL_MS = 60 * 60 * 1000;
 // 24h — was 10 min ("covers Slack's retry window"), but agent runs can now
 // legally exceed 10 minutes (streaming + MCP; live 2026-07-10 run: 11 min),
 // after which the duplicate app_mention/message copy passed dedup and re-ran
