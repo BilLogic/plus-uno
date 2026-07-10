@@ -17,40 +17,6 @@ export const MODELS: Record<ModelTier, string> = {
   opus: "claude-opus-4-8",
 };
 
-// Heuristic router: map the user's message (and any pending proposal) to a tier.
-// Deliberately keyword-based — no extra LLM call — to preserve turn/token
-// economy (D7). Bias to sonnet whenever intent is unclear.
-export function pickModel(opts: { userText: string; hasPending: boolean }): {
-  tier: ModelTier;
-  model: string;
-} {
-  const text = opts.userText.toLowerCase();
-
-  // Confirming/cancelling a pending proposal is a tiny classification turn.
-  if (opts.hasPending && /\b(go ahead|yes|confirm|do it|cancel|no|stop|nope|abort)\b/.test(text)) {
-    return { tier: "haiku", model: MODELS.haiku };
-  }
-
-  // Heavy multi-step reasoning: synthesis, PRD drafting, review/critique, harness maintenance/planning.
-  const heavy =
-    /\b(synthesi|summari[sz]e|draft (a )?prd|write (a )?prd|user flow|screen list|maintain|persona|refactor|plan|scope|architect|review|critique|what's wrong|audit)\b/.test(
-      text,
-    );
-  if (heavy) return { tier: "opus", model: MODELS.opus };
-
-  // Simple lookups / short Q&A: marketplace search, expert lookup, status pings.
-  // (No bare "what's" here — it swallowed review asks like "what's wrong with
-  // this design?" into haiku; "what's wrong" now routes heavy above.)
-  const light =
-    /\b(who (should|can) i (talk|reach)|find (an )?expert|search|show me|list|what is|status|which prototype)\b/.test(
-      text,
-    );
-  if (light) return { tier: "haiku", model: MODELS.haiku };
-
-  // Build/change actions and everything else: capable default.
-  return { tier: "sonnet", model: MODELS.sonnet };
-}
-
 // ─── Native router (Phase 3 final, 2026-07-10 — user decision) ───────────────
 // No classifier model at all. Anthropic's own primitives carry the dynamic
 // part: ONE capable model (sonnet) runs every real request with ADAPTIVE

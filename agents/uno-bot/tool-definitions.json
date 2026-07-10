@@ -500,7 +500,7 @@
   },
   {
     "name": "proposal_resolve",
-    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). If the user asks an unrelated question or is still discussing without deciding, do NOT invoke \u2014 reply conversationally and the proposal sits until \u2705, \u274c, or 15-minute expiry. If the system prompt indicates the current sender is NOT the original requester, do NOT invoke \u2014 reply that only the requester can confirm.",
+    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). If the user asks an unrelated question or is still discussing without deciding, do NOT invoke \u2014 reply conversationally and the proposal sits until \u2705, \u274c, or 60-minute expiry. If the system prompt indicates the current sender is NOT the original requester, do NOT invoke \u2014 reply that only the requester can confirm.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

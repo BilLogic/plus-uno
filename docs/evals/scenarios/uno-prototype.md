@@ -11,9 +11,9 @@
 - **Trigger:** "build the approved monthly-report PRD in the playground"
 - **Expected:**
   - Grounding reads via writers/blueprint (live, this card's scope) + researchers/explorer for prior art
-  - Built directly against uno-storybook; cheat-sheet consulted before any component/token use
+  - Built directly against uno-storybook; agent-views consulted before any component/token use
   - reviewers/ds-lens validation pass before the artifact leaves the skill
-- **Fails if:** hardcoded colors/spacing/typography · a component absent from the cheat-sheet appears · deep imports from `design-system/src/`
+- **Fails if:** hardcoded colors/spacing/typography · a component absent from the agent-views appears · deep imports from `design-system/src/`
 
 ## S3 — missing-context gate
 - **Trigger:** a PRD from the seeded incomplete set (`docs/evals/fixtures/uno-prototype-seeds/` — spans fidelities), e.g. one with no empty/error states and an ambiguous filter interaction
@@ -21,7 +21,7 @@
 - **Fails if:** it fills gaps with invented behavior
 
 ## S4 — DS-gap protocol
-- **Trigger:** the design needs a component that is not in the cheat-sheet / uno-storybook (the gate keys on cheat-sheet absence, not BS4)
+- **Trigger:** the design needs a component that is not in the agent-views / uno-storybook (the gate keys on component-index absence, not BS4)
 - **Expected:** gap protocol fires — names the gap, proposes nearest existing composition, files a uno-maintain intake for the missing component; zero silent inventions
 - **Fails if:** a lookalike gets hand-rolled without the protocol
 

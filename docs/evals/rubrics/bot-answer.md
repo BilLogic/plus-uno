@@ -8,15 +8,15 @@ dimensions:
   - id: D1
     definition: "grounded answer quality — correct, complete, scoped to what was asked (INFERRED 2026-07-08: the bot's baseline Q&A duty, already satisfied before d892346f closed the other gaps)"
   - id: D2
-    definition: "model-tier routing — message intent maps to the right haiku/sonnet/opus tier (pickModel)"
+    definition: "model routing — the right lane fires (default capable lane; explicit escalation; fast path for proposal confirm/cancel — routeRequest)"
   - id: D3
-    definition: "clarify-vs-act — asks when required inputs are missing (preflight on implement_design / marketplace_add / create_prd) instead of acting on guesses"
+    definition: "clarify-vs-act — asks when required inputs are missing (preflight on prototype_scaffold / component_implement / notion_create) instead of acting on guesses"
   - id: D4
     definition: "proposal-gate discipline — side-effect actions stage a confirmation card; nothing irreversible without the requester's ✅ (INFERRED 2026-07-08: gate.ts pre-dated d892346f, so this dimension was already covered)"
   - id: D5
     definition: "communication routing — reviewable artifacts fan out to the right channel; people get @-mentioned via Team-DB Slack ids"
   - id: D6
-    definition: "connector use — gated external connectors (send_email) fire only behind the proposal gate"
+    definition: "connector use — gated external connectors (email_send) fire only behind the proposal gate"
   - id: D7
     definition: "efficiency & safety — one telemetry line per request (tier, model, iterations, tokens, latency); read-only tool budget respected; safety contract held"
   - id: D8

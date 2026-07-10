@@ -96,12 +96,12 @@ Requires: `figma-use` skill before canvas writes; prefer `figma-generate-design`
 |-------|----------------|
 | Figma library changed | `npm run figma:poll` |
 | Token drift | `npm run sync:tokens` + compare |
-| Code compliance | `bash .agent/skills/uno-review/scripts/run-review-checks.sh <prototype>/src` |
+| Code compliance | `bash skills/uno-review/scripts/run-review-checks.sh <prototype>/src` |
 | Registry stale node | Re-copy link after Figma restructure |
 
 ## Related docs
 
 - `design-system/figma/token-registry.json`
 - `design-system/docs/foundations/token-mapping.md`
-- `.agent/skills/uno-prototype/references/figma-mcp-guide.md`
-- `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md`
+- `skills/uno-prototype/references/figma-mcp-guide.md`
+- `skills/uno-prototype/references/figma-registry-mandatory-load.md`

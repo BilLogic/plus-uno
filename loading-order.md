@@ -20,7 +20,7 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 | any agent, on summon | its `agents/<kind>/<name>.md` + the conventions it names | always for that agent |
 | any estate write | the matching `docs/conventions/{notion,figma-workspace,slack,supabase}.md` | before writing |
 | any human-facing text | `docs/conventions/writing-style.md` | before writing |
-| UI building | DS cheat-sheets per AGENTS.md § Progressive loading | mandatory triggers |
+| UI building | DS agent-views per AGENTS.md § Progressive loading | mandatory triggers |
 | orientation / product framing | `docs/context/*` | as needed |
 
 ## Tier 3 — retrieved live, never cached

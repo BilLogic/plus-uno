@@ -15,10 +15,16 @@ export interface Tool {
 export type ToolName =
   // reads (ungated)
   | "notion_search"
+  | "roadmap_query"
   | "source_read"
   | "blueprint_search"
   | "github_read"
   | "slack_thread_read"
+  | "slack_search"
+  | "slack_react"
+  | "slack_user_profile"
+  | "slack_channel_members"
+  | "delegate"
   // writes (gated)
   | "notion_create"
   | "notion_update"

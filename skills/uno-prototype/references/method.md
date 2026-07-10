@@ -78,8 +78,8 @@ usable with at most one regeneration. UNO does not run the generation.
 Direction is settled; the work is execution on the system. DS compliance is
 enforced by construction, not by review catching it later:
 
-- **Cheat-sheet first, always**: components and tokens come from the DS
-  cheat-sheets before any UI code. Not in the cheat-sheet → it does not exist.
+- **DS knowledge first, always**: components and tokens come from the DS
+  agent-views before any UI code. Not in the agent-views → it does not exist.
 - Tokens over literals, official layout formulas, PLUS components before
   generic primitives — the constitution's forbidden patterns apply in full.
 - **Plan before large edits**: confirm the implementation plan and the list of

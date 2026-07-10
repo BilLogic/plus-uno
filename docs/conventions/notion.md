@@ -11,8 +11,8 @@ applied by: agents/writers/notion
 
 **One credential, REST for both** — the `ntn_` internal integration key (`NOTION_API_KEY`), workspace-scoped and non-expiring:
 
-- **Reads** (grounding: `find_experts`, source lookups) → the bot's REST read code. No gate needed — reads never mutate state.
-- **Writes** (`create_prd`, `delete_prd`) → the bot's **own gated tools**, intercepted by the proposal gate — nothing writes without the requester's ✅.
+- **Reads** (grounding: `notion_search`, `roadmap_query`, source lookups) → the bot's REST read code. No gate needed — reads never mutate state.
+- **Writes** (`notion_create`, `notion_update`, `notion_archive`) → the bot's **own gated tools**, intercepted by the proposal gate — nothing writes without the requester's ✅.
 
 **Hosted Notion MCP — READS only (adopted 2026-07-09).** Reads may now come from the hosted Notion MCP (`mcp.notion.com`), attached to the Worker's Anthropic call **read-only** via an `mcp_toolset` allowlist (`agents/uno-bot/src/agent/mcp.ts`, beta `mcp-client-2025-11-20`) — the same rich Notion read surface the IDE uses. Auth is **OAuth 2.1** (`src/oauth/notion.ts`): `mcp.notion.com` is its own authorization server (PKCE + RFC-7591 dynamic client registration — verified via its `/.well-known/oauth-*` metadata and Notion's docs), so the classic `ntn_` token does **not** authenticate it. A human does the browser consent once at `/oauth/notion/start`; the access + refresh tokens live in KV and the Worker refreshes silently.
 
@@ -38,7 +38,7 @@ Under the workspace's **Content Management Systems** page — useful context for
 
 | DB | ID | Use when grounding |
 |---|---|---|
-| Team Member Database | `134b7cca-4982-801d-a91d-d678e79d6e27` | roster / experts (already the `find_experts` source) |
+| Team Member Database | `134b7cca-4982-801d-a91d-d678e79d6e27` | roster / experts (the `notion_search` scope: "team" source) |
 | News | `18ab7cca-4982-805d-b4ab-000b8277e344` (ds) | product announcements, what shipped |
 | Success Stories | `4e0c4f73-6bfb-4d13-a0cf-6fa7be0020cb` (ds) | customer proof, outcomes |
 | Research Papers | `84e77efd-02ef-4fa2-b181-f7381806f678` (ds) | prior research to cite before re-running it |

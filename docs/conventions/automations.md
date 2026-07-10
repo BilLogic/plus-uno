@@ -9,7 +9,7 @@ An automation absent from this table is undocumented by definition.
 
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Owner | Status |
 |---|---|---|---|---|---|---|
-| Figma library sync | 15-min poll of BS4 publishes | uno-synthesize (DS-component PRD creation) | writers/notion | `.github/workflows/figma-library-poll.yml` → `scripts/poll-figma-library.js`, `create-notion-prd.js` | Bill | ✅ live (v1) |
+| Figma library sync | manual run (was: 15-min poll of BS4 publishes) | uno-synthesize (DS-component PRD creation) | writers/notion | `scripts/poll-figma-library.js` (`npm run figma:poll`) + `create-notion-prd.js` — the `figma-library-poll.yml` workflow was removed when registries went generated-only | Bill | ⏸ paused (script-only) |
 | Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` | Bill | ✅ live |
 | Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → playground scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` | Bill | ✅ live |
 | Marketplace add/edit | `repository_dispatch` | uno-publish (registration) | writers/notion (entry) | `marketplace-add.yml` / `marketplace-edit.yml` | Bill | ✅ live |

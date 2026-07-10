@@ -50,7 +50,7 @@ const KV_LAST_GOOD = "harness:last_good";
 const KV_ALERT_AT = "harness:alert_at";
 // Fresh-assembly KV cache: on an in-memory miss (fresh isolate — which is what
 // every AgentRunner alarm invocation may be), serving the harness costs ONE KV
-// read instead of 22 GitHub Raw fetches. On the free tier's 50-subrequest
+// read instead of 20 GitHub Raw fetches. On the free tier's 50-subrequest
 // budget that's the difference between a comfortable turn and a blown one
 // (live incident 2026-07-10). Same 5-min freshness as the in-memory cache, so
 // "merge a doc PR = reprogram the bot within minutes" still holds.
@@ -171,7 +171,7 @@ async function getStableSystem(env: Env): Promise<string> {
   return cachedSystem.promise;
 }
 
-// In-memory miss: try the KV fresh-cache (1 subrequest) before the full 22-fetch
+// In-memory miss: try the KV fresh-cache (1 subrequest) before the full 20-fetch
 // assembly. Any KV problem falls straight through to assembly — the cache is an
 // optimization, never a dependency.
 async function loadSystem(env: Env): Promise<string> {
@@ -219,12 +219,12 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
     `- requester: <@${p.requesterUserId}>`,
     sender ? `- current message sender: <@${sender.userId}>` : "",
     "",
-    "If the user's current message clearly confirms or cancels this proposal, invoke the `resolve_pending_proposal` tool. Otherwise reply conversationally and the proposal will sit until ✅, ❌, or 15-minute expiry.",
+    "If the user's current message clearly confirms or cancels this proposal, invoke the `proposal_resolve` tool. Otherwise reply conversationally and the proposal will sit until ✅, ❌, or 60-minute expiry.",
     "",
-    `IMPORTANT: while this proposal is pending, do NOT invoke \`${p.toolName}\` (or any side-effect tool) again for the same action. An approval is handled ONLY by resolve_pending_proposal with decision "confirm" — re-invoking the tool re-stages a duplicate confirmation card instead of executing, which reads as ignoring the user's approval.`,
+    `IMPORTANT: while this proposal is pending, do NOT invoke \`${p.toolName}\` (or any side-effect tool) again for the same action. An approval is handled ONLY by proposal_resolve with decision "confirm" — re-invoking the tool re-stages a duplicate confirmation card instead of executing, which reads as ignoring the user's approval.`,
     "",
     sender && !senderIsRequester
-      ? `The current sender (<@${sender.userId}>) is NOT the requester (<@${p.requesterUserId}>) — do NOT invoke resolve_pending_proposal. Reply explaining that only the original requester can confirm.`
+      ? `The current sender (<@${sender.userId}>) is NOT the requester (<@${p.requesterUserId}>) — do NOT invoke proposal_resolve. Reply explaining that only the original requester can confirm.`
       : `Authorization rule: only <@${p.requesterUserId}> may confirm or cancel. The Worker will reject resolution attempts from other users.`,
     "</pending_proposal>",
   ].filter(Boolean).join("\n");

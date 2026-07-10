@@ -1,5 +1,5 @@
 // Reaction-path confirmation gate. Text confirmations are handled by the
-// agent loop via the resolve_pending_proposal tool — they don't pass through
+// agent loop via the proposal_resolve tool — they don't pass through
 // here.
 //
 // Filters:

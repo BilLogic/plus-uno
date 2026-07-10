@@ -90,7 +90,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 ## Workflow
 
 1. **Read the spec.** Fetch the linked Notion PRD / change description. If the spec is unfetchable, post an error to the originating Slack thread and exit. For Slack-triggered runs, post a "🔧 Working on it…" ack before proceeding; skip the ack for manual GitHub-UI dispatches.
-2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/forms/`, specs in `design-system/src/specs/`. Confirm the target component exists in `docs/context/design-system/components/cheat-sheet.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
+2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/forms/`, specs in `design-system/src/specs/`. Confirm the target component exists in `design-system/agent-views/components/index.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
 3. **Verify props and styles.** Read the existing `.jsx` and `.stories.jsx` for any component you'll touch. Don't hallucinate props. Don't change a prop's type without flagging it in the PR description.
 4. **Plan the change.** List the files that will be modified — **including** the corresponding stories file. If the change touches a prop or variant, the stories MUST be updated in the same pass; do not ship code-only or stories-only. If >5 files total, stop and escalate to the in-IDE agent.
 5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `docs/conventions/terminology.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive playground; preset selectors over raw data editing).
@@ -99,8 +99,8 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 
 ## References (Load on Every Invocation)
 
-- `docs/context/design-system/components/cheat-sheet.md` — component existence check (MANDATORY)
-- `docs/context/design-system/components/layout-cheat-sheet.md` — page layout formulas (if change touches a page)
+- `design-system/agent-views/components/index.md` — component existence check (MANDATORY)
+- `design-system/docs/patterns/layout.md` — page layout formulas (if change touches a page)
 - `docs/conventions/coding.md` — file naming, imports, token usage, git conventions
 - `docs/conventions/terminology.md` — Plus vocabulary
 
@@ -172,7 +172,7 @@ The shared bot voice from `AGENTS.md` applies here as-is. Two implementation-spe
 ## Edge Cases
 
 - **Spec is ambiguous.** If invoked from a Slack thread, ask one clarifying question rather than guessing. For manually-dispatched work where there's no Slack thread context, skip implementation rather than committing speculative code.
-- **Component doesn't exist in cheat-sheet.** Treat as a new component — the skill-loader will inject `references/new-component-scaffolding.md` if `isNewComponent` is true. If unclear, flag in the PR description.
+- **Component doesn't exist in the component index.** Treat as a new component — the skill-loader will inject `references/new-component-scaffolding.md` if `isNewComponent` is true. If unclear, flag in the PR description.
 - **Change touches generated files.** Skip those files. Note in the PR description: "Token regeneration required — run `npm run sync:tokens && npm run generate:tokens` after merge."
 - **Spec asks for >5 file changes.** Escalate to the in-IDE agent. Produce no file blocks; output a single text line: "Escalating to in-IDE agent: change spans {n} files."
 

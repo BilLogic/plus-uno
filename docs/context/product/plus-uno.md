@@ -5,8 +5,8 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 
 ## What This Is
 
-- **Design System** (`design-system/src/`) — 46 components, 61 form elements, 11 data viz, 10 composite specs, 9 token categories, 11 style files. Published internally as `@plus-ds` alias.
-- **Prototyping Workspace** (`playground/`) — 21 flat project directories for feature prototypes. Discoverable via the Marketplace at `/market`.
+- **Design System** (`design-system/src/`) — 44 components, 20 form components, 42 DataViz charts, 7 spec areas, generated token SCSS. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
+- **Prototyping Workspace** (`playground/`) — 27 flat project directories (~20 feature prototypes + `starter/`, `templates/`, and `test-*` scaffolds). Discoverable via the Marketplace at `/market`.
 - **Storybook** (`.storybook/`) — Interactive component documentation and visual testing. Deployed to Netlify.
 - **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
 - **Product Documentation** (`docs/`) — context (descriptive), conventions (normative), evals, knowledge, plans.
@@ -34,7 +34,7 @@ plus-vibe-coding-starting-kit/
 ├── loading-order.md           The loading contract (Tier 1 #2)
 ├── design-system/             Design system source (was packages/plus-ds/)
 │   └── src/                   Components, forms, DataViz, specs, tokens, styles
-├── playground/                21 prototype projects (flat, project-oriented)
+├── playground/                ~20 feature prototypes + starter/templates/test scaffolds
 ├── src/                       Vite app entry (App.jsx, main.jsx, index.css)
 ├── skills/                    Six dual-face skills (SKILL.md + bot.md + references/method.md)
 ├── agents/                    researchers/ · reviewers/ · writers/ · uno-bot/ (Worker)
@@ -62,12 +62,14 @@ plus-vibe-coding-starting-kit/
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Components | 46 | `design-system/src/components/` |
-| Forms | 61 | `design-system/src/forms/` |
-| DataViz | 11 | `design-system/src/DataViz/` |
-| Specs | 10 | `design-system/src/specs/` |
-| Tokens | 9 | `design-system/src/tokens/` |
-| Styles | 11 | `design-system/src/styles/` |
+| Components | 44 | `design-system/src/components/` (39 top-level + layout + 4 training) |
+| Forms | 20 | `design-system/src/forms/` (exported form components) |
+| DataViz | 42 charts (25 exported wrappers) | `design-system/src/DataViz/` — 6 categories |
+| Specs | 7 product areas | `design-system/src/specs/` (Home, Universal, Training, Admin, Profile, Toolkit, Login) |
+| Tokens | 6 SCSS files + `source/` | `design-system/src/tokens/` (generated — never hand-edit) |
+| Styles | 14 files | `design-system/src/styles/` |
+
+<!-- Counts audited 2026-07-10 — regenerate by `ls` on the dirs above; keep README.md § Design System in sync. -->
 
 ## Deployment
 

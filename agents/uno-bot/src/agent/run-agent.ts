@@ -3,7 +3,7 @@
 // Inputs include the slack context, the current sender's identity, and any
 // pending proposal in this thread. When a proposal is pending, Claude is told
 // about it in the system prompt and can resolve it via the
-// `resolve_pending_proposal` tool — that's how text confirmations like
+// `proposal_resolve` tool — that's how text confirmations like
 // "go ahead" or "cancel" get processed.
 //
 // The loop:
@@ -12,7 +12,7 @@
 //   3. Inspect stop_reason:
 //      - end_turn → return the text.
 //      - tool_use → check for:
-//          (a) resolve_pending_proposal: validate, return as `resolved` if OK,
+//          (a) proposal_resolve: validate, return as `resolved` if OK,
 //              else loop with a tool_result error so Claude can apologize.
 //          (b) a side-effect tool: return as `proposal` for staging.
 //          (c) read-only tools: execute, feed results back, loop.

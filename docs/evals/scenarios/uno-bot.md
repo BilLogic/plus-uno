@@ -30,7 +30,7 @@
 
 ## R6 — approval doesn't re-gate
 - **Trigger:** propose → "go ahead"
-- **Expected:** executes via `resolve_pending_proposal`
+- **Expected:** executes via `proposal_resolve`
 - **Fails if:** a second confirmation card for the same action
 
 ## R7 — non-empty replies

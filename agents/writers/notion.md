@@ -15,7 +15,7 @@ The only agent that writes to Notion. Owns hub golden sections, PRD + Handoff Sp
 - `skills/uno-publish` — Handoff Spec, marketplace entry prose
 - `skills/uno-maintain` — doc fixes, comment-sweep incorporation
 - `skills/uno-research` — study guide + research notes
-- `agents/uno-bot` — the `create_prd` tool (the Worker tool embodies this role)
+- `agents/uno-bot` — the `notion_create` tool (the Worker tool embodies this role)
 - Automations (live): Figma library sync (DS-component PRD creation) · marketplace add/edit entries (`docs/conventions/automations.md`)
 - Automation: Notion comment sweep (`docs/conventions/automations.md` — planned)
 

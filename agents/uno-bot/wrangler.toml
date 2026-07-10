@@ -19,8 +19,8 @@ crons = ["*/15 * * * *"]
 
 # ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
 # plan; design within these, don't fight them) ────────────────────────────────
-#   • 50 subrequests per invocation. One agent turn spends most of it (22
-#     harness fetches + Slack + DO + Anthropic), which is why the AgentRunner
+#   • 50 subrequests per invocation. One agent turn spends most of it (20
+#     harness fetches + Slack + DO + model API), which is why the AgentRunner
 #     processes exactly ONE job per alarm firing (fresh budget each firing).
 #   • ~10ms CPU/request soft budget — agent work is I/O-bound, but keep
 #     CPU-heavy paths (base64 of images) modest.
@@ -44,11 +44,11 @@ SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
 # license needed). github_read is kept as a fallback for now; it can be retired once
 # the MCP is confirmed in real bot usage.
 GITHUB_MCP_ENABLED = "true"
-# Notion "Roadmap" database (the Design HQ board). create_prd drops new PRD
+# Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
 # Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
-# that find_experts queries to suggest collaborators/SMEs for a topic.
+# that notion_search (scope: "team") queries to suggest collaborators/SMEs for a topic.
 NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
 # NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
 # surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
@@ -75,7 +75,7 @@ NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/not
 # Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker
 # 403s) and the local MCP needs the desktop app. The bot surfaces Figma context
 # from Notion + routes real Figma work to the IDE. FIGMA_ACCESS_TOKEN (secret,
-# below) still powers implement_design's screenshot fetch.
+# below) still powers the prototype_scaffold proposal's screenshot fetch.
 # Slack hosted-MCP (read + write) path. Slack has NO dynamic registration → a
 # STATIC pre-registered client is used. The client_id is non-secret (below); the
 # client_secret is a wrangler secret (see SLACK_MCP_CLIENT_SECRET). This redirect
@@ -119,11 +119,11 @@ GEMINI_MODEL = "gemini-3.5-flash"
 #   ANTHROPIC_API_KEY
 #   GITHUB_TOKEN          (PAT with repo:dispatch scope)
 #   FIGMA_ACCESS_TOKEN    (Figma PAT with read access to the prototypes file;
-#                          used by implement_design's proposal-time screenshot
+#                          used by the prototype_scaffold proposal-time screenshot
 #                          fetch in events.ts — Phase 4)
 #   NOTION_API_KEY        (Notion internal integration token, connected to the
-#                          Roadmap board; used by create_prd to add PRD cards)
-#   GMAIL_SENDER          (the authorized "From" mailbox for send_email)
+#                          Roadmap board; used by notion_create to add PRD cards)
+#   GMAIL_SENDER          (the authorized "From" mailbox for email_send)
 #   GMAIL_CLIENT_ID       (Google OAuth client id)
 #   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
 #   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)

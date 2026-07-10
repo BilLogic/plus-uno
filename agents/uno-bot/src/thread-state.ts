@@ -145,7 +145,7 @@ export class ThreadState implements DurableObject {
 
   // Find the freshest non-expired proposal for a (channel, thread) pair.
   // Scans all `prop:*` keys — acceptable given the small active set
-  // (proposals expire after 15 min so cardinality stays low).
+  // (proposals expire after 60 min so cardinality stays low).
   private async getProposalByThread(url: URL): Promise<Response> {
     const channel = url.searchParams.get("channel");
     const thread = url.searchParams.get("thread");
