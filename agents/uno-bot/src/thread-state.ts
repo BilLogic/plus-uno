@@ -33,6 +33,8 @@ interface ProposalRecord {
 
 interface EventRecord {
   seenAt: number;
+  /** "running" = agent turn in flight (lease); "done" = handled. Absent on legacy records = done. */
+  status?: "running" | "done";
 }
 
 // dial raised 2026-07-09 — team prefers thorough over fast (user decision)
@@ -44,6 +46,10 @@ const PROPOSAL_TTL_MS = 15 * 60 * 1000;                // 15 min
 // after which the duplicate app_mention/message copy passed dedup and re-ran
 // the ENTIRE agent turn. One tiny record per user message — keep them a day.
 const EVENT_DEDUP_TTL_MS = 24 * 60 * 60 * 1000;
+// How long a "running" lease is trusted before it's presumed dead and the turn
+// is reclaimed. Longest healthy run observed live is ~11 min; a legit run past
+// this window would get double-run, so keep comfortable headroom above real runs.
+const RUN_LEASE_MS = 20 * 60 * 1000;
 
 export class ThreadState implements DurableObject {
   private storage: DurableObjectStorage;
@@ -163,20 +169,46 @@ export class ThreadState implements DurableObject {
   // ----- event dedup -----
 
   // Slack retries event delivery on timeout or non-200, so the same event_id
-  // can arrive twice. We record first-time event_ids and skip duplicates for
-  // the next 10 min. Race-window note: two concurrent requests could both
-  // see "not seen" and both proceed; acceptable because the volume is low
-  // and the worst case (double-process) is rare; for stricter semantics we'd
-  // need state.blockConcurrencyWhile.
+  // can arrive twice. We record first-time event_ids and skip duplicates.
+  // Race-window note: two concurrent requests could both see "not seen" and
+  // both proceed; acceptable because the volume is low and the worst case
+  // (double-process) is rare; for stricter semantics we'd need
+  // state.blockConcurrencyWhile.
+  //
+  // Two record modes:
+  //   default   — one-shot: recorded as "done" immediately (envelope dedup).
+  //   mode:"run"— a LEASE: recorded as "running"; the caller marks it "done"
+  //               (mark:"done") when the agent turn completes. A "running"
+  //               record older than RUN_LEASE_MS means the owning invocation
+  //               was hard-killed mid-run (e.g. a deploy restarted the DO —
+  //               live incident 2026-07-10: test-1 run killed by the PR #48
+  //               deploy, then every alarm retry skipped on the stuck marker
+  //               and the thread went permanently silent). Stale leases are
+  //               reclaimed: the checker gets seen:false and re-runs the turn.
   private async checkAndRecordEvent(request: Request): Promise<Response> {
-    const body = await request.json<{ event_id: string }>();
+    const body = await request.json<{ event_id: string; mode?: "run"; mark?: "done" }>();
     if (!body?.event_id) return json({ ok: false, error: "missing event_id" }, 400);
     const key = eventKey(body.event_id);
     const existing = await this.storage.get<EventRecord>(key);
-    if (existing && Date.now() - existing.seenAt < EVENT_DEDUP_TTL_MS) {
-      return json({ ok: true, seen: true });
+    if (body.mark === "done") {
+      await this.storage.put<EventRecord>(key, {
+        seenAt: existing?.seenAt ?? Date.now(),
+        status: "done",
+      });
+      return json({ ok: true });
     }
-    await this.storage.put<EventRecord>(key, { seenAt: Date.now() });
+    if (existing && Date.now() - existing.seenAt < EVENT_DEDUP_TTL_MS) {
+      const status = existing.status ?? "done"; // legacy records = one-shot
+      if (status === "done") return json({ ok: true, seen: true, state: "done" });
+      if (Date.now() - existing.seenAt < RUN_LEASE_MS) {
+        return json({ ok: true, seen: true, state: "running" });
+      }
+      // Stale "running" lease → fall through and reclaim.
+    }
+    await this.storage.put<EventRecord>(key, {
+      seenAt: Date.now(),
+      status: body.mode === "run" ? "running" : "done",
+    });
     return json({ ok: true, seen: false });
   }
 }

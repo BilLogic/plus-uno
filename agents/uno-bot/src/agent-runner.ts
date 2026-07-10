@@ -32,6 +32,13 @@ interface RunnerJob {
 
 const JOB_PREFIX = "job:";
 
+// Retry cadence for a DEFERRED job — one whose run-lease is held by another
+// invocation (a live run, or one hard-killed by a deploy). The job is kept and
+// re-checked on this cadence; once the lease is marked done it's dropped, and
+// once the lease goes stale (~20 min, thread-state.ts RUN_LEASE_MS) the retry
+// reclaims it and re-runs the turn. Cost: one cheap alarm firing per interval.
+const DEFER_RETRY_MS = 2 * 60 * 1000;
+
 export class AgentRunner {
   private state: DurableObjectState;
   private env: Env;
@@ -65,14 +72,22 @@ export class AgentRunner {
     // firing gets a FRESH budget, so drain the queue one job per firing.
     const jobs = await this.state.storage.list<RunnerJob>({ prefix: JOB_PREFIX, limit: 1 });
     for (const [key, job] of jobs) {
+      let outcome: "handled" | "deferred" = "handled";
       try {
-        await onRunnerJob(this.env, job.job);
+        outcome = await onRunnerJob(this.env, job.job);
       } catch (err) {
         // Never rethrow: alarm retries would re-run the agent turn.
         console.error(`[runner] job failed: ${err instanceof Error ? err.message : String(err)}`);
-      } finally {
-        await this.state.storage.delete(key);
       }
+      if (outcome === "deferred") {
+        // The turn's run-lease is held elsewhere. Deleting here is how killed
+        // runs used to go permanently silent — instead KEEP the job and check
+        // back: it resolves to "done" (drop) or a stale-lease reclaim (re-run).
+        console.log("[runner] job deferred — run-lease held; retrying in 2 min");
+        await this.state.storage.setAlarm(Date.now() + DEFER_RETRY_MS);
+        return;
+      }
+      await this.state.storage.delete(key);
     }
     // More queued (the drained job's sibling duplicate, or new arrivals):
     // process them in a fresh invocation with a fresh subrequest budget.
