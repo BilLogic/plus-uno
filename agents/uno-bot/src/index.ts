@@ -3,6 +3,7 @@ import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
 import { startNotionOAuth, handleNotionOAuthCallback } from "./oauth/notion";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
+import { handleMcpHealth } from "./debug/mcp-health";
 import { BUILD } from "./version";
 
 export default {
@@ -11,6 +12,13 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/health") {
       return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
+    }
+
+    // Per-server hosted-MCP handshake probe — identifies WHICH server is failing
+    // when the Anthropic connector reports its unnamed "Connection error". Safe
+    // output (names/status/latency only), doubles as the uptime-monitoring hook.
+    if (request.method === "GET" && url.pathname === "/debug/mcp") {
+      return handleMcpHealth(env);
     }
 
     if (request.method === "POST" && url.pathname === "/slack/events") {

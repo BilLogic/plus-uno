@@ -267,7 +267,11 @@ export async function getAccessToken(cfg: ProviderConfig): Promise<string | null
   } catch {
     return null;
   }
-  if (stored.expires_at && stored.refresh_token && stored.expires_at - Date.now() < 60_000) {
+  if (stored.expires_at && stored.expires_at - Date.now() < 60_000) {
+    // Expired (or about to). A stale token must NEVER be returned: one bad
+    // credential poisons the whole Anthropic MCP attachment (the API 400s the
+    // entire request, naming no server). No refresh token → treat as logged out.
+    if (!stored.refresh_token) return null;
     try {
       stored = await refresh(cfg, stored);
     } catch {
