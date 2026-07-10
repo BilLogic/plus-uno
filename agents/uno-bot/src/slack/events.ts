@@ -4,10 +4,12 @@ import { routeRequest } from "../agent/anthropic-client";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
+  claimEventRun,
   deletePendingProposal,
   isDuplicateEvent,
   loadHistory,
   loadPendingProposalByThread,
+  markEventRunDone,
   savePendingProposal,
   type HistoryTurn,
 } from "../thread-state-client";
@@ -159,13 +161,15 @@ async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: strin
 }
 
 // Entry point the AgentRunner DO alarm calls. Runs OUTSIDE waitUntil — no 30s
-// cutoff, fresh subrequest budget per alarm invocation.
-export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<void> {
+// cutoff, fresh subrequest budget per alarm invocation. Returns "deferred" when
+// the turn's run-lease is held by another (possibly killed) invocation — the
+// runner must then KEEP the job and retry later instead of deleting it.
+export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
   if (job.kind === "reaction") {
     await handleReaction(env, job.event);
-    return;
+    return "handled";
   }
-  await onMessageVisiblyFailing(env, job.event);
+  return onMessageVisiblyFailing(env, job.event);
 }
 
 // Outermost catch WITH channel/thread context. onMessage already posts a
@@ -174,9 +178,9 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<void
 // used to bubble to the waitUntil catch in index.ts — logged, invisible to the
 // user ("reacted 👀 then silence"). Backstop it here, best-effort; never throw
 // from the catch.
-async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promise<void> {
+async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promise<"handled" | "deferred"> {
   try {
-    await onMessage(env, msg);
+    return await onMessage(env, msg);
   } catch (err) {
     console.error(`[slack] onMessage failed: ${err instanceof Error ? err.message : String(err)}`);
     await postMessage(env, {
@@ -184,6 +188,7 @@ async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promis
       thread_ts: msg.thread_ts ?? msg.ts,
       text: ":warning: I hit an internal error on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
+    return "handled";
   }
 }
 
@@ -269,21 +274,49 @@ async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<
   }
 }
 
-async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
+async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" | "deferred"> {
   if (!isUserTurn(event)) {
     console.log(`[slack] skipping subtype=${event.subtype ?? ""} bot=${event.bot_id ?? ""}`);
-    return;
+    return "handled";
   }
 
   // Per-message dedup: Slack delivers app_mention AND message.channels for the
   // same message when the bot is @-mentioned in a channel it has history for.
   // Both events have different event_ids so the envelope-level dedup misses
   // them. Key by (channel, ts) which uniquely identifies the user's message.
-  if (await isDuplicateEvent(env, `msg:${event.channel}:${event.ts}`)) {
-    console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already in-flight`);
-    return;
+  //
+  // Lease semantics (not one-shot): the turn is claimed as "running" here and
+  // marked "done" below when it finishes. A deploy mid-run hard-kills the
+  // invocation with no finally, so the alarm retry that follows must NOT be
+  // swallowed as a duplicate — it defers while the lease is fresh and reclaims
+  // (re-runs the turn) once the lease is stale. Before this, a killed run left
+  // its marker stuck "in-flight" and every retry no-opped: 👀-then-silence,
+  // permanently (live incident 2026-07-10, test-1 run killed by a deploy).
+  const runKey = `msg:${event.channel}:${event.ts}`;
+  const claim = await claimEventRun(env, runKey);
+  if (claim === "done") {
+    console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already handled`);
+    return "handled";
+  }
+  if (claim === "running") {
+    console.log(
+      `[slack] dedup: msg ${event.channel}/${event.ts} in-flight — deferring (reclaims if the run died)`,
+    );
+    return "deferred";
   }
 
+  try {
+    await handleUserMessage(env, event);
+  } finally {
+    // Also marks done on a throw: the thrown path posts a visible ❌ upstream,
+    // which counts as handled. Only a hard kill skips this — by design, so the
+    // lease can rescue it.
+    await markEventRunDone(env, runKey);
+  }
+  return "handled";
+}
+
+async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   const channel = event.channel;
   const userId = event.user!;
   const userMsgTs = event.ts;

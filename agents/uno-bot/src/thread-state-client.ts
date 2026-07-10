@@ -120,3 +120,40 @@ export async function isDuplicateEvent(env: Env, event_id: string): Promise<bool
     return false;
   }
 }
+
+// Lease-mode dedup for the per-message agent turn (see thread-state.ts).
+//   "claimed" — this caller owns the turn: run it, then markEventRunDone.
+//   "running" — a fresh lease is held elsewhere (an alarm retry racing a live
+//               run, or a run killed <20 min ago): DEFER — keep the job and
+//               check back later; never delete it, that's how turns go silent.
+//   "done"    — already handled: drop the job.
+export type RunClaim = "claimed" | "running" | "done";
+
+export async function claimEventRun(env: Env, event_id: string): Promise<RunClaim> {
+  try {
+    const res = await call(env, "/events/check-and-record", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ event_id, mode: "run" }),
+    });
+    // Fail open like isDuplicateEvent: double-processing beats losing a turn.
+    if (!res.ok) return "claimed";
+    const body = (await res.json()) as { seen?: boolean; state?: "running" | "done" };
+    if (body.seen !== true) return "claimed";
+    return body.state === "running" ? "running" : "done";
+  } catch {
+    return "claimed";
+  }
+}
+
+export async function markEventRunDone(env: Env, event_id: string): Promise<void> {
+  try {
+    await call(env, "/events/check-and-record", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ event_id, mark: "done" }),
+    });
+  } catch {
+    // Best-effort: a missed done-mark self-heals when the lease goes stale.
+  }
+}
