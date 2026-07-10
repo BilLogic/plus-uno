@@ -729,7 +729,13 @@ const MAX_POST_CHARS = 3900;
 
 function capText(text: string): string {
   if (text.length <= MAX_POST_CHARS) return text;
-  return `${text.slice(0, MAX_POST_CHARS)}\n_…truncated — ask me for the rest._`;
+  // Cut at a line boundary (else a word boundary) so the cap never splits a
+  // <url|label> link in half — live 2026-07-10 a mid-URL cut shipped a broken
+  // link right above the truncation notice.
+  const window = text.slice(0, MAX_POST_CHARS);
+  const lastBreak = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
+  const cut = lastBreak > MAX_POST_CHARS * 0.6 ? window.slice(0, lastBreak) : window;
+  return `${cut}\n_…truncated — ask me for the rest._`;
 }
 
 /**

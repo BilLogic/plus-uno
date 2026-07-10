@@ -491,8 +491,8 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
             tool_use_id: tu.id,
             content: JSON.stringify({
               ok: false,
-              error: "tool budget exhausted for this request",
-              note: "Answer NOW from the tool results you already have. If they're insufficient, say exactly what's missing — do not fabricate.",
+              error: "no more lookups available this turn",
+              note: "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction).",
             }),
           });
           continue;
