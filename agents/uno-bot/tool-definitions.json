@@ -1,7 +1,33 @@
 [
   {
+    "name": "roadmap_query",
+    "description": "READ-ONLY. The PRECISE tool for Roadmap-card questions \u2014 always prefer this over notion_search for anything about cards on the Roadmap board: card status ('what's WIP / under review'), a specific card's Design Status, who's on a card, finding a card from a vague or partial title, or a card number. Queries the live Roadmap database directly and returns a COMPLETE result set (not a keyword sample): title, link, card number, Design Status, Dev Status, pillars, and people per card. Title lookups return ranked fuzzy candidates \u2014 when a user describes a card vaguely, use these to suggest the closest matches with links ('did you mean\u2026') instead of asking for a link. Combine filters freely (e.g. design_status + person). Safe to call freely (read-only, no gate); 1-2 subrequests total, far cheaper than repeated searches.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "design_status": {
+          "type": "string",
+          "description": "Filter by exact Design Status column value, e.g. 'WIP', 'Under Review', 'Ready for Design', 'Under Dev', 'Shipped'. If the value is wrong, the error lists the valid options \u2014 retry with one."
+        },
+        "title": {
+          "type": "string",
+          "description": "Full, partial, or vague card title/description \u2014 fuzzy-matched against every card on the board; returns ranked candidates."
+        },
+        "person": {
+          "type": "string",
+          "description": "A person's name (or part of it) \u2014 matches cards where they appear in any people column (Contributor, Dev, \u2026)."
+        },
+        "card_number": {
+          "type": "number",
+          "description": "The card's numeric id as shown on the board (e.g. 2436)."
+        }
+      }
+    }
+  },
+  {
     "name": "notion_search",
-    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL \u2014 'find the PRD for tutor-matching', 'what did we decide about onboarding', 'is there a study guide for X', 'who should I talk to about assessments', 'show me toolkit prototypes'. Returns matching page titles + Notion URLs (plus key properties); follow up with source_read to pull a specific page's full content. Prefer a narrow `scope` when you know which surface you want \u2014 a scoped query against a known database is far more reliable than an open workspace search. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL \u2014 'what did we decide about onboarding', 'is there a study guide for X', 'who should I talk to about assessments', 'show me toolkit prototypes'. NOT for Roadmap cards \u2014 use roadmap_query for anything about cards/status/owners on the Roadmap board (this keyword search misses existing cards; roadmap_query is exact and complete). Returns matching page titles + Notion URLs (plus key properties); follow up with source_read to pull a specific page's full content. Prefer a narrow `scope` when you know which surface you want \u2014 a scoped query against a known database is far more reliable than an open workspace search. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

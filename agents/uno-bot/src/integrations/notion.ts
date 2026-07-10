@@ -784,3 +784,119 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
     clearTimeout(timer);
   }
 }
+
+// ----- Roadmap card query (exact + complete, unlike /v1/search) -----
+//
+// Notion's /v1/search endpoint is a weak title-keyword search: live 2026-07-10
+// it repeatedly failed to surface an existing, integration-shared Roadmap card
+// by its literal title. Status/title/person questions about the Roadmap need
+// EXACT and COMPLETE answers, so this queries the Roadmap database directly
+// (classic databases/{id}/query, version 2022-06-28) and matches in the Worker.
+// One page of 100 cards ≈ one subrequest (two max) — far cheaper than a chain
+// of search calls on the free-tier 50-subrequest budget.
+
+export interface RoadmapCard {
+  title: string;
+  url: string;
+  /** The card's numeric ID (the board's unique_id property), when present. */
+  card_number: number | null;
+  design_status: string | null;
+  dev_status: string | null;
+  pillars: string[];
+  /** People-type properties → names, e.g. { "Contributor": ["Bill Guo"] }. */
+  people: Record<string, string[]>;
+}
+
+interface RoadmapQueryPage {
+  results?: Array<{
+    id?: string;
+    url?: string;
+    archived?: boolean;
+    properties?: Record<string, NotionProperty & { unique_id?: { number?: number | null } }>;
+  }>;
+  next_cursor?: string | null;
+  has_more?: boolean;
+  message?: string;
+  code?: string;
+}
+
+const ROADMAP_PAGE_SIZE = 100;
+const ROADMAP_MAX_PAGES = 2;
+
+export async function queryRoadmapCards(
+  env: Env,
+  opts: { designStatus?: string } = {},
+): Promise<RoadmapCard[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
+
+  const cards: RoadmapCard[] = [];
+  let cursor: string | undefined;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    for (let page = 0; page < ROADMAP_MAX_PAGES; page++) {
+      const res = await fetch(`${NOTION_API}/databases/${env.NOTION_ROADMAP_DB_ID}/query`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.NOTION_API_KEY}`,
+          "Notion-Version": NOTION_VERSION,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          page_size: ROADMAP_PAGE_SIZE,
+          ...(cursor ? { start_cursor: cursor } : {}),
+          ...(opts.designStatus
+            ? { filter: { property: "Design Status", status: { equals: opts.designStatus } } }
+            : {}),
+        }),
+        signal: controller.signal,
+      });
+      const data = (await res.json()) as RoadmapQueryPage;
+      if (!res.ok) {
+        throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "roadmap query failed"}`);
+      }
+      for (const r of data.results ?? []) {
+        if (!r.id || r.archived) continue;
+        const props = r.properties ?? {};
+        let title = "(untitled)";
+        let cardNumber: number | null = null;
+        let designStatus: string | null = null;
+        let devStatus: string | null = null;
+        let pillars: string[] = [];
+        const people: Record<string, string[]> = {};
+        for (const [name, prop] of Object.entries(props)) {
+          if (prop.type === "title") {
+            const t = plain(prop.title);
+            if (t) title = t;
+          } else if (prop.type === "unique_id") {
+            cardNumber = prop.unique_id?.number ?? null;
+          } else if (prop.type === "status" && name === "Design Status") {
+            designStatus = prop.status?.name ?? null;
+          } else if (prop.type === "status" && name === "Dev Status") {
+            devStatus = prop.status?.name ?? null;
+          } else if (prop.type === "multi_select" && name === "Product Pillar") {
+            pillars = (prop.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean);
+          } else if (prop.type === "people") {
+            const names = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
+            if (names.length) people[name] = names;
+          }
+        }
+        cards.push({
+          title,
+          url: r.url ?? "",
+          card_number: cardNumber,
+          design_status: designStatus,
+          dev_status: devStatus,
+          pillars,
+          people,
+        });
+      }
+      if (!data.has_more || !data.next_cursor) break;
+      cursor = data.next_cursor;
+    }
+    return cards;
+  } finally {
+    clearTimeout(timer);
+  }
+}
