@@ -3,6 +3,14 @@ main = "src/index.ts"
 compatibility_date = "2026-05-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Workers Logs / Observability. This block MUST stay in the file: it was first
+# enabled from the dashboard mid-incident (2026-07-09), and the next CI deploy
+# silently reverted it — wrangler treats a missing block as "disabled", which
+# blinds the `mcp=` telemetry the trial run depends on.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 # Plain vars (non-secret). Override per-env below.
 #
 # IMPORTANT — both values below must point at the GitHub repo whose `main`
