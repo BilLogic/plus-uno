@@ -143,19 +143,29 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // retry. (Edge: if earlier iterations already produced mcp_tool_use blocks
   // in `messages`, the MCP-less retry may itself be rejected — acceptable;
   // the dominant failure mode is the FIRST call, before any MCP blocks exist.)
+  //
+  // STREAMING is load-bearing, not cosmetic: with MCP servers attached, every
+  // server-side MCP tool round runs INSIDE one HTTP request, and Cloudflare in
+  // front of api.anthropic.com kills any request idle past ~100s with a 524
+  // (live incident 2026-07-09: a multi-lookup sonnet run died `[agent] failed:
+  // 524` after the DO runner had correctly kept it alive). Streaming keeps
+  // bytes flowing for the whole run; finalMessage() returns the same
+  // accumulated Message the non-streaming call would have.
   const callClaude = async (
     params: Record<string, unknown>,
   ): Promise<Anthropic.Message> => {
     if (mcpActive) {
       try {
-        return await client.messages.create(
-          {
-            ...params,
-            tools: toolsWithMcp,
-            mcp_servers: mcpServers,
-          } as unknown as Anthropic.MessageCreateParamsNonStreaming,
-          { headers: { "anthropic-beta": MCP_BETA } },
-        );
+        return await client.messages
+          .stream(
+            {
+              ...params,
+              tools: toolsWithMcp,
+              mcp_servers: mcpServers,
+            } as unknown as Anthropic.MessageStreamParams,
+            { headers: { "anthropic-beta": MCP_BETA } },
+          )
+          .finalMessage();
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         if (!/MCP server/i.test(msg)) throw err;
@@ -165,10 +175,12 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
         );
       }
     }
-    return client.messages.create({
-      ...params,
-      tools: toolsPlain,
-    } as Anthropic.MessageCreateParamsNonStreaming);
+    return client.messages
+      .stream({
+        ...params,
+        tools: toolsPlain,
+      } as Anthropic.MessageStreamParams)
+      .finalMessage();
   };
 
   // D2: pick the model tier from the message intent once per request.
