@@ -38,7 +38,11 @@ function transformSegment(seg: string): string {
     // Note: markdown [label](url) links were already converted above, so
     // these patterns can't touch real links.
     .replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "")
-    .replace(/ ?\[(?:docs|skills|agents|design-system)\/[^\]\n]*\]/g, "");
+    .replace(/ ?\[(?:docs|skills|agents|design-system)\/[^\]\n]*\]/g, "")
+    // The models CONSTRUCT GitHub links from pattern and invent the org (live
+    // 2026-07-10, twice: "plus-team/plus-uno" and "plus-uno/plus-uno"). The
+    // repo has exactly one home — rewrite known-wrong orgs deterministically.
+    .replace(/github\.com\/(?:plus-team|plus-uno)\/plus-uno/g, "github.com/BilLogic/plus-uno");
 }
 
 function convertLine(line: string): string {
