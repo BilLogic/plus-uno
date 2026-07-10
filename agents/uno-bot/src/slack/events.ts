@@ -1,6 +1,6 @@
 import type { Env } from "../types";
 import { runAgent, type AgentImage, type AgentResult } from "../agent/run-agent";
-import { pickModel } from "../agent/anthropic-client";
+import { routeRequest } from "../agent/anthropic-client";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -321,12 +321,11 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   // the current turn. Guarded inside — a failure degrades to text-only.
   const vision = await collectVisionInputs(env, event, userText);
 
-  // Wait signal: heavier tiers and vision runs take noticeably longer than a
-  // quick lookup, and the requester has no other cue until the single reply
-  // lands. ⏳ next to 👀 says "bigger think underway — this one's worth the
-  // wait" before the model even starts. pickModel is a cheap keyword check;
-  // runAgent re-runs it identically for the real routing.
-  const { tier: previewTier } = pickModel({ userText, hasPending: pending !== null });
+  // Wait signal: real requests (everything but the confirm/cancel fast-path)
+  // run on the sonnet lane with grounding and can take a while — ⏳ next to 👀
+  // says "bigger think underway" before the model starts. routeRequest is the
+  // same zero-cost lane check runAgent uses.
+  const { tier: previewTier } = routeRequest({ userText, hasPending: pending !== null });
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
   }

@@ -24,7 +24,7 @@ import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { makeAnthropicClient, classifyRoute, MODELS } from "./anthropic-client";
+import { makeAnthropicClient, routeRequest, MODELS } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
@@ -107,6 +107,13 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack } = input;
   const client = makeAnthropicClient(env);
 
+  // D2 (Phase 3 final): three fixed lanes, no classifier — the dynamic part is
+  // native (adaptive thinking + advisor tool below). See routeRequest.
+  const { tier, model, reason: routeReason } = routeRequest({
+    userText,
+    hasPending: pending !== null,
+  });
+
   // Notion hosted-MCP (READS ONLY). Empty until the one-time OAuth consent is
   // done, so the loop is unchanged until then. Current beta shape
   // (mcp-client-2025-11-20): mcp_servers carries connection details, and each
@@ -131,14 +138,38 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     max_uses: 3,
   } as unknown as Anthropic.Tool;
 
+  // Advisor tool (beta, server-side): the sonnet executor can consult opus
+  // mid-request for strategy on the hardest moments — native escalation, no
+  // rerun, no second cold cache. Sonnet lane only: haiku turns are trivial
+  // confirms, and the opus lane IS opus. Advisor model must be ≥ executor
+  // (sonnet-4-6 → opus-4-8 is a valid pair).
+  const ADVISOR_TOOL =
+    tier === "sonnet"
+      ? [{ type: "advisor_20260301", name: "advisor", model: MODELS.opus } as unknown as Anthropic.Tool]
+      : [];
+  const ADVISOR_BETA = tier === "sonnet" ? "advisor-tool-2026-03-01" : null;
+
+  // Adaptive thinking + effort (native dynamic compute): the model decides
+  // when/how much to reason per request — this replaced the routing classifier
+  // (user decision 2026-07-10). haiku-4-5 predates adaptive thinking; its lane
+  // (trivial confirms) doesn't need it.
+  const NATIVE_DIALS: Record<string, unknown> =
+    tier === "haiku" ? {} : { thinking: { type: "adaptive" }, output_config: { effort: "high" } };
+
   const toolsWithMcp = [
     ...(TOOLS as Anthropic.Tool[]),
     WEB_SEARCH_TOOL,
+    ...ADVISOR_TOOL,
     ...(mcpToolsets as unknown as Anthropic.Tool[]),
   ];
   // Fallback tool set: everything EXCEPT the MCP toolsets (web_search is an
   // Anthropic server tool, independent of MCP — it stays).
-  const toolsPlain = [...(TOOLS as Anthropic.Tool[]), WEB_SEARCH_TOOL];
+  const toolsPlain = [...(TOOLS as Anthropic.Tool[]), WEB_SEARCH_TOOL, ...ADVISOR_TOOL];
+
+  const betaHeaders = (withMcp: boolean): Record<string, string> | undefined => {
+    const betas = [...(withMcp ? [MCP_BETA] : []), ...(ADVISOR_BETA ? [ADVISOR_BETA] : [])];
+    return betas.length > 0 ? { "anthropic-beta": betas.join(",") } : undefined;
+  };
 
   // Resilient Anthropic call. If ANY attached MCP server fails to connect,
   // the API 400s the WHOLE request ("Connection error while communicating
@@ -192,10 +223,11 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
         const stream = client.messages.stream(
           {
             ...params,
+            ...NATIVE_DIALS,
             tools: toolsWithMcp,
             mcp_servers: mcpServers,
           } as unknown as Anthropic.MessageStreamParams,
-          { headers: { "anthropic-beta": MCP_BETA } },
+          { headers: betaHeaders(true) },
         );
         attachInterimWatcher(stream);
         return await stream.finalMessage();
@@ -208,10 +240,14 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
         );
       }
     }
-    const stream = client.messages.stream({
-      ...params,
-      tools: toolsPlain,
-    } as Anthropic.MessageStreamParams);
+    const stream = client.messages.stream(
+      {
+        ...params,
+        ...NATIVE_DIALS,
+        tools: toolsPlain,
+      } as unknown as Anthropic.MessageStreamParams,
+      { headers: betaHeaders(false) },
+    );
     attachInterimWatcher(stream);
     return stream.finalMessage();
   };
@@ -264,14 +300,6 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     );
     return JSON.stringify({ ok: true, results });
   };
-
-  // D2 (Phase 3 revamp): route on how much GROUNDING the answer needs, not
-  // what verbs the message uses — one tiny haiku classifier call, with keyword
-  // fast-paths and a keyword fallback (see classifyRoute).
-  const { tier, model, reason: routeReason } = await classifyRoute(client, {
-    userText,
-    hasPending: pending !== null,
-  });
 
   // D7: per-request turn/token telemetry. One structured line per request,
   // visible via `wrangler tail`, so cost + iteration economy is observable.
