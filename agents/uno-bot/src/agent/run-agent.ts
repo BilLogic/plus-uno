@@ -90,7 +90,10 @@ const MAX_ITERATIONS = 16;
 // dial raised 2026-07-09 — team prefers thorough over fast (user decision):
 // users prefer complete+right over fast; Slack's hard cap is 40k chars, and
 // readability guidance (summary-first, thread the detail) still applies.
-const MAX_TOKENS = 8192;
+// Raised again 2026-07-10 for Sonnet 5 + adaptive thinking: thinking tokens
+// share this budget, and Sonnet 5's tokenizer counts ~30% more — 8192 risked
+// an all-thinking, truncated-answer response. We stream, so no timeout risk.
+const MAX_TOKENS = 16384;
 // Cap on individual read-only tool executions per request. Each execution costs
 // Workers subrequests (a blueprint fallback search alone is ~4 fetches), and the
 // free plan allows 50 per request — blowing it kills the request mid-flight so
@@ -130,10 +133,11 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // Anthropic server-side web search (runs on Anthropic's infra, READ-only, no
   // beta header). Gives the bot web grounding — e.g. Figma usage/practice
   // questions and external resources it can't reach any other way (Figma's own
-  // MCP is closed to us). Basic 20250305 variant: works across all three model
-  // tiers (haiku/sonnet/opus). ~$10 per 1k searches — max_uses caps per turn.
+  // MCP is closed to us). Sonnet 5 / Opus 4.8 support the 20260209 variant
+  // (dynamic filtering — better, cheaper results); haiku-4-5 predates it and
+  // keeps the basic 20250305. ~$10 per 1k searches — max_uses caps per turn.
   const WEB_SEARCH_TOOL = {
-    type: "web_search_20250305",
+    type: tier === "haiku" ? "web_search_20250305" : "web_search_20260209",
     name: "web_search",
     max_uses: 3,
   } as unknown as Anthropic.Tool;
@@ -208,10 +212,17 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       const b = block as { type?: string; text?: string };
       if (b.type === "text") {
         pendingNarration = b.text ?? null;
-      } else if (pendingNarration) {
-        emitInterim(pendingNarration);
-        pendingNarration = null;
+        return;
       }
+      // Emit only ahead of SERVER-SIDE work (MCP rounds, web search) — that's
+      // when the user actually waits. Narration before a LOCAL tool_use is the
+      // proposal preview / loop text and posting it would duplicate the card
+      // (edge case from the 2026-07-10 disclosure stress-test). Thinking
+      // blocks never carry narration out — only prior text is ever emitted.
+      if (b.type === "mcp_tool_use" || b.type === "server_tool_use") {
+        if (pendingNarration) emitInterim(pendingNarration);
+      }
+      pendingNarration = null;
     });
   };
 

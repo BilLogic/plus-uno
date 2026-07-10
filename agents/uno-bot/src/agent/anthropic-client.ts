@@ -8,7 +8,12 @@ export type ModelTier = "haiku" | "sonnet" | "opus";
 
 export const MODELS: Record<ModelTier, string> = {
   haiku: "claude-haiku-4-5-20251001",
-  sonnet: "claude-sonnet-4-6",
+  // Sonnet 5 (user decision 2026-07-10): near-Opus quality on exactly our
+  // workload (agentic grounding + synthesis), adaptive thinking on by default,
+  // intro pricing through 2026-08-31. Notes: new tokenizer (~30% more tokens
+  // for the same text — cache/telemetry baselines shift), and thinking shares
+  // the max_tokens budget (see MAX_TOKENS headroom in run-agent).
+  sonnet: "claude-sonnet-5",
   opus: "claude-opus-4-8",
 };
 
