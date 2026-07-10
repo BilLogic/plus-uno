@@ -87,8 +87,15 @@ SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slac
 # channels) — the Worker hard-filters results before the model sees them:
 # public passes; private passes ONLY if its channel ID is listed here (the
 # team-designated, well-organized private channels); DMs/group DMs never pass.
-# Comma-separated channel IDs, e.g. "C0AAA11111,C0BBB22222". Empty = public only.
-SLACK_SEARCH_PRIVATE_ALLOWLIST = ""
+# Comma-separated channel IDs. Empty = public only.
+# Team-approved list (Bill, 2026-07-10 — the starred/design-squad private
+# channels; treated as well-organized and safe to surface):
+#   plus-core C03DVDS4LN9 · plus-goal-setting C07PZJD3HD5 ·
+#   plus-proj-tact C09EPEJEQ9K · plus-instructional-design C07LU2K8DQW ·
+#   plus-admin C089A3E9CCW · plus-design-feedback C074QG2V7DJ ·
+#   plus-marketing C052BG9NE86 · plus-training C07L5RZV6DR ·
+#   plus-universal C072E8SFLKV
+SLACK_SEARCH_PRIVATE_ALLOWLIST = "C03DVDS4LN9,C07PZJD3HD5,C09EPEJEQ9K,C07LU2K8DQW,C089A3E9CCW,C074QG2V7DJ,C052BG9NE86,C07L5RZV6DR,C072E8SFLKV"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET
