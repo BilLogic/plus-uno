@@ -10,6 +10,49 @@ tools generate from UNO's briefs. Only at hi-fi does UNO build directly, against
 uno-publish. The hand-craft path bypasses this skill by design — but nothing
 bypasses the stage-lens review.
 
+## 0. PRD required — entry gate, all fidelities
+
+No PRD → do not enter this skill. Applies to low, mid, high, and hand-craft
+routing alike; there are no exceptions and no "idea-only" bypass.
+
+**Acceptable PRD forms (any one):**
+
+1. **Notion PRD URL** — the document of record from `skills/uno-synthesize`
+2. **Local PRD file** — a `.md` path in the repo (e.g. eval fixtures)
+3. **Inline PRD body** — pasted in the same turn, with structured sections
+   (user flows, acceptance criteria, scope, or equivalent)
+
+**When PRD is missing:** stop immediately. Do not ground, scaffold, write a
+prompt-spec, or touch `playground/`. Invite the designer to run
+`skills/uno-synthesize` first (`notion_create` flow) and return with the PRD
+link or approved inline draft. Never invent requirements to fill the gap.
+
+The IDE enforces this at prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`
+(a data-driven conversation FSM in `.cursor/hooks/uno-prototype/` — stateless per message,
+scoped by `conversation_id`); the skill body enforces it again on load.
+
+**IDE hook behavior:** when prototype intent is detected, the hook runs a finite-state
+workflow (PRD check → PRD upload/verify → fidelity branch [verification if PRD
+hints] → branch-specific inputs → hi-fi confirm / tool select) and blocks each message
+until the current step is satisfied. **No step may be skipped** — PRD hints only
+rephrase the current step as verification (e.g. high-fi in PRD → “generate high-fi?”).
+
+**Agent rendering contract (intake):** the coding agent displays hook content
+**one question per message** — never batches PRD, fidelity, Figma, or later steps
+into a single AskQuestion call or reply. When
+`.cursor/hooks/briefings/active-intake-question.json` exists, the agent reads only
+that file's current `stateId` and `question`; choice steps use AskQuestion with
+`questions.length === 1`. Skipping a step because the user already answered in an
+earlier message, attached a PRD, or named fidelity/Figma in the same turn is
+forbidden — the FSM still asks that step for explicit verification.
+
+To exit without invoking uno-prototype, say
+`skip PRD upload` or `terminate this process`. That releases the workflow but does not grant a PRD bypass
+inside the skill. When hi-fi / FigJam invoke branches complete, send `uno-prototype:execute`
+to hand off to the coding agent; the briefing is written to
+`.cursor/hooks/briefings/active-prototype-briefing.md`. Disable the gate for local testing:
+`"uno": { "prdGate": false }` in `.cursor/settings.json`.
+
 ## 1. Ground the brief — unconditional, scoped
 
 No path from PRD to prototyping skips grounding, at any fidelity.

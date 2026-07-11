@@ -11,7 +11,7 @@ description: >
   critique (uno-review), sharing/handoff (uno-publish), or writing the PRD
   itself (uno-synthesize).
 user-invocable: true
-argument-hint: [prd-or-idea] [fidelity]
+argument-hint: [prd-required] [fidelity]
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__notion-plus__*
 ---
 
@@ -30,9 +30,14 @@ execution layer over it.
 
 ## When to use / when NOT
 
-**Use when** a requirement (usually a PRD from uno-synthesize) needs to become
-an artifact: a flow sketch, a data-flow map, an interactive draft, a working-UI
-proof, or a hi-fi playground build.
+**Use when** a **PRD is already available** (usually from uno-synthesize) and
+needs to become an artifact: a flow sketch, a data-flow map, an interactive
+draft, a working-UI proof, or a hi-fi playground build.
+
+**PRD is mandatory at entry (method §0).** Acceptable forms: Notion PRD URL,
+local `.md` path, or inline PRD body in the same message (user flows +
+acceptance criteria minimum). No PRD → stop and invite
+`skills/uno-synthesize` — do not prototype on an idea alone.
 
 **Not for:** critiquing an artifact (→ `skills/uno-review`) · sharing,
 replicas, or handoff (→ `skills/uno-publish`) · drafting the PRD
@@ -53,6 +58,40 @@ Method §2 in brief — the designer chooses, UNO routes, no gold-plating:
 
 ## Workflow (IDE execution of method.md)
 
+### Intake mode — mandatory before anything else
+
+When `.cursor/hooks/briefings/active-intake-question.json` exists, you are in
+**hook-driven intake**. The hook FSM owns step order; you only render the
+**current** step:
+
+1. Read `active-intake-question.json` first — it is the only source of truth
+   for what to ask this turn (`oneQuestionOnly` and `neverSkipStep` are always
+   true).
+2. **One question per message — no exceptions.** Ask exactly one hook step per
+   reply. If `type` is `choice`, call **AskQuestion** with a `questions` array
+   of length **1** — that single prompt and its options from the JSON file.
+   If `type` is not `choice`, ask exactly that one question in plain text.
+3. **Never skip a step — no exceptions.** Even when the PRD, the user's first
+   message, or conversation history already states fidelity, Figma, scope, or
+   deliverables, you still ask the matching FSM step as a **verification**
+   question (e.g. “I see your PRD indicates high-fidelity — generate a high-fi
+   prototype?”). Do not auto-route, auto-select, or start building.
+4. **Forbidden during intake:** batching multiple hook steps into one
+   AskQuestion call; listing PRD + fidelity + Figma together; loading
+   `method.md`; grounding; building; tables of later steps; or any preview of
+   steps the JSON file does not name.
+5. Intake ends when the file is removed and the user sends `uno-prototype:execute`
+   (read `active-prototype-briefing.md` then).
+
+If intake JSON is absent and the user did not send `uno-prototype:execute`, do
+**not** improvise the workflow or batch-ask PRD/fidelity/Figma yourself — tell
+them to invoke `uno-prototype` / say `prototype this` so the hook can start
+intake one step at a time.
+
+0. **Gate: PRD required** (method §0 — before anything else). Verify a PRD is
+   present (Notion link, local `.md`, or inline structured body). Missing →
+   stop; explain that `skills/uno-synthesize` creates the PRD (`notion_create`
+   on approval) and return here once filed. No exceptions at any fidelity.
 1. **Ground** (method §1 — unconditional, scoped to the card).
    Summon **writers/blueprint** for the grounding read: this card's flows,
    constraints, current-state context + global constraints. Summon
@@ -106,6 +145,17 @@ gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
 ## Constraints
 
+- **Hook FSM + AskQuestion intake** — when `prdGate` is on, `.cursor/hooks/uno-prototype/`
+  advances one step per message and writes `active-intake-question.json`. You
+  render **one** step per message: **AskQuestion** with `questions.length === 1`
+  (choice steps) or a single plain-text question. Never batch steps; never skip a
+  step because context already answers it; never dump the full PRD/fidelity/Figma
+  checklist during intake.
+- **PRD gate is never skipped** — method §0; route to `skills/uno-synthesize`
+  when PRD is absent. The IDE hook runs a finite-state workflow before the agent
+  starts; exit with `terminate this process` or `skip PRD upload` to leave the
+  workflow without invoking this skill. After invoke branches complete, send
+  `uno-prototype:execute` and read `.cursor/hooks/briefings/active-prototype-briefing.md`.
 - Grounding is never skipped — not even for "just a quick sketch".
 - Low/mid: output is the prompt-spec, never the generated artifact.
 - Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,

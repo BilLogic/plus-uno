@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": ".cursor/hooks/require-prd-for-prototype.sh",
+        "matcher": "UserPromptSubmit",
+        "failClosed": true,
+        "timeout": 10
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": ".cursor/hooks/uno-prototype/session-end.mjs",
+        "timeout": 5
+      }
+    ]
+  }
+}

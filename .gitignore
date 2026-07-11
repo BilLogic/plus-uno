@@ -14,6 +14,15 @@ coverage/
 .idea/
 .cursor/*
 !.cursor/rules/
+!.cursor/hooks.json
+!.cursor/hooks/
+!.cursor/settings.json
+.cursor/hooks/state/*
+!.cursor/hooks/state/.gitignore
+!.cursor/hooks/state/.gitkeep
+.cursor/hooks/briefings/*
+!.cursor/hooks/briefings/.gitignore
+!.cursor/hooks/briefings/.gitkeep
 *.swp
 *.swo
 *~

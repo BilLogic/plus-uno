@@ -30,7 +30,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 |---|---|---|
 | `skills/uno-research` | gather context: user studies, Slack threads, analytics, codebase — instrument-first | researchers/* · writers/notion (study guide) |
 | `skills/uno-synthesize` | findings → takeaways → PRD; blueprint updates | writers/notion · writers/blueprint |
-| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / hand-craft) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
+| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / hand-craft); **PRD required at entry** — no PRD → `skills/uno-synthesize` first (IDE: `.cursor/hooks/require-prd-for-prototype.sh`) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
 | `skills/uno-publish` | share-out bundle · handoff rail + Handoff Spec · marketplace entry | writers/notion · writers/figma |
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* |
 | `skills/uno-maintain` | intake · Tier 1/2 fixes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
@@ -70,6 +70,7 @@ Design System knowledge lives in `design-system/docs/` (hand-authored) and `desi
 15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free.
 16. Never write to a Notion surface outside the allowlist in `docs/conventions/notion.md`, and never create new select options, pillars, features, or OKRs there.
 17. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
+18. **uno-prototype intake is one step per message**: When `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly one hook step — AskQuestion with `questions.length === 1` or one plain question. Never batch PRD/fidelity/Figma into one turn; never skip a step because context already answers it.
 
 ## Knowledge
 
