@@ -58,7 +58,7 @@ Every message renders as Slack **mrkdwn** (the Worker's `postMessage` defaults `
 | — | table | **no Markdown tables** — the pipes render literally; use `•` bulleted lines |
 | `&` `<` `>` | literal | escape to `&amp;` `&lt;` `&gt;` in body text |
 
-**House rule: plain mrkdwn only.** Write mrkdwn directly — but as a backstop the Worker coerces every outgoing message (`agents/uno-bot/src/slack/mrkdwn.ts`, applied at `api.ts` `postMessage`), converting stray `##` headings, `**bold**`, `| tables |`, and `[md](links)` to their mrkdwn equivalents. Don't rely on it; the model should emit mrkdwn, the sanitizer just guarantees it. The Worker (`api.ts`) posts plain `text` — Block Kit and `reply_broadcast` are not wired. Don't prescribe buttons, modals, or block layouts the code can't send. (If we ever adopt block-based gates, `api.ts` must first set a top-level `text` fallback — screen readers and notifications read `text`, not blocks.)
+**House rule: plain mrkdwn only.** Write mrkdwn directly — but as a backstop the Worker coerces every outgoing message (`agents/uno-bot/src/slack/mrkdwn.ts`, applied at `api.ts` `postMessage`), converting stray `##` headings, `**bold**`, `| tables |`, and markdown bracket-links to their mrkdwn equivalents. Don't rely on it; the model should emit mrkdwn, the sanitizer just guarantees it. The Worker (`api.ts`) posts plain `text` — Block Kit and `reply_broadcast` are not wired. Don't prescribe buttons, modals, or block layouts the code can't send. (If we ever adopt block-based gates, `api.ts` must first set a top-level `text` fallback — screen readers and notifications read `text`, not blocks.)
 
 ## Threading & mentions
 

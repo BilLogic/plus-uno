@@ -45,8 +45,6 @@
     "dev:test-3": "vite --config playground/test-3/vite.config.js",
     "figma:poll": "node scripts/poll-figma-library.js",
     "figma:poll:init": "node scripts/poll-figma-library.js --init",
-    "figma:fetch-component": "node scripts/fetch-figma-component.js",
-    "figma:write-back": "node scripts/figma-write-back.js",
     "notify:slack": "node scripts/notify-slack.js"
   },
   "keywords": [

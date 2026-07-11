@@ -1,12 +1,15 @@
 import type { Env } from "../types";
 import { runAgent, type AgentImage, type AgentResult } from "../agent/run-agent";
+import { routeRequest } from "../agent/anthropic-client";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
+  claimEventRun,
   deletePendingProposal,
   isDuplicateEvent,
   loadHistory,
   loadPendingProposalByThread,
+  markEventRunDone,
   savePendingProposal,
   type HistoryTurn,
 } from "../thread-state-client";
@@ -100,23 +103,73 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "message": {
       const msg = event as SlackMessageEvent;
       if (await shouldHandleMessage(env, msg)) {
-        await onMessageVisiblyFailing(env, msg);
+        await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
       return;
     }
-    case "app_mention":
+    case "app_mention": {
       // Explicit @mention always engages.
-      await onMessageVisiblyFailing(env, appMentionToMessage(event as SlackAppMentionEvent));
+      const msg = appMentionToMessage(event as SlackAppMentionEvent);
+      await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
       return;
-    case "reaction_added":
-      await handleReaction(env, event as SlackReactionAddedEvent);
+    }
+    case "reaction_added": {
+      // Reactions can confirm a proposal, which executes the real tool (Notion
+      // card, workflow dispatch, email) — same waitUntil() 30s-cancellation
+      // exposure as agent runs, so route through the runner too. Keyed by the
+      // reacted message so confirmations on one proposal stay ordered.
+      const r = event as SlackReactionAddedEvent;
+      await enqueueAgentJob(env, { kind: "reaction", event: r }, `${r.item.channel}:${r.item.ts}`);
       return;
+    }
     default:
       console.log(`[slack] unhandled event type: ${event.type}`);
       return;
   }
+}
+
+// A unit of work for the AgentRunner DO: a user message (full agent pipeline)
+// or a reaction (proposal confirm/cancel, which may execute a gated tool).
+export type RunnerJobPayload =
+  | { kind: "message"; event: SlackMessageEvent }
+  | { kind: "reaction"; event: SlackReactionAddedEvent };
+
+// Hand the work to the per-thread AgentRunner DO instead of running it here:
+// this Worker invocation lives inside ctx.waitUntil(), which Cloudflare cancels
+// ~30s after the Slack ack — any longer run died silently mid-flight
+// ("👀 then silence", live incident 2026-07-09). DO alarms have no such cutoff.
+// Keyed per thread so runs within a thread stay ordered.
+async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
+  const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
+  const res = await stub.fetch("https://do/enqueue", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ job, enqueuedAt: Date.now() }),
+  });
+  if (!res.ok && job.kind === "message") {
+    // Enqueue is the only step left in the Worker — a failure here IS the
+    // 👀-then-silence path, so make it visible instead.
+    console.error(`[slack] runner enqueue failed: ${res.status}`);
+    await postMessage(env, {
+      channel: job.event.channel,
+      thread_ts: job.event.thread_ts ?? job.event.ts,
+      text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
+    }).catch(() => {});
+  }
+}
+
+// Entry point the AgentRunner DO alarm calls. Runs OUTSIDE waitUntil — no 30s
+// cutoff, fresh subrequest budget per alarm invocation. Returns "deferred" when
+// the turn's run-lease is held by another (possibly killed) invocation — the
+// runner must then KEEP the job and retry later instead of deleting it.
+export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
+  if (job.kind === "reaction") {
+    await handleReaction(env, job.event);
+    return "handled";
+  }
+  return onMessageVisiblyFailing(env, job.event);
 }
 
 // Outermost catch WITH channel/thread context. onMessage already posts a
@@ -125,9 +178,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
 // used to bubble to the waitUntil catch in index.ts — logged, invisible to the
 // user ("reacted 👀 then silence"). Backstop it here, best-effort; never throw
 // from the catch.
-async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promise<void> {
+async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promise<"handled" | "deferred"> {
   try {
-    await onMessage(env, msg);
+    return await onMessage(env, msg);
   } catch (err) {
     console.error(`[slack] onMessage failed: ${err instanceof Error ? err.message : String(err)}`);
     await postMessage(env, {
@@ -135,6 +188,7 @@ async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promis
       thread_ts: msg.thread_ts ?? msg.ts,
       text: ":warning: I hit an internal error on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
+    return "handled";
   }
 }
 
@@ -220,21 +274,49 @@ async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<
   }
 }
 
-async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
+async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" | "deferred"> {
   if (!isUserTurn(event)) {
     console.log(`[slack] skipping subtype=${event.subtype ?? ""} bot=${event.bot_id ?? ""}`);
-    return;
+    return "handled";
   }
 
   // Per-message dedup: Slack delivers app_mention AND message.channels for the
   // same message when the bot is @-mentioned in a channel it has history for.
   // Both events have different event_ids so the envelope-level dedup misses
   // them. Key by (channel, ts) which uniquely identifies the user's message.
-  if (await isDuplicateEvent(env, `msg:${event.channel}:${event.ts}`)) {
-    console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already in-flight`);
-    return;
+  //
+  // Lease semantics (not one-shot): the turn is claimed as "running" here and
+  // marked "done" below when it finishes. A deploy mid-run hard-kills the
+  // invocation with no finally, so the alarm retry that follows must NOT be
+  // swallowed as a duplicate — it defers while the lease is fresh and reclaims
+  // (re-runs the turn) once the lease is stale. Before this, a killed run left
+  // its marker stuck "in-flight" and every retry no-opped: 👀-then-silence,
+  // permanently (live incident 2026-07-10, test-1 run killed by a deploy).
+  const runKey = `msg:${event.channel}:${event.ts}`;
+  const claim = await claimEventRun(env, runKey);
+  if (claim === "done") {
+    console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already handled`);
+    return "handled";
+  }
+  if (claim === "running") {
+    console.log(
+      `[slack] dedup: msg ${event.channel}/${event.ts} in-flight — deferring (reclaims if the run died)`,
+    );
+    return "deferred";
   }
 
+  try {
+    await handleUserMessage(env, event);
+  } finally {
+    // Also marks done on a throw: the thrown path posts a visible ❌ upstream,
+    // which counts as handled. Only a hard kill skips this — by design, so the
+    // lease can rescue it.
+    await markEventRunDone(env, runKey);
+  }
+  return "handled";
+}
+
+async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   const channel = event.channel;
   const userId = event.user!;
   const userMsgTs = event.ts;
@@ -268,9 +350,80 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
     return;
   }
 
+  // Deterministic confirm/cancel fast-path — a BARE confirmation on a pending
+  // proposal never needs a model, on any provider. The reaction gate (✅/❌)
+  // was already deterministic; text now matches it. Live failure 2026-07-10
+  // (gemini): "go ahead" made the model re-stage an identical proposal and hit
+  // the duplicate guard instead of resolving — the user's approval bounced.
+  // Anything longer than a bare phrase still goes to the model (it may be a
+  // modification request, not a plain yes/no).
+  if (pending) {
+    const bare = userText.trim().toLowerCase().replace(/[.!?\s]+$/g, "");
+    const CONFIRM_PHRASES = new Set([
+      "go ahead", "yes", "yes please", "confirm", "confirmed", "do it",
+      "ship it", "approve", "approved", "sure", "ok", "okay", "lgtm",
+    ]);
+    const CANCEL_PHRASES = new Set([
+      "cancel", "no", "stop", "abort", "nevermind", "never mind",
+      "cancel it", "don't", "dont",
+    ]);
+    if (CONFIRM_PHRASES.has(bare) || CANCEL_PHRASES.has(bare)) {
+      if (userId !== pending.requesterUserId) {
+        await postMessage(env, {
+          channel,
+          thread_ts: threadTs,
+          text: `Only <@${pending.requesterUserId}> can confirm or cancel this one.`,
+        });
+        return;
+      }
+      const decision = CONFIRM_PHRASES.has(bare) ? "confirm" : "cancel";
+      await resolveProposal(env, pending, decision);
+      await appendHistory(env, channel, threadTs, { role: "user", content: userText });
+      await appendHistory(env, channel, threadTs, {
+        role: "assistant",
+        content: decision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
+      });
+      return;
+    }
+  }
+
   // Vision: pasted images + a linked Figma frame become base64 image blocks on
   // the current turn. Guarded inside — a failure degrades to text-only.
   const vision = await collectVisionInputs(env, event, userText);
+
+  // Wait signal: real requests (everything but the confirm/cancel fast-path)
+  // run on the sonnet lane with grounding and can take a while — ⏳ next to 👀
+  // says "bigger think underway" before the model starts. routeRequest is the
+  // same zero-cost lane check runAgent uses.
+  const { tier: previewTier } = routeRequest({ userText, hasPending: pending !== null });
+  if (previewTier !== "haiku" || vision.images.length > 0) {
+    await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
+  }
+
+  // Interim updates: long runs are now legal (streaming + MCP can take several
+  // minutes), and ⏳ alone left people typing "any thing???" at the 8-minute
+  // mark. Two complementary signals, both as SEPARATE small messages (never
+  // folded into the final answer): (a) the model's own between-tool narration,
+  // filtered and capped by runAgent's onInterim, arrives as it works; (b) a
+  // generic note at ~75s backstops runs that produced no narration yet.
+  let interimPosted = false;
+  const postInterim = (text: string): void => {
+    interimPosted = true;
+    postMessage(env, { channel, thread_ts: threadTs, text: `:hourglass_flowing_sand: ${text}` }).catch(() => {});
+  };
+  // Varied so heavy days don't read as the same canned line five times over
+  // (tone feedback, 2026-07-10). Picked by message ts — stable per run,
+  // different across runs.
+  const BACKSTOP_LINES = [
+    "Still on it — this one needs a longer dig. The full answer will land right here.",
+    "Still digging — there's more to check than usual. Answer coming in this thread.",
+    "Taking my time on this one so it's right. I'll post the full answer here.",
+  ];
+  const interimTimer = setTimeout(() => {
+    if (interimPosted) return;
+    const pick = Math.abs(parseInt(userMsgTs.replace(".", "").slice(-6), 10)) % BACKSTOP_LINES.length;
+    postInterim(BACKSTOP_LINES[pick] ?? BACKSTOP_LINES[0]!);
+  }, 75_000);
 
   let result: AgentResult;
   try {
@@ -289,11 +442,14 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<void> {
       },
       currentSender: { userId },
       pending,
+      onInterim: postInterim,
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
     await postVisibleFailure(env, channel, threadTs, userMsgTs);
     return;
+  } finally {
+    clearTimeout(interimTimer);
   }
 
   // ----- text-only response -----
@@ -619,7 +775,13 @@ const MAX_POST_CHARS = 3900;
 
 function capText(text: string): string {
   if (text.length <= MAX_POST_CHARS) return text;
-  return `${text.slice(0, MAX_POST_CHARS)}\n_…truncated — ask me for the rest._`;
+  // Cut at a line boundary (else a word boundary) so the cap never splits a
+  // <url|label> link in half — live 2026-07-10 a mid-URL cut shipped a broken
+  // link right above the truncation notice.
+  const window = text.slice(0, MAX_POST_CHARS);
+  const lastBreak = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
+  const cut = lastBreak > MAX_POST_CHARS * 0.6 ? window.slice(0, lastBreak) : window;
+  return `${cut}\n_…truncated — ask me for the rest._`;
 }
 
 /**

@@ -76,11 +76,28 @@ export async function savePendingProposal(env: Env, p: PendingProposal): Promise
 }
 
 export async function loadPendingProposal(env: Env, ts: string): Promise<PendingProposal | null> {
-  const res = await call(env, `/proposals?ts=${encodeURIComponent(ts)}`);
-  if (res.status === 404 || res.status === 410) return null;
-  if (!res.ok) return null;
-  const body = (await res.json()) as { ok: boolean; payload?: PendingProposal };
-  return body.payload ?? null;
+  const detailed = await loadPendingProposalDetailed(env, ts);
+  return detailed.state === "found" ? detailed.payload : null;
+}
+
+// Distinguishes "this ts was a proposal but it EXPIRED" (410) from "not a
+// proposal at all" (404) — the gate must tell the requester their delayed
+// ✅/❌ hit an expired card instead of ignoring it silently (live 2026-07-10).
+export type ProposalLookup =
+  | { state: "found"; payload: PendingProposal }
+  | { state: "expired" }
+  | { state: "none" };
+
+export async function loadPendingProposalDetailed(env: Env, ts: string): Promise<ProposalLookup> {
+  try {
+    const res = await call(env, `/proposals?ts=${encodeURIComponent(ts)}`);
+    if (res.status === 410) return { state: "expired" };
+    if (!res.ok) return { state: "none" };
+    const body = (await res.json()) as { ok: boolean; payload?: PendingProposal };
+    return body.payload ? { state: "found", payload: body.payload } : { state: "none" };
+  } catch {
+    return { state: "none" };
+  }
 }
 
 export async function loadPendingProposalByThread(
@@ -118,5 +135,42 @@ export async function isDuplicateEvent(env: Env, event_id: string): Promise<bool
     return body.seen === true;
   } catch {
     return false;
+  }
+}
+
+// Lease-mode dedup for the per-message agent turn (see thread-state.ts).
+//   "claimed" — this caller owns the turn: run it, then markEventRunDone.
+//   "running" — a fresh lease is held elsewhere (an alarm retry racing a live
+//               run, or a run killed <20 min ago): DEFER — keep the job and
+//               check back later; never delete it, that's how turns go silent.
+//   "done"    — already handled: drop the job.
+export type RunClaim = "claimed" | "running" | "done";
+
+export async function claimEventRun(env: Env, event_id: string): Promise<RunClaim> {
+  try {
+    const res = await call(env, "/events/check-and-record", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ event_id, mode: "run" }),
+    });
+    // Fail open like isDuplicateEvent: double-processing beats losing a turn.
+    if (!res.ok) return "claimed";
+    const body = (await res.json()) as { seen?: boolean; state?: "running" | "done" };
+    if (body.seen !== true) return "claimed";
+    return body.state === "running" ? "running" : "done";
+  } catch {
+    return "claimed";
+  }
+}
+
+export async function markEventRunDone(env: Env, event_id: string): Promise<void> {
+  try {
+    await call(env, "/events/check-and-record", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ event_id, mark: "done" }),
+    });
+  } catch {
+    // Best-effort: a missed done-mark self-heals when the lease goes stale.
   }
 }

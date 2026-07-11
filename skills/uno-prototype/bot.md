@@ -1,7 +1,7 @@
 <!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. -->
 # uno-prototype — bot face
 
-Loads: `references/method.md` (the shared procedure — grounding ritual, fidelity routing, the two hard gates) · `docs/conventions/terminology.md`. DS specifics (cheat-sheets) load in the Actions codegen prompts, not the Worker — the Worker only proposes.
+Loads: `references/method.md` (the shared procedure — grounding ritual, fidelity routing, the two hard gates) · `docs/conventions/terminology.md`. DS specifics (agent-views) load in the Actions codegen prompts, not the Worker — the Worker only proposes.
 
 Propose gated implementation runs: DS-library component updates (`component_implement`) and new playground prototypes (`prototype_scaffold`). Both are side-effect tools — every invocation goes through the confirmation gate; the Worker stages the proposal and holds for ✅.
 
@@ -9,7 +9,7 @@ Propose gated implementation runs: DS-library component updates (`component_impl
 
 - **`component_implement(component, notion_prd_url?, notes?)`** — fires `figma-implement.yml`; opens a real draft PR updating a DS-library component. Use for "implement Badge", "go ahead with the Badge change", "implement the latest Figma update for Card".
   - **PRD required, no exceptions.** The polling bot creates a Notion PRD and posts it in `#uno-bot`. If that PRD notification is already in the thread, proceed — the Worker reads it from there. If there is NO PRD in the thread, do NOT invoke — ask the designer for the PRD link first and pass it as `notion_prd_url`. Never implement a component without a PRD; never invent the component name or PRD URL.
-  - `component` uses the exact Figma-library casing (e.g. `Badge`, `CardSurface`). Only invoke when the named component actually exists in the DS library (verify via the cheat-sheet or `github_read` on `design-system/src/components`; the Worker validates too).
+  - `component` uses the exact Figma-library casing (e.g. `Badge`, `CardSurface`). Only invoke when the named component actually exists in the DS library (verify via the GitHub reads on `design-system/src/components`; the Worker validates too).
   - `component_implement` does NOT take a Figma URL — a pasted Figma URL almost always means `prototype_scaffold`.
 - **`prototype_scaffold(figma_url, notion_prd_url?, slug?, notes?)`** — fires `figma-implement-design.yml`; scaffolds a new `playground/{slug}/` and opens a real draft PR. Use for "implement this design <figma.com/…>", "build a prototype from this Figma frame", "scaffold a playground for this screen". NOT for DS-library component updates.
   - `figma_url` must contain a `node-id` query param. `slug` is optional kebab-case matching `^[a-z0-9][a-z0-9-]{1,40}$` (derived from the Figma node name if omitted).

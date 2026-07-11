@@ -41,7 +41,7 @@ design-system/
 playground/{name}/     # Standalone prototypes
 .storybook/            # Storybook config
 scripts/               # Token sync, registry + agent-view generation
-.agent/skills/         # Workflow skills (uno-prototype, uno-review, …)
+skills/         # Workflow skills (uno-prototype, uno-review, …)
 ```
 
 ## Playground Conventions
@@ -75,7 +75,7 @@ playground/{project-name}/
 
 ## Example Selection
 
-When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `playground/**`. See `.agent/skills/uno-prototype/references/implementation.md` and `examples-index.json`.
+When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `playground/**`. See `skills/uno-prototype/references/examples-index.json`.
 
 ## Bootstrap & Providers
 
@@ -102,12 +102,10 @@ npm run preview:react -- --host 127.0.0.1 --port 8080 --strictPort
 # Storybook: npm run storybook → http://127.0.0.1:6006
 ```
 
-Full runbook: `.agent/skills/uno-prototype/references/local-preview.md`
-
 ## File Naming
 
 - Components: PascalCase (`Button/Button.jsx`)
 - Prototypes: kebab-case directories
 - Docs/plans: `YYYY-MM-DD-NNN-type-slug-plan.md`
 
-See `docs/context/conventions/coding.md` for full conventions.
+See `docs/conventions/coding.md` for full conventions.

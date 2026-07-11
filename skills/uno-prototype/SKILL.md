@@ -104,22 +104,23 @@ intake one step at a time.
    - **Low/mid** → write the prompt-spec in the matching mode (method §3) and
      hand it to the designer for the external tool. Do not generate.
    - **High** → build in `playground/`:
-     a. Scaffold from `playground/starter/` per
-        [`references/template-selection-guide.md`](references/template-selection-guide.md)
+     a. Scaffold from `playground/starter/` per `design-system/docs/setup.md`
         (vite config: [`examples/vite-config-example.js`](examples/vite-config-example.js)).
-     b. Load the DS cheat-sheets (Tier-2 table below) **before any component
+     b. Load the DS agent-views (Tier-2 table below) **before any component
         or token use**; verify props against source + stories.
      c. **Confirm the implementation plan + touched files** with the user
         before large edits (method §4).
      d. Figma input? Follow the full implement-design workflow in
         [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) —
-        no skipped steps; translate values per
-        [`references/figma-token-mapping.md`](references/figma-token-mapping.md).
+        no skipped steps; translate variables to tokens via
+        `design-system/figma/token-registry.json` (gate:
+        [`references/figma-registry-mandatory-load.md`](references/figma-registry-mandatory-load.md)).
      e. Playground frames or wip placement in Figma → summon **writers/figma**
         (obeys `docs/conventions/figma-workspace.md`).
-4. **Gate: DS gap** (method §5). Needed component not in the cheat-sheet →
-   name it, propose the nearest existing composition, file a uno-maintain
-   intake. Never hand-roll a lookalike.
+4. **Gate: DS gap** (method §5). Needed component not in
+   `design-system/agent-views/components/index.md` → name it, propose the
+   nearest existing composition, file a uno-maintain intake. Never hand-roll
+   a lookalike.
 5. **Validate & exit** (method §6). Hi-fi: run
    `bash skills/uno-prototype/scripts/validate-prototype.sh playground/{project}`.
    All fidelities: summon **reviewers/ds-lens** for the conformance pass,
@@ -130,9 +131,10 @@ intake one step at a time.
 
 | Trigger | Load |
 |---|---|
-| Building UI, using components or tokens | `docs/context/design-system/components/cheat-sheet.md` (MANDATORY) — content sections: [`references/cheat-components.md`](references/cheat-components.md) · [`references/cheat-forms.md`](references/cheat-forms.md) · [`references/cheat-tokens.md`](references/cheat-tokens.md) |
-| Building new pages, dashboards, layouts | `docs/context/design-system/components/layout-cheat-sheet.md` (MANDATORY) |
-| Figma link / implement-design workflow | [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) (PRIMARY) |
+| Any DS implementation task | `design-system/docs/discovery.md` (MANDATORY entry — route from here) |
+| Building UI, using components or tokens | `design-system/agent-views/components/{Name}/{Name}.md` if it exists, else `design-system/agent-views/components/index.md` + `design-system/agent-views/tokens/tokens.md` |
+| Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
+| Figma link / implement-design workflow | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first; gate: [`references/figma-registry-mandatory-load.md`](references/figma-registry-mandatory-load.md)), then [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) |
 | Grounding read / any blueprint touch | `docs/conventions/supabase.md` |
 | Writing frames/annotations to Figma | `docs/conventions/figma-workspace.md` |
 | Exhaustive lookup: prior-art roots · token sources · tool wiring | [`references/examples-index.json`](references/examples-index.json) · [`references/tokens-index.json`](references/tokens-index.json) · [`references/integrations-index.json`](references/integrations-index.json) |
@@ -159,8 +161,8 @@ gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 - Grounding is never skipped — not even for "just a quick sketch".
 - Low/mid: output is the prompt-spec, never the generated artifact.
 - Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,
-  cheat-sheet is law, no deep imports from `design-system/src/`, PLUS
-  components first, FA Free icons only.
+  DS knowledge (agent-views) is law, no deep imports from
+  `design-system/src/`, PLUS components first, FA Free icons only.
 - This skill builds; it does not judge (uno-review), share (uno-publish), or
   change the DS library (uno-maintain).
 - New packages, Figma writes, and blueprint writes all require explicit

@@ -17,7 +17,7 @@ Judges an artifact against the design system: components sourced from BS4/uno-st
 ## Workflow
 
 1. Confirm the artifact's fidelity tier — lens depth is stage-appropriate (no token nits on a paper wireframe).
-2. Check components against `docs/context/design-system/components/cheat-sheet.md` + storybook stories; tokens against the token cheat-sheet.
+2. Check components against `design-system/agent-views/components/index.md` + storybook stories; tokens against `design-system/agent-views/tokens/tokens.md`.
 3. Return findings: severity · what · where · which DS rule · re-entry point. Zero findings is a valid result.
 
 ## Conventions it obeys

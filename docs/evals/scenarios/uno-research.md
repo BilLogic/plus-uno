@@ -19,7 +19,7 @@
 
 ## S3 — codebase discovery
 - **Trigger:** "do we already have a component for stacked avatars?"
-- **Expected:** summons researchers/explorer; answers via the skill's discovery chain (component-discovery.md → inventory/cheat-sheet + storybook stories) with `path:line` citations; reports "not found" honestly with nearest alternatives
+- **Expected:** summons researchers/explorer; answers via the skill's discovery chain (component-discovery.md → inventory/agent-views + storybook stories) with `path:line` citations; reports "not found" honestly with nearest alternatives
 - **Fails if:** it names a component that doesn't exist · dumps file contents instead of findings
 
 ## S4 — SME precision

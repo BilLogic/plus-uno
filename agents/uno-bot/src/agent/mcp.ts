@@ -34,15 +34,22 @@ const NOTION_URL = "https://mcp.notion.com/mcp";
 // AUTHORITATIVE hosted mcp.notion.com read tool names (confirmed against the live
 // connector registry — `notion-`-prefixed, not bare `search`/`fetch`, not the
 // raw-REST `notion-retrieve-a-*`). Zero write tools.
+//
+// PLAN-GATED TOOLS DELIBERATELY EXCLUDED (workspace is Notion Plus, NO AI
+// add-on — confirmed live 2026-07-10, both bounced with an upgrade error after
+// burning minutes discovering the wall):
+//   notion-query-data-sources  (SQL mode: Business+AI; timed out then gated)
+//   notion-query-database-view (view mode: Business+AI)
+//   notion-query-meeting-notes (Notion AI feature)
+// Excluding them here is the hard hook: the model never sees them, so it goes
+// straight to the plan-independent path (notion-search → notion-fetch cards →
+// read properties). Re-add ONLY if the workspace upgrades.
 export const NOTION_MCP_READ_TOOLS = [
   "notion-search",
   "notion-fetch",
   "notion-get-users",
   "notion-get-teams",
   "notion-get-comments",
-  "notion-query-data-sources",
-  "notion-query-database-view",
-  "notion-query-meeting-notes",
   "notion-get-async-task",
   "notion-download-attachment",
 ];
@@ -85,9 +92,36 @@ const SUPABASE_MCP_READ_TOOLS = [
 // the IDE — where Claude Code IS a catalog client. (FIGMA_ACCESS_TOKEN is still
 // used elsewhere for implement_design's screenshot fetch.)
 
-// ─── Slack (OAuth 2.1 user token in KV; enable-ALL — read + WRITE) ────────────
+// ─── Slack (OAuth 2.1 user token in KV; READ-ONLY allowlist) ──────────────────
+// The Slack hosted MCP only supports USER-token OAuth, so every write through it
+// posts AS THE CONSENTING HUMAN (it showed as "Bill Guo" live, 2026-07-10) — and
+// the team decision is that everything visible from the bot must carry the
+// uno-bot identity. So: MCP = reads only (where the user token is irreplaceable —
+// Slack search APIs don't work with bot tokens at all); ALL writes (messages,
+// reactions, canvases) go through the Worker's own SLACK_BOT_TOKEN paths
+// (postMessage / addReaction / the slack_react tool), which post as uno-bot.
 const SLACK_SERVER = "slack";
 const SLACK_URL = "https://mcp.slack.com/mcp";
+// MESSAGE search is deliberately absent: MCP search results reach the model
+// server-side with the admin token's FULL visibility (DMs, private channels)
+// and only a harness rule between them and the channel. Workspace search now
+// runs through the bot's own `slack_search` tool, where the Worker hard-drops
+// DMs and non-allowlisted private hits BEFORE the model sees them (see
+// tools/slack-search.ts — the visibility firewall). What stays here: directory
+// searches (channels/users/emojis — metadata, not messages) and pull-by-ID
+// reads, which can't trawl private content without already having an ID.
+const SLACK_MCP_READ_TOOLS = [
+  "slack_search_channels",
+  "slack_search_users",
+  "slack_search_emojis",
+  "slack_read_channel",
+  "slack_read_thread",
+  "slack_read_canvas",
+  "slack_read_file",
+  "slack_read_user_profile",
+  "slack_get_reactions",
+  "slack_list_channel_members",
+];
 
 /**
  * Build the MCP servers + their paired toolsets for the Anthropic call. Returns
@@ -141,15 +175,20 @@ export async function buildMcp(env: Env): Promise<{ servers: McpServer[]; toolse
   // Figma — deliberately absent (see the note above): closed catalog + no desktop.
 
   // Slack — active once the one-time OAuth consent has stored a user token in KV.
-  // ENABLE-ALL (no allowlist): this is the ONE service where MCP writes are
-  // intentional — Slack is a native medium for the bot, and the token's granted
-  // OAuth scopes are what actually bound read vs. write. (Every other MCP here is
-  // read-only precisely because writes would bypass the ✅ proposal gate; Slack is
-  // the deliberate exception.)
+  // READ allowlist only: MCP writes would post as the consenting human, not as
+  // uno-bot (user tokens are the only auth the Slack MCP supports) — see the
+  // note above. Writes stay on the Worker's bot-token paths.
   const slackToken = await getSlackAccessToken(env);
   if (slackToken) {
     servers.push({ type: "url", url: SLACK_URL, name: SLACK_SERVER, authorization_token: slackToken });
-    toolsets.push({ type: "mcp_toolset", mcp_server_name: SLACK_SERVER }); // enable-all (scopes bound it)
+    const configs: Record<string, { enabled: true }> = {};
+    for (const t of SLACK_MCP_READ_TOOLS) configs[t] = { enabled: true };
+    toolsets.push({
+      type: "mcp_toolset",
+      mcp_server_name: SLACK_SERVER,
+      default_config: { enabled: false }, // allowlist: everything off, then read tools on
+      configs,
+    });
   }
 
   return { servers, toolsets };

@@ -5,7 +5,7 @@ New designer, PM, developer, or intern: this page + the six skills are all you m
 ## Quick start
 
 ```bash
-git clone https://github.com/BilLogic/plus-uno.git && cd plus-vibe-coding-starting-kit && npm install
+git clone https://github.com/BilLogic/plus-uno.git && cd plus-uno && npm install
 npm run dev          # Vite (4100) + Storybook (4200)
 ```
 

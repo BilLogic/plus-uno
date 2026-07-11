@@ -2,7 +2,8 @@
 # Copy this to `.dev.vars` (gitignored) and fill in the real values.
 #
 # For production deploys, set each via `npx wrangler secret put <NAME>` instead;
-# DO NOT use this file for production secrets.
+# DO NOT use this file for production secrets. The full expected-secrets list
+# also lives as a comment block in wrangler.toml — keep the two in sync.
 
 # --- Slack ---
 # api.slack.com/apps -> your app -> Basic Information -> "Signing Secret"
@@ -11,12 +12,42 @@ SLACK_SIGNING_SECRET=
 # api.slack.com/apps -> your app -> OAuth & Permissions -> "Bot User OAuth Token" (starts xoxb-)
 SLACK_BOT_TOKEN=
 
-# --- Anthropic ---
-# console.anthropic.com -> API Keys -> create one tagged "uno-bot v2"
+# Secret for the static Slack MCP OAuth client (its client_id is the non-secret
+# SLACK_MCP_CLIENT_ID in wrangler.toml [vars]). Only needed for Slack MCP reads.
+SLACK_MCP_CLIENT_SECRET=
+
+# --- Model providers (which one runs is wrangler.toml MODEL_PROVIDER) ---
+# console.anthropic.com -> API Keys (used when MODEL_PROVIDER = "anthropic")
 ANTHROPIC_API_KEY=
+
+# Gemini path (used when MODEL_PROVIDER = "gemini"): EITHER an AI Studio key…
+GEMINI_API_KEY=
+# …OR a Vertex service-account pair (API key takes precedence if both set).
+GEMINI_SA_EMAIL=
+GEMINI_SA_PRIVATE_KEY=
 
 # --- GitHub ---
 # github.com/settings/tokens -> Generate new (classic) with `repo` scope, OR
 # github.com/settings/personal-access-tokens with `Contents: Read` + `Actions: Read & Write`
-# scoped to the target repo (plus-uno-team/plus-uno)
+# scoped to the target repo (BilLogic/plus-uno)
 GITHUB_TOKEN=
+
+# --- Notion ---
+# Internal integration token, connected to the Roadmap board (notion_create / notion_update)
+NOTION_API_KEY=
+
+# --- Figma ---
+# Read-scoped PAT — powers the proposal-card screenshot on prototype_scaffold
+FIGMA_ACCESS_TOKEN=
+
+# --- Supabase (uno-blueprint) ---
+# Publishable/anon read key for blueprint_search (SUPABASE_URL is a [vars] entry)
+SUPABASE_ANON_KEY=
+# Personal Access Token for the hosted Supabase MCP (URL pins read_only=true)
+SUPABASE_MCP_TOKEN=
+
+# --- Gmail (email_send) ---
+GMAIL_SENDER=
+GMAIL_CLIENT_ID=
+GMAIL_CLIENT_SECRET=
+GMAIL_REFRESH_TOKEN=

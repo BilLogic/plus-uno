@@ -32,6 +32,11 @@ import {
 
 // Space-joined user scopes requested at consent (read + the intentional writes).
 const SLACK_SCOPES = [
+  // Classic search scope: required by the raw search.messages Web API that the
+  // slack_search visibility firewall calls directly (live missing_scope error,
+  // 2026-07-10). The granular search:read.* scopes below only satisfy Slack's
+  // hosted MCP server, not the Web API method.
+  "search:read",
   "search:read.public",
   "search:read.private",
   "search:read.im",

@@ -42,7 +42,7 @@ while IFS= read -r file; do
       status=1
     fi
   done < <(link_grep "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
-done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md'; echo AGENTS.md; echo loading-order.md; } | sort)
+done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*'; echo AGENTS.md; echo loading-order.md; } | sort)
 
 echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 
@@ -96,8 +96,10 @@ old_patterns=(
 for pattern in "${old_patterns[@]}"; do
   # `|| true` inside the substitution: zero matches is the SUCCESS case, but under
   # pipefail a matchless grep would fail the assignment and kill the script.
+  # design-system/docs/foundations/ is a VALID current path — only the old
+  # repo-root docs/foundations/ counts as stale.
   count=$({ grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" . 2>/dev/null || true; } \
-    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|storybook-static/" || true; } \
+    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|storybook-static/\|design-system/docs/foundations/\|design-system/docs/knowledge-audit.json" || true; } \
     | wc -l | tr -d ' ')
   if [[ "$count" -gt 0 ]]; then
     echo "[stale] $count references to old path pattern: $pattern"

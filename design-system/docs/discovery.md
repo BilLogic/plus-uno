@@ -51,21 +51,19 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 |-------|------|
 | Component registry (MANDATORY) | `design-system/figma/component-registry.json` |
 | Token registry (MANDATORY) | `design-system/figma/token-registry.json` |
-| Registry load gate | `.agent/skills/uno-prototype/references/figma-registry-mandatory-load.md` |
-| Implement-design workflow | `.agent/skills/uno-prototype/references/figma-mcp-guide.md` |
+| Registry load gate | `skills/uno-prototype/references/figma-registry-mandatory-load.md` |
+| Implement-design workflow | `skills/uno-prototype/references/figma-mcp-guide.md` |
 | Component Figma node links | `design-system/figma/component-figma-links.md` |
 
 ## Workflow Skills (not DS knowledge)
 
 | Topic | Path |
 |-------|------|
-| Scaffold prototype | `.agent/skills/uno-prototype/SKILL.md` |
-| Workflow reference index | `.agent/skills/uno-prototype/references/README.md` |
-| Compare UI alternatives | `.agent/skills/uno-plan/references/iteration-options.md` |
-| Production readiness (states, a11y) | `.agent/skills/uno-review/references/production-checklist.md` |
-| Example selection | `.agent/skills/uno-prototype/references/implementation.md` |
-| Local build and preview | `.agent/skills/uno-prototype/references/local-preview.md` |
-| Human Figma sync pipeline | `docs/figma-sync-workflow.md` |
+| Scaffold prototype | `skills/uno-prototype/SKILL.md` |
+| Workflow reference index | `skills/uno-prototype/references/README.md` |
+| Production readiness (states, a11y) | `skills/uno-maintain/references/production-checklist.md` |
+| Example selection | `skills/uno-prototype/references/examples-index.json` |
+| Local build and preview | `design-system/docs/setup.md` |
 
 ## Implementation Setup
 
@@ -97,7 +95,7 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 → `agent-views/components/Modal/Modal.md` → `docs/patterns/layout.md` (Modal skeleton)
 
 **Implement from Figma**
-→ `design-system/figma/component-registry.json` + `token-registry.json` → `figma-mcp-guide.md` → `docs/foundations/token-mapping.md` → task-specific component/pattern docs
+→ `design-system/figma/component-registry.json` + `token-registry.json` → `figma-mcp-guide.md` → `design-system/docs/foundations/token-mapping.md` → task-specific component/pattern docs
 
 **Refresh all agent artifacts (designer)**
 → `npm run generate:agent`

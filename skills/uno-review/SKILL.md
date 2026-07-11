@@ -53,7 +53,7 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
 | artifact touches Storybook stories/MDX | `references/storybook.md` · `references/storybook-component-docs.md` |
 | posting verdicts / sign-offs to Slack | `docs/conventions/slack.md` |
 
-Lens rule docs (DS cheat-sheets, `foundations/accessibility.md`, `figma-workspace.md`) are loaded by the summoned agents, not here.
+Lens rule docs (DS agent-views, `foundations/accessibility.md`, `figma-workspace.md`) are loaded by the summoned agents, not here.
 
 ## Quality bar
 

@@ -34,16 +34,15 @@ Agents **MUST** read both files below before:
 ## Supporting docs (load after registries)
 
 - `design-system/figma/component-alignment.md` — implement + write-back rules
-- `.agent/skills/uno-prototype/references/figma-mcp-guide.md` — MCP workflow
+- `skills/uno-prototype/references/figma-mcp-guide.md` — MCP workflow
 - `design-system/docs/foundations/token-mapping.md` — extended token tables (authoritative source)
 
 ## Skills that enforce this load
 
 | Skill | When |
 |-------|------|
-| uno-prototype | Always (Phase 3 Build); required before Figma implement-design |
-| uno-plan | When plan includes Figma input or component mapping |
+| uno-prototype | Always (hi-fi build); required before Figma implement-design |
 | uno-research | When auditing Figma ↔ code alignment or component discovery |
 | uno-review | When reviewing Figma-derived prototypes or registry drift |
 
-Router: `.agent/SKILL.md` Grounding Rules #0–1. Entry: `AGENTS.md` Progressive Loading table.
+Entry: `AGENTS.md` § Progressive loading + forbidden pattern #17 route here.

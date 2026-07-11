@@ -27,7 +27,22 @@ function transformSegment(seg: string): string {
   return seg
     .replace(/\*\*([^\n*]+?)\*\*/g, "*$1*") // **bold** → *bold*
     .replace(/__([^\n_]+?)__/g, "*$1*") // __bold__ → *bold*
-    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, "<$2|$1>"); // [label](url) → <url|label>
+    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, "<$2|$1>") // [label](url) → <url|label>
+    // A link wrapped in a code span renders as raw text, not a link (live
+    // 2026-07-10, gemini round: `<url|label>` reached users verbatim). Unwrap.
+    .replace(/`(<https?:\/\/[^`\n]+>)`/g, "$1")
+    // Citation-marker noise the harness bans but models still emit (live
+    // 2026-07-10, gemini stress round): numeric grounding indices like
+    // " [11]" / " [1, 22]" (Gemini's internal chunk ids — meaningless to
+    // readers) and repo-path brackets like " [docs/conventions/notion.md]".
+    // Note: markdown [label](url) links were already converted above, so
+    // these patterns can't touch real links.
+    .replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "")
+    .replace(/ ?\[(?:docs|skills|agents|design-system)\/[^\]\n]*\]/g, "")
+    // The models CONSTRUCT GitHub links from pattern and invent the org (live
+    // 2026-07-10, twice: "plus-team/plus-uno" and "plus-uno/plus-uno"). The
+    // repo has exactly one home — rewrite known-wrong orgs deterministically.
+    .replace(/github\.com\/(?:plus-team|plus-uno)\/plus-uno/g, "github.com/BilLogic/plus-uno");
 }
 
 function convertLine(line: string): string {

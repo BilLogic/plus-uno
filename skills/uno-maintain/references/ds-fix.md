@@ -59,9 +59,9 @@ Files to modify: {paths}
 | `scripts/sync-figma-tokens.js` | `npm run sync:tokens` | pull token variables from Figma |
 | `scripts/generate-all-tokens.js` | `npm run generate:tokens` | regenerate SCSS from token source |
 | `scripts/storybook-networkinterfaces-fix.cjs` | auto via `npm run storybook` | Storybook startup stability |
-| `scripts/poll-figma-library.js` | `npm run figma:poll` | CI-owned — see automations registry |
-| `scripts/fetch-figma-component.js` | `npm run figma:fetch-component` | CI design-context fetch |
-| `scripts/figma-write-back.js` / `publish-code-connect.js` | `npm run figma:write-back` / `figma:publish-code-connect` | post-merge Figma annotations / Code Connect |
+| `scripts/poll-figma-library.js` | `npm run figma:poll` | Figma library change detection — see automations registry |
+| `scripts/generate-component-registry-from-storybook.js` | `npm run generate:component-registry` | regenerate the Figma component registry from MDX `figmaMeta` |
+| `scripts/generate-token-registry.mjs` | `npm run generate:token-registry` / `check:token-registry` | regenerate / drift-check the Figma token registry |
 
 Investigative one-offs (`inspect_nodes.js`, `debug_token_values.js`, `compare_*_tokens.js`, `fix_*`, `refactor_*`) may carry stale paths — read the source before running, prefer `package.json` scripts, and run on a clean branch so the diff is legible.
 

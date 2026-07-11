@@ -1,4 +1,4 @@
-<!-- ~180 tokens | Load for: which uno-prototype reference to open -->
+<!-- ~150 tokens | Load for: which uno-prototype reference to open -->
 
 # uno-prototype References — Index
 
@@ -8,12 +8,11 @@ Workflow docs only. DS facts live in `design-system/docs/` — start at `discove
 
 | File | When |
 |------|------|
+| `method.md` | Always on skill invocation — the runtime-neutral core |
 | `figma-mcp-guide.md` | Figma link — implement-design 7-step workflow + MCP tools |
 | `figma-registry-mandatory-load.md` | Before any Figma JSX/token mapping (gate) |
-| `figma-workflow.md` | Index — routes to the docs above + knowledge |
-| `local-preview.md` | Build and preview locally |
-| `implementation.md` | Pick an existing story/spec to mirror |
 | `examples-index.json` | Story/spec/template file locations |
+| `tokens-index.json` | Token source-file locations |
 | `integrations-index.json` | MCP and integration routing |
 
 ## Related (other skills / knowledge)
@@ -21,8 +20,7 @@ Workflow docs only. DS facts live in `design-system/docs/` — start at `discove
 | Topic | Path |
 |-------|------|
 | DS knowledge entry | `design-system/docs/discovery.md` |
-| Prototype fidelity rules | `SKILL.md` → Prototype Fidelity |
-| UI alternatives | `../uno-plan/references/iteration-options.md` |
-| Production checklist | `../uno-review/references/production-checklist.md` |
-| Human Figma sync pipeline | `docs/figma-sync-workflow.md` |
+| Implementation setup (aliases, playground, Vite) | `design-system/docs/setup.md` |
+| Fidelity routing rules | `../SKILL.md` → Fidelity routing |
+| Production checklist | `skills/uno-maintain/references/production-checklist.md` |
 | Knowledge verification audit | `design-system/figma/knowledge-audit.md` |

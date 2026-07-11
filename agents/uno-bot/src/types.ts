@@ -32,6 +32,10 @@ export interface Env {
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
   THREAD_STATE: DurableObjectNamespace;
+  // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
+  // wall-clock cancellation that silently killed long agent runs (👀-then-
+  // silence, 2026-07-09). See agent-runner.ts.
+  AGENT_RUNNER: DurableObjectNamespace;
   // Harness resilience: stores the last fully-successful system-prompt assembly
   // (all 20+ SKILL_PATHS files fetched clean) + the alert-throttle timestamp.
   // Unset → behavior degrades to pre-KV (partial harness on fetch failures, no
@@ -66,9 +70,28 @@ export interface Env {
   // Slack has NO dynamic registration → a STATIC pre-registered client is used
   // (client_id is a non-secret [vars] entry, client_secret is a wrangler secret).
   // The issued user token lives in SLACK_OAUTH_KV. Unset → the Slack MCP stays
-  // off. Slack is the ONE service attached enable-all (writes intentional).
+  // off (reads-only allowlist; writes go through the bot token).
   SLACK_MCP_CLIENT_ID?: string;
   SLACK_MCP_CLIENT_SECRET?: string;
   SLACK_OAUTH_REDIRECT_URI?: string;
   SLACK_OAUTH_KV?: KVNamespace;
+  // Visibility firewall for slack_search (tools/slack-search.ts): comma-
+  // separated PRIVATE channel IDs whose content is team-designated as fair
+  // game. Everything else private, and all DMs/group DMs, is hard-dropped by
+  // the Worker before the model sees search results. Empty/unset → public only.
+  SLACK_SEARCH_PRIVATE_ALLOWLIST?: string;
+  // --- Gemini provider (dual-provider adapter, phase 1) ----------------------
+  // MODEL_PROVIDER selects the runtime brain: "anthropic" (default) | "gemini".
+  // Phase 1 ships the credential layer + /debug/gemini smoke test only; the
+  // agent loop stays on Anthropic until the phase-2 adapter PR.
+  MODEL_PROVIDER?: string;
+  // Auth mode auto-selected by which credential exists (see gemini/client.ts):
+  // GEMINI_API_KEY (secret, Developer API — simplest) OR the service-account
+  // pair (secrets, Vertex AI): GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY.
+  GEMINI_API_KEY?: string;
+  GEMINI_SA_EMAIL?: string;
+  GEMINI_SA_PRIVATE_KEY?: string;
+  GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
+  GEMINI_REGION?: string; // Vertex only; default "global"
+  GEMINI_MODEL?: string; // default "gemini-3.5-flash"
 }

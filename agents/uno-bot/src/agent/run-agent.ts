@@ -3,7 +3,7 @@
 // Inputs include the slack context, the current sender's identity, and any
 // pending proposal in this thread. When a proposal is pending, Claude is told
 // about it in the system prompt and can resolve it via the
-// `resolve_pending_proposal` tool — that's how text confirmations like
+// `proposal_resolve` tool — that's how text confirmations like
 // "go ahead" or "cancel" get processed.
 //
 // The loop:
@@ -12,7 +12,7 @@
 //   3. Inspect stop_reason:
 //      - end_turn → return the text.
 //      - tool_use → check for:
-//          (a) resolve_pending_proposal: validate, return as `resolved` if OK,
+//          (a) proposal_resolve: validate, return as `resolved` if OK,
 //              else loop with a tool_result error so Claude can apologize.
 //          (b) a side-effect tool: return as `proposal` for staging.
 //          (c) read-only tools: execute, feed results back, loop.
@@ -24,13 +24,19 @@ import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { makeAnthropicClient, pickModel } from "./anthropic-client";
+import { makeAnthropicClient, routeRequest, MODELS } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
 import { executeNotionSearch } from "../tools/notion-search";
+import { executeRoadmapQuery } from "../tools/roadmap-query";
+import { geminiConfigured } from "../gemini/client";
+import { runGeminiAgent } from "./gemini-agent";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
+import { executeSlackSearch } from "../tools/slack-search";
+import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
+import { addReaction } from "../slack/api";
 import type { SlackContext } from "../tools/dispatcher";
 import { BUILD } from "../version";
 
@@ -55,6 +61,10 @@ export interface AgentInput {
   pending: PendingProposal | null;
   /** Vision input for the current turn only. History turns stay plain text. */
   images?: AgentImage[];
+  /** Called with short, FILTERED progress lines (the model's between-tool
+   *  narration, capped + capped-count) so the Worker can post them as separate
+   *  interim messages. Never receives the full working monologue. */
+  onInterim?: (text: string) => void;
 }
 
 export type AgentResult =
@@ -85,7 +95,10 @@ const MAX_ITERATIONS = 16;
 // dial raised 2026-07-09 — team prefers thorough over fast (user decision):
 // users prefer complete+right over fast; Slack's hard cap is 40k chars, and
 // readability guidance (summary-first, thread the detail) still applies.
-const MAX_TOKENS = 8192;
+// Raised again 2026-07-10 for Sonnet 5 + adaptive thinking: thinking tokens
+// share this budget, and Sonnet 5's tokenizer counts ~30% more — 8192 risked
+// an all-thinking, truncated-answer response. We stream, so no timeout risk.
+const MAX_TOKENS = 16384;
 // Cap on individual read-only tool executions per request. Each execution costs
 // Workers subrequests (a blueprint fallback search alone is ~4 fetches), and the
 // free plan allows 50 per request — blowing it kills the request mid-flight so
@@ -99,8 +112,23 @@ const MAX_TOKENS = 8192;
 const READONLY_TOOL_BUDGET = 12;
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
-  const { env, userText, history, currentSender, pending, images } = input;
+  const { env, userText, history, currentSender, pending, images, slack } = input;
+
+  // Provider switch (phase 2): MODEL_PROVIDER="gemini" routes the whole turn
+  // through the Gemini loop (agent/gemini-agent.ts) — same AgentResult contract,
+  // so everything downstream (gate, delivery, history) is provider-blind.
+  if ((env.MODEL_PROVIDER ?? "anthropic").toLowerCase() === "gemini" && geminiConfigured(env)) {
+    return runGeminiAgent(input);
+  }
+
   const client = makeAnthropicClient(env);
+
+  // D2 (Phase 3 final): three fixed lanes, no classifier — the dynamic part is
+  // native (adaptive thinking + advisor tool below). See routeRequest.
+  const { tier, model, reason: routeReason } = routeRequest({
+    userText,
+    hasPending: pending !== null,
+  });
 
   // Notion hosted-MCP (READS ONLY). Empty until the one-time OAuth consent is
   // done, so the loop is unchanged until then. Current beta shape
@@ -111,30 +139,191 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // (see agent/mcp.ts). When no token is stored, all of this is empty and the
   // loop is identical to the pre-MCP behavior.
   const { servers: mcpServers, toolsets: mcpToolsets } = await buildMcp(env);
-  const mcpEnabled = mcpServers.length > 0;
-  const mcpParams = mcpEnabled ? { mcp_servers: mcpServers } : {};
-  const mcpOpts = mcpEnabled
-    ? { headers: { "anthropic-beta": MCP_BETA } }
-    : undefined;
+  const mcpServerNames = mcpServers.map((s) => String((s as Record<string, unknown>).name));
+  // Mutable: trips to false when the MCP attachment breaks THIS request (see
+  // callClaude below) so the retry + all later iterations run without MCP.
+  let mcpActive = mcpServers.length > 0;
   // Anthropic server-side web search (runs on Anthropic's infra, READ-only, no
   // beta header). Gives the bot web grounding — e.g. Figma usage/practice
   // questions and external resources it can't reach any other way (Figma's own
-  // MCP is closed to us). Basic 20250305 variant: works across all three model
-  // tiers (haiku/sonnet/opus). ~$10 per 1k searches — max_uses caps per turn.
+  // MCP is closed to us). Sonnet 5 / Opus 4.8 support the 20260209 variant
+  // (dynamic filtering — better, cheaper results); haiku-4-5 predates it and
+  // keeps the basic 20250305. ~$10 per 1k searches — max_uses caps per turn.
   const WEB_SEARCH_TOOL = {
-    type: "web_search_20250305",
+    type: tier === "haiku" ? "web_search_20250305" : "web_search_20260209",
     name: "web_search",
     max_uses: 3,
   } as unknown as Anthropic.Tool;
 
+  // Advisor tool (beta, server-side): the sonnet executor can consult opus
+  // mid-request for strategy on the hardest moments — native escalation, no
+  // rerun, no second cold cache. Sonnet lane only: haiku turns are trivial
+  // confirms, and the opus lane IS opus. Advisor model must be ≥ executor
+  // (sonnet-4-6 → opus-4-8 is a valid pair).
+  const ADVISOR_TOOL =
+    tier === "sonnet"
+      ? [{ type: "advisor_20260301", name: "advisor", model: MODELS.opus } as unknown as Anthropic.Tool]
+      : [];
+  const ADVISOR_BETA = tier === "sonnet" ? "advisor-tool-2026-03-01" : null;
+
+  // Adaptive thinking + effort (native dynamic compute): the model decides
+  // when/how much to reason per request — this replaced the routing classifier
+  // (user decision 2026-07-10). haiku-4-5 predates adaptive thinking; its lane
+  // (trivial confirms) doesn't need it.
+  const NATIVE_DIALS: Record<string, unknown> =
+    tier === "haiku" ? {} : { thinking: { type: "adaptive" }, output_config: { effort: "high" } };
+
   const toolsWithMcp = [
     ...(TOOLS as Anthropic.Tool[]),
     WEB_SEARCH_TOOL,
+    ...ADVISOR_TOOL,
     ...(mcpToolsets as unknown as Anthropic.Tool[]),
   ];
+  // Fallback tool set: everything EXCEPT the MCP toolsets (web_search is an
+  // Anthropic server tool, independent of MCP — it stays).
+  const toolsPlain = [...(TOOLS as Anthropic.Tool[]), WEB_SEARCH_TOOL, ...ADVISOR_TOOL];
 
-  // D2: pick the model tier from the message intent once per request.
-  const { tier, model } = pickModel({ userText, hasPending: pending !== null });
+  const betaHeaders = (withMcp: boolean): Record<string, string> | undefined => {
+    const betas = [...(withMcp ? [MCP_BETA] : []), ...(ADVISOR_BETA ? [ADVISOR_BETA] : [])];
+    return betas.length > 0 ? { "anthropic-beta": betas.join(",") } : undefined;
+  };
+
+  // Resilient Anthropic call. If ANY attached MCP server fails to connect,
+  // the API 400s the WHOLE request ("Connection error while communicating
+  // with MCP server…") — one dead server must not take the bot down when the
+  // REST fallback tools still work. On that specific error: log which servers
+  // were attached, drop the MCP attachment for the REST OF THIS REQUEST, and
+  // retry. (Edge: if earlier iterations already produced mcp_tool_use blocks
+  // in `messages`, the MCP-less retry may itself be rejected — acceptable;
+  // the dominant failure mode is the FIRST call, before any MCP blocks exist.)
+  //
+  // STREAMING is load-bearing, not cosmetic: with MCP servers attached, every
+  // server-side MCP tool round runs INSIDE one HTTP request, and Cloudflare in
+  // front of api.anthropic.com kills any request idle past ~100s with a 524
+  // (live incident 2026-07-09: a multi-lookup sonnet run died `[agent] failed:
+  // 524` after the DO runner had correctly kept it alive). Streaming keeps
+  // bytes flowing for the whole run; finalMessage() returns the same
+  // accumulated Message the non-streaming call would have.
+  // Interim progress: between-tool narration is surfaced to the user as SHORT
+  // separate messages (never in the final reply — see extractFinalText). Capped
+  // at 3 per request and ~280 chars each; only the first line of a narration
+  // block is used. The full monologue is never exposed (user decision
+  // 2026-07-10 after a delivered reply included seven paragraphs of it).
+  let interimSent = 0;
+  const emitInterim = (raw: string): void => {
+    if (!input.onInterim || interimSent >= 3) return;
+    const line = raw.trim().split("\n")[0]?.trim() ?? "";
+    if (line.length < 15) return; // too short to be informative
+    interimSent++;
+    input.onInterim(line.length > 280 ? `${line.slice(0, 277)}…` : line);
+  };
+  // Watch the stream: when a tool block completes AFTER a text block, that text
+  // was narration — surface it (filtered) while the run continues.
+  const attachInterimWatcher = (stream: ReturnType<typeof client.messages.stream>): void => {
+    let pendingNarration: string | null = null;
+    stream.on("contentBlock", (block: unknown) => {
+      const b = block as { type?: string; text?: string };
+      if (b.type === "text") {
+        pendingNarration = b.text ?? null;
+        return;
+      }
+      // Emit only ahead of SERVER-SIDE work (MCP rounds, web search) — that's
+      // when the user actually waits. Narration before a LOCAL tool_use is the
+      // proposal preview / loop text and posting it would duplicate the card
+      // (edge case from the 2026-07-10 disclosure stress-test). Thinking
+      // blocks never carry narration out — only prior text is ever emitted.
+      if (b.type === "mcp_tool_use" || b.type === "server_tool_use") {
+        if (pendingNarration) emitInterim(pendingNarration);
+      }
+      pendingNarration = null;
+    });
+  };
+
+  const callClaude = async (
+    params: Record<string, unknown>,
+  ): Promise<Anthropic.Message> => {
+    if (mcpActive) {
+      try {
+        const stream = client.messages.stream(
+          {
+            ...params,
+            ...NATIVE_DIALS,
+            tools: toolsWithMcp,
+            mcp_servers: mcpServers,
+          } as unknown as Anthropic.MessageStreamParams,
+          { headers: betaHeaders(true) },
+        );
+        attachInterimWatcher(stream);
+        return await stream.finalMessage();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!/MCP server/i.test(msg)) throw err;
+        mcpActive = false;
+        console.error(
+          `[agent] MCP attachment failed (servers: ${mcpServerNames.join(",")}) — retrying without MCP: ${msg.slice(0, 300)}`,
+        );
+      }
+    }
+    const stream = client.messages.stream(
+      {
+        ...params,
+        ...NATIVE_DIALS,
+        tools: toolsPlain,
+      } as unknown as Anthropic.MessageStreamParams,
+      { headers: betaHeaders(false) },
+    );
+    attachInterimWatcher(stream);
+    return stream.finalMessage();
+  };
+
+  // ── Delegation (Phase 3): the orchestrator model stays on reasoning and
+  // synthesis; mechanical lookups fan out to cheap, fast haiku subagents that
+  // run IN PARALLEL with the MCP servers attached. Server-side MCP rounds cost
+  // zero Worker subrequests, so each subagent is exactly ONE Anthropic call —
+  // this is how "smart model delegates to cheaper models" fits the free tier.
+  const SUBAGENT_SYSTEM =
+    "You are a fast research subagent for the PLUS design team's assistant. Complete the ONE task you're given using the attached read tools (Notion, GitHub, Supabase, Slack). Output: compact bullet facts with links/IDs — no preamble, no narration, no recommendations. Explicitly flag anything you could NOT verify. If the task can't be done, say exactly what's missing in one line.";
+  const runDelegateTasks = async (rawInput: Record<string, unknown>): Promise<string> => {
+    if (!mcpActive) {
+      return JSON.stringify({
+        ok: false,
+        error: "delegation unavailable right now (no data sources attached) — do the lookups yourself",
+      });
+    }
+    const tasks = (Array.isArray(rawInput.tasks) ? rawInput.tasks : []).slice(0, 3) as Array<{
+      goal?: unknown;
+      context?: unknown;
+    }>;
+    if (tasks.length === 0) return JSON.stringify({ ok: false, error: "no tasks given" });
+    const results = await Promise.all(
+      tasks.map(async (t, i) => {
+        const goal = typeof t.goal === "string" ? t.goal.trim() : "";
+        const context = typeof t.context === "string" ? t.context.trim() : "";
+        if (!goal) return { task: i, ok: false as const, error: "missing goal" };
+        try {
+          const msg = await client.messages
+            .stream(
+              {
+                model: MODELS.haiku,
+                max_tokens: 1200,
+                system: SUBAGENT_SYSTEM,
+                messages: [{ role: "user", content: context ? `${goal}\n\nContext:\n${context}` : goal }],
+                tools: mcpToolsets,
+                mcp_servers: mcpServers,
+              } as unknown as Anthropic.MessageStreamParams,
+              { headers: { "anthropic-beta": MCP_BETA } },
+            )
+            .finalMessage();
+          addUsage(msg.usage);
+          recordToolUses(msg.content);
+          return { task: i, ok: true as const, result: extractFinalText(msg.content) || "(no result)" };
+        } catch (err) {
+          return { task: i, ok: false as const, error: err instanceof Error ? err.message.slice(0, 200) : String(err) };
+        }
+      }),
+    );
+    return JSON.stringify({ ok: true, results });
+  };
 
   // D7: per-request turn/token telemetry. One structured line per request,
   // visible via `wrangler tail`, so cost + iteration economy is observable.
@@ -174,10 +363,12 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const finish = (result: AgentResult): AgentResult => {
     const toolsList = [...toolNamesUsed, ...(mcpCallsUsed > 0 ? [`mcp:${mcpCallsUsed}`] : [])];
     console.log(
-      `[uno-bot] request done build=${BUILD} tier=${tier} model=${model} iterations=${iterations} ` +
+      `[uno-bot] request done build=${BUILD} tier=${tier} route=${routeReason} model=${model} iterations=${iterations} ` +
         `tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
         `cache_read=${cacheReadTokens} cache_write=${cacheWriteTokens} ms=${Date.now() - startedAt} ` +
-        `tools=[${toolsList.join(",")}] outcome=${result.kind}`,
+        `tools=[${toolsList.join(",")}] ` +
+        `mcp=${mcpServerNames.length === 0 ? "off" : mcpActive ? mcpServerNames.join("+") : "FELL_BACK"} ` +
+        `outcome=${result.kind}`,
     );
     return result;
   };
@@ -190,26 +381,19 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const messages = buildMessages(history, userText, images);
 
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
-    const response = await client.messages.create({
+    const response = await callClaude({
       model,
       max_tokens: MAX_TOKENS,
       system: systemBlocks as Anthropic.TextBlockParam[],
-      tools: toolsWithMcp,
       messages,
-      ...mcpParams,
-    } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
+    });
 
     iterations++;
     addUsage(response.usage);
     recordToolUses(response.content);
 
     if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
-      const text = response.content
-        .filter((b): b is Anthropic.TextBlock => b.type === "text")
-        .map((b) => b.text)
-        .join("\n")
-        .trim();
-      return finish({ kind: "text", text: text || "(empty response)" });
+      return finish({ kind: "text", text: extractFinalText(response.content) || "(empty response)" });
     }
 
     if (response.stop_reason === "tool_use") {
@@ -307,14 +491,17 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
             tool_use_id: tu.id,
             content: JSON.stringify({
               ok: false,
-              error: "tool budget exhausted for this request",
-              note: "Answer NOW from the tool results you already have. If they're insufficient, say exactly what's missing — do not fabricate.",
+              error: "no more lookups available this turn",
+              note: "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction).",
             }),
           });
           continue;
         }
         toolCallsUsed++;
-        const resultText = await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>);
+        const resultText =
+          tu.name === "delegate"
+            ? await runDelegateTasks(tu.input as Record<string, unknown>)
+            : await executeReadOnlyTool(env, tu.name, tu.input as Record<string, unknown>, slack);
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }
       messages.push({ role: "user", content: toolResults });
@@ -337,29 +524,52 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     content:
       "(system: tool budget exhausted — answer the original question NOW from the tool results above; do not request more tools. If the results are insufficient, say what's missing.)",
   });
-  const finalResponse = await client.messages.create({
+  const finalResponse = await callClaude({
     model,
     max_tokens: MAX_TOKENS,
     system: systemBlocks as Anthropic.TextBlockParam[],
-    tools: toolsWithMcp,
     tool_choice: { type: "none" } as unknown as Anthropic.MessageCreateParams["tool_choice"],
     messages,
-    ...mcpParams,
-  } as Anthropic.MessageCreateParamsNonStreaming, mcpOpts);
+  });
   iterations++;
   addUsage(finalResponse.usage);
   recordToolUses(finalResponse.content);
-  const finalText = finalResponse.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
+  const finalText = extractFinalText(finalResponse.content);
   return finish({
     kind: "text",
     text:
       finalText ||
       "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?",
   });
+}
+
+/**
+ * The user-facing reply is ONLY the text after the last tool block. With MCP
+ * attached, one response interleaves narration and server-side tool rounds —
+ * `[text, mcp_tool_use, mcp_tool_result, text, …, final text]` — and joining
+ * every text block delivered the model's entire working monologue as the reply
+ * (live 2026-07-10: seven paragraphs of "Let me try…" before the answer).
+ * Narration reaches the user separately, filtered, via the interim watcher.
+ * Falls back to the all-text join when there are no tool blocks or nothing
+ * follows the last one.
+ */
+function extractFinalText(content: Anthropic.ContentBlock[]): string {
+  let lastToolIdx = -1;
+  content.forEach((b, i) => {
+    if (b.type !== "text") lastToolIdx = i;
+  });
+  const afterLastTool = content
+    .slice(lastToolIdx + 1)
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n")
+    .trim();
+  if (afterLastTool) return afterLastTool;
+  return content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n")
+    .trim();
 }
 
 /**
@@ -406,7 +616,7 @@ function buildMessages(
             type: "image",
             source: {
               type: "base64",
-              media_type: img.media_type as Anthropic.ImageBlockParam.Source["media_type"],
+              media_type: img.media_type as Anthropic.Base64ImageSource["media_type"],
               data: img.data,
             },
           }),
@@ -418,15 +628,50 @@ function buildMessages(
   return result;
 }
 
-async function executeReadOnlyTool(
+// Exported for the Gemini loop (agent/gemini-agent.ts) — one dispatcher, two
+// providers. (The mutual import between the two agent files is benign: both
+// only reference each other's functions at call time.)
+export async function executeReadOnlyTool(
   env: Env,
   name: string,
   input: Record<string, unknown>,
+  slack: SlackContext,
 ): Promise<string> {
   if (name === "notion_search") return executeNotionSearch(env, input);
+  if (name === "roadmap_query") return executeRoadmapQuery(env, input);
   if (name === "blueprint_search") return executeBlueprintSearch(env, input);
   if (name === "source_read") return executeReadSource(env, input);
   if (name === "github_read") return executeGithubRead(env, input);
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
+  if (name === "slack_search") return executeSlackSearch(env, input);
+  if (name === "slack_react") return executeSlackReact(env, input, slack);
+  if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
+  if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
+}
+
+// Reactions post AS UNO-BOT via the bot token — the Slack MCP was demoted to
+// reads-only because its user-token writes carried the consenting human's
+// identity (team decision 2026-07-10: everything visible is uno-bot). Ungated:
+// reactions are reversible, the same class as the bot's own replies.
+async function executeSlackReact(
+  env: Env,
+  input: Record<string, unknown>,
+  slack: SlackContext,
+): Promise<string> {
+  const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
+  if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
+  if (emoji === "white_check_mark" || emoji === "x") {
+    return JSON.stringify({
+      ok: false,
+      error: "white_check_mark and x are reserved for the requester's confirm/cancel on proposal cards",
+    });
+  }
+  const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;
+  try {
+    await addReaction(env, slack.channel, ts, emoji);
+    return JSON.stringify({ ok: true, reacted: emoji, message_ts: ts });
+  } catch (err) {
+    return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
+  }
 }

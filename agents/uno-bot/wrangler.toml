@@ -3,6 +3,31 @@ main = "src/index.ts"
 compatibility_date = "2026-05-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Workers Logs / Observability. This block MUST stay in the file: it was first
+# enabled from the dashboard mid-incident (2026-07-09), and the next CI deploy
+# silently reverted it — wrangler treats a missing block as "disabled", which
+# blinds the `mcp=` telemetry the trial run depends on.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+# MCP health watchdog — see the scheduled() handler in src/index.ts. Probes all
+# attached MCP servers every 15 minutes; posts a throttled alert to #uno-bot on
+# failure.
+[triggers]
+crons = ["*/15 * * * *"]
+
+# ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
+# plan; design within these, don't fight them) ────────────────────────────────
+#   • 50 subrequests per invocation. One agent turn spends most of it (20
+#     harness fetches + Slack + DO + model API), which is why the AgentRunner
+#     processes exactly ONE job per alarm firing (fresh budget each firing).
+#   • ~10ms CPU/request soft budget — agent work is I/O-bound, but keep
+#     CPU-heavy paths (base64 of images) modest.
+#   • Workers Logs: 200K events/day, then sampling.
+#   • ctx.waitUntil() work is cancelled ~30s after the response — anything
+#     longer runs in the AgentRunner Durable Object alarm instead.
+
 # Plain vars (non-secret). Override per-env below.
 #
 # IMPORTANT — both values below must point at the GitHub repo whose `main`
@@ -19,11 +44,11 @@ SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
 # license needed). github_read is kept as a fallback for now; it can be retired once
 # the MCP is confirmed in real bot usage.
 GITHUB_MCP_ENABLED = "true"
-# Notion "Roadmap" database (the Design HQ board). create_prd drops new PRD
+# Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
 # Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
-# that find_experts queries to suggest collaborators/SMEs for a topic.
+# that notion_search (scope: "team") queries to suggest collaborators/SMEs for a topic.
 NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
 # NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
 # surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
@@ -50,13 +75,43 @@ NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/not
 # Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker
 # 403s) and the local MCP needs the desktop app. The bot surfaces Figma context
 # from Notion + routes real Figma work to the IDE. FIGMA_ACCESS_TOKEN (secret,
-# below) still powers implement_design's screenshot fetch.
+# below) still powers the prototype_scaffold proposal's screenshot fetch.
 # Slack hosted-MCP (read + write) path. Slack has NO dynamic registration → a
 # STATIC pre-registered client is used. The client_id is non-secret (below); the
 # client_secret is a wrangler secret (see SLACK_MCP_CLIENT_SECRET). This redirect
 # URI must match the one registered on the Slack app.
 SLACK_MCP_CLIENT_ID = "12186538800.10808020289637"
 SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback"
+# Visibility firewall for workspace search (src/tools/slack-search.ts). The
+# search credential sees the consenting admin's FULL Slack (DMs, private
+# channels) — the Worker hard-filters results before the model sees them:
+# public passes; private passes ONLY if its channel ID is listed here (the
+# team-designated, well-organized private channels); DMs/group DMs never pass.
+# Comma-separated channel IDs. Empty = public only.
+# Team-approved list (Bill, 2026-07-10 — the starred/design-squad private
+# channels; treated as well-organized and safe to surface):
+#   plus-core C03DVDS4LN9 · plus-goal-setting C07PZJD3HD5 ·
+#   plus-proj-tact C09EPEJEQ9K · plus-instructional-design C07LU2K8DQW ·
+#   plus-admin C089A3E9CCW · plus-design-feedback C074QG2V7DJ ·
+#   plus-marketing C052BG9NE86 · plus-training C07L5RZV6DR ·
+#   plus-universal C072E8SFLKV
+SLACK_SEARCH_PRIVATE_ALLOWLIST = "C03DVDS4LN9,C07PZJD3HD5,C09EPEJEQ9K,C07LU2K8DQW,C089A3E9CCW,C074QG2V7DJ,C052BG9NE86,C07L5RZV6DR,C072E8SFLKV"
+# ── Dual-provider adapter ─────────────────────────────────────────────────────
+# MODEL_PROVIDER: "anthropic" | "gemini". Flipping this var IS the switch —
+# runAgent dispatches the whole turn to the matching loop (src/agent/
+# gemini-agent.ts for gemini: client-side tool loop, local tools only — Gemini
+# has no server-side MCP; hosted-MCP reach returns when switching back).
+# Switched to "gemini" 2026-07-10 (Anthropic budget exhausted — user decision).
+MODEL_PROVIDER = "gemini"
+# Vertex service-account path (project the SA belongs to; region "global").
+GEMINI_PROJECT_ID = "hcii-plus"
+GEMINI_REGION = "global"
+# A/B trial verdict (2026-07-10): gemini-3.1-flash-lite handled simple lookups
+# fine but FABRICATED grounding on multi-source answers (invented a GitHub org
+# in links, skipped fallback-chain rules) — disqualifying for a grounding-first
+# bot. 3.5-flash is the default; the loop auto-adjusts thinking dials if a lite
+# model is ever set here again.
+GEMINI_MODEL = "gemini-3.5-flash"
 
 # Secrets are set via `wrangler secret put`. Expected names:
 #   SLACK_SIGNING_SECRET
@@ -64,11 +119,11 @@ SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slac
 #   ANTHROPIC_API_KEY
 #   GITHUB_TOKEN          (PAT with repo:dispatch scope)
 #   FIGMA_ACCESS_TOKEN    (Figma PAT with read access to the prototypes file;
-#                          used by implement_design's proposal-time screenshot
+#                          used by the prototype_scaffold proposal-time screenshot
 #                          fetch in events.ts — Phase 4)
 #   NOTION_API_KEY        (Notion internal integration token, connected to the
-#                          Roadmap board; used by create_prd to add PRD cards)
-#   GMAIL_SENDER          (the authorized "From" mailbox for send_email)
+#                          Roadmap board; used by notion_create to add PRD cards)
+#   GMAIL_SENDER          (the authorized "From" mailbox for email_send)
 #   GMAIL_CLIENT_ID       (Google OAuth client id)
 #   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
 #   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)
@@ -78,17 +133,33 @@ SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slac
 #                          the MCP URL pins read_only=true so it's a read path)
 #   SLACK_MCP_CLIENT_SECRET (secret for the STATIC Slack MCP OAuth client whose
 #                          id is SLACK_MCP_CLIENT_ID above)
+#   GEMINI_SA_EMAIL       (Gemini/Vertex service-account client_email)
+#   GEMINI_SA_PRIVATE_KEY (Gemini/Vertex service-account private_key — the full
+#                          "-----BEGIN PRIVATE KEY-----…" PEM string)
+#   GEMINI_API_KEY        (optional alternative: AI Studio API key — if set it
+#                          takes precedence over the service-account pair)
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.
 [[durable_objects.bindings]]
 name = "THREAD_STATE"
 class_name = "ThreadState"
 
+# Durable Object — per-thread agent-run executor. Its alarm() runs the message
+# pipeline OUTSIDE ctx.waitUntil(), whose 30s post-ack cancellation silently
+# killed longer agent runs (👀-then-silence incident, 2026-07-09).
+[[durable_objects.bindings]]
+name = "AGENT_RUNNER"
+class_name = "AgentRunner"
+
 # SQLite-backed Durable Object — works on Workers Free plan.
 # (new_classes is the legacy KV-backed migration that requires Workers Paid.)
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["ThreadState"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["AgentRunner"]
 
 # KV — stores the exchanged Notion OAuth token (hosted-MCP READ path). Create it
 # once: `npx wrangler kv namespace create NOTION_OAUTH_KV`, paste the returned id
