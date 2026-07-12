@@ -30,12 +30,12 @@ cc @reviewers — by [date]
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ message → ✅/❌ reaction, requester-only, 15-min expiry.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ message → ✅/❌ reaction, requester-only, 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state.ts` is the source of truth).
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to the project's Decision Log **before** the thread is considered resolved.
 
-**Reactions outside the gates are free-form.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 👀 working, 🎉 shipped, or a fitting custom emoji). Only the gate semantics above are reserved: ✅/❌ carry meaning on proposal cards and review verdicts, so the bot never reacts with those on a pending proposal itself.
+**Reactions outside the gates are free-form — and they're the bot's wit channel.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 👀 working, 🎉 shipped, or a fitting custom emoji). Replies are word-budgeted; reactions aren't — content-matched and specific beats a reflexive 👍 (register details: `agents/uno-bot/AGENT.md § Slack etiquette`). Only the gate semantics above are reserved: ✅/❌ carry meaning on proposal cards and review verdicts, so the bot never reacts with those on a pending proposal itself.
 
 ## Message formatting — Slack mrkdwn (NOT CommonMark)
 
@@ -68,7 +68,7 @@ Every message renders as Slack **mrkdwn** (the Worker's `postMessage` defaults `
 
 ## Writing style (all Slack output)
 
-Applies the house voice (`writing-style.md`) to chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Voice & tone`.
+Applies the house voice (`writing-style.md`) to chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`.
 
 - **Lead with the answer / outcome** — no preamble, no restating the ask back.
 - **Glanceable, not paragraphs.** `*Bold label*` lines + `•` bullets for structure; don't over-format.
@@ -77,7 +77,7 @@ Applies the house voice (`writing-style.md`) to chat; the bot's specific registe
 - **Errors are actionable** — name 2–3 next steps (retry / adjust / escalate), never a bare "something went wrong."
 - **Confirm before real-world side-effects** (the proposal gate) — but gate only genuinely risky ops; no confirmation fatigue.
 - **On behalf of** — acting for a person, say so, and surface what was done + a link.
-- Keep a message under ~4,000 chars; longer → summary + a Gist/PR link.
+- Keep a message under ~4,000 chars; longer → lead with a summary, then thread the detail or append it to the relevant Notion card and link it (there is no Gist tool).
 
 <!-- Grounded in Slack's own docs (fetched 2026-07-08): Formatting message text · Block Kit · chat.postMessage · Agent design · App design guidelines. -->
 
