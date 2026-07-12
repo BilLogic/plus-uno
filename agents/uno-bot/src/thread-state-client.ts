@@ -9,9 +9,6 @@ export type { HistoryTurn };
 export interface PendingProposal {
   toolName: string;
   input: Record<string, unknown>;
-  toolUseId: string;
-  /** Anthropic.ContentBlock[] serialized as JSON. Reserved for a future resume path. */
-  assistantContent: unknown[];
   channel: string;
   threadTs: string;
   userMsgTs: string;

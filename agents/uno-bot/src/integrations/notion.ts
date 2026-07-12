@@ -21,6 +21,24 @@ const DESIGN_STATUS_NEED_PRD = "Need PRD / Under Playground";
 const REQUEST_TIMEOUT_MS = 10000;
 const MAX_RICH_TEXT = 1900; // Notion caps a single rich_text content at 2000
 
+// Shared auth headers for every Notion REST call — one definition so the token
+// header and API version can't drift between endpoints. `write:true` adds the
+// JSON content-type needed by POST/PATCH.
+function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, string> {
+  const h: Record<string, string> = {
+    Authorization: `Bearer ${env.NOTION_API_KEY}`,
+    "Notion-Version": NOTION_VERSION,
+  };
+  if (opts?.write) h["Content-Type"] = "application/json";
+  return h;
+}
+
+// One error-string format for every Notion endpoint (was hand-built ~7×, and
+// drifted). `fallback` names the operation for the message tail.
+function notionError(status: number, data: { code?: string; message?: string }, fallback: string): Error {
+  return new Error(`Notion ${status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? fallback}`);
+}
+
 export interface PrdSection {
   heading: string;
   body: string;
@@ -167,11 +185,7 @@ export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   if (!env.NOTION_TEAM_DB_ID) throw new Error("NOTION_TEAM_DB_ID not configured");
 
-  const headers = {
-    Authorization: `Bearer ${env.NOTION_API_KEY}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
-  };
+  const headers = notionHeaders(env, { write: true });
   const members: TeamMember[] = [];
   let cursor: string | undefined;
   const controller = new AbortController();
@@ -188,7 +202,7 @@ export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
         has_more?: boolean; next_cursor?: string; message?: string; code?: string;
       };
       if (!res.ok) {
-        throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "team query failed"}`);
+        throw notionError(res.status, data, "team query failed");
       }
       for (const row of data.results ?? []) {
         const p = row.properties ?? {};
@@ -295,11 +309,7 @@ function blockText(block: Record<string, unknown>): string {
  */
 export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const headers = {
-    Authorization: `Bearer ${env.NOTION_API_KEY}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
-  };
+  const headers = notionHeaders(env, { write: true });
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
@@ -309,7 +319,7 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       properties?: Record<string, NotionProperty>;
     };
     if (!pageRes.ok || !page.id) {
-      throw new Error(`Notion ${pageRes.status}${page.code ? ` ${page.code}` : ""}: ${page.message ?? "page not found"}`);
+      throw notionError(pageRes.status, page, "page not found");
     }
 
     const properties: Record<string, string> = {};
@@ -373,11 +383,7 @@ export async function notionSearch(
   try {
     const res = await fetch(`${NOTION_API}/search`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.NOTION_API_KEY}`,
-        "Notion-Version": NOTION_VERSION,
-        "Content-Type": "application/json",
-      },
+      headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
         query,
         filter: { property: "object", value: "page" },
@@ -391,7 +397,7 @@ export async function notionSearch(
       code?: string;
     };
     if (!res.ok) {
-      throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "search failed"}`);
+      throw notionError(res.status, data, "search failed");
     }
     const hits: NotionSearchHit[] = [];
     for (const r of data.results ?? []) {
@@ -509,11 +515,7 @@ export async function notionCreate(
   try {
     const res = await fetch(`${NOTION_API}/pages`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.NOTION_API_KEY}`,
-        "Notion-Version": NOTION_VERSION,
-        "Content-Type": "application/json",
-      },
+      headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
         parent: { database_id: plan.databaseId },
         properties: { Name: { title: richText(input.title.trim()) }, ...plan.properties },
@@ -523,7 +525,7 @@ export async function notionCreate(
     });
     const data = (await res.json()) as { id?: string; url?: string; message?: string; code?: string };
     if (!res.ok || !data.id) {
-      throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "create failed"}`);
+      throw notionError(res.status, data, "create failed");
     }
     return {
       id: data.id,
@@ -563,17 +565,43 @@ export interface NotionUpdateResult {
   appended: number;
 }
 
+// Confirm a page is a card in an allowlisted database (the Roadmap board) and
+// return its title. Shared by notionUpdate + archiveCard so mutating tools can
+// only touch Roadmap cards, never arbitrary pages the integration can reach.
+// Throws if the parent isn't allowlisted. Uses the caller's signal so it shares
+// the request-timeout budget.
+async function assertRoadmapCard(
+  env: Env,
+  pageId: string,
+  headers: Record<string, string>,
+  signal: AbortSignal,
+): Promise<{ title: string }> {
+  const allow = [env.NOTION_ROADMAP_DB_ID]
+    .filter((x): x is string => !!x)
+    .map((x) => x.replace(/-/g, "").toLowerCase());
+  const getRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
+  const page = (await getRes.json()) as {
+    id?: string; message?: string; code?: string;
+    parent?: { database_id?: string };
+    properties?: { Name?: { title?: { plain_text?: string }[] } };
+  };
+  if (!getRes.ok || !page.id) {
+    throw notionError(getRes.status, page, "page not found");
+  }
+  const parentDb = (page.parent?.database_id ?? "").replace(/-/g, "").toLowerCase();
+  if (!parentDb || !allow.includes(parentDb)) {
+    throw new Error("that page isn't a card in an allowlisted database — refusing to modify it");
+  }
+  return { title: page.properties?.Name?.title?.[0]?.plain_text ?? "(untitled)" };
+}
+
 export async function notionUpdate(
   env: Env,
   pageId: string,
   input: NotionUpdateInput,
 ): Promise<NotionUpdateResult> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const headers = {
-    Authorization: `Bearer ${env.NOTION_API_KEY}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
-  };
+  const headers = notionHeaders(env, { write: true });
   const updated: string[] = [];
   const skipped: string[] = [];
   let appended = 0;
@@ -581,6 +609,9 @@ export async function notionUpdate(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
+    // Scope guard: only Roadmap cards may be updated/appended (same allowlist
+    // the archive path enforces). Prevents writing to any reachable page.
+    await assertRoadmapCard(env, pageId, headers, controller.signal);
     // 1) Property changes (known names only).
     if (input.properties && Object.keys(input.properties).length) {
       const props: Record<string, unknown> = {};
@@ -602,7 +633,7 @@ export async function notionUpdate(
         });
         if (!res.ok) {
           const err = (await res.json().catch(() => ({}))) as { message?: string };
-          throw new Error(`Notion ${res.status}: ${err.message ?? "property update failed"}`);
+          throw notionError(res.status, err, "property update failed");
         }
       }
     }
@@ -624,7 +655,7 @@ export async function notionUpdate(
       });
       if (!res.ok) {
         const err = (await res.json().catch(() => ({}))) as { message?: string };
-        throw new Error(`Notion ${res.status}: ${err.message ?? "append failed"}`);
+        throw notionError(res.status, err, "append failed");
       }
       appended = children.length;
     }
@@ -640,32 +671,11 @@ export async function notionUpdate(
 // notion_archive can't nuke arbitrary Notion pages.
 export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCard> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const headers = {
-    Authorization: `Bearer ${env.NOTION_API_KEY}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
-  };
-  const allow = [env.NOTION_ROADMAP_DB_ID]
-    .filter((x): x is string => !!x)
-    .map((x) => x.replace(/-/g, "").toLowerCase());
-
+  const headers = notionHeaders(env, { write: true });
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const getRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
-    const page = (await getRes.json()) as {
-      id?: string; message?: string; code?: string;
-      parent?: { database_id?: string };
-      properties?: { Name?: { title?: { plain_text?: string }[] } };
-    };
-    if (!getRes.ok || !page.id) {
-      throw new Error(`Notion ${getRes.status}${page.code ? ` ${page.code}` : ""}: ${page.message ?? "page not found"}`);
-    }
-    const parentDb = (page.parent?.database_id ?? "").replace(/-/g, "").toLowerCase();
-    if (!parentDb || !allow.includes(parentDb)) {
-      throw new Error("that page isn't a card in an allowlisted database — refusing to archive it");
-    }
-    const title = page.properties?.Name?.title?.[0]?.plain_text ?? "(untitled)";
+    const { title } = await assertRoadmapCard(env, pageId, headers, controller.signal);
 
     const patchRes = await fetch(`${NOTION_API}/pages/${pageId}`, {
       method: "PATCH",
@@ -675,7 +685,7 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
     });
     if (!patchRes.ok) {
       const err = (await patchRes.json().catch(() => ({}))) as { message?: string };
-      throw new Error(`Notion ${patchRes.status}: ${err.message ?? "archive failed"}`);
+      throw notionError(patchRes.status, err, "archive failed");
     }
     return { id: pageId, title };
   } finally {
@@ -736,11 +746,7 @@ export async function queryRoadmapCards(
     for (let page = 0; page < ROADMAP_MAX_PAGES; page++) {
       const res = await fetch(`${NOTION_API}/databases/${env.NOTION_ROADMAP_DB_ID}/query`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.NOTION_API_KEY}`,
-          "Notion-Version": NOTION_VERSION,
-          "Content-Type": "application/json",
-        },
+        headers: notionHeaders(env, { write: true }),
         body: JSON.stringify({
           page_size: ROADMAP_PAGE_SIZE,
           ...(cursor ? { start_cursor: cursor } : {}),
@@ -752,7 +758,7 @@ export async function queryRoadmapCards(
       });
       const data = (await res.json()) as RoadmapQueryPage;
       if (!res.ok) {
-        throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "roadmap query failed"}`);
+        throw notionError(res.status, data, "roadmap query failed");
       }
       for (const r of data.results ?? []) {
         if (!r.id || r.archived) continue;

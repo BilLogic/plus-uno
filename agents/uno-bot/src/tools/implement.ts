@@ -15,11 +15,22 @@ export async function executeImplement(
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
-  const component = typeof input.component === "string" ? input.component : "";
-  const notes = typeof input.notes === "string" ? input.notes : undefined;
+  const component = typeof input.component === "string" ? input.component.trim() : "";
+  const notes = typeof input.notes === "string" ? input.notes.slice(0, 2000) : undefined;
   const inputPrdUrl = typeof input.notion_prd_url === "string" ? input.notion_prd_url.trim() : "";
   if (!component) {
     return JSON.stringify({ ok: false, error: "missing 'component' in input" });
+  }
+  // A DS component name is a plain PascalCase identifier (Badge, CardSurface).
+  // Enforce that shape: the value is model-generated and can be steered by
+  // injected content, and it flows into a GitHub Actions client_payload — a
+  // free-form value would be a CI-injection vector (defense in depth alongside
+  // the workflow using env: bindings). notes is length-capped for the same reason.
+  if (!/^[A-Za-z][A-Za-z0-9]{0,49}$/.test(component)) {
+    return JSON.stringify({
+      ok: false,
+      error: `invalid component name '${component}' — expected a plain DS component identifier like 'Badge' or 'CardSurface'.`,
+    });
   }
 
   // A component implement MUST be tied to a Notion PRD — the polling bot creates

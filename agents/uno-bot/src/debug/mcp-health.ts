@@ -12,6 +12,7 @@
 // (curl it, or point an uptime checker at it).
 
 import type { Env } from "../types";
+import { fetchWithTimeout } from "../http";
 import { buildMcp } from "../agent/mcp";
 
 const HANDSHAKE_TIMEOUT_MS = 10_000;
@@ -26,12 +27,9 @@ interface ProbeResult {
 
 async function probeServer(name: string, url: string, token: string): Promise<ProbeResult> {
   const started = Date.now();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), HANDSHAKE_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       method: "POST",
-      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json, text/event-stream",
@@ -48,7 +46,7 @@ async function probeServer(name: string, url: string, token: string): Promise<Pr
           clientInfo: { name: "uno-bot-health", version: "1.0" },
         },
       }),
-    });
+    }, HANDSHAKE_TIMEOUT_MS);
     const text = await res.text();
     // A successful initialize returns 200 with a JSON-RPC result (possibly SSE-framed).
     const ok = res.ok && !text.includes('"error"');
@@ -67,8 +65,6 @@ async function probeServer(name: string, url: string, token: string): Promise<Pr
       ms: Date.now() - started,
       detail: err instanceof Error ? (err.name === "AbortError" ? "timeout" : err.message) : String(err),
     };
-  } finally {
-    clearTimeout(timer);
   }
 }
 

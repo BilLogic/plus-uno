@@ -48,6 +48,12 @@ Under the workspace's **Content Management Systems** page — useful context for
 - `Current Team` routes the card to kanbans; PRD accepted → move to `Design Status: Ready for Design`.
 - Urgency = existing `Priority: Critical` — no separate lane. Maintenance intake = card on this DB with `Product Pillar: Universal` + `Product Tag: Maintenance`, surfaced via a filtered view — **not** a separate DB. ⚠️ Both `Universal` and `Maintenance` must already exist as options on the schema (add `Maintenance` to the `Product Tag` multi-select in the Notion UI once); the bot exact-matches them and never auto-creates.
 
+<!-- ide-only -->
+<!-- Project-hub authoring + Notion-block/enhanced-markdown mechanics below are
+     writers/notion (in-IDE) concerns — the bot writes only structured
+     notion_create/update params, never raw hub blocks. Stripped from the bot's
+     system prompt at assembly (src/agent/skills.ts stripIdeOnly); kept here as
+     the single source for the IDE agent. -->
 ## Project-hub golden sections (in order)
 
 **TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; the top anchor, a cold reader orients in 30s) → **People** (role-labelled @-mentions, one per line) → **Now / Next / Blocked** (one bold-labelled line each: current focus · following step · ⛔ what's stuck) → **Latest progress** (all dated status-pulse bullets inside one *Progress log* accordion — nothing spills onto the page) → **Key references** → **Doc Changelog** (inside a *Show history* toggle) → **Pages** (the final section: a contiguous run of pre-created inline subpages — PRD · Decision Log · Handoff Spec · Rollout · Meeting Notes & Context · Archive).
@@ -76,3 +82,4 @@ Suggestions *about* existing content (including the agent's own) go in **comment
 - Child-page blocks cannot interleave with text — group inline subpages in one contiguous run (the Pages section).
 - Multi-line callout text writes back as stacked one-line fragments — keep callouts atomic.
 - Databases for tracked items with a lifecycle; inline simple tables for static reference (fit-to-page-width is a manual toggle).
+<!-- /ide-only -->

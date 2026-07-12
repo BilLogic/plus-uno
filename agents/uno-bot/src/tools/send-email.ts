@@ -15,6 +15,33 @@ function asAddressList(v: unknown): string[] {
   return [];
 }
 
+function csv(v: string | undefined): string[] {
+  return (v ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+}
+
+// Authorization beyond the requester-identity gate: an optional allowlist of
+// Slack users who may trigger outward email, and an optional allowlist of
+// recipient domains. Unset lists mean "no restriction" (legacy behavior) so
+// this is safe to enable incrementally. Returns an error string, or null if OK.
+function checkEmailAuthorization(env: Env, requestedBy: string | undefined, recipients: string[]): string | null {
+  const users = csv(env.EMAIL_AUTHORIZED_USERS);
+  if (users.length && !(requestedBy && users.includes(requestedBy.toLowerCase()))) {
+    return "outward email isn't enabled for you — ask an admin to add you to the email allowlist, or send it yourself.";
+  }
+  const domains = csv(env.EMAIL_ALLOWED_DOMAINS);
+  if (domains.length) {
+    const offending = recipients.filter((addr) => {
+      const at = addr.lastIndexOf("@");
+      const domain = at >= 0 ? addr.slice(at + 1).toLowerCase() : "";
+      return !domains.some((d) => domain === d || domain.endsWith("." + d));
+    });
+    if (offending.length) {
+      return `these recipients are outside the approved domains (${domains.join(", ")}): ${offending.join(", ")}`;
+    }
+  }
+  return null;
+}
+
 export async function executeSendEmail(
   env: Env,
   input: Record<string, unknown>,
@@ -31,6 +58,16 @@ export async function executeSendEmail(
   if (!body.trim()) return JSON.stringify({ ok: false, error: "missing 'body'" });
   if (badAddrs.length) {
     return JSON.stringify({ ok: false, error: `invalid email address(es): ${badAddrs.join(", ")}` });
+  }
+
+  const authError = checkEmailAuthorization(env, slack.requestedBy, [...to, ...cc]);
+  if (authError) {
+    await postMessage(env, {
+      channel: slack.channel,
+      thread_ts: slack.threadTs,
+      text: `:no_entry: Didn't send — ${authError}`,
+    });
+    return JSON.stringify({ ok: false, status: "not_authorized", error: authError });
   }
 
   try {

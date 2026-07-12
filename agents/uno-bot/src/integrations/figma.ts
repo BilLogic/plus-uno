@@ -6,6 +6,7 @@
 // for the Slack proposal preview.
 
 import type { Env } from "../types";
+import { fetchWithTimeout } from "../http";
 
 const FIGMA_API = "https://api.figma.com";
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
@@ -48,28 +49,21 @@ export async function fetchFigmaNode(
   if (!env.FIGMA_ACCESS_TOKEN) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
 
   const url = `${FIGMA_API}/v1/files/${fileKey}/nodes?ids=${encodeURIComponent(nodeId)}`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), NODE_FETCH_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, {
-      headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
-      signal: controller.signal,
-    });
-    const data = (await res.json().catch(() => ({}))) as {
-      err?: string | null;
-      nodes?: Record<string, { document?: FigmaNode } | undefined>;
-    };
-    if (!res.ok || data.err) {
-      throw new Error(`Figma nodes ${res.status}${data.err ? `: ${data.err}` : ""}`);
-    }
-    const doc = data.nodes?.[nodeId]?.document;
-    if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
-    const texts: string[] = [];
-    collectText(doc, texts);
-    return { name: doc.name ?? "(unnamed)", type: doc.type ?? "NODE", texts };
-  } finally {
-    clearTimeout(timer);
+  const res = await fetchWithTimeout(url, {
+    headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
+  }, NODE_FETCH_TIMEOUT_MS);
+  const data = (await res.json().catch(() => ({}))) as {
+    err?: string | null;
+    nodes?: Record<string, { document?: FigmaNode } | undefined>;
+  };
+  if (!res.ok || data.err) {
+    throw new Error(`Figma nodes ${res.status}${data.err ? `: ${data.err}` : ""}`);
   }
+  const doc = data.nodes?.[nodeId]?.document;
+  if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
+  const texts: string[] = [];
+  collectText(doc, texts);
+  return { name: doc.name ?? "(unnamed)", type: doc.type ?? "NODE", texts };
 }
 
 export interface FigmaUrlParts {
@@ -137,13 +131,10 @@ export async function fetchFigmaImagePngUrl(
   const params = new URLSearchParams({ ids: nodeId, format: "png", scale: String(scale) });
   const url = `${FIGMA_API}/v1/images/${fileKey}?${params.toString()}`;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), IMAGE_FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
-      signal: controller.signal,
-    });
+    }, IMAGE_FETCH_TIMEOUT_MS);
     if (!res.ok) {
       console.warn(`[figma] images ${fileKey} ${nodeId} -> ${res.status}`);
       return null;
@@ -161,7 +152,5 @@ export async function fetchFigmaImagePngUrl(
   } catch (err) {
     console.warn(`[figma] image fetch failed: ${err instanceof Error ? err.message : String(err)}`);
     return null;
-  } finally {
-    clearTimeout(timer);
   }
 }

@@ -20,3 +20,20 @@ source: ce-review round 2026-07-12 (uno-bot src + harness)
 
 ## Acceptance
 - [ ] tsc clean; no behavior change; events.ts under ~500 lines.
+
+## Work log — 2026-07-12
+DONE (behavioral / de-duplication):
+- Item 3: conversationsReplies now delegates to slackGet.
+- Item 4: CONFIRM_PHRASES/CANCEL_PHRASES centralized in agent/loop-shared.ts; both
+  the events.ts fast-path (bareResolution) and anthropic-client routing
+  (looksLikeResolution) derive from the one vocabulary — the lgtm/nope divergence is gone.
+- Item 5: reaction-job enqueue failure now posts the same visible warning message
+  jobs get (was a silent ✅/❌ drop).
+- Item 6 (partial): executeSlackReact moved out of run-agent.ts into agent/loop-shared.ts.
+
+DEFERRED (pure reorganization, no behavior change — not worth the churn/risk on the
+970-line file right now):
+- Item 1: extracting slack/vision.ts, slack/proposal-render.ts, slack/delivery.ts.
+- Item 2: recordExchange() helper for the 6 appendHistory pairs.
+- Item 6 (remainder): moving SlackContext from tools/dispatcher.ts to types.ts.
+Left as a follow-up; reopen if events.ts grows further.

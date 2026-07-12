@@ -97,8 +97,7 @@ export async function geminiGenerate(
 ): Promise<GeminiResult> {
   const started = Date.now();
   const model = opts.model ?? env.GEMINI_MODEL ?? "gemini-3.5-flash";
-  const mode = geminiConfigured(env);
-  if (!mode) {
+  if (!geminiConfigured(env)) {
     return { ok: false, model, error: "no Gemini credential configured", ms: 0 };
   }
 
@@ -114,25 +113,16 @@ export async function geminiGenerate(
   };
 
   let url: string;
-  const headers: Record<string, string> = { "content-type": "application/json" };
-  if (mode === "api-key") {
-    url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-    headers["x-goog-api-key"] = env.GEMINI_API_KEY!;
-  } else {
-    const project = env.GEMINI_PROJECT_ID ?? "";
-    const region = env.GEMINI_REGION ?? "global";
-    const host = region === "global" ? "aiplatform.googleapis.com" : `${region}-aiplatform.googleapis.com`;
-    url = `https://${host}/v1/projects/${project}/locations/${region}/publishers/google/models/${model}:generateContent`;
-    try {
-      headers.authorization = `Bearer ${await getGoogleAccessToken(env)}`;
-    } catch (err) {
-      return {
-        ok: false,
-        model,
-        error: `auth: ${err instanceof Error ? err.message : String(err)}`,
-        ms: Date.now() - started,
-      };
-    }
+  let headers: Record<string, string>;
+  try {
+    ({ url, headers } = await geminiEndpoint(env, model)); // shared endpoint/auth resolution
+  } catch (err) {
+    return {
+      ok: false,
+      model,
+      error: `auth: ${err instanceof Error ? err.message : String(err)}`,
+      ms: Date.now() - started,
+    };
   }
 
   try {

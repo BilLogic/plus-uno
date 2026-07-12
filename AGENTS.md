@@ -76,6 +76,7 @@ Design System knowledge lives in `design-system/docs/` (hand-authored) and `desi
 
 Check `docs/knowledge/INDEX.md` before starting work — past lessons may apply. After significant work, capture learnings via `skills/uno-maintain` (knowledge-capture path). `docs/knowledge/archive/` is the graveyard for superseded docs — never delete, always archive.
 
+<!-- ide-only -->
 ## Commands
 
 | Command | What it does |
@@ -110,3 +111,8 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Product context, users, or domain terms | `docs/context/product/*.md` (foundation) + uno-blueprint (live truth) |
 | New teammate orientation | `docs/context/onboarding.md` |
+<!-- /ide-only -->
+<!-- The two sections above (Commands, Progressive loading) are IDE-agent-only —
+     stripped from the uno-bot system prompt at assembly (src/agent/skills.ts
+     stripIdeOnly), since the Worker has no filesystem or npm and its prompt is
+     fixed at load time. They stay here as the single source for the IDE agent. -->

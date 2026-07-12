@@ -16,6 +16,7 @@ Slack delta only. The shared procedure (taxonomy, tiers, gates) is `references/m
   4. Post the review request to `#plus-design` (format below), suggesting reviewers via `notion_search` (scope: "team"). The post itself is a normal threaded reply, no tool.
 - **After the verdict** (method §5): on ✅ the *in-IDE* agent merges/applies and writes the apply-log row — hand off, then confirm the harness is current. On 🔁 fold feedback in and re-propose (heavy revisions escalate). On ❌ record why in the thread.
 - **Gate instruction edits.** Persona / AGENTS.md / bot-face files steer every session — never propose those silently; two approvals apply (method §5.3).
+- **`notion_update` governance (the bot's one card-mutation tool).** It only touches **Roadmap cards** (the Worker refuses any other parent DB). Allowed via ✅-gated `notion_update`: appending a dated progress/decision note, and property changes that **exact-match an existing select/status option** — never invent options, pillars, or OKRs. A **`Design Status` move to `Ready for Design`** is part of the accepted-PRD paired write (uno-synthesize / the IDE), not a standalone Slack action; other status moves ("move my card to WIP") are fine as a gated `notion_update` when the target option already exists. Missing/renamed option → say so and stop, don't approximate.
 - Faithful to what's flagged: cite the file/frame; never invent an inconsistency, reviewers, or change items. Never auto-file a PRD or auto-open a PR.
 
 ## Output — the review-request post

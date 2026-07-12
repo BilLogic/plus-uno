@@ -1,5 +1,7 @@
 import type { Env } from "../types";
+import { fetchWithTimeout } from "../http";
 import { runAgent, type AgentImage, type AgentResult } from "../agent/run-agent";
+import { bareResolution } from "../agent/loop-shared";
 import { routeRequest } from "../agent/anthropic-client";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
@@ -22,7 +24,6 @@ import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 /** Slack file attachment metadata as delivered on message/app_mention events.
  *  Only the fields the vision path reads — everything else is ignored. */
 export interface SlackEventFile {
-  id?: string;
   name?: string;
   mimetype?: string;
   url_private?: string;
@@ -148,13 +149,19 @@ async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: strin
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ job, enqueuedAt: Date.now() }),
   });
-  if (!res.ok && job.kind === "message") {
+  if (!res.ok) {
     // Enqueue is the only step left in the Worker — a failure here IS the
-    // 👀-then-silence path, so make it visible instead.
-    console.error(`[slack] runner enqueue failed: ${res.status}`);
+    // 👀-then-silence path, so make it visible instead. A dropped REACTION job
+    // is a silently-ignored ✅/❌ (the exact "approved then nothing" failure
+    // this codebase fights elsewhere), so warn on both job kinds — each posts
+    // into its own thread.
+    console.error(`[slack] runner enqueue failed (${job.kind}): ${res.status}`);
+    const target =
+      job.kind === "message"
+        ? { channel: job.event.channel, thread_ts: job.event.thread_ts ?? job.event.ts }
+        : { channel: job.event.item.channel, thread_ts: job.event.item.ts };
     await postMessage(env, {
-      channel: job.event.channel,
-      thread_ts: job.event.thread_ts ?? job.event.ts,
+      ...target,
       text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
   }
@@ -358,16 +365,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Anything longer than a bare phrase still goes to the model (it may be a
   // modification request, not a plain yes/no).
   if (pending) {
-    const bare = userText.trim().toLowerCase().replace(/[.!?\s]+$/g, "");
-    const CONFIRM_PHRASES = new Set([
-      "go ahead", "yes", "yes please", "confirm", "confirmed", "do it",
-      "ship it", "approve", "approved", "sure", "ok", "okay", "lgtm",
-    ]);
-    const CANCEL_PHRASES = new Set([
-      "cancel", "no", "stop", "abort", "nevermind", "never mind",
-      "cancel it", "don't", "dont",
-    ]);
-    if (CONFIRM_PHRASES.has(bare) || CANCEL_PHRASES.has(bare)) {
+    const bareDecision = bareResolution(userText); // shared vocabulary (loop-shared)
+    if (bareDecision) {
       if (userId !== pending.requesterUserId) {
         await postMessage(env, {
           channel,
@@ -376,12 +375,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         });
         return;
       }
-      const decision = CONFIRM_PHRASES.has(bare) ? "confirm" : "cancel";
-      await resolveProposal(env, pending, decision);
+      await resolveProposal(env, pending, bareDecision);
       await appendHistory(env, channel, threadTs, { role: "user", content: userText });
       await appendHistory(env, channel, threadTs, {
         role: "assistant",
-        content: decision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
+        content: bareDecision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
       });
       return;
     }
@@ -580,8 +578,6 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await savePendingProposal(env, {
       toolName: result.toolName,
       input: result.input,
-      toolUseId: result.toolUseId,
-      assistantContent: result.assistantContent as unknown[],
       channel,
       threadTs,
       userMsgTs,
@@ -710,18 +706,14 @@ async function fetchBytes(
   url: string,
   headers?: Record<string, string>,
 ): Promise<ArrayBuffer | null> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), IMAGE_FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url, { headers, signal: controller.signal });
+    const res = await fetchWithTimeout(url, { headers }, IMAGE_FETCH_TIMEOUT_MS);
     if (!res.ok) return null;
     const contentType = res.headers.get("content-type") ?? "";
     if (contentType.includes("text/html")) return null;
     return await res.arrayBuffer();
   } catch {
     return null;
-  } finally {
-    clearTimeout(timer);
   }
 }
 

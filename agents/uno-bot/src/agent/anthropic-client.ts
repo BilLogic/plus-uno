@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Env } from "../types";
+import { looksLikeResolution } from "./loop-shared";
 
 // Model tiers (D2 — skill + model routing). The bot picks a tier from the
 // intent of the incoming message so cheap turns stay cheap (haiku) and heavy
@@ -35,7 +36,7 @@ export interface RouteDecision {
 
 export function routeRequest(opts: { userText: string; hasPending: boolean }): RouteDecision {
   const text = opts.userText.toLowerCase();
-  if (opts.hasPending && /\b(go ahead|yes|confirm|do it|cancel|no|stop|nope|abort)\b/.test(text)) {
+  if (opts.hasPending && looksLikeResolution(text)) {
     return { tier: "haiku", model: MODELS.haiku, reason: "proposal-resolution" };
   }
   if (/\bthink (hard|deeply)\b/.test(text)) {

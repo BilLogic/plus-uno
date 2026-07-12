@@ -7,7 +7,6 @@ import { githubReadPath, githubSearchCode } from "../integrations/github";
 
 export async function executeGithubRead(env: Env, input: Record<string, unknown>): Promise<string> {
   const path = typeof input.path === "string" ? input.path.trim() : "";
-  const list = input.list === true;
   const ref = typeof input.ref === "string" ? input.ref.trim() : undefined;
   const search = typeof input.search === "string" ? input.search.trim() : "";
 
@@ -37,7 +36,7 @@ export async function executeGithubRead(env: Env, input: Record<string, unknown>
   if (!path) return JSON.stringify({ ok: false, error: "missing 'path' (or use 'search')" });
 
   try {
-    const r = await githubReadPath(env, path, list, ref);
+    const r = await githubReadPath(env, path, ref);
     if (r.kind === "dir") {
       return JSON.stringify({
         ok: true,

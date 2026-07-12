@@ -94,4 +94,18 @@ export interface Env {
   GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.5-flash"
+
+  // --- Operational guards ----------------------------------------------------
+  // Shared secret gating the /debug/* routes (they trigger a live model call
+  // and credentialed MCP handshakes, so they must not be public). Unset → the
+  // debug routes return 404. Set via `wrangler secret put DEBUG_TOKEN` and pass
+  // it as the `x-debug-token` header. See src/index.ts.
+  DEBUG_TOKEN?: string;
+  // email_send authorization (defense beyond the requester-identity gate):
+  // EMAIL_AUTHORIZED_USERS = comma-separated Slack user IDs allowed to trigger
+  // outward email; EMAIL_ALLOWED_DOMAINS = comma-separated recipient domains
+  // (e.g. "andrew.cmu.edu,tutor.plus"). Unset → email_send stays available to
+  // any requester / any recipient (legacy behavior). See tools/send-email.ts.
+  EMAIL_AUTHORIZED_USERS?: string;
+  EMAIL_ALLOWED_DOMAINS?: string;
 }

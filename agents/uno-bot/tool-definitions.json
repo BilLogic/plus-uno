@@ -86,7 +86,7 @@
   },
   {
     "name": "github_read",
-    "description": "READ-ONLY. Read from the plus-uno GitHub repo — fetch a file's contents by repo-relative path (DS cheat-sheets, rule docs, AGENTS.md, a component's source), or list a directory (set list:true) to check what EXISTS. Use it to confirm a design-system component before proposing component_implement (list `design-system/src/components`), or to ground a review in the actual rule docs rather than memory. For an arbitrary GitHub URL a designer pasted, prefer source_read; use github_read when you know the path or need a directory listing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Read from the plus-uno GitHub repo — fetch a file's contents by repo-relative path (DS cheat-sheets, rule docs, AGENTS.md, a component's source), or list a directory to check what EXISTS (a directory path returns its entries automatically). Use it to confirm a design-system component before proposing component_implement (read `design-system/src/components`), or to ground a review in the actual rule docs rather than memory. For an arbitrary GitHub URL a designer pasted, prefer source_read; use github_read when you know the path or need a directory listing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -97,10 +97,6 @@
         "path": {
           "type": "string",
           "description": "Repo-relative path, e.g. 'design-system/src/components', 'docs/conventions/accessibility.md'."
-        },
-        "list": {
-          "type": "boolean",
-          "description": "If true, list the directory entries at `path` instead of returning file contents (use to check whether something exists)."
         },
         "ref": {
           "type": "string",
