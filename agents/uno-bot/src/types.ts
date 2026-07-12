@@ -27,6 +27,11 @@ export interface Env {
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;
+  // "Third Party Applications" DB — read-only directory (Application Name /
+  // Application Admin / Power Users) that notion_search scope:"apps" queries
+  // for access-request ROUTING (who to ask for access; the grant stays human).
+  // Optional — unset → the apps scope reports "not configured".
+  NOTION_APPS_DB_ID?: string;
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;

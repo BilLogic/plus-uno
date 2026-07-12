@@ -227,6 +227,117 @@ export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
   }
 }
 
+// ─── Third Party Applications DB (read-only — access-request routing) ────────
+// Ground truth for "who do I ask for access to X" (approved 2026-07-12):
+// Application Name (title) · Application Admin (people — the GRANTOR) ·
+// Power User(s) (relation → people-directory pages; day-to-day experts) ·
+// Usage Status (status). The bot only ROUTES the request; the grant stays
+// human. Relation values are page ids — resolve names with fetchPageTitles.
+
+interface ThirdPartyAppProps {
+  "Application Name"?: { title?: NotionRichText };
+  "Application Admin"?: { people?: { name?: string; id?: string }[] };
+  "Power User(s)"?: { relation?: { id?: string }[] };
+  "Usage Status"?: { status?: { name?: string } | null };
+  "License Type"?: { multi_select?: { name?: string }[] };
+}
+
+export interface ThirdPartyApp {
+  name: string;
+  url: string;
+  /** Application Admin people — the humans who can actually grant access. */
+  admins: string[];
+  /** Power User(s) relation page ids (resolve names via fetchPageTitles). */
+  powerUserPageIds: string[];
+  usageStatus?: string;
+  licenseTypes: string[];
+}
+
+const APPS_PAGE_SIZE = 100;
+const APPS_MAX_PAGES = 2;
+
+/**
+ * Read the Third Party Applications directory (name, admins, power-user page
+ * ids, status). Classic databases/{id}/query — one page of 100 rows ≈ one
+ * subrequest. Throws on failure (caller surfaces it honestly).
+ */
+export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  if (!env.NOTION_APPS_DB_ID) throw new Error("NOTION_APPS_DB_ID not configured");
+
+  const apps: ThirdPartyApp[] = [];
+  let cursor: string | undefined;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    for (let page = 0; page < APPS_MAX_PAGES; page++) {
+      const res = await fetch(`${NOTION_API}/databases/${env.NOTION_APPS_DB_ID}/query`, {
+        method: "POST",
+        headers: notionHeaders(env, { write: true }),
+        body: JSON.stringify({
+          page_size: APPS_PAGE_SIZE,
+          ...(cursor ? { start_cursor: cursor } : {}),
+        }),
+        signal: controller.signal,
+      });
+      const data = (await res.json()) as {
+        results?: Array<{ id?: string; url?: string; archived?: boolean; properties?: ThirdPartyAppProps }>;
+        has_more?: boolean; next_cursor?: string | null; message?: string; code?: string;
+      };
+      if (!res.ok) {
+        throw notionError(res.status, data, "third-party apps query failed");
+      }
+      for (const r of data.results ?? []) {
+        if (!r.id || r.archived) continue;
+        const p = r.properties ?? {};
+        const name = plain(p["Application Name"]?.title);
+        if (!name) continue;
+        apps.push({
+          name,
+          url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
+          admins: (p["Application Admin"]?.people ?? []).map((u) => u.name ?? "").filter(Boolean),
+          powerUserPageIds: (p["Power User(s)"]?.relation ?? []).map((rel) => rel.id ?? "").filter(Boolean),
+          usageStatus: p["Usage Status"]?.status?.name ?? undefined,
+          licenseTypes: (p["License Type"]?.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean),
+        });
+      }
+      if (!data.has_more || !data.next_cursor) break;
+      cursor = data.next_cursor;
+    }
+    return apps;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Resolve Notion page ids to their titles (for relation properties like
+ * Power User(s)). Capped — each id is one subrequest. Unresolvable ids are
+ * skipped, never fabricated.
+ */
+export async function fetchPageTitles(env: Env, pageIds: string[], cap = 4): Promise<string[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  const headers = notionHeaders(env);
+  const titles: string[] = [];
+  for (const id of pageIds.slice(0, cap)) {
+    try {
+      const res = await fetch(`${NOTION_API}/pages/${id}`, { headers });
+      if (!res.ok) continue;
+      const page = (await res.json()) as { properties?: Record<string, NotionProperty> };
+      for (const prop of Object.values(page.properties ?? {})) {
+        if (prop.type === "title") {
+          const t = plain(prop.title);
+          if (t) titles.push(t);
+          break;
+        }
+      }
+    } catch {
+      // skip — the caller reports who it could resolve
+    }
+  }
+  return titles;
+}
+
 const NOTION_ID_RE = /[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}/i;
 
 /** Extract a Notion page id (32-hex, dashes stripped) from a URL or raw id. */

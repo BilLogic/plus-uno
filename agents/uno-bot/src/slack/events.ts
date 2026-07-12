@@ -31,6 +31,7 @@ import {
 } from "./types";
 import { collectVisionInputs } from "./vision";
 import { postVisibleFailure, postTextVerified } from "./delivery";
+import { reviewDraft } from "../agent/draft-judge";
 import { formatProposal, proposalVerb, buildImplementDesignProposal } from "./proposal-render";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
@@ -411,7 +412,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 
   // ----- text-only response -----
   if (result.kind === "text") {
-    const delivery = await postTextVerified(env, channel, threadTs, result.text);
+    // Pre-send self-verification (approved 2026-07-12): substantive drafts get
+    // ONE cheap judge call against the condensed D1–D9 rubric, revised once on
+    // a flagged failure. Short replies skip it entirely; any judge error or
+    // timeout ships the original draft (fail open — see agent/draft-judge.ts).
+    const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
+    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text);
     await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.

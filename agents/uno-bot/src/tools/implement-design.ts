@@ -17,6 +17,7 @@ import { repositoryDispatch } from "./github-dispatch";
 import type { SlackContext } from "./dispatcher";
 import { parseFigmaUrl } from "../integrations/figma";
 import { extractNotionPrdFromText } from "../slack/notion-prd";
+import { fetchThreadTranscript, withThreadTranscript } from "../slack/thread-transcript";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,40}$/;
 
@@ -57,18 +58,32 @@ export async function executeImplementDesign(
   // shape doesn't expose an id (e.g. a notion.site vanity URL).
   const prd = extractNotionPrdFromText(notionPrdUrl);
 
-  const result = await repositoryDispatch(env, "implement-design-from-figma", {
-    figma_url: figmaUrl,
-    file_key: parts.fileKey,
-    node_id: parts.nodeId,
-    slug: rawSlug || undefined,
-    notion_prd_id: prd?.id,
-    notion_prd_url: prd?.url ?? (notionPrdUrl || undefined),
-    notes,
-    thread_ts: slack.threadTs,
-    channel: slack.channel,
-    message_ts: slack.userMsgTs,
-  });
+  // Full-thread context for the runner (approved 2026-07-12). Fail-open: null
+  // never blocks the dispatch. NOTE this payload can reach GitHub's 10-key
+  // client_payload ceiling when slug + PRD + notes are ALL present —
+  // withThreadTranscript counts defined keys and skips (with a warn) rather
+  // than 422 the whole dispatch.
+  const transcript = await fetchThreadTranscript(env, slack.channel, slack.threadTs);
+
+  const result = await repositoryDispatch(
+    env,
+    "implement-design-from-figma",
+    withThreadTranscript(
+      {
+        figma_url: figmaUrl,
+        file_key: parts.fileKey,
+        node_id: parts.nodeId,
+        slug: rawSlug || undefined,
+        notion_prd_id: prd?.id,
+        notion_prd_url: prd?.url ?? (notionPrdUrl || undefined),
+        notes,
+        thread_ts: slack.threadTs,
+        channel: slack.channel,
+        message_ts: slack.userMsgTs,
+      },
+      transcript,
+    ),
+  );
 
   if (!result.ok) {
     return JSON.stringify({

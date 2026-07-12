@@ -27,7 +27,7 @@
   },
   {
     "name": "notion_search",
-    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL — 'what did we decide about onboarding', 'is there a study guide for X', 'who should I talk to about assessments', 'show me toolkit prototypes'. NOT for Roadmap cards — use roadmap_query for anything about cards/status/owners on the Roadmap board (this keyword search misses existing cards; roadmap_query is exact and complete). Returns matching page titles + Notion URLs (plus key properties); follow up with source_read to pull a specific page's full content. Prefer a narrow `scope` when you know which surface you want — a scoped query against a known database is far more reliable than an open workspace search. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL — 'what did we decide about onboarding', 'is there a study guide for X', 'who should I talk to about assessments', 'show me toolkit prototypes'. Scope 'apps' answers access-request routing — 'can I get access to X', 'who owns/admins tool Y': the Third Party Applications directory returns the Application Admin (who can GRANT access) and Power Users (day-to-day experts). Name the right person and pre-fill a short suggested request message they can copy; NEVER claim to grant, request, or change access yourself — the grant stays human. NOT for Roadmap cards — use roadmap_query for anything about cards/status/owners on the Roadmap board (this keyword search misses existing cards; roadmap_query is exact and complete). Returns matching page titles + Notion URLs (plus key properties); follow up with source_read to pull a specific page's full content. Prefer a narrow `scope` when you know which surface you want — a scoped query against a known database is far more reliable than an open workspace search. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -43,9 +43,10 @@
           "type": "string",
           "enum": [
             "team",
+            "apps",
             "any"
           ],
-          "description": "'team' = the Team Member Database roster (people/SME lookups). 'any' = workspace-wide title search. Card lookups should use roadmap_query instead."
+          "description": "'team' = the Team Member Database roster (people/SME lookups). 'apps' = the Third Party Applications directory (access-request routing — query is the tool/service name, e.g. 'Figma'). 'any' = workspace-wide title search. Card lookups should use roadmap_query instead."
         }
       }
     }
