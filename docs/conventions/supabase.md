@@ -1,10 +1,6 @@
 # Supabase / uno-blueprint Conventions
 
-<!--
-status: canonical — this file IS the convention (ADR-017)
-distilled: 2026-07-07 from the Notion 📐 System Overview + Flow 4 doc (now superseded for conventions)
-applied by: agents/writers/blueprint
--->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 📐 System Overview + Flow 4 doc for conventions. Distilled 2026-07-07 · applied by writers/blueprint. -->
 
 ## The contract
 

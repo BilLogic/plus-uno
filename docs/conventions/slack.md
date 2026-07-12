@@ -1,10 +1,6 @@
 # Slack Conventions
 
-<!--
-status: canonical — this file IS the convention (ADR-017)
-distilled: 2026-07-07 from the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 (now superseded for conventions)
-applied by: agents/uno-bot (the embodiment IS the Slack actor — no separate writer)
--->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · applied by agents/uno-bot. -->
 
 ## Channels
 

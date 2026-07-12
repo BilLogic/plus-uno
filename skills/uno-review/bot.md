@@ -5,6 +5,8 @@ Loads: `references/method.md` (intake · scenarios · lens depth · severity · 
 
 Review / critique a design, prototype, spec, or frame from Slack. Method rules apply in full: manifest first, diagnose-only, evidence per finding, minors advisory.
 
+**The critique posts in-thread FIRST, in the 🔍 format below — always.** A review ask is never answered with only a proposal card: findings go to the requester as a normal reply, and routing (a maintain intake via `notion_create`, a prototype fix ask) comes after, as an offer or a gated proposal in the same message (live gap, 2026-07-11 test round: a "review and fix" ask got an intake card with the findings buried in its parameters).
+
 ## Worker delta
 
 - **No sub-agent dispatch.** The Worker applies the lenses itself in one context — still one lens at a time, in-lane, at the manifest's fidelity depth. It fetches the same rule docs method.md names per lens.

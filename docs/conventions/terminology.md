@@ -70,3 +70,12 @@ Two estates describe the product in **different languages**, and the words are N
 - who-does-what / flow / scenario / actor / step / "what happens when" → **blueprint** (Supabase), full stop.
 
 **Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows. Blueprint scenarios, steps, or research notes must never be presented as things found "on the Roadmap", and Roadmap cards must never be called scenarios, steps, or cells.
+
+## Codify the frame words in chat (added 2026-07-12, Bill)
+
+When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English:
+
+- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `layer` · `cell`, the path types `happy` / `alternative` / `unhappy` / `edge case`, and the layer (actor-row) names — `Regular Tutor`, `Lead Tutor`, `Partner Action: Teacher`, `Front Stage Actions`, `Back Stage Actions`, `Front Stage Tech`, `Back Stage Tech`, `Support Actions`, `Visual`.
+- **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
+
+Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `layer`"), not in ordinary prose ("a tutor joins the call").

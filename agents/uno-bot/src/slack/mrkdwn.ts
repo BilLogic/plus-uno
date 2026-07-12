@@ -39,6 +39,11 @@ function transformSegment(seg: string): string {
     // these patterns can't touch real links.
     .replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "")
     .replace(/ ?\[(?:docs|skills|agents|design-system)\/[^\]\n]*\]/g, "")
+    // Bare harness-file citations ("[method.md]", "[bot.md]") and bracketed
+    // row-UUID citations ("[a0000000-…]", "[id1, id2]") — both reached
+    // designers in the 2026-07-11 test round despite the prompt ban.
+    .replace(/ ?\[[a-z0-9_-]+\.md\]/gi, "")
+    .replace(/ ?\[\s*[0-9a-f]{8}[0-9a-f-]{10,}(?:\s*,\s*[0-9a-f-]{8,})*\s*\]/gi, "")
     // The models CONSTRUCT GitHub links from pattern and invent the org (live
     // 2026-07-10, twice: "plus-team/plus-uno" and "plus-uno/plus-uno"). The
     // repo has exactly one home — rewrite known-wrong orgs deterministically.

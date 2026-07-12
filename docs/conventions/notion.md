@@ -1,11 +1,6 @@
 # Notion Conventions
 
-<!--
-status: canonical — this file IS the convention (ADR-017; the Notion 📓 Doc-Management Playbook is superseded)
-distilled: 2026-07-07 from https://app.notion.com/p/396b7cca498281d1b1e7e47072166a4e
-rule: on conflict with any legacy Notion playbook page, this file wins — file a uno-maintain intake to banner the page as superseded.
-applied by: agents/writers/notion
--->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md): this file IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · applied by writers/notion. -->
 
 ## Access paths — reads vs writes (uno-bot Worker)
 

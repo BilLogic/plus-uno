@@ -851,7 +851,7 @@ function formatProposal(
   requesterUserId: string,
   previewText: string | undefined,
 ): string {
-  const body = "```\n" + JSON.stringify(input, null, 2) + "\n```";
+  const body = renderParamsForHumans(input);
   const lines: string[] = [];
   if (previewText) {
     lines.push(previewText, "");
@@ -862,6 +862,54 @@ function formatProposal(
     `React :white_check_mark: / :x: or just say "go ahead" / "cancel" — only <@${requesterUserId}> can confirm.`,
   );
   return lines.join("\n");
+}
+
+// Proposal cards are read by designers, not machines: parameters render as
+// labeled `•` bullets instead of a raw JSON code block (user decision,
+// 2026-07-12). The executable input lives in the DO's pending state — this
+// text is display-only, so readability wins.
+function renderParamsForHumans(input: Record<string, unknown>): string {
+  const entries = Object.entries(input).filter(
+    ([, v]) => v !== undefined && v !== null && v !== "",
+  );
+  if (!entries.length) return "• _(no parameters)_";
+  return entries.map(([k, v]) => renderParamEntry(k, v, "")).join("\n");
+}
+
+function renderParamEntry(key: string, value: unknown, indent: string): string {
+  const label = `${indent}• *${humanizeParamKey(key)}:*`;
+  if (Array.isArray(value)) {
+    if (value.every((item) => typeof item !== "object" || item === null)) {
+      return [label, ...value.map((item) => `${indent}    ◦ ${String(item)}`)].join("\n");
+    }
+    return [
+      label,
+      ...value.map((item) =>
+        typeof item === "object" && item !== null
+          ? Object.entries(item as Record<string, unknown>)
+              .map(([k, v]) => renderParamEntry(k, v, indent + "    "))
+              .join("\n")
+          : `${indent}    ◦ ${String(item)}`,
+      ),
+    ].join("\n");
+  }
+  if (typeof value === "object" && value !== null) {
+    return [
+      label,
+      ...Object.entries(value as Record<string, unknown>).map(([k, v]) =>
+        renderParamEntry(k, v, indent + "    "),
+      ),
+    ].join("\n");
+  }
+  return `${label} ${String(value)}`;
+}
+
+function humanizeParamKey(key: string): string {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\burl\b/gi, "link")
+    .replace(/\bnotion prd\b/gi, "PRD")
+    .replace(/^\w/, (c) => c.toUpperCase());
 }
 
 function proposalVerb(toolName: string): string {
@@ -898,7 +946,7 @@ async function buildImplementDesignProposal(
     : null;
   if (!imageUrl) return { text };
 
-  const params = "```\n" + JSON.stringify(input, null, 2) + "\n```";
+  const params = renderParamsForHumans(input);
   const blocks: unknown[] = [];
   if (previewText) {
     blocks.push({ type: "section", text: { type: "mrkdwn", text: previewText } });
