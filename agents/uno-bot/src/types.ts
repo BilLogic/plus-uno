@@ -1,3 +1,17 @@
+// Slack context threaded into every tool executor: where the run lives + who
+// asked. (Moved here from tools/dispatcher.ts, 2026-07-12, so both the tool
+// layer and the agent loop reference it without importing the dispatcher.)
+export interface SlackContext {
+  channel: string;
+  threadTs: string;
+  userMsgTs: string;
+  requestedBy?: string;
+  /** Notion PRD reference resolved at proposal time, forwarded to the GitHub
+   *  implement/scaffold workflows so codegen gets PRD context. */
+  notionPrdId?: string;
+  notionPrdUrl?: string;
+}
+
 export interface Env {
   SLACK_SIGNING_SECRET: string;
   SLACK_BOT_TOKEN: string;

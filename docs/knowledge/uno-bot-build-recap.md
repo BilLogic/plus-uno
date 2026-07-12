@@ -1,13 +1,14 @@
 # uno-bot — Build Recap: The Critical Pieces
 
-> Source material for (1) the generalizable "set up your own design-ops Slack bot" skill and
-> (2) the recap article (Bill + Bryan). Synthesized 2026-07-11, revised 2026-07-12.
-> Structured **thematically** — each section is one decision a builder will face: the option
-> space, what we chose, why. Ordered so every section only depends on ones before it:
-> problem → teammate → evidence → contract → home → brain → soul → hands → trust → survival
-> → proof → lessons. (Full chronology lives in git and `docs/knowledge/decisions.md`.)
-> Pricing and API facts are dated; each table links its live docs/billing pages — re-check
-> those, not this file.
+> The recap/tutorial: educational source material for the article (Bill + Bryan) and the
+> knowledge base behind the `team-bot-setup` skill. **This doc explains what we built, the
+> options at each decision, and why we chose what we chose.** How to *facilitate someone
+> else's build* lives separately in `docs/plans/2026-07-11-001-slack-bot-setup-skill-plan.md`
+> — the two are deliberately not mixed.
+> Synthesized 2026-07-11, revised 2026-07-12. Ordered by dependency: problem → teammate →
+> evidence → capability & trust → home → brain → soul → hands → proof → lessons. Pricing and
+> API facts are dated; every table links its live docs/billing pages — re-check those, not
+> this file. (Full chronology lives in git and `docs/knowledge/decisions.md`.)
 
 ---
 
@@ -29,10 +30,14 @@ pace actually feels like:
   easier**. A part-timer with a full plate can't tell which lengthy announcement is relevant
   or how much attention it deserves, and their assignments will have changed by next week
   anyway.
+- **The continuity problem cuts both ways.** Interns come back from a week of classes and ask
+  the lead to **remind them where their own work left off** — genuinely frustrating on the
+  sixth repeat. And the reverse is just as real: the lead needs a recap of where someone's
+  work stands without scheduling a meeting to ask.
 - **The lead is the bottleneck — and human.** Keeping everyone on the same page doesn't scale
   when your own task list is full. Students work late at night; the lead works workdays — so
-  answers wait overnight and work stalls. And candidly: patience runs out by the **sixth time
-  you provide the same information, sometimes to the same person**.
+  answers wait overnight and work stalls. Patience runs out by the **sixth time you provide
+  the same information, sometimes to the same person**.
 - **A sync burden was growing in parallel.** The team was building its design system and
   vibe-coding environment at the same time, so every week produced cross-surface drift: a
   Figma component gets fine-tuned and published → the codebase must catch up; someone
@@ -44,25 +49,20 @@ patient with the sixth repeat of a question, living in Slack where the coordinat
 happens?** That's uno-bot's founding job description.
 
 > **Takeaway:** the pitch isn't "AI bot." It's a named organizational pain — onboarding
-> churn, silo drift, announcement blindness, founder bottleneck, timezone mismatch,
-> repeat-question fatigue. If your team doesn't recognize itself in that list, you may not
-> need a bot.
+> churn, silo drift, announcement blindness, continuity amnesia, founder bottleneck, timezone
+> mismatch, repeat-question fatigue. If your team doesn't recognize itself in that list, you
+> may not need a bot.
 
 ---
 
-## 1. What the teammate is: one bot, two trigger modes
+## 1. What the teammate is: proactive + reactive, one bot
 
-uno-bot is **one teammate with two kinds of reflexes** — the distinction is the trigger, not
-the product:
+uno-bot is **one teammate operating in two modes** — and the distinction is who initiates:
 
-- **Conversation (freeform).** @-mention it with anything: roadmap lookups from vague
-  descriptions, design-system questions, service-blueprint walkthroughs, "where did we
-  discuss X," screenshot critique. An agent loop interprets the request and picks tools per
-  turn. Anything with side effects stops at a **✅ confirmation gate**: the bot stages a
-  proposal card, and only the original requester's ✅ (or "go ahead") executes it.
-- **Automations (pipelines).** Scheduled or event-triggered routines that run the same steps
-  every time — and report into Slack, **consolidating updates in the one place coordination
-  already happens**:
+- **Proactive mode (automations).** The bot surfaces information *before anyone asks* and
+  draws attention to what needs it — scheduled or event-triggered routines that run the same
+  steps every time and report into Slack, consolidating updates in the one place coordination
+  already happens:
   - *Figma → code:* a poll detects published component changes → auto-creates a Notion PRD
     (screenshots, change summary, acceptance criteria) → notifies #figma-sync → a designer
     adds intent notes → `implement <Component>` in Slack produces a draft PR with per-phase
@@ -75,15 +75,21 @@ the product:
     throttled alert when one degrades.
   - *Honest dropped attempt:* Figma **token/variable sync** — removed because Figma's
     Variables API is Enterprise-plan-gated. Know your plan tiers before promising a sync.
+- **Reactive mode (conversation).** The bot responds to people's requests and commands:
+  @-mention it with anything — roadmap lookups from vague descriptions, design-system
+  questions, service-blueprint walkthroughs, "where did we discuss X," continuity recaps,
+  screenshot critique. An agent loop interprets the request and picks tools per turn.
+  Anything with side effects stops at a **✅ confirmation gate**: the bot stages a proposal
+  card, and only the original requester's ✅ (or "go ahead") executes it.
 
 Both modes live in **one Cloudflare Worker** (§4), share one harness and one set of safety
 rails, and hand heavy execution to GitHub Actions runners — the bot proposes and gates;
 runners do the work.
 
-> **Takeaway:** pipeline vs freeform is **not an either/or** — most teams end up with a mix.
-> Design automations as bot *capabilities* whose output lands in Slack under the bot's
-> identity, so the team experiences one coherent teammate, not a bot plus a pile of
-> disconnected scripts.
+> **Takeaway:** proactive vs reactive is **not an either/or** — most teams need a mix.
+> Design the proactive automations as bot *capabilities* whose output lands in Slack under
+> the bot's identity, so the team experiences one coherent teammate, not a bot plus a pile
+> of disconnected scripts.
 
 ---
 
@@ -93,86 +99,141 @@ runners do the work.
 
 > Ground on real requests → **interpret** where in the team's workflow each request arose →
 > connect stages into flow maps and identify the key usage moments → **sort** each usage:
-> automate (routine, parameterizable) vs freeform conversation (varied, needs interpretation)
-> vs stays human (taste, strategy) → set capabilities and limits **intentionally** (§3),
-> driven by productivity intent, architectural feasibility, and free-vs-paid cost.
+> proactive automation (routine, parameterizable) vs reactive conversation (varied, needs
+> interpretation) vs stays human (taste, strategy) → set capabilities and limits
+> **intentionally** (§3), driven by productivity intent, architectural feasibility, and
+> free-vs-paid cost.
 
-**What we actually did:**
+**The evidence sources — three, deliberately triangulated:**
+1. **Slack mining**: real requests people already sent (channels + 1:1s, redacted to roles).
+2. **Meeting transcripts**: Zoom AI already summarizes every meeting — those recaps capture
+   the questions and action items people raise out loud, which Slack mining misses.
+3. **The lead's accumulated intuition** from years of answering the questions personally —
+   used to sanity-check the ranking, not replace the data.
 
-1. **Mined real demand.** Collected 25 real requests Bill had fielded in Slack (#plus-design,
-   DMs), redacted to roles, tagged each with how it was handled and which capability should
-   own it. Ranked themes: (1) design-system source-of-truth Q&A — the most common, (2)
-   spec/PRD disambiguation, (3) design review & handoff QA, (4) resource wayfinding, (5)
-   meta-work on the bot itself. Key signal: *"nearly every real request starts from a Notion
-   or Figma URL — the #1 job is source-of-truth lookup."*
-   → Notion: [Real-usage corpus](https://app.notion.com/p/390b7cca498281bb899ae865a2ffa460)
-2. **Traced the existing workflow's friction.** A 17-step audit of the designer's real path
-   (Figma publish → PR merged), each step timed, six friction points ranked by leverage. It
-   also ruled what NOT to automate: the Notion PRD hop stayed manual on purpose — "a feature,
-   not a bug" — because human intent-capture is the point.
-   → `docs/knowledge/research/2026-05-20-user-flow-friction-audit.md`
-3. **Mapped flows before writing code.** The FigJam workflow board became five LLM-readable
-   flows (research→PRD, PRD→prototype, publish, maintenance intake, maintenance review) plus
-   flowcharts per use case — including the confirmation gate designed as an explicit state
-   machine before it was code.
-   → Notion: [Skills Upgrade hub](https://app.notion.com/p/PLUS-Uno-Skills-Upgrade-35db7cca498280378b4cf2d5960dcc62) ·
-   `docs/context/product/uno-bot-flowcharts/uno-bot-v2-flowcharts.md`
+**What we did:** collected **~55 real requests** across Slack (#plus-design, team channels,
+1:1s) and Zoom AI meeting recaps, redacted to roles, tagged each with how it was handled and
+which capability should own it. Measured theme ranking:
+1. **spec/PRD disambiguation** (~16) — and half the newer entries came from *developers*
+   (tooltip copy, status-value semantics, thresholds, empty states), not designers,
+2. **continuity recaps** (12) — "remind me where my work left off," decision recall
+   ("which breakpoint did we delete?"), assignment recall, and the lead needing the reverse
+   ("where does X's work stand?"),
+3. design-system source-of-truth Q&A (~10),
+4. resource/link wayfinding (~8),
+5. design review & handoff QA (~7),
+6. bot meta-work (~5), tooling/team-ops onboarding (2).
 
-Honest gaps: the taxonomy came from **Slack mining + reported designer behavior** — a
-Zoom/meeting-transcript pass was considered but never done; and 25 requests is a floor, not a
-target. **Action: backfill to 50–100** so theme ranking is statistics, not anecdotes, before
-we publish the number as guidance.
+**Two findings that only showed up at ~55 entries** (invisible at 25):
+- **Continuity-recap was the hidden #2 — and it's a DM phenomenon** (11 of its 12 entries
+  came from 1:1s). Channel-only mining structurally misses the exact request types that make
+  the lead a single point of failure; ~3/4 of all new entries came from DMs.
+- **The decision log is the missing source of truth.** The shared root cause behind
+  continuity and many spec questions: decisions live in meeting memory and DM threads, not
+  in any retrievable artifact. Meeting-AI recaps make it worse in a telling way — Zoom AI
+  writes "next steps" bullets for every meeting (~100 recaps in three months) and they sit
+  **unread in an inbox**. Capturing decisions where people ask about them is itself a bot
+  capability.
 
-> **Takeaway:** don't scope a bot from imagination. Collect 50–100 real requests people
-> already make, interpret each back to the workflow stage that produced it, sort into
-> automate / freeform / human, and only then decide capabilities. The corpus doubles as your
-> first eval set (§10).
+Key signal: *"nearly every real request starts from a Notion or Figma URL — the #1 job is
+source-of-truth lookup."*
+→ Notion: [Real-usage corpus](https://app.notion.com/p/390b7cca498281bb899ae865a2ffa460) ·
+repo: `docs/knowledge/research/2026-07-12-request-corpus-expansion.md` (the expansion)
+
+**Two more scoping moves that mattered:**
+- **Traced the existing workflow's friction.** A 17-step audit of the designer's real path
+  (Figma publish → PR merged), each step timed, six friction points ranked by leverage. It
+  also ruled what NOT to automate: the Notion PRD hop stayed manual on purpose — "a feature,
+  not a bug" — because human intent-capture is the point.
+  → `docs/knowledge/research/2026-05-20-user-flow-friction-audit.md`
+- **Mapped flows before writing code.** The FigJam workflow board became five LLM-readable
+  flows (research→PRD, PRD→prototype, publish, maintenance intake, maintenance review) plus
+  flowcharts per use case — including the confirmation gate designed as an explicit state
+  machine before it was code.
+  → Notion: [Skills Upgrade hub](https://app.notion.com/p/PLUS-Uno-Skills-Upgrade-35db7cca498280378b4cf2d5960dcc62) ·
+  `docs/context/product/uno-bot-flowcharts/uno-bot-v2-flowcharts.md`
+
+> **Takeaway:** don't scope a bot from imagination. Collect ~50 real requests across your
+> chat tool *and* your meeting summaries, interpret each back to the workflow stage that
+> produced it, sort into automate / converse / stays-human, and only then decide
+> capabilities. The corpus doubles as your first eval set (§8).
 
 ---
 
-## 3. The capability contract (can / partial / can't)
+## 3. The capability contract — and the trust design that enforces it
 
 The published table that tells your team what the bot fully does, partially does, and refuses
 — so its limits are *chosen and written down*, not discovered by users through failures. The
 problem it solved: the bot had "grown capability-by-capability across sessions" and was
 *simultaneously over-challenged and under-used*.
 
-- **A three-lane matrix**, shipped verbatim as the designer-facing usage contract:
-  - ✅ **DOES fully** — the Slack-native sweet spot: grounded Q&A, gated Notion writes, gated
-    build triggers, thread tl;dr, qualitative visual review, plus the standing automations (§1).
-  - 🟡 **PARTIAL** — good-enough deliverable + a *named threshold* + relay ("drafts the PRD,
-    a human finishes it"; bounded synthesis; qualitative-not-quantitative design review).
-  - 🔴 **REJECTS + routes** — blueprint writes, Figma generation, repo edits, scheduled
-    follow-ups.
-- **The format is a customizable template, by design.** The three lanes, the wall ritual, and
-  a "what would move this to ✅" column are the durable format; every row is the org's own
-  usage moments and judgment calls. Scaling the bot later means *adding rows*, not
-  redesigning the contract.
-- **Three declared inputs per lane call:** productivity intent (does automating this help, or
-  does the friction serve a purpose?), feasibility (what the runtime can genuinely ground),
-  and cost tier (free architecture vs paid).
-- **Walls are handoffs, never rejections (the "wall ritual").** Every 🔴 names why in one
-  line, then offers a concrete next step — ideally a *ready-to-paste prompt for the
-  full-powered IDE agent, links pre-filled*. The bot is a deliberate, enforced **subset of
-  the IDE agent**; differences are intrinsic (headless vs interactive), not provisional.
-- **Three enforcement layers, each catch in exactly one place:** harness rules (steerable) →
-  code preflight (deterministic — "can't be talked out of") → runtime caps.
+**The three-lane matrix**, shipped verbatim as the designer-facing usage contract:
+- ✅ **DOES fully** — the Slack-native sweet spot: grounded Q&A, gated Notion writes, gated
+  build triggers, thread tl;dr, qualitative visual review, plus the proactive automations (§1).
+- 🟡 **PARTIAL** — good-enough deliverable + a *named threshold* + relay ("drafts the PRD,
+  a human finishes it"; bounded synthesis; qualitative-not-quantitative design review).
+- 🔴 **REJECTS + routes** — blueprint writes, Figma generation, repo edits, scheduled
+  follow-ups.
+
+**The redirect design is the critical piece.** A bot that says "I can't do that" and stops
+leaves people stuck and quietly kills adoption. Every 🔴 and every 🟡 threshold runs the same
+**wall ritual**: name what and why in one line, then hand a concrete next step — file a
+✅-gated intake ticket, or a *ready-to-paste prompt for the full-powered IDE agent with the
+links pre-filled*. Nobody who hits a wall leaves empty-handed; the "no" still moves their
+work forward. (Architecturally: the bot is a deliberate, enforced **subset of the IDE
+agent** — differences are intrinsic, headless vs interactive, not provisional.)
+
+**The matrix format is a customizable template, by design.** The three lanes, the wall
+ritual, and a "what would move this to ✅" column are the durable format; every row is the
+org's own usage moments and judgment calls. Three declared inputs per lane call:
+productivity intent (does automating this help, or does the friction serve a purpose?),
+feasibility (what the runtime can genuinely ground), and cost tier (free vs paid).
+
+**The trust machinery that makes the contract real** — every promise above is enforced, not
+asserted, in three layers (harness rules → code preflight → runtime caps), each catch in
+exactly one place:
+
+- **The ✅ proposal gate is the spine.** Side-effect tools never execute inline: the agent
+  invokes the tool, the Worker stages a ⚠️ card, and only the **original requester's** ✅ (or
+  a bare "go ahead" — resolved deterministically Worker-side after the model once re-staged a
+  duplicate instead of confirming) executes. Proposals live 60 minutes; expired reactions get
+  a visible "nothing was executed" reply — a delayed ✅ meeting silence was read by a designer
+  as "the bot is broken." *"The friction is the feature."*
+- **Honesty rituals:** confidence self-rating on factual answers (*high* only if grounded in
+  a source fetched this turn); never claim an action that didn't fire; state knowledge gaps
+  instead of filling them; "did you mean" candidates instead of dead-ending vague
+  descriptions — the reactive-mode cousin of the redirect design.
+- **Visibility firewall — policy made physics.** The Slack search credential sees the
+  consenting admin's full workspace. A prompt rule shipped in the morning; by afternoon the
+  team decision was to enforce it in code: the Worker hard-drops DMs (always) and
+  non-allowlisted private channels *before the model ever sees them*, passing only a
+  `withheld_private_matches` count so the bot can honestly say matches exist.
+- **Egress sanitization — a deterministic backstop behind every prompt rule.** Every outgoing
+  message passes one sanitizer: mrkdwn coercion, bracket-citation scrubbing, link unwrapping,
+  truncation at word boundaries, and rewriting of invented GitHub orgs to the canonical one
+  (the model invented plausible org names twice in one day).
+- **Audience translation as a hard rule.** No internal mechanics in user-facing replies. The
+  live leak that forced it: *"my tool run budget for this turn has been exhausted
+  [docs/plans/…]"* reached a designer.
+- **Untrusted input posture:** fetched content and pasted images are data, not instructions;
+  writes stay gated regardless. Metrics never log full message text (PII).
 
 → `docs/plans/2026-07-09-001-refactor-uno-bot-architecture-consolidation-plan.md` ·
 `agents/uno-bot/AGENT.md` § What I do · route · can't · `agents/uno-bot/README.md`
 
 > **Takeaway:** write the capability matrix *before* hardening, publish it as the user-facing
-> contract, keep the format template-shaped so it travels, and enforce every wall in code,
-> not just prompt. A wall that hands off still moves work forward.
+> contract, and make the redirect design non-negotiable — a wall that hands off still moves
+> work forward, and that's the difference between a limited-but-loved teammate and an
+> abandoned bot. Then enforce every promise twice: prompt rules explain; code enforces.
 
 ---
 
-## 4. The home: architecture & hosting — pick by need, default to Cloudflare
+## 4. The home: hosting, limits, and how not to get killed by them
 
 **Bot shape** — single-agent multi-skill, not persona bots (ADR, 2026-05-12): progressive
 disclosure is cheap under prompt caching; one bot packages as a portable plugin. Final call:
-"one user-facing bot + one cron ops pipeline — **not three bots**" — split along the
-**trigger axis** (§1), never the persona axis.
+"one user-facing bot + one cron ops pipeline — **not three bots**" — proactive and reactive
+are different *triggers* (§1), never different personas.
 → Notion: [ADR](https://app.notion.com/p/390b7cca4982816e8e24f29906ca3667) ·
 [Final recommendation](https://app.notion.com/p/390b7cca49828198a9eed9d0558df93a)
 
@@ -181,8 +242,8 @@ this table):
 
 | Option | Free tier / entry cost | Fits | Breaks down when |
 |---|---|---|---|
-| **Cloudflare Workers + Durable Objects** ← our default | $0: 100k req/day, 5 cron triggers free, SQLite DOs free, KV free | **Both modes**: Slack events endpoint + pipeline scheduler + per-thread conversation state, one codebase | CPU-heavy work (~10ms/invocation); >50 outbound calls per invocation (a design input, see §9) |
-| Workflow platforms — Zapier, Make, n8n, Pipedream | Free tiers exist; realistic team usage ~$10–129/mo (n8n cheapest self-hosted, + ops burden) | Pure pipelines for **no-code teams** — fastest standup, huge connector catalogs | The agent loop: linear step models don't fit multi-tool conversational turns; per-task price creep; migrating off is a replatform |
+| **Cloudflare Workers + Durable Objects** ← our choice | $0: 100k req/day, 5 cron triggers free, SQLite DOs free, KV free | **Both modes**: Slack events endpoint + pipeline scheduler + per-thread conversation state, one codebase | CPU-heavy work (~10ms/invocation); >50 outbound calls per invocation (see the survival checklist below) |
+| Workflow platforms — Zapier, Make, n8n, Pipedream | Free tiers exist; realistic team usage ~$10–129/mo (n8n cheapest self-hosted, + ops burden) | Pure proactive pipelines for **no-code teams** — fastest standup, huge connector catalogs; Pipedream adds code steps for in-between cases | The agent loop: linear step models don't fit multi-tool conversational turns; per-task price creep; migrating off is a replatform |
 | Vercel / other edge functions | Comparable free tiers | Simple event endpoints | No per-thread state primitive for conversations |
 | AWS Lambda + DynamoDB | Generous free tier, more assembly | Teams already deep in AWS | Overkill + cold starts at this scale |
 | **GitHub Actions** (as *runner*, not host) | Free minutes at team scale | **Heavy execution behind any host**: codegen, builds, long jobs | Not a web endpoint — can't receive Slack events itself |
@@ -193,18 +254,13 @@ Live references: [Cloudflare Workers pricing](https://developers.cloudflare.com/
 [Zapier pricing](https://zapier.com/pricing) · [Make pricing](https://www.make.com/en/pricing) ·
 [n8n pricing](https://n8n.io/pricing) · [Pipedream pricing](https://pipedream.com/pricing)
 
-**Recommendation logic:**
-- Conversational or mixed → **Cloudflare, no menu.** Pure pipeline + anyone technical →
-  still Cloudflare: same $0, and **reversible** — pipeline and freeform are the same Worker
-  with different handlers, so changing the mix later is more code, not a replatform.
-- Pure pipeline + truly no-code team → a workflow platform is legitimate; know the ceiling
-  you'll hit if conversation comes later.
-- Heavy execution → **GitHub Actions runner under any host** via `repository_dispatch`.
-- Cost reality at 5–10 designers: **$0 infra**; real spend is the LLM API (~$15–50/mo).
-- **Free-tier limits are design inputs, not obstacles** — documented in `wrangler.toml` (50
-  subrequests/invocation, ~10ms CPU, 30s background-task kill); they shaped the architecture
-  (one DO job per alarm, harness from one KV read, direct-query tools). §9 has the failure
-  modes that taught this.
+**How to choose:** conversational or mixed → Cloudflare. Pure proactive pipeline with anyone
+technical involved → still Cloudflare: same $0, and **reversible** — proactive and reactive
+are the same Worker with different handlers, so changing the mix later is more code, not a
+replatform. Pure pipeline on a truly no-code team → a workflow platform is legitimate; know
+the ceiling you'll hit if conversation comes later. Heavy execution → a GitHub Actions
+runner under any host, via `repository_dispatch`. Cost reality at 5–10 designers: **$0
+infra**; real spend is the LLM API (~$15–50/mo).
 
 **The briefing-packet model** — the Worker code is only the *body*; the brain is ~20 markdown
 files fetched from GitHub Raw at runtime and prompt-cached. **Merging a doc PR reprograms the
@@ -212,9 +268,38 @@ bot in ~5 minutes, no redeploy.** Resilience: KV last-known-good snapshot + degr
 alerts. Bonus proven later: a vendor-neutral markdown harness made the provider swap an
 afternoon (§5).
 
+**Living within the platform's limits — the survival checklist.** Free-tier limits are
+design inputs, not obstacles: we documented them in `wrangler.toml` and let them shape the
+architecture. Each item below was discovered by a live incident; together they're the
+pre-launch checklist for any serverless agent loop:
+
+1. **Know your background-task cutoff.** Cloudflare's `waitUntil` hard-kills at ~30s with no
+   exception — 👀 then silence. Fix: run agent turns in a **Durable Object alarm** (one per
+   thread); the HTTP handler only acks/dedups/enqueues. Keep the executor a *separate* DO
+   class from state (a DO fetching itself deadlocks).
+2. **Know your edge idle timeout.** LLM API edges kill idle HTTP around ~100s. Fix: always
+   **stream** long model calls — flowing bytes keep the connection alive.
+3. **Know your outbound-call budget.** 50 subrequests/invocation on the free tier. Fixes: one
+   job per alarm firing (fresh budget), harness from **one KV read** instead of 20+ raw
+   fetches, direct-query tools instead of search chains, and a dedup TTL longer than your
+   longest run (an 11-minute run outlived its own 10-minute dedup record and re-ran itself).
+4. **Deploys restart your executors mid-run** — and one-shot dedup makes the kill permanent
+   (every retry sees the marker and skips: permanent silence). Fix: dedup records are
+   **leases** — claim marks "running," completion marks "done," a stale lease is reclaimed
+   and re-run.
+5. **One dead external dependency shouldn't kill the request.** A single unreachable MCP
+   server 400s the whole model call → catch, drop the attachment, fall back, report.
+
+Recurring principle: **never silent.** Every failure path posts something visible to the user
+(⚠️ + error text, "nothing was executed", ⏳ progress) and to ops (throttled alerts, one
+telemetry line per request, a `/health` build tag — added after an eval round unknowingly
+tested a stale deploy).
+
 > **Takeaway:** pick the platform whose *primitives map to your jobs* (event endpoint /
 > scheduler / per-thread state / runner), prefer the one that keeps your mix decision
-> reversible, and write its limits down as design inputs before they become incidents.
+> reversible — then enumerate its kill timers before shipping. Ack-then-process needs a
+> durable executor; at-least-once delivery needs a lease, not a flag; every death must leave
+> a visible corpse.
 
 ---
 
@@ -229,7 +314,7 @@ MCP exists on some providers and not others.
 |---|---|---|---|
 | **Anthropic (Claude Sonnet/Opus)** | Server-side MCP; adaptive thinking + effort dials; strongest agentic reliability in our testing | Highest per-token cost; budget exhaustion is a real operational risk | Ran it for the whole hardening era; excellent; budget forced a switch |
 | **Google (Gemini 3.5-flash, $1.50/$9 per M)** | Cheapest capable tier; `googleSearch` + `urlContext` built-ins give free web grounding; implicit caching | **No server-side MCP** → you write a client-side tool loop + local tool equivalents; schema-subset quirks; thought-signature bookkeeping | Current default; **beat our prior Claude rounds** on card/status workflows in live grading |
-| **OpenAI (GPT-5.4-class, ~$2.50/$15 per M)** | **Server-side remote MCP in the Responses API** (no surcharge beyond tokens); hosted web search / file search / code interpreter; reasoning preserved across tool calls | Not yet evaluated by us; nano tier ($0.20/$1.25) carries the lite-tier caution below | The provider seam makes the A/B cheap; a builder should run one |
+| **OpenAI (GPT-5.4-class, ~$2.50/$15 per M)** | **Server-side remote MCP in the Responses API** (no surcharge beyond tokens); hosted web search / file search / code interpreter; reasoning preserved across tool calls | We haven't evaluated it; nano tier ($0.20/$1.25) carries the lite-tier caution below | The provider seam (below) makes such an A/B cheap for any builder |
 | **Lite/budget tiers as default** | Cheapest of all | **Veto lesson:** ours fabricated grounding — invented org names in links, claimed verification it never did | Reverted in 15 min: "a grounding-first bot can't ship hallucinated links to save ~$0.05/turn" |
 
 Live references: [Anthropic pricing](https://docs.anthropic.com/en/docs/about-claude/pricing) ·
@@ -247,9 +332,8 @@ Live references: [Anthropic pricing](https://docs.anthropic.com/en/docs/about-cl
 
 **The load-bearing design choice — the provider seam:** an `AgentInput/AgentResult` contract
 at the agent-turn level keeps events, the ✅ gate, delivery, and history **provider-blind**.
-That's why a budget crisis became an afternoon's provider swap instead of a rewrite, and why
-"try OpenAI" stays a cheap experiment. The vendor-neutral markdown harness (§4) is the other
-half of this portability.
+That's why a budget crisis became an afternoon's provider swap instead of a rewrite. The
+vendor-neutral markdown harness (§4) is the other half of this portability.
 
 > **Takeaway:** don't build a routing layer — one good model with adaptive thinking beats
 > keyword tables and classifier pre-calls, and a warm cache beats "smart" tier-hopping. Put
@@ -286,9 +370,8 @@ deliberately as the tools — and it's the most creative, most customizable laye
   named.
 
 The persona lives in the harness as one versioned markdown file — another org's bot can be a
-deadpan librarian, a hype-person, or a gruff senior engineer by editing it. The guidance to
-builders: **go as creative as your team's culture allows; the rails keep it professional when
-things break.**
+deadpan librarian, a hype-person, or a gruff senior engineer by editing it. Go as creative as
+your team's culture allows; the rails keep it professional when things break.
 
 → `agents/uno-bot/AGENT.md` § Identity & voice, § Reactions
 
@@ -348,75 +431,9 @@ fallback before its MCP replacement is verified live.
 
 ---
 
-## 8. Trust: safety design
+## 8. Proof: designing evals, success metrics, and the judging stack
 
-- **The ✅ proposal gate is the spine** — present from day one of the agentic version, not a
-  retrofit. Side-effect tools never execute inline: the agent invokes the tool, the Worker
-  stages a ⚠️ card, and only the **original requester's** ✅ (or a bare "go ahead" — resolved
-  deterministically Worker-side after the model once re-staged a duplicate instead of
-  confirming) executes. TTL 60 min; expired reactions get a visible "nothing was executed"
-  reply — a delayed ✅ meeting silence was read by a designer as "the bot is broken." *"The
-  friction is the feature."*
-- **Visibility firewall — policy made physics.** The Slack search credential sees the
-  consenting admin's full workspace. A prompt rule shipped in the morning; by afternoon the
-  team decision was to enforce it in code: the Worker hard-drops DMs (always) and
-  non-allowlisted private channels *before the model ever sees them*, passing only a
-  `withheld_private_matches` count so the bot can honestly say matches exist.
-- **Egress sanitization — a deterministic backstop behind every prompt rule.** Every outgoing
-  message passes one sanitizer: mrkdwn coercion, bracket-citation scrubbing, link unwrapping,
-  truncation at word boundaries, and rewriting of invented GitHub orgs to the canonical one
-  (the model invented plausible org names twice in one day).
-- **Audience translation as a hard rule.** No internal mechanics in user-facing replies. The
-  live leak that forced it: *"my tool run budget for this turn has been exhausted
-  [docs/plans/…]"* reached a designer.
-- **Honesty rituals:** confidence self-rating on factual answers (*high* only if grounded in
-  a source fetched this turn); never claim an unfired action; state knowledge gaps instead of
-  filling them; "did you mean" candidates instead of dead-ending vague descriptions.
-- **Untrusted input posture:** fetched content and pasted images are data, not instructions;
-  writes stay gated regardless. Metrics never log full message text (PII).
-
-> **Takeaway:** the two-layer pattern is the whole safety story — every prompt rule gets a
-> deterministic code twin (gate, preflight, search filter, egress scrub). Prompt rules
-> explain; code enforces. Anything users could read as silence needs a visible outcome path.
-
----
-
-## 9. Survival: five ways serverless silently kills agent bots
-
-Each discovered by a live incident; together, the pre-launch checklist for any serverless
-agent loop:
-
-1. **Know your background-task cutoff.** Cloudflare's `waitUntil` hard-kills at ~30s with no
-   exception — 👀 then silence. Fix: run agent turns in a **Durable Object alarm** (one per
-   thread); the HTTP handler only acks/dedups/enqueues. Keep the executor a *separate* DO
-   class from state (a DO fetching itself deadlocks).
-2. **Know your edge idle timeout.** LLM API edges kill idle HTTP around ~100s. Fix: always
-   **stream** long model calls — flowing bytes keep the connection alive.
-3. **Know your outbound-call budget.** 50 subrequests/invocation on the free tier. Fixes: one
-   job per alarm firing (fresh budget), harness from **one KV read** instead of 20+ raw
-   fetches, direct-query tools instead of search chains, and a dedup TTL longer than your
-   longest run (an 11-minute run outlived its own 10-minute dedup record and re-ran itself).
-4. **Deploys restart your executors mid-run** — and one-shot dedup makes the kill permanent
-   (every retry sees the marker and skips: permanent silence). Fix: dedup records are
-   **leases** — claim marks "running," completion marks "done," a stale lease is reclaimed
-   and re-run.
-5. **One dead external dependency shouldn't kill the request.** A single unreachable MCP
-   server 400s the whole model call → catch, drop the attachment, fall back, report.
-
-Recurring principle: **never silent.** Every failure path posts something visible to the user
-(⚠️ + error text, "nothing was executed", ⏳ progress) and to ops (throttled alerts, one
-telemetry line per request, a `/health` build tag — added after an eval round unknowingly
-tested a stale deploy).
-
-> **Takeaway:** enumerate the kill timers before shipping. Ack-then-process needs a durable
-> executor; at-least-once delivery needs a lease, not a flag; every death must leave a
-> visible corpse.
-
----
-
-## 10. Proof: designing evals, success metrics, and the judging stack
-
-Quality wasn't asserted — it was defined, measured, and gated. The design has four layers:
+Quality wasn't asserted — it was defined, measured, and gated. Four layers:
 
 **1) Success metrics designed before any scoring.**
 - **North star: task acceptance rate** — would a designer accept this output as done?
@@ -470,7 +487,7 @@ repo: `docs/evals/scenarios/uno-bot.md` + `docs/evals/rubrics/bot-answer.md`
 
 ---
 
-## 11. Cross-cutting lessons (the article's backbone)
+## 9. Cross-cutting lessons (the article's backbone)
 
 1. **Two-layer defense, everywhere.** Harness rule + deterministic code backstop — repeated
    six times across the build (capability walls, visibility firewall, citations, org links,
@@ -489,7 +506,7 @@ repo: `docs/evals/scenarios/uno-bot.md` + `docs/evals/rubrics/bot-answer.md`
    themselves." Fix: a two-vocabularies table with each estate's terms *and NOT-words*.
    Domain language is config, not prompt garnish.
 7. **Generalization was planned from day one** — org-specific content in dedicated files, IDs
-   in env not source, `<!-- Plus-specific -->` markers — so this extraction is
+   in env not source, `<!-- Plus-specific -->` markers — so extraction into a template is
    content-extraction, not a refactor.
 8. **Make big decisions reversible and they stop being scary:** the hosting choice (mix
    change = more code, same Worker), the provider seam (budget crisis = an afternoon), the
@@ -497,26 +514,26 @@ repo: `docs/evals/scenarios/uno-bot.md` + `docs/evals/rubrics/bot-answer.md`
 
 ---
 
-## 12. Gaps to close before the article
+## 10. Open items
 
-- **Backfill the request corpus from 25 to 50–100** so published guidance is practiced, not
-  aspirational. We have the Slack access to do it.
-- **No Zoom/meeting-transcript mining happened** — the taxonomy is Slack-only. Do a small
-  transcript pass, or say honestly that Slack mining sufficed.
-- **Run the OpenAI A/B** the provider table promises is cheap (server-side MCP + Responses
-  API make it a fair three-way comparison).
-- **Cost data is anecdotal** — pull Workers Logs / token telemetry for real per-turn and
-  per-month numbers before publishing claims.
+- ~~Corpus backfill to ~50~~ **Done (2026-07-12):** ~55 entries across Slack + Zoom recaps —
+  see `docs/knowledge/research/2026-07-12-request-corpus-expansion.md`; §2 updated with the
+  measured ranking. Optional: merge the expansion into the canonical Notion corpus page.
+- ~~Skills-landscape benchmark~~ **Done (2026-07-12):** ~10 comparables analyzed; no existing
+  resource covers the pre-code or post-deploy journey. Positioning + adopt-list live in the
+  skill plan (§7 there).
+- **Real cost numbers** — pulling per-turn/per-month figures from Workers telemetry to
+  replace the anecdotal estimates before publishing (in progress).
 - The article was already a **planned v2 deliverable in Notion** (Medium/Substack) — this
   recap supersedes its outline.
 
-## 13. Source index
+## 11. Source index
 
 - **Repo:** `docs/plans/2026-07-08-00{1..4}`, `2026-07-09-001` (the consolidation ADR — the
   single best document), `docs/knowledge/decisions.md` (ADR-013–017), `docs/knowledge/
   lessons/2026-07-10-harness-consistency-sweep.md`, `docs/conventions/terminology.md`,
   `agents/uno-bot/AGENT.md` + `README.md`, `docs/evals/scenarios/uno-bot.md` +
-  `docs/evals/rubrics/bot-answer.md`, `.github/workflows/` (the automations).
+  `docs/evals/rubrics/bot-answer.md`, `.github/workflows/` (the proactive automations).
 - **Notion:** UNO Bot v1 card (#2372) · UNO Bot v2 card (#2427) · Architecture ADR · Final
   Architecture Recommendation · Generalization & Plugin Packaging · Real-usage corpus ·
   Skills Upgrade hub (5 flows) · Test Plan + Round 1/Round 2 results · Blueprint Grounding

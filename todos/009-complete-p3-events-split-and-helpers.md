@@ -37,3 +37,14 @@ DEFERRED (pure reorganization, no behavior change — not worth the churn/risk o
 - Item 2: recordExchange() helper for the 6 appendHistory pairs.
 - Item 6 (remainder): moving SlackContext from tools/dispatcher.ts to types.ts.
 Left as a follow-up; reopen if events.ts grows further.
+
+## Work log — 2026-07-12 (completion)
+Remaining items done:
+- Item 1: extracted slack/vision.ts, slack/proposal-render.ts, slack/delivery.ts;
+  wire types + RunnerJobPayload moved to slack/types.ts (events.ts re-exports).
+  events.ts: 966 -> 601 lines, now a coherent router+pipeline.
+- Item 2: recordExchange() added to thread-state-client.ts; 5 of the 6
+  appendHistory pairs collapsed (the text-only path keeps its conditional
+  assistant-append). 
+- Item 6 (remainder): SlackContext moved to types.ts; dispatcher re-exports it.
+tsc clean; deployed version b98bb287.

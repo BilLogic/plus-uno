@@ -29,37 +29,36 @@ templates/) plus a **template Worker repo** the skill forks and customizes.
 
 > Ground on real requests → interpret where in the team's workflow each request arose →
 > connect those into flow maps and identify the key usage moments → sort each usage into
-> *automate* vs *freeform conversation* vs *stays human* → set the bot's capabilities and
-> limits intentionally, driven by productivity intent, architectural feasibility, and
-> free-vs-paid cost → enforce every limit twice (prompt rule + code guard) → test with the
-> same evidence you scoped with.
+> *proactive automation* vs *reactive conversation* vs *stays human* → set the bot's
+> capabilities and limits intentionally, driven by productivity intent, architectural
+> feasibility, and free-vs-paid cost — with a **redirect** attached to every limit so nobody
+> leaves stuck → enforce every limit twice (prompt rule + code guard) → test with the same
+> evidence you scoped with.
 
-## 2. The Phase-0 question: what *mix* of pipeline and freeform
+## 2. The Phase-0 question: what *mix* of proactive and reactive
 
-**Not a fork — a mix.** Pipelines and conversations are different *triggers* on the same
-teammate, and most teams end up with both (ours did: a conversational bot + standing
-automations that consolidate Figma/code/Notion updates into Slack, where coordination already
-happens). The first decision is the expected ratio, which sets what gets built first:
+**Not a fork — a mix.** The two modes differ by who initiates, and most teams need both
+(ours did):
 
-| | **Pipeline bot** | **Freeform bot** |
+| | **Proactive mode** (automation) | **Reactive mode** (conversation) |
 |---|---|---|
-| Trigger | Keyword / slash command / schedule / webhook | @-mention, natural conversation |
+| Who initiates | The bot — surfaces info and draws people's attention before anyone asks | The person — bot reacts to commands and requests |
+| Trigger | Schedule / event / webhook / keyword | @-mention, natural conversation |
 | Behavior | Deterministic: same trigger → same steps | Agent loop: model picks tools per turn |
-| Great for | Routine, parameterizable work (detect Figma change → file PRD → notify; `implement Badge` → draft PR) | Lookup, Q&A, disambiguation, synthesis — requests too varied to parameterize |
+| Great for | Routine, parameterizable work (detect Figma change → file PRD → notify channel; `implement Badge` → draft PR); chasing action items; posting meeting recaps where people actually look | Lookup, Q&A, disambiguation, continuity recaps, synthesis — requests too varied to parameterize |
 | Cost profile | Near-zero (LLM only inside specific steps) | LLM cost per conversation turn |
 | Risk profile | Low (auditable, repeatable) | Needs gates, grounding rules, egress guards |
 | Build effort | Days | Weeks (mostly hardening) |
 
 Guidance the skill gives:
 - **Don't decide from intuition — the Phase-1 corpus decides the ratio.** Mostly-routine,
-  parameterizable requests → pipeline-heavy. Mostly lookup/Q&A/varied → conversation-heavy.
-- **Design automations as bot *capabilities*, not side scripts:** their output lands in Slack
-  under the bot's identity, so the team experiences one coherent teammate that both answers
-  questions and keeps surfaces in sync (design-tool change detected → spec doc auto-created →
-  channel notified → one keyword produces a draft PR with in-thread status).
-- **The ratio is cheap to revise if you host on Cloudflare** (see §3) — pipeline and freeform
-  are the same Worker with different handlers. Start where the corpus points; add the other
-  mode later without replatforming.
+  parameterizable requests → proactive-heavy. Mostly lookup/Q&A/varied → reactive-heavy.
+- **Design proactive automations as bot *capabilities*, not side scripts:** their output
+  lands in Slack under the bot's identity, so the team experiences one coherent teammate
+  that both answers questions and keeps surfaces in sync.
+- **The ratio is cheap to revise if you host on Cloudflare** (see §3) — both modes are the
+  same Worker with different handlers. Start where the corpus points; add the other mode
+  later without replatforming.
 
 ## 3. Hosting: pick by need — with Cloudflare as the default recommendation
 
@@ -104,11 +103,15 @@ choice gates integrations) → hands → runtime → content → proof.
   office hour sometimes beats a bot); initial mix hypothesis.
 - Artifact: go/no-go note + mix hypothesis + top-3 hoped-for use cases.
 
-### Phase 1 — Evidence: mine real demand (target 50–100 requests)
-- Model does: with Slack access (or exports), sweeps recent channels for requests the future
-  bot might own; adds meeting/Zoom transcripts where available (the pass we skipped and
-  regretted); redacts to roles; targets **50–100 real requests** — enough that theme ranking
-  is statistics, not anecdotes (our 25 was a floor, not a target).
+### Phase 1 — Evidence: mine real demand (target ~50 requests)
+- Model does: triangulates three sources — (1) **Slack mining** (channels + 1:1s, redacted to
+  roles), (2) **meeting-AI recaps** (Zoom AI / Otter / Granola summaries — the questions and
+  action items people raise out loud, which chat mining misses; the recap "next steps"
+  bullets are ground truth for who-owes-what), and (3) **the lead's accumulated intuition**
+  from years of answering, used to sanity-check the ranking. Targets **~50 real requests**
+  across sources — enough that theme ranking is statistics, not anecdotes. Special hunt:
+  **continuity recaps** ("remind me where my work left off" / the lead needing "where does
+  X's work stand?") — high-frustration, easy to miss in keyword searches.
 - Human decides: redaction rules; where to mine; when the corpus is representative.
 - Artifact: `discovery/request-corpus.md`. **Load-bearing three times:** scoping evidence now,
   capability input in Phase 4, eval seed in Phase 9.
@@ -123,17 +126,18 @@ choice gates integrations) → hands → runtime → content → proof.
   stages (this vocabulary feeds Phase 8).
 - Artifact: `discovery/flow-map.md` — stages, flows, and the ranked usage moments.
 
-### Phase 3 — Sort: automate vs freeform vs stays-human
-- Model does: proposes a three-way sort of every usage moment: **automate** (routine +
-  parameterizable → pipeline trigger, deterministic handling), **freeform** (varied, needs
-  interpretation/lookup/synthesis → conversational agent), **stays human** (taste, strategy,
-  relationships — the bot's job is at most to *prepare* these, never own them). For the
-  automate lane it also sketches each automation *as a bot capability* — trigger, steps, and
-  where its updates land in Slack — so syncs (e.g. design-tool publish → spec doc → channel
-  notification → keyword-triggered draft PR) read as the same teammate, not side scripts.
-  Then compares the result against the Phase-0 mix hypothesis and confirms or revises it.
+### Phase 3 — Sort: proactive vs reactive vs stays-human
+- Model does: proposes a three-way sort of every usage moment: **proactive** (routine +
+  parameterizable → automation that surfaces info before anyone asks), **reactive** (varied,
+  needs interpretation/lookup/synthesis → conversational agent), **stays human** (taste,
+  strategy, relationships — the bot's job is at most to *prepare* these, never own them).
+  For the proactive lane it also sketches each automation *as a bot capability* — trigger,
+  steps, and where its updates land in Slack — so syncs (e.g. design-tool publish → spec doc
+  → channel notification → keyword-triggered draft PR) read as the same teammate, not side
+  scripts. Then compares the result against the Phase-0 mix hypothesis and confirms or
+  revises it.
 - Human decides: every borderline call; the confirmed mix.
-- Artifact: `discovery/sort.md` — the automate/freeform/human ledger + automation sketches.
+- Artifact: `discovery/sort.md` — the proactive/reactive/human ledger + automation sketches.
 
 ### Phase 4 — The capability contract (can / partial / can't)
 The published table that tells the team what the bot fully does ✅, partially does 🟡 (with a
@@ -259,7 +263,7 @@ providers (the agent-turn seam), cost tracking.
 team-bot-setup/
 ├── SKILL.md                     # the nine-phase journey — gates, "model does / human decides"
 ├── references/
-│   ├── shape-guide.md               # the pipeline/freeform mix — §2 expanded, automation-as-capability patterns
+│   ├── shape-guide.md               # the proactive/reactive mix — §2 expanded, automation-as-capability patterns
 │   ├── hosting-options.md           # the §3 comparison table + recommendation logic, dated
 │   ├── capability-matrix-guide.md   # lane heuristics, the three inputs, wall-ritual patterns, blank template
 │   ├── integration-decision-guide.md# API-vs-MCP decision tree + dated verdicts + probe scripts
@@ -297,7 +301,56 @@ IDs-in-env discipline make it content extraction, not a refactor). Genericize to
 7. **Honest exits.** Phase 0 can end in "don't build this"; Phase 5 can end in "that source
    is unreachable — here's the relay design instead."
 
-## 7. Open decisions for Bill
+## 7. Landscape & positioning (researched 2026-07-12)
+
+We benchmarked ~10 comparables: Slack's official `create-slack-app` skill + AI agent
+quickstart + starter-agent templates, Cloudflare's official Slack-agent example, the
+Workers-GPT template genre (shapehq etc.), Vercel Labs' `slack-agent-skill` (the closest
+structural analogue — a wizard with patterns/templates/reference dirs), the community
+"Slack Bot Builder" reference skill, n8n/Zapier AI-bot templates, LangGraph's Slack glue,
+and Anthropic's skill-authoring best practices + "Building Effective Agents."
+
+**The finding: every existing resource starts at "create the app" and ends at "it runs
+locally."** None covers evidence-first scoping, a capability decision artifact, persona as a
+deliverable, demonstrated safety, or an eval methodology. No bot-building skill exists in
+Anthropic's official skills repo at all.
+
+**Validated differentiators** (each checked against the field):
+1. **Evidence-corpus-first scoping** — unique; closest is Vercel's AI-generated code plan
+   (from a prompt, not evidence).
+2. **The capability contract as a published team artifact** — unique; community data backs
+   it (the Slack Bot Builder skill cites 70% of users abandoning over-scoped installs).
+3. **Walls-as-redirects design** — unique; "safety" elsewhere means request signing and
+   secret hygiene, never refusal UX.
+4. **Live safety demonstration instead of assertion** — unique; a demo moment nobody has.
+5. **Three-layer eval judging** — unique among tutorials, and legitimized by Anthropic's own
+   "build evaluations first" authoring guidance.
+6. **Persona molding as a named phase** — mostly unique (elsewhere: "edit the system
+   prompt"); easy to copy alone, strong bundled with the contract.
+7. **Dated decision tables with live doc links** — unique, and directly endorsed by
+   Anthropic's avoid-time-sensitive-content guidance.
+8. **Proactive + reactive in one template** — unique; Slack templates are reactive-only,
+   n8n/Zapier make you pick per workflow.
+
+**Caution:** don't lead with "it's on Cloudflare" — Cloudflare's own Slack-agent example is
+excellent infra documentation. Differentiate on the journey around the runtime.
+
+**Adopt from the field** (they do these better):
+- Slack's **cross-skill delegation** — compose with the official Slack plugin skills for
+  CLI/Block Kit mechanics instead of duplicating them.
+- Vercel's **wizard directory layout** (patterns/ + templates/ + reference/) and
+  conversational choice points at every fork.
+- Anthropic's **copyable progress checklist** pattern — a 10-phase journey needs visible
+  check-off state across sessions — plus SKILL.md <500 lines with progressive disclosure.
+- Cloudflare's **production patterns** (DO state, HMAC verification, tunnel-based local
+  testing) — reference their doc in the runtime phase rather than re-deriving it.
+- n8n's **answer-format contract** ("short answer + supporting details + source citation")
+  — fold response shape into our capability contract.
+- **A bolded recommended row in every decision table** (recommend a default, keep the
+  escape hatch).
+- Per-phase **failure modes + diagnostic command** (`slack doctor`-style escape hatches).
+
+## 8. Open decisions for Bill
 
 1. **Skill name** — `team-bot-setup` vs `design-ops-slack-bot` vs an uno-branded name.
 2. **Template hosting** — separate public GitHub template repo (recommended) vs a folder here.

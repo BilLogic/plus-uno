@@ -5,7 +5,7 @@
 // Each tool body returns a JSON string that goes straight into a tool_result
 // content block.
 
-import type { Env } from "../types";
+import type { Env, SlackContext } from "../types";
 import { executeImplement } from "./implement";
 import { executeImplementDesign } from "./implement-design";
 import { executeNotionCreate } from "./notion-create";
@@ -14,16 +14,9 @@ import { executeNotionArchive } from "./notion-archive";
 import { executeSendEmail } from "./send-email";
 import { executeShareForFeedback } from "./share-for-feedback";
 
-export interface SlackContext {
-  channel: string;
-  threadTs: string;
-  userMsgTs: string;
-  requestedBy?: string;
-  /** Notion PRD reference resolved at proposal time, forwarded to the GitHub
-   *  implement/scaffold workflows so codegen gets PRD context. */
-  notionPrdId?: string;
-  notionPrdUrl?: string;
-}
+// SlackContext now lives in types.ts (shared by the tool layer + agent loop).
+// Re-exported here so existing `from "./dispatcher"` imports keep working.
+export type { SlackContext } from "../types";
 
 export async function executeTool(
   env: Env,

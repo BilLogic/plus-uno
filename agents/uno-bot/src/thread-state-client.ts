@@ -62,6 +62,21 @@ export async function appendHistory(
   });
 }
 
+// Record a full user→assistant exchange in one call — the invariant is that the
+// user turn is always stored WITH the assistant turn (every handleUserMessage
+// exit path recorded the pair by hand, six times; a missed half is a corrupted
+// memory). Sequential (not parallel) so the two turns land in order.
+export async function recordExchange(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+  userText: string,
+  assistantText: string,
+): Promise<void> {
+  await appendHistory(env, channel, thread_ts, { role: "user", content: userText });
+  await appendHistory(env, channel, thread_ts, { role: "assistant", content: assistantText });
+}
+
 // ----- proposals -----
 
 export async function savePendingProposal(env: Env, p: PendingProposal): Promise<void> {
