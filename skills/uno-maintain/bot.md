@@ -1,7 +1,7 @@
 <!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. -->
 # uno-maintain — bot face
 
-Loads: `references/method.md` (the shared procedure — taxonomy, tiers, gates) · `docs/conventions/terminology.md`. This file is only the Slack-Worker delta.
+Slack delta only. The shared procedure (taxonomy, tiers, gates) is `references/method.md`, already in this prompt.
 
 ## Execute (what differs in Slack)
 

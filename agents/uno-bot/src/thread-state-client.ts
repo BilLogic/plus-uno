@@ -75,11 +75,6 @@ export async function savePendingProposal(env: Env, p: PendingProposal): Promise
   });
 }
 
-export async function loadPendingProposal(env: Env, ts: string): Promise<PendingProposal | null> {
-  const detailed = await loadPendingProposalDetailed(env, ts);
-  return detailed.state === "found" ? detailed.payload : null;
-}
-
 // Distinguishes "this ts was a proposal but it EXPIRED" (410) from "not a
 // proposal at all" (404) — the gate must tell the requester their delayed
 // ✅/❌ hit an expired card instead of ignoring it silently (live 2026-07-10).

@@ -42,13 +42,10 @@
         "scope": {
           "type": "string",
           "enum": [
-            "roadmap",
-            "marketplace",
             "team",
-            "research",
             "any"
           ],
-          "description": "Which surface to search. 'roadmap' = the Design HQ Product board (PRDs/cards); 'marketplace' = the Prototype Market DB; 'team' = the Team Member roster (people/SMEs — returns Slack ids for @-mention when present); 'research' = Research & notes (findings/study guides); 'any' = open workspace search (weakest — only when the surface is genuinely unknown). Default 'any'."
+          "description": "'team' = the Team Member Database roster (people/SME lookups). 'any' = workspace-wide title search. Card lookups should use roadmap_query instead."
         }
       }
     }
@@ -242,7 +239,7 @@
   },
   {
     "name": "notion_create",
-    "description": "Create a new page or card in an allowlisted Notion surface — SIDE EFFECT, routed through the confirmation gate. `surface` selects WHERE and WHAT is created: 'prd' (a design PRD on the Roadmap board), 'ds-component-prd' (DS Component PRDs DB), 'intake' (a maintenance intake card on the Roadmap board), 'research' (a Findings & Takeaways / study-guide page in Research & notes), 'marketplace' (a Prototype Market entry). Draft the content conversationally first and let the designer refine it; only invoke once they approve. Follow docs/conventions/notion.md for each surface's required properties and body shape — NEVER create select options / pillars / OKRs; exact-match existing option names. Keep content grounded in the conversation; put genuine unknowns under an 'Open Questions' section rather than inventing.",
+    "description": "Create a new page or card in an allowlisted Notion surface — SIDE EFFECT, routed through the confirmation gate. `surface` selects WHERE and WHAT is created: 'prd' (a design PRD on the Roadmap board — feature and DS-component PRDs alike) or 'intake' (a maintenance intake card on the Roadmap board). Research docs and marketplace entries are NOT bot surfaces — they run in-IDE. Draft the content conversationally first and let the designer refine it; only invoke once they approve. Follow docs/conventions/notion.md for the surface's required properties and body shape — NEVER create select options / pillars / OKRs; exact-match existing option names. Keep content grounded in the conversation; put genuine unknowns under an 'Open Questions' section rather than inventing.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -255,12 +252,9 @@
           "type": "string",
           "enum": [
             "prd",
-            "ds-component-prd",
-            "intake",
-            "research",
-            "marketplace"
+            "intake"
           ],
-          "description": "Which allowlisted surface to create in. Determines the destination database and the required properties (see docs/conventions/notion.md)."
+          "description": "Where to file it: 'prd' (feature or DS-component PRD card on the Roadmap board) or 'intake' (maintenance/request intake card, Product Pillar: Universal + Product Tag: Maintenance). These are the only live surfaces — research docs and marketplace entries are created in-IDE, not by the bot."
         },
         "title": {
           "type": "string",
@@ -292,14 +286,14 @@
         },
         "acceptance_criteria": {
           "type": "array",
-          "description": "For 'prd'/'ds-component-prd': checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold).",
+          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold).",
           "items": {
             "type": "string"
           }
         },
         "properties": {
           "type": "object",
-          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (e.g. PRD: product_pillar; intake: evidence_link, suggested_tier; marketplace: stage, product_pillar, creators, contributors, repo_path, deployment_url, loom_video_url). Only include what the conversation supports; never invent option names.",
+          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (PRD: product_pillar; intake: evidence_link, suggested_tier). Only include what the conversation supports; never invent option names.",
           "additionalProperties": true
         },
         "source_url": {
@@ -311,7 +305,7 @@
   },
   {
     "name": "notion_update",
-    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Two uses, combinable: (1) change PROPERTIES via `properties` — e.g. move a Roadmap card to 'Design Status: Ready for Design', set an Intake Status, update links, edit a marketplace entry's fields; (2) APPEND narrative via `append` — e.g. log a conclusion to a project Decision Log, add a findings section to a doc. Pass the page URL. Follow docs/conventions/notion.md: fetch the schema and EXACT-MATCH existing option names before writing any select/status property (Notion silently auto-creates options on a mismatch). Append rather than overwrite a human-owned body.",
+    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Two uses, combinable: (1) change PROPERTIES via `properties` — e.g.g. log a conclusion to a project Decision Log, add a findings section to a doc. Pass the page URL. Follow docs/conventions/notion.md: fetch the schema and EXACT-MATCH existing option names before writing any select/status property (Notion silently auto-creates options on a mismatch). Append rather than overwrite a human-owned body.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -363,7 +357,7 @@
   },
   {
     "name": "notion_archive",
-    "description": "Archive (soft-delete) a Notion card the bot created — SIDE EFFECT, routed through the confirmation gate. Use to undo a PRD / intake / marketplace entry when the designer asks ('delete that', 'remove that card', 'undo'). Archiving moves the page to Notion's trash (recoverable). SAFETY: only works on cards parented by an allowlisted database — it will refuse anything else. Pass the page URL (typically the link the bot posted when it created the card).",
+    "description": "Archive (soft-delete) a Notion card the bot created — SIDE EFFECT, routed through the confirmation gate. Use to undo a PRD or intake card when the designer asks ('delete that', 'remove that card', 'undo'). Archiving moves the page to Notion's trash (recoverable). SAFETY: only works on cards parented by an allowlisted database — it will refuse anything else. Pass the page URL (typically the link the bot posted when it created the card).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -434,7 +428,7 @@
   },
   {
     "name": "shareout_post",
-    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback, and use notion_create(surface:'marketplace') only when they want to formally register a prototype in the catalog. Draft the shareout text conversationally first; invoke once they approve.",
+    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Draft the shareout text conversationally first; invoke once they approve.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

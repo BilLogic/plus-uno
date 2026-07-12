@@ -65,7 +65,7 @@ uno-bot/
     └── version.ts        BUILD string returned by /health
 ```
 
-Regression prompts for the bot live in the eval loop: `docs/evals/scenarios/uno-bot.md` (R1–R12).
+Regression tests: the **UNO-Bot Test Plan** in Notion (13 `TC-*` cases run one-per-thread in `#uno-bot-sandbox`, hand- or judge-scored 0–3; latest round 2026-07-11 averaged 2.48). Legacy R1–R12 prompts remain in `docs/evals/scenarios/uno-bot.md`.
 
 ## Local dev
 
@@ -114,7 +114,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 
 ## Smoke test
 
-- **Bot behavior:** fire a few of the R1–R12 prompts in `docs/evals/scenarios/uno-bot.md` at @uno-bot — the confidence-line + routing + gate behaviors confirm the current build is live.
+- **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider + MCP health:** `GET /debug/gemini` (live Gemini round-trip), `GET /debug/mcp` (attached MCP servers; also cron-probed every 15 min with alerts to `#uno-bot`).
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `playground/test-prototype/` + a root `dev:test-prototype` script; `npm install && npm run dev:test-prototype` boots it.
 

@@ -1,6 +1,6 @@
-// Worker-safe Notion client for create_prd. Creates a new PRD card on the
-// "Roadmap" database (the Design HQ board), placed in the
-// "Need PRD / Under Playground" Design Status column.
+// Worker-safe Notion client: notionCreate (PRD/intake cards on the Roadmap
+// database, placed in "Need PRD / Under Playground"), notionUpdate,
+// archiveCard, notionSearch, readNotionPage, findTeamMembers, queryRoadmapCards.
 //
 // Schema (introspected from the live Roadmap DB):
 //   title property:        "Name"
@@ -116,60 +116,6 @@ function buildChildren(input: PrdInput): unknown[] {
   return children;
 }
 
-/**
- * Create a feature PRD card on the Design HQ Product (Roadmap) board — the single
- * command board. Sets Design Status / Current Team / Product Pillar.
- * Throws on failure (caller surfaces the error to Slack).
- */
-export async function createPrdCard(
-  env: Env,
-  input: PrdInput,
-): Promise<CreatedPrd> {
-  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const databaseId = env.NOTION_ROADMAP_DB_ID;
-  if (!databaseId) throw new Error(`Roadmap PRD database id not configured`);
-  if (!input.title?.trim()) throw new Error("PRD title is required");
-
-  const properties: Record<string, unknown> = {
-    Name: { title: richText(input.title.trim()) },
-  };
-  {
-    // Properties specific to the Design HQ Product board's schema.
-    properties["Design Status"] = { status: { name: DESIGN_STATUS_NEED_PRD } };
-    // Current Team = "Design" is what the Design HQ -> Product view filters on.
-    properties["Current Team"] = { multi_select: [{ name: "Design" }] };
-    if (input.productPillar?.trim()) {
-      properties["Product Pillar"] = { multi_select: [{ name: input.productPillar.trim() }] };
-    }
-  }
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    const res = await fetch(`${NOTION_API}/pages`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.NOTION_API_KEY}`,
-        "Notion-Version": NOTION_VERSION,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        parent: { database_id: databaseId },
-        properties,
-        children: buildChildren(input),
-      }),
-      signal: controller.signal,
-    });
-    const data = (await res.json()) as { id?: string; url?: string; message?: string; code?: string };
-    if (!res.ok || !data.id) {
-      throw new Error(`Notion ${res.status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? "create failed"}`);
-    }
-    return { id: data.id, url: data.url ?? `https://www.notion.so/${data.id.replace(/-/g, "")}` };
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 // ─── Team Member Database (read-only, for find_experts) ─────────────────────
 // Schema (verified): Name (title), Group (select), Primary Role (rich_text),
 // Short Bio (rich_text), Affiliation (select), LinkedIn / Personal Website /
@@ -281,54 +227,6 @@ export interface ArchivedCard {
   title: string;
 }
 
-/**
- * Archive (soft-delete) a PRD card on the Roadmap board. Safety: refuses to
- * touch a page that isn't a card in the Roadmap database, so the bot can only
- * remove Roadmap cards — not arbitrary Notion pages. Archiving is recoverable
- * from Notion's trash. Throws on failure.
- */
-export async function archiveRoadmapCard(env: Env, pageId: string): Promise<ArchivedCard> {
-  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const headers = {
-    Authorization: `Bearer ${env.NOTION_API_KEY}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
-  };
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    // Verify the page is a card in the Roadmap DB before archiving.
-    const getRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
-    const page = (await getRes.json()) as {
-      id?: string; message?: string; code?: string;
-      parent?: { database_id?: string };
-      properties?: { Name?: { title?: { plain_text?: string }[] } };
-    };
-    if (!getRes.ok || !page.id) {
-      throw new Error(`Notion ${getRes.status}${page.code ? ` ${page.code}` : ""}: ${page.message ?? "page not found"}`);
-    }
-    const parentDb = (page.parent?.database_id ?? "").replace(/-/g, "").toLowerCase();
-    const roadmapDb = env.NOTION_ROADMAP_DB_ID.replace(/-/g, "").toLowerCase();
-    if (parentDb !== roadmapDb) {
-      throw new Error("that page isn't a card on the Roadmap board — refusing to archive it");
-    }
-    const title = page.properties?.Name?.title?.[0]?.plain_text ?? "(untitled)";
-
-    const patchRes = await fetch(`${NOTION_API}/pages/${pageId}`, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({ archived: true }),
-      signal: controller.signal,
-    });
-    if (!patchRes.ok) {
-      const err = (await patchRes.json().catch(() => ({}))) as { message?: string };
-      throw new Error(`Notion ${patchRes.status}: ${err.message ?? "archive failed"}`);
-    }
-    return { id: pageId, title };
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 // ─── Read a Notion page (for read_source / linked-source grounding) ──────────
 // Returns the page title, its properties rendered to strings (so the model can

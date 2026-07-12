@@ -31,7 +31,7 @@ cc @reviewers — by [date]
 
 Decisions reached in threads are written to the project's Decision Log **before** the thread is considered resolved.
 
-**Reactions outside the gates are free-form — and they're the bot's wit channel.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 👀 working, 🎉 shipped, or a fitting custom emoji). Replies are word-budgeted; reactions aren't — content-matched and specific beats a reflexive 👍 (register details: `agents/uno-bot/AGENT.md § Slack etiquette`). Only the gate semantics above are reserved: ✅/❌ carry meaning on proposal cards and review verdicts, so the bot never reacts with those on a pending proposal itself.
+**Reactions outside the gates are free-form — and they're the bot's wit channel.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 🛠 working, 🎉 shipped, or a fitting custom emoji; 👀/⏳/✅/⚠️ are the Worker's automatic signals — the bot doesn't duplicate them). Replies are word-budgeted; reactions aren't — content-matched and specific beats a reflexive 👍 (register details: `agents/uno-bot/AGENT.md § Slack etiquette`). Only the gate semantics above are reserved: ✅/❌ carry meaning on proposal cards and review verdicts, so the bot never reacts with those on a pending proposal itself.
 
 ## Message formatting — Slack mrkdwn (NOT CommonMark)
 

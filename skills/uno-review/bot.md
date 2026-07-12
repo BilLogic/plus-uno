@@ -1,7 +1,7 @@
 <!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. Delta only: the shared procedure lives in references/method.md. -->
 # uno-review — bot face
 
-Loads: `references/method.md` (intake · scenarios · lens depth · severity · verdict — normative) · `docs/conventions/slack.md` (channels + gates).
+Slack delta only. The normative procedure (intake · scenarios · lens depth · severity · verdict) is `references/method.md`; channels + gates are `docs/conventions/slack.md` — both already in this prompt.
 
 Review / critique a design, prototype, spec, or frame from Slack. Method rules apply in full: manifest first, diagnose-only, evidence per finding, minors advisory.
 
@@ -11,7 +11,7 @@ Review / critique a design, prototype, spec, or frame from Slack. Method rules a
 
 - **No sub-agent dispatch.** The Worker applies the lenses itself in one context — still one lens at a time, in-lane, at the manifest's fidelity depth. It fetches the same rule docs method.md names per lens.
 - **Inspect before judging.** First `source_read` (read-only, no gate) the linked Figma frame AND any linked PRD/spec, then diagnose from the fetched content. Never critique from priors or speculatively.
-- **Fidelity wall — qualitative yes, quantitative/spec IDE-only.** With a pasted screenshot or a Figma frame link (the frame arrives with a rendered screenshot the bot can SEE), the bot now does **qualitative visual review** — layout, hierarchy, alignment, spacing *feel*, glaring contrast problems — in addition to flow logic, structure, terminology, copy, and PRD conformance. What stays IDE-only is **quantitative/spec review**: exact WCAG contrast ratios, token fidelity, 44×44 target measurement, focus order, responsive behavior — computed values, not pictures — via `skills/uno-review` + Figma MCP + `run-review-checks.sh`. Say the boundary plainly, still flag what the visual + text-level reading shows *explicitly marked as partial* where depth is limited, and offer to file an intake or hand a ready-to-paste IDE prompt with the frame + PRD links pre-filled. No image attached and none renderable → text-layer review only, labeled as such.
+- **Fidelity wall — qualitative yes, quantitative/spec IDE-only** (the capability boundary lives in `agents/uno-bot/AGENT.md § My lane`). Qualitative visual review from the screenshot: layout, hierarchy, alignment, spacing *feel*, glaring contrast — plus flow logic, structure, terminology, copy, PRD conformance. IDE-only: exact WCAG ratios, token fidelity, 44×44 target measurement, focus order, responsive behavior — computed values, not pictures (`skills/uno-review` + Figma MCP + `run-review-checks.sh`). Say the boundary plainly, mark depth-limited findings *as partial*, and offer an intake or a ready-to-paste IDE prompt with the frame + PRD links pre-filled. No image attached or renderable → text-layer review only, labeled as such.
 - Manifest missing → ask once in-thread for the one-liner (fidelity / tools / PRD link). Still missing, or the target is unfetchable (no link, `source_read` fails) → say so plainly, **record the intake**, route to a human. No generic DIY instructions, no from-memory review.
 - Design QA runs arrive via the RTT trigger with the Roadmap card — resolve RM-ID → `[spec]` file per method.md before walking the build.
 
