@@ -1,0 +1,23 @@
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as TutorPerformancePageStories from './Pages/TutorPerformancePage/TutorPerformancePage.stories.jsx';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta title="Specs/Admin/Tutor/Overview" />
+
+<Title>Admin · Tutor</Title>
+
+Tutor management specs: performance, training progress, tool usage, and
+status/warnings views, organized Elements → Cards → Tables → Modals → Sections → Pages.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=3408-120455"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Tutor performance
+
+<Canvas of={TutorPerformancePageStories.Overview} />
+
+</div>

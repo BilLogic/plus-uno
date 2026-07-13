@@ -7,12 +7,12 @@
 import React from 'react';
 
 export default {
-    title: 'Specs/Admin',
+    title: 'Specs/Admin/Overview',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
-                component: 'Admin organisms for management dashboards. Organized by: Group Admin, Session Admin, Student Admin, Tutor Admin.',
+                component: 'Admin organisms for management dashboards. Organized by sub-area: Tutor, Session, Student, Group — each Elements → Cards → Tables → Modals → Sections → Pages.',
             },
         },
     },
@@ -35,19 +35,19 @@ export const Overview = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {[
                 {
-                    title: 'Group Admin',
+                    title: 'Group',
                     items: ['GroupsTable', 'GroupInfoCard', 'GroupTrainingProgress', 'GroupAdminPage']
                 },
                 {
-                    title: 'Session Admin',
+                    title: 'Session',
                     items: ['SessionsTable', 'SessionBreakdownModal', 'SessionOverviewSection']
                 },
                 {
-                    title: 'Student Admin',
+                    title: 'Student',
                     items: ['StudentsTable', 'StudentDetailModal', 'StudentAdminContainer']
                 },
                 {
-                    title: 'Tutor Admin',
+                    title: 'Tutor',
                     items: ['TutorsTable', 'TutorOverviewModal', 'DataCard', 'TutorToolUsageSection']
                 }
             ].map(section => (

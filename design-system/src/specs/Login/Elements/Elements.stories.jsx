@@ -13,12 +13,12 @@
  */
 
 import React, { useState } from 'react';
-import Button from '@/components/Button';
-import Alert from '@/components/Alert';
-import Select from '@/forms/Select';
-import Input from '@/forms/Input';
-import OptionList from '@/forms/OptionList';
-import Footer from '@/components/Footer';
+import Button from '@/components/actions/Button';
+import Alert from '@/components/messaging/Alert';
+import Select from '@/components/forms-and-inputs/Select';
+import Input from '@/components/forms-and-inputs/Input';
+import OptionList from '@/components/forms-and-inputs/OptionList';
+import Footer from '@/components/_internal/Footer';
 
 import googleIcon from '@/assets/images/auth-providers/google-icon.svg';
 import cleverImage from '@/assets/images/auth-providers/clever-image.png';

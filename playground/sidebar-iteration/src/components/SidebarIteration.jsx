@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SidebarTab from '@/components/SidebarTab';
-import Logo from '@/components/Logo';
+import SidebarTab from '@/components/navigation/SidebarTab';
+import Logo from '@/components/_internal/Logo';
 
 const SidebarIteration = ({
     user = 'tutor',

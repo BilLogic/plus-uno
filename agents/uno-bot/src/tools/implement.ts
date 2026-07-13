@@ -9,17 +9,29 @@ import type { Env } from "../types";
 import { repositoryDispatch } from "./github-dispatch";
 import type { SlackContext } from "./dispatcher";
 import { extractNotionPrdFromText } from "../slack/notion-prd";
+import { fetchThreadTranscript, withThreadTranscript } from "../slack/thread-transcript";
 
 export async function executeImplement(
   env: Env,
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
-  const component = typeof input.component === "string" ? input.component : "";
-  const notes = typeof input.notes === "string" ? input.notes : undefined;
+  const component = typeof input.component === "string" ? input.component.trim() : "";
+  const notes = typeof input.notes === "string" ? input.notes.slice(0, 2000) : undefined;
   const inputPrdUrl = typeof input.notion_prd_url === "string" ? input.notion_prd_url.trim() : "";
   if (!component) {
     return JSON.stringify({ ok: false, error: "missing 'component' in input" });
+  }
+  // A DS component name is a plain PascalCase identifier (Badge, CardSurface).
+  // Enforce that shape: the value is model-generated and can be steered by
+  // injected content, and it flows into a GitHub Actions client_payload — a
+  // free-form value would be a CI-injection vector (defense in depth alongside
+  // the workflow using env: bindings). notes is length-capped for the same reason.
+  if (!/^[A-Za-z][A-Za-z0-9]{0,49}$/.test(component)) {
+    return JSON.stringify({
+      ok: false,
+      error: `invalid component name '${component}' — expected a plain DS component identifier like 'Badge' or 'CardSurface'.`,
+    });
   }
 
   // A component implement MUST be tied to a Notion PRD — the polling bot creates
@@ -36,18 +48,30 @@ export async function executeImplement(
     });
   }
 
-  const result = await repositoryDispatch(env, "implement-figma-changes", {
-    component,
-    notes,
-    thread_ts: slack.threadTs,
-    channel: slack.channel,
-    message_ts: slack.userMsgTs,
-    // The PRD (required) — from the polling-bot notification in the thread root,
-    // or pasted by the designer. The workflow fetches its content and feeds it
-    // to Claude during code generation — same behavior v1 had via Pipedream.
-    notion_prd_id: notionPrdId,
-    notion_prd_url: notionPrdUrl,
-  });
+  // Full-thread context for the runner (approved 2026-07-12): the whole
+  // triggering thread, names resolved, capped + truncation-noted. Fail-open —
+  // a null transcript never blocks the confirmed dispatch.
+  const transcript = await fetchThreadTranscript(env, slack.channel, slack.threadTs);
+
+  const result = await repositoryDispatch(
+    env,
+    "implement-figma-changes",
+    withThreadTranscript(
+      {
+        component,
+        notes,
+        thread_ts: slack.threadTs,
+        channel: slack.channel,
+        message_ts: slack.userMsgTs,
+        // The PRD (required) — from the polling-bot notification in the thread root,
+        // or pasted by the designer. The workflow fetches its content and feeds it
+        // to Claude during code generation — same behavior v1 had via Pipedream.
+        notion_prd_id: notionPrdId,
+        notion_prd_url: notionPrdUrl,
+      },
+      transcript,
+    ),
+  );
 
   if (!result.ok) {
     return JSON.stringify({

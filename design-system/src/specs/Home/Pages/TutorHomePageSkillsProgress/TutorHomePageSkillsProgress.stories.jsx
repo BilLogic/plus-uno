@@ -26,7 +26,7 @@ const skillsProgressData = {
 };
 
 export default {
-    title: 'Specs/Home/Pages/TutorHomePageSkillsProgress',
+    title: 'Specs/Home/Pages/Tutor Home Page Skills Progress',
     component: TutorHomePageSkillsProgress,
     tags: ['!dev', '!autodocs'],
     decorators: [
@@ -43,7 +43,7 @@ export default {
         breakpoint: {
             control: 'select',
             options: ['md', 'lg', 'xl'],
-            description: 'Simulated viewport width in the preview toolbar',
+            description: 'Simulated viewport width — set it here in the Controls panel',
             table: { category: 'Layout' },
         },
     },

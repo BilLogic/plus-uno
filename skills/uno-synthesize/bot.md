@@ -1,7 +1,7 @@
 <!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. -->
 # uno-synthesize — bot face
 
-Loads: `references/method.md` (the shared procedure — scope, findings toll gate, designer gates, PRD, paired write, faithfulness rules) · `docs/conventions/terminology.md`. This file carries only the Worker delta: tool payloads, gates, mrkdwn shapes.
+Slack delta only — tool payloads, gates, mrkdwn shapes. The shared procedure (scope, findings toll gate, designer gates, PRD, paired write, faithfulness rules) is `references/method.md`, already in this prompt.
 
 ## Execute
 

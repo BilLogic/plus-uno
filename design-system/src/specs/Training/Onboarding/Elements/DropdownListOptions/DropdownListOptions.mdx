@@ -1,0 +1,48 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as DropdownListOptionsStories from './DropdownListOptions.stories.jsx';
+import {
+    DsCanvasHero,
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DropdownListOptionsStories} />
+
+<Title />
+
+Multi-row option list used inside onboarding strategy modals — each row is a label / description pair the tutor can pick from.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=74-121962"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/Onboarding/Elements/DropdownListOptions"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default list with the standard option rows.</>}
+>
+    <DsCanvasHero of={DropdownListOptionsStories.Overview} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={DropdownListOptionsStories.Interactive}
+    description={<>Edit each option's label and description inline.</>}
+/>
+
+</div>
+
+</div>

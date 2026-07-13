@@ -43,11 +43,11 @@
  * Width: 340px (from Figma)
  */
 import React, { useState } from 'react';
-import Range from '../../../forms/Range';
-import Button from '../../../components/Button/Button';
+import Range from '@/components/forms-and-inputs/Range';
+import Button from '@/components/actions/Button/Button';
 
 export default {
-    title: 'Specs/Profile/Modals/PreviewImage',
+    title: 'Specs/Profile/Modals/Preview Image',
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',

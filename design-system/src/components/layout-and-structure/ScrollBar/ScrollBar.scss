@@ -1,0 +1,45 @@
+/**
+ * ScrollBar Component Styles
+ * Tokenized custom scrollbar treatment: thin width, outline-colored thumb,
+ * transparent track. Applied through a wrapper class so any scrollable region
+ * can opt in to the Design System scrollbar.
+ */
+
+.plus-scrollbar {
+    // Firefox
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-outline-variant) transparent;
+
+    // WebKit (Chrome, Safari, Edge)
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-outline-variant);
+        border-radius: var(--size-element-radius-sm, 4px);
+
+        &:hover {
+            background-color: var(--color-outline);
+        }
+    }
+
+    &::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+}
+
+.plus-scrollbar-vertical {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.plus-scrollbar-horizontal {
+    overflow-x: auto;
+    overflow-y: hidden;
+}

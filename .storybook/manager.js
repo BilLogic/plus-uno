@@ -1,5 +1,6 @@
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming/create';
+import brandImage from './brand-image.js';
 
 // Storybook manager configuration (runs in the "manager" UI, not inside the preview iframe)
 
@@ -35,7 +36,11 @@ addons.setConfig({
   theme: create({
     base: 'light',
     brandTitle: 'PLUS Storybook',
-    brandImage: '/assets/storybook-brand.svg',
+    // Inlined data URI (see ./brand-image.js). An absolute /assets path broke on the
+    // Netlify /storybook/ subpath deploy — it resolved to the site root, missed, and the
+    // SPA catch-all returned index.html instead of the SVG, so the logo intermittently
+    // failed to render. A data URI has no path dependency and always loads.
+    brandImage,
     brandUrl: './',
     /* PLUS design system primary (see Colors / --color-primary) */
     colorPrimary: '#0472a8',

@@ -1,8 +1,8 @@
 import React from 'react';
-import Select from '@/forms/Select';
-import Textarea from '@/forms/Textarea';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
+import Select from '@/components/forms-and-inputs/Select';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
 
 const SEVERITY_OPTIONS = [
     { value: 'low', label: 'Low — Minor concern, no urgency' },

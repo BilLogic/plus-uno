@@ -1,0 +1,54 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SurfaceContainerStories from './SurfaceContainer.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SurfaceContainerStories} />
+
+<Title />
+The surface container is the **Main-region shell** — the white content area every page is built on. Baked in: `--color-surface` background, Surface-tier padding (`--size-surface-pad-x/y`), gap, radius, and no elevation. It **fills the width it is given**: the page/shell owns the width and the breakpoint mode, the container just adapts. Children are the content slot. It mirrors the published `Pattern/Surface container` Figma component (auto mode + fill), which also carries the adaptive 12-column content grid.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/SurfaceContainer"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Default container: <code>--color-surface</code> background, Surface-tier padding/gap/radius tokens, flat, filling the available width.</>}>
+    <Canvas of={SurfaceContainerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Composition
+
+<DocsCanvasShell description={<>A surface container nested inside the base Surface, wrapping stacked page regions.</>}>
+    <DsCanvasQuiet of={SurfaceContainerStories.Composition} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SurfaceContainerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

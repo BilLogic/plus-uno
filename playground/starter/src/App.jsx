@@ -8,11 +8,11 @@ import './App.css';
  * with your prototype content.
  * 
  * Available design system imports:
- *   import Button from '@/components/Button';
- *   import Modal from '@/components/Modal';
- *   import Badge from '@/components/Badge';
- *   import Alert from '@/components/Alert';
- *   import PageLayout from '@/components/PageLayout';
+ *   import Button from '@/components/actions/Button';
+ *   import Modal from '@/components/messaging/Modal';
+ *   import Badge from '@/components/status-and-loading/Badge';
+ *   import Alert from '@/components/messaging/Alert';
+ *   import PageLayout from '@/components/_internal/PageLayout';
  *   ... and more from design-system/src/components/
  * 
  * Design tokens are available as CSS variables:

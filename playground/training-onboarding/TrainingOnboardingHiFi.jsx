@@ -39,10 +39,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/Button';
-import OnboardingModuleCard from '@/specs/Training/onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
-import CtaButtons from '@/specs/Training/onboarding/Elements/CtaButtons/CtaButtons';
-import OnboardingModulesTable from '@/specs/Training/onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
+import Button from '@/components/actions/Button';
+import OnboardingModuleCard from '@/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
+import CtaButtons from '@/specs/Training/Onboarding/Elements/CtaButtons/CtaButtons';
+import OnboardingModulesTable from '@/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
 import './TrainingOnboardingHiFi.scss';
 
 // ─── Module thumbnail images ─────────────────────────────────────────────────

@@ -2,7 +2,7 @@ import React from 'react';
 import { ResourceType } from './ResourceType';
 
 export default {
-    title: 'Specs/Home/Elements/ResourceType',
+    title: 'Specs/Home/Elements/Resource Type',
     tags: ['!dev', '!autodocs'],
     component: ResourceType,
     parameters: {

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import Badge from '@/components/Badge';
-import Card from '@/components/Card';
-import Alert from '@/components/Alert';
-import Button from '@/components/Button';
-import Progress from '@/components/Progress';
-import Input from '@/forms/Input';
-import Select from '@/forms/Select';
-import Switch from '@/forms/Switch';
-import Checkbox from '@/forms/Checkbox';
-import { Textarea } from '@/forms';
+import Badge from '@/components/status-and-loading/Badge';
+import Card from '@/components/layout-and-structure/Card';
+import Alert from '@/components/messaging/Alert';
+import Button from '@/components/actions/Button';
+import Progress from '@/components/status-and-loading/Progress';
+import Input from '@/components/forms-and-inputs/Input';
+import Select from '@/components/forms-and-inputs/Select';
+import Switch from '@/components/forms-and-inputs/Switch';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import { Textarea } from '@/components/forms-and-inputs';
 
 import './Test3Page.scss';
 

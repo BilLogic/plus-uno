@@ -1,353 +1,197 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
-
+import Button from '@/components/actions/Button/Button';
 
 /**
- * ResponsiveFrame
- * A wrapper component that simulates different viewport widths for Storybook stories.
- * Includes an interactive toolbar to switch between breakpoints.
+ * ResponsiveFrame — the display well for spec Pages & Sections in Storybook docs.
  *
- * Default: **no scaling** (`fitToContainer={false}`) — the frame keeps true md/lg/xl width so the
- * in-page Sidebar and hit targets match production; scroll horizontally and vertically inside the
- * gray wrapper to see the full page (MDX and browser fullscreen). Set `fitToContainer` to `true`
- * to shrink the frame with CSS scale when the container is narrower (no scroll, but imprecise clicks).
+ * Behaviour (all three are the point):
+ *  1. **Responsive.** The page fills the width it is given (`width: 100%`, capped at the
+ *     breakpoint's max) and reflows — it does NOT force a fixed width and scroll. Because the
+ *     page gets its real available width, `PageLayout`'s own ResizeObserver picks up the
+ *     breakpoint: below LG (1024) the Sidebar hides and the TopBar collapses, exactly as in
+ *     production.
+ *  2. **Fullscreen.** A button is always visible (top-right of the well) — hard-to-preview
+ *     pages pop out to the full viewport, where they reflow to the desktop layout.
+ *  3. **Breakpoint-aware.** The `breakpoint` prop (md/lg/xl) caps the max width. It is driven by
+ *     the global **Breakpoint** toolbar (the `plusBreakpoint` Storybook global) — the single
+ *     source of truth; this component intentionally does NOT add its own breakpoint control.
  *
- * @param {Object} props
- * @param {string} props.breakpoint - The initial breakpoint to simulate (md, lg, xl)
- * @param {boolean} [props.fitToContainer=false]
- * @param {React.ReactNode} props.children - The content to wrap
+ * Nesting-safe: if a ResponsiveFrame renders inside another (e.g. a story that wraps itself AND
+ * the global decorator), the inner one becomes a transparent pass-through so there is exactly
+ * one well + one fullscreen button.
  */
-const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, children }) => {
-    const [selectedBreakpoint, setSelectedBreakpoint] = useState(breakpoint);
-    const [scale, setScale] = useState(1);
-    const [contentHeight, setContentHeight] = useState(0);
 
+const RFContext = createContext(false);
+const MAXW = { md: 768, lg: 1024, xl: 1440 };
+
+const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
+    const nested = useContext(RFContext);
     const rootRef = useRef(null);
-    const wrapperRef = useRef(null);
-    const innerRef = useRef(null);
-    const [browserFullscreen, setBrowserFullscreen] = useState(false);
+    // `fullscreen` = the frame is expanded. Native Fullscreen API fills the whole screen when the
+    // host allows it; otherwise a CSS position:fixed overlay fills the iframe viewport so the
+    // button ALWAYS enlarges the preview.
+    const [fullscreen, setFullscreen] = useState(false);
 
+    // Keep state in sync when the user exits native fullscreen via Esc.
     useEffect(() => {
-        setSelectedBreakpoint(breakpoint);
-    }, [breakpoint]);
-
-    const syncBrowserFullscreen = useCallback(() => {
-        const root = rootRef.current;
-        if (!root) {
-            setBrowserFullscreen(false);
-            return;
-        }
-        const active =
-            document.fullscreenElement === root ||
-            document.webkitFullscreenElement === root;
-        setBrowserFullscreen(!!active);
+        const onChange = () => {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            if (!fsEl) setFullscreen(false);
+        };
+        document.addEventListener('fullscreenchange', onChange);
+        document.addEventListener('webkitfullscreenchange', onChange);
+        return () => {
+            document.removeEventListener('fullscreenchange', onChange);
+            document.removeEventListener('webkitfullscreenchange', onChange);
+        };
     }, []);
 
-    useEffect(() => {
-        document.addEventListener('fullscreenchange', syncBrowserFullscreen);
-        document.addEventListener('webkitfullscreenchange', syncBrowserFullscreen);
-        return () => {
-            document.removeEventListener('fullscreenchange', syncBrowserFullscreen);
-            document.removeEventListener('webkitfullscreenchange', syncBrowserFullscreen);
-        };
-    }, [syncBrowserFullscreen]);
-
-    const toggleBrowserFullscreen = useCallback(async () => {
+    const toggleFullscreen = useCallback(async () => {
         const node = rootRef.current;
         if (!node) return;
+        const nativeEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (fullscreen || nativeEl) {
+            setFullscreen(false);
+            try {
+                if (nativeEl && document.exitFullscreen) await document.exitFullscreen();
+                else if (nativeEl && document.webkitExitFullscreen) document.webkitExitFullscreen();
+            } catch { /* noop */ }
+            return;
+        }
+        // Expand immediately (CSS overlay is the guaranteed floor) …
+        setFullscreen(true);
+        // … and try native fullscreen on top for a true whole-screen view where permitted.
         try {
-            const isFs =
-                document.fullscreenElement === node ||
-                document.webkitFullscreenElement === node;
-            if (isFs) {
-                if (document.exitFullscreen) await document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            } else if (node.requestFullscreen) {
-                await node.requestFullscreen();
-            } else if (node.webkitRequestFullscreen) {
-                node.webkitRequestFullscreen();
-            }
-        } catch {
-            /* user denied or embed policy */
-        }
-    }, []);
+            if (node.requestFullscreen) await node.requestFullscreen();
+            else if (node.webkitRequestFullscreen) node.webkitRequestFullscreen();
+        } catch { /* host blocks fullscreen — CSS overlay already applied */ }
+    }, [fullscreen]);
 
-    const widthMap = {
-        md: 768,
-        lg: 1024,
-        xl: 1440,
-    };
+    // Nested inside another ResponsiveFrame → transparent pass-through (single well wins).
+    if (nested) {
+        return <div style={{ width: '100%' }}>{children}</div>;
+    }
 
-    const width = widthMap[selectedBreakpoint] || widthMap.xl;
+    const maxWidth = MAXW[breakpoint] || MAXW.xl;
 
-    const measureScale = useCallback(() => {
-        if (!fitToContainer || !wrapperRef.current) {
-            setScale(1);
-            return;
-        }
-        const w = wrapperRef.current.getBoundingClientRect().width;
-        if (!w || !width) {
-            setScale(1);
-            return;
-        }
-        setScale(Math.min(1, Math.max(0.05, w / width)));
-    }, [fitToContainer, width]);
-
-    const measureHeight = useCallback(() => {
-        if (!innerRef.current) return;
-        setContentHeight(innerRef.current.scrollHeight);
-    }, []);
-
-    useEffect(() => {
-        measureScale();
-    }, [measureScale, selectedBreakpoint]);
-
-    useEffect(() => {
-        if (!fitToContainer) {
-            setScale(1);
-            return undefined;
-        }
-        const el = wrapperRef.current;
-        if (!el) return undefined;
-        const ro = new ResizeObserver(() => {
-            measureScale();
-        });
-        ro.observe(el);
-        return () => ro.disconnect();
-    }, [fitToContainer, measureScale]);
-
-    useEffect(() => {
-        const el = innerRef.current;
-        if (!el) return undefined;
-        const ro = new ResizeObserver(() => {
-            measureHeight();
-        });
-        ro.observe(el);
-        measureHeight();
-        return () => ro.disconnect();
-    }, [measureHeight, children, selectedBreakpoint, scale]);
-
-    const baseInnerStyle = {
-        width: `${width}px`,
-        minWidth: `${width}px`,
-        transition: 'width 0.3s cubic-bezier(0.2, 0, 0.2, 1)',
+    const innerStyle = {
+        width: '100%',
+        maxWidth: `${maxWidth}px`,
+        margin: '0 auto',
         backgroundColor: 'var(--color-surface, #ffffff)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-        height: 'max-content',
-        minHeight: 'calc(100vh - 120px)',
-        overflow: 'visible',
         position: 'relative',
-        border: '1px solid var(--color-outline-variant, #e0e0e0)',
+        transition: 'max-width 0.25s cubic-bezier(0.2,0,0.2,1)',
+        // Always a flex child that fills the column, so a page with height:100% (PageLayout)
+        // resolves against a definite height instead of collapsing to its content. This is what
+        // makes pages fill the preview in the normal well AND in fullscreen — no per-story height.
+        flex: '1 1 auto',
+        minHeight: 0,
     };
-
-    const scaledVisualHeight = contentHeight > 0 ? Math.ceil(contentHeight * scale) : undefined;
-    const scaledVisualWidth = Math.ceil(width * scale);
 
     return (
-        <div
-            ref={rootRef}
-            className={[
-                'responsive-frame-root',
-                browserFullscreen && 'responsive-frame-root--browser-fullscreen',
-            ]
-                .filter(Boolean)
-                .join(' ')}
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                minHeight: browserFullscreen ? '100%' : 'auto',
-                ...(browserFullscreen
-                    ? {
-                        height: '100%',
-                        backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
-                    }
-                    : {}),
-            }}
-        >
+        <RFContext.Provider value={true}>
             <div
-                className="responsive-frame-toolbar"
+                ref={rootRef}
+                className={['responsive-frame-root', fullscreen && 'responsive-frame-root--fullscreen'].filter(Boolean).join(' ')}
                 style={{
-                    padding: '12px 24px',
-                    borderBottom: '1px solid var(--color-outline-variant, #e0e0e0)',
-                    backgroundColor: 'var(--color-surface, #ffffff)',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    flexWrap: 'wrap',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1000,
-                }}
-            >
-                <span className="label-medium" style={{ color: 'var(--color-on-surface-variant, #444746)' }}>
-                    Breakpoint:
-                </span>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    {[
-                        { key: 'md', label: 'MD (768px)' },
-                        { key: 'lg', label: 'LG (1024px)' },
-                        { key: 'xl', label: 'XL (1440px)' },
-                    ].map((bp) => (
-                        <button
-                            key={bp.key}
-                            type="button"
-                            onClick={() => setSelectedBreakpoint(bp.key)}
-                            style={{
-                                padding: '6px 12px',
-                                borderRadius: '4px',
-                                border: '1px solid',
-                                borderColor: selectedBreakpoint === bp.key
-                                    ? 'var(--color-primary, #00639b)'
-                                    : 'var(--color-outline, #747775)',
-                                backgroundColor: selectedBreakpoint === bp.key
-                                    ? 'var(--color-primary-container, #d3e3fd)'
-                                    : 'transparent',
-                                color: selectedBreakpoint === bp.key
-                                    ? 'var(--color-on-primary-container, #001d32)'
-                                    : 'var(--color-on-surface, #1f1f1f)',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                transition: 'all 0.2s ease',
-                            }}
-                        >
-                            {bp.label}
-                        </button>
-                    ))}
-                </div>
-                {/* Next to breakpoint pills — not Storybook’s top toolbar fullscreen (that only expands the Canvas chrome). */}
-                <div
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        marginLeft: '4px',
-                        paddingLeft: '16px',
-                        borderLeft: '1px solid var(--color-outline-variant, #e0e0e0)',
-                    }}
-                >
-                    <button
-                        type="button"
-                        className="responsive-frame-fullscreen-btn"
-                        onClick={() => {
-                            void toggleBrowserFullscreen();
-                        }}
-                        aria-label={browserFullscreen ? 'Exit fullscreen' : 'Enter fullscreen preview'}
-                        title={
-                            browserFullscreen
-                                ? 'Exit fullscreen (Esc)'
-                                : 'Fullscreen this preview — fills your display, outside MDX layout'
-                        }
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            minHeight: 36,
-                            padding: '6px 14px',
-                            borderRadius: 'var(--size-element-radius-md, 8px)',
-                            border: '1px solid var(--color-primary, #00639b)',
-                            backgroundColor: browserFullscreen
-                                ? 'var(--color-primary, #00639b)'
-                                : 'var(--color-primary-container, #d3e3fd)',
-                            color: browserFullscreen
-                                ? 'var(--color-on-primary, #ffffff)'
-                                : 'var(--color-on-primary-container, #001d32)',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            flexShrink: 0,
-                        }}
-                    >
-                        <i
-                            className={`fa-solid ${browserFullscreen ? 'fa-compress' : 'fa-expand'}`}
-                            style={{ fontSize: '14px' }}
-                            aria-hidden="true"
-                        />
-                        <span>{browserFullscreen ? 'Exit fullscreen' : 'Fullscreen'}</span>
-                    </button>
-                </div>
-                {fitToContainer && scale < 0.999 && !browserFullscreen ? (
-                    <span
-                        className="label-medium"
-                        style={{
-                            color: 'var(--color-on-surface-variant, #444746)',
-                            fontSize: '12px',
-                            maxWidth: 260,
-                            marginLeft: 'auto',
-                        }}
-                    >
-                        Scaled to fit —{' '}
-                        <strong style={{ color: 'var(--color-on-surface, #1f1f1f)' }}>
-                            {Math.round(scale * 100)}%
-                        </strong>{' '}
-                        of design width ({width}px)
-                    </span>
-                ) : null}
-            </div>
-
-            <div
-                ref={wrapperRef}
-                className="responsive-frame-wrapper"
-                style={{
-                    flex: 1,
-                    backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
-                    display: 'flex',
-                    justifyContent: fitToContainer ? 'center' : 'flex-start',
-                    alignItems: 'flex-start',
-                    overflowX: 'auto',
-                    overflowY: 'auto',
-                    WebkitOverflowScrolling: 'touch',
-                    padding: '24px',
+                    flexDirection: 'column',
                     width: '100%',
-                    boxSizing: 'border-box',
-                    ...(browserFullscreen ? { flex: 1, minHeight: 0 } : {}),
+                    // Definite height (not just min-height) so the flex chain below hands pages a
+                    // resolvable height — 100vh fills the preview viewport in the normal well; the
+                    // fullscreen branch uses position:fixed/inset:0 + height:100%.
+                    height: fullscreen ? '100%' : '100vh',
+                    minHeight: fullscreen ? '100%' : '100vh',
+                    ...(fullscreen
+                        ? {
+                            // CSS overlay floor — fills the viewport even where native fullscreen is blocked.
+                            position: 'fixed', inset: 0, zIndex: 2147483000,
+                            height: '100%',
+                            backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
+                        }
+                        : {}),
                 }}
             >
-                {fitToContainer ? (
+                {/* Fullscreen-only bar: shows the active breakpoint (set from the global toolbar) + Exit.
+                    The breakpoint itself is NOT changed here — that stays the one global control. */}
+                {fullscreen && (
                     <div
-                        className="responsive-frame-scale-clip"
+                        className="responsive-frame-toolbar"
                         style={{
-                            width: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            overflow: 'hidden',
+                            display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md, 16px)', flexWrap: 'wrap',
+                            padding: 'var(--size-element-pad-y-md, 12px) var(--size-surface-pad-x, 24px)',
+                            borderBottom: '1px solid var(--color-outline-variant)',
+                            backgroundColor: 'var(--color-surface)',
+                            position: 'sticky', top: 0, zIndex: 1000,
                         }}
                     >
-                        <div
-                            style={{
-                                width: `${scaledVisualWidth}px`,
-                                height: scaledVisualHeight != null ? `${scaledVisualHeight}px` : undefined,
-                                overflow: 'hidden',
-                                flexShrink: 0,
-                            }}
-                        >
-                            <div
-                                ref={innerRef}
-                                className="responsive-frame-inner"
-                                style={{
-                                    ...baseInnerStyle,
-                                    transform: `scale(${scale})`,
-                                    transformOrigin: 'top left',
-                                }}
-                            >
-                                {children}
-                            </div>
+                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                            Breakpoint: <strong style={{ color: 'var(--color-on-surface)' }}>{breakpoint.toUpperCase()} ({maxWidth}px)</strong>
+                            <span style={{ marginLeft: 8, opacity: 0.75 }}>— change it from the Breakpoint toolbar</span>
+                        </span>
+                        <div style={{ marginLeft: 'auto' }}>
+                            <Button
+                                text="Exit fullscreen"
+                                style="primary"
+                                fill="filled"
+                                size="small"
+                                leadingVisual="compress"
+                                onClick={() => void toggleFullscreen()}
+                            />
                         </div>
                     </div>
-                ) : (
-                    <div ref={innerRef} className="responsive-frame-inner" style={baseInnerStyle}>
+                )}
+
+                <div
+                    className="responsive-frame-wrapper"
+                    style={{
+                        flex: 1, position: 'relative',
+                        // The display well: filled + bordered on the lowest layer so the page is
+                        // distinguishable from the docs prose; the inner page frame stays clean.
+                        backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
+                        border: fullscreen ? 'none' : '1px solid var(--color-outline-variant, #e0e0e0)',
+                        borderRadius: fullscreen ? 0 : 'var(--size-card-radius-sm, 12px)',
+                        // Flex column in both modes so the inner can flex:1 and hand a page a definite
+                        // full height. The inner still uses width:100% + margin:auto to center up to
+                        // its max width (auto side margins win over align-items in the cross axis).
+                        display: 'flex', flexDirection: 'column', alignItems: 'stretch',
+                        overflowX: 'auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+                        padding: fullscreen ? '24px' : 'clamp(1rem, 3vw, 2rem)',
+                        width: '100%', boxSizing: 'border-box', minHeight: 0,
+                        containerType: 'inline-size',
+                    }}
+                >
+                    {/* Floating fullscreen affordance — ALWAYS available (not in fullscreen, where the bar has Exit). */}
+                    {!fullscreen && (
+                        <div
+                            className="responsive-frame-fullscreen-btn"
+                            style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 20 }}
+                        >
+                            <Button
+                                text="Fullscreen"
+                                style="secondary"
+                                fill="outline"
+                                size="small"
+                                leadingVisual="expand"
+                                onClick={() => void toggleFullscreen()}
+                                aria-label="Open preview in fullscreen"
+                            />
+                        </div>
+                    )}
+
+                    <div className="responsive-frame-inner" style={innerStyle}>
                         {children}
                     </div>
-                )}
+                </div>
             </div>
-        </div>
+        </RFContext.Provider>
     );
 };
 
 ResponsiveFrame.propTypes = {
+    /** Max width to cap at — driven by the global `plusBreakpoint` toolbar. */
     breakpoint: PropTypes.oneOf(['md', 'lg', 'xl']),
-    fitToContainer: PropTypes.bool,
     children: PropTypes.node.isRequired,
 };
 

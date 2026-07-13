@@ -7,6 +7,7 @@
 // not a wall, so a GitHub hiccup must not block legitimate implements.
 
 import type { Env } from "../types";
+import { fetchWithTimeout } from "../http";
 
 const CACHE_TTL_MS = 10 * 60_000;
 const FETCH_TIMEOUT_MS = 8000;
@@ -19,17 +20,14 @@ export async function listDsComponents(env: Env): Promise<string[] | null> {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) return null;
 
   const url = `https://api.github.com/repos/${env.GITHUB_REPO}/contents/design-system/src/components`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: {
         authorization: `Bearer ${env.GITHUB_TOKEN}`,
         accept: "application/vnd.github+json",
         "user-agent": "uno-bot",
       },
-      signal: controller.signal,
-    });
+    }, FETCH_TIMEOUT_MS);
     if (!res.ok) {
       console.warn(`[ds-components] GitHub contents ${res.status}`);
       return null;
@@ -47,8 +45,6 @@ export async function listDsComponents(env: Env): Promise<string[] | null> {
   } catch (err) {
     console.warn(`[ds-components] fetch failed: ${err instanceof Error ? err.message : String(err)}`);
     return null;
-  } finally {
-    clearTimeout(timer);
   }
 }
 

@@ -30,9 +30,11 @@ Both lanes share the same local tool roster, gate protocol, iteration cap (16) a
 
 ## What it can / partially can / can't do
 
-**Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`blueprint_search`), DS/component/repo facts (`github_read` / GitHub MCP), Slack search + thread reads, any linked doc (`source_read`) — and post/react in Slack as itself.
+**Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`blueprint_search`), DS/component/repo facts (`github_read` / GitHub MCP), Slack search + thread reads, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
 
-**Can, behind the ✅ gate (proposal card, 60-min expiry, requester-only confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`).
+**Can, behind the ✅ gate (proposal card, 60-min expiry, requester-only confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
+
+**Quality loop, pre-send:** substantive text drafts (≥1500 chars — deliverable-shaped output, not ordinary replies) get ONE cheap judge call against a condensed D1–D9 rubric (`src/agent/draft-judge.ts`) and are revised once if flagged; short replies skip it, and any judge error/timeout ships the original draft (fail open). Verdicts land in the telemetry stream as `[uno-bot] draft-judge …` lines.
 
 **Partially — Figma:** no Figma MCP for the Worker (closed catalog; only approved apps like Claude Code/Cursor connect). A pasted frame link (with `node-id`) arrives with a rendered screenshot the model can *see*, plus structure/text layers over REST (`source_read`) — so qualitative review works. Variables, tokens, and computed values (exact spacing, contrast ratios) stay IDE-only. The bot never writes to Figma; `FIGMA_ACCESS_TOKEN` only powers the proposal-card screenshot.
 
@@ -65,7 +67,7 @@ uno-bot/
     └── version.ts        BUILD string returned by /health
 ```
 
-Regression prompts for the bot live in the eval loop: `docs/evals/scenarios/uno-bot.md` (R1–R12).
+Regression tests: the **UNO-Bot Test Plan** in Notion (13 `TC-*` cases run one-per-thread in `#uno-bot-sandbox`, hand- or judge-scored 0–3; latest round 2026-07-11 averaged 2.48). Legacy R1–R12 prompts remain in `docs/evals/scenarios/uno-bot.md`.
 
 ## Local dev
 
@@ -114,7 +116,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 
 ## Smoke test
 
-- **Bot behavior:** fire a few of the R1–R12 prompts in `docs/evals/scenarios/uno-bot.md` at @uno-bot — the confidence-line + routing + gate behaviors confirm the current build is live.
+- **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider + MCP health:** `GET /debug/gemini` (live Gemini round-trip), `GET /debug/mcp` (attached MCP servers; also cron-probed every 15 min with alerts to `#uno-bot`).
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `playground/test-prototype/` + a root `dev:test-prototype` script; `npm install && npm run dev:test-prototype` boots it.
 

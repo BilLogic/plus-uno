@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Badge from '@/components/Badge';
-import Card from '@/components/Card';
-import Alert from '@/components/Alert';
-import Button from '@/components/Button';
-import Input from '@/forms/Input';
+import Badge from '@/components/status-and-loading/Badge';
+import Card from '@/components/layout-and-structure/Card';
+import Alert from '@/components/messaging/Alert';
+import Button from '@/components/actions/Button';
+import Input from '@/components/forms-and-inputs/Input';
 
 import './Test1Page.scss';
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PageLayout from '@plus-ds/specs/Universal/Pages/PageLayout/PageLayout';
-import Card from '@plus-ds/components/Card';
-import Button from '@plus-ds/components/Button';
-import Badge from '@plus-ds/components/Badge';
+import Card from '@plus-ds/components/layout-and-structure/Card';
+import Button from '@plus-ds/components/actions/Button';
+import Badge from '@plus-ds/components/status-and-loading/Badge';
 
 // We will split the wizard steps into separate components to keep it clean.
 import Step1Baseline from './Step1Baseline';

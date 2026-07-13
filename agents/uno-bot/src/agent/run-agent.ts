@@ -20,96 +20,31 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 import type { Env } from "../types";
-import type { HistoryTurn, PendingProposal } from "../thread-state-client";
+import type { HistoryTurn } from "../thread-state-client";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { makeAnthropicClient, routeRequest, MODELS } from "./anthropic-client";
 import { buildMcp, MCP_BETA } from "./mcp";
-import { executeNotionSearch } from "../tools/notion-search";
-import { executeRoadmapQuery } from "../tools/roadmap-query";
 import { geminiConfigured } from "../gemini/client";
 import { runGeminiAgent } from "./gemini-agent";
-import { executeBlueprintSearch } from "../tools/blueprint-search";
-import { executeReadSource } from "../tools/read-source";
-import { executeGithubRead } from "../tools/github-read";
-import { executeSlackThreadRead } from "../tools/slack-thread-read";
-import { executeSlackSearch } from "../tools/slack-search";
-import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
-import { addReaction } from "../slack/api";
-import type { SlackContext } from "../tools/dispatcher";
+import {
+  MAX_ITERATIONS,
+  MAX_TOKENS,
+  READONLY_TOOL_BUDGET,
+  BUDGET_EXHAUSTED_LOOKUP_NOTE,
+  BUDGET_EXHAUSTED_SYNTHESIS,
+  CLARIFY_FALLBACK,
+  makeInterimFilter,
+  validateProposalResolve,
+  executeReadOnlyTool,
+  type AgentInput,
+  type AgentResult,
+  type AgentImage,
+} from "./loop-shared";
 import { BUILD } from "../version";
 
-export type { HistoryTurn };
-
-/** A base64-encoded image attached to the CURRENT user turn (Slack paste or a
- *  rendered Figma frame). Never persisted to history — the Durable Object
- *  stores a text marker instead (see events.ts). */
-export interface AgentImage {
-  /** One of the Anthropic-supported image media types (jpeg/png/gif/webp). */
-  media_type: string;
-  /** Raw base64 (no data: prefix). */
-  data: string;
-}
-
-export interface AgentInput {
-  env: Env;
-  userText: string;
-  history: HistoryTurn[];
-  slack: SlackContext;
-  currentSender: { userId: string };
-  pending: PendingProposal | null;
-  /** Vision input for the current turn only. History turns stay plain text. */
-  images?: AgentImage[];
-  /** Called with short, FILTERED progress lines (the model's between-tool
-   *  narration, capped + capped-count) so the Worker can post them as separate
-   *  interim messages. Never receives the full working monologue. */
-  onInterim?: (text: string) => void;
-}
-
-export type AgentResult =
-  | { kind: "text"; text: string }
-  | {
-      kind: "proposal";
-      toolName: string;
-      input: Record<string, unknown>;
-      toolUseId: string;
-      assistantContent: Anthropic.ContentBlock[];
-      /** Brief structural preview Claude wrote alongside the tool_use, if any.
-       *  The Worker combines this with its standardized proposal footer. */
-      previewText?: string;
-    }
-  | {
-      kind: "resolved";
-      decision: "confirm" | "cancel";
-      pending: PendingProposal;
-      messageToUser?: string;
-    };
-
-// Raised from 5: grounding questions legitimately chain several read-only
-// searches (e.g. blueprint_search across a multi-step flow) before the model
-// has enough to answer. If this is still exhausted, we fall back to a final
-// tools-disabled synthesis pass (below) rather than erroring out.
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision)
-const MAX_ITERATIONS = 16;
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision):
-// users prefer complete+right over fast; Slack's hard cap is 40k chars, and
-// readability guidance (summary-first, thread the detail) still applies.
-// Raised again 2026-07-10 for Sonnet 5 + adaptive thinking: thinking tokens
-// share this budget, and Sonnet 5's tokenizer counts ~30% more — 8192 risked
-// an all-thinking, truncated-answer response. We stream, so no timeout risk.
-const MAX_TOKENS = 16384;
-// Cap on individual read-only tool executions per request. Each execution costs
-// Workers subrequests (a blueprint fallback search alone is ~4 fetches), and the
-// free plan allows 50 per request — blowing it kills the request mid-flight so
-// hard that even the error post fails ("reacted :eyes: then silence"). Past
-// the cap the model is told to answer with what it has (and the iteration
-// cap's tool_choice-none fallback backstops that).
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision).
-// NOTE: 12 sits closer to the subrequest cliff than the old 6 (worst case
-// ~4 fetches per blueprint fallback) — if "eyes then silence" recurs on
-// search-heavy turns, this is the first dial to look at.
-const READONLY_TOOL_BUDGET = 12;
+export type { HistoryTurn, AgentInput, AgentResult, AgentImage } from "./loop-shared";
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack } = input;
@@ -209,14 +144,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // at 3 per request and ~280 chars each; only the first line of a narration
   // block is used. The full monologue is never exposed (user decision
   // 2026-07-10 after a delivered reply included seven paragraphs of it).
-  let interimSent = 0;
-  const emitInterim = (raw: string): void => {
-    if (!input.onInterim || interimSent >= 3) return;
-    const line = raw.trim().split("\n")[0]?.trim() ?? "";
-    if (line.length < 15) return; // too short to be informative
-    interimSent++;
-    input.onInterim(line.length > 280 ? `${line.slice(0, 277)}…` : line);
-  };
+  const emitInterim = makeInterimFilter(input.onInterim);
   // Watch the stream: when a tool block completes AFTER a text block, that text
   // was narration — surface it (filtered) while the run continues.
   const attachInterimWatcher = (stream: ReturnType<typeof client.messages.stream>): void => {
@@ -405,57 +333,41 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       // here even though the system prompt already tells Claude — defense in depth.
       const resolveCall = toolUses.find((tu) => tu.name === "proposal_resolve");
       if (resolveCall) {
-        if (!pending) {
+        const verdict = validateProposalResolve(
+          resolveCall.input as { decision?: unknown; message_to_user?: unknown },
+          pending,
+          currentSender.userId,
+        );
+        if (!verdict.ok) {
+          // Reject: feed back an error result — but ALSO satisfy every OTHER
+          // tool_use in the same assistant turn, or the next call 400s on an
+          // orphaned tool_use (review 2026-07-12). The extras get a "deferred"
+          // stub since we're not executing them on a rejected resolve.
           messages.push({ role: "assistant", content: response.content });
           messages.push({
             role: "user",
-            content: [{
-              type: "tool_result",
-              tool_use_id: resolveCall.id,
-              content: JSON.stringify({
-                ok: false,
-                error: "no pending proposal in this thread — reply conversationally instead",
-              }),
-              is_error: true,
-            }],
-          });
-          continue;
-        }
-        if (currentSender.userId !== pending.requesterUserId) {
-          messages.push({ role: "assistant", content: response.content });
-          messages.push({
-            role: "user",
-            content: [{
-              type: "tool_result",
-              tool_use_id: resolveCall.id,
-              content: JSON.stringify({
-                ok: false,
-                error: `not authorized — only <@${pending.requesterUserId}> can resolve this proposal`,
-              }),
-              is_error: true,
-            }],
-          });
-          continue;
-        }
-        const inp = (resolveCall.input ?? {}) as { decision?: "confirm" | "cancel"; message_to_user?: string };
-        if (inp.decision !== "confirm" && inp.decision !== "cancel") {
-          messages.push({ role: "assistant", content: response.content });
-          messages.push({
-            role: "user",
-            content: [{
-              type: "tool_result",
-              tool_use_id: resolveCall.id,
-              content: JSON.stringify({ ok: false, error: "decision must be 'confirm' or 'cancel'" }),
-              is_error: true,
-            }],
+            content: toolUses.map((tu): Anthropic.ToolResultBlockParam =>
+              tu.id === resolveCall.id
+                ? {
+                    type: "tool_result",
+                    tool_use_id: tu.id,
+                    content: JSON.stringify({ ok: false, error: verdict.error }),
+                    is_error: true,
+                  }
+                : {
+                    type: "tool_result",
+                    tool_use_id: tu.id,
+                    content: JSON.stringify({ ok: false, error: "deferred — resolve the pending proposal first" }),
+                  },
+            ),
           });
           continue;
         }
         return finish({
           kind: "resolved",
-          decision: inp.decision,
-          pending,
-          messageToUser: inp.message_to_user,
+          decision: verdict.decision,
+          pending: pending!,
+          messageToUser: verdict.messageToUser,
         });
       }
 
@@ -475,8 +387,6 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
           kind: "proposal",
           toolName: sideEffect.name,
           input: (sideEffect.input as Record<string, unknown>) ?? {},
-          toolUseId: sideEffect.id,
-          assistantContent: response.content,
           previewText: previewText || undefined,
         });
       }
@@ -492,7 +402,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
             content: JSON.stringify({
               ok: false,
               error: "no more lookups available this turn",
-              note: "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction).",
+              note: BUDGET_EXHAUSTED_LOOKUP_NOTE,
             }),
           });
           continue;
@@ -519,11 +429,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // when no tools are defined, so omitting it here would 400 on exactly the
   // multi-search requests this fallback exists for. (The `as` cast is because
   // this SDK version's types predate tool_choice "none"; the API accepts it.)
-  messages.push({
-    role: "user",
-    content:
-      "(system: tool budget exhausted — answer the original question NOW from the tool results above; do not request more tools. If the results are insufficient, say what's missing.)",
-  });
+  messages.push({ role: "user", content: BUDGET_EXHAUSTED_SYNTHESIS });
   const finalResponse = await callClaude({
     model,
     max_tokens: MAX_TOKENS,
@@ -535,12 +441,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   addUsage(finalResponse.usage);
   recordToolUses(finalResponse.content);
   const finalText = extractFinalText(finalResponse.content);
-  return finish({
-    kind: "text",
-    text:
-      finalText ||
-      "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?",
-  });
+  return finish({ kind: "text", text: finalText || CLARIFY_FALLBACK });
 }
 
 /**
@@ -626,52 +527,4 @@ function buildMessages(
     }
   }
   return result;
-}
-
-// Exported for the Gemini loop (agent/gemini-agent.ts) — one dispatcher, two
-// providers. (The mutual import between the two agent files is benign: both
-// only reference each other's functions at call time.)
-export async function executeReadOnlyTool(
-  env: Env,
-  name: string,
-  input: Record<string, unknown>,
-  slack: SlackContext,
-): Promise<string> {
-  if (name === "notion_search") return executeNotionSearch(env, input);
-  if (name === "roadmap_query") return executeRoadmapQuery(env, input);
-  if (name === "blueprint_search") return executeBlueprintSearch(env, input);
-  if (name === "source_read") return executeReadSource(env, input);
-  if (name === "github_read") return executeGithubRead(env, input);
-  if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
-  if (name === "slack_search") return executeSlackSearch(env, input);
-  if (name === "slack_react") return executeSlackReact(env, input, slack);
-  if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
-  if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
-  return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
-}
-
-// Reactions post AS UNO-BOT via the bot token — the Slack MCP was demoted to
-// reads-only because its user-token writes carried the consenting human's
-// identity (team decision 2026-07-10: everything visible is uno-bot). Ungated:
-// reactions are reversible, the same class as the bot's own replies.
-async function executeSlackReact(
-  env: Env,
-  input: Record<string, unknown>,
-  slack: SlackContext,
-): Promise<string> {
-  const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
-  if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
-  if (emoji === "white_check_mark" || emoji === "x") {
-    return JSON.stringify({
-      ok: false,
-      error: "white_check_mark and x are reserved for the requester's confirm/cancel on proposal cards",
-    });
-  }
-  const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;
-  try {
-    await addReaction(env, slack.channel, ts, emoji);
-    return JSON.stringify({ ok: true, reacted: emoji, message_ts: ts });
-  } catch (err) {
-    return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
-  }
 }

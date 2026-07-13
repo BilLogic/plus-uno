@@ -1,7 +1,7 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TooltipAdditionalEmailStories from './TooltipAdditionalEmail.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DsCanvasHero, DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={TooltipAdditionalEmailStories} />
 
@@ -11,7 +11,7 @@ Info tooltip for the Additional Email field on Basic Information.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5719-19370&m=dev"
-    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Profile/Elements/TooltipAdditionalEmail.stories.jsx"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile/Elements"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -21,7 +21,7 @@ Info tooltip for the Additional Email field on Basic Information.
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default placement beside the field label.</>}>
-    <Canvas of={TooltipAdditionalEmailStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <DsCanvasHero of={TooltipAdditionalEmailStories.Overview} layout="padded" />
 </DocsCanvasShell>
 
 </div>

@@ -4,7 +4,7 @@ import { PageLayout } from '@/specs/Universal/Pages';
 import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationTrainingProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationTrainingProgress';
 import { MetricsCard, RecommendedLessons } from '@/specs/Home/Cards';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 import './TutorHomePageSkillsOverviewDifferentLayout.scss';
 
 /**

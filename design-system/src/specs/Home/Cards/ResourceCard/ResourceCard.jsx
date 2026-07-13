@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
-import StaticBadgeSmart from '@/components/StaticBadgeSmart';
+import Card from '@/components/layout-and-structure/Card';
+import Button from '@/components/actions/Button';
+import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
 import './ResourceCard.scss';
 
 /**

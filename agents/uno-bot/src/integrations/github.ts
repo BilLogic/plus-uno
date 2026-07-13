@@ -5,6 +5,7 @@
 // which fails-open because it's a preflight guard, not a user-facing read.
 
 import type { Env } from "../types";
+import { fetchWithTimeout } from "../http";
 
 const GH_TIMEOUT_MS = 8000;
 const GH_TEXT_CAP = 12000; // keep a big file from blowing the model's budget
@@ -20,14 +21,13 @@ export interface GithubReadResult {
 }
 
 /**
- * Read a repo path. If it resolves to a directory (or `list` is set and it is a
- * dir), returns the entry names; otherwise returns the file's decoded text.
- * Throws on any non-2xx so github_read can surface the failure.
+ * Read a repo path. Dir vs file is auto-detected from the GitHub API response
+ * shape (an array = directory listing; an object = file), so no caller flag is
+ * needed. Throws on any non-2xx so github_read can surface the failure.
  */
 export async function githubReadPath(
   env: Env,
   path: string,
-  _list = false,
   ref?: string,
 ): Promise<GithubReadResult> {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
@@ -37,17 +37,14 @@ export async function githubReadPath(
   const qs = ref ? `?ref=${encodeURIComponent(ref)}` : "";
   const url = `https://api.github.com/repos/${env.GITHUB_REPO}/contents/${clean}${qs}`;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GH_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, {
+  {
+    const res = await fetchWithTimeout(url, {
       headers: {
         authorization: `Bearer ${env.GITHUB_TOKEN}`,
         accept: "application/vnd.github+json",
         "user-agent": "uno-bot",
       },
-      signal: controller.signal,
-    });
+    }, GH_TIMEOUT_MS);
     if (!res.ok) {
       throw new Error(`GitHub contents ${res.status} for ${clean}`);
     }
@@ -71,8 +68,6 @@ export async function githubReadPath(
       text = decoded.slice(0, GH_TEXT_CAP);
     }
     return { path: clean, kind: "file", text, truncated };
-  } finally {
-    clearTimeout(timer);
   }
 }
 
@@ -93,25 +88,18 @@ export async function githubSearchCode(env: Env, query: string): Promise<GithubC
   }
   const q = `${query} repo:${env.GITHUB_REPO}`;
   const url = `https://api.github.com/search/code?q=${encodeURIComponent(q)}&per_page=10`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GH_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, {
-      headers: {
-        authorization: `Bearer ${env.GITHUB_TOKEN}`,
-        accept: "application/vnd.github+json",
-        "user-agent": "uno-bot",
-      },
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error(`GitHub code search ${res.status}`);
-    const data = (await res.json()) as {
-      items?: Array<{ path?: string; html_url?: string }>;
-    };
-    return (data.items ?? [])
-      .map((i) => ({ path: i.path ?? "", url: i.html_url ?? "" }))
-      .filter((i) => i.path);
-  } finally {
-    clearTimeout(timer);
-  }
+  const res = await fetchWithTimeout(url, {
+    headers: {
+      authorization: `Bearer ${env.GITHUB_TOKEN}`,
+      accept: "application/vnd.github+json",
+      "user-agent": "uno-bot",
+    },
+  }, GH_TIMEOUT_MS);
+  if (!res.ok) throw new Error(`GitHub code search ${res.status}`);
+  const data = (await res.json()) as {
+    items?: Array<{ path?: string; html_url?: string }>;
+  };
+  return (data.items ?? [])
+    .map((i) => ({ path: i.path ?? "", url: i.html_url ?? "" }))
+    .filter((i) => i.path);
 }

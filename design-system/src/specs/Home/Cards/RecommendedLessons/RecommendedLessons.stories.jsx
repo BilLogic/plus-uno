@@ -2,7 +2,7 @@ import React from 'react';
 import RecommendedLessons from './RecommendedLessons';
 
 export default {
-    title: 'Specs/Home/Cards/RecommendedLessons',
+    title: 'Specs/Home/Cards/Recommended Lessons',
     component: RecommendedLessons,
     tags: ['!dev', '!autodocs'],
 };

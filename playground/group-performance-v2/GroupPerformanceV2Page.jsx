@@ -8,14 +8,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/Button/Button';
-import NavTabs from '@/components/NavTabs/NavTabs';
-import Pagination from '@/components/Pagination/Pagination';
-import Badge from '@/components/Badge/Badge';
-import Dropdown from '@/components/Dropdown/Dropdown';
+import Button from '@/components/actions/Button/Button';
+import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Pagination from '@/components/navigation/Pagination/Pagination';
+import Badge from '@/components/status-and-loading/Badge/Badge';
+import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import { Table } from 'react-bootstrap';
-import TutorDataCard from '@/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard';
-import TutorChartsElement from '@/specs/Admin/Tutor Admin/Elements/TutorChartsElement/TutorChartsElement';
+import TutorDataCard from '@/specs/Admin/Tutor/Cards/TutorDataCard/TutorDataCard';
+import TutorChartsElement from '@/specs/Admin/Tutor/Elements/TutorChartsElement/TutorChartsElement';
 import './GroupPerformanceV2Page.scss';
 
 /**

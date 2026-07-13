@@ -8,7 +8,7 @@ import React from 'react';
 import UserAvatar from './UserAvatar';
 
 export default {
-    title: 'Specs/Universal/Elements/UserAvatar',
+    title: 'Specs/Universal/Elements/User Avatar',
     component: UserAvatar,
     tags: ['!dev', '!autodocs'],
     parameters: {

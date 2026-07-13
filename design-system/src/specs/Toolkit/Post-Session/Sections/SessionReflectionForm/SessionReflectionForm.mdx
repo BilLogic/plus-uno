@@ -1,0 +1,45 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SessionReflectionFormStories from './SessionReflectionForm.stories.jsx';
+import { DsCanvasHero, DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionReflectionFormStories} name="Toolkit Docs — SessionReflectionForm" />
+
+<Title />
+
+This entry is part of **Toolkit** specs (Storybook title `Specs/Toolkit/Post-Session/Sections/Session Reflection Form`). Visual specs live in **Figma**; tokens, layout, and behavior notes are in the **GitHub** source below.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=810-138948"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Sections/SessionReflectionForm"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Default</code> story).</>}>
+    <DsCanvasHero of={SessionReflectionFormStories.Default} layout="padded" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SessionReflectionFormStories.Default}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

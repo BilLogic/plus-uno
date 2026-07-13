@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import TopBar from './TopBar';
 
 export default {
-    title: 'Specs/Universal/Sections/TopBar',
+    title: 'Specs/Universal/Sections/Top Bar',
     component: TopBar,
     tags: ['!dev', '!autodocs'],
     parameters: {

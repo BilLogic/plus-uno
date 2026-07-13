@@ -204,12 +204,17 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
     );
 }
 
-/** Muted border + padded inner well — shared by DocsDemoBlock and DocsCanvasShell. */
+/** Filled + bordered padded inner well (surface-container-lowest, the lowest layer) —
+ *  shared by DocsDemoBlock and DocsCanvasShell so every display block is distinguishable. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
         <div
-            className="sb-ds-docs-preview-well overflow-visible bg-muted/40 dark:bg-muted/25"
-            style={{ borderRadius: 'var(--size-card-radius-sm)' }}
+            className="sb-ds-docs-preview-well overflow-visible"
+            style={{
+                borderRadius: 'var(--size-card-radius-sm)',
+                backgroundColor: 'var(--color-surface-container-lowest)',
+                border: '1px solid var(--color-outline-variant)',
+            }}
         >
             <div
                 className={['min-h-[100px] p-10 md:p-12 lg:p-14', innerClassName].filter(Boolean).join(' ')}

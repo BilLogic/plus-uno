@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "plus-storybook": {
+      "type": "http",
+      "url": "http://localhost:4200/mcp"
+    }
+  }
+}

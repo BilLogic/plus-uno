@@ -1,0 +1,93 @@
+/**
+ * Modal pattern (Patterns/Modal)
+ * Inline modal shell — surface-container-high background, elevation 3,
+ * modal radius/padding/gap tokens, internal body scroll.
+ */
+
+.plus-pattern-modal {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface-container-high);
+    color: var(--color-on-surface);
+    border-radius: var(--size-modal-radius-md);
+    box-shadow: var(--elevation-light-4); /* semantic level 3 (modals) maps to Light/4 per token-mapping.md */
+    overflow: hidden; // keep scrolling body clipped to the radius
+}
+
+/* Padding scale */
+.plus-pattern-modal-pad-sm {
+    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm);
+}
+
+.plus-pattern-modal-pad-md {
+    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
+}
+
+.plus-pattern-modal-pad-lg {
+    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg);
+}
+
+/* Gap scale */
+.plus-pattern-modal-gap-sm {
+    gap: var(--size-modal-gap-sm);
+}
+
+.plus-pattern-modal-gap-md {
+    gap: var(--size-modal-gap-md);
+}
+
+.plus-pattern-modal-gap-lg {
+    gap: var(--size-modal-gap-lg);
+}
+
+/* Header: title + close */
+.plus-pattern-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--size-element-gap-lg);
+    flex-shrink: 0;
+}
+
+.plus-pattern-modal-title {
+    margin: 0;
+    color: var(--color-on-surface);
+    min-width: 0;
+}
+
+.plus-pattern-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    border-radius: var(--size-element-radius-md);
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &:active {
+        background-color: var(--color-on-surface-state-16);
+    }
+}
+
+/* Body: internal scroll past maxHeight */
+.plus-pattern-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* Footer */
+.plus-pattern-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--size-element-gap-sm);
+    flex-shrink: 0;
+}

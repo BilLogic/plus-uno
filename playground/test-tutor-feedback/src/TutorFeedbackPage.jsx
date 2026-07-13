@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Card from '@/components/Card';
-import Badge from '@/components/Badge';
-import Button from '@/components/Button';
-import Alert from '@/components/Alert';
-import { Textarea, Scale } from '@/forms';
+import Card from '@/components/layout-and-structure/Card';
+import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/actions/Button';
+import Alert from '@/components/messaging/Alert';
+import { Textarea, Scale } from '@/components/forms-and-inputs';
 import './TutorFeedbackPage.scss';
 
 const SESSION_ID = 'SES-48291';

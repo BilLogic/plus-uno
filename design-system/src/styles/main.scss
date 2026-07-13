@@ -22,15 +22,15 @@
 // Use @import to ensure global scope availability for @extend (e.g. Dropdown extends Checkbox)
 // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
 // Prototypes and any app that imports main.scss get styles only for uncommented components.
-@import "../components/Button/Button";
-@import "../components/Breadcrumb/Breadcrumb";
-@import "../components/Badge/Badge";
+@import "../components/actions/Button/Button";
+@import "../components/navigation/Breadcrumb/Breadcrumb";
+@import "../components/status-and-loading/Badge/Badge";
 
-@import "../components/Divider/Divider";
+@import "../components/layout-and-structure/Divider/Divider";
 
-@import "../components/ButtonGroup/ButtonGroup";
+@import "../components/actions/ButtonGroup/ButtonGroup";
 // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
-@import "../components/Dropdown/Dropdown";
+@import "../components/forms-and-inputs/Dropdown/Dropdown";
 
 // Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
 // Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
@@ -105,34 +105,34 @@
     border-width: var(--size-card-border-lg);
 }
 
-@import "../components/Modal/Modal";
+@import "../components/messaging/Modal/Modal";
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
-@import "../components/Navbar/Navbar";
+@import "../components/_internal/Navbar/Navbar";
 // @import "../components/Form/Form"; // forms live under src/forms/
 // @import "../components/DatePicker/DatePicker"; // no DatePicker in components/
 // @import "../components/Radio/Radio"; // no Radio in components/
 // @import "../components/Switch/Switch"; // no Switch in components/
 // @import "../components/InputGroup/InputGroup"; // no InputGroup in components/
-@import "../components/ListGroup/ListGroup";
-@import "../components/Carousel/Carousel";
-@import "../components/Collapse/Collapse";
-@import "../components/Jumbotron/Jumbotron";
-@import "../components/MediaObject/MediaObject";
-@import "../components/Progress/Progress";
-@import "../components/Spinner/Spinner";
-@import "../components/LoadingGif/LoadingGif";
-@import "../components/Popover/Popover";
-@import "../components/Pagination/Pagination";
-@import "../components/Tooltip/Tooltip";
-@import "../components/Toast/Toast";
-@import "../components/Scrollspy/Scrollspy";
-// @import "../components/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
-@import "../components/Table/Table";
-@import "../components/NavTabs/NavTabs";
-@import "../components/NavPills/NavPills";
-@import "../components/Alert/Alert";
-@import "../components/Accordion/Accordion";
-@import "../components/UserAvatar/UserAvatar";
+@import "../components/layout-and-structure/ListGroup/ListGroup";
+@import "../components/layout-and-structure/Carousel/Carousel";
+@import "../components/layout-and-structure/Collapse/Collapse";
+@import "../components/layout-and-structure/Jumbotron/Jumbotron";
+@import "../components/layout-and-structure/MediaObject/MediaObject";
+@import "../components/status-and-loading/Progress/Progress";
+@import "../components/status-and-loading/Spinner/Spinner";
+@import "../components/_internal/LoadingGif/LoadingGif";
+@import "../components/overlays/Popover/Popover";
+@import "../components/navigation/Pagination/Pagination";
+@import "../components/overlays/Tooltip/Tooltip";
+@import "../components/messaging/Toast/Toast";
+@import "../components/navigation/Scrollspy/Scrollspy";
+// @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
+@import "../components/_internal/Table/Table";
+@import "../components/navigation/NavTabs/NavTabs";
+@import "../components/navigation/NavPills/NavPills";
+@import "../components/messaging/Alert/Alert";
+@import "../components/layout-and-structure/Accordion/Accordion";
+@import "../components/_internal/UserAvatar/UserAvatar";
 @import "../assets/Logo/Logo";
 
 // Base Styles
@@ -301,4 +301,19 @@ body {
     color: var(--color-on-surface-variant, #3f484a);
     font-size: var(--font-size-body3, 10px);
     box-sizing: border-box;
+}
+
+// Modal Boundary Utility
+// Contains a react-bootstrap Modal (and its backdrop) inside this element instead of
+// letting it cover the whole viewport. Used by page specs in Storybook (`containModal`
+// prop): the modal portal is mounted into this element via the Modal `container` prop,
+// and these overrides scope Bootstrap's fixed positioning to the page frame so popups
+// never cover the outer docs page.
+.plus-modal-boundary {
+    position: relative;
+
+    >.modal,
+    >.modal-backdrop {
+        position: absolute;
+    }
 }

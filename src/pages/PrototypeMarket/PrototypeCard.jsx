@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/Card';
-import Badge from '@/components/Badge';
-import Button from '@/components/Button';
+import Card from '@/components/layout-and-structure/Card';
+import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/actions/Button';
 import { STAGES, PRODUCT_PILLARS, STAGE_META, PILLAR_META } from './prototypes-data';
 import './PrototypeCard.scss';
 

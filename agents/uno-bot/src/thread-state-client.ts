@@ -9,9 +9,6 @@ export type { HistoryTurn };
 export interface PendingProposal {
   toolName: string;
   input: Record<string, unknown>;
-  toolUseId: string;
-  /** Anthropic.ContentBlock[] serialized as JSON. Reserved for a future resume path. */
-  assistantContent: unknown[];
   channel: string;
   threadTs: string;
   userMsgTs: string;
@@ -65,6 +62,21 @@ export async function appendHistory(
   });
 }
 
+// Record a full user→assistant exchange in one call — the invariant is that the
+// user turn is always stored WITH the assistant turn (every handleUserMessage
+// exit path recorded the pair by hand, six times; a missed half is a corrupted
+// memory). Sequential (not parallel) so the two turns land in order.
+export async function recordExchange(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+  userText: string,
+  assistantText: string,
+): Promise<void> {
+  await appendHistory(env, channel, thread_ts, { role: "user", content: userText });
+  await appendHistory(env, channel, thread_ts, { role: "assistant", content: assistantText });
+}
+
 // ----- proposals -----
 
 export async function savePendingProposal(env: Env, p: PendingProposal): Promise<void> {
@@ -73,11 +85,6 @@ export async function savePendingProposal(env: Env, p: PendingProposal): Promise
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ ts: p.proposalTs, payload: p }),
   });
-}
-
-export async function loadPendingProposal(env: Env, ts: string): Promise<PendingProposal | null> {
-  const detailed = await loadPendingProposalDetailed(env, ts);
-  return detailed.state === "found" ? detailed.payload : null;
 }
 
 // Distinguishes "this ts was a proposal but it EXPIRED" (410) from "not a

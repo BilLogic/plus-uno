@@ -521,7 +521,9 @@ h2.toc-title {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
-    padding: 2rem clamp(1rem, 4vw, 2.5rem) !important;
+    /* 2.5rem top / 3.5rem bottom: keep clear air between the component and the
+       attached controls/code strip below (was a cramped 2rem all around). */
+    padding: 2.5rem clamp(1rem, 4vw, 2.5rem) 3.5rem !important;
     border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
     background: color-mix(in srgb, var(--color-muted, #e0e3e7) 40%, transparent);
     border: none !important;
@@ -612,4 +614,27 @@ h2.toc-title {
     border-bottom-right-radius: var(--size-card-radius-sm) !important;
     margin-top: 0 !important;
     box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Fix: docs canvases clip their story (Overview sections showing cropped
+   components). Storybook's Zoom wrapper (`.docs-story > div[scale]`) pins an
+   explicit pixel height measured BEFORE the design-system fonts/styles load,
+   so the rendered component overflows and gets visually cut off. At scale=1
+   no transform math needs the pinned height — let content size the canvas. */
+.sbdocs .docs-story > div[scale="1"] {
+  height: auto !important;
+}
+
+/* Roomier docs canvases: the default ~32px canvas padding puts the bottom
+   controls/show-code bar too close to the rendered component. Give inline
+   (scale=1) canvases more air, especially at the bottom. Contexts that
+   deliberately run flush re-zero below (source order wins the !important tie). */
+.sbdocs .docs-story > div[scale="1"] {
+  padding: 40px 40px 56px !important;
+}
+.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div[scale="1"],
+.sbdocs .sb-ds-docs-preview-well .docs-story > div[scale="1"],
+.sbdocs .sb-button-docs-preview-well .docs-story > div[scale="1"] {
+  padding: 0 !important;
 }

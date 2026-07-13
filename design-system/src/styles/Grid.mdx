@@ -1,0 +1,123 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as GridStories from './Grid.stories.jsx';
+
+<Meta of={GridStories} />
+
+<Title />
+The grid is the horizontal structure of every PLUS page. It divides the main
+content area into columns so that cards, tables, forms, and text blocks align
+consistently across screens — and across designers. The grid governs **where
+content containers sit**; the [spacing tokens](?path=/docs/foundations-spacing--docs)
+govern everything inside them. PLUS is a **desktop-only product**: the grid
+starts at **MD (768px)** — do not design or build below 768px.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Grid anatomy
+
+The grid is made of three parts. Columns flex with the viewport; gutters and
+margins stay fixed per breakpoint.
+
+<GridStories.GridAnatomy />
+</div>
+
+<div className="sb-ds-doc-section">
+### Breakpoints
+
+PLUS uses a **single min-width rule**: each breakpoint is defined only by its
+fixed minimum width, and all column values are computed from the grid at that
+minimum. There are no min/max ranges to design against — between minimums the
+columns simply stretch. This supersedes the old Breakpoint component's
+min–max drag behavior, which is **deprecated**; the grid is now the source of
+truth for how layouts respond.
+
+In Figma, breakpoints are **modes** on the `size / layout` variable collection —
+Medium (768px) / Large (1024px) / X-Large (1440px). In code they are
+`--breakpoint-md-min` / `-lg-min` / `-xl-min` in
+`design-system/src/tokens/_layout.scss`.
+
+<GridStories.Breakpoints />
+
+The column count is **12 at every breakpoint**. Because PLUS never renders on
+small screens, we never drop to 6 or 2 columns — a 4-column card row at XL is
+still a 4-column card row at MD, just narrower. The 32px viewport margin
+intentionally matches `--size-surface-pad-x`, so the grid margin and the page
+surface padding are the same edge.
+</div>
+
+<div className="sb-ds-doc-section">
+### One grid, two contexts
+
+There are exactly **two grid styles** in Figma, and neither is per-breakpoint:
+every value in them is bound to a `size / layout` variable, so a single style
+adapts when you switch the frame's mode. The **viewport grid** structures
+full-page frames; the **content grid** lives on the `Pattern/Surface container`
+component and is what page content actually aligns to — its 8px gutter is what
+the `Columns/col-*` spans (and the code `--col-*` tokens) are computed from.
+
+<GridStories.TwoGrids />
+</div>
+
+<div className="sb-ds-doc-section">
+### Fixed and fluid grids
+
+Grid modes are a deliberate choice per page — pick one and stay with it.
+**Fixed grids** have a maximum width and center themselves inside Main (the
+default). **Fluid grids** expand to fill all available space; use them only
+when content has no natural maximum width, and be careful at very wide viewports
+where text lines get too long.
+
+<GridStories.FixedFluid />
+</div>
+
+<div className="sb-ds-doc-section">
+### Layout regions
+
+PLUS adopts the same region names Atlassian uses for the app shell. The grid
+never spans across SideNav, TopNav, or Panel — those regions have fixed
+dimensions and their own internal spacing. Columns are computed from the width
+of Main after the shell has taken its share.
+
+<GridStories.LayoutRegions />
+</div>
+
+<div className="sb-ds-doc-section">
+### What aligns to the grid
+
+- **Content containers align to columns**: cards, tables, forms, images,
+  charts, and text blocks. A container can span any number of columns, and can
+  be centered by leaving symmetric columns empty on either side.
+- **Small elements never align to the grid**: buttons, icons, chips, and
+  avatars are positioned with spacing tokens (`--size-element-*`), not columns.
+- **Only the top level aligns**: inside a container, use spacing tokens for
+  everything. The grid stops at the container's edge.
+- **Overlays float above the grid**: modals, dropdowns, tooltips, and toasts
+  are positioned relative to their trigger or the viewport, not to columns.
+</div>
+
+<div className="sb-ds-doc-section">
+### Column reference
+
+<GridStories.ColumnReference />
+</div>
+
+<div className="sb-ds-doc-section">
+### Grid inside the app shell
+
+<GridStories.ShellMath />
+</div>
+
+<div className="sb-ds-doc-section">
+### Do's and don'ts
+
+<GridStories.DosAndDonts />
+</div>
+
+</div>

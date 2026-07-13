@@ -1,0 +1,64 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SurfaceStories from './Surface.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SurfaceStories} />
+
+<Title />
+The surface is the base background layer of the application shell. It is a bare tokenized container: pick a surface level, padding scale, radius scale, border, and elevation — everything else is a content slot you fill. It mirrors the Surface slot component in Figma.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Surface"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Default surface: <code>--color-surface</code> background, surface padding tokens, no elevation.</>}>
+    <Canvas of={SurfaceStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Surface levels
+
+<DocsCanvasShell description={<>All six surface color tokens, from <code>surface</code> to <code>surface-container-highest</code>. Never use hex codes for backgrounds — always one of these levels.</>}>
+    <DsCanvasQuiet of={SurfaceStories.Levels} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Elevation
+
+<DocsCanvasShell description={<>Elevation is additive layering via <code>--elevation-light-1…5</code>. Base surfaces are usually flat (elevation 0).</>}>
+    <DsCanvasQuiet of={SurfaceStories.Elevation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SurfaceStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

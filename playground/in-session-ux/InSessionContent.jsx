@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
 import ManageAssignmentModal from './ManageAssignmentModal';
 import StudentInsightsModal from './StudentInsightsModal';
 import { CompactReflectionBar } from './ReflectionAssistant/CompactReflectionBar';

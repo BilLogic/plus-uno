@@ -6,11 +6,11 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4899-13061&m=dev
  */
 import React from 'react';
-import { Label } from '../../../forms/LabelAndCaption.stories';
-import Select from '../../../forms/Select';
+import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import Select from '@/components/forms-and-inputs/Select';
 
 export default {
-    title: 'Specs/Profile/Elements/LanguagePreferences',
+    title: 'Specs/Profile/Elements/Language Preferences',
     excludeStories: ['LanguagePreferences'],
     tags: ['!dev', '!autodocs'],
     parameters: {

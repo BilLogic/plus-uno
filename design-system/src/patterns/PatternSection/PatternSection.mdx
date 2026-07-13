@@ -1,0 +1,64 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PatternSectionStories from './PatternSection.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PatternSectionStories} />
+
+<Title />
+The section pattern is a large structural block for page layout: a title, optional description, an actions slot on the title row, and a content slot. Standard section padding and gap tokens are baked in; basic sections are never elevated. It mirrors the Section slot component in Figma.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternSection"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Title, description, actions slot, and content slot.</>}>
+    <Canvas of={PatternSectionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Slots
+
+<DocsCanvasShell description={<>Title-only header, and the full header row with description and actions.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Slots} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Composition
+
+<DocsCanvasShell description={<>A filled section (<code>--color-surface-container-low</code>) grouping card shells.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Composition} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PatternSectionStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

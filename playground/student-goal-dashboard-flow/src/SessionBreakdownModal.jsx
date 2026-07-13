@@ -1,7 +1,7 @@
 import React from 'react';
-import Modal from '@plus-ds/components/Modal';
-import Table from '@plus-ds/components/Table';
-import Badge from '@plus-ds/components/Badge';
+import Modal from '@plus-ds/components/messaging/Modal';
+import Table from '@plus-ds/components/_internal/Table';
+import Badge from '@plus-ds/components/status-and-loading/Badge';
 
 const SessionBreakdownModal = ({ isOpen, onClose, session, onStudentClick }) => {
 

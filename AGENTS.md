@@ -52,6 +52,35 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 Design System knowledge lives in `design-system/docs/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/docs/discovery.md`; load only task-relevant docs. Workflow skills (`skills/uno-prototype`, `skills/uno-review`, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
 
+## Storybook MCP (agents: prefer this over grepping stories)
+
+`@storybook/addon-mcp` serves an MCP endpoint at **http://localhost:4200/mcp** while `npm run storybook` runs (registered in `.mcp.json` as `plus-storybook`). Use it as the primary interface to the design system:
+
+- `list-all-documentation` → inventory of docs pages; `get-documentation` / `get-documentation-for-story` → component API + usage (verify props here instead of inferring — never hallucinate props).
+- `get-storybook-story-instructions` → ALWAYS call before authoring new stories; follow it over generic CSF habits.
+- `run-story-tests` → run the vitest browser tests for stories you touch (addon-vitest is wired; a11y checks via addon-a11y).
+
+Story-authoring conventions for agent-friendliness (storybook.js.org/docs/ai/best-practices): one concept per story with a "why" description; JSDoc on component exports + per-prop descriptions (react-docgen extracts them); explicit MDX content (no external imports — manifest generation is static); tag anti-pattern/deprecated stories `!manifest` to keep them out of agent context.
+
+## Documentation IA contract (2026-07)
+
+`storybook.taxonomy.json` is the single source of truth for the Storybook sidebar; after editing it run `node scripts/sync-storybook-sort.mjs` (the sort literal in `.storybook/preview.jsx` is generated — never hand-edit it). The shared tree, spoken identically by Storybook titles, repo folders, and both Figma files (see `docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md`):
+
+- Top level: Getting started · Foundations (was Styles+Assets; source still lives in `src/styles/` + `src/assets/`) · Components · Data visualizations · Patterns · Specs · Deprecated.
+- Components groups (kebab-case folders under `src/components/`): `actions`, `forms-and-inputs`, `layout-and-structure`, `messaging`, `navigation`, `overlays`, `status-and-loading`; undocumented internal composites live in `_internal/` until they graduate.
+- Data viz lives in `src/dataviz/<purpose>/` (comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal).
+- Specs grammar: `Specs/<Area>/(<Phase>/)<Type>/<Component>` with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages; Title Case phases/types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
+- Naming: sentence-case display names in titles ("Button group"); PascalCase code exports; specs never re-implement a core component — a local organism used in 2+ areas gets promoted.
+
+## Grid & breakpoint contract (2026-07)
+
+Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `size / layout` variable collection and as `--breakpoint-*-min` in `design-system/src/tokens/_layout.scss`. Never design or build below 768px.
+
+- **Two grids, both single mode-adaptive Figma styles** (values bound to `size / layout` variables — switch the frame's mode, never hand-edit or detach): `Grid/Viewport (adaptive)` (12 col, gutter 12/16/16, margin 16/32/32) for full-page frames without the shell; `Grid/Adaptive (12-col)` (12 col, **gutter 8px** = `--layout-grid-gap`, offset = `Surface/pad-x` 32) — the content grid, carried by `Pattern/Surface container`.
+- **Column spans** come from `Columns/col-1…12` (Figma) = `--col-*` (code); they assume the 8px content gutter. Main content width at breakpoint minimums: 672 / 748 / 1164 (= `1440 − 32 outer − 164 SideNav − 16 gap − 64 surface pad` at XL).
+- **Ownership layering**: the page frame owns width (bound to `Breakpoints/min width`) and the mode; `Pattern/Surface container` runs on auto mode and **fills** the width it's given (`--color-surface`, Surface-tier pad 32/24, gap 24, radius 16) and carries the grid + Content slot; SideNav is **164px** (`--layout-sidebar-width`) and its visibility binds to the `Display/*` booleans (collapses at MD).
+- **Docs-page shell (every MDX)**: `<Title/>` → intro paragraph → `<ResourcesBlock/>` → `<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">` → `sb-ds-doc-section` blocks with `###` headings. Markdown pipe-tables do NOT parse in this MDX setup — always use styled `<table>` JSX (see `src/styles/Spacing.stories.jsx` for the shared pattern).
+
 ## Forbidden patterns
 
 1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.
@@ -77,6 +106,7 @@ Design System knowledge lives in `design-system/docs/` (hand-authored) and `desi
 
 Check `docs/knowledge/INDEX.md` before starting work — past lessons may apply. After significant work, capture learnings via `skills/uno-maintain` (knowledge-capture path). `docs/knowledge/archive/` is the graveyard for superseded docs — never delete, always archive.
 
+<!-- ide-only -->
 ## Commands
 
 | Command | What it does |
@@ -111,3 +141,8 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Product context, users, or domain terms | `docs/context/product/*.md` (foundation) + uno-blueprint (live truth) |
 | New teammate orientation | `docs/context/onboarding.md` |
+<!-- /ide-only -->
+<!-- The two sections above (Commands, Progressive loading) are IDE-agent-only —
+     stripped from the uno-bot system prompt at assembly (src/agent/skills.ts
+     stripIdeOnly), since the Worker has no filesystem or npm and its prompt is
+     fixed at load time. They stay here as the single source for the IDE agent. -->

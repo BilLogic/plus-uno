@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 import './ChatSimulationCard.scss';
 
 // --- Components ---

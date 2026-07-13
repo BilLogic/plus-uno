@@ -1,9 +1,9 @@
 import React from 'react';
 import PageLayout from '@plus-ds/specs/Universal/Pages/PageLayout/PageLayout';
-import Card from '@plus-ds/components/Card';
-import Table from '@plus-ds/components/Table';
-import Badge from '@plus-ds/components/Badge';
-import Button from '@plus-ds/components/Button';
+import Card from '@plus-ds/components/layout-and-structure/Card';
+import Table from '@plus-ds/components/_internal/Table';
+import Badge from '@plus-ds/components/status-and-loading/Badge';
+import Button from '@plus-ds/components/actions/Button';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 

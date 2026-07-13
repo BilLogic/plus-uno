@@ -15,24 +15,46 @@ interface SlackErr {
 }
 type SlackResponse = SlackOk | SlackErr;
 
+// Parse a Slack response defensively: a 5xx or an HTML error page throws out of
+// res.json(), and an un-caught throw here has silently no-op'd a confirmed ✅
+// (the ack-message post at resolve-proposal.ts threw before executeTool ran,
+// 2026-07-11 review). Every caller already handles `{ ok: false, error }`, so
+// degrade transport/parse failures into that shape instead of throwing.
+async function parseSlackResponse<T extends SlackResponse>(res: Response, method: string): Promise<T> {
+  let data: T;
+  try {
+    data = (await res.json()) as T;
+  } catch {
+    const err = `http_${res.status}` as string;
+    console.warn(`[slack] ${method} returned non-JSON (status ${res.status})`);
+    return { ok: false, error: err } as unknown as T;
+  }
+  if (!data.ok) {
+    console.warn(`[slack] ${method} failed: ${(data as SlackErr).error}`);
+  }
+  return data;
+}
+
 async function slackCall<T extends SlackResponse>(
   env: Env,
   method: string,
   payload: Record<string, unknown>,
 ): Promise<T> {
-  const res = await fetch(`https://slack.com/api/${method}`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  const data = (await res.json()) as T;
-  if (!data.ok) {
-    console.warn(`[slack] ${method} failed: ${(data as SlackErr).error}`);
+  let res: Response;
+  try {
+    res = await fetch(`https://slack.com/api/${method}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    console.warn(`[slack] ${method} fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+    return { ok: false, error: "network_error" } as unknown as T;
   }
-  return data;
+  return parseSlackResponse<T>(res, method);
 }
 
 // Slack READ methods reject JSON bodies (invalid_arguments — the
@@ -43,14 +65,16 @@ async function slackGet<T extends SlackResponse>(
   params: Record<string, string>,
 ): Promise<T> {
   const qs = new URLSearchParams(params).toString();
-  const res = await fetch(`https://slack.com/api/${method}?${qs}`, {
-    headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
-  });
-  const data = (await res.json()) as T;
-  if (!data.ok) {
-    console.warn(`[slack] ${method} failed: ${(data as SlackErr).error}`);
+  let res: Response;
+  try {
+    res = await fetch(`https://slack.com/api/${method}?${qs}`, {
+      headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
+    });
+  } catch (err) {
+    console.warn(`[slack] ${method} fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+    return { ok: false, error: "network_error" } as unknown as T;
   }
-  return data;
+  return parseSlackResponse<T>(res, method);
 }
 
 export interface SlackUserInfo {
@@ -173,23 +197,14 @@ export async function conversationsReplies(
   thread_ts: string,
   limit = 20,
 ) {
-  // conversations.replies is a READ method — Slack rejects application/json
-  // bodies on it with `invalid_arguments` (the long-standing warn in our logs).
-  // Read methods take URL-encoded query params.
-  const params = new URLSearchParams({
+  // conversations.replies is a READ method (query params, not a JSON body).
+  // slackGet owns the transport, parse-guard, and failure-warn.
+  return slackGet<ConversationsRepliesResult>(env, "conversations.replies", {
     channel,
     ts: thread_ts,
     limit: String(limit),
     inclusive: "true",
   });
-  const res = await fetch(`https://slack.com/api/conversations.replies?${params}`, {
-    headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
-  });
-  const data = (await res.json()) as ConversationsRepliesResult;
-  if (!data.ok) {
-    console.warn(`[slack] conversations.replies failed: ${(data as { error?: string }).error}`);
-  }
-  return data;
 }
 
 // The bot's own identity, used to tag which thread messages are the bot's

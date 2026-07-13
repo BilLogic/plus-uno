@@ -205,8 +205,8 @@ export async function preflight(
         if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) {
           missing.push("a *Loom walkthrough* link (loom.com)");
         }
-        if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev|vercel\.app)/i.test(haystack)) {
-          missing.push("a *live preview* link (netlify.app / workers.dev / vercel.app)");
+        if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev)/i.test(haystack)) {
+          missing.push("a *live preview* link (netlify.app / workers.dev)");
         }
         if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
           missing.push("a *decision-log / Notion* link");

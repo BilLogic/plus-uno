@@ -1,7 +1,7 @@
 import React from 'react';
-import MultipleChoice from '@/forms/MultipleChoice';
-import Scale from '@/forms/RadioButtonGroup';
-import Badge from '@/components/Badge';
+import MultipleChoice from '@/components/forms-and-inputs/MultipleChoice';
+import Scale from '@/components/forms-and-inputs/RadioButtonGroup';
+import Badge from '@/components/status-and-loading/Badge';
 
 const EFFECTIVENESS_OPTIONS = [
     { value: '1', label: '1' },

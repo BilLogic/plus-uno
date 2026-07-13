@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import Select from '@/forms/Select';
-import Input from '@/forms/Input';
-import Badge from '@/components/Badge';
-import Button from '@/components/Button';
-import ButtonGroup from '@/components/ButtonGroup';
-import Divider from '@/components/Divider';
+import Select from '@/components/forms-and-inputs/Select';
+import Input from '@/components/forms-and-inputs/Input';
+import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/actions/Button';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import Divider from '@/components/layout-and-structure/Divider';
 import PrototypeCard from './PrototypeCard';
 import {
   prototypes,

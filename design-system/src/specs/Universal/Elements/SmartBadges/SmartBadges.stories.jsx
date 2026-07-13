@@ -10,10 +10,10 @@
  */
 
 import React from 'react';
-import StaticBadgeSmart from '../../../../components/StaticBadgeSmart/StaticBadgeSmart';
+import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart/StaticBadgeSmart';
 
 export default {
-    title: 'Specs/Universal/Elements/SmartBadges',
+    title: 'Specs/Universal/Elements/Smart Badges',
     component: StaticBadgeSmart,
     tags: ['!dev', '!autodocs'],
     parameters: {

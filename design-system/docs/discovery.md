@@ -21,7 +21,7 @@ Do **not** bulk-load all knowledge. Load 2–3 focused documents per task (~2,00
 | Per-component agent view | `design-system/agent-views/components/{Name}/{Name}.md` |
 | Form elements (index) | `design-system/agent-views/forms/index.md` |
 | Per-form agent view | `design-system/agent-views/forms/{Name}.md` or `forms/{Name}/{Name}.md` |
-| Component source + Storybook | `design-system/src/components/`, `design-system/src/forms/` |
+| Component source + Storybook | `design-system/src/components/<group>/` (groups: actions, forms-and-inputs, layout-and-structure, messaging, navigation, overlays, status-and-loading, _internal) |
 | Designer verification audit | `design-system/figma/knowledge-audit.md` |
 | Component architecture / inventory | `docs/context/design-system/components/inventory.md` |
 | Component registry (machine) | `design-system/figma/component-registry.json` |

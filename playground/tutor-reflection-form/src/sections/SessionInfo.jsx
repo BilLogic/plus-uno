@@ -1,10 +1,10 @@
 import React from 'react';
-import Select from '@/forms/Select';
-import Switch from '@/forms/Switch';
-import FileUpload from '@/forms/FileUpload';
-import Textarea from '@/forms/Textarea';
-import MultipleChoice from '@/forms/MultipleChoice';
-import Badge from '@/components/Badge';
+import Select from '@/components/forms-and-inputs/Select';
+import Switch from '@/components/forms-and-inputs/Switch';
+import FileUpload from '@/components/forms-and-inputs/FileUpload';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import MultipleChoice from '@/components/forms-and-inputs/MultipleChoice';
+import Badge from '@/components/status-and-loading/Badge';
 
 const CANCEL_REASONS = [
     { value: 'student-absent', label: 'Student(s) absent' },

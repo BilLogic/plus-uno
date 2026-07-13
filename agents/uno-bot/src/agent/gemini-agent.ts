@@ -16,7 +16,6 @@
 //     model's parts VERBATIM to the running contents, which preserves them.
 //   - No advisor / delegate / Anthropic web_search in this mode.
 
-import type Anthropic from "@anthropic-ai/sdk";
 import type { Env } from "../types";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
@@ -25,16 +24,20 @@ import { routeRequest } from "./anthropic-client";
 import { geminiGenerateRaw } from "../gemini/client";
 import { BUILD } from "../version";
 import {
+  MAX_ITERATIONS,
+  MAX_TOKENS,
+  READONLY_TOOL_BUDGET,
+  BUDGET_EXHAUSTED_LOOKUP_NOTE,
+  BUDGET_EXHAUSTED_SYNTHESIS,
+  CLARIFY_FALLBACK,
+  makeInterimFilter,
+  validateProposalResolve,
   executeReadOnlyTool,
   type AgentInput,
   type AgentResult,
   type AgentImage,
-} from "./run-agent";
+} from "./loop-shared";
 import type { HistoryTurn } from "../thread-state-client";
-
-const MAX_ITERATIONS = 16;
-const MAX_TOKENS = 16384;
-const READONLY_TOOL_BUDGET = 12;
 
 // ── Gemini wire types (the subset we touch) ─────────────────────────────────
 
@@ -153,14 +156,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
 
   // Interim narration: text emitted in the same response as function calls is
   // the model narrating upcoming work — same caps/filters as the Anthropic path.
-  let interimSent = 0;
-  const emitInterim = (raw: string): void => {
-    if (!input.onInterim || interimSent >= 3) return;
-    const line = raw.trim().split("\n")[0]?.trim() ?? "";
-    if (line.length < 15) return;
-    interimSent++;
-    input.onInterim(line.length > 280 ? `${line.slice(0, 277)}…` : line);
-  };
+  const emitInterim = makeInterimFilter(input.onInterim);
 
   const pendingForSystem = pending
     ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
@@ -225,35 +221,32 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     // Anthropic path (Worker-side, defense in depth).
     const resolveCall = functionCalls.find((fc) => fc.functionCall!.name === "proposal_resolve");
     if (resolveCall) {
-      const args = (resolveCall.functionCall!.args ?? {}) as {
-        decision?: "confirm" | "cancel";
-        message_to_user?: string;
-      };
-      let error: string | null = null;
-      if (!pending) error = "no pending proposal in this thread — reply conversationally instead";
-      else if (currentSender.userId !== pending.requesterUserId) {
-        error = `not authorized — only <@${pending.requesterUserId}> can resolve this proposal`;
-      } else if (args.decision !== "confirm" && args.decision !== "cancel") {
-        error = "decision must be 'confirm' or 'cancel'";
-      }
-      if (error) {
+      const verdict = validateProposalResolve(
+        resolveCall.functionCall!.args as { decision?: unknown; message_to_user?: unknown },
+        pending,
+        currentSender.userId,
+      );
+      if (!verdict.ok) {
+        // Reject: answer the resolve call AND every other function call in this
+        // turn, so no call is left without a response (same discipline as the
+        // Anthropic path; review 2026-07-12).
         contents.push({ role: "model", parts });
         contents.push({
           role: "user",
-          parts: [{
-            functionResponse: {
-              name: "proposal_resolve",
-              response: { ok: false, error },
-            },
-          }],
+          parts: functionCalls.map((fc): GeminiPart => {
+            const name = fc.functionCall!.name!;
+            return name === "proposal_resolve"
+              ? { functionResponse: { name, response: { ok: false, error: verdict.error } } }
+              : { functionResponse: { name, response: { ok: false, error: "deferred — resolve the pending proposal first" } } };
+          }),
         });
         continue;
       }
       return finish({
         kind: "resolved",
-        decision: args.decision!,
+        decision: verdict.decision,
         pending: pending!,
-        messageToUser: args.message_to_user,
+        messageToUser: verdict.messageToUser,
       });
     }
 
@@ -264,10 +257,6 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         kind: "proposal",
         toolName: sideEffect.functionCall!.name!,
         input: (sideEffect.functionCall!.args ?? {}) as Record<string, unknown>,
-        toolUseId: `gemini-${startedAt}-${iter}`,
-        // The proposal record stores this as unknown[]; Gemini parts serialize
-        // fine and nothing Anthropic-specific reads them back in gemini mode.
-        assistantContent: parts as unknown as Anthropic.ContentBlock[],
         previewText: narration || undefined,
       });
     }
@@ -284,7 +273,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         resultText = JSON.stringify({
           ok: false,
           error: "no more lookups available this turn",
-          note: "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction).",
+          note: BUDGET_EXHAUSTED_LOOKUP_NOTE,
         });
       } else {
         toolCallsUsed++;
@@ -298,17 +287,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // Iteration budget exhausted — force a synthesis pass with function calling
   // disabled (toolConfig NONE keeps the declarations, which Gemini requires
   // when the history contains function turns).
-  contents.push({
-    role: "user",
-    parts: [{
-      text: "(system: tool budget exhausted — answer the original question NOW from the tool results above; do not request more tools. If the results are insufficient, say what's missing.)",
-    }],
-  });
+  contents.push({ role: "user", parts: [{ text: BUDGET_EXHAUSTED_SYNTHESIS }] });
   const finalParts = await callGemini(true);
-  return finish({
-    kind: "text",
-    text:
-      textOf(finalParts) ||
-      "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?",
-  });
+  return finish({ kind: "text", text: textOf(finalParts) || CLARIFY_FALLBACK });
 }

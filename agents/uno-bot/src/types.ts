@@ -1,3 +1,17 @@
+// Slack context threaded into every tool executor: where the run lives + who
+// asked. (Moved here from tools/dispatcher.ts, 2026-07-12, so both the tool
+// layer and the agent loop reference it without importing the dispatcher.)
+export interface SlackContext {
+  channel: string;
+  threadTs: string;
+  userMsgTs: string;
+  requestedBy?: string;
+  /** Notion PRD reference resolved at proposal time, forwarded to the GitHub
+   *  implement/scaffold workflows so codegen gets PRD context. */
+  notionPrdId?: string;
+  notionPrdUrl?: string;
+}
+
 export interface Env {
   SLACK_SIGNING_SECRET: string;
   SLACK_BOT_TOKEN: string;
@@ -13,6 +27,11 @@ export interface Env {
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;
+  // "Third Party Applications" DB — read-only directory (Application Name /
+  // Application Admin / Power Users) that notion_search scope:"apps" queries
+  // for access-request ROUTING (who to ask for access; the grant stays human).
+  // Optional — unset → the apps scope reports "not configured".
+  NOTION_APPS_DB_ID?: string;
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;
@@ -94,4 +113,18 @@ export interface Env {
   GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.5-flash"
+
+  // --- Operational guards ----------------------------------------------------
+  // Shared secret gating the /debug/* routes (they trigger a live model call
+  // and credentialed MCP handshakes, so they must not be public). Unset → the
+  // debug routes return 404. Set via `wrangler secret put DEBUG_TOKEN` and pass
+  // it as the `x-debug-token` header. See src/index.ts.
+  DEBUG_TOKEN?: string;
+  // email_send authorization (defense beyond the requester-identity gate):
+  // EMAIL_AUTHORIZED_USERS = comma-separated Slack user IDs allowed to trigger
+  // outward email; EMAIL_ALLOWED_DOMAINS = comma-separated recipient domains
+  // (e.g. "andrew.cmu.edu,tutor.plus"). Unset → email_send stays available to
+  // any requester / any recipient (legacy behavior). See tools/send-email.ts.
+  EMAIL_AUTHORIZED_USERS?: string;
+  EMAIL_ALLOWED_DOMAINS?: string;
 }

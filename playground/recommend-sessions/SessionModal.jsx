@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import Modal from '@plus-ds/components/Modal/Modal.jsx'
-import Button from '@plus-ds/components/Button/index.js'
-import NavTabs from '@plus-ds/components/NavTabs/NavTabs.jsx'
+import Modal from '@plus-ds/components/messaging/Modal/Modal.jsx'
+import Button from '@plus-ds/components/actions/Button/index.js'
+import NavTabs from '@plus-ds/components/navigation/NavTabs/NavTabs.jsx'
 import RecommendTutorsView from './RecommendTutorsView.jsx'
 
 import { Badge } from '@plus-ds/components'

@@ -2,7 +2,7 @@ import React from 'react';
 import { ButtonContainer } from './ButtonContainer';
 
 export default {
-    title: 'Specs/Home/Elements/ButtonContainer',
+    title: 'Specs/Home/Elements/Button Container',
     tags: ['!dev', '!autodocs'],
     component: ButtonContainer,
     parameters: {

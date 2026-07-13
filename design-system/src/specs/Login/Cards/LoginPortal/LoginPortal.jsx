@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Button from '@/components/Button';
-import Input from '@/forms/Input';
+import Button from '@/components/actions/Button';
+import Input from '@/components/forms-and-inputs/Input';
 
 import {
     LoginAlertBanner,

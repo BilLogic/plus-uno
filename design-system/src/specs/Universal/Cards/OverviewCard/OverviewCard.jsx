@@ -8,7 +8,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import DonutChart from '@/DataViz/PartToWhole/DonutChart/DonutChart';
+import DonutChart from '@/dataviz/part-to-whole/DonutChart/DonutChart';
 import './OverviewCard.scss';
 
 // SMART category colors

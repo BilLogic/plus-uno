@@ -4,7 +4,7 @@ import DataVisualizationTrainingProgress from './DataVisualizationTrainingProgre
 import DataVisualizationSkillsProgress from './DataVisualizationSkillsProgress';
 
 export default {
-    title: 'Specs/Home/Cards/DataVisualization',
+    title: 'Specs/Home/Cards/Data Visualization',
     component: DataVisualization,
     tags: ['!dev', '!autodocs'],
     decorators: [

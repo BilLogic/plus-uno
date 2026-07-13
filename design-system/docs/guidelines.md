@@ -21,7 +21,7 @@ See `docs/context/design-system/foundations/principles.md` for full product desi
 
 - **Bootstrap-first** — PLUS components built on Bootstrap 5.3 / React-Bootstrap. No Material UI, Ant Design, or Tailwind.
 - **Tokens, never literals** — colors, spacing, typography, radius, elevation come from design tokens (`var(--*)`).
-- **Barrel imports** — import from `@/components`, `@/forms`, `@/specs`; never deep-import from `design-system/src/`.
+- **Barrel imports** — import from `@/components`, `@/specs`, `@/dataviz` (forms live under `@/components/forms-and-inputs`); never deep-import from `design-system/src/`.
 - **Verify before you build** — read component `.jsx` and `.stories.jsx` before using unfamiliar APIs. If it's not in the knowledge base, it does not exist.
 - **Compound designing** — extract reusable patterns; today's prototype becomes tomorrow's component.
 

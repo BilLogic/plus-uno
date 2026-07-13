@@ -8,7 +8,7 @@
 import React from 'react';
 
 export default {
-    title: 'Specs/Universal',
+    title: 'Specs/Universal/Overview',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

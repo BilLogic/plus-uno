@@ -7,14 +7,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Breadcrumb from '../../../../components/Breadcrumb';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { UserAvatar } from '../../Elements';
-import Button from '../../../../components/Button';
+import Button from '@/components/actions/Button';
 import './TopBar.scss';
 
 /** Collapsed left section width (toggle button only); matches PageLayout motion. */
 const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
-const TOPBAR_LEFT_EXPANDED_WIDTH = 184;
+const TOPBAR_LEFT_EXPANDED_WIDTH = 164; // matches --layout-sidebar-width / SideNav width
 
 const TopBar = ({
     mode = 'expanded',
@@ -31,7 +31,7 @@ const TopBar = ({
         }
     };
 
-    // Numeric width so CSS can transition; aligns with sidebar (184px when expanded).
+    // Numeric width so CSS can transition; aligns with sidebar (164px when expanded).
     const leftSectionWidth = mode === 'expanded' ? TOPBAR_LEFT_EXPANDED_WIDTH : TOPBAR_LEFT_COLLAPSED_WIDTH;
 
     return (

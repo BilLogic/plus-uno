@@ -1,0 +1,77 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as DesignTokensStories from './DesignTokens.stories.jsx';
+
+<Meta of={DesignTokensStories} />
+
+<Title />
+Every visual value in the design system — color, spacing, typography, radius,
+elevation — is a **token**. Tokens are defined once as Figma variables and
+mirrored one-to-one as CSS custom properties in
+`design-system/src/tokens/*.scss`. Components never hardcode values; they
+reference tokens, so a change in Figma propagates to code by updating a single
+definition.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Figma variables ↔ CSS custom properties
+
+The pipeline works in both directions:
+
+- **Figma → code**: each Figma variable maps to a `var(--*)` custom property.
+  The mapping tables live in `design-system/docs/foundations/token-mapping.md`.
+- **Code → validation**: `design-system/figma/token-registry.json` is generated
+  from those tables via `npm run generate:token-registry`, and every `var(--*)`
+  is validated against `design-system/src/tokens/*.scss`. A token referenced in
+  the mapping doc that does not exist in SCSS fails `npm run check:token-registry`.
+</div>
+
+<div className="sb-ds-doc-section">
+### Collections
+
+The Figma variables are organized into four collections, each with a CSS
+counterpart:
+
+<DesignTokensStories.Collections />
+</div>
+
+<div className="sb-ds-doc-section">
+### Naming contract
+
+Token names encode *context and role*, not raw values:
+
+- **Colors**: `--color-{role}` with modifiers — `on-` for content on that role
+  (`--color-on-primary`), `-container` for filled/elevated surfaces
+  (`--color-primary-container`), `-state-08/12/16` for 8% / 12% / 16% opacity
+  interaction overlays.
+- **Sizes**: `--size-{context}-{property}-{axis?}-{step}` — e.g.
+  `--size-card-pad-x-md`, `--size-element-gap-sm`, `--size-modal-radius-lg`.
+- **Typography**: `--font-{property}-{style}` — e.g. `--font-size-h1`,
+  `--font-weight-title`, `--font-family-code`.
+- **Elevation**: `--elevation-light-{1..5}` by z-height (subtle → dialogs).
+</div>
+
+<div className="sb-ds-doc-section">
+### Source of truth
+
+`design-system/docs/foundations/token-mapping.md` is the **single source of
+truth** for Figma-to-CSS token names. Its key rules:
+
+> **This file is the SOURCE OF TRUTH for token mappings.** `design-system/figma/token-registry.json`
+> is generated from the tables below … Edit the tables here — never hand-edit the JSON.
+
+> 1. **Never hardcode** — all visual values must map to the tokens above
+> 2. **Container over state** — use `-container` tokens for filled surfaces, not `-state-08`
+> 3. **Semantic context** — choose token by context (card → `--size-card-*`, element → `--size-element-*`)
+
+When you need a token, check that doc first; for quick machine lookups,
+`token-registry.json` may be read (read-only).
+</div>
+
+</div>

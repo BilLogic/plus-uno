@@ -1,5 +1,5 @@
 import React from 'react';
-import Cascader from '@plus-ds/forms/Cascader';
+import Cascader from '@plus-ds/components/forms-and-inputs/Cascader';
 
 const Step2Schedule = ({ data, updateData }) => {
     const scheduleOptions = [

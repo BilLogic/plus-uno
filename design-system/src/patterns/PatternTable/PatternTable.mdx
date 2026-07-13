@@ -1,0 +1,64 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PatternTableStories from './PatternTable.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PatternTableStories} />
+
+<Title />
+The table pattern is a shell for data presentation: a toolbar slot, the table content slot (you pass your own `thead`/`tbody`), a pagination slot, and an empty-state slot. The table itself is no-fill — the surrounding card or surface owns the background — and row interaction uses additive `on-surface` overlays, never replaced fills. It mirrors the Table slot component in Figma.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternTable"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Toolbar slot, table children, and pagination slot.</>}>
+    <Canvas of={PatternTableStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Composition
+
+<DocsCanvasShell description={<>The table shell composed inside a card shell — the card provides the fill and elevation.</>}>
+    <DsCanvasQuiet of={PatternTableStories.Composition} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Empty state
+
+<DocsCanvasShell description={<>With <code>empty</code>, the empty-state slot replaces the table and pagination.</>}>
+    <DsCanvasQuiet of={PatternTableStories.EmptyState} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PatternTableStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

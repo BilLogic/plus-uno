@@ -1,0 +1,64 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PatternCardStories from './PatternCard.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PatternCardStories} />
+
+<Title />
+The card pattern is a componentized shell with baked-in tokens — `--color-surface-container-lowest` background, elevation 1, card radius, and outline-variant border. Consumers fill the header, body, and footer slots; the shell owns the frame. It mirrors the Card slot component in Figma. For the fully-featured content card (title, media, links, actions), use the core Card component instead.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternCard"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Card shell with header slot and body children.</>}>
+    <Canvas of={PatternCardStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Slots
+
+<DocsCanvasShell description={<>Body only, header + body, and header + body + footer. Inner dividers use <code>--color-outline-variant</code>.</>}>
+    <DsCanvasQuiet of={PatternCardStories.Slots} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Constraints
+
+<DocsCanvasShell description={<>Card padding scale tokens and the <code>minWidth</code> constraint.</>}>
+    <DsCanvasQuiet of={PatternCardStories.Constraints} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PatternCardStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

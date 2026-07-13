@@ -1,0 +1,55 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ExportSearchFilterBarStories from './ExportSearchFilterBar.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ExportSearchFilterBarStories} />
+
+<Title />
+
+Standard top-of-table strip used across every Tutor Admin page: export button on the left, search input in the middle, filter triggers on the right.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=433-370346"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor/Elements/ExportSearchFilterBar"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default strip with all three controls visible.</>}
+>
+    <Canvas
+        of={ExportSearchFilterBarStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={ExportSearchFilterBarStories.Interactive}
+    description={
+        <>
+            Toggle export / search visibility and provide custom filter buttons via the controls panel.
+        </>
+    }
+/>
+
+</div>
+
+</div>

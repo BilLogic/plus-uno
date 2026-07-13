@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Button from '@/components/Button/Button';
-import Badge from '@/components/Badge/Badge';
-import Alert from '@/components/Alert/Alert';
-import Progress from '@/components/Progress/Progress';
+import Button from '@/components/actions/Button/Button';
+import Badge from '@/components/status-and-loading/Badge/Badge';
+import Alert from '@/components/messaging/Alert/Alert';
+import Progress from '@/components/status-and-loading/Progress/Progress';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import './WeeklyReportPage.scss';
 

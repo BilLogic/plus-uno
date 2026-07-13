@@ -19,7 +19,7 @@ const trainingProgressData = {
 };
 
 export default {
-    title: 'Specs/Home/Pages/TutorHomePageSkillsOverviewDifferentLayout',
+    title: 'Specs/Home/Pages/Tutor Home Page Skills Overview Different Layout',
     component: TutorHomePageSkillsOverviewDifferentLayout,
     tags: ['!dev', '!autodocs'],
     decorators: [
@@ -36,7 +36,7 @@ export default {
         breakpoint: {
             control: 'select',
             options: ['md', 'lg', 'xl'],
-            description: 'Simulated viewport width in the preview toolbar',
+            description: 'Simulated viewport width — set it here in the Controls panel',
             table: { category: 'Layout' },
         },
     },

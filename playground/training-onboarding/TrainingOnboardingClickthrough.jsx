@@ -22,7 +22,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import TrainingOnboardingHiFi, { DEFAULT_MODULES } from './TrainingOnboardingHiFi';
-import OnboardingInnerPage from '@/specs/Training/onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage';
+import OnboardingInnerPage from '@/specs/Training/Onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage';
 
 // Day-1 fresh start: all modules not started so "Welcome to PLUS" is the active first step
 const INITIAL_MODULES = DEFAULT_MODULES.map((m) => ({ ...m, stage: 'not started' }));

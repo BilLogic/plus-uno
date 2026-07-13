@@ -1,0 +1,99 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as SpacingStories from './Spacing.stories.jsx';
+
+<Meta of={SpacingStories} />
+
+<Title />
+The spacing system is a two-tier token architecture: a **primitive scale** (raw
+step values, never used directly) and **semantic per-context tokens** (what you
+actually reference in code). Every gap, padding, radius, and stroke in the
+design system resolves to one of these tokens — never a raw pixel value.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Primitive scale
+
+Primitives live in `design-system/src/tokens/_primitives.scss` and correspond to
+the **size / primitive** variables in Figma (Spacing/Small, Spacing/Medium,
+Spacing/Large). They are the base steps that semantic tokens are built from.
+**Do not use them directly** — pick the semantic token for your context instead.
+
+<SpacingStories.PrimitiveScale />
+
+Larger steps (`1200`–`5000`, xlarge) exist for page-scale layout, alongside
+border-radius primitives (`--size-border-radius-radius-*`) and stroke-width
+primitives (`--size-border-stroke-stroke-*`).
+</div>
+
+<div className="sb-ds-doc-section">
+### Semantic tokens
+
+Semantic tokens (`design-system/src/tokens/_spacing_semantics.scss`, matching
+the **size / semantics** Figma collection) name spacing by *where it is used*,
+not by its value. Each context provides padding, gap, radius, and border tokens
+in `sm` / `md` / `lg` steps:
+
+<SpacingStories.SemanticTokens />
+
+Radius and stroke follow the same pattern: `--size-card-radius-{sm|md|full}`,
+`--size-element-radius-{sm|md|lg|full}`, `--size-element-stroke-{sm|md|lg|xl}`, etc.
+</div>
+
+<div className="sb-ds-doc-section">
+### Which tier belongs where
+
+Spacing is layered from the page inward. Choose the token tier that matches the
+layer you are working in:
+
+<SpacingStories.TierGuide />
+
+Two rules from the layout pattern guide:
+
+- `gap: var(--size-section-gap-md)` — spacing **between major page blocks** (like two different Cards).
+- `gap: var(--size-element-gap-md)` — spacing **between elements inside a Card** (like headers and text).
+- **Never** use raw pixel strings like `gap: '16px'`.
+</div>
+
+<div className="sb-ds-doc-section">
+### Token value reference
+
+The exhaustive per-context values. Every card, section, modal, and surface in
+the system resolves its padding, gap, radius, and border to one of these. All
+tables share one column geometry so the values line up across contexts.
+
+<h4 className="h4" style={{ marginBottom: '12px' }}>Element</h4>
+<SpacingStories.ElementSpacings />
+
+<h4 className="h4" style={{ margin: '32px 0 12px' }}>Card</h4>
+<SpacingStories.CardSpacings />
+
+<h4 className="h4" style={{ margin: '32px 0 12px' }}>Section</h4>
+<SpacingStories.SectionSpacings />
+
+<h4 className="h4" style={{ margin: '32px 0 12px' }}>Modal</h4>
+<SpacingStories.ModalSpacings />
+
+<h4 className="h4" style={{ margin: '32px 0 12px' }}>Surface (page)</h4>
+<SpacingStories.SurfaceSpacings />
+
+<h4 className="h4" style={{ margin: '32px 0 12px' }}>Corner radius application</h4>
+<SpacingStories.CornerRadiusApplication />
+</div>
+
+<div className="sb-ds-doc-section">
+### Status
+
+The finalized spacing upgrade is work-in-progress in the
+[Design System Upgrade 2026](https://www.figma.com/design/LfUpqZvxGf4aPmhF8He2hz/Design-System-Upgrade-2026?node-id=334-26071)
+Figma file — token names here are stable, but values and Figma variable
+organization may still shift as that file lands.
+</div>
+
+</div>

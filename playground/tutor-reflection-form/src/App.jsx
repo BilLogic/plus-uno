@@ -9,7 +9,7 @@ import StudentDeepDive from './sections/StudentDeepDive';
 import TeachingStrategies from './sections/TeachingStrategies';
 import ReviewSubmit from './sections/ReviewSubmit';
 import SuccessScreen from './components/SuccessScreen';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 
 const STEPS = [
     { id: 'session-info', label: 'Session Information', icon: 'clipboard-list' },

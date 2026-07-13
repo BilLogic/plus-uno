@@ -20,12 +20,13 @@ import * as PreviewImageStories from './Modals/PreviewImage.stories.jsx';
 import * as UnsavedChangesStories from './Modals/UnsavedChanges.stories.jsx';
 
 import {
+    DsCanvasHero,
     DocsCanvasShell,
     DocsInteractivePlayground,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta title="Specs/Profile" />
+<Meta title="Specs/Profile/Overview" />
 
 # Profile
 
@@ -36,7 +37,7 @@ Single scrollable reference for tutor profile specs. Previews use the same MDX p
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Profile"
 />
 
-<div className="sb-ds-component-docs not-prose">
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -78,7 +79,7 @@ Single scrollable reference for tutor profile specs. Previews use the same MDX p
 ### Status &amp; Clearance
 
 <DocsCanvasShell description="Read-only section with clearance variants (verified, expired, in progress).">
-    <Canvas of={StatusStories.Variants} story={{ inline: true }} sourceState="hidden" />
+    <DsCanvasHero of={StatusStories.Variants} />
 </DocsCanvasShell>
 
 </div>
@@ -135,13 +136,13 @@ Single scrollable reference for tutor profile specs. Previews use the same MDX p
 ### Tooltip — Additional Email
 
 <DocsCanvasShell>
-    <Canvas of={TooltipAdditionalEmailStories.Variants} story={{ inline: true }} sourceState="hidden" />
+    <DsCanvasHero of={TooltipAdditionalEmailStories.Variants} />
 </DocsCanvasShell>
 
 ### Tooltip — Background &amp; Matching
 
 <DocsCanvasShell>
-    <Canvas of={TooltipBackgroundMatchingStories.Variants} story={{ inline: true }} sourceState="hidden" />
+    <DsCanvasHero of={TooltipBackgroundMatchingStories.Variants} />
 </DocsCanvasShell>
 
 ### Update profile toast
@@ -160,13 +161,13 @@ Single scrollable reference for tutor profile specs. Previews use the same MDX p
 ### Preview image
 
 <DocsCanvasShell>
-    <Canvas of={PreviewImageStories.Variants} story={{ inline: true }} sourceState="hidden" />
+    <DsCanvasHero of={PreviewImageStories.Variants} />
 </DocsCanvasShell>
 
 ### Unsaved changes
 
 <DocsCanvasShell>
-    <Canvas of={UnsavedChangesStories.Overview} story={{ inline: true }} sourceState="hidden" />
+    <DsCanvasHero of={UnsavedChangesStories.Overview} />
 </DocsCanvasShell>
 
 </div>

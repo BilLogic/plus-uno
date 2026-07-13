@@ -117,9 +117,23 @@ async function alertHarnessDegraded(env: Env, missing: string[], usingFallback: 
   }
 }
 
+// Drop `<!-- ide-only -->…<!-- /ide-only -->` regions before the file enters
+// the Worker's system prompt. The harness docs are shared with the in-IDE agent
+// (which HAS a filesystem, npm, etc.); sections that only make sense there —
+// npm command tables, progressive-loading maps, Notion block-authoring quirks —
+// are pure context-window cost for the bot. Marking them keeps ONE source of
+// truth per doc while the bot loads only what it can act on (review 2026-07-12).
+function stripIdeOnly(text: string): string {
+  if (!text) return text;
+  return text.replace(/[^\n]*<!--\s*ide-only\s*-->[\s\S]*?<!--\s*\/ide-only\s*-->[^\n]*\n?/g, "");
+}
+
 async function assembleSystem(env: Env): Promise<string> {
-  const parts = await Promise.all(SKILL_PATHS.map((p) => fetchSkillFile(env, p)));
-  const missing = SKILL_PATHS.filter((_, i) => !parts[i]);
+  const raw = await Promise.all(SKILL_PATHS.map((p) => fetchSkillFile(env, p)));
+  // "missing" is judged on the FETCH (empty = failed), before ide-only stripping,
+  // so trimming IDE-only sections can never look like a degraded harness.
+  const missing = SKILL_PATHS.filter((_, i) => !raw[i]);
+  const parts = raw.map(stripIdeOnly);
   // Generic assembly: each fetched file gets a divider headed by its repo
   // path, so the prompt is self-describing and adding/removing a path can
   // never desync from a hand-maintained label list (the v1 destructuring

@@ -1,0 +1,69 @@
+/**
+ * Table pattern (Patterns/Table)
+ * Table shell — no-fill table, tokenized cell spacing, additive row overlays.
+ * Never set a solid background on the table itself; the surrounding container owns it.
+ */
+
+.plus-pattern-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-table-cell-gap);
+    background-color: transparent;
+    color: var(--color-on-surface);
+}
+
+.plus-pattern-table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+}
+
+.plus-pattern-table-scroll {
+    overflow-x: auto;
+    border-radius: var(--size-table-radius-sm);
+}
+
+.plus-pattern-table-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: transparent;
+
+    th,
+    td {
+        padding: var(--size-table-cell-y) var(--size-table-cell-x);
+        text-align: left;
+        border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+        color: var(--color-on-surface);
+    }
+
+    thead th {
+        color: var(--color-on-surface-variant);
+    }
+
+    /* Additive interaction overlays — never replace the base fill */
+    tbody tr:hover {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    tbody tr:active {
+        background-color: var(--color-on-surface-state-16);
+    }
+}
+
+.plus-pattern-table-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    color: var(--color-on-surface-variant);
+    text-align: center;
+}
+
+.plus-pattern-table-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--size-element-gap-md);
+}

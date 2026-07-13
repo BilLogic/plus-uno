@@ -1,10 +1,6 @@
 # Writing Style — the voice, once
 
-<!--
-status: canonical — this file IS the convention (ADR-017)
-distilled: 2026-07-07 from 📓 playbook §4a (now superseded) + the ux-writing rubric lineage
-applied by: every agent producing human-facing text (writers/*, people-scout outreach drafts) and every skill. Voice is a convention, not a role — there is no copywriter agent.
--->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes 📓 playbook §4a. Distilled 2026-07-07 · applied by every agent producing human-facing text — voice is a convention, not a role. -->
 
 - **Plain, direct, specific.** Short sentences, active voice, named actors: "UNO drafts the PRD," not "the PRD is drafted."
 - **Lead with the point.** First line of every page, section, post, and annotation carries the conclusion; detail follows. Humans skim, agents read top-down — both benefit.

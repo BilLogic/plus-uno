@@ -1,6 +1,6 @@
 import React from 'react';
-import Modal from '@/components/Modal';
-import Badge from '@/components/Badge';
+import Modal from '@/components/messaging/Modal';
+import Badge from '@/components/status-and-loading/Badge';
 
 /**
  * Modal showing all sessions the user has been assigned to,

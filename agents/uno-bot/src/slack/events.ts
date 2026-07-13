@@ -1,9 +1,11 @@
 import type { Env } from "../types";
-import { runAgent, type AgentImage, type AgentResult } from "../agent/run-agent";
+import { runAgent, type AgentResult } from "../agent/run-agent";
+import { bareResolution } from "../agent/loop-shared";
 import { routeRequest } from "../agent/anthropic-client";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
+  recordExchange,
   claimEventRun,
   deletePendingProposal,
   isDuplicateEvent,
@@ -17,68 +19,34 @@ import { addReaction, conversationsReplies, getBotIdentity, postMessage } from "
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import { preflight } from "../agent/preflight";
-import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
+import {
+  type SlackMessageEvent,
+  type SlackAppMentionEvent,
+  type SlackReactionAddedEvent,
+  type SlackInnerEvent,
+  type SlackEventCallback,
+  type SlackUrlVerification,
+  type SlackEnvelope,
+  type RunnerJobPayload,
+} from "./types";
+import { collectVisionInputs } from "./vision";
+import { postVisibleFailure, postTextVerified } from "./delivery";
+import { reviewDraft } from "../agent/draft-judge";
+import { formatProposal, proposalVerb, buildImplementDesignProposal } from "./proposal-render";
 
-/** Slack file attachment metadata as delivered on message/app_mention events.
- *  Only the fields the vision path reads — everything else is ignored. */
-export interface SlackEventFile {
-  id?: string;
-  name?: string;
-  mimetype?: string;
-  url_private?: string;
-  size?: number;
-}
-
-export interface SlackMessageEvent {
-  type: "message";
-  channel: string;
-  user?: string;
-  text?: string;
-  ts: string;
-  thread_ts?: string;
-  bot_id?: string;
-  subtype?: string;
-  files?: SlackEventFile[];
-}
-
-export interface SlackAppMentionEvent {
-  type: "app_mention";
-  channel: string;
-  user: string;
-  text: string;
-  ts: string;
-  thread_ts?: string;
-  files?: SlackEventFile[];
-}
-
-export interface SlackReactionAddedEvent {
-  type: "reaction_added";
-  user: string;
-  reaction: string;
-  item: { type: "message"; channel: string; ts: string };
-  event_ts: string;
-}
-
-export type SlackInnerEvent =
-  | SlackMessageEvent
-  | SlackAppMentionEvent
-  | SlackReactionAddedEvent
-  | { type: string };
-
-export interface SlackEventCallback {
-  type: "event_callback";
-  event: SlackInnerEvent;
-  team_id: string;
-  event_id: string;
-  event_time: number;
-}
-
-export interface SlackUrlVerification {
-  type: "url_verification";
-  challenge: string;
-}
-
-export type SlackEnvelope = SlackEventCallback | SlackUrlVerification | { type: string };
+// Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
+// and any other importer that still reaches for the Slack wire types here.
+export type {
+  SlackEventFile,
+  SlackMessageEvent,
+  SlackAppMentionEvent,
+  SlackReactionAddedEvent,
+  SlackInnerEvent,
+  SlackEventCallback,
+  SlackUrlVerification,
+  SlackEnvelope,
+  RunnerJobPayload,
+} from "./types";
 
 export async function handleSlackEnvelope(env: Env, body: SlackEnvelope): Promise<Response> {
   if (body.type === "url_verification") {
@@ -130,12 +98,6 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   }
 }
 
-// A unit of work for the AgentRunner DO: a user message (full agent pipeline)
-// or a reaction (proposal confirm/cancel, which may execute a gated tool).
-export type RunnerJobPayload =
-  | { kind: "message"; event: SlackMessageEvent }
-  | { kind: "reaction"; event: SlackReactionAddedEvent };
-
 // Hand the work to the per-thread AgentRunner DO instead of running it here:
 // this Worker invocation lives inside ctx.waitUntil(), which Cloudflare cancels
 // ~30s after the Slack ack — any longer run died silently mid-flight
@@ -148,13 +110,19 @@ async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: strin
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ job, enqueuedAt: Date.now() }),
   });
-  if (!res.ok && job.kind === "message") {
+  if (!res.ok) {
     // Enqueue is the only step left in the Worker — a failure here IS the
-    // 👀-then-silence path, so make it visible instead.
-    console.error(`[slack] runner enqueue failed: ${res.status}`);
+    // 👀-then-silence path, so make it visible instead. A dropped REACTION job
+    // is a silently-ignored ✅/❌ (the exact "approved then nothing" failure
+    // this codebase fights elsewhere), so warn on both job kinds — each posts
+    // into its own thread.
+    console.error(`[slack] runner enqueue failed (${job.kind}): ${res.status}`);
+    const target =
+      job.kind === "message"
+        ? { channel: job.event.channel, thread_ts: job.event.thread_ts ?? job.event.ts }
+        : { channel: job.event.item.channel, thread_ts: job.event.item.ts };
     await postMessage(env, {
-      channel: job.event.channel,
-      thread_ts: job.event.thread_ts ?? job.event.ts,
+      ...target,
       text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
   }
@@ -358,16 +326,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Anything longer than a bare phrase still goes to the model (it may be a
   // modification request, not a plain yes/no).
   if (pending) {
-    const bare = userText.trim().toLowerCase().replace(/[.!?\s]+$/g, "");
-    const CONFIRM_PHRASES = new Set([
-      "go ahead", "yes", "yes please", "confirm", "confirmed", "do it",
-      "ship it", "approve", "approved", "sure", "ok", "okay", "lgtm",
-    ]);
-    const CANCEL_PHRASES = new Set([
-      "cancel", "no", "stop", "abort", "nevermind", "never mind",
-      "cancel it", "don't", "dont",
-    ]);
-    if (CONFIRM_PHRASES.has(bare) || CANCEL_PHRASES.has(bare)) {
+    const bareDecision = bareResolution(userText); // shared vocabulary (loop-shared)
+    if (bareDecision) {
       if (userId !== pending.requesterUserId) {
         await postMessage(env, {
           channel,
@@ -376,13 +336,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         });
         return;
       }
-      const decision = CONFIRM_PHRASES.has(bare) ? "confirm" : "cancel";
-      await resolveProposal(env, pending, decision);
-      await appendHistory(env, channel, threadTs, { role: "user", content: userText });
-      await appendHistory(env, channel, threadTs, {
-        role: "assistant",
-        content: decision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
-      });
+      await resolveProposal(env, pending, bareDecision);
+      await recordExchange(
+        env, channel, threadTs, userText,
+        bareDecision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
+      );
       return;
     }
   }
@@ -454,7 +412,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 
   // ----- text-only response -----
   if (result.kind === "text") {
-    const delivery = await postTextVerified(env, channel, threadTs, result.text);
+    // Pre-send self-verification (approved 2026-07-12): substantive drafts get
+    // ONE cheap judge call against the condensed D1–D9 rubric, revised once on
+    // a flagged failure. Short replies skip it entirely; any judge error or
+    // timeout ships the original draft (fail open — see agent/draft-judge.ts).
+    const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
+    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text);
     await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
@@ -473,8 +436,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await resolveProposal(env, result.pending, result.decision, result.messageToUser);
     const finalText = result.messageToUser
       ?? (result.decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
-    await appendHistory(env, channel, threadTs, { role: "assistant", content: finalText });
+    await recordExchange(env, channel, threadTs, vision.historyText, finalText);
     return;
   }
 
@@ -495,8 +457,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const gate = await preflight(result.toolName, result.input, { env, prd, implementPrdUrl });
   if (gate) {
     await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
-    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
-    await appendHistory(env, channel, threadTs, { role: "assistant", content: gate.ask });
+    await recordExchange(env, channel, threadTs, vision.historyText, gate.ask);
     return;
   }
 
@@ -516,8 +477,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       `:hourglass: That exact *${proposalVerb(result.toolName)}* proposal is already waiting on you — ` +
       `react :white_check_mark: / :x: on it, or say "go ahead" / "cancel". I won't post a duplicate card.`;
     await postMessage(env, { channel, thread_ts: threadTs, text: remind });
-    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
-    await appendHistory(env, channel, threadTs, { role: "assistant", content: remind });
+    await recordExchange(env, channel, threadTs, vision.historyText, remind);
     return;
   }
 
@@ -535,8 +495,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await postMessage(env, { channel, thread_ts: threadTs, text: ask });
-      await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
-      await appendHistory(env, channel, threadTs, { role: "assistant", content: ask });
+      await recordExchange(env, channel, threadTs, vision.historyText, ask);
       return;
     }
   } catch (err) {
@@ -576,12 +535,13 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     posted = await postMessage(env, { channel, thread_ts: threadTs, text: proposalText });
   }
   if (posted.ok && posted.ts) {
-    await addReaction(env, channel, posted.ts, "warning");
+    // Persist the moment the card posts: it's reactable instantly, and a quick ✅
+    // that lands before the proposal is saved would look up nothing and be
+    // silently lost (the reaction gate keys off saved state). Save first so the
+    // confirmation always finds it.
     await savePendingProposal(env, {
       toolName: result.toolName,
       input: result.input,
-      toolUseId: result.toolUseId,
-      assistantContent: result.assistantContent as unknown[],
       channel,
       threadTs,
       userMsgTs,
@@ -598,145 +558,6 @@ function stripBotMentions(text: string): string {
   return text.replace(/<@[A-Z0-9]+>/g, "").trim();
 }
 
-// ---------------------------------------------------------------------------
-// Vision input (2026-07-09): Slack-pasted images + Figma frame screenshots are
-// attached to the CURRENT user turn as base64 image blocks so the model can
-// actually see them. Everything here is best-effort — any failure degrades to
-// text-only and must never break the reply. Base64 is NEVER persisted to the
-// Durable Object history; `historyText` carries text markers instead.
-// ---------------------------------------------------------------------------
-
-const MAX_IMAGE_ATTACHMENTS = 3;
-const MAX_IMAGE_BYTES = Math.floor(3.5 * 1024 * 1024); // Anthropic per-image limit is ~5MB; stay well under
-const IMAGE_FETCH_TIMEOUT_MS = 10_000;
-// The Anthropic API only accepts these four image media types — anything else
-// (svg, tiff, heic…) would 400 the whole request, so it's skipped like oversize.
-const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
-
-interface VisionInputs {
-  /** Base64 image blocks for the current turn (Slack files first, then the Figma frame). */
-  images: AgentImage[];
-  /** userText + model-visible notes (omitted files, figma fetch failure). */
-  modelText: string;
-  /** userText + plain-text markers for the stored history (no base64 ever). */
-  historyText: string;
-}
-
-async function collectVisionInputs(
-  env: Env,
-  event: SlackMessageEvent,
-  userText: string,
-): Promise<VisionInputs> {
-  const images: AgentImage[] = [];
-  const modelNotes: string[] = [];
-  const historyMarkers: string[] = [];
-
-  try {
-    // 1) Slack-pasted images: up to MAX_IMAGE_ATTACHMENTS supported image files.
-    const files = Array.isArray(event.files) ? event.files : [];
-    const imageFiles = files.filter(
-      (f) => typeof f?.mimetype === "string" && f.mimetype.startsWith("image/") && !!f.url_private,
-    );
-    let omitted = 0;
-    for (const f of imageFiles) {
-      if (
-        images.length >= MAX_IMAGE_ATTACHMENTS ||
-        !SUPPORTED_IMAGE_TYPES.has(f.mimetype!) ||
-        (typeof f.size === "number" && f.size > MAX_IMAGE_BYTES)
-      ) {
-        omitted++;
-        continue;
-      }
-      const bytes = await fetchBytes(f.url_private!, {
-        Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-      });
-      if (!bytes || bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) {
-        omitted++;
-        continue;
-      }
-      images.push({ media_type: f.mimetype!, data: bytesToBase64(bytes) });
-      historyMarkers.push(`[user attached image: ${f.name ?? "unnamed"}]`);
-    }
-    if (omitted > 0) {
-      modelNotes.push(`[${omitted} more image(s) omitted — too large or unsupported format]`);
-    }
-
-    // 2) Figma frame screenshot: first figma.com URL with a node-id in the text
-    // (cap: 1 frame per message). Reuses the same image-render endpoint the
-    // proposal cards use, then downloads the short-lived signed PNG.
-    const figmaParts = findFigmaFrameUrl(userText);
-    if (figmaParts) {
-      let attached = false;
-      const pngUrl = await fetchFigmaImagePngUrl(env, figmaParts.fileKey, figmaParts.nodeId, 1);
-      if (pngUrl) {
-        const png = await fetchBytes(pngUrl);
-        if (png && png.byteLength > 0 && png.byteLength <= MAX_IMAGE_BYTES) {
-          images.push({ media_type: "image/png", data: bytesToBase64(png) });
-          historyMarkers.push("[figma frame screenshot attached]");
-          attached = true;
-        }
-      }
-      if (!attached) modelNotes.push("[figma screenshot unavailable]");
-    }
-  } catch (err) {
-    // Vision is additive — never let it break the reply. Keep whatever was
-    // collected before the failure and continue text-first.
-    console.warn(
-      `[vision] collection failed, degrading: ${err instanceof Error ? err.message : String(err)}`,
-    );
-  }
-
-  return {
-    images,
-    modelText: [userText, ...modelNotes].join("\n"),
-    historyText: [userText, ...historyMarkers].join("\n"),
-  };
-}
-
-/** First figma.com URL in the message that carries a node-id (Slack wraps links
- *  as `<url>` or `<url|label>` — strip that before parsing). */
-function findFigmaFrameUrl(text: string): ReturnType<typeof parseFigmaUrl> {
-  const matches = text.match(/https?:\/\/[^\s<>|]+/g) ?? [];
-  for (const candidate of matches) {
-    const parts = parseFigmaUrl(candidate);
-    if (parts) return parts;
-  }
-  return null;
-}
-
-/** Timeout-guarded byte fetch; null on any failure. Slack serves an HTML login
- *  page with a 200 when the token can't read the file — treat that as failure. */
-async function fetchBytes(
-  url: string,
-  headers?: Record<string, string>,
-): Promise<ArrayBuffer | null> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), IMAGE_FETCH_TIMEOUT_MS);
-  try {
-    const res = await fetch(url, { headers, signal: controller.signal });
-    if (!res.ok) return null;
-    const contentType = res.headers.get("content-type") ?? "";
-    if (contentType.includes("text/html")) return null;
-    return await res.arrayBuffer();
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-/** ArrayBuffer -> base64, chunked so String.fromCharCode never overflows the
- *  argument limit on multi-MB images. */
-function bytesToBase64(buf: ArrayBuffer): string {
-  const bytes = new Uint8Array(buf);
-  const CHUNK = 0x8000;
-  let binary = "";
-  for (let i = 0; i < bytes.length; i += CHUNK) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
-  }
-  return btoa(binary);
-}
-
 // Key-order-independent JSON compare, so two generations of the same tool input
 // register as identical even if the model emitted fields in a different order.
 function stableStringify(v: unknown): string {
@@ -748,63 +569,6 @@ function stableStringify(v: unknown): string {
       .join(",")}}`;
   }
   return JSON.stringify(v);
-}
-
-// Make failure VISIBLE, resiliently: try the ❌ reaction first (cheapest call —
-// most likely to still succeed if the request is out of subrequest budget),
-// then the error text. Every step is .catch-wrapped so a failure inside the
-// failure path can never re-throw into silence (R2's ":eyes: then nothing").
-async function postVisibleFailure(
-  env: Env,
-  channel: string,
-  threadTs: string,
-  userMsgTs: string,
-): Promise<void> {
-  await addReaction(env, channel, userMsgTs, "x").catch(() => {});
-  await postMessage(env, {
-    channel,
-    thread_ts: threadTs,
-    text: ":x: Something went wrong on my end. Try again in a moment?",
-  }).catch(() => {});
-}
-
-// Slack chat.postMessage hard-fails past 40k chars and renders poorly long
-// before that; AGENTS.md tells the model to keep it short, but the Worker
-// enforces it. Truncation note lets the user ask for the rest.
-const MAX_POST_CHARS = 3900;
-
-function capText(text: string): string {
-  if (text.length <= MAX_POST_CHARS) return text;
-  // Cut at a line boundary (else a word boundary) so the cap never splits a
-  // <url|label> link in half — live 2026-07-10 a mid-URL cut shipped a broken
-  // link right above the truncation notice.
-  const window = text.slice(0, MAX_POST_CHARS);
-  const lastBreak = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
-  const cut = lastBreak > MAX_POST_CHARS * 0.6 ? window.slice(0, lastBreak) : window;
-  return `${cut}\n_…truncated — ask me for the rest._`;
-}
-
-/**
- * Post a text reply and report whether Slack actually accepted it. Guards the
- * R2 "✅ + empty body" defect: empty text gets an honest placeholder, oversized
- * text is capped, a failed post is retried once, and the caller only ✅-reacts
- * when this returns true.
- */
-async function postTextVerified(
-  env: Env,
-  channel: string,
-  threadTs: string,
-  text: string,
-): Promise<{ ok: boolean; text: string }> {
-  const body = text.trim()
-    ? capText(text)
-    : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
-  let posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
-  if (!posted.ok) {
-    console.warn("[slack] text post failed; retrying once");
-    posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
-  }
-  return { ok: !!posted.ok, text: body };
 }
 
 // Build the bot's memory from the ACTUAL Slack thread, so it sees every message
@@ -843,84 +607,4 @@ async function buildThreadHistory(
     console.warn(`[history] thread read failed, using DO fallback: ${err instanceof Error ? err.message : String(err)}`);
   }
   return loadHistory(env, channel, threadTs);
-}
-
-function formatProposal(
-  toolName: string,
-  input: Record<string, unknown>,
-  requesterUserId: string,
-  previewText: string | undefined,
-): string {
-  const body = "```\n" + JSON.stringify(input, null, 2) + "\n```";
-  const lines: string[] = [];
-  if (previewText) {
-    lines.push(previewText, "");
-  }
-  lines.push(
-    `:warning: About to *${proposalVerb(toolName)}*:`,
-    body,
-    `React :white_check_mark: / :x: or just say "go ahead" / "cancel" — only <@${requesterUserId}> can confirm.`,
-  );
-  return lines.join("\n");
-}
-
-function proposalVerb(toolName: string): string {
-  switch (toolName) {
-    case "component_implement": return "implement this component";
-    case "prototype_scaffold": return "scaffold a new prototype from this Figma design";
-    case "notion_create": return "create this card in Notion";
-    case "notion_update": return "update this Notion page";
-    case "notion_archive": return "archive this Notion card";
-    case "shareout_post": return "share this for feedback in #plus-design-feedback";
-    case "email_send": return "send an email via Gmail";
-    default: return toolName;
-  }
-}
-
-// Build a richer proposal for implement_design: the same plaintext as
-// formatProposal (used as the Slack notification fallback AND stored in
-// pending.proposalText), plus Slack blocks that embed a Figma preview
-// screenshot when one can be fetched. The image fetch is best-effort — if it
-// returns null we omit blocks entirely and the proposal posts as plain text,
-// identical to every other tool.
-async function buildImplementDesignProposal(
-  env: Env,
-  input: Record<string, unknown>,
-  requesterUserId: string,
-  previewText: string | undefined,
-): Promise<{ text: string; blocks?: unknown[] }> {
-  const text = formatProposal("prototype_scaffold", input, requesterUserId, previewText);
-
-  const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
-  const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
-  const imageUrl = parts
-    ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1)
-    : null;
-  if (!imageUrl) return { text };
-
-  const params = "```\n" + JSON.stringify(input, null, 2) + "\n```";
-  const blocks: unknown[] = [];
-  if (previewText) {
-    blocks.push({ type: "section", text: { type: "mrkdwn", text: previewText } });
-  }
-  blocks.push({
-    type: "image",
-    image_url: imageUrl,
-    alt_text: "Figma preview of the design to implement",
-  });
-  blocks.push({
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `:warning: About to *${proposalVerb("prototype_scaffold")}*:\n${params}`,
-    },
-  });
-  blocks.push({
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `React :white_check_mark: / :x: or just say "go ahead" / "cancel" — only <@${requesterUserId}> can confirm.`,
-    },
-  });
-  return { text, blocks };
 }

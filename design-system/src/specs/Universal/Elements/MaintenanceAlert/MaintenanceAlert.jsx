@@ -10,7 +10,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Alert from '../../../../components/Alert/Alert';
+import Alert from '@/components/messaging/Alert/Alert';
 
 const MaintenanceAlert = ({
     title = 'Scheduled Maintenance',

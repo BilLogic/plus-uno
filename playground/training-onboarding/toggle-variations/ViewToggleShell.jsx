@@ -20,11 +20,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/Button';
-import ButtonGroup from '@/components/ButtonGroup';
-import NavTabs from '@/components/NavTabs';
-import NavPills from '@/components/NavPills';
-import OnboardingModuleCard from '@/specs/Training/onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
+import Button from '@/components/actions/Button';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import NavTabs from '@/components/navigation/NavTabs';
+import NavPills from '@/components/navigation/NavPills';
+import OnboardingModuleCard from '@/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
 
 import './toggle-variations.scss';
 

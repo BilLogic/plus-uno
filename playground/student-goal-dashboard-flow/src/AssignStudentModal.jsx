@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Modal from '@plus-ds/components/Modal';
-import Table from '@plus-ds/components/Table';
-import Button from '@plus-ds/components/Button';
-import Checkbox from '@plus-ds/forms/Checkbox';
+import Modal from '@plus-ds/components/messaging/Modal';
+import Table from '@plus-ds/components/_internal/Table';
+import Button from '@plus-ds/components/actions/Button';
+import Checkbox from '@plus-ds/components/forms-and-inputs/Checkbox';
 
 const AssignStudentModal = ({ isOpen, onClose, targetItem }) => {
     // Mock students data

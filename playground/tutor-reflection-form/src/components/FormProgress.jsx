@@ -1,5 +1,5 @@
 import React from 'react';
-import Progress from '@/components/Progress';
+import Progress from '@/components/status-and-loading/Progress';
 
 const FormProgress = ({ value }) => {
     return (

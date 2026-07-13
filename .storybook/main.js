@@ -1,4 +1,5 @@
-import path from 'path';
+// This file has been automatically migrated to valid ESM format by Storybook.
+import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import tailwindcss from '@tailwindcss/vite';
@@ -17,30 +18,36 @@ const config = {
     // '../playground/storybook-ai-agent-llm-api/**/*.stories.{js,jsx,ts,tsx}',
     // '../playground/training-onboarding/**/*.stories.{js,jsx,ts,tsx}',
   ],
+
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-docs',
+    '@storybook/addon-mcp',
+    '@storybook/addon-vitest',
+    '@storybook/addon-a11y'
   ],
+
   framework: {
     name: '@storybook/react-vite',
     options: {
       strictMode: true,
     },
   },
+
   typescript: {
     check: false,
     reactDocgen: 'react-docgen',
   },
+
   features: {
     storyStoreV7: true,
   },
-  docs: {
-    autodocs: true,
-  },
+
   server: {
     host: '0.0.0.0',
     port: 6006,
   },
+
   staticDirs: (() => {
     const staticDirs = [];
     const rootDistPath = path.resolve(__dirname, '../dist');
@@ -61,6 +68,7 @@ const config = {
 
     return staticDirs;
   })(),
+
   viteFinal: async (config) => {
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
@@ -153,7 +161,7 @@ const config = {
     config.css.modules.localsConvention = 'camelCase';
 
     return config;
-  },
+  }
 };
 
 export default config;

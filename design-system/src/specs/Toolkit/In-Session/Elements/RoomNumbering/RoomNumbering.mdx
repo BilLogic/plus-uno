@@ -1,0 +1,53 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as RoomNumberingStories from './RoomNumbering.stories.jsx';
+import { DsCanvasHero, DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={RoomNumberingStories} name="Toolkit Docs — RoomNumbering" />
+
+<Title />
+
+Room Numbering v2 (**Session Counts & Room Indicators**, Jul 2026). Every tutor owns a **frozen block** of consecutive Zoom breakout-room numbers sized `assigned students + buffer`, where the buffer scales with tutor count (**3** for ≤4 tutors · **2** for 5–8 · **1** for 9+). The header **room-count badge** is the sum of all blocks. The algorithm lives in `roomNumbering.js` and is unit-tested (`roomNumbering.test.js`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=6995-70551"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/In-Session/Elements/RoomNumbering"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Rules (normative)
+
+1. **Initial assignment** — reserve each tutor a block of `assigned + buffer`; blocks then **freeze**. Room count = sum of blocks.
+2. **Assign** — a student takes the lowest free number in their tutor's block; freed numbers **recycle**.
+3. **Move** — free the old number, reassign in the destination block; no one else renumbers.
+4. **Absence** — no change; the student keeps their number and the room stays empty.
+5. **New student** — assign per rule 2 (recycled numbers included).
+6. **Tutor joins mid-session** — inherits students in place; no new block, no renumbering.
+7. **Block full → borrow** — take the lowest free number from any other block; the row shows the **out-of-range** indicator (warning tint). Rooms ≥ students holds by construction, so a borrow always succeeds.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive walkthrough
+
+<DocsCanvasShell description={<>Run the assignment, then move / add / mark absent / overflow to watch recycling, inheritance, and borrowing.</>}>
+    <DsCanvasHero of={RoomNumberingStories.Interactive} layout="padded" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Badge states
+
+- **Room count — waiting**: tertiary (muted) tint + `—` before the lead runs assignment (tooltip *“Assign students to tutors to size breakout rooms”*).
+- **Room count — active**: secondary tint + frozen total (tooltip *“Rooms to create in Zoom (includes each tutor's buffer)”*).
+- **Student room number**: secondary tint; **out-of-range** rows use warning tint (color-only) when the number is borrowed.
+
+</div>
+
+</div>

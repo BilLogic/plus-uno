@@ -1,0 +1,58 @@
+/**
+ * Card pattern (Patterns/Card)
+ * Baked-in: surface-container-lowest background, elevation 1, card radius sm,
+ * outline (outer-perimeter) border. Slots: header / body / footer.
+ */
+
+.plus-pattern-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface-container-lowest);
+    color: var(--color-on-surface);
+    border: var(--size-card-border-sm) solid var(--color-outline); /* outer perimeter = outline */
+    border-radius: var(--size-card-radius-sm);
+    box-shadow: var(--elevation-light-2); /* semantic level 1 (cards) maps to Light/2 per token-mapping.md */
+    overflow: hidden; // clip slot content to the card radius
+}
+
+/* Padding scale */
+.plus-pattern-card-pad-sm {
+    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+}
+
+.plus-pattern-card-pad-md {
+    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+}
+
+.plus-pattern-card-pad-lg {
+    padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
+}
+
+/* Gap scale */
+.plus-pattern-card-gap-sm {
+    gap: var(--size-card-gap-sm);
+}
+
+.plus-pattern-card-gap-md {
+    gap: var(--size-card-gap-md);
+}
+
+.plus-pattern-card-gap-lg {
+    gap: var(--size-card-gap-lg);
+}
+
+/* Slots — inner dividers use outline-variant */
+.plus-pattern-card-header {
+    border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+    padding-bottom: var(--size-card-gap-sm);
+}
+
+.plus-pattern-card-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.plus-pattern-card-footer {
+    border-top: var(--size-element-border) solid var(--color-outline-variant);
+    padding-top: var(--size-card-gap-sm);
+}

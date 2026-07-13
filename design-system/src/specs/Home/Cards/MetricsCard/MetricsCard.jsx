@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/Card';
-import Badge from '@/components/Badge';
+import Card from '@/components/layout-and-structure/Card';
+import Badge from '@/components/status-and-loading/Badge';
 import './MetricsCard.scss';
 
 /**

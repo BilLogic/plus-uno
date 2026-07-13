@@ -1,0 +1,51 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SessionOverviewSectionStories from './SessionOverviewSection.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionOverviewSectionStories} />
+
+<Title />
+
+Reusable overview section for the Session Admin spec — KPI cards wired to the admin filter bar.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=987-127692"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Session/Sections/SessionOverviewSection"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default overview metrics for the active session cohort.</>}
+>
+    <Canvas
+        of={SessionOverviewSectionStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SessionOverviewSectionStories.Interactive}
+    description={<>Adjust the metric values and loading state from the controls panel.</>}
+/>
+
+</div>
+
+</div>

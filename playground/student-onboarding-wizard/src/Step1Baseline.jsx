@@ -1,5 +1,5 @@
 import React from 'react';
-import ChoiceGrid from '@plus-ds/forms/ChoiceGrid';
+import ChoiceGrid from '@plus-ds/components/forms-and-inputs/ChoiceGrid';
 
 const Step1Baseline = ({ data, updateData }) => {
     const rows = [

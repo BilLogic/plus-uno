@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import Button from '@/components/Button/Button';
-import Badge from '@/components/Badge/Badge';
-import Alert from '@/components/Alert/Alert';
-import Progress from '@/components/Progress/Progress';
-import Accordion from '@/components/Accordion/Accordion';
-import Input from '@/forms/Input';
+import Button from '@/components/actions/Button/Button';
+import Badge from '@/components/status-and-loading/Badge/Badge';
+import Alert from '@/components/messaging/Alert/Alert';
+import Progress from '@/components/status-and-loading/Progress/Progress';
+import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
+import Input from '@/components/forms-and-inputs/Input';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import { ShellContext } from '../../home-redesign/src/context/ShellContext';
 import './MonthlyReportPage.scss';

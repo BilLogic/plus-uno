@@ -533,12 +533,26 @@ function generateLayoutSCSS() {
         if (max) scss += `    --breakpoint-${mode.toLowerCase()}-max: ${max}px;\n`;
     });
 
-    scss += `\n    /* Containers */\n`;
+    scss += `\n    /* App shell + content grid (mirrors the Figma size/layout collection) */\n`;
+    scss += `    --layout-sidebar-width: 164px; /* SideNav fixed width */\n`;
+    scss += `    --layout-grid-gap: 8px; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */\n`;
 
-    // Extract containers (simplified - would need more parsing for full implementation)
-    // For now, output key container values
-
+    // Content-grid column spans (12 cols, 8px gutter) at each breakpoint minimum.
+    // Main content width: MD 672 / LG 748 / XL 1164 (= viewport − outer pad − SideNav − gap − surface pad).
+    const contentWidths = { md: 672, lg: 748, xl: 1164 };
+    const colSpans = (w) => {
+        const col1 = (w - 8 * 11) / 12;
+        return Array.from({ length: 12 }, (_, i) => +(col1 * (i + 1) + 8 * i).toFixed(2));
+    };
+    scss += `\n    /* Content-grid column spans — MD (768) values; LG/XL override below */\n`;
+    colSpans(contentWidths.md).forEach((v, i) => { scss += `    --col-${i + 1}: ${v}px;\n`; });
     scss += `}\n`;
+    scss += `\n@media (min-width: 1024px) {\n    :root {\n`;
+    colSpans(contentWidths.lg).forEach((v, i) => { scss += `        --col-${i + 1}: ${v}px;\n`; });
+    scss += `    }\n}\n`;
+    scss += `\n@media (min-width: 1440px) {\n    :root {\n`;
+    colSpans(contentWidths.xl).forEach((v, i) => { scss += `        --col-${i + 1}: ${v}px;\n`; });
+    scss += `    }\n}\n`;
 
     return scss;
 }

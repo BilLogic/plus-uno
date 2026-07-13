@@ -9,7 +9,7 @@ import React from 'react';
 import MaintenanceAlert from './MaintenanceAlert';
 
 export default {
-    title: 'Specs/Universal/Elements/MaintenanceAlert',
+    title: 'Specs/Universal/Elements/Maintenance Alert',
     component: MaintenanceAlert,
     tags: ['!dev', '!autodocs'],
     parameters: {

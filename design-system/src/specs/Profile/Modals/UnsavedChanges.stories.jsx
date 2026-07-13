@@ -35,10 +35,10 @@
  * Width: ~388.67px (var(--columns-col-7))
  */
 import React from 'react';
-import Button from '../../../components/Button/Button';
+import Button from '@/components/actions/Button/Button';
 
 export default {
-    title: 'Specs/Profile/Modals/UnsavedChanges',
+    title: 'Specs/Profile/Modals/Unsaved Changes',
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',

@@ -8,7 +8,7 @@ import React from 'react';
 import SidebarTab from './SidebarTab';
 
 export default {
-    title: 'Specs/Universal/Elements/SidebarTab',
+    title: 'Specs/Universal/Elements/Sidebar Tab',
     component: SidebarTab,
     tags: ['!dev', '!autodocs'],
     parameters: {

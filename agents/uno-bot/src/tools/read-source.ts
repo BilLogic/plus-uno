@@ -8,6 +8,7 @@
 // Runs inline in the agent loop (no side effect, no gate).
 
 import type { Env } from "../types";
+import { fetchWithTimeout } from "../http";
 import { parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
 
@@ -110,10 +111,8 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
     // ---- GitHub / raw / other http(s) ----
     const raw = toGithubRaw(parsed);
     const fetchUrl = raw ?? url;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), GENERIC_TIMEOUT_MS);
-    try {
-      const res = await fetch(fetchUrl, { signal: controller.signal, headers: { "user-agent": "uno-bot" } });
+    {
+      const res = await fetchWithTimeout(fetchUrl, { headers: { "user-agent": "uno-bot" } }, GENERIC_TIMEOUT_MS);
       if (!res.ok) {
         return JSON.stringify({ ok: false, error: `fetch ${res.status} for ${fetchUrl}`, note: "Couldn't open the link — tell the user you couldn't read it; don't answer from priors." });
       }
@@ -127,8 +126,6 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
         content: body.slice(0, GENERIC_TEXT_CAP),
         note: "Answer from this fetched content and cite the URL. If it doesn't contain the answer, say so — don't fall back to priors silently.",
       });
-    } finally {
-      clearTimeout(timer);
     }
   } catch (err) {
     return JSON.stringify({

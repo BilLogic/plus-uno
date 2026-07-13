@@ -5,18 +5,18 @@
 import React, { useState } from 'react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore – plus-ds JSX components
-import Button from '@/components/Button/Button';
+import Button from '@/components/actions/Button/Button';
 // @ts-ignore
-import ButtonGroup from '@/components/ButtonGroup/ButtonGroup';
+import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
 // @ts-ignore
-import Pagination from '@/components/Pagination/Pagination';
+import Pagination from '@/components/navigation/Pagination/Pagination';
 // @ts-ignore
 import OverviewCard from '@/specs/Universal/Cards/OverviewCard/OverviewCard';
 // @ts-ignore
-import TutorsTrainingProgressTable from '@/specs/Admin/Tutor Admin/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable';
+import TutorsTrainingProgressTable from '@/specs/Admin/Tutor/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable';
 // @ts-ignore
-import ExportSearchFilterBar from '@/specs/Admin/Tutor Admin/Elements/ExportSearchFilterBar/ExportSearchFilterBar';
-import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
+import ExportSearchFilterBar from '@/specs/Admin/Tutor/Elements/ExportSearchFilterBar/ExportSearchFilterBar';
+import '@/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
 // Stable reference: OverviewCard's intro-animation effect lists `smartData` in
 // its deps, so passing a new object literal on every render re-runs that effect

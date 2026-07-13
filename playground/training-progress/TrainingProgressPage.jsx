@@ -4,7 +4,7 @@
  * Clicking a tutor row opens TutorLessonDetailsModal with lesson details for that tutor.
  */
 import React, { useState } from 'react';
-import TutorTrainingProgressPage from '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
+import TutorTrainingProgressPage from '@/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
 import TutorLessonDetailsModal from './TutorLessonDetailsModal';
 
 const TrainingProgressPage = () => {

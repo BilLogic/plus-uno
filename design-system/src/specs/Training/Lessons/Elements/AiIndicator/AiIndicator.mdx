@@ -1,0 +1,58 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AiIndicatorStories from './AiIndicator.stories.jsx';
+import {
+    DsCanvasHero,
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AiIndicatorStories} />
+
+<Title />
+
+Inline "AI" chip used to label AI-generated content within training lessons.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-177685"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/Lessons/Elements/AiIndicator"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Default
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default AI indicator chip.</>}
+>
+    <DsCanvasHero of={AiIndicatorStories.Default} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### In context
+
+<DocsCanvasShell description={<>Same chip placed alongside lesson body copy.</>}>
+    <DsCanvasHero of={AiIndicatorStories.InContext} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={AiIndicatorStories.Interactive}
+    description={<>Edit the label and chip variant inline.</>}
+/>
+
+</div>
+
+</div>

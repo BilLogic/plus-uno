@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import Modal from '@/components/Modal';
-import Button from '@/components/Button';
-import ListGroup, { ListGroupItem } from '@/components/ListGroup';
-import Badge from '@/components/Badge';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
+import ListGroup, { ListGroupItem } from '@/components/layout-and-structure/ListGroup';
+import Badge from '@/components/status-and-loading/Badge';
 
 const EditSessionModal = ({ session, onClose }) => {
     const [activeTab, setActiveTab] = useState('attendees');

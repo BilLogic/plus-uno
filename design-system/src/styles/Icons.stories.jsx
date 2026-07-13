@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default {
-    title: 'Styles/Icons',
+    title: 'Foundations/Iconography',
     tags: ['!dev', '!autodocs'],
 };
 
@@ -28,7 +28,7 @@ const IconTokenTable = ({ rows }) => (
 );
 
 export const Overview = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <p className="body2-txt" style={{ marginBottom: '24px' }}>
             PLUS Design System uses <strong>Font Awesome's free icon library</strong> for all icons.
         </p>
@@ -53,7 +53,7 @@ export const Overview = () => (
 );
 
 export const IconSizeTokensSolid = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
 
         <h4 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h4>
         <IconTokenTable
@@ -79,7 +79,7 @@ export const IconSizeTokensSolid = () => (
 );
 
 export const IconSizeTokensRegular = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
 
         <h4 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h4>
         <IconTokenTable
@@ -129,7 +129,7 @@ export const CommonIcons = () => {
     ];
 
     return (
-        <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1200px' }}>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',

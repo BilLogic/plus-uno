@@ -19,13 +19,17 @@ export default {
     // Per-server hosted-MCP handshake probe — identifies WHICH server is failing
     // when the Anthropic connector reports its unnamed "Connection error". Safe
     // output (names/status/latency only), doubles as the uptime-monitoring hook.
+    // Auth-gated: it runs credentialed handshakes, so it must not be public.
     if (request.method === "GET" && url.pathname === "/debug/mcp") {
+      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
       return handleMcpHealth(env);
     }
 
     // Gemini credential + reachability smoke test (dual-provider phase 1).
     // Returns model, latency, auth mode, and a one-line sample — never secrets.
+    // Auth-gated: it triggers a live (billable) model call, so it must not be public.
     if (request.method === "GET" && url.pathname === "/debug/gemini") {
+      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
       const mode = geminiConfigured(env);
       if (!mode) {
         return Response.json({ ok: false, error: "no Gemini credential configured (GEMINI_API_KEY or GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY)" });
@@ -77,6 +81,29 @@ export default {
     );
   },
 };
+
+// Gate for /debug/* routes. Requires DEBUG_TOKEN to be configured AND matched
+// by the x-debug-token header via a constant-time compare — an unconfigured
+// token means the routes are simply closed (404), never open-by-default.
+function debugAuthorized(request: Request, env: Env): boolean {
+  const expected = env.DEBUG_TOKEN;
+  if (!expected) return false;
+  const provided = request.headers.get("x-debug-token") ?? "";
+  return timingSafeEqualStr(provided, expected);
+}
+
+function timingSafeEqualStr(a: string, b: string): boolean {
+  const enc = new TextEncoder();
+  const ab = enc.encode(a);
+  const bb = enc.encode(b);
+  // Compare over a fixed width so length itself doesn't leak via timing.
+  let diff = ab.length ^ bb.length;
+  const width = Math.max(ab.length, bb.length);
+  for (let i = 0; i < width; i++) {
+    diff |= (ab[i] ?? 0) ^ (bb[i] ?? 0);
+  }
+  return diff === 0;
+}
 
 async function handleSlackEventsRequest(
   request: Request,

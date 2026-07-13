@@ -8,7 +8,7 @@
 import React from 'react';
 
 export default {
-    title: 'Specs/Profile/Elements/ClearanceStatus',
+    title: 'Specs/Profile/Elements/Clearance Status',
     excludeStories: ['ClearanceStatus'],
     tags: ['!dev', '!autodocs'],
     parameters: {

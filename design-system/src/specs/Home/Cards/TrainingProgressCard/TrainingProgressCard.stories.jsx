@@ -2,7 +2,7 @@ import React from 'react';
 import TrainingProgressCard from './TrainingProgressCard';
 
 export default {
-    title: 'Specs/Home/Cards/TrainingProgressCard',
+    title: 'Specs/Home/Cards/Training Progress Card',
     component: TrainingProgressCard,
     tags: ['!dev', '!autodocs'],
 };

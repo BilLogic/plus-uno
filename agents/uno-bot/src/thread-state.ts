@@ -54,11 +54,52 @@ const EVENT_DEDUP_TTL_MS = 24 * 60 * 60 * 1000;
 // this window would get double-run, so keep comfortable headroom above real runs.
 const RUN_LEASE_MS = 20 * 60 * 1000;
 
+// How often the storage-GC alarm runs. Expired records are already ignored on
+// read (TTL checks), but the DO is a single instance whose storage otherwise
+// only grows — event: records in particular are write-once-per-message and were
+// never deleted. A daily sweep keeps storage bounded (review 2026-07-12).
+const GC_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
 export class ThreadState implements DurableObject {
   private storage: DurableObjectStorage;
 
   constructor(state: DurableObjectState, _env: Env) {
     this.storage = state.storage;
+  }
+
+  // Ensure a GC alarm is scheduled. Cheap (one storage read) and idempotent —
+  // called after every write so an idle-then-active DO always has a pending sweep.
+  private async ensureGcAlarm(): Promise<void> {
+    const existing = await this.storage.getAlarm();
+    if (existing === null) {
+      await this.storage.setAlarm(Date.now() + GC_INTERVAL_MS);
+    }
+  }
+
+  // Delete expired records by their own TTL, then reschedule if anything remains.
+  // Keys: event:{id} (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS),
+  // prop:{ts} (PROPOSAL_TTL_MS). Runs at most once a day.
+  async alarm(): Promise<void> {
+    const now = Date.now();
+    let remaining = 0;
+
+    const events = await this.storage.list<EventRecord>({ prefix: "event:" });
+    for (const [key, rec] of events) {
+      if (now - rec.seenAt > EVENT_DEDUP_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
+    const hist = await this.storage.list<HistoryRecord>({ prefix: "hist:" });
+    for (const [key, rec] of hist) {
+      if (now - rec.updatedAt > HISTORY_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
+    const props = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    for (const [key, rec] of props) {
+      if (now - rec.createdAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
+
+    if (remaining > 0) await this.storage.setAlarm(now + GC_INTERVAL_MS);
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -109,6 +150,7 @@ export class ThreadState implements DurableObject {
     const prev = (await this.storage.get<HistoryRecord>(key))?.turns ?? [];
     const turns = [...prev, body.turn].slice(-MAX_HISTORY_TURNS);
     await this.storage.put<HistoryRecord>(key, { turns, updatedAt: Date.now() });
+    await this.ensureGcAlarm();
     return json({ ok: true, length: turns.length });
   }
 
@@ -121,6 +163,7 @@ export class ThreadState implements DurableObject {
       payload: body.payload,
       createdAt: Date.now(),
     });
+    await this.ensureGcAlarm();
     return json({ ok: true });
   }
 
@@ -212,6 +255,7 @@ export class ThreadState implements DurableObject {
       seenAt: Date.now(),
       status: body.mode === "run" ? "running" : "done",
     });
+    await this.ensureGcAlarm();
     return json({ ok: true, seen: false });
   }
 }

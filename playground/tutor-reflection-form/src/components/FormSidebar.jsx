@@ -1,5 +1,5 @@
 import React from 'react';
-import Badge from '@/components/Badge';
+import Badge from '@/components/status-and-loading/Badge';
 
 const FormSidebar = ({ steps, currentStep, onStepClick, hasEscalations }) => {
     return (

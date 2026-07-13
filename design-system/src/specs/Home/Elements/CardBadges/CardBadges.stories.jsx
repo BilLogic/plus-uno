@@ -2,7 +2,7 @@ import React from 'react';
 import { CardBadges } from './CardBadges';
 
 export default {
-    title: 'Specs/Home/Elements/CardBadges',
+    title: 'Specs/Home/Elements/Card Badges',
     tags: ['!dev', '!autodocs'],
     component: CardBadges,
     parameters: {

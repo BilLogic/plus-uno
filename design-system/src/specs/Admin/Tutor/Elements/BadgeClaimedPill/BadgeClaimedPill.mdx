@@ -1,0 +1,71 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as BadgeClaimedPillStories from './BadgeClaimedPill.stories.jsx';
+import { DsCanvasHero, DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BadgeClaimedPillStories} />
+
+<Title />
+
+Yes / No / N/A pill used in tutor tables to indicate whether a badge has been claimed. Also accepts boolean input for legacy data sources.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=3163-151304"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor/Elements/BadgeClaimedPill"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Default
+
+<DocsCanvasShell attachSourceBelow description={<>Default pill.</>}>
+    <DsCanvasHero of={BadgeClaimedPillStories.Default} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+<DocsCanvasShell description={<><strong className="text-foreground">Yes</strong> — claimed.</>}>
+    <DsCanvasHero of={BadgeClaimedPillStories.Yes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">No</strong> — not yet claimed.</>}>
+    <DsCanvasHero of={BadgeClaimedPillStories.No} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">N/A</strong> — not applicable.</>}>
+    <DsCanvasHero of={BadgeClaimedPillStories.NotApplicable} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Boolean input
+
+The component accepts a raw boolean for legacy data sources — `true` maps to "Yes", `false` maps to "No".
+
+<DocsCanvasShell description={<>Boolean <code>true</code>.</>}>
+    <Canvas
+        of={BadgeClaimedPillStories.FromBooleanTrue}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Boolean <code>false</code>.</>}>
+    <Canvas
+        of={BadgeClaimedPillStories.FromBooleanFalse}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

@@ -5,10 +5,10 @@
 
 import React, { useState } from 'react';
 import LookForHelpModal from './LookForHelpModal';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 
 export default {
-    title: 'Specs/Home/Modals/LookForHelpModal',
+    title: 'Specs/Home/Modals/Look For Help Modal',
     component: LookForHelpModal,
     tags: ['!dev', '!autodocs'],
     parameters: {

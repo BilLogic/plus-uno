@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Styles/Patterns/Introduction" />
+<Meta title="Foundations/Patterns/Introduction" />
 
 # Pattern System
 

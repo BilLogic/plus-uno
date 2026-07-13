@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
 
 /**
  * Replicates Design System - Web App Specs node 1687-163680: "Manage Assignment" popup.

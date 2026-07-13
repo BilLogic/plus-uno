@@ -9,10 +9,10 @@ import React, { useState, useCallback } from 'react';
 import TutorProfilePage from './TutorProfilePage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { PageLayout } from '../../../Universal/Pages';
-import { Label } from '../../../../forms/LabelAndCaption.stories';
-import Input from '../../../../forms/Input';
-import Button from '../../../../components/Button/Button';
-import Tooltip from '../../../../components/Tooltip/Tooltip';
+import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import Input from '@/components/forms-and-inputs/Input';
+import Button from '@/components/actions/Button/Button';
+import Tooltip from '@/components/overlays/Tooltip/Tooltip';
 import { Pronouns } from '../../Elements/Pronouns.stories';
 import { StudentTypeDropdown } from '../../Elements/StudentTypeDropdown.stories';
 import { University } from '../../Elements/University.stories';
@@ -23,7 +23,7 @@ import { SemesterAtPLUS } from '../../Elements/SemesterAtPLUS.stories';
 import { UploadProfilePic } from '../../Elements/UploadProfilePic.stories';
 
 export default {
-    title: 'Specs/Profile/Pages/TutorProfilePage',
+    title: 'Specs/Profile/Pages/Tutor Profile Page',
     component: TutorProfilePage,
     tags: ['!dev', '!autodocs'],
     decorators: [

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/Card';
-import { RadarChart } from '@/DataViz';
+import Card from '@/components/layout-and-structure/Card';
+import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
 
 /**

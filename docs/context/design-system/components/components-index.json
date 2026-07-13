@@ -3,14 +3,13 @@
   "updated_for_branch": "main",
   "component_roots": [
     "design-system/src/components",
-    "design-system/src/forms",
-    "design-system/src/DataViz",
+    "design-system/src/patterns",
+    "design-system/src/dataviz",
     "design-system/src/specs"
   ],
   "export_entrypoints": [
     "design-system/src/index.js",
-    "design-system/src/components/index.js",
-    "design-system/src/forms/index.js"
+    "design-system/src/components/index.js"
   ],
   "storybook_story_globs": [
     "../design-system/src/**/*.stories.{js,jsx,ts,tsx}",

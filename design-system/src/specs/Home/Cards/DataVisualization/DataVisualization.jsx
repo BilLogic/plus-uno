@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/Card';
-import NavTabs from '@/components/NavTabs';
-import { RadarChart } from '@/DataViz';
+import Card from '@/components/layout-and-structure/Card';
+import NavTabs from '@/components/navigation/NavTabs';
+import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
 
 /**
