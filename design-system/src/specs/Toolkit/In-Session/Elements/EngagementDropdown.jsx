@@ -95,14 +95,10 @@ export const EngagementDropdown = ({
             </Dropdown.Toggle>
 
             <Dropdown.Menu
-                className="dropdown-menu"
-                style={{
-                    backgroundColor: 'var(--color-surface-container-high)',
-                    borderRadius: 'var(--size-modal-radius-sm)',
-                    boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)',
-                    minWidth: '200px',
-                    overflow: 'visible'
-                }}
+                className="dropdown-menu show"
+                // Surface / radius / shadow come from the shared .dropdown-menu (Dropdown.scss);
+                // only the submenu escape hatch (overflow) is set locally.
+                style={{ overflow: 'visible' }}
             >
                 <div style={{ position: 'relative' }}>
                     <EngagementListItems
@@ -112,16 +108,9 @@ export const EngagementDropdown = ({
 
                     {showSubmenu && (
                         <div
-                            style={{
-                                position: 'absolute',
-                                left: '100%',
-                                top: '28px',
-                                backgroundColor: 'var(--color-surface-container-high)',
-                                borderRadius: 'var(--size-modal-radius-sm)',
-                                boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)',
-                                minWidth: '200px',
-                                zIndex: 1000
-                            }}
+                            className="dropdown-menu show"
+                            // Reuse the shared menu surface/radius/shadow; only position the flyout.
+                            style={{ position: 'absolute', left: '100%', top: '28px', zIndex: 1000 }}
                         >
                             <EngagementSubmenuItems
                                 selectedReason={selectedReason}

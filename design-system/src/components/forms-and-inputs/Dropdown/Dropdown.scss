@@ -86,7 +86,10 @@ $dropdown-themes: (
         min-width: 200px;
         max-width: 320px;
         padding: var(--size-element-pad-y-sm) 0;
-        background-color: var(--color-surface);
+        // Canonical menu surface per Figma (BS4 Dropdown → surface-container #edeef0).
+        // This is the single source: consumers must NOT re-declare the menu background,
+        // radius, or shadow inline. Items are transparent and adopt this surface.
+        background-color: var(--color-surface-container);
         border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
         border-radius: var(--size-element-radius-md);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);

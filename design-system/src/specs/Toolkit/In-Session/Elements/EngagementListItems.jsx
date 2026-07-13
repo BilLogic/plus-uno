@@ -4,13 +4,10 @@ import React from 'react';
  * Engagement List Items Component
  * Dropdown menu items for selecting engagement status
  * 
- * Design tokens used:
- * - Background: --color-surface-container-high
- * - Border radius: --size-modal-radius-sm
- * - Padding: --size-element-pad-x-md, --size-element-pad-y-md
- * - Gap: --size-element-gap-md
- * - Typography: body2-txt (14px)
- * - Icon size: fa-b2 (12px)
+ * Renders bare `.dropdown-item` rows — the menu surface, radius, shadow and item
+ * padding/typography all come from the shared Dropdown styles
+ * (components/forms-and-inputs/Dropdown/Dropdown.scss). Do NOT re-declare the menu
+ * background/radius here; wrap these items in a `.dropdown-menu` container instead.
  */
 
 // Sub-menu items for "Partially engaged" option

@@ -32,9 +32,6 @@ const Template = (args) => (
                 position: 'static', 
                 display: 'block', 
                 width: '200px',
-                backgroundColor: 'var(--color-surface-container-high)',
-                borderRadius: 'var(--size-modal-radius-sm)',
-                boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
             }}
         >
             <EngagementListItems {...args} />
@@ -50,9 +47,6 @@ const SubmenuTemplate = (args) => (
                 position: 'static', 
                 display: 'block', 
                 width: '220px',
-                backgroundColor: 'var(--color-surface-container-high)',
-                borderRadius: 'var(--size-modal-radius-sm)',
-                boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
             }}
         >
             <EngagementSubmenuItems {...args} />
@@ -143,9 +137,6 @@ export const AllVariations = () => (
                             position: 'static', 
                             display: 'block', 
                             width: '200px',
-                            backgroundColor: 'var(--color-surface-container-high)',
-                            borderRadius: 'var(--size-modal-radius-sm)',
-                            boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
                         }}
                     >
                         <EngagementListItems status="unknown" />
@@ -162,9 +153,6 @@ export const AllVariations = () => (
                             position: 'static', 
                             display: 'block', 
                             width: '200px',
-                            backgroundColor: 'var(--color-surface-container-high)',
-                            borderRadius: 'var(--size-modal-radius-sm)',
-                            boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
                         }}
                     >
                         <EngagementListItems status="partially-engaged" />
@@ -181,9 +169,6 @@ export const AllVariations = () => (
                             position: 'static', 
                             display: 'block', 
                             width: '220px',
-                            backgroundColor: 'var(--color-surface-container-high)',
-                            borderRadius: 'var(--size-modal-radius-sm)',
-                            boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
                         }}
                     >
                         <EngagementSubmenuItems selectedReason="joined-late" />
@@ -273,9 +258,6 @@ export const Interactive = () => {
                                 position: 'static', 
                                 display: 'block', 
                                 width: '200px',
-                                backgroundColor: 'var(--color-surface-container-high)',
-                                borderRadius: 'var(--size-modal-radius-sm)',
-                                boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
                             }}
                         >
                             <EngagementListItems 
@@ -296,9 +278,6 @@ export const Interactive = () => {
                                     position: 'static', 
                                     display: 'block', 
                                     width: '220px',
-                                    backgroundColor: 'var(--color-surface-container-high)',
-                                    borderRadius: 'var(--size-modal-radius-sm)',
-                                    boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)'
                                 }}
                             >
                                 <EngagementSubmenuItems 
