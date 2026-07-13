@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 
 // Import Delete Session modals
-import { Recurring_NA } from '../modals/Delete Session/RecurringNA.stories';
-import { One_Session_NA } from '../modals/Delete Session/OneSessionNA.stories';
-import { During_Specific_Day_Period } from '../modals/Delete Session/DuringSpecificDayPeriod.stories';
+import { Recurring_NA } from '../Modals/DeleteSession/RecurringNA.stories';
+import { One_Session_NA } from '../Modals/DeleteSession/OneSessionNA.stories';
+import { During_Specific_Day_Period } from '../Modals/DeleteSession/DuringSpecificDayPeriod.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -133,7 +133,7 @@ const modalMap = {
  * - Modal: Recurring NA, One-Session NA, During Specific Day Period
  * - Breakpoint: MD, LG, XL
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [modal, setModal] = useState('recurring-na');
     const [breakpoint, setBreakpoint] = useState('xl');
 
@@ -248,7 +248,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -273,4 +273,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import MetricsCard from './MetricsCard';
 
 export default {
-    title: 'Specs/Home/Cards/MetricsCard',
+    title: 'Specs/Home/Cards/Metrics Card',
     component: MetricsCard,
     tags: ['!dev', '!autodocs'],
     decorators: [

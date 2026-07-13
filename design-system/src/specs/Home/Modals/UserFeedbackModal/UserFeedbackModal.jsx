@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Modal from '@/components/Modal';
-import Button from '@/components/Button';
-import ButtonGroup from '@/components/ButtonGroup';
-import Select from '@/forms/Select';
-import Textarea from '@/forms/Textarea';
-import Divider from '@/components/Divider';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import Select from '@/components/forms-and-inputs/Select';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import Divider from '@/components/layout-and-structure/Divider';
 import './UserFeedbackModal.scss';
 
 /**
@@ -19,7 +19,8 @@ const UserFeedbackModal = ({
     onClose,
     onSubmit,
     className = '',
-    style
+    style,
+    noOverlay = false
 }) => {
     const [type, setType] = useState(initialType);
     const [severity, setSeverity] = useState(null);
@@ -124,14 +125,18 @@ const UserFeedbackModal = ({
 
     if (!show) return null;
 
+    const overlayClass = noOverlay ? 'plus-user-feedback-modal-overlay-inline' : 'plus-user-feedback-modal-overlay';
+    const modalClass = noOverlay ? 'plus-user-feedback-modal-inline' : 'plus-user-feedback-modal';
+
     return (
-        <div className="plus-user-feedback-modal-overlay" onClick={onClose}>
-            <div 
-                className={`plus-user-feedback-modal ${className}`}
+        <div className={overlayClass} onClick={!noOverlay ? onClose : undefined}>
+            <div
+                className={`${modalClass} ${className}`}
                 style={style}
                 onClick={(e) => e.stopPropagation()}
             >
                 <Modal
+                    renderAs="inline"
                     id={id}
                     title={config.title}
                     onClose={onClose}
@@ -270,7 +275,8 @@ UserFeedbackModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    noOverlay: PropTypes.bool
 };
 
 export default UserFeedbackModal;

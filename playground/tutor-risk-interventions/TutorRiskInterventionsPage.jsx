@@ -15,12 +15,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import NavTabs from '@/components/NavTabs/NavTabs';
-import Dropdown from '@/components/Dropdown/Dropdown';
-import Pagination from '@/components/Pagination/Pagination';
-import TutorChartsElement from '@/specs/Admin/Tutor Admin/Elements/TutorChartsElement/TutorChartsElement';
+import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import Pagination from '@/components/navigation/Pagination/Pagination';
+import TutorChartsElement from '@/specs/Admin/Tutor/Elements/TutorChartsElement/TutorChartsElement';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/Badge/Badge';
+import Badge from '@/components/status-and-loading/Badge/Badge';
 import './TutorRiskInterventionsPage.scss';
 
 const TutorRiskInterventionsPage = ({

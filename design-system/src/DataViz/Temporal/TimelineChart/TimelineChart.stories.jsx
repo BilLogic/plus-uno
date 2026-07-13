@@ -2,7 +2,7 @@ import React from 'react';
 import TimelineChart from './TimelineChart';
 
 export default {
-    title: 'Data Visualizations/Temporal/TimelineChart',
+    title: 'Data visualizations/Temporal/Timeline chart',
     component: TimelineChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

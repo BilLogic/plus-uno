@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Select from '../../../../forms/Select';
+import Select from '@/components/forms-and-inputs/Select';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Teacher Dropdown',

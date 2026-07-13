@@ -12,7 +12,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Badge from '../../../../components/Badge/Badge';
+import Badge from '@/components/status-and-loading/Badge/Badge';
 
 const TYPE_CONFIG = {
     'lead tutor': { badgeStyle: 'info', label: 'Lead' },

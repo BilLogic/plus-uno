@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ProductAreaDropdown } from './ProductAreaDropdown';
 
 export default {
-    title: 'Specs/Home/Elements/ProductAreaDropdown',
+    title: 'Specs/Home/Elements/Product Area Dropdown',
     tags: ['!dev', '!autodocs'],
     component: ProductAreaDropdown,
     parameters: {

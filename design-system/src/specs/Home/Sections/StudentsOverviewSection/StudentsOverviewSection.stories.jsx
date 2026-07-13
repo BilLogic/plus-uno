@@ -2,7 +2,7 @@ import React from 'react';
 import StudentsOverviewSection from './StudentsOverviewSection';
 
 export default {
-    title: 'Specs/Home/Sections/StudentsOverviewSection',
+    title: 'Specs/Home/Sections/Students Overview Section',
     component: StudentsOverviewSection,
     tags: ['!dev', '!autodocs'],
 };

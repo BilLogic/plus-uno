@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import Badge from '../../../../components/Badge/Badge';
+import Button from '@/components/actions/Button/Button';
+import Badge from '@/components/status-and-loading/Badge/Badge';
 
 export default {
     tags: ['!dev', '!autodocs'],

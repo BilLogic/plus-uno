@@ -1,12 +1,12 @@
 // Elements
-export * from './elements/index.js';
+export * from './Elements/index.js';
 // Cards
-export * from './cards/index.js';
+export * from './Cards/index.js';
 // Tables
-export * from './tables/index.js';
+export * from './Tables/index.js';
 // Modals
-export * from './modals/index.js';
+export * from './Modals/index.js';
 // Sections
-export * from './sections/index.js';
+export * from './Sections/index.js';
 // Pages
-export * from './pages/index.js';
+export * from './Pages/index.js';

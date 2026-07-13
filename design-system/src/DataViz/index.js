@@ -1,36 +1,36 @@
 // Comparison Charts
-export { default as BarChart } from './Comparison/BarChart/BarChart';
-export { default as BulletChart } from './Comparison/BulletChart/BulletChart';
-export { default as LollipopChart } from './Comparison/LollipopChart/LollipopChart';
-export { default as RadarChart } from './Comparison/RadarChart/RadarChart';
-export { default as SmartBarChart } from './Comparison/SmartBarChart/SmartBarChart';
-export { default as StackedBarChart } from './Comparison/StackedBarChart/StackedBarChart';
+export { default as BarChart } from './comparison/BarChart/BarChart';
+export { default as BulletChart } from './comparison/BulletChart/BulletChart';
+export { default as LollipopChart } from './comparison/LollipopChart/LollipopChart';
+export { default as RadarChart } from './comparison/RadarChart/RadarChart';
+export { default as SmartBarChart } from './comparison/SmartBarChart/SmartBarChart';
+export { default as StackedBarChart } from './comparison/StackedBarChart/StackedBarChart';
 
 // Correlation Charts
-export { default as ScatterChart } from './Correlation/ScatterChart/ScatterChart';
-export { default as BubbleChart } from './Correlation/BubbleChart/BubbleChart';
+export { default as ScatterChart } from './correlation/ScatterChart/ScatterChart';
+export { default as BubbleChart } from './correlation/BubbleChart/BubbleChart';
 
 // Part-to-Whole Charts
-export { default as DonutChart } from './PartToWhole/DonutChart/DonutChart';
-export { default as GaugeChart } from './PartToWhole/GaugeChart/GaugeChart';
-export { default as PieChart } from './PartToWhole/PieChart/PieChart';
-export { default as SunburstChart } from './PartToWhole/SunburstChart/SunburstChart';
-export { default as TreemapChart } from './PartToWhole/TreemapChart/TreemapChart';
+export { default as DonutChart } from './part-to-whole/DonutChart/DonutChart';
+export { default as GaugeChart } from './part-to-whole/GaugeChart/GaugeChart';
+export { default as PieChart } from './part-to-whole/PieChart/PieChart';
+export { default as SunburstChart } from './part-to-whole/SunburstChart/SunburstChart';
+export { default as TreemapChart } from './part-to-whole/TreemapChart/TreemapChart';
 
 // Temporal Charts
-export { default as AreaChart } from './Temporal/AreaChart/AreaChart';
-export { default as ComboChart } from './Temporal/ComboChart/ComboChart';
-export { default as LineChart } from './Temporal/LineChart/LineChart';
-export { default as WaterfallChart } from './Temporal/WaterfallChart/WaterfallChart';
+export { default as AreaChart } from './temporal/AreaChart/AreaChart';
+export { default as ComboChart } from './temporal/ComboChart/ComboChart';
+export { default as LineChart } from './temporal/LineChart/LineChart';
+export { default as WaterfallChart } from './temporal/WaterfallChart/WaterfallChart';
 
 // Distribution Charts
-export { default as BoxPlotChart } from './Distribution/BoxPlotChart/BoxPlotChart';
-export { default as HeatmapChart } from './Distribution/HeatmapChart/HeatmapChart';
-export { default as HistogramChart } from './Distribution/HistogramChart/HistogramChart';
+export { default as BoxPlotChart } from './distribution/BoxPlotChart/BoxPlotChart';
+export { default as HeatmapChart } from './distribution/HeatmapChart/HeatmapChart';
+export { default as HistogramChart } from './distribution/HistogramChart/HistogramChart';
 
 // Other Charts
-export { default as DependencyWheel } from './Other/DependencyWheel/DependencyWheel';
-export { default as FunnelChart } from './Other/FunnelChart/FunnelChart';
-export { default as NetworkGraph } from './Other/NetworkGraph/NetworkGraph';
-export { default as SankeyDiagram } from './Other/SankeyDiagram/SankeyDiagram';
-export { default as WordCloud } from './Other/WordCloud/WordCloud';
+export { default as DependencyWheel } from './flow-and-relationships/DependencyWheel/DependencyWheel';
+export { default as FunnelChart } from './flow-and-relationships/FunnelChart/FunnelChart';
+export { default as NetworkGraph } from './flow-and-relationships/NetworkGraph/NetworkGraph';
+export { default as SankeyDiagram } from './flow-and-relationships/SankeyDiagram/SankeyDiagram';
+export { default as WordCloud } from './flow-and-relationships/WordCloud/WordCloud';

@@ -1,5 +1,5 @@
 import React from 'react';
-import Dropdown from '../../../../components/Dropdown/Dropdown';
+import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 
 export default {
     tags: ['!dev', '!autodocs'],

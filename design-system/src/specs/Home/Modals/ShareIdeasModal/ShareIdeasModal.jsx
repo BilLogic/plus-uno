@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Modal from '@/components/Modal';
-import Button from '@/components/Button';
-import Select from '@/forms/Select';
-import Textarea from '@/forms/Textarea';
-import Divider from '@/components/Divider';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
+import Select from '@/components/forms-and-inputs/Select';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import Divider from '@/components/layout-and-structure/Divider';
 import './ShareIdeasModal.scss';
 
 /**
@@ -101,6 +101,7 @@ const ShareIdeasModal = ({
                 onClick={(e) => e.stopPropagation()}
             >
                 <Modal
+                    renderAs="inline"
                     id={id}
                     title="Share some ideas"
                     onClose={onClose}

@@ -2,7 +2,7 @@ import React from 'react';
 import HistogramChart from './HistogramChart';
 
 export default {
-    title: 'Data Visualizations/Distribution/HistogramChart',
+    title: 'Data visualizations/Distribution/Histogram chart',
     component: HistogramChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

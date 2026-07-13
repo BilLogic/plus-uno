@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button';
-import Badge from '../../../../components/Badge/Badge';
-import { AttendanceDropdown } from '../elements/AttendanceDropdown.jsx';
-import { EngagementDropdown } from '../elements/EngagementDropdown.jsx';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge/Badge';
+import { AttendanceDropdown } from '../Elements/AttendanceDropdown.jsx';
+import { EngagementDropdown } from '../Elements/EngagementDropdown.jsx';
 
 export default {
     tags: ['!dev', '!autodocs'],

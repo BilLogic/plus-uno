@@ -1,5 +1,5 @@
 import React from 'react';
-import SessionManagementSnackbar from '../../../../components/SessionManagementSnackbar/SessionManagementSnackbar';
+import SessionManagementSnackbar from '@/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar';
 
 export default {
     tags: ['!dev', '!autodocs'],

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import WeeklyReportContent from './WeeklyReportContent';
-import Button from '@/components/Button/Button';
+import Button from '@/components/actions/Button/Button';
 
 export default function App() {
     const [view, setView] = useState('index');

@@ -2,7 +2,7 @@ import React from 'react';
 import SmartBarChart from './SmartBarChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/SmartBarChart',
+    title: 'Data visualizations/Comparison/Smart bar chart',
     component: SmartBarChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

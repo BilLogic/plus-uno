@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../tables/AllSessionsTable.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { SessionStatusFilter } from '../elements/Filters/SessionStatusFilter.stories';
-import { TutorFilter } from '../elements/Filters/Tutor Filter/TutorFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../Tables/AllSessionsTable.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { SessionStatusFilter } from '../Elements/Filters/SessionStatusFilter.stories';
+import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],

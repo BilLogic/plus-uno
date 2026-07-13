@@ -2,7 +2,7 @@ import React from 'react';
 import StackedBarChart from './StackedBarChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/StackedBarChart',
+    title: 'Data visualizations/Comparison/Stacked bar chart',
     component: StackedBarChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

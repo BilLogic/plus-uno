@@ -1,0 +1,182 @@
+/**
+ * TreeSelect Component Styles
+ * Hierarchical select: a trigger input opens a panel of expandable tree nodes
+ * with checkboxes (multiple) or single selection. Mirrors the Cascader trigger
+ * styling and uses Design System tokens throughout.
+ */
+
+.plus-tree-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.plus-tree-select-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.plus-tree-select-input {
+    width: 100%;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md, 4px);
+    background-color: var(--color-surface-container-lowest);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+    padding-right: calc(var(--size-element-pad-x-md, 10px) + 20px); // Space for arrow
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+
+    &.plus-tree-select-input-open,
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+    }
+
+    &:disabled {
+        background-color: var(--color-surface-container-low);
+        border-color: var(--color-outline-variant);
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.plus-tree-select-arrow {
+    position: absolute;
+    right: var(--size-element-pad-x-md, 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-on-surface-variant);
+    font-size: 14px; // Matches Fontawesome/Solid/H6 sizing used by Cascader
+    font-weight: 900;
+    pointer-events: none;
+    transition: transform 0.15s ease-in-out;
+
+    &.plus-tree-select-arrow-open {
+        transform: translateY(-50%) rotate(180deg);
+    }
+}
+
+.plus-tree-select-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 1000;
+    min-width: 100%;
+    width: max-content;
+    max-width: 360px;
+    max-height: 320px;
+    overflow-y: auto;
+    background-color: var(--color-surface-container-high);
+    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm, 4px);
+    box-shadow: var(--elevation-light-2);
+    padding: var(--size-element-pad-y-sm, 4px) 0;
+}
+
+.plus-tree-select-node {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm, 8px);
+    padding-top: var(--size-element-pad-y-md, 6px);
+    padding-bottom: var(--size-element-pad-y-md, 6px);
+    padding-right: var(--size-element-pad-x-md, 10px);
+    color: var(--color-secondary-text);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    white-space: nowrap;
+
+    &:hover:not(.plus-tree-select-node-disabled) {
+        background-color: var(--color-surface-container);
+    }
+
+    &.plus-tree-select-node-selected {
+        background-color: var(--color-secondary-state-16);
+        color: var(--color-secondary-text);
+
+        &:hover {
+            background-color: var(--color-secondary-state-16);
+        }
+    }
+
+    &.plus-tree-select-node-disabled {
+        background-color: transparent;
+        color: var(--color-on-surface-variant);
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.plus-tree-select-node-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &.plus-tree-select-node-toggle-empty {
+        cursor: default;
+    }
+}
+
+.plus-tree-select-node-caret {
+    color: var(--color-on-surface-variant);
+    font-size: 14px;
+    font-weight: 900;
+    transition: transform 0.15s ease-in-out;
+
+    &.plus-tree-select-node-caret-open {
+        transform: rotate(90deg);
+    }
+}
+
+.plus-tree-select-checkbox {
+    margin: 0;
+    flex-shrink: 0;
+
+    .form-check-input {
+        margin-top: 0;
+        cursor: pointer;
+        border-color: var(--color-outline);
+
+        &:checked,
+        &:indeterminate {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        &:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.plus-tree-select-node-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

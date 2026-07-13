@@ -25,7 +25,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 import {
     MOCK_STEPS,
     MOCK_SUPPLEMENTAL,

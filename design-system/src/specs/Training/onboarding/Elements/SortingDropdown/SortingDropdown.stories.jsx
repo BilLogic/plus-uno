@@ -11,7 +11,7 @@ import './SortingDropdown.scss';
 import '../DropdownListOptions/DropdownListOptions.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Elements/SortingDropdown',
+    title: 'Specs/Training/Onboarding/Elements/Sorting Dropdown',
     component: SortingDropdown,
     tags: ['!dev', '!autodocs'],
     parameters: {

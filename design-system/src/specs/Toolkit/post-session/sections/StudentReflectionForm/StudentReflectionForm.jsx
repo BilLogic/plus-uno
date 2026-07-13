@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Card from '../../../../../components/Card';
-import Button from '../../../../../components/Button';
-import Divider from '../../../../../components/Divider';
+import Card from '@/components/layout-and-structure/Card';
+import Button from '@/components/actions/Button';
+import Divider from '@/components/layout-and-structure/Divider';
 
 /**
  * StudentReflectionForm

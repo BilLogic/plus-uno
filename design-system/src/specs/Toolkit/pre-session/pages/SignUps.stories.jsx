@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { SignInTableRow, SignInTableHeaderRow } from '../tables/SignInTable.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TutorFilter } from '../elements/Filters/Tutor Filter/TutorFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
-import { DaysFilter } from '../elements/Filters/Days Filter/DaysFilter.stories';
-import { CapacityFilter } from '../elements/Filters/Capacity Filter/CapacityFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { SignInTableRow, SignInTableHeaderRow } from '../Tables/SignInTable.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
+import { DaysFilter } from '../Elements/Filters/DaysFilter/DaysFilter.stories';
+import { CapacityFilter } from '../Elements/Filters/CapacityFilter/CapacityFilter.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Button from '@plus-ds/components/Button/index.js'
+import Button from '@plus-ds/components/actions/Button/index.js'
 
 const mockTutors = [
     { id: 101, name: 'Alice Johnson', subjects: 'Math, Science', rating: '4.9', avatar: 'A' },

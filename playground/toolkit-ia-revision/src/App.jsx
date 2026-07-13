@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useReducer, useState } from 'react';
-import Sidebar from '@/components/Sidebar/Sidebar';
-import Accordion from '@/components/Accordion/Accordion';
-import Button from '@/components/Button/Button';
-import NavTabs from '@/components/NavTabs/NavTabs';
-import Card from '@/components/Card/Card';
-import Badge from '@/components/Badge/Badge';
+import Sidebar from '@/components/_internal/Sidebar/Sidebar';
+import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
+import Button from '@/components/actions/Button/Button';
+import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Card from '@/components/layout-and-structure/Card/Card';
+import Badge from '@/components/status-and-loading/Badge/Badge';
 import { MOCK_SESSIONS, sessionById } from './mockData';
 import './App.scss';
 

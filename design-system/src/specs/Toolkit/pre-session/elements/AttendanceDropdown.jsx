@@ -3,7 +3,7 @@ import { Dropdown } from 'react-bootstrap';
 // Import the reusable Toolkit components from dedicated files
 import { AttendanceBadge } from './badges/AttendanceBadge.jsx';
 import { AttendanceListItems } from './AttendanceListItems.jsx';
-import '../../../../components/Dropdown/Dropdown.scss'; // Ensure styles are loaded
+import '@/components/forms-and-inputs/Dropdown/Dropdown.scss'; // Ensure styles are loaded
 
 // Custom Toggle to use the exported AttendanceBadge component
 const CustomToggle = forwardRef(({ children, onClick, className }, ref) => (

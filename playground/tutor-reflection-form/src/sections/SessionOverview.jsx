@@ -1,6 +1,6 @@
 import React from 'react';
-import Rating from '@/forms/Rating';
-import Textarea from '@/forms/Textarea';
+import Rating from '@/components/forms-and-inputs/Rating';
+import Textarea from '@/components/forms-and-inputs/Textarea';
 
 const RATING_LABELS = {
     0: '',

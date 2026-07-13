@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavTabs, Modal, Table, Button, Badge, Alert } from '@plus-ds/components';
-import { Checkbox } from '@plus-ds/forms';
+import { Checkbox } from '@plus-ds/components/forms-and-inputs';
 import { ArrowRight, ArrowLeft } from 'react-bootstrap-icons';
 import './FillInModal.scss';
 

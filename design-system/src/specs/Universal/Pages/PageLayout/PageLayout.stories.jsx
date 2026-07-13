@@ -15,11 +15,11 @@
 
 import React from 'react';
 import PageLayout from './PageLayout';
-import Card from '../../../../components/Card/Card';
+import Card from '@/components/layout-and-structure/Card/Card';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 
 export default {
-    title: 'Specs/Universal/Pages/PageLayout',
+    title: 'Specs/Universal/Pages/Page Layout',
     component: PageLayout,
     tags: ['!dev', '!autodocs'],
     decorators: [
@@ -36,7 +36,7 @@ export default {
         breakpoint: {
             control: 'select',
             options: ['md', 'lg', 'xl'],
-            description: 'Simulated viewport width in the preview toolbar',
+            description: 'Simulated viewport width — set it here in the Controls panel',
             table: { category: 'Layout' },
         },
     },

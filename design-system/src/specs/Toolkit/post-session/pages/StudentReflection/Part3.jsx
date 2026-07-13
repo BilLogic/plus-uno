@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../../../../components/Button/Button';
-import { PageLayout } from '../../../../../specs/Universal/Pages';
-import SideNavBar from '../../sections/SideNavBar/SideNavBar';
-import FormReflection from '../../sections/FormReflection/FormReflection';
-import { StudentRatingField } from '../../elements/StudentRating.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
+import FormReflection from '@/specs/Toolkit/Post-Session/Sections/FormReflection/FormReflection';
+import { StudentRatingField } from '@/specs/Toolkit/Post-Session/Elements/StudentRating.stories';
 
 const reflectionPrompt = [
     {

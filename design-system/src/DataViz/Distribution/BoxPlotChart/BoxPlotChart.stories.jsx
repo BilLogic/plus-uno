@@ -2,7 +2,7 @@ import React from 'react';
 import BoxPlotChart from './BoxPlotChart';
 
 export default {
-    title: 'Data Visualizations/Distribution/BoxPlotChart',
+    title: 'Data visualizations/Distribution/Box plot chart',
     component: BoxPlotChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

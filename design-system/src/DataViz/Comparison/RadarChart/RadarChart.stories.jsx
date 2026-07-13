@@ -2,7 +2,7 @@ import React from 'react';
 import RadarChart from './RadarChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/RadarChart',
+    title: 'Data visualizations/Comparison/Radar chart',
     component: RadarChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

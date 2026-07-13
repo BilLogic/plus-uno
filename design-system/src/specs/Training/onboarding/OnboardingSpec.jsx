@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageLayout, Section, Card, Table, Button, Badge } from '@/components';
-import { Select } from '@/forms';
+import { Select } from '@/components/forms-and-inputs';
 
 export const OnboardingSpec = () => {
     // Configuration

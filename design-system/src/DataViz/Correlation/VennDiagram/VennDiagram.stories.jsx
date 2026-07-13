@@ -2,7 +2,7 @@ import React from 'react';
 import VennDiagram from './VennDiagram';
 
 export default {
-    title: 'Data Visualizations/Correlation/VennDiagram',
+    title: 'Data visualizations/Correlation/Venn diagram',
     component: VennDiagram,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -8,11 +8,11 @@
 import React from 'react';
 import OnboardingModuleCard from './OnboardingModuleCard';
 import './OnboardingModuleCard.scss';
-import '../../Elements/StrategyBadge/StrategyBadge.scss';
-import '../../Elements/StatusIndicators/StatusIndicators.scss';
+import '@/specs/Training/Onboarding/Elements/StrategyBadge/StrategyBadge.scss';
+import '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Cards/OnboardingModuleCard',
+    title: 'Specs/Training/Onboarding/Cards/Onboarding Module Card',
     component: OnboardingModuleCard,
     tags: ['!dev', '!autodocs'],
     parameters: {

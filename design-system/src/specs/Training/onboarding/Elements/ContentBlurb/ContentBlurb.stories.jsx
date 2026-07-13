@@ -11,7 +11,7 @@ import './ContentBlurb.scss';
 import '../StrategyBadge/StrategyBadge.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Elements/ContentBlurb',
+    title: 'Specs/Training/Onboarding/Elements/Content Blurb',
     component: ContentBlurb,
     tags: ['!dev', '!autodocs'],
     parameters: {

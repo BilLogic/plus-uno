@@ -4,8 +4,8 @@ import { PageLayout } from '@/specs/Universal/Pages';
 import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { MetricsCard, RecommendedLessons, BadgeCard } from '@/specs/Home/Cards';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
 import './TutorHomePageSkillsOverview.scss';
 
 /**

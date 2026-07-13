@@ -7,11 +7,11 @@
 
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { PageLayout } from '../../../../Universal/Pages';
-import Button from '@/components/Button';
-import OnboardingModuleCard from '../../Cards/OnboardingModuleCard/OnboardingModuleCard';
-import OnboardingModulesTable from '../../Tables/OnboardingModulesTable/OnboardingModulesTable';
-import SortingDropdown from '../../Elements/SortingDropdown/SortingDropdown';
+import { PageLayout } from '@/specs/Universal/Pages';
+import Button from '@/components/actions/Button';
+import OnboardingModuleCard from '@/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
+import OnboardingModulesTable from '@/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
+import SortingDropdown from '@/specs/Training/Onboarding/Elements/SortingDropdown/SortingDropdown';
 import './OnboardingOverviewPage.scss';
 
 const OnboardingOverviewPage = ({

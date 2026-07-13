@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import PageLayout from '@/components/PageLayout/PageLayout';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
+import PageLayout from '@/components/_internal/PageLayout/PageLayout';
+import Card from '@/components/layout-and-structure/Card';
+import Button from '@/components/actions/Button';
 import EditSessionModal from './EditSessionModal';
 import AttendanceModal from './AttendanceModal';
 

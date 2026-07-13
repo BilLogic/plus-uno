@@ -24,8 +24,12 @@ import { geminiConfigured, geminiGenerate } from "../gemini/client";
 import { makeAnthropicClient, MODELS } from "./anthropic-client";
 import { BUILD } from "../version";
 
-// Drafts under this length are quick lookups/acks — never judged.
-const MIN_DRAFT_CHARS = 800;
+// Drafts under this length are never judged. 1500 chars targets deliverable-
+// shaped output (PRD drafts, spec answers, recaps) and exempts ordinary
+// conversational replies — the judge's failure modes (overclaiming, invented
+// links, structure) barely occur below this, and every judged reply pays one
+// extra model round-trip of latency.
+const MIN_DRAFT_CHARS = 1500;
 // Hard wall-clock cap; past it the original draft ships (fail open).
 const JUDGE_TIMEOUT_MS = 25_000;
 // Inputs are capped so the judge call stays cheap and bounded.

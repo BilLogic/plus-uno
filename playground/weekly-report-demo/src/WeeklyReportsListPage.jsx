@@ -9,10 +9,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
-import Pagination from '@/components/Pagination/Pagination';
-import Progress from '@/components/Progress/Progress';
+import Badge from '@/components/status-and-loading/Badge/Badge';
+import Button from '@/components/actions/Button/Button';
+import Pagination from '@/components/navigation/Pagination/Pagination';
+import Progress from '@/components/status-and-loading/Progress/Progress';
 import './WeeklyReportsListPage.scss';
 
 // Mock data for weekly reports

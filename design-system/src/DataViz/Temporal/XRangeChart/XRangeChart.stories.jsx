@@ -2,7 +2,7 @@ import React from 'react';
 import XRangeChart from './XRangeChart';
 
 export default {
-    title: 'Data Visualizations/Temporal/XRangeChart',
+    title: 'Data visualizations/Temporal/X-range chart',
     component: XRangeChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

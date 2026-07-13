@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../../../../components/Button/Button';
-import Checkbox from '../../../../../forms/Checkbox';
-import Textarea from '../../../../../forms/Textarea';
-import { PageLayout } from '../../../../../specs/Universal/Pages';
-import SideNavBar from '../../sections/SideNavBar/SideNavBar';
-import { SessionRatingField } from '../../elements/SessionRating.stories';
+import Button from '@/components/actions/Button/Button';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import { PageLayout } from '@/specs/Universal/Pages';
+import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
+import { SessionRatingField } from '@/specs/Toolkit/Post-Session/Elements/SessionRating.stories';
 
 const sessionRatingCommentsByValue = {
     1: 'Lots of room for improvement.',

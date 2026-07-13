@@ -1,6 +1,6 @@
 import React from 'react';
-import { Label, Caption } from '../../../../forms/LabelAndCaption.stories';
-import DateAndTimePicker from '../../../../forms/DateAndTimePicker';
+import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import DateAndTimePicker from '@/components/forms-and-inputs/DateAndTimePicker';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/New Form Time Input',

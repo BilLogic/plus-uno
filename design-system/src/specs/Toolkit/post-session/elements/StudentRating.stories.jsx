@@ -1,5 +1,5 @@
 import React from 'react';
-import Rating from '../../../../forms/Rating';
+import Rating from '@/components/forms-and-inputs/Rating';
 
 export default {
     tags: ['!dev', '!autodocs'],

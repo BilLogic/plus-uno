@@ -5,10 +5,10 @@
 
 import React, { useState } from 'react';
 import ShareIdeasModal from './ShareIdeasModal';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 
 export default {
-    title: 'Specs/Home/Modals/ShareIdeasModal',
+    title: 'Specs/Home/Modals/Share Ideas Modal',
     component: ShareIdeasModal,
     tags: ['!dev', '!autodocs'],
     parameters: {

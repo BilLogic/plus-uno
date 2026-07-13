@@ -21,7 +21,7 @@ const skillsOverviewData = {
 };
 
 export default {
-    title: 'Specs/Home/Pages/TutorHomePageSkillsOverview',
+    title: 'Specs/Home/Pages/Tutor Home Page Skills Overview',
     component: TutorHomePageSkillsOverview,
     tags: ['!dev', '!autodocs'],
     decorators: [
@@ -38,7 +38,7 @@ export default {
         breakpoint: {
             control: 'select',
             options: ['md', 'lg', 'xl'],
-            description: 'Simulated viewport width in the preview toolbar',
+            description: 'Simulated viewport width — set it here in the Controls panel',
             table: { category: 'Layout' },
         },
     },

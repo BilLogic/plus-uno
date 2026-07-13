@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default {
-    title: 'Assets/Images',
+    title: 'Foundations/Imagery',
     tags: ['!dev', '!autodocs'],
 };
 

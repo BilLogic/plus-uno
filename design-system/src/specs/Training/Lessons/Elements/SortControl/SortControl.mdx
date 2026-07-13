@@ -1,0 +1,48 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SortControlStories from './SortControl.stories.jsx';
+import {
+    DsCanvasHero,
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SortControlStories} />
+
+<Title />
+
+Compact ascending / descending sort toggle used on the Lessons Overview table headers.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=747-54853"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/Lessons/Elements/SortControl"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Default
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default sort control in resting state.</>}
+>
+    <DsCanvasHero of={SortControlStories.Default} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SortControlStories.Interactive}
+    description={<>Click the chevrons to toggle direction; observe the value output inline.</>}
+/>
+
+</div>
+
+</div>

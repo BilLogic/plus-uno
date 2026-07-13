@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import Modal from '../../../../../components/Modal';
-import Button from '../../../../../components/Button';
-import Select from '@/forms/Select';
-import Textarea from '@/forms/Textarea';
-import Switch from '@/forms/Switch';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
+import Select from '@/components/forms-and-inputs/Select';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import Switch from '@/components/forms-and-inputs/Switch';
 
 // Import CTA button components from Tutor View
 import {
     BackButton,
     SubmitRequestButton
-} from '../../elements/CTATutorViewButtons.stories';
+} from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Call-Offs',
@@ -195,6 +195,7 @@ const WithdrawToggle = ({ checked, onChange }) => (
  */
 export const CallOff_Request_Details = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}

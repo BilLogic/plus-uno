@@ -1,6 +1,6 @@
 import React from 'react';
-import Textarea from '@/forms/Textarea';
-import Badge from '@/components/Badge';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import Badge from '@/components/status-and-loading/Badge';
 import StudentCard from '../components/StudentCard';
 
 const ENGAGEMENT_OPTIONS = [

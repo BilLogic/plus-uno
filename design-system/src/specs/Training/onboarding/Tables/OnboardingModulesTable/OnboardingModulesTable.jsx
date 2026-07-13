@@ -8,8 +8,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import StatusIndicators from '../../Elements/StatusIndicators/StatusIndicators';
-import CtaButtons from '../../Elements/CtaButtons/CtaButtons';
+import StatusIndicators from '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators';
+import CtaButtons from '@/specs/Training/Onboarding/Elements/CtaButtons/CtaButtons';
 import './OnboardingModulesTable.scss';
 
 const OnboardingModulesTable = ({

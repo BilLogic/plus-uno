@@ -1,13 +1,13 @@
 import React from 'react';
-import Modal from '../../../../components/Modal';
-import Button from '../../../../components/Button';
-import ButtonGroup from '../../../../components/ButtonGroup';
-import Badge from '../../../../components/Badge';
-import MATHiaGoalStatusBanner from '../elements/MATHiaGoalStatusBanner';
-import { AttendanceDropdown } from '../elements/AttendanceDropdown';
-import { SessionInfoCard } from '../cards/SessionInfoCard.stories';
-import { LeadBadge, CountBadge } from '../elements/badges/TutorBadges';
-import { SessionAttendeeListItem } from '../../pre-session/elements/Session Attendee List Items/SessionAttendeeListItems.stories';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import Badge from '@/components/status-and-loading/Badge';
+import MATHiaGoalStatusBanner from '../Elements/MATHiaGoalStatusBanner';
+import { AttendanceDropdown } from '../Elements/AttendanceDropdown';
+import { SessionInfoCard } from '../Cards/SessionInfoCard.stories';
+import { LeadBadge, CountBadge } from '../Elements/badges/TutorBadges';
+import { SessionAttendeeListItem } from '@/specs/Toolkit/Pre-Session/Elements/SessionAttendeeListItems/SessionAttendeeListItems.stories';
 
 export default {
     title: 'Specs/Toolkit/In-Session/Modals/In-Session Pop-up Modal',
@@ -90,6 +90,7 @@ const AttendeeRow = ({ name, initialStatus = 'unknown' }) => (
  */
 export const AttendanceLoadingLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -189,6 +190,7 @@ export const AttendanceLoadingLead = () => (
  */
 export const AttendanceInitialLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -299,6 +301,7 @@ export const AttendanceInitialLead = () => (
  */
 export const AttendanceLoadedLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -448,6 +451,7 @@ const AssignmentTabButtonGroup = () => (
  */
 export const AssignmentLoadingLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -594,6 +598,7 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
  */
 export const AssignmentLoadedLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -704,6 +709,7 @@ const SessionInfoTabButtonGroup = () => (
  */
 export const SessionInfoLoadingLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -768,6 +774,7 @@ export const SessionInfoLoadingLead = () => (
  */
 export const SessionInfoLoadedLead = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -871,6 +878,7 @@ const RegularTabButtonGroup = () => (
 
 export const SessionInfoLoadedRegular = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}
@@ -989,6 +997,7 @@ const RosterHeader = ({ title, count, showInfo = false }) => (
 
 export const AttendanceLoadedRegular = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => {}}

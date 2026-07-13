@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default {
-    title: 'Styles/Elevation',
+    title: 'Foundations/Elevation',
     tags: ['!dev', '!autodocs'],
 };
 

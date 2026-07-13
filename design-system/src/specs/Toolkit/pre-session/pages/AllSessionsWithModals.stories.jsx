@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../tables/AllSessionsTable.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { SessionStatusFilter } from '../elements/Filters/SessionStatusFilter.stories';
-import { TutorFilter } from '../elements/Filters/Tutor Filter/TutorFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../Tables/AllSessionsTable.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { SessionStatusFilter } from '../Elements/Filters/SessionStatusFilter.stories';
+import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
 
 // Import Session Detail modals
-import * as SessionDetailsModals from '../modals/Session Details (All User)/SessionDetails.stories';
-import * as OneTimeAttendeesCompletedModal from '../modals/Session Details (All User)/OneTimeAttendeesCompleted.stories';
+import * as SessionDetailsModals from '../Modals/SessionDetailsAllUser/SessionDetails.stories';
+import * as OneTimeAttendeesCompletedModal from '../Modals/SessionDetailsAllUser/OneTimeAttendeesCompleted.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -149,7 +149,7 @@ const modalMap = {
  * - Tab: Info, Attendees
  * - Session Status: Upcoming, Completed
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [sessionType, setSessionType] = useState('one-time');
     const [tab, setTab] = useState('info');
     const [sessionStatus, setSessionStatus] = useState('upcoming');
@@ -332,7 +332,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -357,4 +357,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

@@ -1,6 +1,6 @@
 import React from 'react';
-import Radio from '../../../../forms/Radio';
-import DatePicker from '../../../../forms/DatePicker';
+import Radio from '@/components/forms-and-inputs/Radio';
+import DatePicker from '@/components/forms-and-inputs/DatePicker';
 
 export default {
     tags: ['!dev', '!autodocs'],

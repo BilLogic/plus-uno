@@ -2,11 +2,23 @@ import React, { useState } from 'react';
 import UserFeedbackModal from './UserFeedbackModal';
 
 export default {
-    title: 'Specs/Home/Modals/UserFeedbackModal',
+    title: 'Specs/Home/Modals/User Feedback Modal',
     component: UserFeedbackModal,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'centered',
+    },
+    argTypes: {
+        show: {
+            control: 'boolean',
+            description: 'Whether the modal is visible',
+            table: { category: 'State' },
+        },
+        noOverlay: {
+            control: 'boolean',
+            description: 'Render inline without the fixed fullscreen overlay',
+            table: { category: 'Behavior' },
+        },
     },
 };
 
@@ -60,7 +72,6 @@ export const Problem = {
     render: (args) => (
         <UserFeedbackModal
             {...args}
-            show={true}
             type="problem"
             onClose={() => console.log('Close clicked')}
             onSubmit={(data) => console.log('Submit:', data)}
@@ -68,6 +79,8 @@ export const Problem = {
     ),
     args: {
         type: 'problem',
+        show: true,
+        noOverlay: true,
     }
 };
 
@@ -75,7 +88,6 @@ export const Question = {
     render: (args) => (
         <UserFeedbackModal
             {...args}
-            show={true}
             type="question"
             onClose={() => console.log('Close clicked')}
             onSubmit={(data) => console.log('Submit:', data)}
@@ -83,6 +95,8 @@ export const Question = {
     ),
     args: {
         type: 'question',
+        show: true,
+        noOverlay: true,
     }
 };
 
@@ -90,7 +104,6 @@ export const Feedback = {
     render: (args) => (
         <UserFeedbackModal
             {...args}
-            show={true}
             type="feedback"
             onClose={() => console.log('Close clicked')}
             onSubmit={(data) => console.log('Submit:', data)}
@@ -98,6 +111,8 @@ export const Feedback = {
     ),
     args: {
         type: 'feedback',
+        show: true,
+        noOverlay: true,
     }
 };
 

@@ -11,7 +11,7 @@ import React from 'react';
 import OverviewCard from './OverviewCard';
 
 export default {
-    title: 'Specs/Universal/Cards/OverviewCard',
+    title: 'Specs/Universal/Cards/Overview Card',
     component: OverviewCard,
     tags: ['!dev', '!autodocs'],
     parameters: {

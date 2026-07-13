@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
-import SessionAvailabilitySnackbar from '../../../../components/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
+import SessionAvailabilitySnackbar from '@/components/_internal/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar';
 
 export default {
     tags: ['!dev', '!autodocs'],

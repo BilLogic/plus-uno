@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { ReflectionsTableRow, ReflectionsTableHeaderRow } from '../tables/ReflectionsTable.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { CompletionFilter } from '../elements/Filters/CompletionFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { ReflectionsTableRow, ReflectionsTableHeaderRow } from '../Tables/ReflectionsTable.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { CompletionFilter } from '../Elements/Filters/CompletionFilter.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],

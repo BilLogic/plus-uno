@@ -2,7 +2,7 @@ import React from 'react';
 import StreamgraphChart from './StreamgraphChart';
 
 export default {
-    title: 'Data Visualizations/Temporal/StreamgraphChart',
+    title: 'Data visualizations/Temporal/Streamgraph chart',
     component: StreamgraphChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

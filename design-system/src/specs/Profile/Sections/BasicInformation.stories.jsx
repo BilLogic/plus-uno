@@ -54,14 +54,14 @@
  * - Additional Email info icon tooltip: "Get notifications sent to an alternate email address"
  */
 import React from 'react';
-import { Label } from '../../../forms/LabelAndCaption.stories';
-import Input from '../../../forms/Input';
-import Button from '../../../components/Button/Button';
-import Tooltip from '../../../components/Tooltip/Tooltip';
+import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import Input from '@/components/forms-and-inputs/Input';
+import Button from '@/components/actions/Button/Button';
+import Tooltip from '@/components/overlays/Tooltip/Tooltip';
 import { Pronouns } from '../Elements/Pronouns.stories';
 
 export default {
-    title: 'Specs/Profile/Sections/BasicInformation',
+    title: 'Specs/Profile/Sections/Basic Information',
     excludeStories: ['BasicInformationSection'],
     tags: ['!dev', '!autodocs'],
     parameters: {

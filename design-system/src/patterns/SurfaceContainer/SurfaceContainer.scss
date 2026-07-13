@@ -1,0 +1,51 @@
+/**
+ * Surface container pattern (Patterns/Surface container)
+ * General wrapper for page content — `--color-surface-container`, flat, tokenized spacing.
+ */
+
+.plus-pattern-surface-container {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface-container);
+    color: var(--color-on-surface);
+}
+
+/* Padding — only one surface-container padding token pair exists */
+.plus-pattern-surface-container-pad-none {
+    padding: 0;
+}
+
+.plus-pattern-surface-container-pad-md {
+    padding: var(--size-surface-container-pad-y) var(--size-surface-container-pad-x);
+}
+
+/* Gap — only the md surface-container gap token exists */
+.plus-pattern-surface-container-gap-none {
+    gap: 0;
+}
+
+.plus-pattern-surface-container-gap-md {
+    gap: var(--size-surface-container-gap-md);
+}
+
+/* Radius scale — reuses the Sections layer radius steps; lg is the surface radius token */
+.plus-pattern-surface-container-radius-none {
+    border-radius: 0;
+}
+
+.plus-pattern-surface-container-radius-sm {
+    border-radius: var(--size-section-radius-sm);
+}
+
+.plus-pattern-surface-container-radius-md {
+    border-radius: var(--size-section-radius-md);
+}
+
+.plus-pattern-surface-container-radius-lg {
+    border-radius: var(--size-surface-radius);
+}
+
+/* Border */
+.plus-pattern-surface-container-bordered {
+    border: var(--size-surface-border) solid var(--color-outline-variant);
+}

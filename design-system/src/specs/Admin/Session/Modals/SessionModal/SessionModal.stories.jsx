@@ -1,0 +1,135 @@
+/**
+ * SessionModal - Admin Session Admin Modal
+ * 
+ * Modal for viewing session breakdown with student-tutor pairings.
+ * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=987-127605
+ */
+
+import React, { useState, useEffect } from 'react';
+import SessionModal from './SessionModal';
+import Button from '@/components/actions/Button/Button';
+import './SessionModal.scss';
+
+const defaultStudents = [
+    { id: 1, studentName: 'Amanda Novak', studentStatus: 'Needs to set goals', tutorName: 'Ethan Cole', tutorType: 'Lead', timeSpent: 11 },
+    { id: 2, studentName: 'Ashley Brown', studentStatus: 'Needs to set goals', tutorName: 'Martha Dunn', tutorType: 'Regular', timeSpent: 8 },
+    { id: 3, studentName: 'Frank Bass', studentStatus: 'Needs to set goals', tutorName: 'Martha Dunn', tutorType: 'Regular', timeSpent: 11 },
+    { id: 4, studentName: 'Henry Hamm', studentStatus: 'Needs to set goals', tutorName: 'Martha Dunn', tutorType: 'Regular', timeSpent: 15 },
+    { id: 5, studentName: 'Jose Green', studentStatus: 'Needs to set goals', tutorName: 'Ethan Cole', tutorType: 'Lead', timeSpent: 10 },
+    { id: 6, studentName: 'Miles Hazel', studentStatus: 'Needs to set goals', tutorName: 'Ethan Cole', tutorType: 'Lead', timeSpent: 14 },
+    { id: 7, studentName: 'Olga Petra', studentStatus: 'Needs to set goals', tutorName: 'Martha Dunn', tutorType: 'Regular', timeSpent: 3 },
+    { id: 8, studentName: 'Pete Smith', studentStatus: 'Needs to set goals', tutorName: 'Martha Dunn', tutorType: 'Regular', timeSpent: 4 },
+    { id: 9, studentName: 'Sam Morales', studentStatus: 'Needs to set goals', tutorName: 'Martha Dunn', tutorType: 'Regular', timeSpent: 11 },
+];
+
+export default {
+    title: 'Specs/Admin/Session/Modals/Session Modal',
+    component: SessionModal,
+    tags: ['!dev', '!autodocs'],
+    parameters: {
+        docs: {
+            description: {
+                component: `Modal component for viewing session breakdown details. Shows a table with student-tutor pairings and time spent.
+
+## Figma Reference
+Node ID: 987-127605
+
+## Features
+- Session date in title
+- Close button
+- Session breakdown table with sortable columns
+- Student Status and Tutor Type badges
+`,
+            },
+        },
+    },
+    argTypes: {
+        show: {
+            control: 'boolean',
+            description: 'Whether the modal is visible',
+            table: { category: 'State' },
+        },
+        sessionDate: {
+            control: 'text',
+            description: 'Session date for the title',
+            table: { category: 'Content' },
+        },
+    },
+};
+
+/**
+ * Overview - Shows modal matching Figma design
+ */
+export const Overview = {
+    args: {
+        show: false,
+    },
+    render: (args) => {
+        const [showModal, setShowModal] = useState(args.show);
+
+        useEffect(() => {
+            setShowModal(args.show);
+        }, [args.show]);
+
+        return (
+            <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
+                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Session Modal</h6>
+                
+                <Button
+                    text={showModal ? "Hide Modal" : "Show Modal"}
+                    style="primary"
+                    fill="filled"
+                    onClick={() => setShowModal(!showModal)}
+                />
+
+                <SessionModal
+                    show={showModal}
+                    sessionDate="11/02/12"
+                    students={defaultStudents}
+                    onHide={() => setShowModal(false)}
+                    onSort={(column) => console.log('Sort by:', column)}
+                />
+            </div>
+        );
+    },
+};
+
+/**
+ * Interactive - Interactive playground with controls
+ */
+export const Interactive = {
+    render: (args) => {
+        const [showModal, setShowModal] = useState(args.show);
+        const [sortColumn, setSortColumn] = useState('tutorName');
+
+        useEffect(() => {
+            setShowModal(args.show);
+        }, [args.show]);
+
+        return (
+            <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
+                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>
+                    Session Modal - Interactive
+                </h6>
+                <Button
+                    text={showModal ? "Hide Modal" : "Show Modal"}
+                    style="primary"
+                    fill="filled"
+                    onClick={() => setShowModal(!showModal)}
+                />
+                <SessionModal
+                    show={showModal}
+                    sessionDate={args.sessionDate}
+                    students={defaultStudents}
+                    sortColumn={sortColumn}
+                    onHide={() => setShowModal(false)}
+                    onSort={(column) => setSortColumn(column)}
+                />
+            </div>
+        );
+    },
+    args: {
+        show: false,
+        sessionDate: '11/02/12',
+    },
+};

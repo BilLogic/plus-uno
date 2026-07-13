@@ -1,6 +1,6 @@
 import React from 'react';
-import Modal from '../../../../components/Modal';
-import Button from '../../../../components/Button';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -18,6 +18,7 @@ export default {
  */
 export const StartingZoomSession = () => (
     <Modal
+        renderAs="inline"
         width={332}
         showBottomButtons={false}
         onClose={() => {}}

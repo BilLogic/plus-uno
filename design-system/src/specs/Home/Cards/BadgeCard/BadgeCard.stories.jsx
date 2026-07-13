@@ -2,7 +2,7 @@ import React from 'react';
 import BadgeCard from './BadgeCard';
 
 export default {
-    title: 'Specs/Home/Cards/BadgeCard',
+    title: 'Specs/Home/Cards/Badge Card',
     component: BadgeCard,
     tags: ['!dev', '!autodocs'],
 };

@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Card from '../../../../../components/Card';
-import Button from '../../../../../components/Button';
-import Dropdown from '../../../../../components/Dropdown';
-import Switch from '@/forms/Switch';
-import Input from '@/forms/Input';
-import Checkbox from '@/forms/Checkbox';
-import Textarea from '@/forms/Textarea';
+import Card from '@/components/layout-and-structure/Card';
+import Button from '@/components/actions/Button';
+import Dropdown from '@/components/forms-and-inputs/Dropdown';
+import Switch from '@/components/forms-and-inputs/Switch';
+import Input from '@/components/forms-and-inputs/Input';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import Textarea from '@/components/forms-and-inputs/Textarea';
 
 /**
  * SessionInformationForm

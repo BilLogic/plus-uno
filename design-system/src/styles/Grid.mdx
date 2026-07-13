@@ -1,0 +1,146 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta title="Foundations/Grid" />
+
+# Grid
+
+The grid is the horizontal structure of every PLUS page. It divides the main
+content area into columns so that cards, tables, forms, and text blocks align
+consistently across screens — and across designers. The grid governs **where
+content containers sit**; the [spacing tokens](?path=/docs/foundations-spacing--docs)
+govern everything inside them.
+
+PLUS is a **desktop-only product**. There is no small-screen tier: the grid
+starts at **MD (768px)** and there are no phone or small-tablet breakpoints.
+Do not design or build below 768px.
+
+## Grid anatomy
+
+The grid is made of three parts:
+
+| Part | What it is |
+|------|-----------|
+| **Columns** | Equal vertical divisions of the main content area. Content containers align to column edges. |
+| **Gutters** | The fixed gaps between columns. Content never bleeds into gutters. |
+| **Margins** | The empty space between the outermost columns and the edge of the main content area. Content never bleeds into margins either. |
+
+Columns flex with the viewport; gutters and margins stay fixed per breakpoint.
+
+## Breakpoints
+
+PLUS uses a **single min-width rule**: each breakpoint is defined only by its
+fixed minimum width, and all column values are computed from the grid at that
+minimum. There are no min/max ranges to design against — between minimums the
+columns simply stretch. This supersedes the old Breakpoint component's
+min–max drag behavior, which is **deprecated**; the grid is now the source of
+truth for how layouts respond.
+
+Breakpoint tokens live in `design-system/src/tokens/_layout.scss`
+(`--breakpoint-md-min`, `--breakpoint-lg-min`, `--breakpoint-xl-min`).
+
+| Breakpoint | Min width | Columns | Gutter | Margin |
+|------------|-----------|---------|--------|--------|
+| **MD** | 768px | 12 | 12px (`--size-spacing-medium-space-200`) | 16px (`--size-spacing-medium-space-300`) |
+| **LG** | 1024px | 12 | 16px (`--size-spacing-medium-space-300`) | 32px (`--size-spacing-large-space-600`) |
+| **XL** | 1440px | 12 | 16px (`--size-spacing-medium-space-300`) | 32px (`--size-spacing-large-space-600`) |
+
+The column count is **12 at every breakpoint**. Because PLUS never renders on
+small screens, we never drop to 6 or 2 columns — a 4-column card row at XL is
+still a 4-column card row at MD, just narrower. Gutters and margins reuse the
+spacing primitives above; the 32px margin intentionally matches
+`--size-surface-pad-x`, so the grid margin and the page surface padding are
+the same edge.
+
+## Fixed and fluid grids
+
+Like the breakpoints, grid modes are a deliberate choice per page — pick one
+and stay with it.
+
+**Fixed grids** have a maximum width and center themselves inside the main
+content area. This is the default. Two widths are available:
+
+| Mode | Max width (incl. margins) | Use for |
+|------|--------------------------|---------|
+| **Fixed-wide** | 1296px | Most experiences: dashboards, directories, search results, settings — anything with structured content. |
+| **Fixed-narrow** | 864px | Long-form reading: documentation, articles, review flows. Caps line length so text stays readable. |
+
+**Fluid grids** expand to fill all available space. Use them only when the
+content has no natural maximum width — boards, timelines, whiteboard-style
+canvases. Be careful at very wide viewports: text lines get too long and
+related elements drift apart.
+
+## Layout regions
+
+PLUS adopts the same region names Atlassian uses for the app shell:
+
+| Region | PLUS today |
+|--------|-----------|
+| **TopNav** | The `TopBar` section spec — full-width bar at the top of the shell. |
+| **SideNav** | The `Sidebar` section spec — fixed-width navigation on the left (184px in the current `PageLayout` spec). |
+| **Main** | The content area. **The grid applies here and only here.** |
+| **Panel** | Contextual surface on the right. In PLUS it currently functions as an off-canvas drawer rather than a docked region, but the region name is retained for future use. |
+
+The grid never spans across SideNav, TopNav, or Panel — those regions have
+fixed dimensions and their own internal spacing. Columns are computed from the
+width of Main after the shell has taken its share.
+
+## What aligns to the grid
+
+- **Content containers align to columns**: cards, tables, forms, images,
+  charts, and text blocks. A container can span any number of columns, and can
+  be centered by leaving symmetric columns empty on either side.
+- **Small elements never align to the grid**: buttons, icons, chips, and
+  avatars are positioned with spacing tokens
+  (`--size-element-*`), not columns.
+- **Only the top level aligns**: inside a container, use spacing tokens for
+  everything. The grid stops at the container's edge.
+- **Overlays float above the grid**: modals, dropdowns, tooltips, and toasts
+  are positioned relative to their trigger or the viewport, not to columns.
+
+## Do's and don'ts
+
+**Do:**
+
+- **Do** span content across however many columns it needs — 3, 4, 6, 12; the grid doesn't prescribe a count.
+- **Do** use fixed-wide for structured content: dashboards, directories, tables, search results.
+- **Do** use fixed-narrow for long-form reading so line length stays comfortable.
+- **Do** use fluid grids for content that grows horizontally, like boards and timelines.
+- **Do** set the grid to the full width of the Main region at each breakpoint's minimum width.
+- **Do** design at more than one breakpoint — at minimum MD (768) and XL (1440) — so stretch behavior is intentional.
+- **Do** switch breakpoints in Figma through the frame's grid styles, so linked styles stay attached.
+
+**Don't:**
+
+- **Don't** let content bleed into gutters or margins — it breaks alignment everywhere else on the page.
+- **Don't** align buttons, icons, or other small elements to columns; use `--size-element-*` spacing tokens instead.
+- **Don't** use fixed-wide for long-form text — lines get too long to read.
+- **Don't** use fixed-narrow for content that needs horizontal room, like wide tables.
+- **Don't** use fluid grids for structured content with a natural width; at large viewports the visual relationships fall apart.
+- **Don't** resize the grid by hand in Figma — detached grid styles stop mapping to the breakpoints.
+- **Don't** span the grid across SideNav, TopNav, or Panel; the grid belongs to Main only.
+- **Don't** design below 768px — PLUS has no small-screen tier.
+
+## Grid inside the app shell
+
+Most PLUS pages render inside `PageLayout` (SideNav + TopNav + Main). The
+grid is computed from the **Main region's width**, not the viewport, so at
+each breakpoint minimum the usable content width is smaller than the viewport:
+
+```
+MD  (768):  768 − 32 (outer) − 64 (surface padding)          = 672px
+LG (1024): 1024 − 32 − 164 (SideNav) − 16 (gap) − 64          = 748px
+XL (1440): 1440 − 32 − 164 − 16 − 64                          = 1164px
+```
+
+At MD the SideNav collapses, which is why it drops out of the MD calculation.
+(The `--layout-sidebar-width` token is 164px; the current `PageLayout` spec
+renders the sidebar at 184px — a known drift to reconcile. When it changes,
+these content widths shift with it; the formula is what's stable.)
+Column reference values at each minimum are listed in
+[Foundations/Layout & grid](?path=/docs/foundations-layout-grid--docs).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
+/>

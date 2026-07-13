@@ -1,8 +1,8 @@
 import React from 'react';
 import { Table, Badge } from 'react-bootstrap';
-import { Button } from '../../../components';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import OnboardingModuleCard from '@/components/training/OnboardingModuleCard';
+import { Button } from '@/components';
+import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
+import OnboardingModuleCard from '@/components/_internal/training/OnboardingModuleCard';
 
 const OnboardingOverviewPage = () => {
     const featuredModules = [

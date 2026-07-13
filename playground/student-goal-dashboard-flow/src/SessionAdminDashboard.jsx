@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Card from '@plus-ds/components/Card';
-import NavTabs from '@plus-ds/components/NavTabs';
-import Badge from '@plus-ds/components/Badge';
-import Table from '@plus-ds/components/Table';
+import Card from '@plus-ds/components/layout-and-structure/Card';
+import NavTabs from '@plus-ds/components/navigation/NavTabs';
+import Badge from '@plus-ds/components/status-and-loading/Badge';
+import Table from '@plus-ds/components/_internal/Table';
 import TopBar from '@plus-ds/specs/Universal/Sections/TopBar/TopBar';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import Button from '@plus-ds/components/Button';
+import Button from '@plus-ds/components/actions/Button';
 
 // Mock Data
 const sessionData = [

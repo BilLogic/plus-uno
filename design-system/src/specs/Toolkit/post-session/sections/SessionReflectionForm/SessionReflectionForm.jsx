@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
-import Card from '../../../../../components/Card';
-import Button from '../../../../../components/Button';
+import Card from '@/components/layout-and-structure/Card';
+import Button from '@/components/actions/Button';
 
 /**
  * SessionReflectionForm

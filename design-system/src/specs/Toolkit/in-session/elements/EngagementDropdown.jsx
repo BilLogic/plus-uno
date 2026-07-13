@@ -2,7 +2,7 @@ import React, { useState, forwardRef } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { EngagementBadge } from './EngagementBadge.jsx';
 import { EngagementListItems, EngagementSubmenuItems } from './EngagementListItems.jsx';
-import '../../../../components/Dropdown/Dropdown.scss';
+import '@/components/forms-and-inputs/Dropdown/Dropdown.scss';
 
 /**
  * Engagement Dropdown Component

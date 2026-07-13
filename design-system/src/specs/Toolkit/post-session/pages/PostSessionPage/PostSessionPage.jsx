@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import SideNavBar from '../../sections/SideNavBar/SideNavBar';
-import SessionInformationForm from '../../sections/SessionInformationForm/SessionInformationForm';
+import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
+import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/SessionInformationForm/SessionInformationForm';
 
 const PostSessionPage = ({
     initialSessionData,

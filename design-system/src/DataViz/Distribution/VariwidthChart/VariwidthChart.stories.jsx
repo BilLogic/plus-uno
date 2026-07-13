@@ -2,7 +2,7 @@ import React from 'react';
 import VariwidthChart from './VariwidthChart';
 
 export default {
-    title: 'Data Visualizations/Distribution/VariwidthChart',
+    title: 'Data visualizations/Distribution/Variwidth chart',
     component: VariwidthChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

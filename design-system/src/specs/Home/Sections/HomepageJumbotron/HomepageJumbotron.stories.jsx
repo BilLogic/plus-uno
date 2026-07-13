@@ -2,7 +2,7 @@ import React from 'react';
 import HomepageJumbotron from './HomepageJumbotron';
 
 export default {
-    title: 'Specs/Home/Sections/HomepageJumbotron',
+    title: 'Specs/Home/Sections/Homepage Jumbotron',
     component: HomepageJumbotron,
     tags: ['!dev', '!autodocs'],
 };

@@ -1,11 +1,11 @@
 import React from 'react';
-import Modal from '../../../../../components/Modal';
+import Modal from '@/components/messaging/Modal';
 
 // Import CTA button components from Tutor View
 import {
     SeeSessionsFillInButton,
     ViewUpdatedScheduleButton
-} from '../../elements/CTATutorViewButtons.stories';
+} from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Call-Offs',
@@ -35,6 +35,7 @@ export default {
  */
 export const CallOff_Confirmation = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}

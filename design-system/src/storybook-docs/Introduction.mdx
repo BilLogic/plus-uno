@@ -1,12 +1,12 @@
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import LinkTo from '@storybook/addon-links/react';
-import Badge from '@/components/Badge';
-import Divider from '@/components/Divider';
-import Pagination from '@/components/Pagination';
-import Button from '@/components/Button';
+import Badge from '@/components/status-and-loading/Badge';
+import Divider from '@/components/layout-and-structure/Divider';
+import Pagination from '@/components/navigation/Pagination';
+import Button from '@/components/actions/Button';
 
 <Meta
-  title="PLUS Docs/Introduction"
+  title="Getting started/Introduction"
   parameters={{
     docs: {
       description: {
@@ -188,19 +188,19 @@ import Button from '@/components/Button';
 
     <ul className="ml-6 list-disc space-y-2 text-sm text-muted-foreground">
       <li>
-        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Typography" name="Docs">
+        <LinkTo className="text-foreground underline hover:no-underline" title="Foundations/Typography" name="Docs">
           Typography
         </LinkTo>{' '}
         - type scale and font stacks
       </li>
       <li>
-        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Colors" name="Docs">
+        <LinkTo className="text-foreground underline hover:no-underline" title="Foundations/Color" name="Docs">
           Colors
         </LinkTo>{' '}
         - palette and semantic color usage
       </li>
       <li>
-        <LinkTo className="text-foreground underline hover:no-underline" title="Styles/Layout" name="Docs">
+        <LinkTo className="text-foreground underline hover:no-underline" title="Foundations/Layout & grid" name="Docs">
           Layout
         </LinkTo>{' '}
         - spacing and grid patterns

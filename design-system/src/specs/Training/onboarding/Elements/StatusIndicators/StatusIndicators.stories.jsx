@@ -10,7 +10,7 @@ import StatusIndicators from './StatusIndicators';
 import './StatusIndicators.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Elements/StatusIndicators',
+    title: 'Specs/Training/Onboarding/Elements/Status Indicators',
     component: StatusIndicators,
     tags: ['!dev', '!autodocs'],
     parameters: {

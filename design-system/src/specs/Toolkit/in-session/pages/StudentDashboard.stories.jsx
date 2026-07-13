@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import Dropdown from '../../../../components/Dropdown/Dropdown';
-import { PageLayout } from '../../../Universal/Pages';
-import { TableRow, TableHeaderRow } from '../tables/StudentList.stories';
-import { SessionControls } from '../elements/SessionControls.stories';
-import { SortingOptions } from '../elements/SortingOptions.stories';
-import MATHiaGoalStatusBanner from '../elements/MATHiaGoalStatusBanner';
-import { Toast } from '../../../../components/Toast';
+import Button from '@/components/actions/Button/Button';
+import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { TableRow, TableHeaderRow } from '../Tables/StudentList.stories';
+import { SessionControls } from '../Elements/SessionControls.stories';
+import { SortingOptions } from '../Elements/SortingOptions.stories';
+import MATHiaGoalStatusBanner from '../Elements/MATHiaGoalStatusBanner';
+import { Toast } from '@/components/messaging/Toast';
 
-import * as InSessionModals from '../modals/InSessionPopUpModal.stories';
-import { StartingZoomSession } from '../modals/StartingZoomSession.stories';
-import { AddTutor, AddStudent } from '../modals/AddModal.stories';
+import * as InSessionModals from '../Modals/InSessionPopUpModal.stories';
+import { StartingZoomSession } from '../Modals/StartingZoomSession.stories';
+import { AddTutor, AddStudent } from '../Modals/AddModal.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Tooltip from '@/components/Tooltip';
+import Tooltip from '@/components/overlays/Tooltip';
 import './NavFab.scss';
 
 const STORYBOOK_URL = import.meta.env.VITE_STORYBOOK_URL || '/storybook';

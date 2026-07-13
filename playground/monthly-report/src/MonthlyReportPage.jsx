@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
-import Alert from '@/components/Alert';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
+import Alert from '@/components/messaging/Alert';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import './MonthlyReportPage.scss';
 

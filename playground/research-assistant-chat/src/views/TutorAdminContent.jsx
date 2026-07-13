@@ -7,7 +7,7 @@ import { CompactChatBar } from '../components/CompactChatBar';
 import { ResearchAssistantChat } from '../ResearchAssistantChat';
 import '../ResearchAssistantChat.css';
 
-import '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
+import '@/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
 /**
  * TutorAdminContent: Content-only version for use inside ShellLayout.

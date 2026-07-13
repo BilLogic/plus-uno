@@ -11,7 +11,7 @@ import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './OnboardingOverviewPage.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Pages/OnboardingOverviewPage',
+    title: 'Specs/Training/Onboarding/Pages/Onboarding Overview Page',
     component: OnboardingOverviewPage,
     tags: ['!dev', '!autodocs'],
     decorators: [

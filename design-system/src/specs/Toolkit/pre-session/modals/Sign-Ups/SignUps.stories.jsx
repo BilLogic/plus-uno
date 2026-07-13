@@ -1,26 +1,26 @@
 import React from 'react';
-import Modal from '../../../../../components/Modal';
-import ButtonGroup from '../../../../../components/ButtonGroup';
-import Button from '../../../../../components/Button';
-import Badge from '../../../../../components/Badge';
-import Alert from '../../../../../components/Alert';
+import Modal from '@/components/messaging/Modal';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
+import Alert from '@/components/messaging/Alert';
 
 // Import the reusable SessionInfoCard component
-import { SessionInfoCard } from '../../cards/SessionInfoCard.stories';
+import { SessionInfoCard } from '@/specs/Toolkit/Pre-Session/Cards/SessionInfoCard.stories';
 // Import CTA button components from Tutor View
 import {
     CloseButton,
     SignUpRecurringButton,
     BackButton
-} from '../../elements/CTATutorViewButtons.stories';
+} from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
 // Import CTA Sign-Up Related buttons
 import {
     ConfirmSignUpButton,
     CheckScheduleButton,
     SuccessButton
-} from '../../elements/CTA Sign-Up Related Buttons';
+} from '@/specs/Toolkit/Pre-Session/Elements/CtaSignUpRelatedButtons';
 // Import modal table components
-import { SignInTableHeaderRowModal, SignInTableRowModal } from '../../tables/SignInTable.stories';
+import { SignInTableHeaderRowModal, SignInTableRowModal } from '@/specs/Toolkit/Pre-Session/Tables/SignInTable.stories';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Sign-Ups',
@@ -38,6 +38,7 @@ export default {
  */
 export const RecurringSession_PreSignUp = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}
@@ -156,6 +157,7 @@ export const RecurringSession_PreSignUp = () => (
  */
 export const ConfirmSignUp = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}
@@ -229,6 +231,7 @@ export const ConfirmSignUp = () => (
  */
 export const SuccessAll = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}

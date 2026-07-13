@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default {
-    title: 'Styles/Layout',
+    title: 'Foundations/Layout & grid',
     tags: ['!dev', '!autodocs'],
 };
 

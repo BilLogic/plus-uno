@@ -17,7 +17,7 @@ import PropTypes from 'prop-types';
  * @param {boolean} [props.fitToContainer=false]
  * @param {React.ReactNode} props.children - The content to wrap
  */
-const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, children }) => {
+const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, showToolbar = false, children }) => {
     const [selectedBreakpoint, setSelectedBreakpoint] = useState(breakpoint);
     const [scale, setScale] = useState(1);
     const [contentHeight, setContentHeight] = useState(0);
@@ -132,12 +132,10 @@ const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, children }
         minWidth: `${width}px`,
         transition: 'width 0.3s cubic-bezier(0.2, 0, 0.2, 1)',
         backgroundColor: 'var(--color-surface, #ffffff)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         height: 'max-content',
         minHeight: 'calc(100vh - 120px)',
         overflow: 'visible',
         position: 'relative',
-        border: '1px solid var(--color-outline-variant, #e0e0e0)',
     };
 
     const scaledVisualHeight = contentHeight > 0 ? Math.ceil(contentHeight * scale) : undefined;
@@ -165,11 +163,17 @@ const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, children }
                     : {}),
             }}
         >
+            {/* Breakpoint switching is a native Storybook control (the `breakpoint` arg in the
+                Controls panel / docs playground). This legacy toolbar stays available behind
+                `showToolbar` only for browser-fullscreen demos, where Controls aren't reachable. */}
+            {(showToolbar || browserFullscreen) && (
             <div
                 className="responsive-frame-toolbar"
                 style={{
-                    padding: '12px 24px',
-                    borderBottom: '1px solid var(--color-outline-variant, #e0e0e0)',
+                    padding: browserFullscreen ? '12px 24px' : '0 0 12px',
+                    borderBottom: browserFullscreen
+                        ? '1px solid var(--color-outline-variant, #e0e0e0)'
+                        : 'none',
                     backgroundColor: 'var(--color-surface, #ffffff)',
                     display: 'flex',
                     alignItems: 'center',
@@ -285,20 +289,26 @@ const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, children }
                     </span>
                 ) : null}
             </div>
+            )}
 
             <div
                 ref={wrapperRef}
                 className="responsive-frame-wrapper"
                 style={{
                     flex: 1,
-                    backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
+                    // No chrome of its own outside fullscreen: the docs canvas already provides
+                    // a backdrop and the inner page frame carries the single visible border —
+                    // extra nested boxes waste space and confuse what "the page" is.
+                    backgroundColor: browserFullscreen
+                        ? 'var(--color-surface-container-lowest, #f8f9fa)'
+                        : 'transparent',
                     display: 'flex',
                     justifyContent: fitToContainer ? 'center' : 'flex-start',
                     alignItems: 'flex-start',
                     overflowX: 'auto',
                     overflowY: 'auto',
                     WebkitOverflowScrolling: 'touch',
-                    padding: '24px',
+                    padding: browserFullscreen ? '24px' : 0,
                     width: '100%',
                     boxSizing: 'border-box',
                     ...(browserFullscreen ? { flex: 1, minHeight: 0 } : {}),
@@ -348,6 +358,7 @@ const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, children }
 ResponsiveFrame.propTypes = {
     breakpoint: PropTypes.oneOf(['md', 'lg', 'xl']),
     fitToContainer: PropTypes.bool,
+    showToolbar: PropTypes.bool,
     children: PropTypes.node.isRequired,
 };
 

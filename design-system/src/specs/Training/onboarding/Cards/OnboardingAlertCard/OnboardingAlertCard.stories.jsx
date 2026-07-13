@@ -10,7 +10,7 @@ import OnboardingAlertCard from './OnboardingAlertCard';
 import './OnboardingAlertCard.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Cards/OnboardingAlertCard',
+    title: 'Specs/Training/Onboarding/Cards/Onboarding Alert Card',
     component: OnboardingAlertCard,
     tags: ['!dev', '!autodocs'],
     parameters: {

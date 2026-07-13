@@ -11,7 +11,7 @@ import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './OnboardingInnerPage.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Pages/OnboardingInnerPage',
+    title: 'Specs/Training/Onboarding/Pages/Onboarding Inner Page',
     component: OnboardingInnerPage,
     tags: ['!dev', '!autodocs'],
     decorators: [
@@ -95,16 +95,18 @@ export const Overview = {
  */
 export const WithCompletionModal = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'xl',
+        showCompletionModal: false
     },
     render: (args) => (
         <OnboardingInnerPage
+            key={String(args.showCompletionModal)}
             moduleTitle="PLUS APP Usage"
             moduleDescription="Learn how to use the PLUS tutoring application effectively."
             moduleDuration="Estimated Time: 15 minutes"
             badgeType="image"
             showAlert={false}
-            showCompletionModal={true}
+            showCompletionModal={args.showCompletionModal}
         />
     ),
 };

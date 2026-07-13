@@ -10,7 +10,7 @@ import CtaButtons from './CtaButtons';
 import './CtaButtons.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Elements/CtaButtons',
+    title: 'Specs/Training/Onboarding/Elements/Cta Buttons',
     component: CtaButtons,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -11,9 +11,9 @@ design-system/src/specs/Toolkit/
 ├── ToolkitSpecification.mdx (Storybook aggregate: title Specs/Toolkit)
 │   Regenerate all sibling *.mdx files: `node scripts/toolkit-spec-docs.mjs` from repo root.
 │
-├── pre-session/   (elements, cards, tables, modals, sections, pages — each with *.stories.jsx + *.mdx)
-├── in-session/
-├── post-session/
+├── Pre-Session/   (elements, cards, tables, modals, sections, pages — each with *.stories.jsx + *.mdx)
+├── In-Session/
+├── Post-Session/
 │
 ├── Elements/   (legacy conceptual grouping — see phase folders for actual specs)
 │   ├── SessionControlButtons/

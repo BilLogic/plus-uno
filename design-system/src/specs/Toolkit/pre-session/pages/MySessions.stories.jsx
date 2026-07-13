@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 // Import Session Details modals from Toolkit specs
-import * as SessionDetailsModals from '../modals/Session Details (All User)/SessionDetails.stories';
+import * as SessionDetailsModals from '../Modals/SessionDetailsAllUser/SessionDetails.stories';
 // Import Sign-Ups modals from Toolkit specs
-import * as SignUpsModals from '../modals/Sign-Ups/SignUps.stories';
+import * as SignUpsModals from '../Modals/Sign-Ups/SignUps.stories';
 // Import Call-Offs modals from Toolkit specs
-import * as CallOffConfirmationStories from '../modals/Call-Offs/CallOffConfirmation.stories';
-import * as AutoExcuseConfirmationStories from '../modals/Call-Offs/AutoExcuseConfirmation.stories';
-import * as AutoApproveConfirmationStories from '../modals/Call-Offs/AutoApproveConfirmation.stories';
+import * as CallOffConfirmationStories from '../Modals/Call-Offs/CallOffConfirmation.stories';
+import * as AutoExcuseConfirmationStories from '../Modals/Call-Offs/AutoExcuseConfirmation.stories';
+import * as AutoApproveConfirmationStories from '../Modals/Call-Offs/AutoApproveConfirmation.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -131,7 +131,7 @@ const UpdateAlert = ({ title, description, onClose }) => (
 // StatCard is imported from OverviewCard.stories.jsx
 // NavHorizontal is imported from NavHorizontal.stories.jsx
 
-// TableRow and TableHeaderRow are imported from '../tables/MySessions.stories'
+// TableRow and TableHeaderRow are imported from '../Tables/MySessions.stories'
 
 /**
  * Main Content Area
@@ -402,7 +402,7 @@ export const Interactive = () => {
  * - Scrim overlay to simulate modal context
  * - Breakpoint toggle for responsive preview
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [showAlert, setShowAlert] = useState(true);
     const [selectedTab, setSelectedTab] = useState('my-sessions');
     const [breakpoint, setBreakpoint] = useState('xl');
@@ -583,7 +583,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -594,4 +594,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

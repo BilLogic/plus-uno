@@ -2,7 +2,7 @@ import React from 'react';
 import PackedBubbleChart from './PackedBubbleChart';
 
 export default {
-    title: 'Data Visualizations/Correlation/PackedBubbleChart',
+    title: 'Data visualizations/Correlation/Packed bubble chart',
     component: PackedBubbleChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

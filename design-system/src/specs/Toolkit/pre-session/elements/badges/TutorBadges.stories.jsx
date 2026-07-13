@@ -2,7 +2,7 @@ import { TutorBadge, LeadBadge, CountBadge } from './TutorBadges.jsx';
 
 export default {
     tags: ['!dev', '!autodocs'],
-    title: 'Specs/Toolkit/Pre-session/Elements/Badges/Tutor Badges',
+    title: 'Specs/Toolkit/Pre-Session/Elements/Badges/Tutor Badges',
     parameters: {
         layout: 'centered',
         docs: {

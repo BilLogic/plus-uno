@@ -1,6 +1,6 @@
 import React from 'react';
-import { Label } from '../../../../forms/LabelAndCaption.stories';
-import InputGroup from '../../../../forms/InputGroup/InputGroup';
+import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import InputGroup from '@/components/forms-and-inputs/InputGroup/InputGroup';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Steppers',

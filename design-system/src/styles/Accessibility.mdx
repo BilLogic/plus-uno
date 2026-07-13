@@ -1,0 +1,53 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Accessibility" />
+
+# Accessibility
+
+Baseline accessibility expectations for the design system. These rules are
+built into the tokens and the Pattern System — following the token pairings
+below keeps components compliant by default.
+
+## Contrast
+
+Text and icon colors are paired with their surface tokens so contrast is
+guaranteed by the palette, not checked per-component:
+
+| Content | Token | Pairs with |
+|---------|-------|-----------|
+| Primary text | `--color-on-surface` | Any surface / surface-container step |
+| Secondary text (subtitles, metadata, timestamps) | `--color-on-surface-variant` | Any surface / surface-container step |
+| Text on filled color | `--color-on-primary`, `--color-on-*` | The matching `--color-{role}` / `-container` fill |
+
+Never place `on-surface` colors on accent fills or vice versa — always use the
+`on-` token that matches the background's role.
+
+## Focus states
+
+Per the Pattern System's universal interaction logic, focus is an **additive
+overlay** — it never replaces the base fill:
+
+- Overlay `on-surface` at **12% opacity** (`--color-on-surface-state-12`) on top of the base fill.
+- Change the border to **Inverse Primary** (`--color-inverse-primary`).
+- Component opacity stays at 100%.
+
+This gives every interactive element (buttons, cards, table rows, list items) a
+visible, consistent focus indicator in both themes.
+
+## Disabled states
+
+Disabled components are set to **38% total opacity**
+(`--color-disabled-opacity: 0.38`), applied to the whole component rather than
+recoloring individual parts. Disabled elements are not focus targets.
+
+## Automated checks
+
+The a11y addon (`@storybook/addon-a11y`) is enabled in `.storybook/main.js` and
+runs axe checks inside story tests. To run the checks for a set of stories:
+
+```bash
+npx vitest --project=storybook --run <path>
+```
+
+Violations surface in the test UI (the `a11y.test` parameter in
+`.storybook/preview.jsx` controls whether they are advisory or fail CI).

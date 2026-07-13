@@ -2,7 +2,7 @@ import React from 'react';
 import LollipopChart from './LollipopChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/LollipopChart',
+    title: 'Data visualizations/Comparison/Lollipop chart',
     component: LollipopChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

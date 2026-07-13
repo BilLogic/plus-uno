@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 
 // Import Confirm Session Availability modals
-import { Session_Details_One_Time_Session } from '../modals/Confirm Session Availability/SessionDetailsOneTimeSession.stories';
-import { Session_Details_Recurring_Session } from '../modals/Confirm Session Availability/SessionDetailsRecurringSession.stories';
-import { Attendees_One_Time_Session } from '../modals/Confirm Session Availability/AttendeesOneTimeSession.stories';
-import { Attendees_Recurring_Session } from '../modals/Confirm Session Availability/AttendeesRecurringSession.stories';
-import { Session_Details_NA } from '../modals/Confirm Session Availability/SessionDetailsNA.stories';
+import { Session_Details_One_Time_Session } from '../Modals/ConfirmSessionAvailability/SessionDetailsOneTimeSession.stories';
+import { Session_Details_Recurring_Session } from '../Modals/ConfirmSessionAvailability/SessionDetailsRecurringSession.stories';
+import { Attendees_One_Time_Session } from '../Modals/ConfirmSessionAvailability/AttendeesOneTimeSession.stories';
+import { Attendees_Recurring_Session } from '../Modals/ConfirmSessionAvailability/AttendeesRecurringSession.stories';
+import { Session_Details_NA } from '../Modals/ConfirmSessionAvailability/SessionDetailsNA.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -137,7 +137,7 @@ const modalMap = {
  * - Modal: Session Details One-Time, Session Details Recurring, Attendees One-Time, Attendees Recurring, Session Details NA
  * - Breakpoint: MD, LG, XL
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [modal, setModal] = useState('session-details-one-time');
     const [breakpoint, setBreakpoint] = useState('xl');
 
@@ -254,7 +254,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -279,4 +279,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

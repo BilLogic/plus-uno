@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '../../../../components/Button/Button';
+import Button from '@/components/actions/Button/Button';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Management Buttons',

@@ -1,0 +1,37 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as SessionModalStories from './SessionModal.stories.jsx';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionModalStories} />
+
+<Title />
+
+Detail modal for a single tutoring session — surfaces date, tutor, attendees, attendance summary, and any session notes. Triggered from a row click in the sessions table.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=987-127605"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Session/Modals/SessionModal"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+The modal stories render in an overlay (`show={true}`) so they're not embedded inline — opening them inside the docs page would cover the page itself. Jump to the dedicated story entries in the sidebar:
+
+- **Overview** — `Specs/Admin/Session Admin/Modals/SessionModal/Overview`. Default open state.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+To exercise the modal's props without leaving the docs, open the Session Admin page playground and toggle `modalOpen` inside its controls — that surface drives the modal in context.
+
+</div>
+
+</div>

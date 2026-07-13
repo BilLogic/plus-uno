@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/Button';
-import OnboardingModuleCard from '@/specs/Training/onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
-import CtaButtons from '@/specs/Training/onboarding/Elements/CtaButtons/CtaButtons';
-import OnboardingModulesTable from '@/specs/Training/onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
+import Button from '@/components/actions/Button';
+import OnboardingModuleCard from '@/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
+import CtaButtons from '@/specs/Training/Onboarding/Elements/CtaButtons/CtaButtons';
+import OnboardingModulesTable from '@/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
 import { ShellContext } from '../home-redesign/src/context/ShellContext';
 import './TrainingOnboardingHiFi.scss';
 

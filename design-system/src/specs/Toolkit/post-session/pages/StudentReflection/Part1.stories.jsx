@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '../../../../../components/Button/Button';
+import Button from '@/components/actions/Button/Button';
 import StudentReflectionPart1 from './Part1';
 import StudentReflectionPart2 from './Part2';
 import StudentReflectionPart3 from './Part3';

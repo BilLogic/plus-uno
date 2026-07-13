@@ -1,122 +1,350 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": 1,
+  "version": 2,
+  "$comment": "Single source of truth for the Storybook IA. .storybook/preview.jsx imports storySortOrder from this file \u2014 edit here, never there. Grammar: docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md",
   "titlePrefixes": [
-    "PLUS Docs/",
-    "Styles/",
-    "Assets/",
-    "Forms/",
+    "Getting started/",
+    "Foundations/",
     "Components/",
-    "Data Visualizations/",
+    "Data visualizations/",
     "Specs/",
-    "Introduction/"
+    "Deprecated/"
   ],
-  "flatTitleGroups": ["Components", "Forms"],
-  "docsFirstGroups": ["Components", "Forms"],
-  "docsFirstTag": "!dev",
-  "storySortOrder": [
-    "PLUS Docs",
-    ["Introduction"],
-    "Styles",
-    [
-      "Introduction",
-      "Icons",
-      "Typography",
-      "Layout",
-      "Colors",
-      "Elevation",
-      "Patterns",
-      [
-        "Introduction",
-        "Elements",
-        "Cards",
-        "Modals",
-        "Sections",
-        "Tables",
-        "Surfaces",
-        "SurfaceContainer"
-      ]
+  "componentGroups": {
+    "Actions": [
+      "Button",
+      "Button group"
     ],
-    "Assets",
-    "Forms",
-    [
+    "Forms and inputs": [
       "Cascader",
       "Checkbox",
-      "Choice Grid",
-      "Date Picker",
-      "File Upload",
+      "Choice grid",
+      "Date picker",
+      "Date & time picker",
+      "Dropdown",
+      "File upload",
       "Input",
-      "Input Group",
-      "Label and Caption",
-      "Multiple Choice",
-      "Number Input",
+      "Input group",
+      "Label & caption",
+      "Multiple choice",
+      "Number input",
       "Radio",
       "Range",
       "Rating",
+      "Rich text editor",
       "Scale",
       "Select",
       "Switch",
       "Textarea",
-      "Textarea ver 2",
-      "Time Picker"
+      "Tree select"
     ],
-    "Components",
-    [
+    "Layout and structure": [
       "Accordion",
-      "Alert",
-      "Badge",
-      "Breadcrumb",
-      "Button",
-      "ButtonGroup",
       "Card",
       "Carousel",
       "Collapse",
       "Divider",
-      "Dropdown",
       "Jumbotron",
-      "ListGroup",
-      "Loading",
-      "MediaObject",
+      "List group",
+      "Media object",
+      "Scroll bar"
+    ],
+    "Messaging": [
+      "Alert",
       "Modal",
-      "NavPills",
-      "NavTabs",
+      "Toast"
+    ],
+    "Navigation": [
+      "Breadcrumb",
+      "Nav pills",
+      "Nav tabs",
       "Pagination",
-      "Popover",
-      "Progress",
-      "RichTextEditor",
       "Scrollspy",
-      "SidebarTab",
-      "Toast",
+      "Sidebar tab"
+    ],
+    "Overlays": [
+      "Popover",
       "Tooltip"
     ],
-    "Data Visualizations",
+    "Status and loading": [
+      "Badge",
+      "Loading",
+      "Progress"
+    ]
+  },
+  "specTypeOrder": [
+    "Overview",
+    "Elements",
+    "Cards",
+    "Tables",
+    "Modals",
+    "Sections",
+    "Pages"
+  ],
+  "flatTitleGroups": [],
+  "docsFirstGroups": [
+    "Components"
+  ],
+  "docsFirstTag": "!dev",
+  "storySortOrder": [
+    "Getting started",
+    [
+      "Introduction"
+    ],
+    "Foundations",
+    [
+      "Introduction",
+      "Color",
+      "Typography",
+      "Layout & grid",
+      "Grid",
+      "Spacing",
+      "Patterns",
+      [
+        "Introduction",
+        "Surfaces",
+        "Surface container",
+        "Card",
+        "Section",
+        "Modal",
+        "Table"
+      ],
+      "Elevation",
+      "Iconography",
+      "Logos",
+      "Imagery",
+      "Design tokens",
+      "Accessibility"
+    ],
+    "Components",
+    [
+      "Actions",
+      [
+        "Button",
+        "Button group"
+      ],
+      "Forms and inputs",
+      [
+        "Cascader",
+        "Checkbox",
+        "Choice grid",
+        "Date picker",
+        "Date & time picker",
+        "Dropdown",
+        "File upload",
+        "Input",
+        "Input group",
+        "Label & caption",
+        "Multiple choice",
+        "Number input",
+        "Radio",
+        "Range",
+        "Rating",
+        "Rich text editor",
+        "Scale",
+        "Select",
+        "Switch",
+        "Textarea",
+        "Tree select"
+      ],
+      "Layout and structure",
+      [
+        "Accordion",
+        "Card",
+        "Carousel",
+        "Collapse",
+        "Divider",
+        "Jumbotron",
+        "List group",
+        "Media object",
+        "Scroll bar"
+      ],
+      "Messaging",
+      [
+        "Alert",
+        "Modal",
+        "Toast"
+      ],
+      "Navigation",
+      [
+        "Breadcrumb",
+        "Nav pills",
+        "Nav tabs",
+        "Pagination",
+        "Scrollspy",
+        "Sidebar tab"
+      ],
+      "Overlays",
+      [
+        "Popover",
+        "Tooltip"
+      ],
+      "Status and loading",
+      [
+        "Badge",
+        "Loading",
+        "Progress"
+      ]
+    ],
+    "Data visualizations",
+    [
+      "Comparison",
+      "Correlation",
+      "Distribution",
+      "Flow & relationships",
+      "Part-to-whole",
+      "Temporal"
+    ],
     "Specs",
     [
       "Universal",
-      ["Elements", ["SmartBadges"], "Cards", "Tables", "Sections", "Modals", "Pages"],
+      [
+        "Overview",
+        "Elements",
+        [
+          "Smart Badges"
+        ],
+        "Cards",
+        "Tables",
+        "Modals",
+        "Sections",
+        "Pages"
+      ],
       "Login",
-      ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
+      [
+        "Overview",
+        "Elements",
+        "Cards",
+        "Tables",
+        "Modals",
+        "Sections",
+        "Pages"
+      ],
       "Home",
-      ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
+      [
+        "Overview",
+        "Elements",
+        "Cards",
+        "Tables",
+        "Modals",
+        "Sections",
+        "Pages"
+      ],
       "Profile",
-      ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
+      [
+        "Overview",
+        "Elements",
+        "Cards",
+        "Tables",
+        "Modals",
+        "Sections",
+        "Pages"
+      ],
       "Training",
-      ["TrainingLessons", "Onboarding"],
+      [
+        "Overview",
+        "Onboarding",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ],
+        "Lessons",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ]
+      ],
       "Toolkit",
-      ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
+      [
+        "Overview",
+        "Pre-Session",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ],
+        "In-Session",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ],
+        "Post-Session",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ]
+      ],
       "Admin",
       [
-        "Group Admin",
-        ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
-        "Session Admin",
-        ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
-        "Student Admin",
-        ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"],
-        "Tutor Admin",
-        ["Elements", "Cards", "Tables", "Sections", "Modals", "Pages"]
+        "Overview",
+        "Tutor",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ],
+        "Session",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ],
+        "Student",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ],
+        "Group",
+        [
+          "Overview",
+          "Elements",
+          "Cards",
+          "Tables",
+          "Modals",
+          "Sections",
+          "Pages"
+        ]
       ]
     ],
-    "Introduction"
+    "Deprecated",
+    "*"
   ],
   "docsSpine": [
     "Content",
@@ -126,6 +354,17 @@
     "Layout",
     "Interactive"
   ],
-  "docsSpineExceptions": ["Anatomy", "Behavior", "Types"]
+  "docsSpineExceptions": [
+    "Anatomy",
+    "Behavior",
+    "Types"
+  ],
+  "lifecycle": {
+    "tags": [
+      "wip",
+      "beta",
+      "deprecated"
+    ],
+    "$comment": "[wip] -> [beta] -> stable (untagged) -> [deprecated]; same tags used as Figma frame/page prefixes."
+  }
 }
-

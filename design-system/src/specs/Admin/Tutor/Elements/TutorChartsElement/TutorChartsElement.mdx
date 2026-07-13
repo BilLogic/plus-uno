@@ -1,0 +1,58 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorChartsElementStories from './TutorChartsElement.stories.jsx';
+import {
+    DsCanvasHero,
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorChartsElementStories} />
+
+<Title />
+
+Wrapper around the DataViz charts (Pie, Bar, Line) with the Tutor Admin styling and legend treatment. Used by every Tutor Admin section that needs a chart card.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262214"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor/Elements/TutorChartsElement"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell description={<><strong className="text-foreground">Pie</strong> variant with donut subtitle.</>}>
+    <DsCanvasHero of={TutorChartsElementStories.Pie} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">Bar</strong> variant.</>}>
+    <DsCanvasHero of={TutorChartsElementStories.Bar} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong className="text-foreground">Line</strong> variant.</>}>
+    <DsCanvasHero of={TutorChartsElementStories.Line} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TutorChartsElementStories.Pie}
+    description={
+        <>
+            Switch the <code>variant</code> control to render a different chart type and tweak the
+            title / subtitle / data inline.
+        </>
+    }
+/>
+
+</div>
+
+</div>

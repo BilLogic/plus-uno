@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stepper } from './Steppers.stories';
-import { Label, Caption } from '../../../../forms/LabelAndCaption.stories';
-import InputGroup from '../../../../forms/InputGroup/InputGroup';
+import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import InputGroup from '@/components/forms-and-inputs/InputGroup/InputGroup';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Steppers Max Tutor & Lead Tutor',

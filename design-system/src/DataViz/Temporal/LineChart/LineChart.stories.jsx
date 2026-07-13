@@ -2,7 +2,7 @@ import React from 'react';
 import LineChart from './LineChart';
 
 export default {
-    title: 'Data Visualizations/Temporal/LineChart',
+    title: 'Data visualizations/Temporal/Line chart',
     component: LineChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

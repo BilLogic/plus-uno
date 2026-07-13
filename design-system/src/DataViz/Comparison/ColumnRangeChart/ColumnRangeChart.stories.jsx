@@ -2,7 +2,7 @@ import React from 'react';
 import ColumnRangeChart from './ColumnRangeChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/ColumnRangeChart',
+    title: 'Data visualizations/Comparison/Column range chart',
     component: ColumnRangeChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default {
-    title: 'Styles/Typography',
+    title: 'Foundations/Typography',
     tags: ['!dev', '!autodocs'],
 };
 

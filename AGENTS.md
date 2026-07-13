@@ -52,6 +52,26 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 Design System knowledge lives in `design-system/docs/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/docs/discovery.md`; load only task-relevant docs. Workflow skills (`skills/uno-prototype`, `skills/uno-review`, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
 
+## Storybook MCP (agents: prefer this over grepping stories)
+
+`@storybook/addon-mcp` serves an MCP endpoint at **http://localhost:4200/mcp** while `npm run storybook` runs (registered in `.mcp.json` as `plus-storybook`). Use it as the primary interface to the design system:
+
+- `list-all-documentation` → inventory of docs pages; `get-documentation` / `get-documentation-for-story` → component API + usage (verify props here instead of inferring — never hallucinate props).
+- `get-storybook-story-instructions` → ALWAYS call before authoring new stories; follow it over generic CSF habits.
+- `run-story-tests` → run the vitest browser tests for stories you touch (addon-vitest is wired; a11y checks via addon-a11y).
+
+Story-authoring conventions for agent-friendliness (storybook.js.org/docs/ai/best-practices): one concept per story with a "why" description; JSDoc on component exports + per-prop descriptions (react-docgen extracts them); explicit MDX content (no external imports — manifest generation is static); tag anti-pattern/deprecated stories `!manifest` to keep them out of agent context.
+
+## Documentation IA contract (2026-07)
+
+`storybook.taxonomy.json` is the single source of truth for the Storybook sidebar; after editing it run `node scripts/sync-storybook-sort.mjs` (the sort literal in `.storybook/preview.jsx` is generated — never hand-edit it). The shared tree, spoken identically by Storybook titles, repo folders, and both Figma files (see `docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md`):
+
+- Top level: Getting started · Foundations (was Styles+Assets; source still lives in `src/styles/` + `src/assets/`) · Components · Data visualizations · Patterns · Specs · Deprecated.
+- Components groups (kebab-case folders under `src/components/`): `actions`, `forms-and-inputs`, `layout-and-structure`, `messaging`, `navigation`, `overlays`, `status-and-loading`; undocumented internal composites live in `_internal/` until they graduate.
+- Data viz lives in `src/dataviz/<purpose>/` (comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal).
+- Specs grammar: `Specs/<Area>/(<Phase>/)<Type>/<Component>` with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages; Title Case phases/types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
+- Naming: sentence-case display names in titles ("Button group"); PascalCase code exports; specs never re-implement a core component — a local organism used in 2+ areas gets promoted.
+
 ## Forbidden patterns
 
 1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.

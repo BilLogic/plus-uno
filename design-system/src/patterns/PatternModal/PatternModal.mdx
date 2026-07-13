@@ -1,0 +1,54 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PatternModalStories from './PatternModal.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PatternModalStories} />
+
+<Title />
+The modal pattern is the dialog shell: header with title and close button, body slot with internal scroll, and footer slot. Baked-in tokens — `--color-surface-container-high` background, elevation 3, modal radius/padding/gap. Rendered inline for documentation; for a real overlay with backdrop and focus management, use the core Modal component (never ship a modal without a scrim).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternModal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Header with title + close, body children, and footer actions slot.</>}>
+    <Canvas of={PatternModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Scrolling
+
+<DocsCanvasShell description={<>With <code>maxHeight</code> set, the body slot scrolls internally while header and footer stay pinned.</>}>
+    <DsCanvasQuiet of={PatternModalStories.Scrolling} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PatternModalStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>

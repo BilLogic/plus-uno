@@ -2,7 +2,7 @@ import React from 'react';
 import DumbbellChart from './DumbbellChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/DumbbellChart',
+    title: 'Data visualizations/Comparison/Dumbbell chart',
     component: DumbbellChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

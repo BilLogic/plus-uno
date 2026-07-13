@@ -6,48 +6,10 @@
 
 Mirrors `design-system/src/forms/`. Import via `@/forms/`.
 
-## Form elements (20)
+## Form elements (0)
 
-- [Cascader](forms/Cascader.md)
-- [Checkbox](forms/Checkbox.md)
-- [ChoiceGrid](forms/ChoiceGrid.md)
-- [DateAndTimePicker](forms/DateAndTimePicker.md)
-- [DatePicker](forms/DatePicker/DatePicker.md)
-- [FileUpload](forms/FileUpload.md)
-- [Input](forms/Input.md)
-- [InputGroup](forms/InputGroup/InputGroup.md)
-- [MultipleChoice](forms/MultipleChoice.md)
-- [NumberInput](forms/NumberInput.md)
-- [OptionList](forms/OptionList.md)
-- [Radio](forms/Radio.md)
-- [Range](forms/Range.md)
-- [Rating](forms/Rating.md)
-- [Scale](forms/Scale.md)
-- [Select](forms/Select.md)
-- [SelectMultiple](forms/SelectMultiple.md)
-- [Switch](forms/Switch.md)
-- [TagInput](forms/TagInput.md)
-- [Textarea](forms/Textarea.md)
+
 
 ```
-Cascader
-Checkbox
-ChoiceGrid
-DateAndTimePicker
-DatePicker
-FileUpload
-Input
-InputGroup
-MultipleChoice
-NumberInput
-OptionList
-Radio
-Range
-Rating
-Scale
-Select
-SelectMultiple
-Switch
-TagInput
-Textarea
+
 ```

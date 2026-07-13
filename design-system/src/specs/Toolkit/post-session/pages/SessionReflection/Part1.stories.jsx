@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../../../../components/Button/Button';
+import Button from '@/components/actions/Button/Button';
 import SessionReflectionPart1 from './Part1';
 import SessionReflectionPart2 from './Part2';
 import SessionReflectionPart3 from './Part3';

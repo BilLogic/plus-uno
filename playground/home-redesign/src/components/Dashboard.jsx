@@ -6,10 +6,10 @@ import ChatSimulationCard from './ChatSimulationCard';
 import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { RecommendedLessons } from '@/specs/Home/Cards';
-import Button from '@/components/Button';
-import DonutChart from '@/DataViz/PartToWhole/DonutChart/DonutChart';
-import { BarChart } from '@/DataViz';
-import Progress from '@/components/Progress/Progress';
+import Button from '@/components/actions/Button';
+import DonutChart from '@/dataviz/part-to-whole/DonutChart/DonutChart';
+import { BarChart } from '@/dataviz';
+import Progress from '@/components/status-and-loading/Progress/Progress';
 
 import imgGivingEffectivePraise from '../assets/giving-effective-praise.png';
 import imgReactingToErrors from '../assets/reacting-to-errors.png';

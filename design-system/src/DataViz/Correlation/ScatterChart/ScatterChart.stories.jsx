@@ -2,7 +2,7 @@ import React from 'react';
 import ScatterChart from './ScatterChart';
 
 export default {
-    title: 'Data Visualizations/Correlation/ScatterChart',
+    title: 'Data visualizations/Correlation/Scatter chart',
     component: ScatterChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Switch from '../../../../../forms/Switch';
-import Textarea from '../../../../../forms/Textarea';
+import Switch from '@/components/forms-and-inputs/Switch';
+import Textarea from '@/components/forms-and-inputs/Textarea';
 
 const defaultReflectionPrompts = [
     {

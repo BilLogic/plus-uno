@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '../../chartTheme';
+import chartTheme from '@/dataviz/chartTheme';
 
 /**
  * BarChart Component

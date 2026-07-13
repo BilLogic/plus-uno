@@ -2,7 +2,7 @@ import React from 'react';
 import BarChart from './BarChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/BarChart',
+    title: 'Data visualizations/Comparison/Bar chart',
     component: BarChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

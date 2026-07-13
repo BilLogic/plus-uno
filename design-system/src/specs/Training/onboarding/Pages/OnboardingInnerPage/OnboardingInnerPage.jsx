@@ -7,11 +7,11 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { PageLayout } from '../../../../Universal/Pages';
-import ContentBlurb from '../../Elements/ContentBlurb/ContentBlurb';
-import OnboardingAlertCard from '../../Cards/OnboardingAlertCard/OnboardingAlertCard';
-import StrategyContentPromptModal from '../../Modals/StrategyContentPromptModal/StrategyContentPromptModal';
-import ModuleCompletionModal from '../../Modals/ModuleCompletionModal/ModuleCompletionModal';
+import { PageLayout } from '@/specs/Universal/Pages';
+import ContentBlurb from '@/specs/Training/Onboarding/Elements/ContentBlurb/ContentBlurb';
+import OnboardingAlertCard from '@/specs/Training/Onboarding/Cards/OnboardingAlertCard/OnboardingAlertCard';
+import StrategyContentPromptModal from '@/specs/Training/Onboarding/Modals/StrategyContentPromptModal/StrategyContentPromptModal';
+import ModuleCompletionModal from '@/specs/Training/Onboarding/Modals/ModuleCompletionModal/ModuleCompletionModal';
 import './OnboardingInnerPage.scss';
 
 const OnboardingInnerPage = ({

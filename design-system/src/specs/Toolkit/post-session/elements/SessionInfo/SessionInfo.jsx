@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '../../../../../components/Card';
-import Divider from '../../../../../components/Divider';
+import Card from '@/components/layout-and-structure/Card';
+import Divider from '@/components/layout-and-structure/Divider';
 
 /**
  * SessionInfo

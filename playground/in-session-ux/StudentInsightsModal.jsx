@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { GaugeChart, HeatmapChart } from '@/DataViz';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
-import ButtonGroup from '@/components/ButtonGroup';
-import NavTabs from '@/components/NavTabs';
-import Accordion from '@/components/Accordion';
+import { GaugeChart, HeatmapChart } from '@/dataviz';
+import Button from '@/components/actions/Button';
+import Badge from '@/components/status-and-loading/Badge';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import NavTabs from '@/components/navigation/NavTabs';
+import Accordion from '@/components/layout-and-structure/Accordion';
 
 const PRACTICE_HEATMAP_Y = ['W4', 'W3', 'W2', 'W1'];
 const PRACTICE_HEATMAP_X = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

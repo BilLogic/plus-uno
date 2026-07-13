@@ -5,8 +5,8 @@
  */
 import React from 'react';
 import PageLayout from '@/specs/Universal/Pages/PageLayout/PageLayout';
-import Card from '@/components/Card';
-import Badge from '@/components/Badge';
+import Card from '@/components/layout-and-structure/Card';
+import Badge from '@/components/status-and-loading/Badge';
 
 const MOCK = {
     studentName: 'Jordan',

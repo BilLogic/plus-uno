@@ -1,6 +1,6 @@
 import React from 'react';
 import StorybookAIAgent from './StorybookAIAgent';
-import TutorTrainingProgressPage from '@/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
+import TutorTrainingProgressPage from '@/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 
 export default {

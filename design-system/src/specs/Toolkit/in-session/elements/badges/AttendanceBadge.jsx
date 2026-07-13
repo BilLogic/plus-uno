@@ -1,5 +1,5 @@
 import React from 'react';
-import Badge from '../../../../../components/Badge/Badge';
+import Badge from '@/components/status-and-loading/Badge/Badge';
 
 const caretIcon = <i className="fa-solid fa-caret-down"></i>;
 

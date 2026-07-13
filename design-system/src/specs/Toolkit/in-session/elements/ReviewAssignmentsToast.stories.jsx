@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toast } from '../../../../components/Toast';
+import { Toast } from '@/components/messaging/Toast';
 
 export default {
     tags: ['!dev', '!autodocs'],

@@ -10,7 +10,7 @@ import StrategyContentPromptModal from './StrategyContentPromptModal';
 import './StrategyContentPromptModal.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Modals/StrategyContentPromptModal',
+    title: 'Specs/Training/Onboarding/Modals/Strategy Content Prompt Modal',
     component: StrategyContentPromptModal,
     tags: ['!dev', '!autodocs'],
     parameters: {

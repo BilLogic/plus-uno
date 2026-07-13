@@ -6,10 +6,10 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214381&m=dev
  */
 import React from 'react';
-import Toast from '../../../components/Toast';
+import Toast from '@/components/messaging/Toast';
 
 export default {
-    title: 'Specs/Profile/Elements/UpdateProfileToast',
+    title: 'Specs/Profile/Elements/Update Profile Toast',
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',

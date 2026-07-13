@@ -10,7 +10,7 @@ import ModuleCompletionModal from './ModuleCompletionModal';
 import './ModuleCompletionModal.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Modals/ModuleCompletionModal',
+    title: 'Specs/Training/Onboarding/Modals/Module Completion Modal',
     component: ModuleCompletionModal,
     tags: ['!dev', '!autodocs'],
     parameters: {

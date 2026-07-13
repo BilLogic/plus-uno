@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { FillInTableRow, FillInTableHeaderRow } from '../tables/FillInTable.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { FillInTableRow, FillInTableHeaderRow } from '../Tables/FillInTable.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 
 // Import Session Fill-ins modals
-import * as FillInModals from '../modals/Session Fill-ins/SessionFillIns.stories';
+import * as FillInModals from '../Modals/SessionFillIns/SessionFillIns.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -142,7 +142,7 @@ const modalLabels = {
  * - Breakpoint: MD / LG / XL
  * - Modal Step: Empty State, Fill In, Session Details, Consent Form, Confirmation, Success
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [modalStep, setModalStep] = useState('fill-in');
     const [breakpoint, setBreakpoint] = useState('xl');
 
@@ -251,7 +251,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -276,4 +276,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

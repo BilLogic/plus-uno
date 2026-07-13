@@ -10,7 +10,7 @@ import StrategyBadge from './StrategyBadge';
 import './StrategyBadge.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Elements/StrategyBadge',
+    title: 'Specs/Training/Onboarding/Elements/Strategy Badge',
     component: StrategyBadge,
     tags: ['!dev', '!autodocs'],
     parameters: {

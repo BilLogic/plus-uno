@@ -1,5 +1,5 @@
 import React from 'react';
-import SessionAvailabilitySnackbar from '../../../../components/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar';
+import SessionAvailabilitySnackbar from '@/components/_internal/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar';
 
 export default {
     tags: ['!dev', '!autodocs'],

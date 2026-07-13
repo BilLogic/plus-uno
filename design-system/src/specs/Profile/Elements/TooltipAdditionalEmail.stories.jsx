@@ -6,10 +6,10 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5719-19370&m=dev
  */
 import React from 'react';
-import Tooltip from '../../../components/Tooltip/Tooltip';
+import Tooltip from '@/components/overlays/Tooltip/Tooltip';
 
 export default {
-    title: 'Specs/Profile/Elements/TooltipAdditionalEmail',
+    title: 'Specs/Profile/Elements/Tooltip Additional Email',
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',

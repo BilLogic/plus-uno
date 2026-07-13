@@ -1,7 +1,7 @@
 import React from 'react';
-import Modal from '../../../../components/Modal';
-import Button from '../../../../components/Button';
-import Select from '../../../../forms/Select';
+import Modal from '@/components/messaging/Modal';
+import Button from '@/components/actions/Button';
+import Select from '@/components/forms-and-inputs/Select';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -36,6 +36,7 @@ const studentOptions = [
  */
 export const AddTutor = () => (
     <Modal
+        renderAs="inline"
         width={332}
         showBottomButtons={false}
         onClose={() => {}}
@@ -130,6 +131,7 @@ export const AddTutor = () => (
  */
 export const AddStudent = () => (
     <Modal
+        renderAs="inline"
         width={332}
         showBottomButtons={false}
         onClose={() => {}}

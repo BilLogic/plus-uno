@@ -115,104 +115,279 @@ const preview = {
         type: 'code',
       },
     },
+
     options: {
       storySort: {
+        // AUTO-GENERATED between the IA-SORT markers from storybook.taxonomy.json (the IA
+        // single source of truth). Storybook statically parses this parameter, so the value
+        // must be a literal — edit the taxonomy, then run: node scripts/sync-storybook-sort.mjs
+        /* IA-SORT-START */
         order: [
-          'PLUS Docs',
-          ['Introduction'],
-          'Styles',
-          ['Introduction', 'Icons', 'Typography', 'Layout', 'Colors', 'Elevation', 'Patterns', ['Introduction', 'Elements', 'Cards', 'Modals', 'Sections', 'Tables', 'Surfaces', 'SurfaceContainer']],
-          'Assets',
-          'Forms',
+          "Getting started",
           [
-            'Cascader',
-            'Checkbox',
-            'Choice Grid',
-            'Date Picker',
-            'File Upload',
-            'Input',
-            'Input Group',
-            'Label and Caption',
-            'Multiple Choice',
-            'Number Input',
-            'Radio',
-            'Range',
-            'Rating',
-            'Scale',
-            'Select',
-            'Switch',
-            'Textarea',
-            'Textarea ver 2',
-            'Time Picker',
+            "Introduction"
           ],
-          'Components',
+          "Foundations",
           [
-            'Accordion',
-            'Alert',
-            'Badge',
-            'Breadcrumb',
-            'Button',
-            'ButtonGroup',
-            'Card',
-            'Carousel',
-            'Collapse',
-            'Divider',
-            'Dropdown',
-            'Jumbotron',
-            'ListGroup',
-            'Loading',
-            'MediaObject',
-            'Modal',
-            'NavPills',
-            'NavTabs',
-            'Pagination',
-            'Popover',
-            'Progress',
-            'RichTextEditor',
-            'Scrollspy',
-            'SidebarTab',
-            'Toast',
-            'Tooltip',
-          ],
-          'Data Visualizations',
-          'Specs',
-          [
-            'Universal',
-            ['Elements', ['SmartBadges'], 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-            'Login',
-            ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-            'Home',
-            ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-            'Profile',
-            ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-            'Training',
-            ['TrainingLessons', 'Onboarding'],
-            'Toolkit',
+            "Introduction",
+            "Color",
+            "Typography",
+            "Layout & grid",
+            "Grid",
+            "Spacing",
+            "Patterns",
             [
-              'Pre-Session',
-              ['Elements', 'Cards', 'Tables', 'Modals', 'Sections', 'Pages'],
-              'In-Session',
-              ['Elements', 'Cards', 'Tables', 'Modals', 'Sections', 'Pages'],
-              'Post-Session',
-              ['Elements', 'Cards', 'Tables', 'Modals', 'Sections', 'Pages'],
+              "Introduction",
+              "Surfaces",
+              "Surface container",
+              "Card",
+              "Section",
+              "Modal",
+              "Table"
             ],
-            'Admin',
-            [
-              'Group Admin',
-              ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-              'Session Admin',
-              ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-              'Student Admin',
-              ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-              'Tutor Admin',
-              ['Elements', 'Cards', 'Tables', 'Sections', 'Modals', 'Pages'],
-            ],
+            "Elevation",
+            "Iconography",
+            "Logos",
+            "Imagery",
+            "Design tokens",
+            "Accessibility"
           ],
-          'Introduction',
+          "Components",
+          [
+            "Actions",
+            [
+              "Button",
+              "Button group"
+            ],
+            "Forms and inputs",
+            [
+              "Cascader",
+              "Checkbox",
+              "Choice grid",
+              "Date picker",
+              "Date & time picker",
+              "Dropdown",
+              "File upload",
+              "Input",
+              "Input group",
+              "Label & caption",
+              "Multiple choice",
+              "Number input",
+              "Radio",
+              "Range",
+              "Rating",
+              "Rich text editor",
+              "Scale",
+              "Select",
+              "Switch",
+              "Textarea",
+              "Tree select"
+            ],
+            "Layout and structure",
+            [
+              "Accordion",
+              "Card",
+              "Carousel",
+              "Collapse",
+              "Divider",
+              "Jumbotron",
+              "List group",
+              "Media object",
+              "Scroll bar"
+            ],
+            "Messaging",
+            [
+              "Alert",
+              "Modal",
+              "Toast"
+            ],
+            "Navigation",
+            [
+              "Breadcrumb",
+              "Nav pills",
+              "Nav tabs",
+              "Pagination",
+              "Scrollspy",
+              "Sidebar tab"
+            ],
+            "Overlays",
+            [
+              "Popover",
+              "Tooltip"
+            ],
+            "Status and loading",
+            [
+              "Badge",
+              "Loading",
+              "Progress"
+            ]
+          ],
+          "Data visualizations",
+          [
+            "Comparison",
+            "Correlation",
+            "Distribution",
+            "Flow & relationships",
+            "Part-to-whole",
+            "Temporal"
+          ],
+          "Specs",
+          [
+            "Universal",
+            [
+              "Overview",
+              "Elements",
+              [
+                "Smart Badges"
+              ],
+              "Cards",
+              "Tables",
+              "Modals",
+              "Sections",
+              "Pages"
+            ],
+            "Login",
+            [
+              "Overview",
+              "Elements",
+              "Cards",
+              "Tables",
+              "Modals",
+              "Sections",
+              "Pages"
+            ],
+            "Home",
+            [
+              "Overview",
+              "Elements",
+              "Cards",
+              "Tables",
+              "Modals",
+              "Sections",
+              "Pages"
+            ],
+            "Profile",
+            [
+              "Overview",
+              "Elements",
+              "Cards",
+              "Tables",
+              "Modals",
+              "Sections",
+              "Pages"
+            ],
+            "Training",
+            [
+              "Overview",
+              "Onboarding",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ],
+              "Lessons",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ]
+            ],
+            "Toolkit",
+            [
+              "Overview",
+              "Pre-Session",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ],
+              "In-Session",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ],
+              "Post-Session",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ]
+            ],
+            "Admin",
+            [
+              "Overview",
+              "Tutor",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ],
+              "Session",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ],
+              "Student",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ],
+              "Group",
+              [
+                "Overview",
+                "Elements",
+                "Cards",
+                "Tables",
+                "Modals",
+                "Sections",
+                "Pages"
+              ]
+            ]
+          ],
+          "Deprecated",
+          "*"
         ],
+        /* IA-SORT-END */
       },
     },
+
     actions: { argTypesRegex: '^on[A-Z].*' },
+
     controls: {
       exclude: ['id', 'className', 'name', 'defaultValue', 'onChange', 'onInput', 'onFocus', 'onBlur'],
       matchers: {
@@ -220,6 +395,7 @@ const preview = {
         date: /Date$/i,
       },
     },
+
     backgrounds: {
       options: {
         light: {
@@ -240,34 +416,77 @@ const preview = {
         }
       }
     },
+
     viewport: {
+      // PLUS breakpoints — mirror the Figma foundations (Layout & Grid → Breakpoint set).
+      // No mobile: the product targets md and up. Values match --breakpoint-*-min tokens.
       options: {
-        mobile: {
-          name: 'Mobile',
-          styles: {
-            width: '375px',
-            height: '667px',
-          },
-        },
-        tablet: {
-          name: 'Tablet',
+        md: {
+          name: 'MD — medium (tablet, 768px)',
           styles: {
             width: '768px',
             height: '1024px',
           },
         },
-        desktop: {
-          name: 'Desktop',
+        lg: {
+          name: 'LG — large (desktop, 1024px)',
           styles: {
-            width: '1280px',
-            height: '800px',
+            width: '1024px',
+            height: '768px',
           },
         },
+        xl: {
+          name: 'XL — extra large (HD, 1440px)',
+          styles: {
+            width: '1440px',
+            height: '900px',
+          },
+        },
+      },
+    },
+
+    a11y: {
+      // 'todo' - show a11y violations in the test UI only
+      // 'error' - fail CI on a11y violations
+      // 'off' - skip a11y checks entirely
+      test: 'todo'
+    }
+  },
+
+  globalTypes: {
+    plusBreakpoint: {
+      description: 'Constrain any Specs story to a PLUS breakpoint width (works in docs and canvas)',
+      toolbar: {
+        title: 'Breakpoint',
+        icon: 'ruler',
+        items: [
+          { value: '', title: 'Native (no constraint)' },
+          { value: 'md', title: 'MD — 768px' },
+          { value: 'lg', title: 'LG — 1024px' },
+          { value: 'xl', title: 'XL — 1440px' },
+        ],
+        dynamicTitle: true,
       },
     },
   },
 
   decorators: [
+    // Global PLUS breakpoint toggle: constrains every Specs story (pages, sections,
+    // cards, elements) to the selected width so responsive behavior can be inspected
+    // from the toolbar — in docs pages and in canvas view alike. Complements the
+    // built-in Viewport tool (canvas-only) and the per-page-story `breakpoint` arg.
+    (Story, context) => {
+      const bp = context.globals.plusBreakpoint;
+      const widths = { md: 768, lg: 1024, xl: 1440 };
+      if (bp && widths[bp] && context.title.startsWith('Specs/')) {
+        return (
+          <div style={{ width: `${widths[bp]}px`, maxWidth: '100%', containerType: 'inline-size' }}>
+            <Story />
+          </div>
+        );
+      }
+      return <Story />;
+    },
     (Story, context) => {
       // Provide dynamic context to the AI Agent so the LLM knows which screen/story it's looking at
       const activeContext = `${context.title} — ${context.name}`;
@@ -280,7 +499,7 @@ const preview = {
       if (
         context.name !== 'Interactive' &&
         context.name !== 'Overview' &&
-        (context.title.startsWith('Components/') || context.title.startsWith('Forms/'))
+        context.title.startsWith('Components/')
       ) {
          return (
            <div style={{ pointerEvents: 'none' }}>
@@ -297,7 +516,9 @@ const preview = {
     backgrounds: {
       value: 'light'
     }
-  }
+  },
+
+  tags: ['autodocs']
 };
 
 export default preview;

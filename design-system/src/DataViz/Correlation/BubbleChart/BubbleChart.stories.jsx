@@ -2,7 +2,7 @@ import React from 'react';
 import BubbleChart from './BubbleChart';
 
 export default {
-    title: 'Data Visualizations/Correlation/BubbleChart',
+    title: 'Data visualizations/Correlation/Bubble chart',
     component: BubbleChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

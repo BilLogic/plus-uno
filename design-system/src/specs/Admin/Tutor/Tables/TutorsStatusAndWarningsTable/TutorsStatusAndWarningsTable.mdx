@@ -1,0 +1,65 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TutorsStatusAndWarningsTableStories from './TutorsStatusAndWarningsTable.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TutorsStatusAndWarningsTableStories} />
+
+<Title />
+
+Status & warnings details table — status badges per tutor with warning indicators and signup state.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=258-262435"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Tutor/Tables/TutorsStatusAndWarningsTable"
+/>
+
+<div className="sb-ds-component-docs not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Default
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default table populated with sample data.</>}
+>
+    <Canvas
+        of={TutorsStatusAndWarningsTableStories.Default}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Empty state
+
+<DocsCanvasShell description={<>Table with no rows — shows the empty placeholder copy.</>}>
+    <Canvas
+        of={TutorsStatusAndWarningsTableStories.EmptyState}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TutorsStatusAndWarningsTableStories.Interactive}
+    description={<>Tweak the row count and filter values inline.</>}
+/>
+
+</div>
+
+</div>

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 
 // Import Create New Session modals
-import { Forming } from '../modals/Create New Session/Forming.stories';
-import { Filled } from '../modals/Create New Session/Filled.stories';
-import { Unsaved_Warning } from '../modals/Create New Session/UnsavedWarning.stories';
+import { Forming } from '../Modals/CreateNewSession/Forming.stories';
+import { Filled } from '../Modals/CreateNewSession/Filled.stories';
+import { Unsaved_Warning } from '../Modals/CreateNewSession/UnsavedWarning.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -129,7 +129,7 @@ const modalMap = {
  * - Modal: Forming, Filled, Unsaved Warning
  * - Breakpoint: MD, LG, XL
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [modal, setModal] = useState('forming');
     const [breakpoint, setBreakpoint] = useState('xl');
 
@@ -245,7 +245,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -270,4 +270,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

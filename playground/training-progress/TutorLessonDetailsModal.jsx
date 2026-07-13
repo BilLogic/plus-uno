@@ -4,8 +4,8 @@
  * Opened when clicking a tutor row in Training Progress Details table.
  */
 import React from 'react';
-import Modal from '@/components/Modal';
-import Badge from '@/components/Badge';
+import Modal from '@/components/messaging/Modal';
+import Badge from '@/components/status-and-loading/Badge';
 
 // Mock lesson data per tutor (in real app would come from API keyed by tutor id).
 const LESSONS_BY_TUTOR = {

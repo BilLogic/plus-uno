@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../../../../components/Button/Button';
-import Rating from '../../../../../forms/Rating';
-import Checkbox from '../../../../../forms/Checkbox';
-import Textarea from '../../../../../forms/Textarea';
-import { PageLayout } from '../../../../../specs/Universal/Pages';
-import SideNavBar from '../../sections/SideNavBar/SideNavBar';
+import Button from '@/components/actions/Button/Button';
+import Rating from '@/components/forms-and-inputs/Rating';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import { PageLayout } from '@/specs/Universal/Pages';
+import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
 
 const improvementAreas = [
     { id: 'math-proficiency', label: 'Build my math teaching proficiency.' },

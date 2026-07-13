@@ -2,7 +2,7 @@ import React from 'react';
 import ParetoChart from './ParetoChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/ParetoChart',
+    title: 'Data visualizations/Comparison/Pareto chart',
     component: ParetoChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

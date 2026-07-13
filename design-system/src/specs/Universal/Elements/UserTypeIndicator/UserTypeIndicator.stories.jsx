@@ -9,7 +9,7 @@ import React from 'react';
 import UserTypeIndicator from './UserTypeIndicator';
 
 export default {
-    title: 'Specs/Universal/Elements/UserTypeIndicator',
+    title: 'Specs/Universal/Elements/User Type Indicator',
     component: UserTypeIndicator,
     tags: ['!dev', '!autodocs'],
     parameters: {

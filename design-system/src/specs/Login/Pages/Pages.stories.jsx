@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import Logo from '@/components/Logo';
+import Logo from '@/components/_internal/Logo';
 import { LoginPortal } from '@/specs/Login/Cards';
 
 export default {

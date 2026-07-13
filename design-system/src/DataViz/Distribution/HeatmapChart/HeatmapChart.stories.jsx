@@ -2,7 +2,7 @@ import React from 'react';
 import HeatmapChart from './HeatmapChart';
 
 export default {
-    title: 'Data Visualizations/Distribution/HeatmapChart',
+    title: 'Data visualizations/Distribution/Heatmap chart',
     component: HeatmapChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

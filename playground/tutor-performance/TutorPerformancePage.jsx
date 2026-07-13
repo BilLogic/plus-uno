@@ -5,18 +5,18 @@
  */
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import PageLayout from '@/components/PageLayout/PageLayout';
-import NavTabs from '@/components/NavTabs/NavTabs';
-import Button from '@/components/Button';
-import Card from '@/components/Card';
-import Pagination from '@/components/Pagination';
-import { DonutChart } from '@/DataViz';
-import AdminDateRangeFilter from '@/specs/Admin/Tutor Admin/Elements/AdminDateRangeFilter/AdminDateRangeFilter';
-import TutorsPerformanceTable from '@/specs/Admin/Tutor Admin/Tables/TutorsPerformanceTable/TutorsPerformanceTable';
+import PageLayout from '@/components/_internal/PageLayout/PageLayout';
+import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Button from '@/components/actions/Button';
+import Card from '@/components/layout-and-structure/Card';
+import Pagination from '@/components/navigation/Pagination';
+import { DonutChart } from '@/dataviz';
+import AdminDateRangeFilter from '@/specs/Admin/Tutor/Elements/AdminDateRangeFilter/AdminDateRangeFilter';
+import TutorsPerformanceTable from '@/specs/Admin/Tutor/Tables/TutorsPerformanceTable/TutorsPerformanceTable';
 import AttendanceModal from './AttendanceModal';
 import TutorLessonDetailsModal from './TutorLessonDetailsModal';
-import '@/specs/Admin/Tutor Admin/Elements/AdminDateRangeFilter/AdminDateRangeFilter.scss';
-import '@/specs/Admin/Tutor Admin/Tables/TutorsPerformanceTable/TutorsPerformanceTable.scss';
+import '@/specs/Admin/Tutor/Elements/AdminDateRangeFilter/AdminDateRangeFilter.scss';
+import '@/specs/Admin/Tutor/Tables/TutorsPerformanceTable/TutorsPerformanceTable.scss';
 import './TutorPerformancePage.scss';
 
 const TUTORS = [

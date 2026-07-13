@@ -7,9 +7,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Breadcrumb from '../../../../components/Breadcrumb';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { UserAvatar } from '../../Elements';
-import Button from '../../../../components/Button';
+import Button from '@/components/actions/Button';
 import './TopBar.scss';
 
 /** Collapsed left section width (toggle button only); matches PageLayout motion. */

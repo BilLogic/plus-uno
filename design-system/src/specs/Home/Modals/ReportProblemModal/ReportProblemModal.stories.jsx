@@ -5,10 +5,10 @@
 
 import React, { useState } from 'react';
 import ReportProblemModal from './ReportProblemModal';
-import Button from '@/components/Button';
+import Button from '@/components/actions/Button';
 
 export default {
-    title: 'Specs/Home/Modals/ReportProblemModal',
+    title: 'Specs/Home/Modals/Report Problem Modal',
     component: ReportProblemModal,
     tags: ['!dev', '!autodocs'],
     parameters: {

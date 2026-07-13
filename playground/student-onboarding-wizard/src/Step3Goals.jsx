@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Textarea from '@plus-ds/forms/Textarea';
-import TagInput from '@plus-ds/forms/TagInput';
+import Textarea from '@plus-ds/components/forms-and-inputs/Textarea';
+import TagInput from '@plus-ds/components/forms-and-inputs/TagInput';
 
 const Step3Goals = ({ data, updateData }) => {
     const textValue = data.goals?.text || '';

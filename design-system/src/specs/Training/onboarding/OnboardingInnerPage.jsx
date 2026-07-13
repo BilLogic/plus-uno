@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { Button, Card } from '../../../components';
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import { Button, Card } from '@/components';
+import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
 
 const OnboardingInnerPage = () => {
     return (

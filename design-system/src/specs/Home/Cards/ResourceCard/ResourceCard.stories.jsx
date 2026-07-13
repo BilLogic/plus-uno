@@ -2,7 +2,7 @@ import React from 'react';
 import ResourceCard from './ResourceCard';
 
 export default {
-    title: 'Specs/Home/Cards/ResourceCard',
+    title: 'Specs/Home/Cards/Resource Card',
     component: ResourceCard,
     tags: ['!dev', '!autodocs'],
 };

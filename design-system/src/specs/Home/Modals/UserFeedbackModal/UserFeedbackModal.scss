@@ -13,6 +13,15 @@
     overflow-y: auto;
 }
 
+.plus-user-feedback-modal-overlay-inline {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    background-color: transparent;
+}
+
 .plus-user-feedback-modal {
     position: relative;
     z-index: 1051;
@@ -28,6 +37,22 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+    }
+}
+
+.plus-user-feedback-modal-inline {
+    position: relative;
+    z-index: 1;
+    max-width: 672px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+
+    .plus-modal {
+        max-height: none;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
     }
 }
 

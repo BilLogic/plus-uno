@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from '../../highchartsModules';
+import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '../../chartTheme';
+import chartTheme from '@/dataviz/chartTheme';
 
 /**
  * RadarChart Component

@@ -48,8 +48,8 @@
  * - Save button gets set active upon any edits
  */
 import React from 'react';
-import Tooltip from '../../../components/Tooltip/Tooltip';
-import Button from '../../../components/Button/Button';
+import Tooltip from '@/components/overlays/Tooltip/Tooltip';
+import Button from '@/components/actions/Button/Button';
 import { StudentTypeDropdown } from '../Elements/StudentTypeDropdown.stories';
 import { University } from '../Elements/University.stories';
 import { GradYearDropdown } from '../Elements/GradYearDropdown.stories';
@@ -57,7 +57,7 @@ import { MathLevel } from '../Elements/MathLevel.stories';
 import { LanguagePreferences } from '../Elements/LanguagePreferences.stories';
 
 export default {
-    title: 'Specs/Profile/Sections/BackgroundAndMatching',
+    title: 'Specs/Profile/Sections/Background And Matching',
     excludeStories: ['BackgroundAndMatchingSection'],
     tags: ['!dev', '!autodocs'],
     parameters: {

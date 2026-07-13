@@ -8,7 +8,7 @@ import HighchartsReact from 'highcharts-react-official';
  * Visualizes data with a background bar and a foreground value bar.
  * Migrated to Highcharts column chart.
  */
-import chartTheme from '../../chartTheme';
+import chartTheme from '@/dataviz/chartTheme';
 
 /**
  * SmartBarChart Component

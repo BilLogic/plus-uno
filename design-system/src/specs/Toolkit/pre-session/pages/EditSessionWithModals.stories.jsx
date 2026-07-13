@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { TableRow, TableHeaderRow } from '../tables/MySessions.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
-import { SiteFilter } from '../elements/Filters/SiteFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 
 // Import Edit Session modals
-import { Forming } from '../modals/Edit Session/Forming.stories';
-import { Session_Type } from '../modals/Edit Session/SessionType.stories';
-import { Attendee_Edit } from '../modals/Edit Session/AttendeeEdit.stories';
-import { Reconfirm_Tutor_Availability } from '../modals/Edit Session/ReconfirmTutorAvailability.stories';
-import { Unsaved_Warning } from '../modals/Edit Session/UnsavedWarning.stories';
+import { Forming } from '../Modals/EditSession/Forming.stories';
+import { Session_Type } from '../Modals/EditSession/SessionType.stories';
+import { Attendee_Edit } from '../Modals/EditSession/AttendeeEdit.stories';
+import { Reconfirm_Tutor_Availability } from '../Modals/EditSession/ReconfirmTutorAvailability.stories';
+import { Unsaved_Warning } from '../Modals/EditSession/UnsavedWarning.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -137,7 +137,7 @@ const modalMap = {
  * - Modal: Forming, Session Type, Attendee Edit, Reconfirm Tutor Availability, Unsaved Warning
  * - Breakpoint: MD, LG, XL
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [modal, setModal] = useState('forming');
     const [breakpoint, setBreakpoint] = useState('xl');
 
@@ -254,7 +254,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -279,4 +279,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

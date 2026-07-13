@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default {
-    title: 'Styles/Colors',
+    title: 'Foundations/Color',
     tags: ['!dev', '!autodocs'],
 };
 

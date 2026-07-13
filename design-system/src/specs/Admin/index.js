@@ -4,9 +4,9 @@
  */
 
 // Tutor Admin
-export * from './Tutor Admin/Cards/index.js';
-export * from './Tutor Admin/Elements/index.js';
-export * from './Tutor Admin/Modals/index.js';
-export * from './Tutor Admin/Pages/index.js';
-export * from './Tutor Admin/Sections/index.js';
-export * from './Tutor Admin/Tables/index.js';
+export * from './Tutor/Cards/index.js';
+export * from './Tutor/Elements/index.js';
+export * from './Tutor/Modals/index.js';
+export * from './Tutor/Pages/index.js';
+export * from './Tutor/Sections/index.js';
+export * from './Tutor/Tables/index.js';

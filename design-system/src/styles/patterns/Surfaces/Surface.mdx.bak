@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Styles/Patterns/Surfaces" />
+<Meta title="Foundations/Patterns/Surfaces" />
 
 # Surfaces
 

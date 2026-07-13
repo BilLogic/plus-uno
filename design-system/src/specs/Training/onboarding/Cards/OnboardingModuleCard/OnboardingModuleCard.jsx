@@ -7,8 +7,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import StrategyBadge from '../../Elements/StrategyBadge/StrategyBadge';
-import StatusIndicators from '../../Elements/StatusIndicators/StatusIndicators';
+import StrategyBadge from '@/specs/Training/Onboarding/Elements/StrategyBadge/StrategyBadge';
+import StatusIndicators from '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators';
 import './OnboardingModuleCard.scss';
 
 const OnboardingModuleCard = ({

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Dropdown from '../../../../../components/Dropdown/Dropdown';
+import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Type Filter',

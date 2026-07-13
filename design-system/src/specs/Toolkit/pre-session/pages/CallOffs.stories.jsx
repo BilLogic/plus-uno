@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import Button from '../../../../components/Button/Button';
-import ButtonGroup from '../../../../components/ButtonGroup/ButtonGroup';
-import { PageLayout } from '../../../../specs/Universal/Pages';
-import { StatCard } from '../cards/OverviewCard.stories';
-import { CallOffsTableRow, CallOffsTableHeaderRow } from '../tables/CallOffsTable.stories';
-import { NavHorizontal } from '../tables/NavHorizontal.stories';
-import { TimeframeFilter } from '../elements/Filters/TimeframeFilter.stories';
+import Button from '@/components/actions/Button/Button';
+import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
+import { PageLayout } from '@/specs/Universal/Pages';
+import { StatCard } from '../Cards/OverviewCard.stories';
+import { CallOffsTableRow, CallOffsTableHeaderRow } from '../Tables/CallOffsTable.stories';
+import { NavHorizontal } from '../Tables/NavHorizontal.stories';
+import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
 
 // Import Call-Offs modals
-import * as CallOffRequestDetailsModal from '../modals/Call-Offs/CallOffRequestDetails.stories';
-import * as CallOffConfirmationModal from '../modals/Call-Offs/CallOffConfirmation.stories';
-import * as AutoExcuseConfirmationModal from '../modals/Call-Offs/AutoExcuseConfirmation.stories';
-import * as AutoApproveConfirmationModal from '../modals/Call-Offs/AutoApproveConfirmation.stories';
+import * as CallOffRequestDetailsModal from '../Modals/Call-Offs/CallOffRequestDetails.stories';
+import * as CallOffConfirmationModal from '../Modals/Call-Offs/CallOffConfirmation.stories';
+import * as AutoExcuseConfirmationModal from '../Modals/Call-Offs/AutoExcuseConfirmation.stories';
+import * as AutoApproveConfirmationModal from '../Modals/Call-Offs/AutoApproveConfirmation.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -352,7 +352,7 @@ export const Interactive = () => {
  * - Modal state toggle to switch between different Call-Offs modals
  * - Breakpoint toggle for responsive preview
  */
-export const WithModals = () => {
+export const WithModals = (args) => {
     const [selectedTab, setSelectedTab] = useState('call-offs');
     const [callOffState, setCallOffState] = useState('pending');
     const [breakpoint, setBreakpoint] = useState('xl');
@@ -512,7 +512,7 @@ export const WithModals = () => {
                     right: 0,
                     bottom: 0,
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: 'flex',
+                    display: args.open ? 'flex' : 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
@@ -523,4 +523,9 @@ export const WithModals = () => {
             </div>
         </div>
     );
+};
+
+WithModals.args = { open: false };
+WithModals.argTypes = {
+    open: { control: 'boolean', description: 'Show the modal overlay on top of the page' },
 };

@@ -10,7 +10,7 @@ import DropdownListOptions from './DropdownListOptions';
 import './DropdownListOptions.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Elements/DropdownListOptions',
+    title: 'Specs/Training/Onboarding/Elements/Dropdown List Options',
     component: DropdownListOptions,
     tags: ['!dev', '!autodocs'],
     parameters: {

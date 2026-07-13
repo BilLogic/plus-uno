@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import Card from '@/components/Card';
-import NavTabs from '@/components/NavTabs';
-import Button from '@/components/Button/Button';
-import chartTheme from '@/DataViz/chartTheme';
-import { RadarChart } from '@/DataViz';
+import Card from '@/components/layout-and-structure/Card';
+import NavTabs from '@/components/navigation/NavTabs';
+import Button from '@/components/actions/Button/Button';
+import chartTheme from '@/dataviz/chartTheme';
+import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
 
 /**

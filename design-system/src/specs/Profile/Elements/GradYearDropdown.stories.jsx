@@ -6,11 +6,11 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4313-28236&m=dev
  */
 import React from 'react';
-import { Label } from '../../../forms/LabelAndCaption.stories';
-import Select from '../../../forms/Select';
+import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import Select from '@/components/forms-and-inputs/Select';
 
 export default {
-    title: 'Specs/Profile/Elements/GradYearDropdown',
+    title: 'Specs/Profile/Elements/Grad Year Dropdown',
     excludeStories: ['GradYearDropdown'],
     tags: ['!dev', '!autodocs'],
     parameters: {

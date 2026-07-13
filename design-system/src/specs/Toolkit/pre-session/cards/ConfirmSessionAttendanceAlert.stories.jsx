@@ -1,5 +1,5 @@
 import React from 'react';
-import Alert from '../../../../components/Alert/Alert';
+import Alert from '@/components/messaging/Alert/Alert';
 
 export default {
     tags: ['!dev', '!autodocs'],

@@ -8,11 +8,11 @@
 import React, { useState } from 'react';
 import OnboardingModulesTable from './OnboardingModulesTable';
 import './OnboardingModulesTable.scss';
-import '../../Elements/StatusIndicators/StatusIndicators.scss';
-import '../../Elements/CtaButtons/CtaButtons.scss';
+import '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators.scss';
+import '@/specs/Training/Onboarding/Elements/CtaButtons/CtaButtons.scss';
 
 export default {
-    title: 'Specs/Training/Onboarding/Tables/OnboardingModulesTable',
+    title: 'Specs/Training/Onboarding/Tables/Onboarding Modules Table',
     component: OnboardingModulesTable,
     tags: ['!dev', '!autodocs'],
     parameters: {

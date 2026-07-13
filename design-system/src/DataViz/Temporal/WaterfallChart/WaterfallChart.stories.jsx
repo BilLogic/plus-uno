@@ -2,7 +2,7 @@ import React from 'react';
 import WaterfallChart from './WaterfallChart';
 
 export default {
-    title: 'Data Visualizations/Temporal/WaterfallChart',
+    title: 'Data visualizations/Temporal/Waterfall chart',
     component: WaterfallChart,
     tags: ['!dev', '!autodocs'],
     parameters: {

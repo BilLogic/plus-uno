@@ -1,9 +1,9 @@
 import React from 'react';
-import Select from '@/forms/Select';
-import Textarea from '@/forms/Textarea';
-import Switch from '@/forms/Switch';
-import Alert from '@/components/Alert';
-import Badge from '@/components/Badge';
+import Select from '@/components/forms-and-inputs/Select';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+import Switch from '@/components/forms-and-inputs/Switch';
+import Alert from '@/components/messaging/Alert';
+import Badge from '@/components/status-and-loading/Badge';
 
 const StudentDeepDive = ({ students, lowScoringStudents, data, onChange }) => {
     const studentOptions = students.map((s) => ({

@@ -1,7 +1,7 @@
 import React from 'react';
-import Modal from '../../../../components/Modal';
-import ButtonGroup from '../../../../components/ButtonGroup';
-import Button from '../../../../components/Button';
+import Modal from '@/components/messaging/Modal';
+import ButtonGroup from '@/components/actions/ButtonGroup';
+import Button from '@/components/actions/Button';
 
 import {
     CloseButton,
@@ -9,7 +9,7 @@ import {
     CancelButton,
     ConfirmWithdrawalButton,
     ViewUpdatedScheduleButton
-} from '../elements/CTATutorViewButtons.stories';
+} from '../Elements/CTATutorViewButtons.stories';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -26,6 +26,7 @@ export default {
  */
 export const PreReview_TutorRequest = () => (
     <Modal
+        renderAs="inline"
         width={672} // Figma: col-12 = 672px
         showBottomButtons={false}
         onClose={() => { }}
@@ -127,6 +128,7 @@ const FieldRow = ({ label, value }) => (
  */
 export const PreReview_WithdrawRequest = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}
@@ -189,6 +191,7 @@ export const PreReview_WithdrawRequest = () => (
  */
 export const PreReview_RequestWithdrawn = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}
@@ -250,6 +253,7 @@ export const PreReview_RequestWithdrawn = () => (
  */
 export const PostReview_SupervisorReview = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}
@@ -331,6 +335,7 @@ export const PostReview_SupervisorReview = () => (
  */
 export const PostReview_TutorRequest = () => (
     <Modal
+        renderAs="inline"
         width={672}
         showBottomButtons={false}
         onClose={() => { }}

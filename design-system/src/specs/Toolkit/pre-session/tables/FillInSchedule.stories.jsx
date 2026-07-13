@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Badge from '../../../../components/Badge/Badge';
-import Checkbox from '../../../../forms/Checkbox';
+import Badge from '@/components/status-and-loading/Badge/Badge';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
 export default {
     tags: ['!dev', '!autodocs'],

@@ -1,0 +1,54 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Patterns/Introduction" />
+
+# Patterns
+
+Patterns are **componentized shells**. Each one bakes in the non-negotiable frame of a layout layer — background token, radius, elevation, border, and min/max constraints — and leaves everything else as **slots** for consumers to fill. They mirror the slot components in the **"Design System - BS4 Foundation + Component Library"** Figma file one-to-one: what a designer drops content into in Figma is what a developer passes as a slot prop in React.
+
+## The slot philosophy
+
+A pattern never renders your content for you. It answers exactly one question — *what does this layer of the page look like?* — and delegates the rest:
+
+- **The shell owns the frame.** Surface color, radius, elevation, border, padding, and gap come from design tokens and cannot drift. You choose from token-backed scales (`sm` / `md` / `lg`), never raw values.
+- **You own the slots.** `header`, `footer`, `actions`, `toolbar`, `pagination`, `emptyState`, and `children` accept any node. Fill them with core components (Button, Badge, Input…) or your own composition.
+- **Patterns nest by layer.** Surface → Surface container → Section → Card → Table/Modal content. Each layer's tokens are scoped to it (`--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-table-*`, `--size-surface-*`).
+
+## Layer identity
+
+| Pattern | Component | Background token | Elevation |
+| :--- | :--- | :--- | :--- |
+| Surfaces | `Surface` | `--color-surface` (or any container level) | 0 (prop up to 5) |
+| Surface container | `SurfaceContainer` | `--color-surface-container` | 0 |
+| Section | `PatternSection` | no-fill (or `--color-surface-container-low`) | 0 |
+| Card | `PatternCard` | `--color-surface-container-lowest` | 1 |
+| Table | `PatternTable` | no-fill (container owns the background) | 0 |
+| Modal | `PatternModal` | `--color-surface-container-high` | 3 |
+
+## Content on top of surfaces
+
+- **Primary text**: `--color-on-surface` — headings, primary data, active body text.
+- **Secondary text**: `--color-on-surface-variant` — subtitles, metadata, timestamps.
+- **Outer borders**: `--color-outline` / **inner dividers**: `--color-outline-variant`.
+- **Interaction states are additive overlays**: hover `--color-on-surface-state-08`, focus `-12`, pressed `-16` layered on top of the base fill — never replace the fill itself.
+
+## Patterns vs. core components
+
+Patterns are *shells*; core components are *finished furniture*. `PatternCard` gives you a tokenized frame with three slots, while the core `Card` component ships title/media/links/actions behavior. Reach for a pattern when you are composing something the core component does not cover — and never rebuild the frame by hand with raw divs and hex codes.
+
+```jsx
+import { Surface, SurfaceContainer, PatternSection, PatternCard, PatternTable, PatternModal } from '@';
+
+<Surface level="surface" padding="md">
+    <SurfaceContainer radius="md">
+        <PatternSection title="Team" actions={<Button text="Add" />}>
+            <PatternCard>
+                <PatternTable toolbar={...} pagination={...}>
+                    <thead>…</thead>
+                    <tbody>…</tbody>
+                </PatternTable>
+            </PatternCard>
+        </PatternSection>
+    </SurfaceContainer>
+</Surface>
+```

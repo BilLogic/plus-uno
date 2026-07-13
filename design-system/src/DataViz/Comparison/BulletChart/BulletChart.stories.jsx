@@ -2,7 +2,7 @@ import React from 'react';
 import BulletChart from './BulletChart';
 
 export default {
-    title: 'Data Visualizations/Comparison/BulletChart',
+    title: 'Data visualizations/Comparison/Bullet chart',
     component: BulletChart,
     tags: ['!dev', '!autodocs'],
     parameters: {
