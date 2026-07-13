@@ -268,3 +268,18 @@ All Storybook builds green (exit 0).
   visibility → Display/* booleans, tokenized shell paddings; then finalize
   Storybook docs (Grid doc gutter correction: content grid = 8px) + full
   component-parity sweep.
+
+## Round 12 — full parity sweep (inventory, naming, spec links)
+
+- Extracted full inventories: BS4 197 top-level components/sets; Web App Specs
+  180 organisms (per-page shallow section walk); Storybook 58 component/pattern
+  titles + 266 spec MDX.
+- **figmaLinks: 0 placeholders remain** (was 145): 28 name-matched, 70 curated
+  to parent sets, 47 page-anchored (each page-anchor = a Figma-side
+  componentization gap, listed in the report).
+- Naming sync: BS4 `Side Bar Tab`→`Sidebar Tab`, `Pattern/Table shell`→`Pattern/Table`.
+- Report: docs/context/design-system/figma-storybook-parity-2026-07.md — open
+  decisions: graduate `_internal/Table` + `_internal/Navbar` (Figma documents
+  both publicly), add missing `Pattern/Surface` in Figma, archive legacy Input
+  Group generations, de-[wip] the Card page.
+- Verified: build green, 117/117 spec tests. Committed ca3dd6d9, pushed.
