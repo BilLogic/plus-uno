@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
+import Button from '@/components/actions/Button/Button';
 
 /**
  * ResponsiveFrame — the display well for spec Pages & Sections in Storybook docs.
@@ -12,8 +13,9 @@ import PropTypes from 'prop-types';
  *     production.
  *  2. **Fullscreen.** A button is always visible (top-right of the well) — hard-to-preview
  *     pages pop out to the full viewport, where they reflow to the desktop layout.
- *  3. **Breakpoint-aware.** `breakpoint` (md/lg/xl) caps the max width so a specific breakpoint
- *     can be simulated; the global "Breakpoint" toolbar does the same for every Specs story.
+ *  3. **Breakpoint-aware.** The `breakpoint` prop (md/lg/xl) caps the max width. It is driven by
+ *     the global **Breakpoint** toolbar (the `plusBreakpoint` Storybook global) — the single
+ *     source of truth; this component intentionally does NOT add its own breakpoint control.
  *
  * Nesting-safe: if a ResponsiveFrame renders inside another (e.g. a story that wraps itself AND
  * the global decorator), the inner one becomes a transparent pass-through so there is exactly
@@ -23,16 +25,13 @@ import PropTypes from 'prop-types';
 const RFContext = createContext(false);
 const MAXW = { md: 768, lg: 1024, xl: 1440 };
 
-const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) => {
+const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
     const nested = useContext(RFContext);
-    const [selectedBreakpoint, setSelectedBreakpoint] = useState(breakpoint);
     const rootRef = useRef(null);
     // `fullscreen` = the frame is expanded. Native Fullscreen API fills the whole screen when the
     // host allows it; otherwise a CSS position:fixed overlay fills the iframe viewport so the
     // button ALWAYS enlarges the preview.
     const [fullscreen, setFullscreen] = useState(false);
-
-    useEffect(() => { setSelectedBreakpoint(breakpoint); }, [breakpoint]);
 
     // Keep state in sync when the user exits native fullscreen via Esc.
     useEffect(() => {
@@ -74,7 +73,7 @@ const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) =
         return <div style={{ width: '100%' }}>{children}</div>;
     }
 
-    const maxWidth = MAXW[selectedBreakpoint] || MAXW.xl;
+    const maxWidth = MAXW[breakpoint] || MAXW.xl;
 
     const innerStyle = {
         width: '100%',
@@ -111,44 +110,33 @@ const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) =
                         : {}),
                 }}
             >
-                {/* Fullscreen-only toolbar: breakpoint pills + exit (Controls aren't reachable in fullscreen). */}
-                {(showToolbar || fullscreen) && (
+                {/* Fullscreen-only bar: shows the active breakpoint (set from the global toolbar) + Exit.
+                    The breakpoint itself is NOT changed here — that stays the one global control. */}
+                {fullscreen && (
                     <div
                         className="responsive-frame-toolbar"
                         style={{
-                            display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap',
-                            padding: '12px 24px',
-                            borderBottom: '1px solid var(--color-outline-variant, #e0e0e0)',
-                            backgroundColor: 'var(--color-surface, #ffffff)',
+                            display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md, 16px)', flexWrap: 'wrap',
+                            padding: 'var(--size-element-pad-y-md, 12px) var(--size-surface-pad-x, 24px)',
+                            borderBottom: '1px solid var(--color-outline-variant)',
+                            backgroundColor: 'var(--color-surface)',
                             position: 'sticky', top: 0, zIndex: 1000,
                         }}
                     >
-                        <span className="label-medium" style={{ color: 'var(--color-on-surface-variant, #444746)' }}>Breakpoint:</span>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            {[{ k: 'md', l: 'MD (768)' }, { k: 'lg', l: 'LG (1024)' }, { k: 'xl', l: 'XL (1440)' }].map((bp) => (
-                                <button
-                                    key={bp.k} type="button" onClick={() => setSelectedBreakpoint(bp.k)}
-                                    style={{
-                                        padding: '6px 12px', borderRadius: '4px', border: '1px solid',
-                                        borderColor: selectedBreakpoint === bp.k ? 'var(--color-primary, #00639b)' : 'var(--color-outline, #747775)',
-                                        backgroundColor: selectedBreakpoint === bp.k ? 'var(--color-primary-container, #d3e3fd)' : 'transparent',
-                                        color: selectedBreakpoint === bp.k ? 'var(--color-on-primary-container, #001d32)' : 'var(--color-on-surface, #1f1f1f)',
-                                        cursor: 'pointer', fontSize: '14px', fontWeight: 500,
-                                    }}
-                                >{bp.l}</button>
-                            ))}
+                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                            Breakpoint: <strong style={{ color: 'var(--color-on-surface)' }}>{breakpoint.toUpperCase()} ({maxWidth}px)</strong>
+                            <span style={{ marginLeft: 8, opacity: 0.75 }}>— change it from the Breakpoint toolbar</span>
+                        </span>
+                        <div style={{ marginLeft: 'auto' }}>
+                            <Button
+                                text="Exit fullscreen"
+                                style="primary"
+                                fill="filled"
+                                size="small"
+                                leadingVisual="compress"
+                                onClick={() => void toggleFullscreen()}
+                            />
                         </div>
-                        <button
-                            type="button" onClick={() => void toggleFullscreen()}
-                            style={{
-                                marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '8px', minHeight: 36,
-                                padding: '6px 14px', borderRadius: 'var(--size-element-radius-md, 8px)',
-                                border: '1px solid var(--color-primary, #00639b)', backgroundColor: 'var(--color-primary, #00639b)',
-                                color: 'var(--color-on-primary, #ffffff)', cursor: 'pointer', fontSize: '14px', fontWeight: 600,
-                            }}
-                        >
-                            <i className="fa-solid fa-compress" aria-hidden="true" /> Exit fullscreen
-                        </button>
                     </div>
                 )}
 
@@ -172,28 +160,22 @@ const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) =
                         ...(fullscreen ? { minHeight: 0, flexDirection: 'column', alignItems: 'stretch' } : {}),
                     }}
                 >
-                    {/* Floating fullscreen affordance — ALWAYS available (not in fullscreen, where the toolbar has Exit). */}
+                    {/* Floating fullscreen affordance — ALWAYS available (not in fullscreen, where the bar has Exit). */}
                     {!fullscreen && (
-                        <button
-                            type="button"
+                        <div
                             className="responsive-frame-fullscreen-btn"
-                            onClick={() => void toggleFullscreen()}
-                            aria-label="Open preview in fullscreen"
-                            title="Open this page in fullscreen"
-                            style={{
-                                position: 'absolute', top: '10px', right: '10px', zIndex: 20,
-                                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                padding: '6px 10px', borderRadius: 'var(--size-element-radius-md, 8px)',
-                                border: '1px solid var(--color-outline-variant, #e0e0e0)',
-                                backgroundColor: 'var(--color-surface, #ffffff)',
-                                color: 'var(--color-on-surface, #1f1f1f)',
-                                cursor: 'pointer', fontSize: '12px', fontWeight: 600,
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                            }}
+                            style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 20 }}
                         >
-                            <i className="fa-solid fa-expand" aria-hidden="true" />
-                            <span>Fullscreen</span>
-                        </button>
+                            <Button
+                                text="Fullscreen"
+                                style="secondary"
+                                fill="outline"
+                                size="small"
+                                leadingVisual="expand"
+                                onClick={() => void toggleFullscreen()}
+                                aria-label="Open preview in fullscreen"
+                            />
+                        </div>
                     )}
 
                     <div className="responsive-frame-inner" style={innerStyle}>
@@ -206,10 +188,8 @@ const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) =
 };
 
 ResponsiveFrame.propTypes = {
+    /** Max width to cap at — driven by the global `plusBreakpoint` toolbar. */
     breakpoint: PropTypes.oneOf(['md', 'lg', 'xl']),
-    showToolbar: PropTypes.bool,
-    /** Kept for back-compat; scaling was removed in favour of true responsive reflow. */
-    fitToContainer: PropTypes.bool,
     children: PropTypes.node.isRequired,
 };
 

@@ -249,13 +249,6 @@ export const Interactive = () => {
     const [currentSession, setCurrentSession] = useState(defaultSessions[0]);
     const [statusFilter, setStatusFilter] = useState('all');
     const [students, setStudents] = useState(defaultStudents);
-    const [breakpoint, setBreakpoint] = useState('xl');
-
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
 
     const handleAttendanceChange = (studentId, newStatus) => {
         setStudents(prev => prev.map(s =>
@@ -274,94 +267,38 @@ export const Interactive = () => {
         ? students
         : students.filter(s => s.status === statusFilter);
 
+    // Breakpoint/responsive width is provided by the global Breakpoint toolbar via the
+    // ResponsiveFrame decorator — the story renders the page directly.
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Breakpoint Toggle Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-            </div>
-
-            {/* Status Display */}
-            <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 'var(--size-element-gap-lg)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)'
-            }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span className="small text-muted fw-bold">Current Session:</span>
-                    <span className="body2-txt">{currentSession.school} ({currentSession.teacher})</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span className="small text-muted fw-bold">Status Filter:</span>
-                    <span className="body2-txt">{statusFilter === 'all' ? 'All Students' : statusFilter}</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span className="small text-muted fw-bold">Students Shown:</span>
-                    <span className="body2-txt">{filteredStudents.length} of {students.length}</span>
-                </div>
-            </div>
-
-            {/* Page Container with dynamic width */}
-            <div style={{
-                maxWidth: `${breakpointWidths[breakpoint]}px`,
-                margin: '0 auto',
-                width: '100%',
-                transition: 'max-width 0.3s ease'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions', href: '#' },
-                            { text: `${currentSession.school} (${currentSession.teacher}), ${currentSession.time}...` }
-                        ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: 'lead',
-                        activeTab: 'sessions'
-                    }}
-                    id="student-dashboard-page-interactive"
-                >
-                    <MainContent
-                        students={filteredStudents}
-                        currentSession={currentSession}
-                        sessions={defaultSessions}
-                        statusFilter={statusFilter}
-                        onSessionChange={setCurrentSession}
-                        onStatusFilterChange={setStatusFilter}
-                        onAttendanceChange={handleAttendanceChange}
-                        onEngagementChange={handleEngagementChange}
-                        onMarkHelped={() => { }}
-                        isInteractive={true}
-                        isLeadTutor={true}
-                    />
-                </PageLayout>
-            </div>
-        </div>
+        <PageLayout
+            topBarConfig={{
+                breadcrumbs: [
+                    { text: 'Home', href: '#' },
+                    { text: 'Sessions', href: '#' },
+                    { text: `${currentSession.school} (${currentSession.teacher}), ${currentSession.time}...` }
+                ],
+                user: { name: 'John Doe', role: 'Lead' }
+            }}
+            sidebarConfig={{
+                user: 'lead',
+                activeTab: 'sessions'
+            }}
+            id="student-dashboard-page-interactive"
+        >
+            <MainContent
+                students={filteredStudents}
+                currentSession={currentSession}
+                sessions={defaultSessions}
+                statusFilter={statusFilter}
+                onSessionChange={setCurrentSession}
+                onStatusFilterChange={setStatusFilter}
+                onAttendanceChange={handleAttendanceChange}
+                onEngagementChange={handleEngagementChange}
+                onMarkHelped={() => { }}
+                isInteractive={true}
+                isLeadTutor={true}
+            />
+        </PageLayout>
     );
 };
 
@@ -960,21 +897,9 @@ const LeadSupervisorEmptyContent = ({
  * Also includes MATHia Goal Status Banner toggle (Visible/Hidden) and Session Type (Goal Setting/Non-Goal Setting).
  * Includes breakpoint toggle (MD / LG / XL) for responsive preview.
  */
-export const RegularTutorView = () => {
-    const [viewState, setViewState] = useState('loaded');
-    const [showBanner, setShowBanner] = useState(true);
-    const [bannerSessionType, setBannerSessionType] = useState('goal-setting');
-    const [showToast, setShowToast] = useState(false);
-    const [toastType, setToastType] = useState('assignment-all');
+const RegularTutorViewRender = (args) => {
     const [currentSession, setCurrentSession] = useState(defaultSessions[0]);
     const [students, setStudents] = useState(defaultStudents);
-    const [breakpoint, setBreakpoint] = useState('xl');
-
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
 
     const handleAttendanceChange = (studentId, newStatus) => {
         setStudents(prev => prev.map(s =>
@@ -988,158 +913,14 @@ export const RegularTutorView = () => {
         ));
     };
 
+    const viewState = args.viewState;
+    const showBanner = args.goalBanner;
+    const bannerSessionType = args.sessionType;
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* View State Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    View State:
-                </span>
-                <Button
-                    text="Loaded"
-                    size="small"
-                    style="primary"
-                    fill={viewState === 'loaded' ? 'filled' : 'outline'}
-                    onClick={() => setViewState('loaded')}
-                />
-                <Button
-                    text="Empty"
-                    size="small"
-                    style="primary"
-                    fill={viewState === 'empty' ? 'filled' : 'outline'}
-                    onClick={() => setViewState('empty')}
-                />
-
-                <span style={{
-                    width: '1px',
-                    height: '20px',
-                    backgroundColor: 'var(--color-outline-variant)',
-                    margin: '0 var(--size-element-gap-sm)',
-                }} />
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Goal Banner:
-                </span>
-                <Button
-                    text={showBanner ? 'Visible' : 'Hidden'}
-                    size="small"
-                    style="primary"
-                    fill={showBanner ? 'filled' : 'outline'}
-                    onClick={() => setShowBanner(!showBanner)}
-                />
-
-                {showBanner && (
-                    <>
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                            Session Type:
-                        </span>
-                        <Button
-                            text="Goal Setting"
-                            size="small"
-                            style="primary"
-                            fill={bannerSessionType === 'goal-setting' ? 'filled' : 'outline'}
-                            onClick={() => setBannerSessionType('goal-setting')}
-                        />
-                        <Button
-                            text="Non-Goal Setting"
-                            size="small"
-                            style="primary"
-                            fill={bannerSessionType === 'non-goal-setting' ? 'filled' : 'outline'}
-                            onClick={() => setBannerSessionType('non-goal-setting')}
-                        />
-                    </>
-                )}
-
-                <span style={{
-                    width: '1px',
-                    height: '20px',
-                    backgroundColor: 'var(--color-outline-variant)',
-                    margin: '0 var(--size-element-gap-sm)',
-                }} />
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-
-                {viewState === 'loaded' && (
-                    <>
-                        <span style={{
-                            width: '1px',
-                            height: '20px',
-                            backgroundColor: 'var(--color-outline-variant)',
-                            margin: '0 var(--size-element-gap-sm)',
-                        }} />
-
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                            Toast:
-                        </span>
-                        <Button
-                            text={showToast ? 'Visible' : 'Hidden'}
-                            size="small"
-                            style="primary"
-                            fill={showToast ? 'filled' : 'outline'}
-                            onClick={() => setShowToast(!showToast)}
-                        />
-
-                        {showToast && (
-                            <>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                                    Toast Type:
-                                </span>
-                                <Button
-                                    text="Assignment (For All)"
-                                    size="small"
-                                    style="primary"
-                                    fill={toastType === 'assignment-all' ? 'filled' : 'outline'}
-                                    onClick={() => setToastType('assignment-all')}
-                                />
-                                <Button
-                                    text="Goal Setting (Warmup)"
-                                    size="small"
-                                    style="primary"
-                                    fill={toastType === 'goal-setting-warmup' ? 'filled' : 'outline'}
-                                    onClick={() => setToastType('goal-setting-warmup')}
-                                />
-                            </>
-                        )}
-                    </>
-                )}
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{viewState === 'loaded' ? 'Loaded' : 'Empty'}</strong> @ <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Page Container with dynamic width */}
-            <div style={{
-                maxWidth: `${breakpointWidths[breakpoint]}px`,
-                height: '1024px',
-                margin: '0 auto',
-                width: '100%',
-                transition: 'max-width 0.3s ease',
-                position: 'relative',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-            }}>
+        // Fixed-height frame so PageLayout (height:100%) has a definite height in the docs well.
+        // Width + breakpoint come from the global Breakpoint toolbar (ResponsiveFrame decorator).
+        <div style={{ height: '1024px', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
                 <PageLayout
                     topBarConfig={{
                         breadcrumbs: viewState === 'loaded'
@@ -1184,8 +965,8 @@ export const RegularTutorView = () => {
                     )}
                 </PageLayout>
 
-                {/* Toast - only in loaded state */}
-                {viewState === 'loaded' && showToast && (
+                {/* Toast — only in loaded state; visibility driven by the `toast` arg. */}
+                {viewState === 'loaded' && args.toast && (
                     <div style={{
                         position: 'fixed',
                         bottom: 'var(--size-section-gap-lg)',
@@ -1194,36 +975,15 @@ export const RegularTutorView = () => {
                         zIndex: 1050,
                         width: '672px',
                     }}>
-                        {toastType === 'assignment-all' ? (
-                            <Toast
-                                style="secondary"
-                                title="Review Assignments"
-                                timestamp="11 mins ago"
-                                show={true}
-                                autohide={false}
-                                onClose={() => setShowToast(false)}
-                                className="w-100"
-                            >
-                                <span
-                                    className="body3-txt font-weight-light"
-                                    style={{ color: 'var(--color-on-surface)' }}
-                                >
+                        {args.toastType === 'assignment-all' ? (
+                            <Toast style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
+                                <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
                                     Your student roster was just updated. Take a moment to review your new assignments.
                                 </span>
                             </Toast>
                         ) : (
-                            <Toast
-                                style="info"
-                                title="Warmup phase in progress."
-                                show={true}
-                                autohide={false}
-                                onClose={() => setShowToast(false)}
-                                className="w-100"
-                            >
-                                <span
-                                    className="body3-txt font-weight-light"
-                                    style={{ color: 'var(--color-on-surface)' }}
-                                >
+                            <Toast style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
+                                <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
                                     Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
                                     Personalized goals will be available in a few weeks.{' '}
                                     <span className="body3-txt font-weight-semibold">
@@ -1234,9 +994,20 @@ export const RegularTutorView = () => {
                         )}
                     </div>
                 )}
-            </div>
         </div>
     );
+};
+
+export const RegularTutorView = {
+    render: RegularTutorViewRender,
+    argTypes: {
+        viewState: { control: 'radio', options: ['loaded', 'empty'], name: 'View state', table: { category: 'State' } },
+        goalBanner: { control: 'boolean', name: 'Goal banner', table: { category: 'State' } },
+        sessionType: { control: 'radio', options: ['goal-setting', 'non-goal-setting'], name: 'Session type', table: { category: 'State' } },
+        toast: { control: 'boolean', name: 'Toast', table: { category: 'State' } },
+        toastType: { control: 'radio', options: ['assignment-all', 'goal-setting-warmup'], name: 'Toast type', table: { category: 'State' } },
+    },
+    args: { viewState: 'loaded', goalBanner: true, sessionType: 'goal-setting', toast: false, toastType: 'assignment-all' },
 };
 
 /**
@@ -1285,416 +1056,117 @@ const scrim2ModalLabels = {
     'add-student': 'Add Student',
 };
 
-export const LeadSupervisorView = () => {
-    const [viewState, setViewState] = useState('loaded');
-    const [showBanner, setShowBanner] = useState(true);
-    const [bannerSessionType, setBannerSessionType] = useState('goal-setting');
-    const [showToast, setShowToast] = useState(false);
-    const [toastType, setToastType] = useState('assignment-leads');
+const LeadSupervisorViewRender = (args) => {
     const [currentSession, setCurrentSession] = useState(defaultSessions[0]);
     const [students, setStudents] = useState(defaultStudents);
-    const [breakpoint, setBreakpoint] = useState('xl');
-    const [showScrim1, setShowScrim1] = useState(false);
-    const [scrim1Modal, setScrim1Modal] = useState('attendance-loaded');
-    const [showScrim2, setShowScrim2] = useState(false);
-    const [scrim2Modal, setScrim2Modal] = useState('zoom-session');
-
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
 
     const handleAttendanceChange = (studentId, newStatus) => {
-        setStudents(prev => prev.map(s =>
-            s.id === studentId ? { ...s, attendanceStatus: newStatus } : s
-        ));
+        setStudents(prev => prev.map(s => (s.id === studentId ? { ...s, attendanceStatus: newStatus } : s)));
+    };
+    const handleEngagementChange = (studentId, newStatus) => {
+        setStudents(prev => prev.map(s => (s.id === studentId ? { ...s, engagementStatus: newStatus } : s)));
     };
 
-    const handleEngagementChange = (studentId, newStatus) => {
-        setStudents(prev => prev.map(s =>
-            s.id === studentId ? { ...s, engagementStatus: newStatus } : s
-        ));
-    };
+    const viewState = args.viewState;
+    const showBanner = args.goalBanner;
+    const bannerSessionType = args.sessionType;
+    const Scrim1Modal = args.scrim1 !== 'none' ? scrim1ModalMap[args.scrim1] : null;
+    const Scrim2Modal = args.scrim2 !== 'none' ? scrim2ModalMap[args.scrim2] : null;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* View State Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    View State:
-                </span>
-                <Button
-                    text="Loaded"
-                    size="small"
-                    style="primary"
-                    fill={viewState === 'loaded' ? 'filled' : 'outline'}
-                    onClick={() => setViewState('loaded')}
-                />
-                <Button
-                    text="Empty"
-                    size="small"
-                    style="primary"
-                    fill={viewState === 'empty' ? 'filled' : 'outline'}
-                    onClick={() => setViewState('empty')}
-                />
-
-                <span style={{
-                    width: '1px',
-                    height: '20px',
-                    backgroundColor: 'var(--color-outline-variant)',
-                    margin: '0 var(--size-element-gap-sm)',
-                }} />
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Goal Banner:
-                </span>
-                <Button
-                    text={showBanner ? 'Visible' : 'Hidden'}
-                    size="small"
-                    style="primary"
-                    fill={showBanner ? 'filled' : 'outline'}
-                    onClick={() => setShowBanner(!showBanner)}
-                />
-
-                {showBanner && (
-                    <>
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                            Session Type:
-                        </span>
-                        <Button
-                            text="Goal Setting"
-                            size="small"
-                            style="primary"
-                            fill={bannerSessionType === 'goal-setting' ? 'filled' : 'outline'}
-                            onClick={() => setBannerSessionType('goal-setting')}
-                        />
-                        <Button
-                            text="Non-Goal Setting"
-                            size="small"
-                            style="primary"
-                            fill={bannerSessionType === 'non-goal-setting' ? 'filled' : 'outline'}
-                            onClick={() => setBannerSessionType('non-goal-setting')}
-                        />
-                    </>
-                )}
-
-                <span style={{
-                    width: '1px',
-                    height: '20px',
-                    backgroundColor: 'var(--color-outline-variant)',
-                    margin: '0 var(--size-element-gap-sm)',
-                }} />
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
+        // Fixed-height frame so PageLayout resolves height:100% in the docs well; width/breakpoint
+        // come from the global Breakpoint toolbar (ResponsiveFrame decorator).
+        <div style={{ height: '1024px', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: viewState === 'loaded'
+                        ? [
+                            { text: 'Home', href: '#' },
+                            { text: 'Sessions', href: '#' },
+                            { text: `${currentSession.school} (${currentSession.teacher}), ${currentSession.time}, ${currentSession.date}` }
+                        ]
+                        : [
+                            { text: 'Home', href: '#' },
+                            { text: 'Students' }
+                        ],
+                    user: { name: 'John Doe', role: 'Lead' }
+                }}
+                sidebarConfig={{ user: 'lead', activeTab: 'sessions' }}
+                id="student-dashboard-lead-supervisor"
+            >
+                {viewState === 'loaded' ? (
+                    <LeadSupervisorLoadedContent
+                        students={students}
+                        currentSession={currentSession}
+                        sessions={defaultSessions}
+                        onSessionChange={setCurrentSession}
+                        onAttendanceChange={handleAttendanceChange}
+                        onEngagementChange={handleEngagementChange}
+                        isInteractive={true}
+                        showBanner={showBanner}
+                        bannerSessionType={bannerSessionType}
                     />
-                ))}
-
-                {viewState === 'loaded' && (
-                    <>
-                        <span style={{
-                            width: '1px',
-                            height: '20px',
-                            backgroundColor: 'var(--color-outline-variant)',
-                            margin: '0 var(--size-element-gap-sm)',
-                        }} />
-
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                            Toast:
-                        </span>
-                        <Button
-                            text={showToast ? 'Visible' : 'Hidden'}
-                            size="small"
-                            style="primary"
-                            fill={showToast ? 'filled' : 'outline'}
-                            onClick={() => setShowToast(!showToast)}
-                        />
-
-                        {showToast && (
-                            <>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                                    Toast Type:
-                                </span>
-                                <Button
-                                    text="Assignment (For Leads)"
-                                    size="small"
-                                    style="primary"
-                                    fill={toastType === 'assignment-leads' ? 'filled' : 'outline'}
-                                    onClick={() => setToastType('assignment-leads')}
-                                />
-                                <Button
-                                    text="Goal Setting (Warmup)"
-                                    size="small"
-                                    style="primary"
-                                    fill={toastType === 'goal-setting-warmup' ? 'filled' : 'outline'}
-                                    onClick={() => setToastType('goal-setting-warmup')}
-                                />
-                            </>
-                        )}
-                    </>
+                ) : (
+                    <LeadSupervisorEmptyContent
+                        currentSession={currentSession}
+                        sessions={defaultSessions}
+                        onSessionChange={setCurrentSession}
+                        isInteractive={true}
+                        showBanner={showBanner}
+                        bannerSessionType={bannerSessionType}
+                    />
                 )}
+            </PageLayout>
 
-                <span style={{
-                    width: '1px',
-                    height: '20px',
-                    backgroundColor: 'var(--color-outline-variant)',
-                    margin: '0 var(--size-element-gap-sm)',
-                }} />
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Scrim 1:
-                </span>
-                <Button
-                    text={showScrim1 ? 'Visible' : 'Hidden'}
-                    size="small"
-                    style="primary"
-                    fill={showScrim1 ? 'filled' : 'outline'}
-                    onClick={() => {
-                        setShowScrim1(!showScrim1);
-                        if (showScrim1) setShowScrim2(false);
-                    }}
-                />
-
-                {showScrim1 && (
-                    <>
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                            Modal:
-                        </span>
-                        {Object.entries(scrim1ModalLabels).map(([key, label]) => (
-                            <Button
-                                key={key}
-                                text={label}
-                                size="small"
-                                style="primary"
-                                fill={scrim1Modal === key ? 'filled' : 'outline'}
-                                onClick={() => setScrim1Modal(key)}
-                            />
-                        ))}
-
-                        <span style={{
-                            width: '1px',
-                            height: '20px',
-                            backgroundColor: 'var(--color-outline-variant)',
-                            margin: '0 var(--size-element-gap-sm)',
-                        }} />
-
-                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                            Scrim 2:
-                        </span>
-                        <Button
-                            text={showScrim2 ? 'Visible' : 'Hidden'}
-                            size="small"
-                            style="primary"
-                            fill={showScrim2 ? 'filled' : 'outline'}
-                            onClick={() => setShowScrim2(!showScrim2)}
-                        />
-
-                        {showScrim2 && (
-                            <>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                                    Modal:
-                                </span>
-                                {Object.entries(scrim2ModalLabels).map(([key, label]) => (
-                                    <Button
-                                        key={key}
-                                        text={label}
-                                        size="small"
-                                        style="primary"
-                                        fill={scrim2Modal === key ? 'filled' : 'outline'}
-                                        onClick={() => setScrim2Modal(key)}
-                                    />
-                                ))}
-                            </>
-                        )}
-                    </>
-                )}
-
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{viewState === 'loaded' ? 'Loaded' : 'Empty'}</strong> @ <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Page Container with dynamic width */}
-            <div style={{
-                maxWidth: `${breakpointWidths[breakpoint]}px`,
-                height: '1024px',
-                margin: '0 auto',
-                width: '100%',
-                transition: 'max-width 0.3s ease',
-                position: 'relative',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: viewState === 'loaded'
-                            ? [
-                                { text: 'Home', href: '#' },
-                                { text: 'Sessions', href: '#' },
-                                { text: `${currentSession.school} (${currentSession.teacher}), ${currentSession.time}, ${currentSession.date}` }
-                            ]
-                            : [
-                                { text: 'Home', href: '#' },
-                                { text: 'Students' }
-                            ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: 'lead',
-                        activeTab: 'sessions'
-                    }}
-                    id="student-dashboard-lead-supervisor"
-                >
-                    {viewState === 'loaded' ? (
-                        <LeadSupervisorLoadedContent
-                            students={students}
-                            currentSession={currentSession}
-                            sessions={defaultSessions}
-                            onSessionChange={setCurrentSession}
-                            onAttendanceChange={handleAttendanceChange}
-                            onEngagementChange={handleEngagementChange}
-                            isInteractive={true}
-                            showBanner={showBanner}
-                            bannerSessionType={bannerSessionType}
-                        />
+            {/* Toast — loaded state only; visibility driven by the `toast` arg. */}
+            {viewState === 'loaded' && args.toast && (
+                <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 1050, width: '672px' }}>
+                    {args.toastType === 'assignment-leads' ? (
+                        <Toast style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
+                            <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                                It&apos;s been 10 minutes since the session started. Would you like to{' '}
+                                <a href="#" className="body3-txt font-weight-bold" style={{ color: 'var(--color-on-surface)', textDecoration: 'underline' }} onClick={(e) => e.preventDefault()}>review and adjust assignments</a>?{' '}
+                            </span>
+                        </Toast>
                     ) : (
-                        <LeadSupervisorEmptyContent
-                            currentSession={currentSession}
-                            sessions={defaultSessions}
-                            onSessionChange={setCurrentSession}
-                            isInteractive={true}
-                            showBanner={showBanner}
-                            bannerSessionType={bannerSessionType}
-                        />
+                        <Toast style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
+                            <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                                Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
+                                Personalized goals will be available in a few weeks.{' '}
+                                <span className="body3-txt font-weight-semibold">Remember to check in with each student and mark them as helped.</span>
+                            </span>
+                        </Toast>
                     )}
-                </PageLayout>
+                </div>
+            )}
 
-                {/* Toast - only in loaded state */}
-                {viewState === 'loaded' && showToast && (
-                    <div style={{
-                        position: 'fixed',
-                        bottom: 'var(--size-section-gap-lg)',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        zIndex: 1050,
-                        width: '672px',
-                    }}>
-                        {toastType === 'assignment-leads' ? (
-                            <Toast
-                                style="secondary"
-                                title="Review Assignments"
-                                timestamp="11 mins ago"
-                                show={true}
-                                autohide={false}
-                                onClose={() => setShowToast(false)}
-                                className="w-100"
-                            >
-                                <span
-                                    className="body3-txt font-weight-light"
-                                    style={{ color: 'var(--color-on-surface)' }}
-                                >
-                                    It's been 10 minutes since the session started. Would you like to{' '}
-                                    <a
-                                        href="#"
-                                        className="body3-txt font-weight-bold"
-                                        style={{
-                                            color: 'var(--color-on-surface)',
-                                            textDecoration: 'underline',
-                                        }}
-                                        onClick={(e) => e.preventDefault()}
-                                    >
-                                        review and adjust assignments
-                                    </a>
-                                    ?{' '}
-                                </span>
-                            </Toast>
-                        ) : (
-                            <Toast
-                                style="info"
-                                title="Warmup phase in progress."
-                                show={true}
-                                autohide={false}
-                                onClose={() => setShowToast(false)}
-                                className="w-100"
-                            >
-                                <span
-                                    className="body3-txt font-weight-light"
-                                    style={{ color: 'var(--color-on-surface)' }}
-                                >
-                                    Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
-                                    Personalized goals will be available in a few weeks.{' '}
-                                    <span className="body3-txt font-weight-semibold">
-                                        Remember to check in with each student and mark them as helped.
-                                    </span>
-                                </span>
-                            </Toast>
-                        )}
-                    </div>
-                )}
+            {/* Scrim 1 — in-session pop-up modal; select via the `scrim1` arg. */}
+            {Scrim1Modal && (
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 1000 }}>
+                    <Scrim1Modal />
+                </div>
+            )}
 
-                {/* Scrim 1 - In-Session Pop-Up Modal */}
-                {showScrim1 && (() => {
-                    const Scrim1Modal = scrim1ModalMap[scrim1Modal];
-                    return (
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 'var(--size-section-pad-x-lg)',
-                            zIndex: 1000,
-                        }}>
-                            {Scrim1Modal ? <Scrim1Modal /> : null}
-                        </div>
-                    );
-                })()}
-
-                {/* Scrim 2 - Zoom Session / Add Tutor / Add Student (on top of Scrim 1) */}
-                {showScrim1 && showScrim2 && (() => {
-                    const Scrim2Modal = scrim2ModalMap[scrim2Modal];
-                    return (
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 'var(--size-section-pad-x-lg)',
-                            zIndex: 1100,
-                        }}>
-                            {Scrim2Modal ? <Scrim2Modal /> : null}
-                        </div>
-                    );
-                })()}
-            </div>
+            {/* Scrim 2 — stacks on Scrim 1; select via the `scrim2` arg. */}
+            {Scrim1Modal && Scrim2Modal && (
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 1100 }}>
+                    <Scrim2Modal />
+                </div>
+            )}
         </div>
     );
+};
+
+export const LeadSupervisorView = {
+    render: LeadSupervisorViewRender,
+    argTypes: {
+        viewState: { control: 'radio', options: ['loaded', 'empty'], name: 'View state', table: { category: 'State' } },
+        goalBanner: { control: 'boolean', name: 'Goal banner', table: { category: 'State' } },
+        sessionType: { control: 'radio', options: ['goal-setting', 'non-goal-setting'], name: 'Session type', table: { category: 'State' } },
+        toast: { control: 'boolean', name: 'Toast', table: { category: 'State' } },
+        toastType: { control: 'radio', options: ['assignment-leads', 'goal-setting-warmup'], name: 'Toast type', table: { category: 'State' } },
+        scrim1: { control: 'select', options: ['none', ...Object.keys(scrim1ModalMap)], name: 'Scrim 1 modal', table: { category: 'Scrims' } },
+        scrim2: { control: 'select', options: ['none', ...Object.keys(scrim2ModalMap)], name: 'Scrim 2 modal (needs Scrim 1)', table: { category: 'Scrims' } },
+    },
+    args: { viewState: 'loaded', goalBanner: true, sessionType: 'goal-setting', toast: false, toastType: 'assignment-leads', scrim1: 'none', scrim2: 'none' },
 };
