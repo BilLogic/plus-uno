@@ -49,9 +49,16 @@ reference/production/
 # Local Netlify folder
 .netlify
 
-# Vercel
-.vercel/
-
 # Figma automation temp files
 .figma-sync-context/
 .agent/handoffs/
+
+# Article-authoring writeups — local-only (recap, skill plan, research, style guide).
+# Source material for the public case study; kept off the remote deliberately.
+docs/knowledge/uno-bot-build-recap.md
+docs/knowledge/uno-bot-build-guide.md
+docs/plans/2026-07-11-001-slack-bot-setup-skill-plan.md
+docs/knowledge/research/2026-07-12-field-scan-improvements.md
+docs/knowledge/research/2026-07-12-request-corpus-expansion.md
+docs/knowledge/research/2026-07-12-uno-bot-cost-analysis.md
+docs/conventions/article-writing-style.md
