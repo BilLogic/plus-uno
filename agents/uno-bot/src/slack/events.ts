@@ -33,6 +33,7 @@ import { collectVisionInputs } from "./vision";
 import { postVisibleFailure, postTextVerified } from "./delivery";
 import { reviewDraft } from "../agent/draft-judge";
 import { formatProposal, proposalVerb, buildImplementDesignProposal } from "./proposal-render";
+import { describeNotionTarget } from "../integrations/notion";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -518,6 +519,15 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // Show which PRD this implement is tied to, so the requester can see it.
     const preview = implementPrdUrl ? `Using the PRD for this change: ${implementPrdUrl}` : result.previewText;
     proposalText = formatProposal(result.toolName, result.input, userId, preview);
+  } else if (result.toolName === "notion_update" || result.toolName === "notion_archive") {
+    // Writes are no longer DB-allowlisted, so the human ✅ is the backstop — make
+    // the card show the CONCRETE target (page title + parent DB), not a bare id,
+    // so an approver can't be steered into confirming a write on some arbitrary
+    // page a read pulled in (review 2026-07-13). Best-effort; null → no line.
+    const pageUrl = typeof result.input.page_url === "string" ? result.input.page_url : "";
+    const target = pageUrl ? await describeNotionTarget(env, pageUrl) : null;
+    const targetNote = target ? `• *Target:* ${target.title} — in ${target.parent}` : undefined;
+    proposalText = formatProposal(result.toolName, result.input, userId, result.previewText, targetNote);
   } else {
     proposalText = formatProposal(result.toolName, result.input, userId, result.previewText);
   }

@@ -62,6 +62,8 @@ Canonical decision log for the design org. One row per durable decision; lineage
 
 Useful context for grounding via `notion_search` catalog scopes (or Notion MCP in-IDE). uno reads these as a matter of course and doesn't write them unless a human explicitly asks (✅-gated). Each row lists the **DATABASE id** (what the Worker queries) — not the data-source id.
 
+⚠️ **`running_notes` is team-readable but personal.** 1:1 / running-notes rows get the same discretion as private Slack content (AGENT.md "Personal Notion notes"): summarize neutrally, but never surface highly sensitive personal specifics (visa/immigration, comp, health, performance/PIP, hardship) — decline and point to the person/manager instead.
+
 | DB | Database ID | `notion_search` scope | Use when grounding |
 |---|---|---|---|
 | Team Member Database | `134b7cca-4982-801d-a91d-d678e79d6e27` | `team` | roster / experts |

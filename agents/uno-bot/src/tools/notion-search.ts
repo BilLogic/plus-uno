@@ -255,15 +255,6 @@ const ROUTING_NOTE =
   "Access-request routing: the Application Admin is who GRANTS access — name them as the person to ask, and pre-fill a short suggested request message the user can copy (what they need, why, and for how long). Power Users are the day-to-day experts for usage questions. NEVER claim to grant, request, or change access yourself — you only route. If admins is empty, suggest the Power Users (or the team roster via scope 'team') as the closest known contact and say the admin isn't recorded. Link the app's Notion page.";
 
 /**
- * Normalize an application name for loose matching.
- *
- * @param s - App name or query
- */
-function normalizeAppName(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-}
-
-/**
  * Search the Third Party Applications directory for access-request routing.
  *
  * @param env - Worker env
@@ -280,11 +271,11 @@ async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
     });
   }
 
-  const q = normalizeAppName(query);
+  const q = normalizeTitle(query);
   // No/blank query → return the directory so the model can enumerate.
   const matches = q
     ? apps.filter((a) => {
-        const n = normalizeAppName(a.name);
+        const n = normalizeTitle(a.name);
         return n.includes(q) || q.includes(n);
       })
     : apps;

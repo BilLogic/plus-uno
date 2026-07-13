@@ -12,14 +12,19 @@ export function formatProposal(
   input: Record<string, unknown>,
   requesterUserId: string,
   previewText: string | undefined,
+  // Optional resolved-target line (e.g. "• *Target:* «title» — in «DB»") shown
+  // above the raw params, so the approver of a write sees the CONCRETE page it
+  // will touch, not just an opaque id. Used for notion_update / notion_archive.
+  targetNote?: string,
 ): string {
   const body = renderParamsForHumans(input);
   const lines: string[] = [];
   if (previewText) {
     lines.push(previewText, "");
   }
+  lines.push(`:warning: About to *${proposalVerb(toolName)}*:`);
+  if (targetNote) lines.push(targetNote);
   lines.push(
-    `:warning: About to *${proposalVerb(toolName)}*:`,
     body,
     `React :white_check_mark: / :x: or just say "go ahead" / "cancel" — only <@${requesterUserId}> can confirm.`,
   );
