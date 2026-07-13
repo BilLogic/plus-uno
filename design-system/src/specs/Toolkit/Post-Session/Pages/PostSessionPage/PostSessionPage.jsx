@@ -35,9 +35,8 @@ const PostSessionPage = ({
                         selectedStudentIds={selectedStudentIds}
                         onStudentSelectionChange={setSelectedStudentIds}
                         onSave={(data) => {
+                            // In a real app, saving would advance to Page 2.
                             setSessionData(data);
-                            console.log('Session Info Saved:', data);
-                            // In a real app, this would navigate to Page 2
                         }}
                     />
                 ) : (

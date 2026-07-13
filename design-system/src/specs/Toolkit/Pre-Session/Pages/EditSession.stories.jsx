@@ -7,6 +7,7 @@ import { NavHorizontal } from '../Tables/NavHorizontal.stories';
 import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
 import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import SessionManagementSnackbar from '@/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar';
+import { UpdateAlert } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -65,63 +66,6 @@ The Interactive story includes:
     },
 };
 
-/**
- * Update Alert Component
- * Uses semantic tokens:
- * - Background: --color-primary-container-state-16 (primary tonal)
- * - Border: --color-primary (primary color)
- * - Radius: --size-modal-radius-md (modal/card radius)
- * - Padding: --size-card-pad-y-sm, --size-card-pad-x-sm (card padding)
- * - Gap: --size-card-gap-sm (internal card gap)
- * - Typography: h6, body2-txt
- */
-const UpdateAlert = ({ title, description, onClose }) => (
-    <div
-        style={{
-            backgroundColor: 'var(--color-primary-container-state-16)',
-            border: '1px solid var(--color-primary)',
-            borderRadius: 'var(--size-modal-radius-md)',
-            padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-            display: 'flex',
-            gap: 'var(--size-card-gap-sm)',
-            width: '100%'
-        }}
-    >
-        <div
-            style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)'
-            }}
-        >
-            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
-                {title}
-            </span>
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                {description}
-            </span>
-        </div>
-        <button
-            onClick={onClose}
-            style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                alignSelf: 'flex-start'
-            }}
-        >
-            <i
-                className="fa-solid fa-xmark"
-                style={{
-                    fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--color-on-surface-variant)'
-                }}
-            />
-        </button>
-    </div>
-);
 
 /**
  * Main Content Area

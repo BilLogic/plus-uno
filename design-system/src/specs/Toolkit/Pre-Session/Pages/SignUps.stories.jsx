@@ -8,6 +8,7 @@ import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories
 import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import { DaysFilter } from '../Elements/Filters/DaysFilter/DaysFilter.stories';
 import { CapacityFilter } from '../Elements/Filters/CapacityFilter/CapacityFilter.stories';
+import { SectionTitle } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -17,24 +18,6 @@ export default {
     },
 };
 
-/**
- * Section Title with Info Icon
- */
-const SectionTitle = ({ title }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
-        <h4 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
-            {title}
-        </h4>
-        <i
-            className="fa-solid fa-circle-info"
-            style={{
-                fontSize: 'var(--font-size-fa-h6-solid)',
-                color: 'var(--color-on-surface-variant)',
-                cursor: 'pointer'
-            }}
-        />
-    </div>
-);
 
 /**
  * Main Content Area for Sign-Ups Page

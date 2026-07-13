@@ -8,6 +8,7 @@ import { SessionStatusFilter } from '../Elements/Filters/SessionStatusFilter.sto
 import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories';
 import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
+import { SectionTitle, UpdateAlert } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -17,82 +18,7 @@ export default {
     },
 };
 
-/**
- * Update Alert Component
- * Uses semantic tokens:
- * - Background: --color-primary-container-state-16 (primary tonal)
- * - Border: --color-primary (primary color)
- * - Radius: --size-modal-radius-md (modal/card radius)
- * - Padding: --size-card-pad-y-sm, --size-card-pad-x-sm (card padding)
- * - Gap: --size-card-gap-sm (internal card gap)
- * - Typography: h6, body2-txt
- */
-const UpdateAlert = ({ title, description, onClose }) => (
-    <div
-        style={{
-            backgroundColor: 'var(--color-primary-container-state-16)',
-            border: '1px solid var(--color-primary)',
-            borderRadius: 'var(--size-modal-radius-md)',
-            padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-            display: 'flex',
-            gap: 'var(--size-card-gap-sm)',
-            width: '100%'
-        }}
-    >
-        <div
-            style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)'
-            }}
-        >
-            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
-                {title}
-            </span>
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                {description}
-            </span>
-        </div>
-        <button
-            onClick={onClose}
-            style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                alignSelf: 'flex-start'
-            }}
-        >
-            <i
-                className="fa-solid fa-xmark"
-                style={{
-                    fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--color-on-surface-variant)'
-                }}
-            />
-        </button>
-    </div>
-);
 
-/**
- * Section Title with Info Icon
- */
-const SectionTitle = ({ title }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
-        <h4 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
-            {title}
-        </h4>
-        <i
-            className="fa-solid fa-circle-info"
-            style={{
-                fontSize: 'var(--font-size-fa-h6-solid)',
-                color: 'var(--color-on-surface-variant)',
-                cursor: 'pointer'
-            }}
-        />
-    </div>
-);
 
 /**
  * Main Content Area for All Sessions Page

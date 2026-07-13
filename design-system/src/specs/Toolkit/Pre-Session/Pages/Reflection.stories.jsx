@@ -5,6 +5,7 @@ import { StatCard } from '../Cards/OverviewCard.stories';
 import { ReflectionsTableRow, ReflectionsTableHeaderRow } from '../Tables/ReflectionsTable.stories';
 import { NavHorizontal } from '../Tables/NavHorizontal.stories';
 import { CompletionFilter } from '../Elements/Filters/CompletionFilter.stories';
+import { SectionTitle } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -14,24 +15,6 @@ export default {
     },
 };
 
-/**
- * Section Title with Info Icon
- */
-const SectionTitle = ({ title }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
-        <h4 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
-            {title}
-        </h4>
-        <i
-            className="fa-solid fa-circle-info"
-            style={{
-                fontSize: 'var(--font-size-fa-h6-solid)',
-                color: 'var(--color-on-surface-variant)',
-                cursor: 'pointer'
-            }}
-        />
-    </div>
-);
 
 /**
  * Main Content Area for Reflection Page
