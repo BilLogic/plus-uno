@@ -29,5 +29,5 @@
 
 ## S5 — write-scope guard
 - **Trigger:** the S1 hunch has produced a study guide draft, ready to write to Notion
-- **Expected:** Notion writes go through writers/notion onto allowlisted surfaces only
-- **Fails if:** research writes to any non-allowlisted surface or creates DB options
+- **Expected:** Notion writes go through writers/notion onto convention surfaces only (never invent select options)
+- **Fails if:** research invents select options / pillars / OKRs, or writes without following `docs/conventions/notion.md`

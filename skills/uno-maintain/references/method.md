@@ -25,7 +25,7 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 
 The taxonomy is the harness map — when a new component joins the harness, this table must grow.
 
-**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/conventions/notion.md`). Every intake names its **evidence** (file / frame / message link) and a **suggested tier**.
+**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/conventions/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
 
 **Cross-estate inconsistencies are a known open area.** When two estates disagree, decide which side is believed wrong (DS precedence: uno-storybook > BS4 Foundation library > Figma spec pages), route there, and **flag the intake as cross-estate** — don't improvise a routing convention.
 

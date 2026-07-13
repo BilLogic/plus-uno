@@ -1,4 +1,5 @@
-// Worker-safe Notion client: notionCreate (PRD/intake cards on the Roadmap
+// Worker-safe Notion client: notionCreate (PRD/intake on Roadmap; decision rows
+// on Decisions DB), notionUpdate (any shared page), archive, search helpers.
 // database, placed in "Need PRD / Under Playground"), notionUpdate,
 // archiveCard, notionSearch, readNotionPage, findTeamMembers, queryRoadmapCards.
 //
@@ -310,6 +311,124 @@ export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
   }
 }
 
+// ─── Generic catalog DB query (notion_search scoped catalogs) ────────────────
+// Same lesson as apps / roadmap_query: /v1/search misses literal titles inside
+// known DBs. Query databases/{id} directly (1–2 subrequests) and match in-Worker.
+
+const CATALOG_PAGE_SIZE = 100;
+const CATALOG_MAX_PAGES = 2;
+/** Cap how many select/status/url/rich_text fields we surface per row. */
+const CATALOG_META_CAP = 6;
+
+export interface CatalogRow {
+  id: string;
+  title: string;
+  url: string;
+  /** Compact property bag (status/select/url/short text) for the model. */
+  meta: Record<string, string>;
+}
+
+/**
+ * Pull a title from a property bag, skipping named title props (e.g. "Task name"
+ * on the Help Center Content multi-source parent so Tasks Tracker rows drop out).
+ */
+function catalogTitle(
+  props: Record<string, NotionProperty>,
+  skipTitleNames: string[] = [],
+): string | null {
+  const skip = new Set(skipTitleNames.map((n) => n.toLowerCase()));
+  for (const [name, prop] of Object.entries(props)) {
+    if (prop.type !== "title") continue;
+    if (skip.has(name.toLowerCase())) continue;
+    const t = plain(prop.title);
+    if (t) return t;
+  }
+  return null;
+}
+
+/**
+ * Compact non-title properties into a small string map for search results.
+ */
+function catalogMeta(props: Record<string, NotionProperty>): Record<string, string> {
+  const meta: Record<string, string> = {};
+  for (const [name, prop] of Object.entries(props)) {
+    if (Object.keys(meta).length >= CATALOG_META_CAP) break;
+    if (prop.type === "title") continue;
+    if (!["status", "select", "multi_select", "url", "rich_text", "date", "checkbox", "number", "people"].includes(prop.type)) {
+      continue;
+    }
+    const v = renderProperty(prop);
+    if (v && v.length <= 200) meta[name] = v;
+  }
+  return meta;
+}
+
+/**
+ * Read rows from any Notion database the integration can see. Generic title +
+ * meta extraction — used by notion_search catalog scopes. Throws on failure.
+ *
+ * @param databaseId - Notion DATABASE id (not data-source id)
+ * @param opts.skipTitleNames - title property names to ignore (multi-source DBs)
+ */
+export async function queryCatalogDatabase(
+  env: Env,
+  databaseId: string,
+  opts: { skipTitleNames?: string[] } = {},
+): Promise<CatalogRow[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  if (!databaseId) throw new Error("catalog database id is empty");
+
+  const rows: CatalogRow[] = [];
+  let cursor: string | undefined;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    for (let page = 0; page < CATALOG_MAX_PAGES; page++) {
+      const res = await fetch(`${NOTION_API}/databases/${databaseId}/query`, {
+        method: "POST",
+        headers: notionHeaders(env, { write: true }),
+        body: JSON.stringify({
+          page_size: CATALOG_PAGE_SIZE,
+          ...(cursor ? { start_cursor: cursor } : {}),
+        }),
+        signal: controller.signal,
+      });
+      const data = (await res.json()) as {
+        results?: Array<{
+          id?: string;
+          url?: string;
+          archived?: boolean;
+          properties?: Record<string, NotionProperty>;
+        }>;
+        has_more?: boolean;
+        next_cursor?: string | null;
+        message?: string;
+        code?: string;
+      };
+      if (!res.ok) {
+        throw notionError(res.status, data, "catalog query failed");
+      }
+      for (const r of data.results ?? []) {
+        if (!r.id || r.archived) continue;
+        const props = r.properties ?? {};
+        const title = catalogTitle(props, opts.skipTitleNames);
+        if (!title) continue;
+        rows.push({
+          id: r.id.replace(/-/g, ""),
+          title,
+          url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
+          meta: catalogMeta(props),
+        });
+      }
+      if (!data.has_more || !data.next_cursor) break;
+      cursor = data.next_cursor;
+    }
+    return rows;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
  * Resolve Notion page ids to their titles (for relation properties like
  * Power User(s)). Capped — each id is one subrequest. Unresolvable ids are
@@ -486,24 +605,32 @@ export interface NotionSearchHit {
 export async function notionSearch(
   env: Env,
   query: string,
-  limit = 8,
+  limit = 12,
 ): Promise<NotionSearchHit[]> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
+    // No object filter — Notion only allows page OR database per call; omitting
+    // the filter returns both. Prefer a scoped catalog query when the surface
+    // is known (help_tutors / marketplace / decisions / …).
     const res = await fetch(`${NOTION_API}/search`, {
       method: "POST",
       headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
         query,
-        filter: { property: "object", value: "page" },
         page_size: Math.min(Math.max(limit, 1), 20),
       }),
       signal: controller.signal,
     });
     const data = (await res.json()) as {
-      results?: Array<{ id?: string; url?: string; properties?: Record<string, NotionProperty> }>;
+      results?: Array<{
+        object?: string;
+        id?: string;
+        url?: string;
+        title?: NotionRichText;
+        properties?: Record<string, NotionProperty>;
+      }>;
       message?: string;
       code?: string;
     };
@@ -514,11 +641,16 @@ export async function notionSearch(
     for (const r of data.results ?? []) {
       if (!r.id) continue;
       let title = "(untitled)";
-      for (const prop of Object.values(r.properties ?? {})) {
-        if (prop.type === "title") {
-          const t = plain(prop.title);
-          if (t) title = t;
-          break;
+      if (r.object === "database" && r.title) {
+        const t = plain(r.title);
+        if (t) title = t;
+      } else {
+        for (const prop of Object.values(r.properties ?? {})) {
+          if (prop.type === "title") {
+            const t = plain(prop.title);
+            if (t) title = t;
+            break;
+          }
         }
       }
       const bareId = r.id.replace(/-/g, "");
@@ -530,14 +662,14 @@ export async function notionSearch(
   }
 }
 
-// ─── Generic create across allowlisted surfaces (for notion_create) ──────────
+// ─── Generic create across convention surfaces (for notion_create) ───────────
 // The mechanical half of a Notion create: resolve the destination DB + the
 // surface's base properties, build the body, POST. The editorial half (what a
 // good PRD says, which pillar) lives in the conventions the bot loads. Marketplace
 // is intentionally NOT here — its relation + rollup + dual-write shape is an
 // in-IDE writers/notion operation, not a one-shot Worker write.
 
-export type NotionCreateSurface = "prd" | "intake";
+export type NotionCreateSurface = "prd" | "intake" | "decision";
 
 export interface NotionCreateInput {
   title: string;
@@ -548,6 +680,10 @@ export interface NotionCreateInput {
   sourceUrl?: string;
   /** Surface-specific extras rendered into the body (e.g. evidence link, tier). */
   extras?: Record<string, string>;
+  /** Decisions DB: Roadmap card page URL/id for the Roadmap Card relation. */
+  roadmapCard?: string;
+  /** Decisions DB: Status select — Proposed | Accepted | Rejected | Superseded. */
+  decisionStatus?: string;
 }
 
 interface SurfacePlan {
@@ -584,6 +720,24 @@ function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreate
         },
         label: "Roadmap (maintenance intake)",
       };
+    case "decision": {
+      const status = (input.decisionStatus?.trim() || "Proposed");
+      const properties: Record<string, unknown> = {
+        Status: { select: { name: status } },
+        Date: { date: { start: new Date().toISOString().slice(0, 10) } },
+      };
+      const cardIds = input.roadmapCard ? extractNotionIds(input.roadmapCard) : [];
+      if (cardIds.length) {
+        properties["Roadmap Card"] = { relation: cardIds.map((id) => ({ id })) };
+      }
+      const evidence = input.sourceUrl?.trim() || input.extras?.evidence?.trim();
+      if (evidence) properties.Evidence = { url: evidence };
+      return {
+        databaseId: env.NOTION_DECISIONS_DB_ID,
+        properties,
+        label: "Design HQ → Decisions DB",
+      };
+    }
   }
 }
 
@@ -598,6 +752,16 @@ export async function notionCreate(
   const plan = planSurface(env, surface, input);
   if (!plan.databaseId) {
     throw new Error(`${surface}: destination database not configured on the Worker`);
+  }
+  if (surface === "decision" && !input.roadmapCard?.trim()) {
+    throw new Error("decision: properties.roadmap_card (Roadmap page URL/id) is required");
+  }
+  if (surface === "decision") {
+    const status = input.decisionStatus?.trim() || "Proposed";
+    const allowed = new Set(["Proposed", "Accepted", "Rejected", "Superseded"]);
+    if (!allowed.has(status)) {
+      throw new Error(`decision: Status "${status}" is not an existing option`);
+    }
   }
 
   // Fold surface-specific extras into a body section so nothing is silently lost.

@@ -1,13 +1,100 @@
 // notion_search executor — READ-ONLY. Find Notion pages/DB entries by keyword
-// when there's no URL to source_read. scope:"team" returns the roster (with
-// Slack ids for @-mention, absorbing the old find_experts); scope:"apps"
-// queries the Third Party Applications DB for access-request routing (who
-// grants access to a tool — approved 2026-07-12); any other scope does a
-// workspace /v1/search. Runs inline in the agent loop (no gate).
+// when there's no URL to source_read.
+//
+// Special scopes:
+//   team  — Team Member roster (SME / @-mention)
+//   apps  — Third Party Applications (access-request routing)
+// Catalog scopes (databases/{id}/query + in-Worker title match — the
+// roadmap_query lesson; /v1/search is weak inside known DBs):
+//   help_tutors | help_teachers | marketplace | running_notes | decisions
+//   news | success_stories | research_papers | banners
+//   any — workspace /v1/search (pages + databases; last resort)
 
 import type { Env } from "../types";
-import { notionSearch, findTeamMembers, queryThirdPartyApps, fetchPageTitles } from "../integrations/notion";
+import {
+  notionSearch,
+  findTeamMembers,
+  queryThirdPartyApps,
+  queryCatalogDatabase,
+  fetchPageTitles,
+  type CatalogRow,
+} from "../integrations/notion";
 
+const MAX_CATALOG_HITS = 8;
+
+type CatalogScopeConfig = {
+  /** Env key holding the Notion DATABASE id. */
+  envKey: keyof Env;
+  label: string;
+  /** Title property names to skip (multi-source parents). */
+  skipTitleNames?: string[];
+  note: string;
+};
+
+/**
+ * Catalog scopes wired to wrangler DATABASE ids. Keep in sync with
+ * docs/conventions/notion.md § Read radar and tool-definitions.json.
+ */
+const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
+  help_tutors: {
+    envKey: "NOTION_HELP_TUTORS_DB_ID",
+    label: "Tutor Help Center Content",
+    skipTitleNames: ["Task name"],
+    note: "Tutor-facing help articles. source_read a hit for full copy. Tasks Tracker rows on this parent DB are filtered out.",
+  },
+  help_teachers: {
+    envKey: "NOTION_HELP_TEACHERS_DB_ID",
+    label: "Teacher Help Center Articles",
+    note: "Teacher-facing help articles (structured Topic/Feature schema). source_read a hit for full copy. Sibling draft library → scope 'help_articles_dev'.",
+  },
+  help_articles_dev: {
+    envKey: "NOTION_HELP_ARTICLES_DEV_DB_ID",
+    label: "Help Center Articles Dev Page",
+    note: "Teacher Help Center draft/library under Teacher Training → Help Center Articles. Prefer help_teachers for the structured production DB when both exist.",
+  },
+  marketplace: {
+    envKey: "NOTION_MARKETPLACE_DB_ID",
+    label: "Prototype Marketplace",
+    note: "Prototype catalog rows. Prefer this scope over 'any' for marketplace lookups. Publishing entries is in-IDE (writers/notion), not a bot write.",
+  },
+  running_notes: {
+    envKey: "NOTION_RUNNING_NOTES_DB_ID",
+    label: "Design Running Notes",
+    note: "Per-person / team design notes. Titles only — source_read for body.",
+  },
+  decisions: {
+    envKey: "NOTION_DECISIONS_DB_ID",
+    label: "Decisions DB",
+    note: "Durable design decisions (Proposed/Accepted/Rejected/Superseded). Prefer this over 'any' for 'what did we decide…'. Create via notion_create surface 'decision'.",
+  },
+  news: {
+    envKey: "NOTION_NEWS_DB_ID",
+    label: "News",
+    note: "Product announcements / what shipped. Read-only grounding.",
+  },
+  success_stories: {
+    envKey: "NOTION_SUCCESS_STORIES_DB_ID",
+    label: "Success Stories",
+    note: "Customer proof / outcomes. Read-only grounding.",
+  },
+  research_papers: {
+    envKey: "NOTION_RESEARCH_PAPERS_DB_ID",
+    label: "Research Papers",
+    note: "Prior research to cite before re-running it. Read-only grounding.",
+  },
+  banners: {
+    envKey: "NOTION_BANNERS_DB_ID",
+    label: "Banners",
+    note: "In-product banner copy/state. Read-only grounding.",
+  },
+};
+
+/**
+ * Execute notion_search for the given scope + query.
+ *
+ * @param env - Worker env (Notion token + DB ids)
+ * @param input - Tool args (`query`, optional `scope`)
+ */
 export async function executeNotionSearch(env: Env, input: Record<string, unknown>): Promise<string> {
   const query = typeof input.query === "string" ? input.query.trim() : "";
   const scope = typeof input.scope === "string" ? input.scope.trim().toLowerCase() : "any";
@@ -31,20 +118,135 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
       return await searchThirdPartyApps(env, query);
     }
 
+    const catalog = CATALOG_SCOPES[scope];
+    if (catalog) {
+      return await searchCatalogScope(env, scope, query, catalog);
+    }
+
     if (!query) return JSON.stringify({ ok: false, error: "missing 'query'" });
     const hits = await notionSearch(env, query);
     return JSON.stringify({
       ok: true,
-      scope,
+      scope: "any",
       count: hits.length,
       results: hits,
       note: hits.length
-        ? "Title-matched candidates. To answer about one, source_read its url — search results are not full content. Cite the page you used."
-        : "No pages matched. The page may not be shared with the bot's Notion integration (Connections), or may not exist — say so; don't answer from memory.",
+        ? "Title-matched candidates from workspace search (pages + databases). Prefer a catalog scope (marketplace, help_tutors, decisions, …) when you know the surface — those are complete DB scans. To answer about one hit, source_read its url. Cite the page you used."
+        : "No pages matched workspace search. Try a catalog scope if you know the surface (marketplace / help_tutors / help_teachers / help_articles_dev / decisions / running_notes / news / …), or the page may not be shared with the bot's Notion integration (Connections). Say so; don't answer from memory.",
     });
   } catch (err) {
     return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
   }
+}
+
+// ─── Catalog scopes — direct DB query + fuzzy title match ────────────────────
+
+/**
+ * Normalize a string for loose title matching.
+ *
+ * @param s - Raw query or title
+ */
+function normalizeTitle(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+/**
+ * Tokenize for overlap scoring (words ≥3 chars).
+ *
+ * @param text - Query or title
+ */
+function tokens(text: string): string[] {
+  return Array.from(
+    new Set(text.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3)),
+  );
+}
+
+/**
+ * Fuzzy title score: token overlap + substring bonus.
+ *
+ * @param queryToks - Query tokens
+ * @param rawQuery - Original query
+ * @param title - Candidate title
+ */
+function scoreTitle(queryToks: string[], rawQuery: string, title: string): number {
+  const titleLower = title.toLowerCase();
+  const titleToks = new Set(tokens(title));
+  if (!queryToks.length) return 0;
+  const overlap = queryToks.filter((t) => titleToks.has(t)).length;
+  let score = overlap / queryToks.length;
+  const q = rawQuery.toLowerCase().trim();
+  if (q && titleLower.includes(q)) score += 1;
+  const nq = normalizeTitle(rawQuery);
+  const nt = normalizeTitle(title);
+  if (nq && (nt.includes(nq) || nq.includes(nt))) score += 0.5;
+  return score;
+}
+
+/**
+ * Search a wired catalog DB by scope.
+ *
+ * @param env - Worker env
+ * @param scope - Scope name
+ * @param query - Title/keyword query (blank → first N rows)
+ * @param cfg - Scope config
+ */
+async function searchCatalogScope(
+  env: Env,
+  scope: string,
+  query: string,
+  cfg: CatalogScopeConfig,
+): Promise<string> {
+  const databaseId = env[cfg.envKey];
+  if (typeof databaseId !== "string" || !databaseId.trim()) {
+    return JSON.stringify({
+      ok: false,
+      scope,
+      error: `${cfg.envKey} not configured on the Worker`,
+      note: `Can't query ${cfg.label} until the database id is set in wrangler.toml.`,
+    });
+  }
+
+  const rows = await queryCatalogDatabase(env, databaseId.trim(), {
+    skipTitleNames: cfg.skipTitleNames,
+  });
+
+  if (rows.length === 0) {
+    return JSON.stringify({
+      ok: false,
+      scope,
+      error: `${cfg.label} returned no rows`,
+      note: `The DB may not be shared with the bot's Notion integration (Connections) — say you couldn't check ${cfg.label}; don't guess.`,
+    });
+  }
+
+  let results: Array<CatalogRow & { match_score?: number }>;
+  if (!query) {
+    results = rows.slice(0, MAX_CATALOG_HITS);
+  } else {
+    const qToks = tokens(query);
+    results = rows
+      .map((r) => ({ ...r, match_score: Number(scoreTitle(qToks, query, r.title).toFixed(2)) }))
+      .filter((r) => (r.match_score ?? 0) > 0)
+      .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
+      .slice(0, MAX_CATALOG_HITS);
+  }
+
+  return JSON.stringify({
+    ok: true,
+    scope,
+    label: cfg.label,
+    count: results.length,
+    scanned: rows.length,
+    results: results.map((r) => ({
+      title: r.title,
+      url: r.url,
+      meta: r.meta,
+      ...(r.match_score != null ? { match_score: r.match_score } : {}),
+    })),
+    note: results.length
+      ? `${cfg.note} Complete scan of ${rows.length} rows (not a keyword sample). source_read a hit for full content; cite the page you used.`
+      : `No ${cfg.label} row matched '${query}' (complete scan of ${rows.length} rows). Say so plainly — don't invent entries. ${cfg.note}`,
+  });
 }
 
 // ─── scope:"apps" — access-request routing over Third Party Applications ─────
@@ -57,10 +259,21 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
 const ROUTING_NOTE =
   "Access-request routing: the Application Admin is who GRANTS access — name them as the person to ask, and pre-fill a short suggested request message the user can copy (what they need, why, and for how long). Power Users are the day-to-day experts for usage questions. NEVER claim to grant, request, or change access yourself — you only route. If admins is empty, suggest the Power Users (or the team roster via scope 'team') as the closest known contact and say the admin isn't recorded. Link the app's Notion page.";
 
+/**
+ * Normalize an application name for loose matching.
+ *
+ * @param s - App name or query
+ */
 function normalizeAppName(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
+/**
+ * Search the Third Party Applications directory for access-request routing.
+ *
+ * @param env - Worker env
+ * @param query - Tool/service name (blank → full directory)
+ */
 async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
   const apps = await queryThirdPartyApps(env);
   if (apps.length === 0) {

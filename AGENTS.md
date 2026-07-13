@@ -98,7 +98,7 @@ Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `siz
 13. Always validate in Storybook when component behavior is touched.
 14. Confirm implementation plan and touched files before large or risky edits.
 15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free.
-16. Never write to a Notion surface outside the allowlist in `docs/conventions/notion.md`, and never create new select options, pillars, features, or OKRs there.
+16. Notion writes follow `docs/conventions/notion.md` (convention surfaces + ✅-gated tools) — never invent select options, pillars, features, or OKRs; exact-match existing option names. Safety is the gate + schema match, not a hardcoded DB fence.
 17. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
 
 ## Knowledge

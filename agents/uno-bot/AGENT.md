@@ -45,7 +45,12 @@ Questions, discussion, thinking-out-loud → answer directly from loaded docs; i
 | DS component / token / prop / rule-doc fact | GitHub MCP reads (`github_read` fallback) | read |
 | "who should I talk to about X" / find an SME | `notion_search` scope `"team"` | read |
 | "can I get access to X" / "who owns/admins tool Y" | `notion_search` scope `"apps"` | read |
-| search the prototype catalog | `notion_search` scope `"any"` (title search) | read |
+| prototype catalog / marketplace entry | `notion_search` scope `"marketplace"` | read |
+| Help Center article (tutor / teacher / draft) | `notion_search` scope `"help_tutors"` / `"help_teachers"` / `"help_articles_dev"` | read |
+| "what did we decide about X" | `notion_search` scope `"decisions"` | read |
+| design running notes | `notion_search` scope `"running_notes"` | read |
+| news / success story / research paper / banner | `notion_search` scope `"news"` / `"success_stories"` / `"research_papers"` / `"banners"` | read |
+| unknown Notion surface (last resort) | `notion_search` scope `"any"` | read |
 | find prior discussion in Slack | `slack_search` | read |
 | read a thread / tally sign-offs | `slack_thread_read` | read |
 | acknowledge / celebrate / signal state | `slack_react` | direct |

@@ -103,7 +103,7 @@ export async function preflight(
 
     case "notion_create": {
       // Only PRD-shaped surfaces need the substance check — an intake or a
-      // research note can legitimately be short.
+      // decision can legitimately be short.
       const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
       const title = typeof input.title === "string" ? input.title.trim() : "";
       const summary = typeof input.summary === "string" ? input.summary.trim() : "";
@@ -112,6 +112,23 @@ export async function preflight(
           ask:
             ":memo: That PRD is a little thin to file. Give me a clear *title* and a couple of sentences of *summary* (what it is + why), and I'll draft the card.",
         };
+      }
+      if (surface === "decision") {
+        const props =
+          input.properties && typeof input.properties === "object"
+            ? (input.properties as Record<string, unknown>)
+            : {};
+        const roadmap =
+          (typeof props.roadmap_card === "string" && props.roadmap_card.trim()) ||
+          (typeof props["Roadmap Card"] === "string" && props["Roadmap Card"].trim()) ||
+          (typeof input.roadmap_card === "string" && input.roadmap_card.trim()) ||
+          "";
+        if (!title || !roadmap) {
+          return {
+            ask:
+              ":memo: To log a decision I need a one-line *title* and the *Roadmap card* URL (properties.roadmap_card). Optional: Status (Proposed/Accepted/…), Evidence URL (Slack/Figma/Zoom), and a short Why in sections.",
+          };
+        }
       }
 
       // Placeholder scan: never file a card with TBD/TODO/lorem/placeholder in
@@ -196,7 +213,7 @@ export async function preflight(
       }
 
       // Bundle check (uno-publish contract): a PROTOTYPE share-out must carry
-      // the full bundle — Loom walkthrough + live preview + decision-log links.
+      // the full bundle — Loom walkthrough + live preview + Decisions DB links.
       // The composing agent is told to gather these; this backstop makes it
       // code-enforced instead of best-effort.
       if (/prototype|playground|scaffold/i.test(summary)) {
@@ -209,7 +226,7 @@ export async function preflight(
           missing.push("a *live preview* link (netlify.app / workers.dev)");
         }
         if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
-          missing.push("a *decision-log / Notion* link");
+          missing.push("a *Decisions DB / Notion* link (project Decisions view or hub)");
         }
         if (missing.length > 0) {
           return {
