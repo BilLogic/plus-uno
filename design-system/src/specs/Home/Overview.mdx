@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as TutorHomePageStories from './Pages/TutorHomePageSkillsOverview/TutorHomePageSkillsOverview.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Home/Overview" />
 
-# Home
+<Title>Home</Title>
 
 Tutor home experience specs: skills overview, learning, and student sections with
 their cards and modals, organized Elements → Cards → Tables → Modals → Sections → Pages.
@@ -14,6 +14,10 @@ their cards and modals, organized Elements → Cards → Tables → Modals → S
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home"
 />
 
-## Featured page — Tutor home (skills overview)
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Tutor home (skills overview)
 
 <Canvas of={TutorHomePageStories.Overview} />
+
+</div>

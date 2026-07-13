@@ -1,10 +1,10 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as DesignTokensStories from './DesignTokens.stories.jsx';
 
-<Meta title="Foundations/Design tokens" />
+<Meta of={DesignTokensStories} />
 
-# Design tokens
-
+<Title />
 Every visual value in the design system — color, spacing, typography, radius,
 elevation — is a **token**. Tokens are defined once as Figma variables and
 mirrored one-to-one as CSS custom properties in
@@ -12,7 +12,15 @@ mirrored one-to-one as CSS custom properties in
 reference tokens, so a change in Figma propagates to code by updating a single
 definition.
 
-## Figma variables ↔ CSS custom properties
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Figma variables ↔ CSS custom properties
 
 The pipeline works in both directions:
 
@@ -22,20 +30,19 @@ The pipeline works in both directions:
   from those tables via `npm run generate:token-registry`, and every `var(--*)`
   is validated against `design-system/src/tokens/*.scss`. A token referenced in
   the mapping doc that does not exist in SCSS fails `npm run check:token-registry`.
+</div>
 
-## Collections
+<div className="sb-ds-doc-section">
+### Collections
 
 The Figma variables are organized into four collections, each with a CSS
 counterpart:
 
-| Figma collection | CSS source | Contents |
-|------------------|-----------|----------|
-| colors / accent | `_colors.scss` | Primary, secondary, status (danger, success, warning, info), SMART competency colors, and their `-container` / `on-` / `-state-*` variants |
-| colors / neutral | `_colors.scss` | Surface, the surface-container ladder (`--color-surface-container-lowest` → `-low` → base → `-high` → `-highest`), on-surface/on-surface-variant, outline/outline-variant, inverse surface, plus state layers (`-state-08/12/16`) |
-| size / primitive | `_primitives.scss` | Raw spacing steps (`--size-spacing-{small\|medium\|large}-space-*`), border radius and stroke primitives — never used directly |
-| size / semantics | `_spacing_semantics.scss` | Per-context tokens: `--size-element-*`, `--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-surface-*`, `--size-table-*` |
+<DesignTokensStories.Collections />
+</div>
 
-## Naming contract
+<div className="sb-ds-doc-section">
+### Naming contract
 
 Token names encode *context and role*, not raw values:
 
@@ -48,8 +55,10 @@ Token names encode *context and role*, not raw values:
 - **Typography**: `--font-{property}-{style}` — e.g. `--font-size-h1`,
   `--font-weight-title`, `--font-family-code`.
 - **Elevation**: `--elevation-light-{1..5}` by z-height (subtle → dialogs).
+</div>
 
-## Source of truth
+<div className="sb-ds-doc-section">
+### Source of truth
 
 `design-system/docs/foundations/token-mapping.md` is the **single source of
 truth** for Figma-to-CSS token names. Its key rules:
@@ -63,8 +72,6 @@ truth** for Figma-to-CSS token names. Its key rules:
 
 When you need a token, check that doc first; for quick machine lookups,
 `token-registry.json` may be read (read-only).
+</div>
 
-<ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
-/>
+</div>

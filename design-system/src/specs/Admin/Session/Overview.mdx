@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as SessionAdminPageStories from './Pages/SessionAdminPage/SessionAdminPage.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Admin/Session/Overview" />
 
-# Admin · Session
+<Title>Admin · Session</Title>
 
 Session management specs: session tables, breakdowns, and the session modal,
 organized Elements → Cards → Tables → Modals → Sections → Pages.
@@ -14,6 +14,10 @@ organized Elements → Cards → Tables → Modals → Sections → Pages.
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Session"
 />
 
-## Featured page — Session admin
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Session admin
 
 <Canvas of={SessionAdminPageStories.Overview} />
+
+</div>

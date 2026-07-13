@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as GroupInfoPageStories from './Pages/GroupInfoPage/GroupInfoPage.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Admin/Group/Overview" />
 
-# Admin · Group
+<Title>Admin · Group</Title>
 
 Group management specs: group info and training-progress views with their
 tables, organized Elements → Cards → Tables → Modals → Sections → Pages.
@@ -14,6 +14,10 @@ tables, organized Elements → Cards → Tables → Modals → Sections → Page
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Group"
 />
 
-## Featured page — Group info
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Group info
 
 <Canvas of={GroupInfoPageStories.Overview} />
+
+</div>

@@ -77,7 +77,7 @@ const SidebarTab = ({
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                width: '184px',
+                width: '164px',
                 padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg)',
                 gap: 'var(--size-element-gap-md)',
                 borderRadius: 'var(--size-modal-radius-md)',

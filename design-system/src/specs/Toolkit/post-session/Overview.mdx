@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as PostSessionPageStories from './Pages/PostSessionPage/PostSessionPage.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Toolkit/Post-Session/Overview" />
 
-# Toolkit · Post-Session
+<Title>Toolkit · Post-Session</Title>
 
 Reflection and feedback after a session ends: session reflection, self and
 student ratings, and the feedback forms. Organized
@@ -15,6 +15,10 @@ Elements → Cards → Tables → Modals → Sections → Pages.
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session"
 />
 
-## Featured page — Post-Session
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Post-Session
 
 <Canvas of={PostSessionPageStories.Default} />
+
+</div>

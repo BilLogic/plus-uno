@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as StudentAdminPageStories from './Pages/StudentAdminPage/StudentAdminPage.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Admin/Student/Overview" />
 
-# Admin · Student
+<Title>Admin · Student</Title>
 
 Student management specs: student roster tables, overview sections, and the
 student modal, organized Elements → Cards → Tables → Modals → Sections → Pages.
@@ -14,6 +14,10 @@ student modal, organized Elements → Cards → Tables → Modals → Sections �
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Admin/Student"
 />
 
-## Featured page — Student admin
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Student admin
 
 <Canvas of={StudentAdminPageStories.Overview} />
+
+</div>

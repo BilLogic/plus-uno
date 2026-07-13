@@ -296,19 +296,20 @@ const ResponsiveFrame = ({ breakpoint = 'xl', fitToContainer = false, showToolba
                 className="responsive-frame-wrapper"
                 style={{
                     flex: 1,
-                    // No chrome of its own outside fullscreen: the docs canvas already provides
-                    // a backdrop and the inner page frame carries the single visible border —
-                    // extra nested boxes waste space and confuse what "the page" is.
-                    backgroundColor: browserFullscreen
-                        ? 'var(--color-surface-container-lowest, #f8f9fa)'
-                        : 'transparent',
+                    // The wrapper is the DISPLAY BLOCK: a filled, bordered well on the lowest
+                    // layer so the shown page is clearly distinguishable from the docs prose.
+                    // The border/fill live here on the OUTER well — the inner page frame stays
+                    // clean (no doubled outline), which is what "the page" should look like.
+                    backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
+                    border: browserFullscreen ? 'none' : '1px solid var(--color-outline-variant, #e0e0e0)',
+                    borderRadius: browserFullscreen ? 0 : 'var(--size-card-radius-sm, 12px)',
                     display: 'flex',
                     justifyContent: fitToContainer ? 'center' : 'flex-start',
                     alignItems: 'flex-start',
                     overflowX: 'auto',
                     overflowY: 'auto',
                     WebkitOverflowScrolling: 'touch',
-                    padding: browserFullscreen ? '24px' : 0,
+                    padding: browserFullscreen ? '24px' : 'clamp(1rem, 3vw, 2rem)',
                     width: '100%',
                     boxSizing: 'border-box',
                     ...(browserFullscreen ? { flex: 1, minHeight: 0 } : {}),

@@ -132,9 +132,8 @@ const preview = {
             "Introduction",
             "Color",
             "Typography",
-            "Layout & grid",
-            "Grid",
             "Spacing",
+            "Grid",
             "Patterns",
             [
               "Introduction",

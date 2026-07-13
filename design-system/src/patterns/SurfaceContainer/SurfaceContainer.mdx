@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={SurfaceContainerStories} />
 
 <Title />
-The surface container is the general wrapper for page content or large groups of sections. A page-region variant of Surface with a baked-in `--color-surface-container` background, container padding/gap tokens, and no elevation. Children are the content slot. It mirrors the Surface container slot component in Figma.
+The surface container is the **Main-region shell** — the white content area every page is built on. Baked in: `--color-surface` background, Surface-tier padding (`--size-surface-pad-x/y`), gap, radius, and no elevation. It **fills the width it is given**: the page/shell owns the width and the breakpoint mode, the container just adapts. Children are the content slot. It mirrors the published `Pattern/Surface container` Figma component (auto mode + fill), which also carries the adaptive 12-column content grid.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
@@ -19,7 +19,7 @@ The surface container is the general wrapper for page content or large groups of
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Default container: <code>--color-surface-container</code> background, container padding and gap tokens, flat.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Default container: <code>--color-surface</code> background, Surface-tier padding/gap/radius tokens, flat, filling the available width.</>}>
     <Canvas of={SurfaceContainerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 

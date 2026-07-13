@@ -72,6 +72,15 @@ Story-authoring conventions for agent-friendliness (storybook.js.org/docs/ai/bes
 - Specs grammar: `Specs/<Area>/(<Phase>/)<Type>/<Component>` with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages; Title Case phases/types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
 - Naming: sentence-case display names in titles ("Button group"); PascalCase code exports; specs never re-implement a core component — a local organism used in 2+ areas gets promoted.
 
+## Grid & breakpoint contract (2026-07)
+
+Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `size / layout` variable collection and as `--breakpoint-*-min` in `design-system/src/tokens/_layout.scss`. Never design or build below 768px.
+
+- **Two grids, both single mode-adaptive Figma styles** (values bound to `size / layout` variables — switch the frame's mode, never hand-edit or detach): `Grid/Viewport (adaptive)` (12 col, gutter 12/16/16, margin 16/32/32) for full-page frames without the shell; `Grid/Adaptive (12-col)` (12 col, **gutter 8px** = `--layout-grid-gap`, offset = `Surface/pad-x` 32) — the content grid, carried by `Pattern/Surface container`.
+- **Column spans** come from `Columns/col-1…12` (Figma) = `--col-*` (code); they assume the 8px content gutter. Main content width at breakpoint minimums: 672 / 748 / 1164 (= `1440 − 32 outer − 164 SideNav − 16 gap − 64 surface pad` at XL).
+- **Ownership layering**: the page frame owns width (bound to `Breakpoints/min width`) and the mode; `Pattern/Surface container` runs on auto mode and **fills** the width it's given (`--color-surface`, Surface-tier pad 32/24, gap 24, radius 16) and carries the grid + Content slot; SideNav is **164px** (`--layout-sidebar-width`) and its visibility binds to the `Display/*` booleans (collapses at MD).
+- **Docs-page shell (every MDX)**: `<Title/>` → intro paragraph → `<ResourcesBlock/>` → `<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">` → `sb-ds-doc-section` blocks with `###` headings. Markdown pipe-tables do NOT parse in this MDX setup — always use styled `<table>` JSX (see `src/styles/Spacing.stories.jsx` for the shared pattern).
+
 ## Forbidden patterns
 
 1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.

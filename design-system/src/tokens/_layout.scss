@@ -18,6 +18,55 @@
     --breakpoint-xxl-min: 1920px;
     /* Assuming next generic step or keep open */
 
-    /* Containers */
-    /* Note: Container and column width tokens are available but may require responsive handling */
+    /* App shell + content grid (mirrors the Figma size/layout collection) */
+    --layout-sidebar-width: 164px; /* SideNav fixed width */
+    --layout-grid-gap: 8px; /* content-grid gutter (= --size-element-gap-sm); col-* spans assume this */
+
+    /* Content-grid column spans — MD (768) values; LG/XL override below */
+    --col-1: 48.67px;
+    --col-2: 105.33px;
+    --col-3: 162px;
+    --col-4: 218.67px;
+    --col-5: 275.33px;
+    --col-6: 332px;
+    --col-7: 388.67px;
+    --col-8: 445.33px;
+    --col-9: 502px;
+    --col-10: 558.67px;
+    --col-11: 615.33px;
+    --col-12: 672px;
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --col-1: 55px;
+        --col-2: 118px;
+        --col-3: 181px;
+        --col-4: 244px;
+        --col-5: 307px;
+        --col-6: 370px;
+        --col-7: 433px;
+        --col-8: 496px;
+        --col-9: 559px;
+        --col-10: 622px;
+        --col-11: 685px;
+        --col-12: 748px;
+    }
+}
+
+@media (min-width: 1440px) {
+    :root {
+        --col-1: 89.67px;
+        --col-2: 187.33px;
+        --col-3: 285px;
+        --col-4: 382.67px;
+        --col-5: 480.33px;
+        --col-6: 578px;
+        --col-7: 675.67px;
+        --col-8: 773.33px;
+        --col-9: 871px;
+        --col-10: 968.67px;
+        --col-11: 1066.33px;
+        --col-12: 1164px;
+    }
 }

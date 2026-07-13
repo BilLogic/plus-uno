@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as OnboardingOverviewPageStories from './Pages/OnboardingOverviewPage/OnboardingOverviewPage.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Training/Onboarding/Overview" />
 
-# Training · Onboarding
+<Title>Training · Onboarding</Title>
 
 New-tutor onboarding: the module overview and inner pages, module cards, status
 indicators, and completion modals. Organized
@@ -15,6 +15,10 @@ Elements → Cards → Tables → Modals → Sections → Pages.
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/Onboarding"
 />
 
-## Featured page — Onboarding overview
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Onboarding overview
 
 <Canvas of={OnboardingOverviewPageStories.Overview} />
+
+</div>

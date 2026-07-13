@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as MySessionsStories from './Pages/MySessions.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Toolkit/Pre-Session/Overview" />
 
-# Toolkit · Pre-Session
+<Title>Toolkit · Pre-Session</Title>
 
 Everything a tutor or supervisor does before a session runs: session sign-ups,
 fill-ins, call-offs, availability confirmation, and session management (create /
@@ -15,6 +15,10 @@ edit / delete). Organized Elements → Cards → Tables → Modals → Sections 
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Pre-Session"
 />
 
-## Featured page — My Sessions
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — My Sessions
 
 <Canvas of={MySessionsStories.Overview} />
+
+</div>

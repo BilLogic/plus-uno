@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import ModalManager from '@restart/ui/ModalManager';
 import { PageLayout } from '@/specs/Universal/Pages';
 import Button from '@/components/actions/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
@@ -18,6 +19,11 @@ import '@/specs/Admin/Student/Tables/StudentsTable/StudentsTable.scss';
 import '@/specs/Admin/Student/Sections/StudentOverviewSection/StudentOverviewSection.scss';
 import '@/specs/Admin/Student/Modals/StudentModal/StudentModal.scss';
 import './StudentAdminPage.scss';
+
+// Shared manager for contained modals: skips react-bootstrap's document.body
+// scroll-lock and padding mutations so an open contained modal never affects
+// the host page (e.g. a Storybook docs page).
+const containedModalManager = new ModalManager({ handleContainerOverflow: false });
 
 const StudentAdminPage = ({
     students = [],
@@ -121,6 +127,7 @@ const StudentAdminPage = ({
     const containedModalProps = containModal
         ? {
             container: modalBoundaryRef,
+            manager: containedModalManager,
             enforceFocus: false,
             autoFocus: false,
             restoreFocus: false,

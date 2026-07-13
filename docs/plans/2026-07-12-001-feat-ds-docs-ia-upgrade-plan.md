@@ -123,3 +123,148 @@ Figma cleanup executed (phases 4–5): File 1 pages renamed/regrouped under labe
 - **Popup containment sweep (42 story files):** portal/fixed modals no longer cover docs pages — Admin modals arg-gated default-off; UserFeedbackModal contained via noOverlay; OnboardingInnerPage scrim arg-gated; 9 Toolkit WithModals pages gated behind `open` (default off); 51 Modal usages in 27 spec files switched to `renderAs="inline"` — which also FIXED ~27 stories that previously rendered nothing at all. Known pre-existing: AllSessionsWithModals modalMap references missing exports.
 - **Inventory closed:** TreeSelect (forms-and-inputs) and ScrollBar (layout-and-structure) built with stories/MDX/tests (9/9 green); taxonomy updated. No component now exists on only one side.
 - **Audit findings (to schedule):** 7 component MDX missing 4–5 docsSpine sections (worst: RichTextEditor); 145/266 spec figmaLinks are file-level placeholders (need node-ids); Login specs least documented (5 stories without MDX); Layout & grid page documents 4 phantom tokens (--layout-grid-gap, --layout-sidebar-width, --size-surface-container-pad-x-sm, --col-1..12).
+
+## Round 6 execution (2026-07-12)
+
+- **Popup root cause fixed:** Admin page components portaled react-bootstrap modals to document.body (fixed + backdrop over the docs page). New `.plus-modal-boundary` utility + `containModal` prop on StudentAdminPage / SessionAdminPage / TutorPerformancePage (container ref + ModalManager without scroll-lock + no focus stealing); OnboardingInnerPage scrim fixed→absolute. WithModal stories arg-driven; verified on the repro page: 0 fixed overlays, modals contained, no body scroll-lock. 13/13 tests green.
+- **Page display outline removed:** ResponsiveFrame inner frame no longer draws border/shadow — the page itself is the only visible content.
+- **Grid foundation shipped:** Foundations/Grid Storybook page (Atlassian's grid rules adapted: desktop-only MD/LG/XL, fixed-wide 1296 / fixed-narrow 864 / fluid, 12 columns, SideNav/TopNav/Main/Panel region naming with Panel-as-off-canvas note, full do's/don'ts, single min-width rule deprecating min–max drag). Figma: grid styles Grid/MD 768 (12/12/16), Grid/LG 1024 (12/16/32), Grid/XL 1440 (12/16/32), Grid/Main region (12/16/0) created and applied to Breakpoint variants + the Main-region Surface container.
+- **Patterns corrected after native-slot conversion (slots verified as SLOT nodes):** Card widths 320/480/720 with min/max bounds, Section 480/720/1080, Modal min/max per size; Body slots 140–180px vs Footer 48–56px (proportions fixed); Surface container reframed as the app-shell Main region (1164 = XL math, min 672) carrying the Main grid.
+- **Flagged decisions:** sidebar width drift — token 164px vs PageLayout code 184px; Breakpoint set still carries Mobile 320 / Tablet 600 variants contradicting desktop-only (deprecation candidates; renaming variant values may break instances). Follow-up: thorough grid-alignment testing round across specs.
+
+## Round 7 — Grid/Spacing consolidation, sidebar 164, Vercel purge, Figma breakpoint fix
+
+- **Docs consolidation.** Removed the redundant `Foundations/Layout & grid` page
+  (deleted `Layout.mdx` + `Layout.stories.jsx`). The two clean pages the user
+  wanted now stand alone: **Spacing** (token scale + per-context value tables,
+  moved into new `Spacing.stories.jsx`) and **Grid** (12-col grid, breakpoints,
+  regions, column reference — now via new `Grid.stories.jsx`). Taxonomy reordered
+  to `… Typography, Spacing, Grid, Patterns …`; storySort regenerated. Updated the
+  two inbound links (Introduction.mdx, Grid.mdx).
+- **Table parsing.** Grid tables converted from markdown to styled `<table>`
+  components (matching the proven Layout/Spacing pattern) so they parse and style
+  consistently. Verified in-browser.
+- **Do's & don'ts.** Now a sectioned, side-by-side two-column block (green Do /
+  red Don't with icons) via `GridStories.DosAndDonts`. Verified in-browser.
+- **Sidebar 164.** Reconciled the 164↔184 drift in favour of **164px**
+  (`--layout-sidebar-width`). Finding: the 184 was a hardcoded tab width, not a
+  different grouping. Introduced `SIDEBAR_WIDTH = 164` constant in PageLayout and
+  fixed all shell refs: PageLayout wrapper+inner, both SidebarTab copies
+  (specs + components/navigation), TopBar `TOPBAR_LEFT_EXPANDED_WIDTH`. Grid math
+  (1164 @ XL) now holds on both sides.
+- **Vercel purge.** No real Vercel config existed (no vercel.json/.vercel/workflow).
+  Removed the stray refs: `.vercel/` from .gitignore and `vercel.app` from the
+  uno-bot preflight preview-link regex. Any GitHub↔Vercel integration the user sees
+  is an external app/dashboard connection to disconnect on Vercel's side.
+- **Figma breakpoint.** `Breakpoint` set (6:349) made desktop-only: deleted the
+  off-spec `05 - Mobile (320)` and `04 - Tablet Small (600)` variants + their 2
+  demo instances on the Layout & Grid page; added an MD (768) demo instance to
+  complete the XL/LG/MD row; renumbered Fluid 06→04; compacted variants (set width
+  6132→5012). Result: XL / LG / MD / Fluid. Flagged variant *naming* (Desktop HD /
+  Desktop / Tablet vs MD/LG/XL) for user review.
+
+## Round 8 — table fixes, cross-page consistency, app-shell component
+
+- **Figma breakpoint naming.** Renamed variant values to **MD (768) / LG (1024) /
+  XL (1440) / Fluid** (6:349); demo instances re-resolve cleanly.
+- **Spacing page (was "very broken").** Root cause: markdown tables don't parse in
+  this MDX setup — the Primitive scale etc. rendered as raw pipes. Converted ALL
+  Spacing tables to styled components (Spacing.stories.jsx) with ONE shared column
+  geometry (`tableLayout: fixed` + colgroup) so Token/Value/Description line up
+  across every context table. Rewrote Spacing.mdx to the canonical wrapper +
+  doc-section + `###` structure.
+- **Grid Do/Don't → matched pairs.** Rebuilt as a 2-col grid where each row is one
+  Do and its corresponding Don't on the same topic (zebra rows), not two big blocks.
+- **Cross-page consistency.** Normalized foundation pages: `###` section headings
+  everywhere (Grid, Spacing, DesignTokens, Accessibility converted from `##`);
+  removed the `padding:24px, margin:0 auto` indent wrappers from Colors/Icons/
+  Elevation/Typography stories so content is flush-left with headings (fixes the
+  Iconography optical-balance drift). Also converted the last two broken-markdown
+  pages (Accessibility, DesignTokens) to styled tables + canonical structure.
+- **Display block bg+border restored.** `DocsPreviewCard` was missing its border;
+  now surface-container-lowest fill + outline-variant border. ResponsiveFrame outer
+  wrapper is now the DISPLAY WELL (surface-container-lowest fill, outline-variant
+  border, 12px radius, padding) while the inner page stays clean — display blocks
+  are distinguishable again without the doubled-outline the user disliked.
+- **Figma app-shell starting point (NEW).** Built `Pattern/App shell` component on
+  the Patterns page: TopNav (52) + SideNav (**164**) + Main (an INSTANCE of
+  Pattern/Surface container = 1164px, carrying the 12-col grid + a fillable Content
+  slot). All fills token-bound (surface / surface-container). Grid math matches
+  PageLayout exactly: 1440 − 32 − 164 − 16 − 64 = 1164. Consumers instance it and
+  fill the Main slot to start an empty screen.
+- **Container #4 = Fluid.** The Fluid breakpoint variant is the fluid-grid mode
+  (columns stretch to fill Main; no fixed max width) — for boards/timelines/canvases.
+- **FLAGGED:** the existing breakpoint grid-annotation frames still label the SideNav
+  at **200px** (should be 164). Left untouched to avoid disturbing the grid overlay
+  alignment — needs a careful pass or user confirmation.
+
+All Storybook builds green (exit 0).
+
+## Round 9 — top-padding fix, correct app-shell (real components + slot), naming
+
+- **Foundation top-padding inconsistency fixed.** Grid/Spacing/DesignTokens/
+  Accessibility had a literal `# H1` INSIDE the `--page` wrapper (which carries
+  margin-top 4–6rem), pushing the title down vs Color/Typography (which put
+  `<Title/>` OUTSIDE the wrapper). Moved all four to `<Title/>`-outside + intro
+  paragraph inside. Build green; verified Spacing title now flush like Color.
+- **App-shell corrected.** Deleted my wrong BS4 placeholder shell. Learned the real
+  structure: the typical page is the `App Outer Layout` component (Top Bar variant
+  set + Main Container[ Side Bar 164 + Content Container ]) using the REAL Top Bar +
+  Side Bar components. Built a correct reference shell in the Web App Specs file
+  using instances of the real Top Bar (expanded) + Side Bar (164) + a Main region
+  (surface, 12-col grid, 32 pad) with a slot-ready Content frame. Exact math:
+  164 + 16 + 1228 (inner 1164).
+- **Cross-file slot gap found.** The BS4 `Pattern/Surface container` slot
+  (key 8df64f18…) is NOT published/enabled in the Web App Specs file
+  (`importComponentByKeyAsync` → "key not found"), and this file has NO local color
+  variables (they come from the BS4 library). Native slots can't be created via API.
+  So making typical pages truly use the slot needs either: publish BS4 pattern as a
+  library + enable here, OR create a local Surface-container slot component here
+  (with the one manual "convert frame to slot" UI step).
+- **Naming alignment (PENDING — figma-plus transport dropping).** Target mapping to
+  match Storybook: Figma `Side Bar`→`Sidebar`, `Side Bar Tab`→`Sidebar Tab`,
+  `App Outer Layout`→`Page Layout` (`Top Bar` already matches). Rename attempts
+  failed on repeated MCP transport drops; needs a retry when the connection is stable.
+- **Patterns docs** (skip the `--page` wrapper, off styling) — deferred to the
+  Storybook-finalization phase per the user's gate.
+
+## Round 10 — full docs-shell sweep, adaptive mode-driven grid, Badge parity fix
+
+- **Storybook shell consistency (370 MDX audited, 131 fixed).** Canonical shell
+  ratified from Button.mdx: `<Title/>` → intro → ResourcesBlock → `--page` wrapper
+  → doc-sections. Codemod: 76 specs pages missing `--page`; 40 dataviz pages
+  wrapped; 11 Overview/H1 pages converted to `<Title>` blocks (## → ###);
+  Patterns/Introduction rewritten canonical (its markdown table → styled JSX
+  table); Grid/Spacing/DesignTokens/Accessibility intros + ResourcesBlocks moved
+  to Button position. Re-audit: 0 offenders. Build green (exit 0).
+- **BS4 adaptive grid + tokens (THE mode-driven design).** Discovered `size /
+  layout` collection already has MD/LG/XL MODES with `Breakpoints/min width`
+  (768/1024/1440), `Columns/col-1..12`, and `Display/*` visibility booleans.
+  Derived from col-* math that the CONTENT grid gutter is **8px** (12×89.67+11×8
+  = 1164), not the 12/16 viewport gutters. Created mode-varying vars: Grid/columns,
+  Grid/content-gutter (8), Grid/viewport-gutter (12/16/16), Grid/viewport-margin
+  (16/32/32), Main/width (736/812/1228).
+  - **Pattern/Surface container retokenized** from wrong element-tier bindings
+    (pad 12/6, gap 10, radius 4, surface-container fill) to Surface tier: fill →
+    surface, pad → Surface/pad-x/y (32/24), gap → Surface/gap-md, radius →
+    Surface/radius (16), width BOUND to Main/width, minWidth 736. ONE grid style
+    "Grid/Adaptive (12-col)" (count/gutter bound to Grid/*, offset bound to
+    Surface/pad-x) applied to it. **Mode-flip verified: MD 736/672, LG 812/748,
+    XL 1228/1164 — slot width = col-12 at every mode.**
+  - **Breakpoint set**: ONE "Grid/Viewport (adaptive)" style on all variants, each
+    variant pinned to its size/layout mode, widths bound to Breakpoints/min width.
+    Old static grid styles (MD 768/LG 1024/XL 1440/Main region) retired.
+  - Pattern audit: Card/Modal fully bound; Table no-fill + Section no-fill are
+    per-SSOT intentional; nothing numeric left unbound.
+- **Naming sync (Web App Specs)**: `Side Bar`→`Sidebar`, `Side Bar Tab`→`Sidebar
+  Tab`, `App Outer Layout`→`Page Layout`; `Top Bar` already matched Storybook.
+- **Badge parity FIXED (user's example).** Figma truth (Static Badges 25:568):
+  rounded rectangles, radius by tier — h1–h3 radius-lg 8, h4–h6 radius-150 6,
+  b1–b3 radius-md 4; state-08 fills (already matched). Code rendered a 999px PILL.
+  Badge.scss now applies the tiered radii; verified in-browser (b2 → 4px).
+- **NEXT (user gate)**: user publishes the BS4 library → then rebuild Page Layout
+  in Web App Specs as ONE mode-adaptive component: insert Pattern/Surface
+  container instance as Main, bind width to Breakpoints/min width, Sidebar
+  visibility → Display/* booleans, tokenized shell paddings; then finalize
+  Storybook docs (Grid doc gutter correction: content grid = 8px) + full
+  component-parity sweep.

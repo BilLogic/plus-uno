@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as LessonsOverviewPageStories from './Pages/LessonsOverviewPage/LessonsOverviewPage.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Training/Lessons/Overview" />
 
-# Training · Lessons
+<Title>Training · Lessons</Title>
 
 The training-lesson library: lesson overview and detail pages, lesson lists and
 tables, ratings, and status selection. Organized
@@ -15,6 +15,10 @@ Elements → Cards → Tables → Modals → Sections → Pages.
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Training/Lessons"
 />
 
-## Featured page — Lessons overview
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Lessons overview
 
 <Canvas of={LessonsOverviewPageStories.Overview} />
+
+</div>

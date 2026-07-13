@@ -1,10 +1,10 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as StudentDashboardStories from './Pages/StudentDashboard.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Toolkit/In-Session/Overview" />
 
-# Toolkit · In-Session
+<Title>Toolkit · In-Session</Title>
 
 The live tutoring surface: the student dashboard with attendance and engagement
 tracking, session controls, goal status, and student tags. Organized
@@ -15,6 +15,10 @@ Elements → Cards → Tables → Modals → Sections → Pages.
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/In-Session"
 />
 
-## Featured page — Student Dashboard
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Featured page — Student Dashboard
 
 <Canvas of={StudentDashboardStories.Overview} />
+
+</div>

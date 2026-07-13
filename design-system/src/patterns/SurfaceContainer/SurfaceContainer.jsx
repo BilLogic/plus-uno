@@ -4,16 +4,17 @@ import './SurfaceContainer.scss';
 
 /**
  * Surface container pattern for PLUS design system.
- * Page-region wrapper variant of Surface: general wrapper for page content or
- * large groups of sections. Baked-in `--color-surface-container` background,
- * surface-container padding + gap tokens, flat (elevation 0).
- * Mirrors the "Surface container" slot component in the Figma design system file.
+ * The Main-region shell: baked-in `--color-surface` background, Surface-tier
+ * padding/gap/radius tokens, flat (elevation 0), and it FILLS the width it is
+ * given — the page/shell owns the width and the breakpoint mode. Mirrors the
+ * published `Pattern/Surface container` Figma component (auto mode + fill),
+ * which carries the adaptive 12-column content grid and the Content slot.
  */
 const SurfaceContainer = ({
     id,
     padding = 'md',
     gap = 'md',
-    radius = 'none',
+    radius = 'md',
     border = false,
     as: Component = 'div',
     className = '',

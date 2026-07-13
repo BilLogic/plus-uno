@@ -29,7 +29,7 @@ const TypeScale = ({ category, description, examples }) => (
 );
 
 export const TypographyDisplay = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <TypeScale
             category="Display"
             description="Largest text for hero sections"
@@ -44,7 +44,7 @@ export const TypographyDisplay = () => (
 );
 
 export const TypographyHeadlines = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <TypeScale
             category="Headlines"
             description="Main headings for page sections"
@@ -58,7 +58,7 @@ export const TypographyHeadlines = () => (
 );
 
 export const TypographyTitles = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <TypeScale
             category="Titles"
             description="Subheadings and card titles"
@@ -72,7 +72,7 @@ export const TypographyTitles = () => (
 );
 
 export const TypographyBody = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <TypeScale
             category="Body"
             description="Content text"

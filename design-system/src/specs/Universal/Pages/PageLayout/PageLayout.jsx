@@ -13,9 +13,11 @@ import { TopBar, Sidebar } from '../../Sections';
 const SIDEBAR_TRANSITION = 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
 const CONTENT_TRANSITION = 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
 
+/** SideNav width — matches the --layout-sidebar-width token (164px). Single source; do not hardcode elsewhere. */
+const SIDEBAR_WIDTH = 164;
 /** TopBar skeleton: left (toggle), center (breadcrumb), right (avatar). Same layout as TopBar for no CLS. */
 const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
-const TOPBAR_LEFT_EXPANDED_WIDTH = 184;
+const TOPBAR_LEFT_EXPANDED_WIDTH = SIDEBAR_WIDTH;
 
 const PageLayout = ({
     children,
@@ -161,7 +163,7 @@ const PageLayout = ({
                 transition: 'gap 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
                 alignItems: 'stretch',
             }}>
-                {/* Sidebar Wrapper – stays in flow; width 184↔0 so content area grows/shrinks with same timing; shell-reveal for entrance */}
+                {/* Sidebar Wrapper – stays in flow; width 164↔0 so content area grows/shrinks with same timing; shell-reveal for entrance */}
                 <div
                     className={`plus-page-sidebar-wrapper${!shellLoading ? ' shell-reveal' : ''}${!shellLoading && shellEntered ? ' has-entered' : ''}`}
                     style={{
@@ -173,12 +175,12 @@ const PageLayout = ({
                         backgroundColor: 'var(--color-surface-container)',
                         transition: SIDEBAR_TRANSITION,
                         zIndex: 100,
-                        width: showSidebar ? 184 : 0,
-                        minWidth: showSidebar ? 184 : 0,
+                        width: showSidebar ? SIDEBAR_WIDTH : 0,
+                        minWidth: showSidebar ? SIDEBAR_WIDTH : 0,
                         pointerEvents: showSidebar ? 'auto' : 'none',
                     }}
                 >
-                    <div style={{ width: 184, minWidth: 184, height: '100%', overflowY: 'auto' }}>
+                    <div style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH, height: '100%', overflowY: 'auto' }}>
                         <Sidebar
                             {...sidebarProps}
                             activeTabId={sidebarActiveCombined}

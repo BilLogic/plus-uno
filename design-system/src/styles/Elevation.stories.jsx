@@ -37,7 +37,7 @@ const ElevationTable = ({ headers, rows }) => (
 );
 
 export const Overview = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <p className="body1-txt" style={{ marginBottom: '32px' }}>
             Elevation tokens provide box-shadow values for creating depth and hierarchy in the UI.
         </p>
@@ -52,7 +52,7 @@ export const Overview = () => (
 );
 
 export const AllElevations = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <ElevationTable
             headers={['Token', 'Value', 'Visual', 'Use Case']}
             rows={[

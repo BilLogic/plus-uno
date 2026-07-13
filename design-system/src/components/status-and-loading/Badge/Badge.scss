@@ -20,10 +20,10 @@
     padding-left: var(--size-element-pad-x-lg);
     padding-right: var(--size-element-pad-x-lg);
 
-    // Shape
-    // Figma spec: Badges use pill shape - Border/Radius/radius-1000 (999px)
-    // Using semantic token --size-element-radius-full which maps to --size-border-radius-radius-1000
-    border-radius: var(--size-element-radius-full);
+    // Shape — per the Figma "Static Badges" set (node 25:568), badges are ROUNDED
+    // RECTANGLES, not pills. Radius scales with the size tier:
+    //   h1–h3 → Element/radius-lg (8px) · h4–h6 → radius-150 (6px) · b1–b3 → Element/radius-md (4px)
+    border-radius: var(--size-element-radius-lg);
 
     // Default Font (overridden by size classes)
     text-align: center;
@@ -32,7 +32,7 @@
 
 
     // --- SIZES ---
-    // Override padding based on size class
+    // Override padding + radius based on size class (mirrors the Figma variant tiers)
     // Match both size classes (b2) and typography classes (body2-txt) for compatibility
     &.h4,
     &.h5,
@@ -42,6 +42,7 @@
     &.h6-txt {
         padding-left: var(--size-element-pad-x-md);
         padding-right: var(--size-element-pad-x-md);
+        border-radius: var(--size-border-radius-radius-150, 6px);
     }
 
     &.b1,
@@ -52,6 +53,7 @@
     &.body3-txt {
         padding-left: var(--size-element-pad-x-sm);
         padding-right: var(--size-element-pad-x-sm);
+        border-radius: var(--size-element-radius-md);
         // Font weight now handled via typography class in JSX (font-weight-semibold)
     }
 

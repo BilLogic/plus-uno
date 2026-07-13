@@ -40,7 +40,7 @@ const ColorTable = ({ headers, rows, hasColor = true }) => (
 );
 
 export const Overview = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <p className="body1-txt" style={{ marginBottom: '32px' }}>
             PLUS follows Material Design 3 color guidance. All colors follow Material Design 3 roles and are sourced from Figma design system variables.
         </p>
@@ -48,7 +48,7 @@ export const Overview = () => (
 );
 
 export const AccentColors = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <h4 className="h3" style={{ marginBottom: '16px' }}>Primary</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
@@ -88,7 +88,7 @@ export const AccentColors = () => (
 );
 
 export const StatusColors = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <h4 className="h3" style={{ marginBottom: '16px' }}>Success</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
@@ -128,7 +128,7 @@ export const StatusColors = () => (
 );
 
 export const NeutralColors = () => (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px' }}>
         <h4 className="h3" style={{ marginBottom: '16px' }}>Text</h4>
         <ColorTable
             headers={['Token', 'Value', 'Color', 'Description']}
