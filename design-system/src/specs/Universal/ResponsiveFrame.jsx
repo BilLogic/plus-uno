@@ -82,12 +82,11 @@ const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
         backgroundColor: 'var(--color-surface, #ffffff)',
         position: 'relative',
         transition: 'max-width 0.25s cubic-bezier(0.2,0,0.2,1)',
-        // Fullscreen: become a flex child that fills the column so a page with height:100%
-        // (PageLayout) resolves against a definite height instead of collapsing to content.
-        // Non-fullscreen: keep a tall min-height so short previews still fill the docs well.
-        ...(fullscreen
-            ? { flex: '1 1 auto', minHeight: 0 }
-            : { minHeight: 'calc(100vh - 220px)' }),
+        // Always a flex child that fills the column, so a page with height:100% (PageLayout)
+        // resolves against a definite height instead of collapsing to its content. This is what
+        // makes pages fill the preview in the normal well AND in fullscreen — no per-story height.
+        flex: '1 1 auto',
+        minHeight: 0,
     };
 
     return (
@@ -99,7 +98,11 @@ const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     width: '100%',
-                    minHeight: fullscreen ? '100%' : 'auto',
+                    // Definite height (not just min-height) so the flex chain below hands pages a
+                    // resolvable height — 100vh fills the preview viewport in the normal well; the
+                    // fullscreen branch uses position:fixed/inset:0 + height:100%.
+                    height: fullscreen ? '100%' : '100vh',
+                    minHeight: fullscreen ? '100%' : '100vh',
                     ...(fullscreen
                         ? {
                             // CSS overlay floor — fills the viewport even where native fullscreen is blocked.
@@ -149,15 +152,14 @@ const ResponsiveFrame = ({ breakpoint = 'xl', children }) => {
                         backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
                         border: fullscreen ? 'none' : '1px solid var(--color-outline-variant, #e0e0e0)',
                         borderRadius: fullscreen ? 0 : 'var(--size-card-radius-sm, 12px)',
-                        // Non-fullscreen: block layout — the inner uses width:100% + margin:auto to
-                        // fill and center up to its max (a flex item would shrink to min-content).
-                        // Fullscreen: flex column so the inner can flex:1 and give a page a full height.
-                        display: fullscreen ? 'flex' : 'block',
+                        // Flex column in both modes so the inner can flex:1 and hand a page a definite
+                        // full height. The inner still uses width:100% + margin:auto to center up to
+                        // its max width (auto side margins win over align-items in the cross axis).
+                        display: 'flex', flexDirection: 'column', alignItems: 'stretch',
                         overflowX: 'auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch',
                         padding: fullscreen ? '24px' : 'clamp(1rem, 3vw, 2rem)',
-                        width: '100%', boxSizing: 'border-box',
+                        width: '100%', boxSizing: 'border-box', minHeight: 0,
                         containerType: 'inline-size',
-                        ...(fullscreen ? { minHeight: 0, flexDirection: 'column', alignItems: 'stretch' } : {}),
                     }}
                 >
                     {/* Floating fullscreen affordance — ALWAYS available (not in fullscreen, where the bar has Exit). */}

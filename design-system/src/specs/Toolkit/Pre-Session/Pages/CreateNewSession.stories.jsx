@@ -157,7 +157,7 @@ const defaultSessions = [
  * Includes snackbar notification for session creation
  */
 export const Overview = () => (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', position: 'relative' }}>
+    <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto', position: 'relative' }}>
         <PageLayout
             topBarConfig={{
                 breadcrumbs: [
@@ -307,6 +307,7 @@ export const Interactive = () => {
             {/* Page Preview Container */}
             <div style={{
                 width: `${breakpointWidths[breakpoint]}px`,
+                height: '100%',
                 margin: '0 auto',
                 border: '2px dashed var(--color-outline-variant)',
                 borderRadius: 'var(--size-card-radius-sm)',

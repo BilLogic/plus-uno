@@ -253,6 +253,7 @@ export const WithModals = (args) => {
             <div style={{
                 position: 'relative',
                 width: `${breakpointWidths[breakpoint]}px`,
+                height: '100%',
                 margin: '0 auto',
                 border: '2px dashed var(--color-outline-variant)',
                 borderRadius: 'var(--size-card-radius-sm)',

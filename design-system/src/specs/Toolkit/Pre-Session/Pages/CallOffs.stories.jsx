@@ -170,7 +170,7 @@ const defaultPastCallOffs = [
  * Full layout using PageLayout component with sidebar and top bar
  */
 export const Overview = () => (
-    <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
             topBarConfig={{
                 breadcrumbs: [
@@ -290,6 +290,7 @@ export const Interactive = () => {
             {/* Page Preview Container */}
             <div style={{
                 width: `${breakpointWidths[breakpoint]}px`,
+                height: '100%',
                 margin: '0 auto',
                 border: '2px dashed var(--color-outline-variant)',
                 borderRadius: 'var(--size-card-radius-sm)',
@@ -452,6 +453,7 @@ export const WithModals = (args) => {
             <div style={{
                 position: 'relative',
                 width: `${breakpointWidths[breakpoint]}px`,
+                height: '100%',
                 margin: '0 auto',
                 border: '2px dashed var(--color-outline-variant)',
                 borderRadius: 'var(--size-card-radius-sm)',

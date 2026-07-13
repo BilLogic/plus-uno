@@ -143,7 +143,7 @@ const supervisorTabs = [
  * Tutor view: No "All sessions" tab, "Fill in" button
  */
 export const OverviewTutor = () => (
-    <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
             topBarConfig={{
                 breadcrumbs: [
@@ -178,7 +178,7 @@ export const OverviewTutor = () => (
  * Supervisor view: Includes "All sessions" tab, "Recruit / Fill in" button, "All sessions" filter
  */
 export const OverviewSupervisor = () => (
-    <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
             topBarConfig={{
                 breadcrumbs: [
@@ -328,6 +328,7 @@ export const Interactive = () => {
             {/* Page Preview Container */}
             <div style={{
                 width: `${breakpointWidths[breakpoint]}px`,
+                height: '100%',
                 margin: '0 auto',
                 border: '2px dashed var(--color-outline-variant)',
                 borderRadius: 'var(--size-card-radius-sm)',

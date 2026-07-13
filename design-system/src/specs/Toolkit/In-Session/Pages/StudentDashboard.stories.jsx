@@ -205,7 +205,7 @@ const defaultStudents = [
  * Full layout using PageLayout component with sidebar and top bar
  */
 export const Overview = () => (
-    <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
             topBarConfig={{
                 breadcrumbs: [
@@ -920,7 +920,7 @@ const RegularTutorViewRender = (args) => {
     return (
         // Fixed-height frame so PageLayout (height:100%) has a definite height in the docs well.
         // Width + breakpoint come from the global Breakpoint toolbar (ResponsiveFrame decorator).
-        <div style={{ height: '1024px', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
                 <PageLayout
                     topBarConfig={{
                         breadcrumbs: viewState === 'loaded'
@@ -1076,7 +1076,7 @@ const LeadSupervisorViewRender = (args) => {
     return (
         // Fixed-height frame so PageLayout resolves height:100% in the docs well; width/breakpoint
         // come from the global Breakpoint toolbar (ResponsiveFrame decorator).
-        <div style={{ height: '1024px', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
             <PageLayout
                 topBarConfig={{
                     breadcrumbs: viewState === 'loaded'

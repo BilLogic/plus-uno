@@ -1,65 +1,14 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
 import StudentReflectionPart1 from './Part1';
 import StudentReflectionPart2 from './Part2';
 import StudentReflectionPart3 from './Part3';
 
-const breakpointWidths = {
-    md: 768,
-    lg: 1024,
-    xl: 1440,
-};
-
-const BreakpointPreview = ({ Component, args }) => {
-    const [breakpoint, setBreakpoint] = useState('xl');
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                    backgroundColor: 'var(--color-surface-container-low)',
-                    borderRadius: 'var(--size-card-radius-sm)',
-                    flexWrap: 'wrap',
-                }}
-            >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            <div
-                style={{
-                    width: `${breakpointWidths[breakpoint]}px`,
-                    height: '1024px',
-                    margin: '0 auto',
-                    border: '2px dashed var(--color-outline-variant)',
-                    borderRadius: 'var(--size-card-radius-sm)',
-                    overflow: 'hidden',
-                    transition: 'width 0.3s ease',
-                }}
-            >
-                <Component {...args} />
-            </div>
-        </div>
-    );
-};
+const BreakpointPreview = ({ Component, args }) => (
+    // Width/breakpoint + height come from the global Breakpoint toolbar (ResponsiveFrame decorator).
+    <div style={{ height: '100%', width: '100%', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+        <Component {...args} />
+    </div>
+);
 
 export default {
     title: 'Specs/Toolkit/Post-Session/Pages/Student Reflection',
