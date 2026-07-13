@@ -58,11 +58,24 @@ export async function executeNotionUpdate(
     const parts: string[] = [];
     if (r.updated.length) parts.push(`set ${r.updated.join(", ")}`);
     if (r.appended) parts.push(`appended ${r.appended} block(s)`);
-    const skippedNote = r.skipped.length ? ` (skipped unknown props: ${r.skipped.join(", ")})` : "";
+    const skippedNote = r.skipped.length ? ` — couldn't set: ${r.skipped.join("; ")}` : "";
+
+    // Nothing landed (every requested property was skipped): report a FAILURE,
+    // never a quiet "no changes" — so the bot doesn't claim a move it didn't make
+    // (live 2026-07-13: "Dev_Status" was skipped and the run read as done).
+    if (!r.updated.length && !r.appended) {
+      await postMessage(env, {
+        channel: slack.channel,
+        thread_ts: slack.threadTs,
+        text: `:warning: I couldn't change the Notion page${skippedNote || " — nothing to update"}.`,
+      });
+      return JSON.stringify({ ok: false, status: "no_changes", ...r });
+    }
+
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:pencil2: Updated the Notion page — ${parts.join("; ") || "no changes"}${skippedNote}.`,
+      text: `:pencil2: Updated the Notion page — ${parts.join("; ")}${skippedNote}.`,
     });
     return JSON.stringify({ ok: true, status: "updated", ...r });
   } catch (err) {

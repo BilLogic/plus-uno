@@ -302,7 +302,7 @@
   },
   {
     "name": "notion_update",
-    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Two uses, combinable: (1) change PROPERTIES via `properties` — e.g.g. log a conclusion to a project Decision Log, add a findings section to a doc. Pass the page URL. Follow docs/conventions/notion.md: fetch the schema and EXACT-MATCH existing option names before writing any select/status property (Notion silently auto-creates options on a mismatch). Append rather than overwrite a human-owned body.",
+    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Works on ANY page or database the bot is shared on (not just the Roadmap board): Roadmap cards, project Decision Logs, per-person running-notes pages, any DB. Two uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema and matches your property name to it case/space/underscore-insensitively, then writes by the REAL type, so \"Dev Status\", \"Dev_Status\", a Date, a Person, a URL, a number, a checkbox all work. It NEVER invents a select/status option — if a value isn't an existing option it reports back instead of guessing (Notion auto-creates on mismatch). (2) append narrative blocks via `append` — append, never overwrite a human-owned body. Pass the page URL.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -316,7 +316,7 @@
         },
         "properties": {
           "type": "object",
-          "description": "Property changes as key→value, exact-matched against the live schema by the tool (status/select options must already exist).",
+          "description": "Property changes as name→value (string values). The tool matches each name to the page's live database schema (case/space/underscore-insensitive) and formats by the real Notion type — status, select, multi_select (comma-separated), date (ISO, or \"start → end\"), number, checkbox, url, email, rich text, title. select/status/multi_select values must be EXISTING options (unknown ones are reported, never created). People/relation need a Notion id or URL.",
           "additionalProperties": true
         },
         "append": {
@@ -354,7 +354,7 @@
   },
   {
     "name": "notion_archive",
-    "description": "Archive (soft-delete) a Notion card the bot created — SIDE EFFECT, routed through the confirmation gate. Use to undo a PRD or intake card when the designer asks ('delete that', 'remove that card', 'undo'). Archiving moves the page to Notion's trash (recoverable). SAFETY: only works on cards parented by an allowlisted database — it will refuse anything else. Pass the page URL (typically the link the bot posted when it created the card).",
+    "description": "Archive (soft-delete) a Notion page/card — SIDE EFFECT, routed through the confirmation gate. Use to undo or remove a page the designer asks to delete ('delete that', 'remove that card', 'undo'). Works on any page the bot can reach, not just cards it created. Archiving moves the page to Notion's trash (recoverable); the ✅ confirmation gate + requester identity are the safety. Pass the page URL (typically the link the bot posted when it created the card).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

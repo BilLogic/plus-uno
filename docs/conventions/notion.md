@@ -13,9 +13,13 @@
 
 ⚠️ **The MCP-write principle (cross-service, not just Notion).** Inline MCP tools execute server-side during the turn, so any tool exposed via MCP bypasses the ✅ proposal gate. Therefore a write goes **direct via MCP only if it wouldn't need the gate anyway** — i.e. reversible + low-blast-radius, like Slack messaging (the bot's native medium, already ungated for replies). **Consequential / outward / irreversible writes stay hard-gated bot tools, never MCP:** Notion artifacts (`notion_create`/`update`/`archive`) and email. Per current decisions: **Slack** = reads + messaging writes direct via MCP; **Notion** = reads via MCP, writes gated; **Supabase** = reads only (the MCP URL pins server-enforced `read_only=true`) — **the bot has NO blueprint write path at all**: a blueprint-change ask becomes a maintenance intake ticket (`notion_create` intake, ✅-gated) or an IDE handoff (`uno-maintain`, where migrations/diff/review live); **Figma** = *no MCP at all* — its hosted MCP is a closed catalog (only Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker 403s) and the local MCP needs a desktop app, so the bot grounds Figma from the Notion docs that reference it and routes real Figma work to the IDE. The `ntn_` REST key remains Notion's write path + the read fallback when the MCP token isn't set.
 
-## Write-surface allowlist
+## Write surfaces
 
-The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintain change to this list, never an inline decision.
+uno can update properties and append content on **any page or database it's shared on** (Roadmap cards, project Decision Logs, per-person running-notes pages, any DB) via `notion_update` / `notion_archive` — always behind the requester's ✅. `notion_update` reads the target's live schema and writes each property by its real type (status, select, multi_select, date, people, relation, number, checkbox, url, text…), matching your property name case/space/underscore-insensitively — so there's no hardcoded surface fence and no need to guess a type. It still never invents a select/status option: a value that isn't an existing option is reported back, not created.
+
+**Still OUT of scope from Slack** (no Notion-API path, or too structural for a one-shot gated write) — creating a **database**, creating or editing a **view** (the API can't make views at all), creating select options / pillars / OKRs, and any **blueprint** write. Those become a maintenance intake ticket (✅-gated `notion_create`) or an `uno-maintain` IDE handoff — offer that, don't attempt it inline.
+
+The surfaces below are the **common ones with house conventions** — follow the convention when writing them; the table is guidance, not a permission fence:
 
 | Surface | Who writes | Notes |
 |---|---|---|
@@ -29,7 +33,7 @@ The agent writes ONLY to these named surfaces. Adding a surface is a uno-maintai
 
 ## Read radar — other workspace DBs (READ-only grounding, never written by uno)
 
-Under the workspace's **Content Management Systems** page — useful context for grounding (via Notion MCP reads), but uno never writes to them:
+Under the workspace's **Content Management Systems** page — useful context for grounding (via Notion MCP reads). uno reads these for grounding and doesn't write them as a matter of course; a deliberate, ✅-gated write isn't blocked if a human explicitly asks for one:
 
 | DB | ID | Use when grounding |
 |---|---|---|

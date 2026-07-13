@@ -535,7 +535,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     posted = await postMessage(env, { channel, thread_ts: threadTs, text: proposalText });
   }
   if (posted.ok && posted.ts) {
-    await addReaction(env, channel, posted.ts, "warning");
+    // Persist the moment the card posts: it's reactable instantly, and a quick ✅
+    // that lands before the proposal is saved would look up nothing and be
+    // silently lost (the reaction gate keys off saved state). Save first so the
+    // confirmation always finds it.
     await savePendingProposal(env, {
       toolName: result.toolName,
       input: result.input,

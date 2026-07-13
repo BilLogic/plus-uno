@@ -648,21 +648,101 @@ export async function notionCreate(
   }
 }
 
-// ─── Update an existing card: properties and/or narrative append (notion_update)
-// Properties are formatted by a KNOWN-name map only — writing an arbitrary
-// {name: value} without knowing its Notion type would be wrong, and guessing a
-// select/status option name would trip the silent auto-create footgun. Unknown
-// property names are skipped and reported (the caller surfaces them). This covers
-// the real Worker use — Roadmap status/pillar moves. `append` adds body blocks.
+// ─── Update an existing page: schema-aware property writes + narrative append ──
+// (notion_update). Property writes introspect the page's PARENT DATABASE schema,
+// so the tool can set ANY property by its real Notion type — no hardcoded
+// name/type allowlist. The requested name is matched to the live schema case/
+// space/underscore-insensitively, so "Dev_Status" resolves to "Dev Status"
+// (live 2026-07-13: an underscore name was silently skipped as "unknown prop").
+// select/status/multi_select values are validated against the schema's existing
+// options, so a mismatch is REPORTED rather than tripping Notion's silent option
+// auto-create. Names with no schema match — and types we can't safely set from a
+// plain string (people/relation without an id) — are skipped WITH A REASON.
+// Writes are no longer limited to the Roadmap board: the ✅ confirmation gate +
+// requester identity are the safety, not a DB allowlist, so the bot can manage
+// any page/DB it's shared on. `append` adds body blocks.
 
-const KNOWN_PROP_FORMATTERS: Record<string, (v: string) => unknown> = {
-  "Design Status": (v) => ({ status: { name: v } }),
-  "Intake Status": (v) => ({ status: { name: v } }),
-  "Dev Status": (v) => ({ status: { name: v } }),
-  "Current Team": (v) => ({ multi_select: v.split(",").map((s) => ({ name: s.trim() })).filter((o) => o.name) }),
-  "Product Pillar": (v) => ({ multi_select: v.split(",").map((s) => ({ name: s.trim() })).filter((o) => o.name) }),
-  "Priority": (v) => ({ select: { name: v } }),
-};
+// A property from a database's live schema: its real (correctly-cased) name, its
+// Notion type, and — for option-typed props — a lower→real option-name map used
+// to echo the exact stored casing (Notion auto-creates an option on any mismatch).
+interface NotionSchemaProp {
+  name: string;
+  type: string;
+  options?: Map<string, string>;
+}
+
+// Match a requested property name to a schema name ignoring case, spaces, and
+// underscores ("dev status" == "Dev_Status" == "DevStatus").
+function normalizeName(s: string): string {
+  return s.toLowerCase().replace(/[\s_]+/g, "").trim();
+}
+
+// Pull Notion ids (uuid form, dashes optional) out of a value — for relation /
+// people writes where the model passes a page/user id or a Notion URL.
+function extractNotionIds(v: string): string[] {
+  const out: string[] = [];
+  const re = /[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(v))) out.push(m[0].replace(/-/g, ""));
+  return out;
+}
+
+// Format a single value for the property's REAL Notion type. Returns either a
+// ready-to-PATCH value (with an optional note), or a skip reason the caller
+// surfaces — it never guesses an option name or a type it can't set safely.
+function formatPropByType(prop: NotionSchemaProp, raw: string): { value?: unknown; note?: string; skip?: string } {
+  const v = raw.trim();
+  if (!v) return { skip: "empty value" };
+  switch (prop.type) {
+    case "title": return { value: { title: richText(v) } };
+    case "rich_text": return { value: { rich_text: richText(v) } };
+    case "url": return { value: { url: v } };
+    case "email": return { value: { email: v } };
+    case "phone_number": return { value: { phone_number: v } };
+    case "number": {
+      const n = Number(v);
+      return Number.isNaN(n) ? { skip: `"${v}" isn't a number` } : { value: { number: n } };
+    }
+    case "checkbox":
+      return { value: { checkbox: /^(true|yes|y|1|checked|done|✅)$/i.test(v) } };
+    case "date": {
+      const [start, end] = v.split(/\s*(?:→|-->|\.\.|\bto\b)\s*/i);
+      return { value: { date: { start: (start ?? v).trim(), ...(end ? { end: end.trim() } : {}) } } };
+    }
+    case "select": {
+      const real = prop.options?.get(v.toLowerCase());
+      return real ? { value: { select: { name: real } } } : { skip: `"${v}" isn't an existing option for ${prop.name}` };
+    }
+    case "status": {
+      const real = prop.options?.get(v.toLowerCase());
+      return real ? { value: { status: { name: real } } } : { skip: `"${v}" isn't an existing status for ${prop.name}` };
+    }
+    case "multi_select": {
+      const reals: { name: string }[] = [];
+      const bad: string[] = [];
+      for (const part of v.split(",").map((s) => s.trim()).filter(Boolean)) {
+        const real = prop.options?.get(part.toLowerCase());
+        if (real) reals.push({ name: real }); else bad.push(part);
+      }
+      if (!reals.length) return { skip: `no existing ${prop.name} options matched (${bad.join(", ")})` };
+      return { value: { multi_select: reals }, note: bad.length ? `ignored unknown: ${bad.join(", ")}` : undefined };
+    }
+    case "people": {
+      const ids = extractNotionIds(v);
+      return ids.length
+        ? { value: { people: ids.map((id) => ({ id })) } }
+        : { skip: `${prop.name} is a People property — needs Notion user id(s), not a name` };
+    }
+    case "relation": {
+      const ids = extractNotionIds(v);
+      return ids.length
+        ? { value: { relation: ids.map((id) => ({ id })) } }
+        : { skip: `${prop.name} is a Relation — needs a Notion page id/URL` };
+    }
+    default:
+      return { skip: `can't set "${prop.name}" (${prop.type}) from Slack` };
+  }
+}
 
 export interface NotionUpdateInput {
   properties?: Record<string, string>;
@@ -676,34 +756,67 @@ export interface NotionUpdateResult {
   appended: number;
 }
 
-// Confirm a page is a card in an allowlisted database (the Roadmap board) and
-// return its title. Shared by notionUpdate + archiveCard so mutating tools can
-// only touch Roadmap cards, never arbitrary pages the integration can reach.
-// Throws if the parent isn't allowlisted. Uses the caller's signal so it shares
-// the request-timeout budget.
-async function assertRoadmapCard(
+// Fetch a page's title + its PARENT DATABASE property schema (real names, types,
+// and option lists). Any page the integration can read is fair game — the ✅ gate
+// is the safety, not a DB allowlist. `schema` is empty when the page isn't
+// parented by a database (a page-in-page has no property schema; only append
+// applies). Uses the caller's signal to share the request-timeout budget.
+interface PageSchema {
+  title: string;
+  parentKind: "database" | "page" | "workspace" | "unknown";
+  schema: Map<string, NotionSchemaProp>; // keyed by normalizeName(realName)
+}
+
+async function fetchPageSchema(
   env: Env,
   pageId: string,
   headers: Record<string, string>,
   signal: AbortSignal,
-): Promise<{ title: string }> {
-  const allow = [env.NOTION_ROADMAP_DB_ID]
-    .filter((x): x is string => !!x)
-    .map((x) => x.replace(/-/g, "").toLowerCase());
+): Promise<PageSchema> {
   const getRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
   const page = (await getRes.json()) as {
     id?: string; message?: string; code?: string;
-    parent?: { database_id?: string };
-    properties?: { Name?: { title?: { plain_text?: string }[] } };
+    parent?: { type?: string; database_id?: string };
+    properties?: Record<string, NotionProperty>;
   };
   if (!getRes.ok || !page.id) {
     throw notionError(getRes.status, page, "page not found");
   }
-  const parentDb = (page.parent?.database_id ?? "").replace(/-/g, "").toLowerCase();
-  if (!parentDb || !allow.includes(parentDb)) {
-    throw new Error("that page isn't a card in an allowlisted database — refusing to modify it");
+  let title = "(untitled)";
+  for (const prop of Object.values(page.properties ?? {})) {
+    if (prop.type === "title") { title = plain(prop.title) || title; break; }
   }
-  return { title: page.properties?.Name?.title?.[0]?.plain_text ?? "(untitled)" };
+  const dbId = page.parent?.database_id;
+  const schema = new Map<string, NotionSchemaProp>();
+  if (!dbId) {
+    const kind =
+      page.parent?.type === "page_id" ? "page" :
+      page.parent?.type === "workspace" ? "workspace" : "unknown";
+    return { title, parentKind: kind, schema };
+  }
+  const dbRes = await fetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal });
+  const db = (await dbRes.json()) as {
+    message?: string; code?: string;
+    properties?: Record<string, {
+      type: string;
+      select?: { options?: { name?: string }[] };
+      status?: { options?: { name?: string }[] };
+      multi_select?: { options?: { name?: string }[] };
+    }>;
+  };
+  if (!dbRes.ok) {
+    throw notionError(dbRes.status, db, "database schema fetch failed");
+  }
+  for (const [name, def] of Object.entries(db.properties ?? {})) {
+    let options: Map<string, string> | undefined;
+    const rawOpts = def.select?.options ?? def.status?.options ?? def.multi_select?.options;
+    if (rawOpts) {
+      options = new Map();
+      for (const o of rawOpts) { if (o.name) options.set(o.name.toLowerCase(), o.name); }
+    }
+    schema.set(normalizeName(name), { name, type: def.type, options });
+  }
+  return { title, parentKind: "database", schema };
 }
 
 export async function notionUpdate(
@@ -720,20 +833,27 @@ export async function notionUpdate(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    // Scope guard: only Roadmap cards may be updated/appended (same allowlist
-    // the archive path enforces). Prevents writing to any reachable page.
-    await assertRoadmapCard(env, pageId, headers, controller.signal);
-    // 1) Property changes (known names only).
+    // 1) Property changes — matched to the live schema by real name/type. Only
+    //    fetch the schema when there ARE properties to set (append-only skips the
+    //    two extra reads). No DB allowlist: the ✅ gate already approved this write.
     if (input.properties && Object.keys(input.properties).length) {
+      const { schema, parentKind } = await fetchPageSchema(env, pageId, headers, controller.signal);
       const props: Record<string, unknown> = {};
-      for (const [name, value] of Object.entries(input.properties)) {
-        const fmt = KNOWN_PROP_FORMATTERS[name];
-        if (fmt && typeof value === "string" && value.trim()) {
-          props[name] = fmt(value.trim());
-          updated.push(name);
-        } else {
-          skipped.push(name);
+      for (const [reqName, value] of Object.entries(input.properties)) {
+        if (typeof value !== "string") { skipped.push(`${reqName} (non-text value)`); continue; }
+        const match = schema.get(normalizeName(reqName));
+        if (!match) {
+          skipped.push(
+            parentKind === "database"
+              ? `${reqName} (no such property on this database)`
+              : `${reqName} (this page isn't in a database, so it has no editable properties)`,
+          );
+          continue;
         }
+        const fmt = formatPropByType(match, value);
+        if (fmt.value === undefined) { skipped.push(`${match.name} (${fmt.skip})`); continue; }
+        props[match.name] = fmt.value;
+        updated.push(fmt.note ? `${match.name} (${fmt.note})` : match.name);
       }
       if (Object.keys(props).length) {
         const res = await fetch(`${NOTION_API}/pages/${pageId}`, {
@@ -777,16 +897,16 @@ export async function notionUpdate(
   }
 }
 
-// Archive a card parented by an ALLOWLISTED database (currently just the
-// Roadmap board — the single command board). Refuses anything else, so
-// notion_archive can't nuke arbitrary Notion pages.
+// Archive (soft-delete → Notion trash, recoverable) any page the integration can
+// reach. No DB allowlist — the ✅ confirmation gate + requester identity are the
+// safety. Fetches the title first for the confirmation echo (best-effort).
 export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCard> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   const headers = notionHeaders(env, { write: true });
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const { title } = await assertRoadmapCard(env, pageId, headers, controller.signal);
+    const { title } = await fetchPageSchema(env, pageId, headers, controller.signal);
 
     const patchRes = await fetch(`${NOTION_API}/pages/${pageId}`, {
       method: "PATCH",
