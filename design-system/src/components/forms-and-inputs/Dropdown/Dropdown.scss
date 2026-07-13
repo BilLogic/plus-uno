@@ -110,7 +110,12 @@ $dropdown-themes: (
         gap: var(--size-element-gap-md);
         width: 100%;
         padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
-        background-color: var(--color-surface);
+        // Transparent so the item always adopts the menu container's surface — a hard-coded
+        // --color-surface left items near-white on menus that use a darker container token
+        // (e.g. the Engagement/Attendance menus on --color-surface-container-high), so the
+        // rows didn't match their container. Hover/selected/focus/active are translucent
+        // overlays and layer correctly on whatever base the container provides.
+        background-color: transparent;
         border: none;
         color: var(--color-on-surface);
         font-family: var(--font-family-body);
