@@ -101,9 +101,12 @@ $dropdown-themes: (
     .dropdown-item,
     .pdropdown-item {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
+        // Menu items lay out in a single row: [check][leading][label grows][trailing][counter][caret].
+        // Consumers that drop children straight into .dropdown-item (Engagement/Attendance list items,
+        // Select) rely on this — a column direction stacks their label above the caret/checkbox.
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
         gap: var(--size-element-gap-md);
         width: 100%;
         padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
@@ -199,16 +202,28 @@ $dropdown-themes: (
         width: 100%;
     }
 
+    // Label takes the free space so trailing icons (caret, counter, submenu chevron) sit flush right.
+    .pdropdown-item-text {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
     // --- COUNTER BADGE ---
+    // Compact pill sized like the Badge counter (1.5em box) so the number sits centered with
+    // breathing room — not the flat, stretched oval a 1em height produced.
     .pdropdown-counter {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5em;
+        height: 1.5em;
+        padding: 0 0.4em;
         background-color: var(--color-on-surface-state-16);
         border-radius: var(--size-element-radius-full);
-        padding: 0 var(--size-element-pad-x-sm);
-        height: var(--size-element-gap-lg);
-        display: flex;
-        align-items: center;
         font-size: var(--font-size-body3);
         font-weight: var(--font-weight-semibold-1);
+        line-height: 1;
     }
 
     // --- DIVIDER ---
@@ -302,7 +317,9 @@ $dropdown-themes: (
         border-radius: 0 var(--size-element-radius-md) var(--size-element-radius-md) 0;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
-        border-left-color: rgba(255, 255, 255, 0.3);
+        // Pull the toggle left by one stroke so its left border and the text button's right border
+        // collapse into a single divider line — no phantom 1px gap / doubled "bar" between the halves.
+        margin-left: calc(var(--size-element-stroke-sm) * -1);
 
         // CRITICAL: Caret icon for split toggle
         &::after {
@@ -496,7 +513,6 @@ $dropdown-themes: (
             .pdropdown-split-text-btn {
                 background-color: transparent;
                 border-color: var($col-main);
-                border-right-color: transparent;
                 color: var($col-text);
 
                 &:hover {
