@@ -21,6 +21,21 @@ export default {
             options: ['lead', 'tutor'],
             description: 'User role determines which control variant renders',
             table: { category: 'Design' }
+        },
+        studentCount: {
+            control: 'text',
+            description: 'Student badge text (present / roster), e.g. "6/8"',
+            table: { category: 'Content' }
+        },
+        tutorCount: {
+            control: 'text',
+            description: 'Tutor badge text, e.g. "2/2"',
+            table: { category: 'Content' }
+        },
+        roomCount: {
+            control: 'text',
+            description: 'Room badge text (lead only), e.g. "10" or "—" while waiting',
+            table: { category: 'Content' }
         }
     }
 };
@@ -78,6 +93,19 @@ export const AllVariations = () => (
                 onCopyAssignments={() => console.log('Copy assignments')}
             />
         </div>
+        <div>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--color-on-surface-variant)' }}>
+                Lead Tutor — room count waiting (before assignment)
+            </h6>
+            <SessionControlsConsolidated
+                role="lead"
+                roomCount="—"
+                onManageSession={() => console.log('Manage session')}
+                onRequestTutors={() => console.log('Request tutors')}
+                onViewSessionInfo={() => console.log('View session info')}
+                onCopyAssignments={() => console.log('Copy assignments')}
+            />
+        </div>
     </div>
 );
 
@@ -100,6 +128,9 @@ export const Interactive = (args) => {
         }}>
             <SessionControlsConsolidated
                 role={args.role}
+                studentCount={args.studentCount}
+                tutorCount={args.tutorCount}
+                roomCount={args.roomCount}
                 onManageSession={() => addLog('Manage session')}
                 onRequestTutors={() => addLog('Request tutors')}
                 onRequestLeadTutor={() => addLog('Request lead tutor')}
@@ -128,4 +159,7 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     role: 'lead',
+    studentCount: '6/8',
+    tutorCount: '2/2',
+    roomCount: '10',
 };

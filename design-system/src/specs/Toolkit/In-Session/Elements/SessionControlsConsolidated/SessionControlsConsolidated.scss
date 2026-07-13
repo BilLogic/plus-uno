@@ -2,4 +2,12 @@
     display: flex;
     align-items: center;
     gap: var(--size-element-gap-sm);
+
+    // Live info badges sit tight together, then a small gap to the action buttons.
+    &__badges {
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-xs);
+        margin-right: var(--size-element-gap-xs);
+    }
 }
