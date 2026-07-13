@@ -5,7 +5,7 @@
  * Figma Specs: 112-597 (Collapsed), 112-596 (Expanded)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import { TopBar, Sidebar } from '../../Sections';
 
@@ -53,6 +53,15 @@ const PageLayout = ({
     const sidebarActiveCombined = sidebarProps.activeTabId ?? sidebarProps.activeTab;
     delete sidebarProps.activeTabId;
     delete sidebarProps.activeTab;
+
+    // Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
+    // MD/LG breakpoints) starts with the Sidebar already collapsed — no expanded→collapsed flash.
+    useLayoutEffect(() => {
+        if (sidebarHidden || sidebarExpanded || !containerRef.current) return;
+        const w = containerRef.current.getBoundingClientRect().width;
+        if (w && w < breakpoint) setIsSidebarVisible(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (sidebarHidden) {

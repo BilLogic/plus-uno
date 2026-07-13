@@ -283,3 +283,29 @@ All Storybook builds green (exit 0).
   both publicly), add missing `Pattern/Surface` in Figma, archive legacy Input
   Group generations, de-[wip] the Card page.
 - Verified: build green, 117/117 spec tests. Committed ca3dd6d9, pushed.
+
+## Round 13 — responsive page previews: fullscreen, reflow, breakpoint pickup
+
+User asks (page documentation): (1) always-available fullscreen, (2) pages
+display responsively to the width given, (3) pick up the breakpoint spec
+(Sidebar hidden + TopBar collapsed at MD).
+
+- **ResponsiveFrame rewritten.** Was: forced fixed width (768/1024/1440) + scroll,
+  fullscreen button gated behind `showToolbar` (never passed). Now: inner is
+  `width:100%, maxWidth:<bp>` — the page fills the given width and reflows (block
+  layout so it doesn't shrink to min-content), `containerType: inline-size`. An
+  always-visible **Fullscreen** button (top-right); toggle uses native Fullscreen
+  API with a CSS `position:fixed` overlay fallback where the host iframe blocks it.
+  Nesting-safe via React context (inner RF → pass-through) so the 17 stories that
+  wrap themselves don't double-frame.
+- **Global coverage.** preview.jsx decorator now wraps EVERY `Specs/*/Pages/*`
+  story in ResponsiveFrame (covers the 26 pages that never imported it), folding
+  the Breakpoint toolbar in. Elements/Cards keep the lightweight width constraint.
+- **Breakpoint pickup fixed.** Root cause: the old fixed 1440 inner made
+  PageLayout's ResizeObserver always see ≥1024, so the Sidebar never collapsed.
+  With the responsive inner it sees the real width → Sidebar hides + TopBar
+  collapses below LG. Verified: MD → sidebarW 0, TopBar hamburger; XL → sidebar 164.
+- **No flash.** Added a `useLayoutEffect` initial measure in PageLayout so a page
+  mounted narrow starts collapsed before paint (no expanded→collapsed flicker).
+- Build green (exit 0); verified across Page Layout, PostSessionPage (no-RF page),
+  MD/XL, and the fullscreen button on all page stories.

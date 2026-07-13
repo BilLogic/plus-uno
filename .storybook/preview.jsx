@@ -7,6 +7,7 @@ import '../design-system/src/styles/main.scss';
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import StorybookAIAgent from '../playground/storybook-ai-agent-llm-api/StorybookAIAgent';
+import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
 
 /**
  * Storybook preview configuration for PLUS Design System
@@ -477,7 +478,22 @@ const preview = {
     (Story, context) => {
       const bp = context.globals.plusBreakpoint;
       const widths = { md: 768, lg: 1024, xl: 1440 };
-      if (bp && widths[bp] && context.title.startsWith('Specs/')) {
+      const isSpecs = context.title.startsWith('Specs/');
+      // Pages & Sections get the responsive DISPLAY WELL: fills the width it's given (so the page
+      // reflows and PageLayout's own breakpoint logic hides the Sidebar / collapses the TopBar
+      // below LG), plus an always-available Fullscreen button. Nesting-safe: stories that already
+      // wrap themselves in ResponsiveFrame collapse the inner one to a pass-through.
+      const isPage = isSpecs && /\/Pages\//.test(context.title);
+      if (isPage) {
+        return (
+          <ResponsiveFrame breakpoint={bp && widths[bp] ? bp : 'xl'}>
+            <Story />
+          </ResponsiveFrame>
+        );
+      }
+      // Other Specs (Elements, Cards, Modals, Tables) keep the lightweight width constraint so
+      // their responsive behaviour can still be inspected from the Breakpoint toolbar.
+      if (bp && widths[bp] && isSpecs) {
         return (
           <div style={{ width: `${widths[bp]}px`, maxWidth: '100%', containerType: 'inline-size' }}>
             <Story />
