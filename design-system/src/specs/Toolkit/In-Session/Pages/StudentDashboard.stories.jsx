@@ -3,7 +3,7 @@ import Button from '@/components/actions/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { TableRow, TableHeaderRow } from '../Tables/StudentList.stories';
-import { SessionControls } from '../Elements/SessionControls.stories';
+import SessionControlsConsolidated from '../Elements/SessionControlsConsolidated/SessionControlsConsolidated';
 import { SortingOptions } from '../Elements/SortingOptions.stories';
 import MATHiaGoalStatusBanner from '../Elements/MATHiaGoalStatusBanner';
 import { Toast } from '@/components/messaging/Toast';
@@ -36,12 +36,12 @@ The page uses the **PageLayout** component which provides:
 | Component | Source | Purpose |
 |-----------|--------|---------|
 | PageLayout | Universal/Pages | Page structure with sidebar |
-| SessionControls | in-session/elements | Copy assignments & Manage Session buttons |
+| SessionControlsConsolidated | in-session/elements | Role-aware header: count badges + Manage session / overflow |
 | TableRow/TableHeaderRow | StudentList.stories | Student data with dropdowns |
 | AttendanceDropdown | in-session/elements | Attendance status selection |
 | EngagementDropdown | in-session/elements | Engagement status selection |
 | SortingOptions | in-session/elements | Sort by Name, Status, Bookmark, Progress |
-| Dropdown | plus-ds/components | Status filter & session selector |
+| Dropdown | plus-ds/components | Status filter |
 | Button | plus-ds/components | Mark Helped action |
 | MATHiaGoalStatusBanner | in-session/elements | Goal status banner |
 
@@ -58,9 +58,8 @@ The page uses the **PageLayout** component which provides:
 ## Interactive Features
 
 The Interactive story includes:
-- **Session selector dropdown** - Switch between sessions
 - **Status filter dropdown** - Filter students by status
-- **Session controls** - Copy assignments with success state, Manage Session
+- **Consolidated session controls** - role-aware header (count badges + Manage session / overflow menu)
 - **Attendance/Engagement dropdowns** - Update student status
 - **Mark Helped buttons** - Track student assistance
                 `,
@@ -69,41 +68,8 @@ The Interactive story includes:
     },
 };
 
-/**
- * Session Selector Dropdown
- * Displays current session with school, teacher, time, and date
- */
-const SessionSelector = ({ currentSession, sessions, onSelect, isInteractive = false }) => {
-    const items = sessions.map(session => ({
-        label: `${session.school} (${session.teacher}), ${session.time}, ${session.date}`,
-        selected: session.id === currentSession.id,
-        onClick: () => isInteractive && onSelect(session)
-    }));
-
-    return (
-        <div style={{ minWidth: '300px' }}>
-            <style>{`
-                .session-selector-dropdown .dropdown-menu {
-                    max-width: 400px !important;
-                    min-width: 350px !important;
-                }
-                .session-selector-dropdown .dropdown-item {
-                    white-space: normal !important;
-                    word-wrap: break-word !important;
-                    line-height: 1.4 !important;
-                }
-            `}</style>
-            <Dropdown
-                buttonText={`${currentSession.school} (${currentSession.teacher}), ${currentSession.time}, ${currentSession.date}`}
-                items={items}
-                style="primary"
-                fill="outline"
-                size="small"
-                className="session-selector-dropdown"
-            />
-        </div>
-    );
-};
+// Session Selector removed per the Session Controls Consolidation spec — the low-usage
+// session-selection dropdown is gone; the consolidated header controls replace it.
 
 /**
  * Status Filter Dropdown
@@ -192,23 +158,11 @@ const MainContent = ({
                 />
             </div>
 
-            {/* Right: Session Selector and Controls */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--size-element-gap-sm)' }}>
-                <SessionSelector
-                    currentSession={currentSession}
-                    sessions={sessions}
-                    onSelect={onSessionChange}
-                    isInteractive={isInteractive}
-                />
-
-                {/* Session Controls - only show for lead tutors */}
-                {isLeadTutor && (
-                    <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                        <SessionControls action="copy assignments" user="lead & supervisors" />
-                        <SessionControls action="manage session" user="lead & supervisors" />
-                    </div>
-                )}
-            </div>
+            {/* Right: consolidated session controls (badge cluster + Manage session / overflow) */}
+            <SessionControlsConsolidated
+                role={isLeadTutor ? 'lead' : 'tutor'}
+                studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
+            />
         </div>
 
         {/* Student Table */}
@@ -732,13 +686,10 @@ const RegularTutorLoadedContent = ({
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
-                <SessionSelector
-                    currentSession={currentSession}
-                    sessions={sessions}
-                    onSelect={onSessionChange}
-                    isInteractive={isInteractive}
+                <SessionControlsConsolidated
+                    role="tutor"
+                    studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
                 />
-                <SessionControls action="view session info" user="regular tutors" />
             </div>
         </div>
 
@@ -817,13 +768,7 @@ const RegularTutorEmptyContent = ({
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
-                <SessionSelector
-                    currentSession={currentSession}
-                    sessions={sessions}
-                    onSelect={onSessionChange}
-                    isInteractive={isInteractive}
-                />
-                <SessionControls action="view session info" user="regular tutors" />
+                <SessionControlsConsolidated role="tutor" studentCount="0/0" />
             </div>
         </div>
 
@@ -901,14 +846,10 @@ const LeadSupervisorLoadedContent = ({
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
-                <SessionSelector
-                    currentSession={currentSession}
-                    sessions={sessions}
-                    onSelect={onSessionChange}
-                    isInteractive={isInteractive}
+                <SessionControlsConsolidated
+                    role="lead"
+                    studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
                 />
-                <SessionControls action="copy assignments" user="lead & supervisors" />
-                <SessionControls action="manage session" user="lead & supervisors" />
             </div>
         </div>
 
@@ -987,14 +928,7 @@ const LeadSupervisorEmptyContent = ({
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
-                <SessionSelector
-                    currentSession={currentSession}
-                    sessions={sessions}
-                    onSelect={onSessionChange}
-                    isInteractive={isInteractive}
-                />
-                <SessionControls action="copy assignments" user="lead & supervisors" />
-                <SessionControls action="manage session" user="lead & supervisors" />
+                <SessionControlsConsolidated role="lead" studentCount="0/0" />
             </div>
         </div>
 
