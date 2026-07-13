@@ -81,9 +81,14 @@ const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) =
         maxWidth: `${maxWidth}px`,
         margin: '0 auto',
         backgroundColor: 'var(--color-surface, #ffffff)',
-        minHeight: fullscreen ? '100%' : 'calc(100vh - 220px)',
         position: 'relative',
         transition: 'max-width 0.25s cubic-bezier(0.2,0,0.2,1)',
+        // Fullscreen: become a flex child that fills the column so a page with height:100%
+        // (PageLayout) resolves against a definite height instead of collapsing to content.
+        // Non-fullscreen: keep a tall min-height so short previews still fill the docs well.
+        ...(fullscreen
+            ? { flex: '1 1 auto', minHeight: 0 }
+            : { minHeight: 'calc(100vh - 220px)' }),
     };
 
     return (
@@ -156,14 +161,15 @@ const ResponsiveFrame = ({ breakpoint = 'xl', showToolbar = false, children }) =
                         backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)',
                         border: fullscreen ? 'none' : '1px solid var(--color-outline-variant, #e0e0e0)',
                         borderRadius: fullscreen ? 0 : 'var(--size-card-radius-sm, 12px)',
-                        // Block layout (not flex): the inner uses width:100% + margin:auto to fill and
-                        // center up to its max — a flex item would shrink to min-content instead.
-                        display: 'block',
+                        // Non-fullscreen: block layout — the inner uses width:100% + margin:auto to
+                        // fill and center up to its max (a flex item would shrink to min-content).
+                        // Fullscreen: flex column so the inner can flex:1 and give a page a full height.
+                        display: fullscreen ? 'flex' : 'block',
                         overflowX: 'auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch',
                         padding: fullscreen ? '24px' : 'clamp(1rem, 3vw, 2rem)',
                         width: '100%', boxSizing: 'border-box',
                         containerType: 'inline-size',
-                        ...(fullscreen ? { minHeight: 0 } : {}),
+                        ...(fullscreen ? { minHeight: 0, flexDirection: 'column', alignItems: 'stretch' } : {}),
                     }}
                 >
                     {/* Floating fullscreen affordance — ALWAYS available (not in fullscreen, where the toolbar has Exit). */}
