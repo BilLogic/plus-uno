@@ -68,8 +68,7 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | Third Party Applications | `207b7cca-4982-801b-a80f-e7e1c69c3d3c` | `apps` | who grants access to a tool |
 | Decisions DB | `6279ea4a-cd84-4d51-90e1-e6b6af53bb19` | `decisions` | durable decisions (also a write surface) |
 | Tutor Help Center Content | `24dadbad-35c8-47fa-8b3d-48a28184bdd5` | `help_tutors` | tutor-facing help articles (skips Tasks Tracker rows on this parent) |
-| Teacher Help Center Articles | `379b7cca-4982-800b-ae0f-ed31e7c0ec78` | `help_teachers` | teacher-facing help articles (structured Topic/Feature schema) |
-| Help Center Articles Dev Page | `364b7cca-4982-804a-9975-f803d6155fc6` | `help_articles_dev` | teacher HC draft/library sibling under Teacher Training → Help Center Articles |
+| Teacher Help Center Articles | `379b7cca-4982-800b-ae0f-ed31e7c0ec78` | `help_teachers` | teacher-facing help articles |
 | Prototype Marketplace | `397b7cca-4982-8002-826c-c45e2baa8e4f` | `marketplace` | prototype catalog search (publish is in-IDE) |
 | Design Running Notes | `3ee43141-b0ce-4517-badc-cb52a7b97bdb` | `running_notes` | per-person / team design notes |
 | News | `18ab7cca-4982-80b7-9168-db5c5ab201e9` | `news` | product announcements, what shipped |
@@ -77,7 +76,7 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | Research Papers | `85af6f14-7e96-4ed7-aa92-687579a14b4f` | `research_papers` | prior research to cite before re-running |
 | Banners | `36eb7cca-4982-81f4-ad99-e53e62d9506a` | `banners` | live in-product banner copy/state |
 
-**Not tracked** (deliberate — noise or wrong owner for bot grounding): Tasks Tracker on HC Content, Content HQ editorial / meeting / social DBs, demo pages. Use `scope: "any"` only as a last resort when the surface is unknown.
+**Not tracked** (deliberate — noise or wrong owner for bot grounding): Help Center Articles Dev Page, Tasks Tracker on HC Content, Content HQ editorial / meeting / social DBs, demo pages. Use `scope: "any"` only as a last resort when the surface is unknown.
 
 **Findability rule:** access ≠ search. Workspace `/v1/search` is weak inside known DBs — prefer the catalog scope (direct `databases/{id}/query`). Empty results usually mean the DB isn't shared with the uno-bot Notion integration (Connections), not that the row doesn't exist.
 

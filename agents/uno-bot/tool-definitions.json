@@ -27,7 +27,7 @@
   },
   {
     "name": "notion_search",
-    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL. Prefer a narrow `scope` when you know the surface — scoped queries hit the live database directly (complete scan + fuzzy title match) and beat workspace search. Scopes: 'team' (SME roster), 'apps' (access-request routing — Application Admin grants; you only route), 'marketplace' (prototype catalog), 'help_tutors' / 'help_teachers' / 'help_articles_dev' (Help Center articles — tutor production, teacher production, teacher draft library), 'decisions' (Decisions DB), 'running_notes' (Design Running Notes), 'news' / 'success_stories' / 'research_papers' / 'banners' (Content HQ read radar), 'any' (workspace title search — last resort). NOT for Roadmap cards — use roadmap_query. Returns titles + URLs (+ key properties); follow up with source_read for full content. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL. Prefer a narrow `scope` when you know the surface — scoped queries hit the live database directly (complete scan + fuzzy title match) and beat workspace search. Scopes: 'team' (SME roster), 'apps' (access-request routing — Application Admin grants; you only route), 'marketplace' (prototype catalog), 'help_tutors' / 'help_teachers' (Help Center articles), 'decisions' (Decisions DB), 'running_notes' (Design Running Notes), 'news' / 'success_stories' / 'research_papers' / 'banners' (Content HQ read radar), 'any' (workspace title search — last resort). NOT for Roadmap cards — use roadmap_query. Returns titles + URLs (+ key properties); follow up with source_read for full content. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -47,7 +47,6 @@
             "marketplace",
             "help_tutors",
             "help_teachers",
-            "help_articles_dev",
             "decisions",
             "running_notes",
             "news",
@@ -56,7 +55,7 @@
             "banners",
             "any"
           ],
-          "description": "'team' = Team Member roster. 'apps' = Third Party Applications (access routing). 'marketplace' = Prototype Marketplace. 'help_tutors' / 'help_teachers' / 'help_articles_dev' = Help Center article DBs (tutor production, teacher production, teacher draft library). 'decisions' = Decisions DB. 'running_notes' = Design Running Notes. 'news' / 'success_stories' / 'research_papers' / 'banners' = Content HQ. 'any' = workspace-wide title search (prefer a catalog scope when you know the surface). Card lookups → roadmap_query."
+          "description": "'team' = Team Member roster. 'apps' = Third Party Applications (access routing). 'marketplace' = Prototype Marketplace. 'help_tutors' / 'help_teachers' = Help Center article DBs. 'decisions' = Decisions DB. 'running_notes' = Design Running Notes. 'news' / 'success_stories' / 'research_papers' / 'banners' = Content HQ. 'any' = workspace-wide title search (prefer a catalog scope when you know the surface). Card lookups → roadmap_query."
         }
       }
     }

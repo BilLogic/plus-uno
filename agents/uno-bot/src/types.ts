@@ -38,8 +38,6 @@ export interface Env {
   NOTION_HELP_TUTORS_DB_ID?: string;
   /** Teacher Help Center Articles — notion_search scope "help_teachers". */
   NOTION_HELP_TEACHERS_DB_ID?: string;
-  /** Help Center Articles Dev Page — notion_search scope "help_articles_dev". */
-  NOTION_HELP_ARTICLES_DEV_DB_ID?: string;
   /** Prototype Marketplace — notion_search scope "marketplace". */
   NOTION_MARKETPLACE_DB_ID?: string;
   /** Design Running Notes — notion_search scope "running_notes". */

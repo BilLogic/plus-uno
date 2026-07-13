@@ -45,12 +45,7 @@ const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
   help_teachers: {
     envKey: "NOTION_HELP_TEACHERS_DB_ID",
     label: "Teacher Help Center Articles",
-    note: "Teacher-facing help articles (structured Topic/Feature schema). source_read a hit for full copy. Sibling draft library → scope 'help_articles_dev'.",
-  },
-  help_articles_dev: {
-    envKey: "NOTION_HELP_ARTICLES_DEV_DB_ID",
-    label: "Help Center Articles Dev Page",
-    note: "Teacher Help Center draft/library under Teacher Training → Help Center Articles. Prefer help_teachers for the structured production DB when both exist.",
+    note: "Teacher-facing help articles. source_read a hit for full copy.",
   },
   marketplace: {
     envKey: "NOTION_MARKETPLACE_DB_ID",
@@ -132,7 +127,7 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
       results: hits,
       note: hits.length
         ? "Title-matched candidates from workspace search (pages + databases). Prefer a catalog scope (marketplace, help_tutors, decisions, …) when you know the surface — those are complete DB scans. To answer about one hit, source_read its url. Cite the page you used."
-        : "No pages matched workspace search. Try a catalog scope if you know the surface (marketplace / help_tutors / help_teachers / help_articles_dev / decisions / running_notes / news / …), or the page may not be shared with the bot's Notion integration (Connections). Say so; don't answer from memory.",
+        : "No pages matched workspace search. Try a catalog scope if you know the surface (marketplace / help_tutors / help_teachers / decisions / running_notes / news / …), or the page may not be shared with the bot's Notion integration (Connections). Say so; don't answer from memory.",
     });
   } catch (err) {
     return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });

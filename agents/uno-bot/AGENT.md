@@ -46,7 +46,7 @@ Questions, discussion, thinking-out-loud → answer directly from loaded docs; i
 | "who should I talk to about X" / find an SME | `notion_search` scope `"team"` | read |
 | "can I get access to X" / "who owns/admins tool Y" | `notion_search` scope `"apps"` | read |
 | prototype catalog / marketplace entry | `notion_search` scope `"marketplace"` | read |
-| Help Center article (tutor / teacher / draft) | `notion_search` scope `"help_tutors"` / `"help_teachers"` / `"help_articles_dev"` | read |
+| Help Center article (tutor / teacher) | `notion_search` scope `"help_tutors"` / `"help_teachers"` | read |
 | "what did we decide about X" | `notion_search` scope `"decisions"` | read |
 | design running notes | `notion_search` scope `"running_notes"` | read |
 | news / success story / research paper / banner | `notion_search` scope `"news"` / `"success_stories"` / `"research_papers"` / `"banners"` | read |

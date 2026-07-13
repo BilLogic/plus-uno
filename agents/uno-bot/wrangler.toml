@@ -68,9 +68,6 @@ NOTION_HELP_TUTORS_DB_ID = "24dadbad-35c8-47fa-8b3d-48a28184bdd5"
 # also hosts Tasks Tracker — Worker skips "Task name" title rows.
 NOTION_HELP_TEACHERS_DB_ID = "379b7cca-4982-800b-ae0f-ed31e7c0ec78"
 # Teacher Help Center Articles (ds c24b7cca-4982-82fc-bbf9-079585b06629).
-NOTION_HELP_ARTICLES_DEV_DB_ID = "364b7cca-4982-804a-9975-f803d6155fc6"
-# Help Center Articles Dev Page — sibling draft/library under Teacher Training →
-# Help Center Articles (ds 364b7cca-4982-8083-9e3a-000bad1e1dab).
 NOTION_MARKETPLACE_DB_ID = "397b7cca-4982-8002-826c-c45e2baa8e4f"
 # Prototype Marketplace under Design HQ (ds 397b7cca-4982-80d8-9967-000b69521ce9).
 NOTION_RUNNING_NOTES_DB_ID = "3ee43141-b0ce-4517-badc-cb52a7b97bdb"
@@ -80,8 +77,8 @@ NOTION_NEWS_DB_ID = "18ab7cca-4982-80b7-9168-db5c5ab201e9"
 NOTION_SUCCESS_STORIES_DB_ID = "55c702c6-18dd-4b5c-8cea-eac797c02257"
 NOTION_RESEARCH_PAPERS_DB_ID = "85af6f14-7e96-4ed7-aa92-687579a14b4f"
 NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
-# NOT tracked (deliberate): Tasks Tracker on HC Content, Content HQ
-# editorial/meeting/social DBs, demo pages.
+# NOT tracked (deliberate): Help Center Articles Dev Page, Tasks Tracker on HC
+# Content, Content HQ editorial/meeting/social DBs, demo pages.
 # NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
 # surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
 # research is an IDE-only skill that writes to the project hub's Research page.
