@@ -11,7 +11,7 @@ import { CapacityFilter } from '../Elements/Filters/CapacityFilter/CapacityFilte
 
 // Import Sign-Ups modals
 import * as SignUpsModals from '../Modals/Sign-Ups/SignUps.stories';
-import { SectionTitle } from './_pageHelpers';
+import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -281,35 +281,9 @@ export const WithModals = (args) => {
                 </PageLayout>
 
                 {/* Scrim Overlay + Modal */}
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    display: args.open ? 'flex' : 'none',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 'var(--size-section-pad-x-lg)',
-                    zIndex: 1000
-                }}>
-                    {ModalComponent ? (
-                        <ModalComponent />
-                    ) : (
-                        <div style={{
-                            backgroundColor: 'var(--color-surface-container-high)',
-                            borderRadius: 'var(--size-modal-radius-lg)',
-                            padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
-                            width: '672px',
-                            textAlign: 'center',
-                        }}>
-                            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
-                                No modal available for: {tab} / {user}
-                            </p>
-                        </div>
-                    )}
-                </div>
+                <ModalScrim open={args.open}>
+                    {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for: {tab} / {user}</MissingModal>}
+                </ModalScrim>
             </div>
         </div>
     );
