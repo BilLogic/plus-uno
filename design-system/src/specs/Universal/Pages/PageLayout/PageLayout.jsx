@@ -208,8 +208,10 @@ const PageLayout = ({
                     flex: '1 0 0',
                     alignItems: 'stretch',
                     minWidth: 0,
+                    // Height comes from the parent's align-items:stretch + this flex track.
+                    // A redundant height:100% over-resolves at short viewports and grows the
+                    // layer past the shell, clipping the bottom under the shell's overflow:hidden.
                     minHeight: 0,
-                    height: '100%',
                     overflow: 'hidden',
                     backgroundColor: 'var(--color-surface, #f9f9fc)',
                     borderRadius: 'var(--size-surface-radius, 16px)',
@@ -225,7 +227,6 @@ const PageLayout = ({
                                 minHeight: 0,
                                 padding: 0,
                                 width: '100%',
-                                height: '100%',
                                 boxSizing: 'border-box',
                                 display: 'flex',
                                 flexDirection: 'column',
