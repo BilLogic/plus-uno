@@ -105,20 +105,24 @@ html {
 }
 
 /*
- * Page MDX with embedded `ResponsiveFrame` (Admin / Training full-page specs):
- * widen the docs body so the 1440px XL frame doesn't get clipped, and tame the
- * sticky toolbar / 100vh minimums that ResponsiveFrame uses for solo Canvas view.
+ * Any docs page that embeds a `ResponsiveFrame` (every Specs *Page*) goes FULL-WIDTH,
+ * responsive to the iframe edge (minus the comfortable side padding inherited from
+ * `.sbdocs-wrapper`). The featured screen inside is width-constrained to the selected
+ * breakpoint by ResponsiveFrame itself; when that width exceeds the well, the WELL scrolls
+ * horizontally — the docs page itself never does. This is what makes the Breakpoint toolbar
+ * actually simulate MD/LG/XL instead of the page just filling whatever space it's given.
  *
  * `:has()` is Chrome 105+ / Safari 15.4+ / Firefox 121+ — Storybook is typically viewed in Chromium.
  */
+.sbdocs-wrapper:has(.responsive-frame-root),
 .sbdocs-wrapper:has(.sb-ds-component-docs--page-fullbleed) {
-    max-width: 112rem !important; /* ~1792px — fits 1440px frame + canvas padding with room to spare */
+    max-width: none !important;
 }
 
 /* The breakpoint switcher pins itself to `top: 0` of the scroll container. In docs each Story
    becomes a separate ResponsiveFrame and the docs body scrolls — multiple sticky toolbars would
    pile on top of each other. Pin them to the start of their frame instead. */
-.sbdocs .sb-ds-component-docs--page-fullbleed .responsive-frame-toolbar {
+.sbdocs .responsive-frame-toolbar {
     position: static !important;
 }
 

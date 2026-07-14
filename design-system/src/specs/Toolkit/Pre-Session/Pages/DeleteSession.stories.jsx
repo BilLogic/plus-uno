@@ -225,18 +225,10 @@ export const Overview = () => (
  * - Dynamic session data per tab
  * - Breakpoint toggle to preview at different screen sizes
  */
-export const Interactive = () => {
-    const [showSnackbar, setShowSnackbar] = useState(true);
-    const [showAlert, setShowAlert] = useState(true);
+const InteractiveRender = (args) => {
+    const showSnackbar = args.snackbar;
+    const showAlert = args.alert;
     const [selectedTab, setSelectedTab] = useState('my-sessions');
-    const [breakpoint, setBreakpoint] = useState('xl');
-
-    // Breakpoint widths from design system
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
 
     // Different session data per tab
     const sessionsByTab = {
@@ -278,118 +270,58 @@ export const Interactive = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                {/* Snackbar Toggle */}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Snackbar:
-                </span>
-                <Button
-                    text={showSnackbar ? 'On' : 'Off'}
-                    size="small"
-                    style="primary"
-                    fill={showSnackbar ? 'filled' : 'outline'}
-                    onClick={() => setShowSnackbar(!showSnackbar)}
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Sessions' }
+                    ],
+                    user: { name: 'John Doe' }
+                }}
+                sidebarConfig={{
+                    user: 'supervisor',
+                    activeTab: 'sessions'
+                }}
+                id="delete-session-page-interactive"
+            >
+                <MainContent
+                    showAlert={showAlert}
+                    onAlertClose={() => {}}
+                    tabs={tabs}
+                    selectedTab={selectedTab}
+                    onTabChange={setSelectedTab}
+                    sessions={sessionsByTab[selectedTab] || []}
                 />
+            </PageLayout>
 
-                <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--size-element-gap-sm)' }} />
-
-                {/* Alert Toggle */}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Alert:
-                </span>
-                <Button
-                    text={showAlert ? 'On' : 'Off'}
-                    size="small"
-                    style="primary"
-                    fill={showAlert ? 'filled' : 'outline'}
-                    onClick={() => setShowAlert(!showAlert)}
-                />
-
-                <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--size-element-gap-sm)' }} />
-
-                {/* Breakpoint Toggle */}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Page Preview Container */}
-            <div style={{
-                width: `${breakpointWidths[breakpoint]}px`,
-                height: '100%',
-                margin: '0 auto',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-                transition: 'width 0.3s ease',
-                position: 'relative'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions' }
-                        ],
-                        user: { name: 'John Doe' }
+            {/* Snackbar - positioned at bottom center */}
+            {showSnackbar && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        bottom: 'var(--size-section-gap-lg)',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1000
                     }}
-                    sidebarConfig={{
-                        user: 'supervisor',
-                        activeTab: 'sessions'
-                    }}
-                    id="delete-session-page-interactive"
                 >
-                    <MainContent
-                        showAlert={showAlert}
-                        onAlertClose={() => setShowAlert(false)}
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                        sessions={sessionsByTab[selectedTab] || []}
+                    <SessionManagementSnackbar
+                        type="session canceled"
+                        timestamp="1 mins ago"
+                        onClose={() => {}}
                     />
-                </PageLayout>
-
-                {/* Snackbar - positioned at bottom center */}
-                {showSnackbar && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: 'var(--size-section-gap-lg)',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            zIndex: 1000
-                        }}
-                    >
-                        <SessionManagementSnackbar 
-                            type="session canceled" 
-                            timestamp="1 mins ago"
-                            onClose={() => setShowSnackbar(false)}
-                        />
-                    </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
+};
+
+export const Interactive = {
+    render: InteractiveRender,
+    argTypes: {
+        snackbar: { control: 'boolean', name: 'Session-canceled snackbar', table: { category: 'State' } },
+        alert: { control: 'boolean', name: 'Update alert', table: { category: 'State' } },
+    },
+    args: { snackbar: true, alert: true },
 };

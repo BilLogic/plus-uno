@@ -1,0 +1,53 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as RequestTutorStories from './RequestTutorOffCanvas.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasHero } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={RequestTutorStories} name="Toolkit Docs — RequestTutor" />
+
+<Title />
+
+The **Request tutor** off-canvas is triggered from the in-session Session Controls overflow menu.
+A **lead** posts a structured request (number of tutors, closing time, reason) then confirms the Slack
+message; a **regular tutor** requests a lead tutor with a one-tap Slack message. Both end in a **sent**
+confirmation state.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=6065-66287"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/In-Session/Elements/RequestTutor"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={RequestTutorStories.Playground}
+    description={<>Switch <strong className="text-foreground">Role</strong> (lead / tutor) and step through the flow. The panel pins to the right of its stage.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Lead — request form → Slack → sent
+
+<DocsCanvasShell description={<>Lead flow starts on the request form.</>}>
+    <DsCanvasHero of={RequestTutorStories.LeadRequest} layout="fullscreen" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Regular tutor — request a lead tutor
+
+<DocsCanvasShell description={<>Tutor flow skips the form and goes straight to the Slack preview.</>}>
+    <DsCanvasHero of={RequestTutorStories.TutorRequest} layout="fullscreen" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

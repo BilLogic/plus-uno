@@ -58,7 +58,8 @@ const Sidebar = ({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 'var(--size-surface-gap-sm)',
-                width: 'fit-content',
+                width: '100%',
+                minWidth: 0,
                 height: '100%',
                 boxSizing: 'border-box',
                 ...style

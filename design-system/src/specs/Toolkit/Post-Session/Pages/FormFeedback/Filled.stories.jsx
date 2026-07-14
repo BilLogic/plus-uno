@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import FormFeedbackFilled from './Filled';
+import FormFeedbackUnfilled from './Unfilled';
 
 const BreakpointPreview = ({ Component, args }) => (
     // Width/breakpoint + height come from the global Breakpoint toolbar (ResponsiveFrame decorator).
@@ -35,8 +36,22 @@ export default {
  * filled textareas with example responses.
  */
 export const Filled = {
-    render: (args) => <BreakpointPreview Component={FormFeedbackFilled} args={args} />,
+    render: ({ state, ...rest }) => (
+        <BreakpointPreview
+            Component={state === 'unfilled' ? FormFeedbackUnfilled : FormFeedbackFilled}
+            args={rest}
+        />
+    ),
+    argTypes: {
+        state: {
+            control: 'radio',
+            options: ['filled', 'unfilled'],
+            name: 'Form state',
+            table: { category: 'State' },
+        },
+    },
     args: {
+        state: 'filled',
         students: [
             { name: 'Kiera Wintervale', status: 'complete' },
             { name: 'Baxter Ellington', status: 'complete' },

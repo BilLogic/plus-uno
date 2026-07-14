@@ -189,7 +189,7 @@ const PageLayout = ({
                         pointerEvents: showSidebar ? 'auto' : 'none',
                     }}
                 >
-                    <div style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH, height: '100%', overflowY: 'auto' }}>
+                    <div style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH, height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
                         <Sidebar
                             {...sidebarProps}
                             activeTabId={sidebarActiveCombined}

@@ -31,7 +31,16 @@ export default {
 };
 
 export const Part1 = {
-    render: (args) => <BreakpointPreview Component={SessionReflectionPart1} args={args} />,
+    render: (args) => (
+        <BreakpointPreview key={args.initialRating} Component={SessionReflectionPart1} args={args} />
+    ),
+    argTypes: {
+        initialRating: {
+            control: { type: 'range', min: 0, max: 5, step: 1 },
+            name: 'Session rating',
+            table: { category: 'State' },
+        },
+    },
     args: {
         students: [
             { name: 'Kiera Wintervale', status: 'complete' },

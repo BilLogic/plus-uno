@@ -62,7 +62,7 @@ export default {
 export const Overview = {
     render: () => (
         <PageLayout
-            style={{ minHeight: 'min(680px, calc(100vh - 200px))', height: 'auto' }}
+            style={{ minHeight: 'min(680px, calc(100vh - 200px))', height: '100%' }}
             sidebarConfig={{
                 user: 'tutor',
             }}
@@ -108,7 +108,7 @@ export const Overview = {
 export const Interactive = {
     render: (args) => (
         <PageLayout
-            style={{ minHeight: 'min(680px, calc(100vh - 200px))', height: 'auto' }}
+            style={{ minHeight: 'min(680px, calc(100vh - 200px))', height: '100%' }}
             sidebarConfig={{
                 user: args.userType,
             }}

@@ -153,18 +153,10 @@ export const Overview = () => (
  * - Action buttons
  * - Breakpoint toggle to preview at different screen sizes
  */
-export const Interactive = () => {
+const InteractiveRender = (args) => {
     const [selectedTab, setSelectedTab] = useState('reflections');
-    const [completionFilter, setCompletionFilter] = useState('Incomplete');
-    const [breakpoint, setBreakpoint] = useState('xl');
+    const completionFilter = args.completionFilter;
     const [reflections, setReflections] = useState(defaultReflections);
-
-    // Breakpoint widths from design system
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
 
     const tabs = [
         { id: 'my-sessions', label: 'My sessions', count: 20 },
@@ -204,97 +196,41 @@ export const Interactive = () => {
         }
     };
 
-    const completedCount = reflections.filter(r => r.status === 'completed').length;
-    const incompleteCount = reflections.filter(r => r.status === 'incomplete').length;
-
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Breakpoint Toggle Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Current State Info */}
-            <div style={{
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                display: 'flex',
-                gap: 'var(--size-element-gap-lg)'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Filter: <strong>{completionFilter}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-success)' }}>
-                    Completed: <strong>{completedCount}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-error)' }}>
-                    Incomplete: <strong>{incompleteCount}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Showing: <strong>{filteredReflections.length}</strong> reflections
-                </span>
-            </div>
-
-            {/* Page Preview Container */}
-            <div style={{
-                width: `${breakpointWidths[breakpoint]}px`,
-                height: '100%',
-                margin: '0 auto',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-                transition: 'width 0.3s ease'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions' }
-                        ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: 'tutor',
-                        activeTab: 'sessions'
-                    }}
-                    id="reflection-page-interactive"
-                >
-                    <MainContent
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                        reflections={filteredReflections}
-                        completionFilter={completionFilter}
-                        onCompletionFilterChange={setCompletionFilter}
-                        onAction={handleAction}
-                        interactive={true}
-                    />
-                </PageLayout>
-            </div>
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Sessions' }
+                    ],
+                    user: { name: 'John Doe', role: 'Lead' }
+                }}
+                sidebarConfig={{
+                    user: 'tutor',
+                    activeTab: 'sessions'
+                }}
+                id="reflection-page-interactive"
+            >
+                <MainContent
+                    tabs={tabs}
+                    selectedTab={selectedTab}
+                    onTabChange={setSelectedTab}
+                    reflections={filteredReflections}
+                    completionFilter={completionFilter}
+                    onCompletionFilterChange={() => {}}
+                    onAction={handleAction}
+                    interactive={true}
+                />
+            </PageLayout>
         </div>
     );
+};
+
+export const Interactive = {
+    render: InteractiveRender,
+    argTypes: {
+        completionFilter: { control: 'radio', options: ['Incomplete', 'Completed', 'Both'], name: 'Completion filter', table: { category: 'State' } },
+    },
+    args: { completionFilter: 'Incomplete' },
 };

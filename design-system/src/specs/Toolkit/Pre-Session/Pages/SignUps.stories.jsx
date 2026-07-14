@@ -159,18 +159,9 @@ export const Overview = () => (
  * - Filter changes
  * - Breakpoint toggle to preview at different screen sizes
  */
-export const Interactive = () => {
-    const [selectedTab, setSelectedTab] = useState('sign-ups');
-    const [breakpoint, setBreakpoint] = useState('xxl');
+const InteractiveRender = (args) => {
+    const selectedTab = args.tab;
     const [filters, setFilters] = useState(defaultFilters);
-
-    // Breakpoint widths from design system
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 992,
-        'xl': 1200,
-        'xxl': 1400,
-    };
 
     const handleFilterChange = (filterKey, value) => {
         setFilters(prev => ({ ...prev, [filterKey]: value }));
@@ -185,69 +176,43 @@ export const Interactive = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Breakpoint Toggle Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Page Preview Container */}
-            <div style={{
-                width: `${breakpointWidths[breakpoint]}px`,
-                height: '100%',
-                margin: '0 auto',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-                transition: 'width 0.3s ease'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions' }
-                        ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: 'tutor',
-                        activeTab: 'sessions'
-                    }}
-                    id="sign-ups-page-interactive"
-                >
-                    <MainContent
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                        sessions={defaultSessions}
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                    />
-                </PageLayout>
-            </div>
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Sessions' }
+                    ],
+                    user: { name: 'John Doe', role: 'Lead' }
+                }}
+                sidebarConfig={{
+                    user: 'tutor',
+                    activeTab: 'sessions'
+                }}
+                id="sign-ups-page-interactive"
+            >
+                <MainContent
+                    tabs={tabs}
+                    selectedTab={selectedTab}
+                    onTabChange={() => {}}
+                    sessions={defaultSessions}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                />
+            </PageLayout>
         </div>
     );
+};
+
+export const Interactive = {
+    render: InteractiveRender,
+    argTypes: {
+        tab: {
+            control: 'select',
+            options: ['my-sessions', 'sign-ups', 'fill-ins', 'call-offs', 'reflections'],
+            name: 'Active tab',
+            table: { category: 'State' },
+        },
+    },
+    args: { tab: 'sign-ups' },
 };

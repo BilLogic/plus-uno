@@ -24,11 +24,44 @@ const defaultSessionData = {
     didNotHappen: false,
 };
 
-export const Default = {
-    args: {
+const sessionStateData = {
+    default: {
         initialSessionData: defaultSessionData,
-        initialStudents: defaultStudents,
         initialSelectedStudents: ['Kiera Wintervale', 'Baxter Ellington'],
+    },
+    empty: {
+        initialSessionData: { date: '', sessionOption: '', didNotHappen: false },
+        initialSelectedStudents: [],
+    },
+    'did-not-happen': {
+        initialSessionData: { ...defaultSessionData, didNotHappen: true },
+        initialSelectedStudents: ['Kiera Wintervale', 'Baxter Ellington'],
+    },
+};
+
+export const Default = {
+    render: ({ state, ...rest }) => {
+        const data = sessionStateData[state] || sessionStateData.default;
+        return (
+            <PostSessionPage
+                key={state}
+                initialStudents={defaultStudents}
+                initialSessionData={data.initialSessionData}
+                initialSelectedStudents={data.initialSelectedStudents}
+                {...rest}
+            />
+        );
+    },
+    argTypes: {
+        state: {
+            control: 'radio',
+            options: ['default', 'empty', 'did-not-happen'],
+            name: 'Form state',
+            table: { category: 'State' },
+        },
+    },
+    args: {
+        state: 'default',
     },
 };
 

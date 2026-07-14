@@ -3,6 +3,7 @@ import Button from '@/components/actions/Button';
 import Badge from '@/components/status-and-loading/Badge/Badge';
 import { AttendanceDropdown } from '../Elements/AttendanceDropdown.jsx';
 import { EngagementDropdown } from '../Elements/EngagementDropdown.jsx';
+import { RoomBadge } from '../Elements/badges/RoomBadge.jsx';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -161,6 +162,8 @@ export const TableHeaderRow = () => (
 export const TableRow = ({
     studentName,
     isNew = false,
+    roomNumber,
+    roomOutOfRange = false,
     status = 'needs-goals',
     attendanceStatus = 'unknown',
     engagementStatus = 'unknown',
@@ -212,6 +215,7 @@ export const TableRow = ({
                     overflow: 'hidden'
                 }}
             >
+                <RoomBadge number={roomNumber} outOfRange={roomOutOfRange} />
                 <StudentBadge isNew={isNew} />
                 <span
                     className="body3-txt"
@@ -286,7 +290,7 @@ export const TableRow = ({
                 }}
             >
                 <Button
-                    text="Goals"
+                    text="Set Goals"
                     style="primary"
                     fill="outline"
                     size="small"
@@ -374,11 +378,11 @@ export const RowStates = () => (
  */
 export const Interactive = () => {
     const [students, setStudents] = useState([
-        { id: 1, studentName: 'Cameron Williamson', isNew: true, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-        { id: 2, studentName: 'Jane Cooper', isNew: true, status: 'needs-goals', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-        { id: 3, studentName: 'Robert Fox', isNew: false, status: 'on-track', attendanceStatus: 'present', engagementStatus: 'fully-engaged' },
-        { id: 4, studentName: 'Esther Howard', isNew: true, status: 'needs-goals', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-        { id: 5, studentName: 'Leslie Alexander', isNew: false, status: 'exceeding', attendanceStatus: 'present', engagementStatus: 'fully-engaged' }
+        { id: 1, studentName: 'Cameron Williamson', isNew: true, roomNumber: 1, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+        { id: 2, studentName: 'Jane Cooper', isNew: true, roomNumber: 2, status: 'needs-goals', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+        { id: 3, studentName: 'Robert Fox', isNew: false, roomNumber: 3, status: 'on-track', attendanceStatus: 'present', engagementStatus: 'fully-engaged' },
+        { id: 4, studentName: 'Esther Howard', isNew: true, roomNumber: 4, status: 'needs-goals', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+        { id: 5, studentName: 'Leslie Alexander', isNew: false, roomNumber: 5, roomOutOfRange: true, status: 'exceeding', attendanceStatus: 'present', engagementStatus: 'fully-engaged' }
     ]);
 
     const handleAttendanceChange = (studentId) => (newStatus) => {

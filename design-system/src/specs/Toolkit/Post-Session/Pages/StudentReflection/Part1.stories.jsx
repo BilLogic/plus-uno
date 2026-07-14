@@ -21,6 +21,14 @@ export default {
 
 export const Part1 = {
     render: (args) => <BreakpointPreview Component={StudentReflectionPart1} args={args} />,
+    argTypes: {
+        studentName: {
+            control: 'select',
+            options: ['Kiera Wintervale', 'Baxter Ellington', 'Milo Thorne'],
+            name: 'Student',
+            table: { category: 'Content' },
+        },
+    },
     args: {
         studentName: 'Kiera Wintervale',
         students: [
