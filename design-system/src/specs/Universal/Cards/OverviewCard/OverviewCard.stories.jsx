@@ -362,12 +362,12 @@ export const Overview = () => (
             gap: '16px',
             marginBottom: '32px'
         }}>
-            <OverviewCard type="relationships" smartData={smartDataSets.relationships} />
-            <OverviewCard type="socio-emotional" smartData={smartDataSets['socio-emotional']} />
-            <OverviewCard type="mastering-content" smartData={smartDataSets['mastering-content']} />
-            <OverviewCard type="advocacy" smartData={smartDataSets.advocacy} />
-            <OverviewCard type="technology-tools" smartData={smartDataSets['technology-tools']} />
-            <OverviewCard type="undefined" smartData={smartDataSets.undefined} />
+            <OverviewCard type="relationships" smartData={smartDataSets.relationships} titleAs="h4" />
+            <OverviewCard type="socio-emotional" smartData={smartDataSets['socio-emotional']} titleAs="h4" />
+            <OverviewCard type="mastering-content" smartData={smartDataSets['mastering-content']} titleAs="h4" />
+            <OverviewCard type="advocacy" smartData={smartDataSets.advocacy} titleAs="h4" />
+            <OverviewCard type="technology-tools" smartData={smartDataSets['technology-tools']} titleAs="h4" />
+            <OverviewCard type="undefined" smartData={smartDataSets.undefined} titleAs="h4" />
         </div>
 
         <h3 style={{ marginBottom: '16px', fontFamily: 'Lato, sans-serif' }}>Metric Cards</h3>
@@ -376,14 +376,14 @@ export const Overview = () => (
             flexWrap: 'wrap',
             gap: '16px'
         }}>
-            <OverviewCard type="status" chartValue={37.5} subtitle="37.5%" />
-            <OverviewCard type="completion" chartValue={20} />
-            <OverviewCard type="accuracy" chartValue={20} />
-            <OverviewCard type="avg-accuracy" chartValue={20} />
-            <OverviewCard type="avg-completion" chartValue={20} />
-            <OverviewCard type="time-spent" chartValue={33} subtitle="30 / 90 min" editLink />
-            <OverviewCard type="effort" chartValue={20} />
-            <OverviewCard type="progress" chartValue={20} />
+            <OverviewCard type="status" chartValue={37.5} subtitle="37.5%" titleAs="h4" />
+            <OverviewCard type="completion" chartValue={20} titleAs="h4" />
+            <OverviewCard type="accuracy" chartValue={20} titleAs="h4" />
+            <OverviewCard type="avg-accuracy" chartValue={20} titleAs="h4" />
+            <OverviewCard type="avg-completion" chartValue={20} titleAs="h4" />
+            <OverviewCard type="time-spent" chartValue={33} subtitle="30 / 90 min" editLink titleAs="h4" />
+            <OverviewCard type="effort" chartValue={20} titleAs="h4" />
+            <OverviewCard type="progress" chartValue={20} titleAs="h4" />
         </div>
     </div>
 );

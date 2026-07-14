@@ -25,13 +25,17 @@ const Alert = ({
     style = 'primary',
     title,
     children,
-    dismissable = true,
+    dismissible = true,
+    /** @deprecated Prefer `dismissible` — kept for existing call sites */
+    dismissable,
     onDismiss,
     className = '',
     variant,
     ...props
 }) => {
     const [show, setShow] = useState(true);
+    /** Prefer `dismissible`; honor legacy `dismissable` when explicitly passed */
+    const canDismiss = dismissable !== undefined ? dismissable : dismissible;
 
     if (!show) return null;
 
@@ -51,7 +55,7 @@ const Alert = ({
             id={id}
             variant={variant || alertStyle}
             show={show}
-            onClose={dismissable ? handleClose : undefined}
+            onClose={canDismiss ? handleClose : undefined}
             dismissible={false} // Custom dismiss button used in SCSS structure
             className={`plus-alert ${alertStyle} ${className}`}
             {...props}
@@ -61,7 +65,7 @@ const Alert = ({
                 <div className="plus-alert-text body2-txt">{children}</div>
             </div>
 
-            {dismissable && (
+            {canDismiss && (
                 <button
                     type="button"
                     className={`plus-alert-dismiss-btn ${dismissBtnClass}`}
@@ -87,6 +91,8 @@ Alert.propTypes = {
     /** Alert content - supports text, JSX, or React components */
     children: PropTypes.node.isRequired,
     /** Whether the alert can be dismissed */
+    dismissible: PropTypes.bool,
+    /** @deprecated Prefer `dismissible` */
     dismissable: PropTypes.bool,
     /** Callback when alert is dismissed */
     onDismiss: PropTypes.func,

@@ -1,0 +1,185 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as LoginElementsStories from './Elements.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+{/* Figma: Elements · Login — node 112:1200 */}
+<Meta of={LoginElementsStories} />
+
+<Title />
+
+Login atoms from the Web App Specs **Elements** frame: institution dropdown & form,
+access-code form, auth / misc buttons, alert, and footer.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-1200"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Login/Elements"
+    sets={[
+        { name: 'Elements frame', nodeId: '112:1200' },
+        { name: 'Dropdown / Institution Selection', nodeId: '112:1815' },
+        { name: 'Form / Institution Selection', nodeId: '113:41985' },
+        { name: 'Form / Access Code', nodeId: '113:38704' },
+        { name: 'Button / Auths', nodeId: '113:38903' },
+        { name: 'Button / Misc', nodeId: '113:38836' },
+        { name: 'Alert', nodeId: '113:41804' },
+        { name: 'Footer', nodeId: '113:38671' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Index of Login element organisms mirrored from Figma.</>}
+>
+    <Canvas
+        of={LoginElementsStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Dropdown / Institution Selection
+
+States: empty · open · typing · filled (Figma `Dropdown / Institution Selection`).
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Non-interactive spec strip so every dropdown state stays visible.</>}
+>
+    <Canvas
+        of={LoginElementsStories.InstitutionSelection}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Form / Institution Selection
+
+Variants: `official` · `independent` (Figma `Form / Institution Selection`).
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Labeled field + caption for registering with an institution vs entering a name.</>}
+>
+    <Canvas
+        of={LoginElementsStories.InstitutionForm}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Form / Access Code
+
+States: default · invalid (Figma `Form / Access Code`).
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Required access-code field with helper caption and validation message.</>}
+>
+    <Canvas
+        of={LoginElementsStories.AccessCodeForm}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Button / Auths
+
+Providers: Google · Clever (Figma `Button / Auths`).
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>SSO continue buttons using the dedicated auth-provider assets.</>}
+>
+    <Canvas
+        of={LoginElementsStories.AuthButtons}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Button / Misc
+
+Actions: try a demo · back · continue · log in (enabled / disabled) — Figma `Button / Misc`.
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Primary tonal / filled actions used across portal steps.</>}
+>
+    <Canvas
+        of={LoginElementsStories.LoginButtons}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Alert
+
+Logged-out / session message banner (Figma `Alert`).
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Primary dismissible alert used above the portal header.</>}
+>
+    <Canvas
+        of={LoginElementsStories.LoginAlert}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Footer
+
+Page-level version / copyright / terms strip (Figma `Footer`).
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Login footer composition on a surface-container well.</>}
+>
+    <Canvas
+        of={LoginElementsStories.LoginFooterComponent}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

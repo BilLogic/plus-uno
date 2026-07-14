@@ -9,7 +9,12 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        style: {
+            control: 'select',
+            options: ['primary', 'secondary', 'success', 'info', 'warning', 'danger'],
+            description: 'Progress color style',
+            table: { category: 'Design' }
+        },
         value: { control: { type: 'range', min: 0, max: 100 }, description: 'Progress value', table: { category: 'Content' } },
         size: {
             control: 'select',
@@ -105,4 +110,9 @@ export const Interactive = {
         animated: false,
         showLabel: true,
     },
+    render: (args) => (
+        <div style={{ width: '100%', minWidth: '200px', maxWidth: '480px' }}>
+            <Progress {...args} />
+        </div>
+    ),
 };

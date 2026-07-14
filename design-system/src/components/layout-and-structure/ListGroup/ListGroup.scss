@@ -171,3 +171,52 @@
         color: var(--color-surface);
     }
 }
+
+// --- SELECTION INDICATOR (ListGroup.Item selectable, ListGroup.Option) ---
+// Purely visual checkbox/radio glyph — see SelectionIndicator.jsx for why this
+// is not a real <input>. Sized and colored to match the Checkbox/Radio components.
+.plus-list-option-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: var(--size-element-stroke-md, 2px) solid var(--color-outline-variant);
+    background-color: var(--color-surface-container-lowest);
+    transition: all 0.2s;
+
+    &--checkbox {
+        border-radius: var(--size-element-radius-sm);
+
+        .fa-check {
+            font-size: 10px;
+            color: var(--color-on-primary);
+        }
+    }
+
+    &--radio {
+        border-radius: var(--size-element-radius-full);
+
+        &.is-selected::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: var(--size-element-radius-full);
+            background-color: var(--color-on-primary);
+        }
+    }
+
+    &.is-selected {
+        border-color: var(--color-primary);
+        background-color: var(--color-primary);
+    }
+
+    &.is-disabled {
+        opacity: 0.38;
+    }
+}
+
+.plus-list-option-label {
+    flex: 1;
+}

@@ -54,7 +54,7 @@ Design System knowledge lives in `design-system/docs/` (hand-authored) and `desi
 
 ## Storybook MCP (agents: prefer this over grepping stories)
 
-`@storybook/addon-mcp` serves an MCP endpoint at **http://localhost:4200/mcp** while `npm run storybook` runs (registered in `.mcp.json` as `plus-storybook`). Use it as the primary interface to the design system:
+`@storybook/addon-mcp` serves an MCP endpoint at **http://localhost:4200/mcp** while `npm run storybook` runs (registered in `.mcp.json` as `storybook`). Use it as the primary interface to the design system:
 
 - `list-all-documentation` → inventory of docs pages; `get-documentation` / `get-documentation-for-story` → component API + usage (verify props here instead of inferring — never hallucinate props).
 - `get-storybook-story-instructions` → ALWAYS call before authoring new stories; follow it over generic CSF habits.

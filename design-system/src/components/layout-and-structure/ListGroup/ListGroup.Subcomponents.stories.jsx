@@ -87,8 +87,8 @@ function ListGroupItemVariantsDemos() {
     return (
         <>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE SELECT</span>
-                <ListGroup>
+                <span id="single-select-demo-label" className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE SELECT</span>
+                <ListGroup aria-labelledby="single-select-demo-label">
                     {['opt1', 'opt2', 'opt3'].map((value, i) => (
                         <ListGroup.Item
                             key={value}
@@ -103,8 +103,8 @@ function ListGroupItemVariantsDemos() {
                 </ListGroup>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTI SELECT</span>
-                <ListGroup>
+                <span id="multi-select-demo-label" className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTI SELECT</span>
+                <ListGroup aria-labelledby="multi-select-demo-label">
                     {['opt1', 'opt2', 'opt3'].map((value, i) => (
                         <ListGroup.Item
                             key={value}

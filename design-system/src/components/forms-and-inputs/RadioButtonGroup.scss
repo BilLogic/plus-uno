@@ -71,10 +71,17 @@
 }
 
 // Disabled wrapper state
+// Uses a solid muted token for text instead of low opacity, so the
+// end labels and option labels keep sufficient color contrast (WCAG AA).
 .plus-scale-disabled {
-    opacity: 0.38;
     cursor: not-allowed;
     pointer-events: none;
+
+    .plus-scale-end-label,
+    .plus-scale-option-label,
+    .plus-radio-button-label {
+        color: var(--color-on-surface-variant);
+    }
 }
 
 /**

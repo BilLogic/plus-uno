@@ -116,22 +116,49 @@
 
 /* ============================================
    ICON BUTTONS (Previous/Next)
+   Square segments so caret glyphs stay centered (text-cell padding
+   made the first/last cells look wider and off-balance).
    ============================================ */
 
+.plus-pagination .page-item-icon {
+    flex: 0 0 auto;
+}
+
 .plus-pagination .page-item-icon .page-link {
+    /* Match vertical padding; keep horizontal equal so the cell is square-ish */
+    padding: var(--size-spacing-small-space-075);
+    /* 6px all sides */
+    min-width: calc(
+        var(--font-size-fa-body2) + (2 * var(--size-spacing-small-space-075))
+    );
+    width: auto;
+    box-sizing: border-box;
+
     /* Icon color - secondary color */
     color: var(--color-secondary) !important;
     /* #445c6a */
 
     /* Icon sizing - default (medium): Fontawesome/Solid/B2 */
     i {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1em;
         font-size: var(--font-size-fa-body2);
         /* 12px */
-        line-height: var(--font-line-height-fa-body2);
-        /* 1.833 (183.3%) */
+        line-height: 1;
         color: var(--color-secondary) !important;
         font-weight: 900;
-        /* Font Awesome Solid */
+        /* Font Awesome Solid — optical center for asymmetric caret glyphs */
+        transform: translateX(0);
+    }
+
+    .fa-caret-left {
+        transform: translateX(-0.05em);
+    }
+
+    .fa-caret-right {
+        transform: translateX(0.05em);
     }
 }
 
@@ -309,16 +336,17 @@
 }
 
 .plus-pagination.plus-pagination-small .page-item-icon .page-link {
-    /* Icon buttons use same padding as text buttons for small */
-    padding: var(--size-spacing-small-space-050) var(--size-spacing-small-space-100);
-    /* 4px, 8px */
+    padding: var(--size-spacing-small-space-050);
+    /* 4px all sides */
+    min-width: calc(
+        var(--font-size-fa-body3) + (2 * var(--size-spacing-small-space-050))
+    );
 }
 
 .plus-pagination.plus-pagination-small .page-item-icon .page-link i {
     font-size: var(--font-size-fa-body3);
     /* 10px */
-    line-height: var(--font-line-height-fa-body3);
-    /* 2.0 (200%) */
+    line-height: 1;
 }
 
 /* Large size */
@@ -337,15 +365,17 @@
     /* 1.5 (150%) */
 }
 
-/* Large icon buttons: different padding - 12px horizontal, 8px vertical */
+/* Large icon buttons: square cell matching large text vertical rhythm */
 .plus-pagination.plus-pagination-large .page-item-icon .page-link {
-    padding: var(--size-spacing-small-space-100) var(--size-spacing-medium-space-200);
-    /* 8px, 12px */
+    padding: var(--size-spacing-small-space-100);
+    /* 8px all sides */
+    min-width: calc(
+        var(--font-size-fa-body1) + (2 * var(--size-spacing-small-space-100))
+    );
 }
 
 .plus-pagination.plus-pagination-large .page-item-icon .page-link i {
     font-size: var(--font-size-fa-body1);
     /* 14px */
-    line-height: var(--font-line-height-fa-body1);
-    /* 1.714 (171.4%) */
+    line-height: 1;
 }

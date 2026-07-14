@@ -95,7 +95,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -148,7 +148,7 @@ Node ID: 531-62962
  */
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <GroupTrainingProgressPage
@@ -203,7 +203,7 @@ export const Interactive = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         selectedGroup: 'All Groups',
         rowCount: 20,
     },

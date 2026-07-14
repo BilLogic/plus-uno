@@ -65,7 +65,7 @@ Full page layout for Tutor Status and Warnings section.
 
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <TutorStatusWarningsPage
@@ -102,7 +102,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         activeTab: 'statusWarnings',
         currentPage: 1,
         totalPages: 10,

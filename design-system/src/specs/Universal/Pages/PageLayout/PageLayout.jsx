@@ -44,7 +44,7 @@ const PageLayout = ({
     const containerRef = React.useRef(null);
     /** When shell width is below lg, user-expanded sidebar must not be undone by ResizeObserver. */
     const manualNarrowExpandRef = React.useRef(false);
-    const breakpoint = 1024; // lg-min breakpoint per DS schema
+    const breakpoint = 1024; // lg-min breakpoint per DS schema — sidebar on at LG+; collapsed below
 
     const showSidebar = !sidebarHidden && isSidebarVisible;
 
@@ -54,45 +54,85 @@ const PageLayout = ({
     delete sidebarProps.activeTabId;
     delete sidebarProps.activeTab;
 
-    // Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
-    // MD/LG breakpoints) starts with the Sidebar already collapsed — no expanded→collapsed flash.
-    useLayoutEffect(() => {
-        if (sidebarHidden || sidebarExpanded || !containerRef.current) return;
-        const w = containerRef.current.getBoundingClientRect().width;
-        if (w && w < breakpoint) setIsSidebarVisible(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    /**
+ * Read layout width using border-box so 1px borders don’t push LG (1024) under the threshold.
+ * @param {Element | null} el
+ * @param {ResizeObserverEntry} [entry]
+ * @returns {number}
+ */
+const readWidth = (el, entry) => {
+    const box = entry?.borderBoxSize?.[0];
+    if (box && typeof box.inlineSize === 'number') return box.inlineSize;
+    if (!el) return 0;
+    return el.getBoundingClientRect().width;
+};
 
-    useEffect(() => {
-        if (sidebarHidden) {
-            manualNarrowExpandRef.current = false;
-            setIsSidebarVisible(false);
-            return undefined;
-        }
-        if (sidebarExpanded) {
-            manualNarrowExpandRef.current = false;
-            setIsSidebarVisible(true);
-            return undefined;
-        }
-        if (!containerRef.current) return;
+/**
+ * Storybook ResponsiveFrame can set `data-plus-breakpoint` (md|lg|xl) so sidebar
+ * follows the toolbar simulation even when the frame fills a wider docs column.
+ * @param {Element | null} el
+ * @returns {'md' | 'lg' | 'xl' | null}
+ */
+const readForcedBreakpoint = (el) => {
+    const host = el?.closest?.('[data-plus-breakpoint]');
+    const bp = host?.getAttribute?.('data-plus-breakpoint');
+    if (bp === 'md' || bp === 'lg' || bp === 'xl') return bp;
+    return null;
+};
 
-        const observer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                const w = entry.contentRect.width;
-                if (w >= breakpoint) {
-                    manualNarrowExpandRef.current = false;
-                    setIsSidebarVisible(true);
-                } else {
-                    // Narrow: respect user overlay-open; otherwise collapse (default below lg).
-                    setIsSidebarVisible(manualNarrowExpandRef.current);
-                }
+/**
+ * @param {number} width
+ * @param {'md' | 'lg' | 'xl' | null} forced
+ * @returns {boolean} Whether the sidebar should be visible by default
+ */
+const sidebarVisibleFor = (width, forced) => {
+    if (forced === 'md') return false;
+    if (forced === 'lg' || forced === 'xl') return true;
+    return width >= breakpoint;
+};
+
+// Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
+// MD breakpoint) starts with the Sidebar already collapsed — no expanded→collapsed flash.
+useLayoutEffect(() => {
+    if (sidebarHidden || sidebarExpanded || !containerRef.current) return;
+    const el = containerRef.current;
+    const forced = readForcedBreakpoint(el);
+    const w = readWidth(el);
+    setIsSidebarVisible(sidebarVisibleFor(w, forced));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
+useEffect(() => {
+    if (sidebarHidden) {
+        manualNarrowExpandRef.current = false;
+        setIsSidebarVisible(false);
+        return undefined;
+    }
+    if (sidebarExpanded) {
+        manualNarrowExpandRef.current = false;
+        setIsSidebarVisible(true);
+        return undefined;
+    }
+    if (!containerRef.current) return undefined;
+
+    const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+            const forced = readForcedBreakpoint(entry.target);
+            const w = readWidth(entry.target, entry);
+            if (sidebarVisibleFor(w, forced)) {
+                manualNarrowExpandRef.current = false;
+                setIsSidebarVisible(true);
+            } else {
+                // Narrow / MD: respect user overlay-open; otherwise collapse.
+                setIsSidebarVisible(manualNarrowExpandRef.current);
             }
-        });
+        }
+    });
 
-        observer.observe(containerRef.current);
+    observer.observe(containerRef.current);
 
-        return () => observer.disconnect();
-    }, [sidebarHidden, sidebarExpanded]);
+    return () => observer.disconnect();
+}, [sidebarHidden, sidebarExpanded]);
 
     const handleSidebarToggle = (newMode) => {
         if (sidebarHidden) return;

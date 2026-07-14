@@ -7,9 +7,8 @@
  */
 import React from 'react';
 import Button from '@/components/actions/Button';
-
-const placeholderAvatar = 'https://www.figma.com/api/mcp/asset/2639388b-a606-45a9-9eef-47aeb0ac2c74';
-const filledAvatar = 'https://www.figma.com/api/mcp/asset/ba92c16a-334e-43a3-a4c9-006b17b8dc2b';
+import placeholderAvatar from '@/assets/images/avatars/profile-placeholder.svg';
+import filledAvatar from '@/assets/images/avatars/profile-filled.svg';
 
 export default {
     title: 'Specs/Profile/Elements/Upload Profile Pic',

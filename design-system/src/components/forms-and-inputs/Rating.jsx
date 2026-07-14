@@ -119,6 +119,7 @@ const RatingItem = ({
                 onClick={!disabled ? onClick : undefined}
                 role={!disabled ? 'button' : undefined}
                 tabIndex={!disabled ? 0 : undefined}
+                aria-label={!disabled ? `Rate ${value} star${value === 1 ? '' : 's'}` : undefined}
                 onKeyDown={!disabled && onClick ? (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();

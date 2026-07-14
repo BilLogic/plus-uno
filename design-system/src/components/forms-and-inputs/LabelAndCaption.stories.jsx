@@ -3,10 +3,19 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 
 /**
  * Label — form label with optional required asterisk.
+ * Renders as a native `<label>` so it is announced by assistive tech; pass
+ * `htmlFor` matching the paired control's `id` to associate them explicitly.
  * Caption — helper text with semantic states.
+ *
+ * @param {object} props
+ * @param {string} [props.text] Label copy.
+ * @param {boolean} [props.required] Whether to show the required asterisk.
+ * @param {string} [props.htmlFor] `id` of the form control this label describes.
+ * @returns {JSX.Element}
  */
-const Label = ({ text = 'Label', required = true }) => (
-    <div
+const Label = ({ text = 'Label', required = true, htmlFor }) => (
+    <label
+        htmlFor={htmlFor}
         style={{
             display: 'flex',
             gap: 'var(--size-spacing-space-050)',
@@ -38,7 +47,7 @@ const Label = ({ text = 'Label', required = true }) => (
                 *
             </span>
         )}
-    </div>
+    </label>
 );
 
 const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) => {
@@ -208,8 +217,9 @@ export const Layout = () => (
                     maxWidth: '400px',
                 }}
             >
-                <Label text="Email Address" required />
+                <Label text="Email Address" required htmlFor="layout-email" />
                 <input
+                    id="layout-email"
                     type="email"
                     placeholder="Enter your email"
                     style={{
@@ -232,8 +242,9 @@ export const Layout = () => (
                     maxWidth: '400px',
                 }}
             >
-                <Label text="Username" required />
+                <Label text="Username" required htmlFor="layout-username" />
                 <input
+                    id="layout-username"
                     type="text"
                     value="john_doe"
                     readOnly
@@ -258,10 +269,12 @@ export const Layout = () => (
                     maxWidth: '400px',
                 }}
             >
-                <Label text="Password" required />
+                <Label text="Password" required htmlFor="layout-password" />
                 <input
+                    id="layout-password"
                     type="password"
                     value="123"
+                    readOnly
                     style={{
                         padding: '8px 12px',
                         border: '1px solid var(--color-danger)',
@@ -283,10 +296,12 @@ export const Layout = () => (
                     maxWidth: '400px',
                 }}
             >
-                <Label text="Phone Number" required={false} />
+                <Label text="Phone Number" required={false} htmlFor="layout-phone" />
                 <input
+                    id="layout-phone"
                     type="tel"
                     value="555-0123"
+                    readOnly
                     style={{
                         padding: '8px 12px',
                         border: '1px solid var(--color-warning)',
@@ -312,8 +327,9 @@ export const Layout = () => (
                     maxWidth: '400px',
                 }}
             >
-                <Label text="Account Type" required />
+                <Label text="Account Type" required htmlFor="layout-account-type" />
                 <input
+                    id="layout-account-type"
                     type="text"
                     value="Premium"
                     disabled

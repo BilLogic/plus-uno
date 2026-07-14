@@ -23,11 +23,11 @@ export const SpinnerStates = () => (
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Border (Default)</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Border (Default)</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="grow" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Grow</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Grow</p>
                 </div>
             </div>
         </div>
@@ -38,15 +38,15 @@ export const SpinnerStates = () => (
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="growing" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Growing (3×3 Grid)</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Growing (3×3 Grid)</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="rotating" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Rotating (4 Corners)</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Rotating (4 Corners)</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="stacking" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Stacking (Bars)</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Stacking (Bars)</p>
                 </div>
             </div>
         </div>
@@ -57,11 +57,11 @@ export const SpinnerStates = () => (
             <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-end' }}>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Default (48px)</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Default (48px)</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <Spinner variant="border" size="sm" />
-                    <p style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>Small (24px)</p>
+                    <p style={{ marginTop: '8px', fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>Small (24px)</p>
                 </div>
             </div>
         </div>

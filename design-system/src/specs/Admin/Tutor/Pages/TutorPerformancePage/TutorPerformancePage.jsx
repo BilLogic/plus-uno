@@ -256,6 +256,7 @@ const TutorPerformancePage = ({
                             onPageChange={onPageChange}
                             type="icon"
                             size="small"
+                            ariaLabel="Tutors table pagination"
                         />
                     </div>
                 </div>

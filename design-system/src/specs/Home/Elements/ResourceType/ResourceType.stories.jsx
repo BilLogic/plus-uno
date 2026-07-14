@@ -14,23 +14,23 @@ export const Overview = () => (
     <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <ResourceType type="pdf" />
-            <span style={{ fontSize: '12px', color: '#666' }}>PDF</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>PDF</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <ResourceType type="link" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Link</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>Link</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <ResourceType type="video" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Video</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>Video</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <ResourceType type="image" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Image</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>Image</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <ResourceType type="slides" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Slides</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>Slides</span>
         </div>
     </div>
 );

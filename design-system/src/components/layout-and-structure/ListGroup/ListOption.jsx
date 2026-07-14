@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Radio from '@/components/forms-and-inputs/Radio';
-import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import SelectionIndicator from './SelectionIndicator';
 import './ListGroup.scss';
 
 /**
@@ -50,29 +49,8 @@ export const ListOption = ({
             tabIndex={disabled ? -1 : 0}
             {...props}
         >
-            {mode === 'multi' ? (
-                <Checkbox
-                    name={name}
-                    value={value}
-                    checked={selected}
-                    disabled={disabled}
-                    label={displayLabel}
-                    size="small"
-                    onChange={() => { }} // Handled by parent onClick
-                    className="plus-list-option-checkbox"
-                />
-            ) : (
-                <Radio
-                    name={name}
-                    value={value}
-                    checked={selected}
-                    disabled={disabled}
-                    label={displayLabel}
-                    size="small"
-                    onChange={() => { }} // Handled by parent onClick
-                    className="plus-list-option-radio"
-                />
-            )}
+            <SelectionIndicator mode={mode} selected={selected} disabled={disabled} />
+            <span className="plus-list-option-label">{displayLabel}</span>
         </div>
     );
 };

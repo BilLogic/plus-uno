@@ -39,14 +39,7 @@ const config = {
     reactDocgen: 'react-docgen',
   },
 
-  features: {
-    storyStoreV7: true,
-  },
-
-  server: {
-    host: '0.0.0.0',
-    port: 6006,
-  },
+  // storyStoreV7 is default in Storybook 10 — no features flag needed.
 
   staticDirs: (() => {
     const staticDirs = [];

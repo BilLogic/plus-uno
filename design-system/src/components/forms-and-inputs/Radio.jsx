@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import './Radio.scss';
 
+/**
+ * Radio — single option within a named radio group.
+ * Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
+ */
 const Radio = ({
     id,
     name,

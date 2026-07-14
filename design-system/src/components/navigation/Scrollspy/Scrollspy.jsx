@@ -31,6 +31,7 @@ export const ScrollspyContent = ({
     className = '',
     style,
     height,
+    'aria-label': ariaLabel = 'Scrollable content',
     ...props
 }) => {
     const finalStyle = {
@@ -45,6 +46,12 @@ export const ScrollspyContent = ({
             id={id}
             className={`plus-scrollspy-content ${className}`}
             style={finalStyle}
+            // Makes the scroll container keyboard-focusable so it satisfies
+            // the "scrollable-region-focusable" a11y rule. (No `role="region"`
+            // — that creates a landmark, and multiple ScrollspyContent
+            // instances on one page would collide under "landmark-unique".)
+            tabIndex={0}
+            aria-label={ariaLabel}
             {...props}
         >
             {children}
@@ -57,7 +64,8 @@ ScrollspyContent.propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,
-    height: PropTypes.string
+    height: PropTypes.string,
+    'aria-label': PropTypes.string
 };
 
 

@@ -1,123 +1,41 @@
-# Login Organism Structure
+# Login Specs Structure
 
-## Overview
-The Login organism is a higher-level component that combines multiple molecules, elements, cards, tables, modals, sections, and pages to create a complete login/authentication experience.
+Mirror of Figma **Login** canvas (`node-id=1-165`) in Web App Specs.
 
-## Directory Structure
+## Storybook ↔ Figma
 
-```
-design-system/src/specs/Login/
-├── STRUCTURE.md (this file)
-├── Login.stories.js (main organism overview story)
-│
-├── Elements/
-│   ├── InstitutionSelection/
-│   │   ├── InstitutionSelection.stories.js
-│   │   ├── InstitutionSelection.scss
-│   │   └── index.js
-│   ├── AccessCodeForm/
-│   │   ├── AccessCodeForm.stories.js
-│   │   ├── AccessCodeForm.scss
-│   │   └── index.js
-│   ├── LoginButtons/
-│   │   ├── LoginButtons.stories.js
-│   │   ├── LoginButtons.scss
-│   │   └── index.js
-│   ├── AuthButtons/
-│   │   ├── AuthButtons.stories.js
-│   │   ├── AuthButtons.scss
-│   │   └── index.js
-│   ├── LoginFooter/
-│   │   ├── LoginFooter.stories.js
-│   │   ├── LoginFooter.scss
-│   │   └── index.js
-│   └── LoginAlert/
-│       ├── LoginAlert.stories.js
-│       ├── LoginAlert.scss
-│       └── index.js
-│
-├── Cards/
-│   └── LoginPortal/
-│       ├── LoginPortal.stories.js
-│       ├── LoginPortal.scss
-│       ├── LoginPortal.Variants.stories.js (official step 1, demo step 1, official step 2, etc.)
-│       └── index.js
-│
-├── Tables/
-│   └── (to be added as needed)
-│
-├── Modals/
-│   └── NotificationsModal/
-│       ├── NotificationsModal.stories.js
-│       ├── NotificationsModal.scss
-│       ├── NotificationsModal.Variants.stories.js (type A, type B)
-│       └── index.js
-│
-├── Sections/
-│   └── (to be added as needed)
-│
-├── Pages/
-│   └── SignInPortal/
-│       ├── SignInPortal.stories.js
-│       ├── SignInPortal.scss
-│       └── index.js
-│
-└── index.js (main export file for Login organism)
-```
+| Storybook | Figma |
+| --- | --- |
+| `Specs/Login/Overview` | Login canvas overview |
+| `Specs/Login/Elements` | Components → Elements (`112:1200`) |
+| `Specs/Login/Cards` | Components → Cards → Login Portal (`113:42363`) |
+| `Specs/Login/Modals` | Components → Modals → Notifications (`115:4973`) |
+| `Specs/Login/Pages` | Components → Pages → Sign-in Portal (`115:5078`) |
+| Tables / Sections | Empty / archived in Figma — no docs yet |
 
-## Component Breakdown from Figma
+## Elements (Figma)
 
-### Elements Section
-1. **InstitutionSelection** (`dropdown / institution selection`)
-   - States: empty, filled, open, typing
-   - Form variants: official, independent
+1. **Dropdown / Institution Selection** — empty · open · typing · filled  
+2. **Form / Institution Selection** — official · independent  
+3. **Form / Access Code** — default · invalid  
+4. **Button / Auths** — Google · Clever  
+5. **Button / Misc** — try a demo · back · continue · log in (± disabled)  
+6. **Alert**  
+7. **Footer**
 
-2. **AccessCodeForm** (`form / access code`)
-   - States: default, invalid
+## Cards
 
-3. **LoginButtons** (`button / misc`)
-   - Actions: try a demo, back to log in portal, continue, log in
-   - States: enabled, disabled
+**Login Portal** — `type=official|demo` × `step=1|2|3a|3b`
 
-4. **AuthButtons** (`button / auths`)
-   - Providers: google, clever
+## Modals
 
-5. **LoginFooter** (`footer`)
-   - Footer component for login pages
+**Notifications** — type A · type B
 
-6. **LoginAlert** (`alert`)
-   - Alert component for login error messages
+## Pages
 
-### Cards Section
-1. **LoginPortal** (`login portal`)
-   - Variants:
-     - type=official, step=1
-     - type=demo, step=1
-     - type=official, step=2
-     - type=official, step=3a
-     - type=official, step=3b
+**Sign-in Portal** — full page (logo + portal card + help footer)
 
-### Modals Section
-1. **NotificationsModal** (`modal / notifications`)
-   - Variants: type A, type B
+## Docs
 
-### Pages Section
-1. **SignInPortal** (`Sign-in Portal`)
-   - Complete sign-in portal page
-
-## Storybook Organization
-
-Each subcategory (Elements, Cards, Tables, Modals, Sections, Pages) will have its own Storybook page/section, making it easy to navigate and view all components within that category.
-
-### Story Naming Convention
-- Main story: `ComponentName.stories.js`
-- Variant stories: `ComponentName.Variants.stories.js`, `ComponentName.States.stories.js`, etc.
-- Follow the same pattern as molecules
-
-## Implementation Notes
-
-1. **Organisms vs Molecules**: Organisms are higher-level compositions that may use molecules and elements as building blocks
-2. **Token Usage**: Follow the same token reference guidelines, but may use tokens from multiple component types (elements, cards, sections, etc.)
-3. **Bootstrap Foundation**: Use Bootstrap 5.3 as functional foundation, then customize all styling to match Figma exactly
-4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
-
+Each category has an MDX docs page (`Elements.mdx`, `Cards.mdx`, `Modals.mdx`, `Pages.mdx`)
+using `DocsCanvasShell` sections aligned to the Figma frames above.

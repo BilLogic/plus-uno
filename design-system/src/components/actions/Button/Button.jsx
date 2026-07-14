@@ -57,7 +57,7 @@ ButtonContent.propTypes = {
  * Button Component
  * Universal interactive element slightly favoring Figma spec over Bootstrap defaults.
  */
-const Button = ({
+export const Button = ({
     // Content
     text,
     children,

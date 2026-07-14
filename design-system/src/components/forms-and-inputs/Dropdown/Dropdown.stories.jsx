@@ -16,7 +16,12 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        style: {
+            control: 'select',
+            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default'],
+            description: 'Trigger color style',
+            table: { category: 'Design' }
+        },
         buttonText: {
             control: 'text',
             description: 'Text displayed on the dropdown toggle button',

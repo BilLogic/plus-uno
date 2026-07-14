@@ -40,7 +40,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -108,7 +108,7 @@ Node ID: 1006-258597
  */
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <StudentAdminPage
@@ -172,7 +172,7 @@ export const Interactive = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         selectedSchool: 'All Schools',
         rowCount: 20,
         modalOpen: false,
@@ -187,7 +187,7 @@ export const Interactive = {
  */
 export const WithModalInfoVariant = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         modalOpen: true,
     },
     render: (args) => {
@@ -218,7 +218,7 @@ export const WithModalInfoVariant = {
  */
 export const WithModalSessionsVariant = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         modalOpen: true,
     },
     render: (args) => {

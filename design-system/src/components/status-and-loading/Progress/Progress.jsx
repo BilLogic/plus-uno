@@ -37,6 +37,7 @@ const Progress = ({
             <div
                 className={barClasses}
                 role="progressbar"
+                aria-label={label || 'Progress'}
                 aria-valuenow={value}
                 aria-valuemin={min}
                 aria-valuemax={max}

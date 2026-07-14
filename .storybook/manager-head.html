@@ -110,13 +110,18 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    // Local: Vite marketplace on :4100. Deployed Storybook lives under /storybook/ → site root.
+    const isLocal =
+      location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const marketplaceHref = isLocal ? 'http://localhost:4100' : '/';
+
     const fab = document.createElement('div');
     fab.className = 'sb-nav-fab';
     fab.innerHTML = `
-      <a class="sb-nav-fab__trigger" href="http://localhost:4100" title="Back to Marketplace">
+      <a class="sb-nav-fab__trigger" href="${marketplaceHref}" title="Back to Marketplace">
         <i class="fa-solid fa-compass"></i>
       </a>
-      <a class="sb-nav-fab__action" href="http://localhost:4100" title="Marketplace">
+      <a class="sb-nav-fab__action" href="${marketplaceHref}" title="Marketplace">
         <i class="fa-solid fa-store"></i>
       </a>
       <button class="sb-nav-fab__action sb-nav-fab__action--ai" title="PLUS AI Agent (⌘+/)">
@@ -233,33 +238,3 @@
     pointer-events: none !important;
   }
 </style>
-
-<script>
-  // --- Console noise filter (manager UI only) --------------------------------
-  // The Storybook manager runtime currently logs a deprecation about `Button active`
-  // as a console *error*. It's non-actionable for us (Storybook internal), so we
-  // suppress only that exact message substring to keep DevTools usable.
-  (function patchManagerConsoleOnce() {
-    if (globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__) return;
-    globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__ = true;
-
-    const SUPPRESSED = 'The `active` prop on `Button` is deprecated and will be removed in Storybook 11.';
-
-    const originalWarn = console.warn.bind(console);
-    const originalError = console.error.bind(console);
-
-    function shouldSuppress(args) {
-      return args.some((a) => typeof a === 'string' && a.includes(SUPPRESSED));
-    }
-
-    console.warn = (...args) => {
-      if (shouldSuppress(args)) return;
-      originalWarn(...args);
-    };
-
-    console.error = (...args) => {
-      if (shouldSuppress(args)) return;
-      originalError(...args);
-    };
-  })();
-</script>

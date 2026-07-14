@@ -226,6 +226,7 @@ const SessionAdminPage = ({
                             onPageChange={onPageChange}
                             type="icon"
                             size="small"
+                            ariaLabel="Sessions table pagination"
                         />
                     </div>
                 </div>

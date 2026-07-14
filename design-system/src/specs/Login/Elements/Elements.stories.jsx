@@ -54,12 +54,13 @@ export const Overview = () => (
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md)' }}>
             {[
-                { name: 'InstitutionSelection', desc: 'Dropdown for selecting institution with states: empty, filled, open, typing' },
-                { name: 'AccessCodeForm', desc: 'Form for entering access code with default and invalid states' },
-                { name: 'LoginButtons', desc: 'Action buttons: try demo, back, continue, log in (enabled/disabled)' },
-                { name: 'AuthButtons', desc: 'Authentication provider buttons for Google and Clever' },
-                { name: 'LoginFooter', desc: 'Footer component for login pages' },
-                { name: 'LoginAlert', desc: 'Alert for login error messages and notifications' }
+                { name: 'InstitutionSelection', desc: 'Dropdown / Institution Selection — empty, open, typing, filled' },
+                { name: 'InstitutionForm', desc: 'Form / Institution Selection — official vs independent' },
+                { name: 'AccessCodeForm', desc: 'Form / Access Code — default and invalid' },
+                { name: 'LoginButtons', desc: 'Button / Misc — try demo, back, continue, log in (enabled/disabled)' },
+                { name: 'AuthButtons', desc: 'Button / Auths — Google and Clever' },
+                { name: 'LoginFooter', desc: 'Footer for login pages' },
+                { name: 'LoginAlert', desc: 'Alert for login messages' }
             ].map(item => (
                 <div key={item.name} style={{
                     padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
@@ -517,6 +518,91 @@ export const LoginFooterComponent = () => (
                 termsText="Terms of Use"
                 termsUrl="#"
             />
+        </div>
+    </div>
+);
+
+/**
+ * InstitutionForm
+ * Form / Institution Selection — official vs independent (Figma 113:41985).
+ */
+export const InstitutionForm = () => (
+    <div
+        style={{
+            padding: 'var(--size-section-pad-y-lg)',
+            maxWidth: '560px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-lg)',
+            pointerEvents: 'none',
+        }}
+    >
+        <div>
+            <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>
+                Register With Your Institution
+            </div>
+            <Input
+                id="institution-form-official"
+                name="institution-form-official"
+                label="Register With Your Institution"
+                showLabel={false}
+                placeholder="Select your institution from the list"
+                trailingVisual="dropdown"
+                size="medium"
+            />
+            <div
+                className="body3-txt"
+                style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 'var(--size-element-gap-sm)',
+                    marginTop: 'var(--size-element-gap-sm)',
+                    color: 'var(--color-on-surface-variant)',
+                }}
+            >
+                <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                <span>
+                    Are you a new tutor?{' '}
+                    <span style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
+                        Register With Institution
+                    </span>
+                    .
+                </span>
+            </div>
+        </div>
+
+        <div>
+            <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>
+                Institution Name
+            </div>
+            <Input
+                id="institution-form-independent"
+                name="institution-form-independent"
+                label="Institution Name"
+                showLabel={false}
+                placeholder="Add your institution name..."
+                trailingVisual="dropdown"
+                size="medium"
+            />
+            <div
+                className="body3-txt"
+                style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 'var(--size-element-gap-sm)',
+                    marginTop: 'var(--size-element-gap-sm)',
+                    color: 'var(--color-on-surface-variant)',
+                }}
+            >
+                <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                <span>
+                    Are you a new tutor?{' '}
+                    <span style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
+                        Register With Institution
+                    </span>
+                    .
+                </span>
+            </div>
         </div>
     </div>
 );

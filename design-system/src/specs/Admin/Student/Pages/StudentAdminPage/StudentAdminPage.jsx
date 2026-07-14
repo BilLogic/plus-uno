@@ -204,6 +204,7 @@ const StudentAdminPage = ({
                             onPageChange={onPageChange}
                             type="icon"
                             size="small"
+                            ariaLabel="Students table pagination"
                         />
                     </div>
                 </div>

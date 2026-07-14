@@ -256,6 +256,7 @@ const StudentModal = ({
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={setCurrentPage}
+                                    ariaLabel="Student sessions pagination"
                                 />
                             </div>
                         </div>

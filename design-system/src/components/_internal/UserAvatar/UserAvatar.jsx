@@ -35,7 +35,7 @@ const UserAvatar = ({
                 width: 'fit-content',
                 padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
                 borderRadius: 'var(--size-element-radius-md)',
-                backgroundColor: isHover ? 'rgba(25, 28, 30, 0.08)' : 'var(--color-surface-container-lowest)',
+                backgroundColor: isHover ? 'var(--color-on-surface-state-08)' : 'var(--color-surface-container-lowest)',
                 cursor: onClick ? 'pointer' : 'default'
             }}
             onClick={onClick}
@@ -107,14 +107,14 @@ const UserAvatar = ({
                         minWidth: '12px',
                         padding: '0 var(--size-element-pad-x-sm)',
                         borderRadius: '999px', // radius-full
-                        backgroundColor: 'rgba(190, 12, 22, 0.08)', // danger-08
+                        backgroundColor: 'var(--color-danger-state-08)',
                         flexShrink: 0
                     }}
                 >
                     <span
                         className="body3-txt"
                         style={{
-                            color: '#9b0606', // danger-text
+                            color: 'var(--color-danger-text)',
                             fontWeight: 400,
                             textAlign: 'center'
                         }}

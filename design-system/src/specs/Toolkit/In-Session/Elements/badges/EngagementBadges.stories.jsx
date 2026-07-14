@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Badge from '@/components/status-and-loading/Badge/Badge';
+import Button from '@/components/actions/Button/Button';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -248,8 +249,9 @@ export const Interactive = () => {
                 }}
             >
                 <div className="d-flex flex-column gap-2">
-                    <label className="small text-muted fw-bold">Engagement State:</label>
+                    <label htmlFor="engagement-state-select" className="small text-muted fw-bold">Engagement State:</label>
                     <select
+                        id="engagement-state-select"
                         className="form-select form-select-sm"
                         value={text}
                         onChange={(e) => {
@@ -268,22 +270,22 @@ export const Interactive = () => {
                 </div>
 
                 <div className="d-flex flex-column gap-2">
-                    <label className="small text-muted fw-bold">Show Dropdown:</label>
-                    <div className="btn-group" role="group">
-                        <button
-                            type="button"
-                            className={`btn btn-sm ${showDropdown ? 'btn-primary' : 'btn-outline-primary'}`}
+                    <span className="small text-muted fw-bold">Show Dropdown:</span>
+                    <div className="btn-group" role="group" aria-label="Show dropdown toggle">
+                        <Button
+                            text="Yes"
+                            size="small"
+                            style="primary"
+                            fill={showDropdown ? 'filled' : 'outline'}
                             onClick={() => setShowDropdown(true)}
-                        >
-                            Yes
-                        </button>
-                        <button
-                            type="button"
-                            className={`btn btn-sm ${!showDropdown ? 'btn-primary' : 'btn-outline-primary'}`}
+                        />
+                        <Button
+                            text="No"
+                            size="small"
+                            style="primary"
+                            fill={!showDropdown ? 'filled' : 'outline'}
                             onClick={() => setShowDropdown(false)}
-                        >
-                            No
-                        </button>
+                        />
                     </div>
                 </div>
             </div>

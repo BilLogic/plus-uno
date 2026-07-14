@@ -152,35 +152,35 @@ export const InteractionStatesLong = () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
-                <Textarea placeholder="Enter text..." variant="long" />
+                <Textarea aria-label="Long form textarea, default state" placeholder="Enter text..." variant="long" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (STATIC)</span>
-                <Textarea placeholder="Enter text..." variant="long" state="focus" />
+                <Textarea aria-label="Long form textarea, focus state" placeholder="Enter text..." variant="long" state="focus" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED</span>
-                <Textarea defaultValue="Some content here" variant="long" />
+                <Textarea aria-label="Long form textarea, filled state" defaultValue="Some content here" variant="long" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
-                <Textarea defaultValue="Looks good" variant="long" state="success" />
+                <Textarea aria-label="Long form textarea, valid state" defaultValue="Looks good" variant="long" state="success" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ERROR</span>
-                <Textarea defaultValue="Invalid content" variant="long" state="error" />
+                <Textarea aria-label="Long form textarea, error state" defaultValue="Invalid content" variant="long" state="error" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <Textarea defaultValue="Disabled content" variant="long" disabled />
+                <Textarea aria-label="Long form textarea, disabled state" defaultValue="Disabled content" variant="long" disabled />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
-                <Textarea defaultValue="Read only content" variant="long" readOnly />
+                <Textarea aria-label="Long form textarea, read only state" defaultValue="Read only content" variant="long" readOnly />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY (PLACEHOLDER)</span>
-                <Textarea placeholder="Read only placeholder" variant="long" readOnly />
+                <Textarea aria-label="Long form textarea, read only placeholder state" placeholder="Read only placeholder" variant="long" readOnly />
             </div>
         </div>
     </div>
@@ -192,35 +192,35 @@ export const InteractionStatesShort = () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
-                <Textarea placeholder="Enter text..." variant="short" />
+                <Textarea aria-label="Short form textarea, default state" placeholder="Enter text..." variant="short" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (STATIC)</span>
-                <Textarea placeholder="Enter text..." variant="short" state="focus" />
+                <Textarea aria-label="Short form textarea, focus state" placeholder="Enter text..." variant="short" state="focus" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED</span>
-                <Textarea defaultValue="Short content" variant="short" />
+                <Textarea aria-label="Short form textarea, filled state" defaultValue="Short content" variant="short" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
-                <Textarea defaultValue="Looks good" variant="short" state="success" />
+                <Textarea aria-label="Short form textarea, valid state" defaultValue="Looks good" variant="short" state="success" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ERROR</span>
-                <Textarea defaultValue="Invalid short content" variant="short" state="error" />
+                <Textarea aria-label="Short form textarea, error state" defaultValue="Invalid short content" variant="short" state="error" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <Textarea defaultValue="Disabled short content" variant="short" disabled />
+                <Textarea aria-label="Short form textarea, disabled state" defaultValue="Disabled short content" variant="short" disabled />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
-                <Textarea defaultValue="Read only short content" variant="short" readOnly />
+                <Textarea aria-label="Short form textarea, read only state" defaultValue="Read only short content" variant="short" readOnly />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY (PLACEHOLDER)</span>
-                <Textarea placeholder="Read only placeholder" variant="short" readOnly />
+                <Textarea aria-label="Short form textarea, read only placeholder state" placeholder="Read only placeholder" variant="short" readOnly />
             </div>
         </div>
     </div>

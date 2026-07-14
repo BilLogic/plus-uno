@@ -12,6 +12,7 @@ const ScrollBar = ({
     maxHeight = '320px',
     horizontal = false,
     id,
+    'aria-label': ariaLabel = 'Scrollable content',
     className = '',
     style,
     ...props
@@ -28,7 +29,18 @@ const ScrollBar = ({
     };
 
     return (
-        <div id={id} className={classes} style={inlineStyles} {...props}>
+        <div
+            id={id}
+            className={classes}
+            style={inlineStyles}
+            // Makes the scroll container keyboard-focusable (arrow keys scroll
+            // it) so it satisfies the "scrollable-region-focusable" a11y rule.
+            // (No `role="region"` — that creates a landmark, and multiple
+            // ScrollBars on one page would collide under "landmark-unique".)
+            tabIndex={0}
+            aria-label={ariaLabel}
+            {...props}
+        >
             {children}
         </div>
     );
@@ -39,6 +51,7 @@ ScrollBar.propTypes = {
     maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     horizontal: PropTypes.bool,
     id: PropTypes.string,
+    'aria-label': PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object
 };

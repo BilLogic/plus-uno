@@ -71,7 +71,7 @@ Full page layout for Tutor Tool Usage section.
 
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <TutorToolUsagePage
@@ -111,7 +111,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         activeTab: 'toolUsage',
         currentPage: 1,
         totalPages: 10,

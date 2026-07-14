@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../design-system/src/styles/main.scss';
@@ -16,8 +15,21 @@ import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFram
 import { createRoot } from 'react-dom/client';
 
 // ---- Global AI Agent Setup ---------------------------------
-// We inject the AI Agent globally so it is available on pure Docs pages
-// that do not contain any Story blocks (where decorators would not run).
+// Inject only on local Storybook so Netlify static builds never ship the
+// client-side OpenAI key path (VITE_* keys are baked into the bundle).
+// Also skip under Vitest / portable-stories (addon-vitest loads this preview).
+
+/**
+ * @returns {boolean} Whether the in-iframe AI agent should mount.
+ */
+const shouldMountGlobalAIAgent = () => {
+  if (typeof window === 'undefined') return false;
+  if (import.meta.env?.MODE === 'test' || import.meta.env?.VITEST) return false;
+  // Storybook static builds set CONFIG_TYPE to PRODUCTION
+  if (window.CONFIG_TYPE === 'PRODUCTION') return false;
+  const host = window.location.hostname;
+  return host === 'localhost' || host === '127.0.0.1';
+};
 
 const GlobalAgentWrapper = () => {
   const [context, setContext] = useState('Storybook Docs');
@@ -29,7 +41,7 @@ const GlobalAgentWrapper = () => {
   return <StorybookAIAgent pageContext={context} />;
 };
 
-if (typeof window !== 'undefined' && !window.__PLUS_AI_AGENT_ROOT__) {
+if (shouldMountGlobalAIAgent() && !window.__PLUS_AI_AGENT_ROOT__) {
   window.__PLUS_AI_AGENT_ROOT__ = true;
   
   const injectAgent = () => {
@@ -446,10 +458,8 @@ const preview = {
     },
 
     a11y: {
-      // 'todo' - show a11y violations in the test UI only
-      // 'error' - fail CI on a11y violations
-      // 'off' - skip a11y checks entirely
-      test: 'todo'
+      // Fail story tests / CI on accessibility violations (addon-a11y + addon-vitest).
+      test: 'error'
     }
   },
 
@@ -479,23 +489,29 @@ const preview = {
       const bp = context.globals.plusBreakpoint;
       const widths = { md: 768, lg: 1024, xl: 1440 };
       const isSpecs = context.title.startsWith('Specs/');
-      // Pages & Sections get the responsive DISPLAY WELL: fills the width it's given (so the page
-      // reflows and PageLayout's own breakpoint logic hides the Sidebar / collapses the TopBar
-      // below LG), plus an always-available Fullscreen button. Nesting-safe: stories that already
-      // wrap themselves in ResponsiveFrame collapse the inner one to a pass-through.
+      // Pages get the responsive DISPLAY WELL. Native fills available space; MD/LG/XL set a
+      // minimum width (scroll horizontally when the docs column is narrower, fill when wider).
+      // Nesting-safe: stories that already wrap in ResponsiveFrame collapse the inner one.
       const isPage = isSpecs && /\/Pages\//.test(context.title);
       if (isPage) {
         return (
-          <ResponsiveFrame breakpoint={bp && widths[bp] ? bp : 'xl'}>
+          <ResponsiveFrame breakpoint={bp && widths[bp] ? bp : 'native'}>
             <Story />
           </ResponsiveFrame>
         );
       }
-      // Other Specs (Elements, Cards, Modals, Tables) keep the lightweight width constraint so
-      // their responsive behaviour can still be inspected from the Breakpoint toolbar.
+      // Other Specs: same min-width semantics (do not shrink below the selected breakpoint).
       if (bp && widths[bp] && isSpecs) {
         return (
-          <div style={{ width: `${widths[bp]}px`, maxWidth: '100%', containerType: 'inline-size' }}>
+          <div
+            style={{
+              width: '100%',
+              minWidth: `${widths[bp]}px`,
+              maxWidth: '100%',
+              overflowX: 'auto',
+              containerType: 'inline-size',
+            }}
+          >
             <Story />
           </div>
         );
@@ -509,9 +525,11 @@ const preview = {
         setTimeout(() => window.__setAIContext(activeContext), 0);
       }
 
-      // Disable pointer interaction for static docs examples (keeps scroll/canvas stable).
-      // Allow 'Interactive' and 'Overview' so docs canvases with Controls stay usable.
+      // Docs-only: disable pointer interaction on static component examples so
+      // scroll stays stable. Canvas / Interactive / Overview stay fully usable
+      // (Controls, play functions, a11y checks).
       if (
+        context.viewMode === 'docs' &&
         context.name !== 'Interactive' &&
         context.name !== 'Overview' &&
         context.title.startsWith('Components/')

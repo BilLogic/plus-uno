@@ -123,7 +123,7 @@ export const PickDate = () => {
     return (
         <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Single Date</h6>
-            <p style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
                 Click on the input to open the calendar and select a date.
             </p>
             <DatePicker value={date} onChange={setDate} placeholder="Select a date" />
@@ -160,12 +160,12 @@ export const PickRange = () => {
     return (
         <div style={{ paddingBottom: '300px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Date Range</h6>
-            <p style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
                 Use two date pickers to define a start and end date for a range.
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                 <DatePicker value={startDate} onChange={setStartDate} placeholder="Start Date" maxDate={endDate} />
-                <span style={{ color: '#666' }}>to</span>
+                <span style={{ color: 'var(--color-on-surface-variant)' }}>to</span>
                 <DatePicker value={endDate} onChange={setEndDate} placeholder="End Date" minDate={startDate} />
             </div>
             {(startDate || endDate) && (

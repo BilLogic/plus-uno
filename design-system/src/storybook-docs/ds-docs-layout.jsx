@@ -248,10 +248,10 @@ export function DocsDemoBlock({ description, children, previewClassName = '', ch
 /**
  * Wrap Storybook Canvas in the same preview chrome + spacing as DocsDemoBlock.
  *
- * @param {boolean} [attachSourceBelow] — When true, the Canvas preview is a rounded card only;
- *   the “Show code” control and source block sit below it (visually attached), not inside the card.
+ * @param {boolean} [attachSourceBelow=true] — Preview is a rounded card; “Show code” /
+ *   “Copy code” and the source block sit below it (attached), not overlaid on the preview.
  */
-export function DocsCanvasShell({ description, children, attachSourceBelow = false }) {
+export function DocsCanvasShell({ description, children, attachSourceBelow = true }) {
     const shellClass = [
         'sb-docs-demo',
         'not-prose',
@@ -286,8 +286,12 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
             <div
-                className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible bg-muted/40 dark:bg-muted/25"
-                style={{ borderRadius: 'var(--size-card-radius-sm)' }}
+                className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible"
+                style={{
+                    borderRadius: 'var(--size-card-radius-sm)',
+                    backgroundColor: 'var(--color-surface-container-lowest)',
+                    border: '1px solid var(--color-outline-variant)',
+                }}
             >
                 <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
                     <Canvas
@@ -297,7 +301,13 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                         sourceState="none"
                     />
                 </div>
-                <div className="sb-ds-docs-interactive-panel__controls border-t border-border/50 bg-muted/25 px-10 pb-8 pt-6 md:px-12 md:pb-10 md:pt-7 lg:px-14 dark:bg-muted/15">
+                <div
+                    className="sb-ds-docs-interactive-panel__controls border-t px-10 pb-8 pt-6 md:px-12 md:pb-10 md:pt-7 lg:px-14"
+                    style={{
+                        borderColor: 'var(--color-outline-variant)',
+                        backgroundColor: 'var(--color-surface-container-lowest)',
+                    }}
+                >
                     <Controls of={ofStory} />
                 </div>
             </div>

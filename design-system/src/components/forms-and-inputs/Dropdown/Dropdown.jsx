@@ -133,6 +133,7 @@ const Dropdown = ({
                 onClick={toggleDropdown}
                 aria-haspopup="true"
                 aria-expanded={show}
+                aria-label={split ? `${buttonText || 'Toggle'} options` : undefined}
             >
                 {!split && <span>{buttonText}</span>}
             </button>

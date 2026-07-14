@@ -74,7 +74,7 @@ const Pagination = ({
         className
     ].filter(Boolean).join(' ');
 
-    const renderPageItem = (page, isActive, isDisabled, content, isIconButton = false) => (
+    const renderPageItem = (page, isActive, isDisabled, content, isIconButton = false, accessibleLabel) => (
         <li 
             className={`page-item ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''} ${isIconButton ? 'page-item-icon' : ''}`} 
             key={page}
@@ -85,6 +85,7 @@ const Pagination = ({
                 onClick={(e) => !isDisabled && handlePageChange(e, page)}
                 aria-current={isActive ? 'page' : undefined}
                 aria-disabled={isDisabled ? 'true' : undefined}
+                aria-label={isIconButton ? accessibleLabel : undefined}
                 tabIndex={isDisabled ? -1 : undefined}
             >
                 {content}
@@ -100,8 +101,9 @@ const Pagination = ({
                     currentPage - 1,
                     false,
                     currentPage === 1,
-                    type === 'icon' ? <i className="fas fa-caret-left"></i> : prevText,
-                    type === 'icon'
+                    type === 'icon' ? <i className="fas fa-caret-left" aria-hidden="true"></i> : prevText,
+                    type === 'icon',
+                    prevText
                 )}
 
                 {/* Render pages with proper ellipsis placement */}
@@ -133,8 +135,9 @@ const Pagination = ({
                     currentPage + 1,
                     false,
                     currentPage === totalPages,
-                    type === 'icon' ? <i className="fas fa-caret-right"></i> : nextText,
-                    type === 'icon'
+                    type === 'icon' ? <i className="fas fa-caret-right" aria-hidden="true"></i> : nextText,
+                    type === 'icon',
+                    nextText
                 )}
             </ul>
         </nav>

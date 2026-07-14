@@ -216,7 +216,15 @@ const ProgressRing = ({ value, label, size = 48, height = 48, color, animated = 
 
     return (
         <div className="plus-progress-ring" style={{ width: size, height }} ref={ringRef}>
-            <HighchartsReact highcharts={Highcharts} options={options} immutable />
+            {/*
+              * Decorative: the ring duplicates the value already rendered as
+              * visible text below, and Highcharts' default `role="img"` SVG
+              * has no accessible name without the accessibility module. Hide
+              * it from assistive tech rather than announcing an unlabeled image.
+              */}
+            <div aria-hidden="true">
+                <HighchartsReact highcharts={Highcharts} options={options} immutable />
+            </div>
             <div className="plus-progress-ring__label">
                 <span className="plus-progress-ring__text">{displayText || parsed.finalText}</span>
             </div>
