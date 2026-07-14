@@ -1,0 +1,44 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as InstitutionFormStories from './InstitutionForm.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={InstitutionFormStories} />
+
+<Title />
+
+Variants: `official` · `independent` (Figma `Form / Institution Selection`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=113-41985"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Login/Elements/InstitutionForm"
+    sets={[
+        { name: 'Elements frame', nodeId: '112:1200' },
+        { name: 'Form / Institution Selection', nodeId: '113:41985' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Labeled field + caption for registering with an institution vs entering a name.</>}
+>
+    <Canvas
+        of={InstitutionFormStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

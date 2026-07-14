@@ -7,34 +7,35 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
+/**
+ * Figma Recommended Lessons — both breakpoints side by side.
+ */
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '400px' }}>
-        <div>
-            <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)', fontSize: 'var(--font-size-h6)' }}>
-                Below XXL (275.33px)
-            </h3>
-            <RecommendedLessons
-                breakpoint="< XXL"
-                title="Lesson Title"
-                badgeType="mastering-content"
-                duration="12 mins"
-                status="in-progress"
-                aiRecommended={true}
-            />
-        </div>
-        <div>
-            <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)', fontSize: 'var(--font-size-h6)' }}>
-                XXL & Above (368px)
-            </h3>
-            <RecommendedLessons
-                breakpoint="XXL & above"
-                title="Lesson Title"
-                badgeType="mastering-content"
-                duration="12 mins"
-                status="in-progress"
-                aiRecommended={true}
-            />
-        </div>
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '40px',
+            flexWrap: 'wrap',
+            padding: '24px',
+            backgroundColor: 'var(--color-surface-container-high)',
+        }}
+    >
+        <RecommendedLessons
+            breakpoint="< XXL"
+            title="Lesson Title"
+            badgeType="mastering-content"
+            duration="12 mins"
+            status="in-progress"
+            aiRecommended
+        />
+        <RecommendedLessons
+            breakpoint="XXL & above"
+            title="Lesson Title"
+            badgeType="mastering-content"
+            duration="12 mins"
+            status="in-progress"
+            aiRecommended
+        />
     </div>
 );
-

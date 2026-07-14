@@ -110,9 +110,8 @@ const TutorHomePageSkillsOverview = ({
                         onViewSchedule={() => console.log('View schedule clicked')}
                     />
                     <BadgeCard
-                        description=""
+                        size="M"
                         badgeType="unclaimed"
-                        badgeSize="thumbnail"
                         buttonText="Claim"
                         tooltipText="Complete 20/20 lessons to claim your badge"
                     />

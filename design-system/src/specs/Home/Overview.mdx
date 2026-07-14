@@ -1,23 +1,130 @@
 import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as TutorHomePageStories from './Pages/TutorHomePageSkillsOverview/TutorHomePageSkillsOverview.stories.jsx';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
+{/* Figma Home canvas: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/?node-id=134-175383 */}
 <Meta title="Specs/Home/Overview" />
 
 <Title>Home</Title>
 
-Tutor home experience specs: skills overview, learning, and student sections with
-their cards and modals, organized Elements → Cards → Tables → Modals → Sections → Pages.
+Tutor home local organisms from the Web App Specs file. Organized the same way as Figma:
+**Elements → Cards → Tables → Modals → Sections → Pages**.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=1-168"
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=134-175383"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home"
+    sets={[
+        { name: 'Home canvas', nodeId: '134:175383' },
+        { name: 'Elements', nodeId: '134:175386' },
+        { name: 'Cards', nodeId: '134:175388' },
+        { name: 'Modals', nodeId: '134:175598' },
+        { name: 'Sections', nodeId: '134:175692' },
+        { name: 'Pages · Skills (Home Page)', nodeId: '563:206909' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Featured page — Tutor home (skills overview)
+<div className="sb-ds-doc-section">
 
-<Canvas of={TutorHomePageStories.Overview} />
+### Catalog
+
+<table className="sb-ds-doc-table">
+    <thead>
+        <tr>
+            <th>Figma section</th>
+            <th>Storybook docs</th>
+            <th>Contents</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Elements</strong></td>
+            <td>
+                <a href="?path=/docs/specs-home-elements-card-badges--docs">Card Badges</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-elements-badges--docs">Badges</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-elements-button-container--docs">Button Container</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-elements-product-area-dropdown--docs">Product Area Dropdown</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-elements-resource-type--docs">Resource Type</a>
+            </td>
+            <td>Increase/decrease · Certified tutor badges · CTA container · Product area · Resource glyphs</td>
+        </tr>
+        <tr>
+            <td><strong>Cards</strong></td>
+            <td>
+                <a href="?path=/docs/specs-home-cards-data-visualization--docs">Data Visualization</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-cards-metrics-card-sessions--docs">Metrics Card / Sessions</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-cards-recommended-lessons--docs">Recommended Lessons</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-cards-resource-card--docs">Resource Card</a>
+                {' · '}
+                                <a href="?path=/docs/specs-home-cards-overview-card-training-progress--docs">Overview Card / Training Progress</a>
+            </td>
+            <td>Skills charts · Sessions/Lessons metrics · Lessons carousel · Resources · Training progress</td>
+        </tr>
+        <tr>
+            <td><strong>Modals</strong></td>
+            <td>
+                <a href="?path=/docs/specs-home-modals-user-feedback-modal--docs">User Feedback Modal</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-modals-update-notification--docs">Update Notification</a>
+            </td>
+            <td>Problem / question / feedback · AI Coach announcement</td>
+        </tr>
+        <tr>
+            <td><strong>Sections</strong></td>
+            <td>
+                <a href="?path=/docs/specs-home-sections-homepage-jumbotron--docs">Homepage Jumbotron</a>
+                {' · '}
+                                <a href="?path=/docs/specs-home-sections-students-overview--docs">Students Overview</a>
+            </td>
+            <td>Sign-up / session / reflection · Bottom students overview</td>
+        </tr>
+        <tr>
+            <td><strong>Pages</strong></td>
+            <td>
+                <a href="?path=/docs/specs-home-pages-tutor-home-page-skills-overview--docs">Skills Overview</a>
+                {' · '}
+                <a href="?path=/docs/specs-home-pages-tutor-home-page-skills-progress--docs">Skills Progress</a>
+            </td>
+            <td>Skills (Home Page) compositions</td>
+        </tr>
+        <tr>
+            <td>Tables</td>
+            <td>—</td>
+            <td>Empty in Figma — no Storybook docs yet</td>
+        </tr>
+    </tbody>
+</table>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Featured page — Skills overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Tutor home with Skills Overview tab (Figma Pages · Skills Home Page).</>}
+>
+    <Canvas
+        of={TutorHomePageStories.Overview}
+        story={{ inline: true }}
+        layout="fullscreen"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
 
 </div>

@@ -7,11 +7,42 @@ Mirror of Figma **Login** canvas (`node-id=1-165`) in Web App Specs.
 | Storybook | Figma |
 | --- | --- |
 | `Specs/Login/Overview` | Login canvas overview |
-| `Specs/Login/Elements` | Components → Elements (`112:1200`) |
-| `Specs/Login/Cards` | Components → Cards → Login Portal (`113:42363`) |
-| `Specs/Login/Modals` | Components → Modals → Notifications (`115:4973`) |
-| `Specs/Login/Pages` | Components → Pages → Sign-in Portal (`115:5078`) |
+| `Specs/Login/Elements/Institution Selection` | Dropdown / Institution Selection (`112:1815`) |
+| `Specs/Login/Elements/Institution Form` | Form / Institution Selection (`113:41985`) |
+| `Specs/Login/Elements/Access Code Form` | Form / Access Code (`113:38704`) |
+| `Specs/Login/Elements/Auth Buttons` | Button / Auths (`113:38903`) |
+| `Specs/Login/Elements/Login Buttons` | Button / Misc (`113:38836`) |
+| `Specs/Login/Elements/Login Alert` | Alert (`113:41804`) |
+| `Specs/Login/Elements/Login Footer` | Footer (`113:38671`) |
+| `Specs/Login/Cards/Login Portal` | Cards → Login Portal (`113:42363`) |
+| `Specs/Login/Modals/Login Notifications Modal` | Modals → Notifications (`115:4973`) |
+| `Specs/Login/Pages/Sign-in Portal` | Pages → Sign-in Portal (`115:5078`) |
 | Tables / Sections | Empty / archived in Figma — no docs yet |
+
+## Folder layout
+
+Each organism has its own folder with `{Name}.jsx` (when needed), `{Name}.stories.jsx`, and `{Name}.mdx`.
+
+```
+Login/
+├── Overview.mdx
+├── STRUCTURE.md
+├── Elements/
+│   ├── InstitutionSelection/
+│   ├── InstitutionForm/
+│   ├── AccessCodeForm/
+│   ├── AuthButtons/
+│   ├── LoginButtons/
+│   ├── LoginAlert/
+│   ├── LoginFooter/
+│   └── shared/          # LoginOrDivider + shared SCSS
+├── Cards/
+│   └── LoginPortal/
+├── Modals/
+│   └── LoginNotificationsModal/
+└── Pages/
+    └── SignInPortal/
+```
 
 ## Elements (Figma)
 
@@ -37,5 +68,4 @@ Mirror of Figma **Login** canvas (`node-id=1-165`) in Web App Specs.
 
 ## Docs
 
-Each category has an MDX docs page (`Elements.mdx`, `Cards.mdx`, `Modals.mdx`, `Pages.mdx`)
-using `DocsCanvasShell` sections aligned to the Figma frames above.
+Each organism has an MDX docs page using `DocsCanvasShell` sections aligned to the Figma frames above.

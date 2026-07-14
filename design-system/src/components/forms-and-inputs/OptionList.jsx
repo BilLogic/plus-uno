@@ -129,3 +129,6 @@ OptionList.propTypes = {
 };
 
 export default OptionList;
+
+// Attach after both modules resolve to avoid ListGroup ↔ OptionList circular init.
+ListGroup.OptionList = OptionList;

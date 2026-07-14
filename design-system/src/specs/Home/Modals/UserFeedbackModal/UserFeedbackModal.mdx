@@ -11,11 +11,19 @@ import {
 
 <Title />
 
-Unified user-feedback modal with three modes — `problem`, `question`, and `feedback`. Each mode swaps its rating icons (flag / clock / lightbulb) and textarea copy while sharing the same product-area dropdown, image upload, and contact-info footer.
+Unified Home feedback dialog covering all three modes — `problem`, `question`, and `feedback` — in one organism (Figma `User Feedback Modal`). Severity icons use Font Awesome Regular (flag / circle-question / comment-dots); counts are 5 for problem and 4 for question/feedback.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-126557"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Modals/UserFeedbackModal"
+    sets={[
+        { name: 'Home Modals canvas', nodeId: '134:175598' },
+        { name: 'User Feedback Modal', nodeId: '83:126557' },
+        { name: 'type=problem', nodeId: '83:126558' },
+        { name: 'type=question', nodeId: '83:126577' },
+        { name: 'type=feedback', nodeId: '83:126596' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -24,8 +32,10 @@ Unified user-feedback modal with three modes — `problem`, `question`, and `fee
 
 ### Overview
 
+Tutor home page with scrim and the problem-mode dialog open. Switch modes with the in-modal type tabs, or use the per-mode stories below for isolated inspection.
+
 <DocsCanvasShell
-    description={<>Open the trigger buttons to launch each of the three modal modes. Use the per-mode stories below to inspect each one inline.</>}
+    description={<>App chrome + overlay + open modal (contained in the docs stage).</>}
 >
     <Canvas
         of={UserFeedbackModalStories.Overview}
@@ -42,7 +52,7 @@ Unified user-feedback modal with three modes — `problem`, `question`, and `fee
 
 <DocsInteractivePlayground
     of={UserFeedbackModalStories.Problem}
-    description={<>"Report a problem" mode — flag-icon impact rating.</>}
+    description={<>"Report a problem" — five regular flag icons for impact rating.</>}
 />
 
 </div>
@@ -53,7 +63,7 @@ Unified user-feedback modal with three modes — `problem`, `question`, and `fee
 
 <DocsInteractivePlayground
     of={UserFeedbackModalStories.Question}
-    description={<>"Ask a question" mode — clock-icon urgency rating.</>}
+    description={<>"Look for help" — four regular circle-question icons for urgency.</>}
 />
 
 </div>
@@ -64,7 +74,7 @@ Unified user-feedback modal with three modes — `problem`, `question`, and `fee
 
 <DocsInteractivePlayground
     of={UserFeedbackModalStories.Feedback}
-    description={<>"Share an idea" mode — lightbulb-icon urgency rating.</>}
+    description={<>"Share some ideas" — four regular comment-dots icons for urgency.</>}
 />
 
 </div>

@@ -1,181 +1,125 @@
+/**
+ * BadgeCard styles — Figma Overview Card / Training Progress badge variants.
+ * Fixed widths (not responsive --col-* tokens): >M = 218.67px, M = 162px; height 331px.
+ */
+
 .plus-badge-card {
-    width: var(--col-3, 162px);
-    height: 331px; // Fixed height per Figma spec
-    box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.06);
-    background-color: var(--color-surface-container-lowest);
-    position: relative;
-    overflow: hidden; // Prevent badge overflow
-    display: flex;
-    flex-direction: column;
-    
-    // Fix for specific card that was incorrectly using col-4 - override to correct col-3 width
-    // Apply this class to the specific card instance that needs fixing
-    &--fix-col4-width {
-        width: var(--col-3, 162px) !important;
+    width: 218.67px;
+    height: 331px;
+    max-width: 218.67px;
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    box-shadow: var(--elevation-light-1, 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15));
+    border-radius: var(--size-border-radius-radius-4-5, 16px);
+    overflow: visible;
+    box-sizing: border-box;
+
+    &--gt-m {
+        width: 218.67px;
+        max-width: 218.67px;
     }
-    
-    // Override width and height when in grid layout (home page)
-    .plus-tutor-home-jumbotron-section & {
-        width: auto; // Let grid auto sizing determine width
-        height: 100%;
-        min-width: var(--col-3, 162px); // Minimum width to ensure badge fits
+
+    &--m {
+        width: 162px;
+        max-width: 162px;
     }
-    
-    // Ensure Card.Body doesn't add extra padding
-    .plus-card-content {
+
+    .plus-card-content,
+    .plus-card-body,
+    .plus-card-description {
         padding: 0 !important;
+        margin: 0 !important;
         height: 100%;
-        display: flex;
-        flex-direction: column;
     }
 }
 
-.plus-badge-card-content {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    position: relative;
-    flex: 1;
-    min-height: 200px;
-    
-    // Default padding for full size badge
-    padding-right: 200px;
-    
-    // Adjust padding based on badge size
-    &--thumbnail {
-        padding-right: 100px;
-        min-height: 100px;
-    }
-    
-    &--modal {
-        padding-right: 150px;
-        min-height: 150px;
-    }
-    
-    &--full {
-        padding-right: 200px;
-        min-height: 200px;
-    }
-}
-
-// Adjust positioning for col-4 width cards
-// Target cards with col-4 width via inline style - match the style attribute
-.plus-badge-card[style*="--col-4"],
-.plus-badge-card[style*="col-4"] {
-    // Ensure col-4 width is properly set and constrained
-    width: var(--col-4) !important;
-    max-width: var(--col-4);
-    
-    .plus-badge-card-content {
-        // Better spacing for wider col-4 cards
-        align-items: flex-start;
-        
-        &--thumbnail {
-            padding-right: 100px; // Thumbnail badge spacing
-        }
-        
-        &--full {
-            padding-right: 220px; // Slightly more space for badge in wider card
-        }
-    }
-    
-    .plus-badge-card-left {
-        // Ensure proper alignment in wider cards - text should align to top
-        justify-content: flex-start;
-        padding-top: var(--size-card-pad-md);
-    }
-    
-    .plus-badge-card-badge {
-        // Adjust badge position for col-4 width - center vertically
-        right: var(--size-card-pad-md);
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    
-    .plus-badge-card-button {
-        // Button should be at bottom
-        margin-top: auto;
-    }
-}
-
-.plus-badge-card-left {
+.plus-badge-card__inner {
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
-    flex: 1;
-    padding: var(--size-card-pad-md);
-    z-index: 1;
-    min-width: 0; // Allow text to shrink if needed
+    gap: var(--size-spacing-within-component-spacer-4-5, 16px);
+    height: 100%;
+    padding: var(--size-spacing-within-component-spacer-5, 20px);
+    box-sizing: border-box;
 }
 
-.plus-badge-card-title {
+.plus-badge-card__title {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--size-spacing-within-component-spacer-2, 4px);
+    width: 100%;
 }
 
-// Title uses h5 class from typography system
+.plus-badge-card__title-text {
+    margin: 0;
+    color: var(--color-on-surface-variant, #3f484a);
+}
 
-.plus-badge-card-info-icon {
-    color: var(--color-warning);
-    font-size: 14px;
+.plus-badge-card__info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-on-surface-variant, #3f484a);
+    font-size: 13px;
+    line-height: 1;
+    cursor: default;
+}
+
+button.plus-badge-card__info {
     cursor: pointer;
 }
 
-.plus-badge-card-description {
+.plus-badge-card__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-spacing-within-component-spacer-3, 8px);
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+}
+
+.plus-badge-card__copy {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    align-items: flex-start;
+    gap: var(--size-spacing-between-components-spacer-2, 8px);
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
 }
 
-.plus-badge-card-progress {
-    font-family: var(--font-family-header);
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-h4);
-    line-height: var(--font-line-height-h4);
-    color: var(--color-on-background);
+.plus-badge-card__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.plus-badge-card__headline {
     margin: 0;
+    color: var(--color-on-surface-variant, #3f484a);
 }
 
-.plus-badge-card-label {
+.plus-badge-card__subline {
     margin: 0;
-    // Uses body2-txt class from typography system
+    color: var(--color-on-surface-variant, #3f484a);
 }
 
-.plus-badge-card-button {
-    margin-top: auto;
-}
-
-.plus-badge-card-badge {
-    position: absolute;
-    right: var(--size-card-pad-md);
-    top: 50%;
-    transform: translateY(-50%);
+.plus-badge-card__badge {
+    flex: 0 0 90px;
+    width: 90px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 0;
-    pointer-events: none;
-    
-    // Ensure badge doesn't overflow card
+    overflow: hidden;
+
     .plus-certified-tutor-badge {
-        width: 100%;
-        height: 100%;
-    }
-    
-    // Size variants
-    &--thumbnail {
-        width: 100px;
-        height: 100px;
-    }
-    
-    &--modal {
-        width: 150px;
-        height: 150px;
-    }
-    
-    &--full {
-        width: 200px;
-        height: 200px;
+        width: 90px !important;
+        height: 90px !important;
     }
 }

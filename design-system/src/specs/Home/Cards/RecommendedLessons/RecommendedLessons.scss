@@ -1,41 +1,28 @@
-// Target both the Card component and our custom class
+// Recommended Lessons — Figma 563:192591
+// < XXL: 275.33 × ~341 · XXL & above: 285 × ~341
+
 .card.plus-recommended-lessons,
 .plus-recommended-lessons {
-    background-color: var(--color-surface);
-    border-color: var(--color-outline-variant);
+    background-color: var(--color-surface, #f9f9fc);
+    border-color: var(--color-outline-variant, #bec8ca);
     border-style: solid;
-    border-width: var(--size-card-border-sm);
-    border-radius: var(--size-card-radius-sm);
+    border-width: 1px;
+    border-radius: var(--size-card-radius-sm, 12px);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    
-    // Prevent flex shrinking in carousel
     flex-shrink: 0;
-    
-    // Default widths - fixed widths per Figma spec
-    // Inline style from component takes precedence
-    // These are fallbacks if inline style isn't applied
     width: 275.33px;
     max-width: 275.33px;
-    
-    // XXL & above uses fixed 368px width
+
     &.plus-recommended-lessons-xxl-above {
-        width: 368px;
-        max-width: 368px;
+        width: 285px;
+        max-width: 285px;
     }
-    
-    // Remove all padding from Card wrapper elements
-    .plus-card-content {
-        padding: 0 !important;
-    }
-    
-    .plus-card-body {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    
+
+    .plus-card-content,
+    .plus-card-body,
     .plus-card-description {
         padding: 0 !important;
         margin: 0 !important;
@@ -44,32 +31,26 @@
 
 .plus-recommended-lessons-image {
     width: 100%;
-    // Fixed height based on Figma specs
-    // For '< XXL': 275.33px width, 184px height
-    // For 'XXL & above': 368px width, 184px height (same height, wider card)
     height: 184px;
-    background-color: var(--color-primary-state-08);
+    background-color: var(--color-tertiary-state-08, rgba(0, 82, 221, 0.08));
     opacity: 0.38;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
     box-sizing: border-box;
     overflow: hidden;
     flex-shrink: 0;
-    
+
     img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 0;
     }
 
     .plus-recommended-lessons-image-placeholder {
         width: 100%;
         height: 100%;
-        border-radius: 0;
         background: transparent;
     }
 }
@@ -83,45 +64,50 @@
 .plus-recommended-lessons-top {
     display: flex;
     flex-direction: column;
-    gap: var(--size-spacing-small-space-100);
-    padding: var(--size-spacing-medium-space-300) var(--size-spacing-medium-space-400);
+    gap: var(--size-spacing-small-space-100, 8px);
+    padding: var(--size-spacing-medium-space-300, 16px) var(--size-spacing-medium-space-400, 20px);
 }
 
 .plus-recommended-lessons-tags {
     display: flex;
     align-items: center;
-    column-gap: var(--size-spacing-small-space-075);
-    padding: var(--size-spacing-small-space-050) 0;
+    flex-wrap: wrap;
+    column-gap: var(--size-spacing-small-space-075, 6px);
+    padding: var(--size-spacing-small-space-050, 4px) 0;
 }
 
 .plus-recommended-lessons-separator {
-    color: var(--color-on-surface-variant);
+    color: var(--color-on-surface-variant, #3f484a);
     font-size: 12px;
-    margin: 0 var(--size-spacing-small-space-075) 0 var(--size-spacing-small-space-100);
+    line-height: 1.667;
 }
 
 .plus-recommended-lessons-duration {
-    color: var(--color-on-surface-variant);
+    color: var(--color-on-surface-variant, #3f484a);
 }
 
 .plus-recommended-lessons-title {
+    display: block;
     font-family: var(--font-family-header);
-    font-weight: var(--font-weight-semibold-2);
-    font-size: var(--font-size-h5);
-    line-height: var(--font-line-height-h5);
-    color: var(--color-on-surface);
+    font-weight: var(--font-weight-semibold-2, 600);
+    font-size: var(--font-size-h5, 20px);
+    line-height: 1.4;
+    color: var(--color-on-surface, #191c1e);
     margin: 0;
+    padding: 0;
+    /* Ellipsis only — do not clamp height (28px + overflow clipped glyph bottoms) */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    height: 28px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .plus-recommended-lessons-bottom {
     display: flex;
     align-items: center;
-    padding: var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-400);
-    gap: var(--size-element-gap-sm);
+    padding: var(--size-spacing-medium-space-200, 12px) var(--size-spacing-medium-space-400, 20px);
+    gap: var(--size-element-gap-sm, 8px);
 }
 
 .plus-recommended-lessons-indicators {
@@ -129,37 +115,33 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--size-element-gap-sm);
+    gap: 0;
 }
 
-.plus-recommended-lessons-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    i {
-        color: var(--color-warning-text);
-        font-size: 12px;
-    }
-}
-
+.plus-recommended-lessons-status,
 .plus-recommended-lessons-ai-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    i {
-        color: var(--color-primary);
-        font-size: 12px;
-    }
+    min-width: 36px;
+    padding: 6px 10px;
+}
+
+.plus-recommended-lessons-status i {
+    color: var(--color-warning, #715c00);
+    font-size: 12px;
+}
+
+.plus-recommended-lessons-ai-indicator i {
+    color: var(--color-primary, #0472a8);
+    font-size: 12px;
 }
 
 .plus-recommended-lessons-divider {
     width: 100%;
 
     .plus-divider-line {
-        background-color: var(--color-outline-variant);
+        background-color: var(--color-outline-variant, #bec8ca);
         opacity: 0.38;
     }
 }
-

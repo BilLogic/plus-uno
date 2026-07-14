@@ -224,11 +224,5 @@ ListGroup.Item = ListGroupItem;
 // Attach ListOption for individual option use cases
 ListGroup.Option = ListOptionComponent;
 
-// Import and attach OptionList for full option list container use cases
-// This consolidates OptionList into ListGroup as ListGroup.OptionList
-import OptionListComponent from '@/components/forms-and-inputs/OptionList';
-ListGroup.OptionList = OptionListComponent;
-
 export default ListGroup;
 export { ListOption as ListOptionComponent } from './ListOption';
-export { default as OptionList } from '@/components/forms-and-inputs/OptionList';

@@ -1,0 +1,44 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AuthButtonsStories from './AuthButtons.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AuthButtonsStories} />
+
+<Title />
+
+Providers: Google · Clever (Figma `Button / Auths`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=113-38903"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Login/Elements/AuthButtons"
+    sets={[
+        { name: 'Elements frame', nodeId: '112:1200' },
+        { name: 'Button / Auths', nodeId: '113:38903' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>SSO continue buttons using the dedicated auth-provider assets.</>}
+>
+    <Canvas
+        of={AuthButtonsStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

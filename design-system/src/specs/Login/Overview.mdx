@@ -1,5 +1,5 @@
 import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
-import * as LoginPagesStories from './Pages/Pages.stories.jsx';
+import * as SignInPortalStories from './Pages/SignInPortal/SignInPortal.stories.jsx';
 import {
     DocsCanvasShell,
     ResourcesBlock,
@@ -34,13 +34,50 @@ Login canvas and reserved for future work).
 
 ### Catalog
 
-| Figma section | Storybook docs | Contents |
-| --- | --- | --- |
-| **Elements** | [Specs/Login/Elements](?path=/docs/specs-login-elements--docs) | Alert · Auth buttons · Misc buttons · Institution dropdown · Access-code form · Institution form · Footer |
-| **Cards** | [Specs/Login/Cards](?path=/docs/specs-login-cards--docs) | Login Portal (`official` / `demo` × steps 1–3b) |
-| **Modals** | [Specs/Login/Modals](?path=/docs/specs-login-modals--docs) | Notifications modal types A & B |
-| **Pages** | [Specs/Login/Pages](?path=/docs/specs-login-pages--docs) | Sign-in Portal full page |
-| Tables / Sections | — | Empty / archived in Figma (Jul 2026) — no Storybook docs yet |
+<table>
+    <thead>
+        <tr>
+            <th>Figma section</th>
+            <th>Storybook docs</th>
+            <th>Contents</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Elements</strong></td>
+            <td>
+                <a href="?path=/docs/specs-login-elements-institution-selection--docs">Institution Selection</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-institution-form--docs">Institution Form</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-access-code-form--docs">Access Code Form</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-auth-buttons--docs">Auth Buttons</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-login-buttons--docs">Login Buttons</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-login-alert--docs">Login Alert</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-login-footer--docs">Login Footer</a>
+            </td>
+            <td>Alert · Auth buttons · Misc buttons · Institution dropdown · Access-code form · Institution form · Footer</td>
+        </tr>
+        <tr>
+            <td><strong>Cards</strong></td>
+            <td><a href="?path=/docs/specs-login-cards-login-portal--docs">Login Portal</a></td>
+            <td>Login Portal (<code>official</code> / <code>demo</code> × steps 1–3b)</td>
+        </tr>
+        <tr>
+            <td><strong>Modals</strong></td>
+            <td><a href="?path=/docs/specs-login-modals-login-notifications-modal--docs">Login Notifications Modal</a></td>
+            <td>Notifications modal types A &amp; B</td>
+        </tr>
+        <tr>
+            <td><strong>Pages</strong></td>
+            <td><a href="?path=/docs/specs-login-pages-sign-in-portal--docs">Sign-in Portal</a></td>
+            <td>Sign-in Portal full page</td>
+        </tr>
+        <tr>
+            <td>Tables / Sections</td>
+            <td>—</td>
+            <td>Empty / archived in Figma (Jul 2026) — no Storybook docs yet</td>
+        </tr>
+    </tbody>
+</table>
 
 </div>
 
@@ -56,7 +93,7 @@ Matches Figma **Pages → Sign-in Portal**. Browse the catalog links above for E
     description={<>Official step-1 portal on the surface-container page shell.</>}
 >
     <Canvas
-        of={LoginPagesStories.SignInPortal}
+        of={SignInPortalStories.Overview}
         story={{ inline: true }}
         layout="fullscreen"
         sourceState="hidden"

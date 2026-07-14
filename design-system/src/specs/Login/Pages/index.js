@@ -1,3 +1,6 @@
-// Legacy LoginPage is deprecated in favor of the Figma-aligned SignInPortal
-// page stories defined in `Pages.stories.jsx`. We intentionally do not
-// re-export it here so it no longer appears under Specs/Login/Pages.
+/**
+ * @fileoverview Login Organism - Pages Index
+ * Full-page login and authentication experiences.
+ */
+
+export { default as SignInPortal } from './SignInPortal/SignInPortal';
