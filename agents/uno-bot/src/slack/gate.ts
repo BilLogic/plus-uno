@@ -6,7 +6,8 @@
 //   - Only ✅ and ❌ reactions are considered.
 //   - Only reactions on a proposal message we have pending state for (or, on a
 //     miss, the thread's active proposal — see findThreadProposal).
-//   - Only reactions from the original requester.
+//   - Anyone in the thread may confirm/cancel (the requester lock was removed
+//     2026-07-14; requesterUserId is still stored for the record).
 
 import type { Env } from "../types";
 import {
@@ -74,16 +75,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     if (!pending) return;
   }
 
-  if (event.user !== pending.requesterUserId) {
-    // Cross-user reaction. Silently ignore (Slack reactions are low-stakes;
-    // posting a "you can't do that" message would be noisy).
-    console.log(
-      `[gate] reaction :${event.reaction}: from <@${event.user}> on proposal ${event.item.ts}` +
-      ` ignored — requester is <@${pending.requesterUserId}>`,
-    );
-    return;
-  }
-
+  // Anyone in the thread may confirm/cancel — no requester check (2026-07-14).
   try {
     await resolveProposal(env, pending, decision /* narrative: default */);
   } catch (err) {

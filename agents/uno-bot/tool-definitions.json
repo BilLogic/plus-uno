@@ -172,7 +172,7 @@
   },
   {
     "name": "slack_react",
-    "description": "Add an emoji reaction AS UNO-BOT to a message in the current thread. Use freely to acknowledge, celebrate, or signal state — any workspace emoji name (without colons), e.g. 'tada', 'eyes', 'raised_hands', or a custom workspace emoji. Reactions are reversible and ungated. Do NOT react with white_check_mark or x on proposal cards (those are reserved for the requester's confirm/cancel). If message_ts is omitted, reacts to the user's current message.",
+    "description": "Add an emoji reaction AS UNO-BOT to a message in the current thread. Use freely to acknowledge, celebrate, or signal state — any workspace emoji name (without colons), e.g. 'tada', 'eyes', 'raised_hands', or a custom workspace emoji. Reactions are reversible and ungated. Do NOT react with white_check_mark or x on proposal cards (those are reserved for confirm/cancel). If message_ts is omitted, reacts to the user's current message.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -505,7 +505,7 @@
   },
   {
     "name": "proposal_resolve",
-    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). If the user asks an unrelated question or is still discussing without deciding, do NOT invoke — reply conversationally and the proposal sits until ✅, ❌, or 60-minute expiry. If the system prompt indicates the current sender is NOT the original requester, do NOT invoke — reply that only the requester can confirm.",
+    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). Anyone in the thread may confirm or cancel — not just the original requester. If the user asks an unrelated question or is still discussing without deciding, do NOT invoke — reply conversationally and the proposal sits until ✅, ❌, or 60-minute expiry.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

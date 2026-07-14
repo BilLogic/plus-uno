@@ -219,13 +219,12 @@ export type ResolveValidation =
 export function validateProposalResolve(
   args: { decision?: unknown; message_to_user?: unknown } | undefined,
   pending: PendingProposal | null,
-  currentSenderId: string,
+  // Kept for signature stability + logging; no longer gated on — anyone in the
+  // thread may confirm/cancel (2026-07-14).
+  _currentSenderId: string,
 ): ResolveValidation {
   if (!pending) {
     return { ok: false, error: "no pending proposal in this thread — reply conversationally instead" };
-  }
-  if (currentSenderId !== pending.requesterUserId) {
-    return { ok: false, error: `not authorized — only <@${pending.requesterUserId}> can resolve this proposal` };
   }
   const decision = args?.decision;
   if (decision !== "confirm" && decision !== "cancel") {
@@ -270,7 +269,7 @@ async function executeSlackReact(
   if (emoji === "white_check_mark" || emoji === "x") {
     return JSON.stringify({
       ok: false,
-      error: "white_check_mark and x are reserved for the requester's confirm/cancel on proposal cards",
+      error: "white_check_mark and x are reserved for confirm/cancel on proposal cards",
     });
   }
   const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;

@@ -510,6 +510,7 @@ interface NotionProperty {
   select?: { name?: string } | null;
   status?: { name?: string } | null;
   multi_select?: { name?: string }[];
+  relation?: { id?: string }[];
   date?: { start?: string; end?: string | null } | null;
   url?: string | null;
   email?: string | null;
@@ -862,8 +863,9 @@ interface NotionSchemaProp {
 }
 
 // Match a requested property name to a schema name ignoring case, spaces, and
-// underscores ("dev status" == "Dev_Status" == "DevStatus").
-function normalizeName(s: string): string {
+// underscores ("dev status" == "Dev_Status" == "DevStatus"). Exported so the
+// proposal card can line up a requested field against the page's real property.
+export function normalizeName(s: string): string {
   return s.toLowerCase().replace(/[\s_]+/g, "").trim();
 }
 
@@ -1045,15 +1047,35 @@ async function fetchPageSchema(
   return { title, inDatabase: true, schema };
 }
 
+// A field's current value on the page, read back for a notion_update card's
+// `current → new` diff. `label` is the property's REAL name (so the bullet reads
+// "Dev Status", not the model's "dev_status"); `value` is empty when unset.
+export interface CurrentFieldValue {
+  label: string;
+  value: string;
+}
+
+export interface NotionTargetDescription {
+  title: string;
+  parent: string;
+  /** Canonical page URL, for the linked-card line (never a bare hex). */
+  url: string;
+  /** Current values of the changed fields, keyed by normalizeName(fieldName). */
+  current: Record<string, CurrentFieldValue>;
+}
+
 // Resolve a page's human label + parent-database name for a PROPOSAL card, so an
 // approver sees the CONCRETE target of a notion_update / notion_archive (title +
 // which DB) instead of a bare id — the human read is the backstop now that writes
-// aren't DB-allowlisted (review 2026-07-13). Best-effort: returns null on any
-// failure so the proposal still posts.
+// aren't DB-allowlisted (review 2026-07-13). Also returns the canonical URL and,
+// for any `changedFields` passed, each field's CURRENT value (so a notion_update
+// card can show `current → new`). Best-effort: returns null on any failure so the
+// proposal still posts.
 export async function describeNotionTarget(
   env: Env,
   rawUrlOrId: string,
-): Promise<{ title: string; parent: string } | null> {
+  changedFields: string[] = [],
+): Promise<NotionTargetDescription | null> {
   const pageId = parseNotionPageId(rawUrlOrId);
   if (!pageId || !env.NOTION_API_KEY) return null;
   const headers = notionHeaders(env, { write: true });
@@ -1063,6 +1085,7 @@ export async function describeNotionTarget(
     const res = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
     const page = (await res.json()) as {
       id?: string;
+      url?: string;
       parent?: { type?: string; database_id?: string };
       properties?: Record<string, NotionProperty>;
     };
@@ -1071,14 +1094,35 @@ export async function describeNotionTarget(
     for (const prop of Object.values(page.properties ?? {})) {
       if (prop.type === "title") { title = plain(prop.title) || title; break; }
     }
+
+    // Read back the current value of each field being changed. Relation values
+    // render as page titles (not ids) via a best-effort title fetch.
+    const current: Record<string, CurrentFieldValue> = {};
+    if (changedFields.length) {
+      const wanted = new Set(changedFields.map(normalizeName));
+      for (const [name, prop] of Object.entries(page.properties ?? {})) {
+        const key = normalizeName(name);
+        if (!wanted.has(key)) continue;
+        let value = renderProperty(prop);
+        if (prop.type === "relation" && prop.relation?.length) {
+          const ids = prop.relation.map((r) => r.id).filter((x): x is string => !!x);
+          const titles = ids.length ? await fetchPageTitles(env, ids).catch(() => []) : [];
+          if (titles.length) value = titles.join(", ");
+        }
+        current[key] = { label: name, value };
+      }
+    }
+
+    const url = page.url || `https://www.notion.so/${pageId}`;
     const dbId = page.parent?.database_id;
     if (!dbId) {
-      return { title, parent: page.parent?.type === "page_id" ? "a sub-page" : "a standalone page" };
+      const parent = page.parent?.type === "page_id" ? "a sub-page" : "a standalone page";
+      return { title, parent, url, current };
     }
     const dbRes = await fetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal: controller.signal });
-    if (!dbRes.ok) return { title, parent: "a database" };
+    if (!dbRes.ok) return { title, parent: "a database", url, current };
     const db = (await dbRes.json()) as { title?: NotionRichText };
-    return { title, parent: plain(db.title) || "a database" };
+    return { title, parent: plain(db.title) || "a database", url, current };
   } catch {
     return null;
   } finally {

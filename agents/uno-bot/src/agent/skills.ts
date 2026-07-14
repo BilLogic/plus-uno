@@ -54,7 +54,6 @@ export async function buildSystemBlocks(
 }
 
 function renderPendingBlock(p: PendingContext, sender: SenderContext | null): string {
-  const senderIsRequester = sender ? sender.userId === p.requesterUserId : false;
   return [
     "<pending_proposal>",
     "You previously proposed a side-effect action in this Slack thread that is awaiting confirmation:",
@@ -67,9 +66,7 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
     "",
     `IMPORTANT: while this proposal is pending, do NOT invoke \`${p.toolName}\` (or any side-effect tool) again for the same action. An approval is handled ONLY by proposal_resolve with decision "confirm" — re-invoking the tool re-stages a duplicate confirmation card instead of executing, which reads as ignoring the user's approval.`,
     "",
-    sender && !senderIsRequester
-      ? `The current sender (<@${sender.userId}>) is NOT the requester (<@${p.requesterUserId}>) — do NOT invoke proposal_resolve. Reply explaining that only the original requester can confirm.`
-      : `Authorization rule: only <@${p.requesterUserId}> may confirm or cancel. The Worker will reject resolution attempts from other users.`,
+    "Authorization: anyone in the thread may confirm or cancel — not just the original requester. A clear go-ahead/cancel from any participant resolves it.",
     "</pending_proposal>",
   ].filter(Boolean).join("\n");
 }

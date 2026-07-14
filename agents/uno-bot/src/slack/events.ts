@@ -32,8 +32,18 @@ import {
 import { collectVisionInputs } from "./vision";
 import { postVisibleFailure, postTextVerified } from "./delivery";
 import { reviewDraft } from "../agent/draft-judge";
-import { formatProposal, proposalVerb, buildImplementDesignProposal } from "./proposal-render";
-import { describeNotionTarget } from "../integrations/notion";
+import {
+  formatProposal,
+  formatNotionUpdateProposal,
+  proposalVerb,
+  buildImplementDesignProposal,
+} from "./proposal-render";
+import {
+  describeNotionTarget,
+  normalizeName,
+  parseNotionPageId,
+  fetchPageTitles,
+} from "../integrations/notion";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -329,14 +339,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   if (pending) {
     const bareDecision = bareResolution(userText); // shared vocabulary (loop-shared)
     if (bareDecision) {
-      if (userId !== pending.requesterUserId) {
-        await postMessage(env, {
-          channel,
-          thread_ts: threadTs,
-          text: `Only <@${pending.requesterUserId}> can confirm or cancel this one.`,
-        });
-        return;
-      }
+      // Anyone in the thread may confirm/cancel (2026-07-14) — the requester lock
+      // was removed here and everywhere else that gated on requesterUserId.
       await resolveProposal(env, pending, bareDecision);
       await recordExchange(
         env, channel, threadTs, userText,
@@ -519,7 +523,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // Show which PRD this implement is tied to, so the requester can see it.
     const preview = implementPrdUrl ? `Using the PRD for this change: ${implementPrdUrl}` : result.previewText;
     proposalText = formatProposal(result.toolName, result.input, userId, preview);
-  } else if (result.toolName === "notion_update" || result.toolName === "notion_archive") {
+  } else if (result.toolName === "notion_update") {
+    // Conversational card: warm lead + linked card + `current → new` diff. No ⚠️
+    // preamble — the lead, the named card, and the diff speak for themselves.
+    const body = await buildNotionUpdateBody(env, result.input);
+    proposalText = formatNotionUpdateProposal(result.previewText, body);
+  } else if (result.toolName === "notion_archive") {
     // Writes are no longer DB-allowlisted, so the human ✅ is the backstop — make
     // the card show the CONCRETE target (page title + parent DB), not a bare id,
     // so an approver can't be steered into confirming a write on some arbitrary
@@ -566,6 +575,83 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 
 function stripBotMentions(text: string): string {
   return text.replace(/<@[A-Z0-9]+>/g, "").trim();
+}
+
+// ── notion_update card body (linked card + `current → new` diff) ──────────────
+// Builds the DISPLAY body for a notion_update proposal — separate from the
+// executable tool input, which lives untouched in the DO's pending state. Reads
+// the page for its title/URL/parent DB + the current value of each changed field
+// (describeNotionTarget), resolves any people/relation new-values from ids/URLs
+// to real names, and codifies every property value in backticks.
+
+function humanizeFieldName(key: string): string {
+  return key.replace(/[_\s]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// People/relation writes arrive as a Notion id or URL — resolve to a real name
+// so the card never shows a bare `notion.so/e5cb…`. Plain values (a select name,
+// a date) carry no 32-hex id and pass straight through. Best-effort.
+async function resolveNotionValueForDisplay(env: Env, raw: string): Promise<string> {
+  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  const out: string[] = [];
+  for (const part of parts) {
+    const id = parseNotionPageId(part);
+    if (id) {
+      const titles = await fetchPageTitles(env, [id]).catch(() => []);
+      if (titles.length) { out.push(...titles); continue; }
+    }
+    out.push(part);
+  }
+  return out.join(", ") || raw.trim();
+}
+
+// A one-line note for an `append` (narrative) update, so the card doesn't drop it.
+function describeAppend(append: unknown): string | null {
+  if (!append || typeof append !== "object") return null;
+  const o = append as Record<string, unknown>;
+  const headings = (Array.isArray(o.sections) ? o.sections : [])
+    .map((s) => (s && typeof s === "object" ? String((s as Record<string, unknown>).heading ?? "").trim() : ""))
+    .filter(Boolean);
+  if (headings.length) return `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`;
+  if (typeof o.text === "string" && o.text.trim()) return `• *Appending a note to the page.*`;
+  return null;
+}
+
+async function buildNotionUpdateBody(env: Env, input: Record<string, unknown>): Promise<string> {
+  const pageUrl = typeof input.page_url === "string" ? input.page_url : "";
+  const properties =
+    input.properties && typeof input.properties === "object"
+      ? (input.properties as Record<string, unknown>)
+      : {};
+  const changedFields = Object.keys(properties);
+  const target = pageUrl ? await describeNotionTarget(env, pageUrl, changedFields) : null;
+
+  const lines: string[] = [];
+
+  // Named + linked card — `<url|Title> — in <ParentDB>`, never a bare hex URL.
+  if (target) {
+    lines.push(`*<${target.url}|${target.title}>* — in ${target.parent}`);
+  } else if (pageUrl) {
+    lines.push(`*<${pageUrl}|this Notion page>*`);
+  }
+
+  // One bullet per changed field, always — `current → new`, values backticked.
+  for (const [reqName, rawVal] of Object.entries(properties)) {
+    if (typeof rawVal !== "string") continue;
+    const cur = target?.current?.[normalizeName(reqName)];
+    const label = cur?.label ?? humanizeFieldName(reqName);
+    const newDisplay = await resolveNotionValueForDisplay(env, rawVal);
+    lines.push(
+      cur?.value
+        ? `• *${label}:* \`${cur.value}\` → \`${newDisplay}\``
+        : `• *${label}:* \`${newDisplay}\``,
+    );
+  }
+
+  const appendNote = describeAppend(input.append);
+  if (appendNote) lines.push(appendNote);
+
+  return lines.join("\n");
 }
 
 // Key-order-independent JSON compare, so two generations of the same tool input
