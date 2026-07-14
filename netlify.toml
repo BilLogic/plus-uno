@@ -26,8 +26,19 @@
   to = "/storybook/:splat"
   status = 200
 
-# SPA catch-all for live-app routes (must come AFTER Storybook + landing redirects).
-# Existing files under /demo/* and /storybook/* are served as static assets first.
+# Demo walkthrough SPA — keep deep links under /demo/* (e.g. /demo/home)
+# Frozen share URL /demo/demo.html still works (same HTML entry).
+[[redirects]]
+  from = "/demo"
+  to = "/demo/home"
+  status = 302
+
+[[redirects]]
+  from = "/demo/*"
+  to = "/demo/demo.html"
+  status = 200
+
+# SPA catch-all for live-app routes (must come AFTER Storybook + demo redirects).
 [[redirects]]
   from = "/*"
   to = "/index.html"

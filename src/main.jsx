@@ -4,8 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/main.scss';
 import '../prototypes/home-redesign/src/styles/plus-tokens.scss';
-import '../prototypes/research-assistant-chat/src/styles/plus-tokens.scss';
-import '../prototypes/research-assistant-chat/src/index.css';
 import App from './App';
 import './index.css';
 

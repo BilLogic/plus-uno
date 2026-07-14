@@ -1,10 +1,8 @@
 /**
  * Production surfaces hosted on main (not a discovery catalog — that is Notion).
  *
- * 1. Live app — SPA routes under /home, /app, …
- * 2. Full Demo Walkthrough — static build at /demo/demo.html (slug + URL frozen)
- *
- * Content modules used by both: in-session-ux, research-assistant-chat, monthly-report.
+ * 1. Live app — Storybook Specs pages wired as one product (`prototypes/live-app`)
+ * 2. Full Demo Walkthrough — recording build under `/demo/*` (`prototypes/home-redesign`)
  */
 
 export const STAGES = ['low', 'mid', 'high'];
@@ -37,14 +35,14 @@ export const PILLAR_META = {
 
 /**
  * Two production prototypes on main.
- * Demo id `1028` and path `/demo/demo.html` must not change (Notion + share links).
+ * Demo entry `/demo/demo.html` redirects into `/demo/home` (slug prefix frozen).
  */
 export const prototypes = [
   {
     id: 'live-app',
-    title: 'Live app (current)',
+    title: 'Live app (Storybook specs)',
     description:
-      'Holistic tutor flow on production: Home, Admin, Sessions, Reflection, Lessons, Research Assistant, Monthly Reports — wired as one SPA shell.',
+      'Holistic product replica assembled from design-system Specs page components (Home, Training, Toolkit, Admin, Profile, Login).',
     deploymentUrl: '/home',
     notionCardUrl: null,
     notionCardId: null,
@@ -54,22 +52,22 @@ export const prototypes = [
     contributors: ['Bill'],
     productPillar: 'universal',
     localPath: '/home',
-    repoPath: 'prototypes/home-redesign/',
+    repoPath: 'prototypes/live-app/',
   },
   {
     id: '1028',
     title: 'Full Demo Walkthrough',
     description:
-      'Full-screen, edge-to-edge recording build that stitches the key screens into one click-through flow: Home → Lessons → Sessions → Reflection → Training Progress → Research terminal. Press "\\" to toggle the admin sidebar section.',
+      'Full-screen recording build under /demo/* (e.g. /demo/home). Stitches Home → Lessons → Sessions → Reflection → Training Progress → Research terminal. Press "\\" to toggle the admin sidebar. Entry /demo/demo.html is frozen.',
     deploymentUrl: '/demo/demo.html',
     notionCardUrl: null,
     notionCardId: null,
     stage: 'high',
-    lastUpdated: '2026-06-04',
+    lastUpdated: '2026-07-14',
     creators: ['Bill'],
     contributors: ['Bill'],
     productPillar: 'universal',
-    localPath: null,
+    localPath: '/demo/home',
     repoPath: 'prototypes/home-redesign/',
   },
 ];

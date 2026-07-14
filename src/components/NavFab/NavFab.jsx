@@ -23,7 +23,7 @@ const NAV_ITEMS = [
     id: 'demo',
     label: 'Full demo',
     icon: 'fa-solid fa-clapperboard',
-    href: '/demo/demo.html',
+    href: '/demo/home',
     external: false,
   },
   {

@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "concurrently --names app,storybook --prefix-colors blue,magenta \"vite --port 4100\" \"npm run storybook\"",
     "dev:vite": "vite --port 4100",
-    "dev:app": "vite --config prototypes/home-redesign/vite.config.js",
+    "dev:app": "vite --config prototypes/live-app/vite.config.js",
+    "dev:live-app": "vite --config prototypes/live-app/vite.config.js",
     "test": "npm --prefix design-system test",
     "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 4200 --host 0.0.0.0 --config-dir .storybook",
     "build-storybook": "npm run generate:brand-image && storybook build --config-dir .storybook -o storybook-static && mkdir -p dist && rm -rf dist/storybook && mv storybook-static dist/storybook",

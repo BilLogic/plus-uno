@@ -10,10 +10,11 @@ import './demo.css';
 
 /**
  * Demo Recording entry point.
- * Full-screen shell (no fixed frame). Uses BrowserRouter so window.location.pathname
- * matches the active route — the reused admin/research components rely on that
- * (the standalone prototype runs the same way). Reuses the same screen content.
+ * basename keeps all routes under `/demo/*` in production (e.g. `/demo/home`).
+ * Vite `base` is `/demo/` on build and `/` in local `dev:demo`.
  */
+const basename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || undefined;
+
 const rootEl = document.getElementById('root');
 if (!rootEl) {
     document.body.innerHTML = '<div style="padding:20px;color:red;font-family:sans-serif;">Error: #root not found</div>';
@@ -22,7 +23,7 @@ if (!rootEl) {
         ReactDOM.createRoot(rootEl).render(
             <React.StrictMode>
                 <ThemeProvider>
-                    <BrowserRouter>
+                    <BrowserRouter basename={basename}>
                         <DemoApp />
                     </BrowserRouter>
                 </ThemeProvider>

@@ -8,6 +8,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import { TopBar, Sidebar } from '../../Sections';
+import { usePageLayoutShell } from './PageLayoutShellContext';
 
 /** Shared motion: sidebar + content grow/shrink in sync (Material-style decelerate, 280ms). */
 const SIDEBAR_TRANSITION = 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -40,7 +41,10 @@ const PageLayout = ({
     /** When true, force sidebar expanded (e.g. for Storybook/demos). Overrides breakpoint. */
     sidebarExpanded = false,
 }) => {
-    const [isSidebarVisible, setIsSidebarVisible] = useState(() => (sidebarExpanded || !sidebarHidden));
+    const pageShell = usePageLayoutShell();
+    const forceExpanded = sidebarExpanded || Boolean(pageShell?.forceSidebarExpanded);
+    const fullscreen = Boolean(pageShell?.fullscreen);
+    const [isSidebarVisible, setIsSidebarVisible] = useState(() => (forceExpanded || !sidebarHidden));
     const containerRef = React.useRef(null);
     /** When shell width is below lg, user-expanded sidebar must not be undone by ResizeObserver. */
     const manualNarrowExpandRef = React.useRef(false);
@@ -50,7 +54,15 @@ const PageLayout = ({
 
     /** Sidebar expects `activeTabId`; specs often pass `activeTab`. Strip both before spread. */
     const sidebarProps = { ...(sidebarConfig || {}) };
-    const sidebarActiveCombined = sidebarProps.activeTabId ?? sidebarProps.activeTab;
+    if (pageShell?.enabled) {
+        if (pageShell.user) sidebarProps.user = pageShell.user;
+        if (pageShell.goHome) sidebarProps.onHomeClick = pageShell.goHome;
+        if (pageShell.onTabClick) sidebarProps.onTabClick = pageShell.onTabClick;
+    }
+    const sidebarActiveCombined =
+        (pageShell?.enabled && pageShell.activeTab ? pageShell.activeTab : null)
+        ?? sidebarProps.activeTabId
+        ?? sidebarProps.activeTab;
     delete sidebarProps.activeTabId;
     delete sidebarProps.activeTab;
 
@@ -94,7 +106,7 @@ const sidebarVisibleFor = (width, forced) => {
 // Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
 // MD breakpoint) starts with the Sidebar already collapsed — no expanded→collapsed flash.
 useLayoutEffect(() => {
-    if (sidebarHidden || sidebarExpanded || !containerRef.current) return;
+    if (sidebarHidden || forceExpanded || !containerRef.current) return;
     const el = containerRef.current;
     const forced = readForcedBreakpoint(el);
     const w = readWidth(el);
@@ -108,7 +120,7 @@ useEffect(() => {
         setIsSidebarVisible(false);
         return undefined;
     }
-    if (sidebarExpanded) {
+    if (forceExpanded) {
         manualNarrowExpandRef.current = false;
         setIsSidebarVisible(true);
         return undefined;
@@ -132,7 +144,7 @@ useEffect(() => {
     observer.observe(containerRef.current);
 
     return () => observer.disconnect();
-}, [sidebarHidden, sidebarExpanded]);
+}, [sidebarHidden, forceExpanded]);
 
     const handleSidebarToggle = (newMode) => {
         if (sidebarHidden) return;
@@ -151,19 +163,23 @@ useEffect(() => {
         <div
             id={id}
             ref={containerRef}
-            className={`plus-page-layout ${className}`}
+            className={`plus-page-layout${fullscreen ? ' plus-page-layout--fullscreen' : ''} ${className}`}
             style={{
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
                 height: '100%',
+                minHeight: fullscreen ? 0 : undefined,
+                flex: fullscreen ? '1 1 auto' : undefined,
                 backgroundColor: 'var(--color-surface-container)',
                 overflow: 'hidden',
-                border: '1px solid var(--color-outline-variant)',
-                borderRadius: '8px',
+                border: fullscreen ? 'none' : '1px solid var(--color-outline-variant)',
+                borderRadius: fullscreen ? 0 : '8px',
                 boxSizing: 'border-box',
-                padding: 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)',
+                padding: fullscreen
+                    ? 'var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 16px)'
+                    : 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)',
                 gap: 'var(--size-element-gap-md, 16px)',
                 alignItems: 'flex-start',
                 ...style

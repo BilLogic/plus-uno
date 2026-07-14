@@ -2,14 +2,14 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'react-bootstrap';
 import NavFab from './components/NavFab/NavFab';
-import HomeRedesignApp from '../prototypes/home-redesign/src/App';
+import { LiveAppRoutes } from '../prototypes/live-app/src/App';
 import './App.scss';
 
 /**
  * Production SPA on main:
  * - Storybook landing
- * - Live app shell (`prototypes/home-redesign`) at /home, /app, …
- * - Full demo walkthrough stays at /demo/demo.html (separate Vite build — not routed here)
+ * - Live app — Storybook Specs pages as one full-screen product
+ * - Demo walkthrough — separate Vite build under `/demo/*`
  */
 function StorybookEmbed() {
   const storyBookUrl = import.meta.env.VITE_STORYBOOK_URL || 'http://localhost:4200';
@@ -52,19 +52,11 @@ function App() {
         <Route path="/" element={<Navigate to="/storybook" replace />} />
         <Route path="/market" element={<Navigate to="/storybook" replace />} />
         <Route path="/storybook" element={<StorybookEmbed />} />
-
-        {/* Live app — holistic tutor flow */}
         <Route path="/app/*" element={<Navigate to="/home" replace />} />
-        <Route path="/home/*" element={<HomeRedesignApp contentKey="home" />} />
-        <Route path="/admin/*" element={<HomeRedesignApp contentKey="admin" />} />
-        <Route path="/sessions/*" element={<HomeRedesignApp contentKey="sessions" />} />
-        <Route path="/reflection/*" element={<HomeRedesignApp contentKey="reflection" />} />
-        <Route path="/lessons/*" element={<HomeRedesignApp contentKey="lessons" />} />
-        <Route path="/research-assistant/*" element={<HomeRedesignApp contentKey="research-assistant" />} />
-        <Route path="/monthly-reports/*" element={<HomeRedesignApp contentKey="monthly-reports" />} />
-        <Route path="/monthly-report/*" element={<HomeRedesignApp contentKey="monthly-report" />} />
 
-        {/* Unknown paths (incl. retired numeric IDs) → Storybook */}
+        {/* Live app routes — declared as siblings so absolute paths match */}
+        {LiveAppRoutes()}
+
         <Route path="*" element={<Navigate to="/storybook" replace />} />
       </Routes>
     </ThemeProvider>

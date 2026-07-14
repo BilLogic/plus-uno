@@ -235,12 +235,13 @@ function DemoApp() {
                 <Route path="reflection" element={<ReflectionContent />} />
                 <Route path="sessions" element={<InSessionContent />} />
                 <Route path="lessons" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
-                <Route path="lessons/*" element={<Navigate to="/lessons/supporting-growth-mindset" replace />} />
                 <Route path="lessons/supporting-growth-mindset" element={<LessonsContent />} />
                 <Route path="monthly-reports" element={<MonthlyReportsListContent />} />
                 <Route path="monthly-report" element={<MonthlyReportContent />} />
                 <Route path="admin" element={<TutorAdminContent />} />
                 <Route path="research-assistant" element={<TutorAdminContent />} />
+                {/* Frozen entry URL /demo/demo.html → /demo/home */}
+                <Route path="demo.html" element={<Navigate to="/home" replace />} />
                 <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
         </Routes>

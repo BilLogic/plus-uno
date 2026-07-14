@@ -4,7 +4,7 @@
 
 Design system, prototyping workspace, and agent infrastructure for the [PLUS tutoring platform](https://tutors.plus/) (500+ college tutors, 3,000+ K-12 students). This is a **prototype builder and design workspace — not a production app**.
 
-**Live site:** [plus-uno.netlify.app](https://plus-uno.netlify.app) → **Storybook** (`/storybook/`). **Live app:** [/home](https://plus-uno.netlify.app/home) (alias [/app](https://plus-uno.netlify.app/app)). **Full demo walkthrough:** [/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html) (slug frozen). Experiments: [Notion Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c).
+**Live site:** [plus-uno.netlify.app](https://plus-uno.netlify.app) → **Storybook** (`/storybook/`). **Live app (Specs replica):** [/home](https://plus-uno.netlify.app/home). **Full demo:** [/demo/home](https://plus-uno.netlify.app/demo/home) (entry [/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html) frozen). Experiments: [Notion Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c).
 
 ## Quick Start
 

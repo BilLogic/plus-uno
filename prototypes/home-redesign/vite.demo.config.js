@@ -10,11 +10,10 @@ const repoRoot = path.resolve(__dirname, '../..');
 /**
  * Demo Recording Vite config.
  *
- * - Dev (`npm run dev:demo`): served at the root so `/demo.html` works, with a
- *   middleware fallback so BrowserRouter deep links stay on the demo file.
- * - Build (`npm run build:demo`): emitted into the marketplace's `dist/demo/`
- *   as a self-contained sub-app (base `/demo/`), so the deployed marketplace can
- *   link to `/demo/demo.html`. Built after the root app so it isn't wiped.
+ * - Dev (`npm run dev:demo`): base `/` so `/demo.html` works locally.
+ * - Build (`npm run build:demo`): base `/demo/` + Netlify rewrite `/demo/*` → `/demo/demo.html`.
+ *   BrowserRouter basename=`/demo` keeps routes like `/demo/home`, `/demo/sessions`.
+ *   Frozen share URL `/demo/demo.html` redirects in-app to `/demo/home`.
  */
 const demoFallback = () => ({
     name: 'demo-html-spa-fallback',

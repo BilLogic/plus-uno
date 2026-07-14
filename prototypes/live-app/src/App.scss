@@ -1,0 +1,13 @@
+.live-app {
+  min-height: 100vh;
+  background: var(--color-surface-container, #f0f0f5);
+}
+
+.live-app-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: var(--font-family-body, 'Lato', sans-serif);
+  color: var(--color-on-surface-variant, #45464f);
+}
