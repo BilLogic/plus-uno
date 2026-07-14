@@ -1,13 +1,17 @@
 import {
+  CHALLENGE_OPTIONS,
+  DEFAULT_DESIGN_SYSTEM,
   EXECUTE_PHRASE,
-  FIDELITY_OPTIONS,
-  HI_CONFIRM_FIELDS_NO_FIGMA,
-  HI_CONFIRM_FIELDS_WITH_FIGMA,
+  FIDELITY_LEVEL_OPTIONS,
+  HI_CONFIRM_TABLE_ROWS,
+  LOW_FI_OPTIONS,
+  PRD_CHECK_QUESTION,
+  PRD_PASTE_MESSAGE,
   TOOL_LINKS,
 } from './constants.mjs';
 import {
   buildFidelityVerification,
-  mapFidelityOtherAnswer,
+  extractPrdSettings,
 } from './prd-hints.mjs';
 import {
   buildChallengePrompt,
@@ -18,7 +22,6 @@ import {
   isFigJamLink,
   isFigmaDesignLink,
   isNonEmptyText,
-  isPrdDocument,
 } from './validators.mjs';
 
 /**
@@ -36,81 +39,56 @@ import {
 export const STATES = {
   prd_check: {
     id: 'prd_check',
-    question: 'Do you already have a PRD?',
+    question: PRD_CHECK_QUESTION,
     type: 'choice',
     options: ['Yes', 'No'],
-    transition: (value) => (value === 'Yes' ? 'prd_upload' : 'awaiting_prd_synthesize'),
+    transition: (value) => (value === 'Yes' ? 'prd_paste' : 'awaiting_prd_synthesize'),
   },
 
-  prd_upload: {
-    id: 'prd_upload',
-    question: [
-      'Upload or link your PRD (one of):',
-      '- PDF',
-      '- Notion link',
-      '- Google Doc',
-      '- Brief',
-      '- Other documentation',
-    ].join('\n'),
+  prd_paste: {
+    id: 'prd_paste',
+    question: PRD_PASTE_MESSAGE,
     type: 'upload',
-    validate: (value, ctx, attachments) => {
-      if (ctx.pendingPrd && /^(yes|yes, use that prd)$/i.test(value.trim())) return true;
-      return isPrdDocument(value, attachments);
-    },
-    transition: (value, ctx) => {
-      if (ctx.pendingPrd && /^yes/i.test(value.trim())) {
-        return {
-          next: 'fidelity_select',
-          patch: { prd: ctx.pendingPrd, pendingPrd: undefined },
-        };
-      }
-      if (ctx.pendingPrd && /^no/i.test(value.trim())) {
-        return {
-          next: 'prd_upload',
-          patch: { pendingPrd: undefined, prdHints: undefined },
-        };
-      }
-      return 'fidelity_select';
-    },
+    validate: (value, _ctx, attachments) =>
+      isNonEmptyText(value) || (Array.isArray(attachments) && attachments.length > 0),
+    transition: () => 'fidelity_select',
   },
 
   awaiting_prd_synthesize: {
     id: 'awaiting_prd_synthesize',
     question: [
-      'No PRD yet. Run the UNO Synthesize / Notion workflow first:',
-      `- Skill: ${TOOL_LINKS.unoSynthesize}`,
-      '- Create and approve a PRD in Notion, then return here with the PRD link or document.',
+      'No PRD yet — stopping the uno-prototype workflow.',
       '',
-      'Prototype generation cannot continue until a PRD is provided.',
+      'A PRD is required to prototype. Create one first, then start uno-prototype again:',
+      `- UNO Synthesize (in-IDE): ${TOOL_LINKS.unoSynthesize}`,
+      `- uno-bot (in Slack): message ${TOOL_LINKS.unoBot} to synthesize one`,
     ].join('\n'),
     type: 'terminal',
     terminal: true,
-    validate: (value, _ctx, attachments) => isPrdDocument(value, attachments),
-    transition: () => 'fidelity_select',
   },
 
   fidelity_select: {
     id: 'fidelity_select',
     question: 'What fidelity do you want to make?',
     type: 'choice',
-    options: FIDELITY_OPTIONS,
+    options: FIDELITY_LEVEL_OPTIONS,
     transition: (value, ctx) => transitionFidelityChoice(value, ctx),
   },
 
-  fidelity_other: {
-    id: 'fidelity_other',
-    question:
-      'Which fidelity do you want instead? Describe your target (e.g. low / sketch, mid / validate, user flow, data flow, flow variety, high-fi).',
-    type: 'text',
-    validate: (value) => isNonEmptyText(value),
-    transition: (value, ctx) => {
-      const mapped = mapFidelityOtherAnswer(value);
-      if (mapped) return mapped;
-      return {
-        next: 'fidelity_select',
-        patch: { fidelityOtherNote: value.trim(), fidelityVerified: false },
-      };
-    },
+  fidelity_level_pick: {
+    id: 'fidelity_level_pick',
+    question: 'Which fidelity do you want?',
+    type: 'choice',
+    options: FIDELITY_LEVEL_OPTIONS,
+    transition: (value) => transitionFidelityLevel(value),
+  },
+
+  low_fi_working_through: {
+    id: 'low_fi_working_through',
+    question: 'What are you working through?',
+    type: 'choice',
+    options: LOW_FI_OPTIONS,
+    transition: (value) => transitionLowFiChoice(value),
   },
 
   hi_figma_check: {
@@ -120,7 +98,7 @@ export const STATES = {
     options: ['Yes', 'No'],
     transition: (value, ctx) => {
       if (value === 'Yes') return 'hi_figma_link';
-      return startFieldCollection(ctx, HI_CONFIRM_FIELDS_NO_FIGMA);
+      return startConfirmTable(ctx);
     },
   },
 
@@ -128,50 +106,80 @@ export const STATES = {
     id: 'hi_figma_link',
     question: 'Provide the Figma link.',
     type: 'link',
-    validate: (value, ctx) => {
-      if (ctx.pendingFigmaLink && /^yes/i.test(value.trim())) return true;
-      return isFigmaDesignLink(value);
-    },
+    validate: (value) => isFigmaDesignLink(value),
     transition: (value, ctx) => {
-      const link = ctx.pendingFigmaLink && /^yes/i.test(value.trim())
-        ? ctx.pendingFigmaLink
-        : value.trim();
-      const next = startFieldCollection(ctx, HI_CONFIRM_FIELDS_WITH_FIGMA);
-      return { ...next, patch: { ...next.patch, figmaLink: link, pendingFigmaLink: undefined } };
+      const next = startConfirmTable(ctx);
+      return { ...next, patch: { ...next.patch, figmaLink: value.trim() } };
     },
   },
 
-  hi_confirm_collect: {
-    id: 'hi_confirm_collect',
+  hi_confirm_table: {
+    id: 'hi_confirm_table',
+    question: 'Review your project settings before continuing.',
+    type: 'choice',
+    options: ['Confirm and continue', 'Edit project settings'],
+    validate: (value, ctx) => {
+      if (value !== 'Confirm and continue') return true;
+      return allConfirmFieldsPopulated(ctx);
+    },
+    transition: (value, ctx) => {
+      if (value === 'Confirm and continue') {
+        const collected = getConfirmCollected(ctx);
+        return {
+          next: 'invoke_ready',
+          patch: {
+            ...collected,
+            designSystem: DEFAULT_DESIGN_SYSTEM,
+            collected: undefined,
+          },
+        };
+      }
+      return 'hi_settings_edit';
+    },
+  },
+
+  hi_settings_edit: {
+    id: 'hi_settings_edit',
+    question: [
+      'Reply with updated values using these labels (one per line):',
+      'Project name: ...',
+      'Scope: ...',
+      'Fidelity: ...',
+      'Required screens: ...',
+    ].join('\n'),
     type: 'text',
-    question: '',
     validate: (value) => isNonEmptyText(value),
-    transition: (value, ctx) => advanceFieldCollection(value, ctx),
+    transition: (value, ctx) => {
+      const collected = parseSettingsEdit(value, ctx);
+      return { next: 'hi_confirm_table', patch: { collected, ...collected } };
+    },
   },
 
   challenge_question: {
     id: 'challenge_question',
     question: "What's the challenge?",
-    type: 'text',
-    validate: (value) => isNonEmptyText(value),
-    transition: (value) => ({
-      next: 'challenge_tool_select',
-      patch: { challenge: value.trim(), branch: 'challenge' },
-    }),
+    type: 'choice',
+    options: CHALLENGE_OPTIONS,
+    transition: (value) => {
+      if (value === 'Other') {
+        return { next: 'challenge_other' };
+      }
+      return {
+        next: 'challenge_deliver',
+        patch: {
+          branch: 'challenge',
+          challengeTool:
+            value === 'Functional / working UI' ? 'v0_google_ai_studio' : 'claude_figma_stitch',
+        },
+      };
+    },
   },
 
-  challenge_tool_select: {
-    id: 'challenge_tool_select',
-    question: 'Which external tool should the prompt-spec target?',
-    type: 'choice',
-    options: ['Claude Design / Figma Make / Stitch', 'v0 / Google AI Studio'],
-    transition: (value) => ({
-      next: 'challenge_deliver',
-      patch: {
-        challengeTool:
-          value === 'v0 / Google AI Studio' ? 'v0_google_ai_studio' : 'claude_figma_stitch',
-      },
-    }),
+  challenge_other: {
+    id: 'challenge_other',
+    question: "Describe what you're trying to get out of this prototype.",
+    type: 'text',
+    validate: (value) => isNonEmptyText(value),
   },
 
   challenge_deliver: {
@@ -250,59 +258,135 @@ function transitionFidelityChoice(value, ctx) {
       return { next: 'flow_variety_deliver', patch: { fidelity: verification.inferred, branch: 'flow_variety', fidelityVerified: true } };
     }
     if (/no, generate a different fidelity/i.test(value)) {
-      return { next: 'fidelity_other', patch: { fidelityVerified: false } };
+      return { next: 'fidelity_level_pick', patch: { fidelityVerified: false } };
     }
   }
 
-  const map = {
-    'High-fidelity prototype': 'hi_figma_check',
-    'Challenge / Ideation': 'challenge_question',
-    'User Flow': 'user_flow_figjam_link',
-    'Data Flow': 'data_flow_figjam_link',
-    'Flow Variety': 'flow_variety_deliver',
-  };
-  const next = map[value];
-  const patch = { fidelity: value, fidelityVerified: true };
-  if (value === 'High-fidelity prototype') patch.branch = 'high_fidelity';
-  if (value === 'User Flow') patch.branch = 'user_flow';
-  if (value === 'Data Flow') patch.branch = 'data_flow';
-  if (value === 'Flow Variety') patch.branch = 'flow_variety';
-  if (value === 'Challenge / Ideation') patch.branch = 'challenge';
-  return { next, patch };
+  return transitionFidelityLevel(value);
+}
+
+/**
+ * @param {string} value
+ */
+function transitionFidelityLevel(value) {
+  if (value === 'Hi-fi') {
+    return {
+      next: 'hi_figma_check',
+      patch: { fidelity: 'High-fidelity prototype', branch: 'high_fidelity', fidelityVerified: true },
+    };
+  }
+  if (value === 'Mid-fi') {
+    return {
+      next: 'challenge_question',
+      patch: { fidelity: 'Mid-fi', branch: 'challenge', fidelityVerified: true },
+    };
+  }
+  if (value === 'Low-fi') {
+    return {
+      next: 'low_fi_working_through',
+      patch: { fidelity: 'Low-fi', branch: 'low_fidelity', fidelityVerified: true },
+    };
+  }
+  return { next: 'fidelity_level_pick', patch: { fidelityVerified: false } };
+}
+
+/**
+ * @param {string} value
+ */
+function transitionLowFiChoice(value) {
+  if (value === 'User flow & system') {
+    return { next: 'user_flow_figjam_link', patch: { branch: 'user_flow' } };
+  }
+  if (value === 'Data flow') {
+    return { next: 'data_flow_figjam_link', patch: { branch: 'data_flow' } };
+  }
+  if (value === 'Flow variety') {
+    return { next: 'flow_variety_deliver', patch: { branch: 'flow_variety' } };
+  }
+  return { next: 'low_fi_working_through' };
 }
 
 /**
  * @param {Record<string, unknown>} ctx
- * @param {Array<{ key: string; question: string }>} fields
  */
-function startFieldCollection(ctx, fields) {
+function getConfirmCollected(ctx) {
+  const fromCollected = /** @type {Record<string, string>} */ (ctx.collected || {});
   return {
-    next: 'hi_confirm_collect',
-    patch: {
-      confirmFields: fields,
-      fieldIndex: 0,
-      collected: {},
-    },
+    projectName: fromCollected.projectName || /** @type {string} */ (ctx.projectName || ''),
+    scope: fromCollected.scope || /** @type {string} */ (ctx.scope || ''),
+    fidelity: fromCollected.fidelity || /** @type {string} */ (ctx.fidelity || ''),
+    requiredScreens:
+      fromCollected.requiredScreens || /** @type {string} */ (ctx.requiredScreens || ''),
   };
+}
+
+/**
+ * @param {Record<string, unknown>} ctx
+ */
+function allConfirmFieldsPopulated(ctx) {
+  const collected = getConfirmCollected(ctx);
+  return HI_CONFIRM_TABLE_ROWS.every(({ key }) => Boolean(collected[key]?.trim()));
+}
+
+/**
+ * @param {Record<string, unknown>} ctx
+ * @returns {string}
+ */
+export function buildConfirmTable(ctx) {
+  const collected = getConfirmCollected(ctx);
+  const rows = HI_CONFIRM_TABLE_ROWS.map(({ key, label }) => {
+    const value = collected[key]?.trim() || '(not set)';
+    return `| ${label} | ${value} |`;
+  });
+
+  return [
+    '| Field | Value |',
+    '| --- | --- |',
+    ...rows,
+    '',
+    '_Design system: Plus Design System (always applied — not configurable)_',
+  ].join('\n');
 }
 
 /**
  * @param {string} value
  * @param {Record<string, unknown>} ctx
  */
-function advanceFieldCollection(value, ctx) {
-  const fields = /** @type {Array<{ key: string; question: string }>} */ (ctx.confirmFields || []);
-  const index = /** @type {number} */ (ctx.fieldIndex ?? 0);
-  const collected = /** @type {Record<string, string>} */ ({ ...(ctx.collected || {}) });
-  const field = fields[index];
-  if (!field) return 'invoke_ready';
+function parseSettingsEdit(value, ctx) {
+  const updated = getConfirmCollected(ctx);
+  const labelToKey = Object.fromEntries(
+    HI_CONFIRM_TABLE_ROWS.map(({ key, label }) => [label.toLowerCase(), key]),
+  );
 
-  collected[field.key] = value.trim() === 'none' ? '' : value.trim();
-  const nextIndex = index + 1;
-  if (nextIndex >= fields.length) {
-    return { next: 'invoke_ready', patch: { ...collected, collected, fieldIndex: nextIndex } };
+  for (const line of value.split('\n')) {
+    const match = line.match(/^([^:]+):\s*(.+)$/);
+    if (!match) continue;
+    const key = labelToKey[match[1].trim().toLowerCase()];
+    if (key) updated[key] = match[2].trim();
   }
-  return { next: 'hi_confirm_collect', patch: { collected, fieldIndex: nextIndex } };
+
+  return updated;
+}
+
+/**
+ * @param {Record<string, unknown>} ctx
+ */
+function startConfirmTable(ctx) {
+  const fromPrd = extractPrdSettings(/** @type {string} */ (ctx.prd || ''));
+  const collected = {
+    projectName: fromPrd.projectName || '',
+    scope: fromPrd.scope || '',
+    fidelity: /** @type {string} */ (ctx.fidelity || ''),
+    requiredScreens: fromPrd.requiredScreens || '',
+  };
+
+  return {
+    next: 'hi_confirm_table',
+    patch: {
+      collected,
+      designSystem: DEFAULT_DESIGN_SYSTEM,
+    },
+  };
 }
 
 /**
@@ -319,18 +403,10 @@ export function getState(stateId) {
  * @returns {string[] | undefined}
  */
 export function resolveOptions(state, ctx) {
-  if (state.id === 'prd_upload' && ctx.pendingPrd) {
-    return ['Yes, use that PRD', 'No, I will provide a different PRD'];
-  }
-
   if (state.id === 'fidelity_select') {
     const verification = buildFidelityVerification(ctx.prdHints);
     if (verification) return verification.options;
-    return FIDELITY_OPTIONS;
-  }
-
-  if (state.id === 'hi_figma_link' && ctx.pendingFigmaLink) {
-    return ['Yes, use that Figma link', 'No, I will provide a different link'];
+    return FIDELITY_LEVEL_OPTIONS;
   }
 
   return state.options;
@@ -338,13 +414,20 @@ export function resolveOptions(state, ctx) {
 
 /**
  * @param {ConversationState} state
- * @param {Record<string, unknown>} ctx
  * @returns {'choice' | 'text' | 'upload' | 'link' | 'terminal'}
  */
-export function resolveType(state, ctx) {
-  if (state.id === 'prd_upload' && ctx.pendingPrd) return 'choice';
-  if (state.id === 'hi_figma_link' && ctx.pendingFigmaLink) return 'choice';
+export function resolveType(state) {
   return state.type;
+}
+
+/**
+ * @param {Record<string, unknown>} ctx
+ * @param {string} question
+ * @returns {string}
+ */
+function prefixResumedPrd(ctx, question) {
+  if (!ctx.prdResumed) return question;
+  return ['I already have your PRD from this conversation.', '', question].join('\n');
 }
 
 /**
@@ -353,32 +436,24 @@ export function resolveType(state, ctx) {
  * @returns {string}
  */
 export function resolveQuestion(state, ctx) {
-  if (state.id === 'prd_upload' && ctx.pendingPrd) {
-    return 'I see you already shared PRD content in this conversation. Should I use that as your PRD?';
-  }
-
   if (state.id === 'fidelity_select') {
     const verification = buildFidelityVerification(ctx.prdHints);
-    if (verification) return verification.question;
-    return state.question;
-  }
-
-  if (state.id === 'hi_figma_check' && ctx.prdHints?.mentionsFigma) {
-    return 'I see your PRD references Figma. Do you already have a Figma file you want to build upon?';
-  }
-
-  if (state.id === 'hi_figma_link' && ctx.pendingFigmaLink) {
-    return `I found this Figma link in your PRD:\n${ctx.pendingFigmaLink}\n\nUse this link?`;
-  }
-
-  if (state.id === 'hi_confirm_collect') {
-    const fields = /** @type {Array<{ key: string; question: string }>} */ (ctx.confirmFields || []);
-    const index = /** @type {number} */ (ctx.fieldIndex ?? 0);
-    const field = fields[index];
-    if (field?.key === 'fidelity' && ctx.fidelity) {
-      return `${field.question} (You selected: ${ctx.fidelity})`;
+    if (verification) {
+      return prefixResumedPrd(ctx, verification.question);
     }
-    return field?.question || 'Confirm project settings.';
+    return prefixResumedPrd(ctx, state.question);
+  }
+
+  if (state.id === 'hi_confirm_table') {
+    return [
+      'Review your project settings before continuing.',
+      '',
+      buildConfirmTable(ctx),
+    ].join('\n');
+  }
+
+  if (state.id === 'hi_settings_edit') {
+    return state.question;
   }
 
   if (state.id === 'challenge_deliver') {
@@ -417,7 +492,7 @@ export function formatQuestionMessage(state, ctx) {
     lines.push('');
   }
 
-  if (state.id === 'fidelity_other') {
+  if (state.id === 'challenge_other') {
     lines.push('(Type your answer in the text box.)', '');
   }
 

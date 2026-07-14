@@ -8,6 +8,7 @@
     }
   },
   "uno": {
-    "prdGate": true
+    "prdGate": true,
+    "writebackGate": true
   }
 }

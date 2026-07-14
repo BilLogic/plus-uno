@@ -5,43 +5,47 @@ import { TOOL_LINKS } from './constants.mjs';
  * @returns {string}
  */
 export function buildChallengePrompt(context) {
-  const challenge = context.challenge || '(not provided)';
   const useV0 = context.challengeTool === 'v0_google_ai_studio';
 
-  const toolSection = useV0
-    ? [
-        '## Recommended tools',
-        `- v0: ${TOOL_LINKS.v0}`,
-        `- Google AI Studio: ${TOOL_LINKS.googleAiStudio}`,
-      ]
-    : [
-        '## Recommended tools',
-        `- Claude Design: ${TOOL_LINKS.claudeDesign}`,
-        `- FigJam Make: ${TOOL_LINKS.figjamMake}`,
-        `- Stitch: ${TOOL_LINKS.stitch}`,
-      ];
+  if (useV0) {
+    return [
+      '# Prompt-spec: functional / working UI',
+      '',
+      '## Recommended tools',
+      `- v0: ${TOOL_LINKS.v0}`,
+      `- Google AI Studio: ${TOOL_LINKS.googleAiStudio}`,
+      '',
+      '## Prompt to paste into your chosen tool',
+      '```',
+      'You are helping me build a functional, working UI for the PLUS tutoring platform.',
+      '',
+      'Produce an interactive prototype a user can actually click through.',
+      'Focus on real components, working states, and end-to-end interactions for the core flow.',
+      'Do not invent production requirements beyond what is stated in my brief.',
+      '```',
+      '',
+      'The coding agent does not generate this artifact. Carry the prompt above to v0 or Google AI Studio.',
+    ].join('\n');
+  }
 
   return [
-    '# Challenge / Ideation prompt-spec',
+    '# Prompt-spec: validate layout & interaction',
     '',
-    '## Challenge',
-    challenge,
-    '',
-    ...toolSection,
+    '## Recommended tools',
+    `- Claude Design: ${TOOL_LINKS.claudeDesign}`,
+    `- Figma Make: ${TOOL_LINKS.figjamMake}`,
+    `- Stitch: ${TOOL_LINKS.stitch}`,
     '',
     '## Prompt to paste into your chosen tool',
     '```',
-    `You are helping me explore and validate a product challenge for PLUS tutoring platform.`,
-    ``,
-    `Challenge:`,
-    challenge,
-    ``,
-    `Produce an interactive exploration that helps us test assumptions, compare directions, and identify what needs proving before we commit to a hi-fi build.`,
-    `Include: problem framing, 2-3 divergent directions, key risks, and what evidence would de-risk each direction.`,
-    `Do not invent production requirements beyond what is stated above.`,
+    'You are helping me validate the layout and interaction of a screen for the PLUS tutoring platform.',
+    '',
+    'Produce a visual exploration that lets us test layout, hierarchy, and interaction patterns.',
+    'Show 2-3 divergent directions and call out the key layout / interaction decisions in each.',
+    'Do not invent production requirements beyond what is stated in my brief.',
     '```',
     '',
-    'The coding agent does not generate this artifact. Carry the prompt above to an external tool.',
+    'The coding agent does not generate this artifact. Carry the prompt above to Claude Design, Figma Make, or Stitch.',
   ].join('\n');
 }
 

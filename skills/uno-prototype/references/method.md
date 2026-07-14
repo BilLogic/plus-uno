@@ -33,23 +33,27 @@ scoped by `conversation_id`); the skill body enforces it again on load.
 
 **IDE hook behavior:** when prototype intent is detected, the hook runs a finite-state
 workflow (PRD check → PRD upload/verify → fidelity branch [verification if PRD
-hints] → branch-specific inputs → hi-fi confirm / tool select) and blocks each message
+hints] → branch-specific inputs → hi-fi settings table confirm / tool select) and blocks each message
 until the current step is satisfied. **No step may be skipped** — PRD hints only
 rephrase the current step as verification (e.g. high-fi in PRD → “generate high-fi?”).
+Hi-fi confirmation shows a **single verification table** (project name, scope,
+fidelity, required screens) prefilled from the PRD; Plus Design System is always
+applied and is never asked.
 
 **Agent rendering contract (intake):** the coding agent displays hook content
 **one question per message** — never batches PRD, fidelity, Figma, or later steps
 into a single AskQuestion call or reply. When
 `.cursor/hooks/briefings/active-intake-question.json` exists, the agent reads only
 that file's current `stateId` and `question`; choice steps use AskQuestion with
-`questions.length === 1`. Skipping a step because the user already answered in an
+`questions.length === 1`; hi-fi confirm uses `type: confirmation_table` with one
+AskQuestion for confirm/edit. Skipping a step because the user already answered in an
 earlier message, attached a PRD, or named fidelity/Figma in the same turn is
 forbidden — the FSM still asks that step for explicit verification.
 
 To exit without invoking uno-prototype, say
 `skip PRD upload` or `terminate this process`. That releases the workflow but does not grant a PRD bypass
-inside the skill. When hi-fi / FigJam invoke branches complete, send `uno-prototype:execute`
-to hand off to the coding agent; the briefing is written to
+inside the skill. After hi-fi settings are confirmed, the hook stops intercepting;
+send `uno-prototype:execute` when ready to build. The briefing is written to
 `.cursor/hooks/briefings/active-prototype-briefing.md`. Disable the gate for local testing:
 `"uno": { "prdGate": false }` in `.cursor/settings.json`.
 

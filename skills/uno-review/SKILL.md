@@ -40,6 +40,7 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
    - Stage-lens / handoff gate → summon **reviewers/ds-lens + reviewers/uno-lens + reviewers/a11y-lens in parallel**, each with the artifact + manifest. Each stays in-lane at the manifest's depth — no token nits on low-fi work.
    - Design QA → summon **reviewers/design-qa** with the Roadmap card; it resolves RM-ID → `[spec]` Figma file and walks the QA build against it with the Design QA checklist.
 4. **Coded artifacts:** run `bash skills/uno-review/scripts/run-review-checks.sh <dir>` and hand the hits to ds-lens as evidence (patterns: `references/catch-patterns.md`).
+4b. **Figma write-back artifacts:** run `npm run validate:figma-writeback` + `npm run audit:figma-writeback` on the playground manifest; fail the review if either fails.
 5. **Merge findings** — dedupe cross-lens overlaps, keep each finding's severity · lens · evidence · reference · re-entry point (method.md § Findings & severity).
 6. **Verdict** per method.md § Verdict & re-entry: `Issues? = Yes` only at severity major+; minors travel as advisory; Design QA blockers hold `Ready for Prod`.
 7. **Log the run** — summon **reviewers/rubric-applier** with `docs/evals/rubrics/uno-review.md`; it scores the dimensions and appends the eval-run entry. Golden scenarios this skill must pass: `docs/evals/scenarios/uno-review.md`.

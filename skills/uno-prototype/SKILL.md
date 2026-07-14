@@ -70,7 +70,12 @@ When `.cursor/hooks/briefings/active-intake-question.json` exists, you are in
 2. **One question per message — no exceptions.** Ask exactly one hook step per
    reply. If `type` is `choice`, call **AskQuestion** with a `questions` array
    of length **1** — that single prompt and its options from the JSON file.
-   If `type` is not `choice`, ask exactly that one question in plain text.
+   If `type` is `confirmation_table`, show the `table` field as a markdown
+   table plus one AskQuestion for confirm/edit — never ask project name, scope,
+   fidelity, or required screens one-by-one. Plus Design System is always
+   applied; never ask which design system to use.
+   If `type` is not `choice` or `confirmation_table`, ask exactly that one
+   question in plain text.
 3. **Never skip a step — no exceptions.** Even when the PRD, the user's first
    message, or conversation history already states fidelity, Figma, scope, or
    deliverables, you still ask the matching FSM step as a **verification**
@@ -79,9 +84,26 @@ When `.cursor/hooks/briefings/active-intake-question.json` exists, you are in
 4. **Forbidden during intake:** batching multiple hook steps into one
    AskQuestion call; listing PRD + fidelity + Figma together; loading
    `method.md`; grounding; building; tables of later steps; or any preview of
-   steps the JSON file does not name.
-5. Intake ends when the file is removed and the user sends `uno-prototype:execute`
-   (read `active-prototype-briefing.md` then).
+   steps the JSON file does not name. (The hi-fi **confirmation table** is the
+   one exception — it summarizes four collected fields in a single step.)
+5. Intake ends when the user confirms the hi-fi settings table (or completes
+   other terminal branches). The hook clears `active-intake-question.json` and
+   stops intercepting. Send `uno-prototype:execute` when ready to build (read
+   `active-prototype-briefing.md` first).
+
+**Strict gate vs flexible conversation:** The hook only enforces the flow for
+PRD upload, fidelity selection, Figma link, and the hi-fi confirmation table
+(`STRICT_GATE_STATE_IDS` in `.cursor/hooks/uno-prototype/constants.mjs`).
+Mid/low-fi branch steps (challenge question, FigJam link, etc.) are optional —
+off-topic replies pass through to normal agent conversation without blocking.
+Terminal branches (mid-fi prompt-spec delivery) also never block follow-up
+messages.
+
+**PRD reuse within a conversation:** After a PRD is pasted once, the hook
+caches it for that conversation. Follow-up requests to switch fidelity (or
+start another prototype pass for the same project) resume at fidelity selection
+— PRD check and paste are skipped. Say **upload a new PRD** to clear the cache
+and start fresh.
 
 If intake JSON is absent and the user did not send `uno-prototype:execute`, do
 **not** improvise the workflow or batch-ask PRD/fidelity/Figma yourself — tell

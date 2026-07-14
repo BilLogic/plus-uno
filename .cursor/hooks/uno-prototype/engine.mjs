@@ -1,9 +1,10 @@
-import { GLOBAL_COMMANDS, EXECUTE_PHRASE } from './constants.mjs';
+import { GLOBAL_COMMANDS, EXECUTE_PHRASE, STRICT_GATE_STATE_IDS } from './constants.mjs';
 import {
   hasPrototypeIntent,
+  hasFidelitySwitchIntent,
+  hasNewPrdIntent,
   isBypassRequest,
   isExecuteRequest,
-  hasPrdSignal,
 } from './intents.mjs';
 import { extractPrdHints } from './prd-hints.mjs';
 import {
@@ -21,11 +22,14 @@ import {
 } from './intake-question.mjs';
 import {
   clearBriefing,
+  clearPrdCache,
   clearSession,
   isPrdGateEnabled,
+  loadPrdCache,
   loadSession,
   readBriefing,
   resolveRepoRoot,
+  savePrdCache,
   saveSession,
   writeBriefing,
 } from './storage.mjs';
@@ -56,22 +60,43 @@ function result(continueSubmit, userMessage, agentMessage) {
 }
 
 /**
- * @param {string} [initialPrompt]
+ * @param {string} stateId
+ * @returns {boolean}
+ */
+function isStrictGateState(stateId) {
+  return STRICT_GATE_STATE_IDS.has(stateId);
+}
+
+/**
+ * @param {string} conversationId
+ */
+function releaseSession(conversationId) {
+  clearIntakeQuestion();
+  clearSession(conversationId);
+}
+
+/**
+ * @param {Record<string, unknown>} [cachedPrd]
  * @returns {{ stateId: string; history: string[]; context: Record<string, unknown>; status: 'active' }}
  */
-function createSession(initialPrompt = '') {
-  /** @type {Record<string, unknown>} */
-  const context = {};
-
-  if (initialPrompt && hasPrdSignal(initialPrompt)) {
-    context.pendingPrd = initialPrompt.trim();
-    context.prdHints = extractPrdHints(initialPrompt);
+function createSession(cachedPrd = null) {
+  if (cachedPrd?.prd) {
+    return {
+      stateId: 'fidelity_select',
+      history: ['fidelity_select'],
+      context: {
+        prd: cachedPrd.prd,
+        prdHints: cachedPrd.prdHints || extractPrdHints(/** @type {string} */ (cachedPrd.prd)),
+        prdResumed: true,
+      },
+      status: 'active',
+    };
   }
 
   return {
     stateId: 'prd_check',
     history: ['prd_check'],
-    context,
+    context: {},
     status: 'active',
   };
 }
@@ -91,17 +116,12 @@ function transitionSession(session, nextStateId, patch = {}) {
 /**
  * @param {Record<string, unknown>} context
  * @param {string} prdText
+ * @param {string} conversationId
  */
-function storePrdContext(context, prdText) {
+function storePrdContext(context, prdText, conversationId) {
   context.prd = prdText;
   context.prdHints = extractPrdHints(prdText);
-
-  const designLinks = /** @type {string[]} */ (context.prdHints?.figmaLinks || []).filter((link) =>
-    /figma\.com\/(design|file)/i.test(link),
-  );
-  if (designLinks.length > 0) {
-    context.pendingFigmaLink = designLinks[0];
-  }
+  savePrdCache(conversationId, { prd: prdText, prdHints: context.prdHints });
 }
 
 /**
@@ -127,6 +147,19 @@ function prepareInvoke(conversationId, session) {
 }
 
 /**
+ * @param {import('./states.mjs').ConversationState} state
+ * @param {Record<string, unknown>} context
+ * @returns {string}
+ */
+function terminalAgentMessage(state, context) {
+  return [
+    formatQuestionMessage(state, context),
+    '',
+    'Workflow complete. Continue the conversation normally — the hook will no longer intercept.',
+  ].join('\n');
+}
+
+/**
  * @param {HookInput} input
  * @returns {{ continue: boolean; user_message?: string }}
  */
@@ -147,15 +180,30 @@ export function handleSubmit(input) {
     return result(true);
   }
 
+  if (hasNewPrdIntent(prompt)) {
+    clearPrdCache(conversationId);
+    clearBriefing(conversationId);
+    clearSession(conversationId);
+    const fresh = createSession();
+    saveSession(conversationId, fresh);
+    return presentState(conversationId, fresh);
+  }
+
+  const cachedPrd = loadPrdCache(conversationId);
+  const wantsReentry =
+    hasFidelitySwitchIntent(prompt) || (hasPrototypeIntent(prompt) && Boolean(cachedPrd));
+
   const session = loadSession(conversationId);
 
   if (isExecuteRequest(prompt)) {
-    if (session?.status === 'awaiting_execute' && readBriefing(conversationId)) {
+    if (readBriefing(conversationId)) {
       clearSession(conversationId);
+      clearIntakeQuestion();
       return result(true);
     }
     return result(
-      false,
+      true,
+      undefined,
       [
         'No completed uno-prototype workflow is waiting for execution.',
         'Start a prototype workflow first, or say "terminate this process" to exit.',
@@ -163,13 +211,27 @@ export function handleSubmit(input) {
     );
   }
 
+  if (session?.status === 'awaiting_execute') {
+    return result(true);
+  }
+
   if (session?.status === 'active' || session?.status === 'awaiting_execute') {
     return handleActiveSession(conversationId, session, prompt, attachments);
   }
 
+  if (wantsReentry && cachedPrd) {
+    const resumed = createSession(cachedPrd);
+    saveSession(conversationId, resumed);
+    return presentState(conversationId, resumed);
+  }
+
+  if (hasFidelitySwitchIntent(prompt) && !cachedPrd) {
+    return result(true);
+  }
+
   if (!hasPrototypeIntent(prompt)) return result(true);
 
-  const newSession = createSession(prompt);
+  const newSession = createSession();
   saveSession(conversationId, newSession);
   return presentState(conversationId, newSession);
 }
@@ -181,15 +243,36 @@ export function handleSubmit(input) {
  * @param {Array<{ type?: string; file_path?: string }>} attachments
  */
 function handleActiveSession(conversationId, session, prompt, attachments) {
+  if (hasFidelitySwitchIntent(prompt)) {
+    const atFidelityStep =
+      session.stateId === 'fidelity_select' || session.stateId === 'fidelity_level_pick';
+    if (!atFidelityStep) {
+      const cached = loadPrdCache(conversationId) || (session.context?.prd ? {
+        prd: session.context.prd,
+        prdHints: session.context.prdHints,
+      } : null);
+      if (cached) {
+        const resumed = createSession(cached);
+        saveSession(conversationId, resumed);
+        return presentState(conversationId, resumed);
+      }
+    }
+  }
+
   if (GLOBAL_COMMANDS.restart.test(prompt)) {
-    const restarted = createSession();
+    const cached = loadPrdCache(conversationId);
+    const restarted = createSession(cached);
     saveSession(conversationId, restarted);
     return presentState(conversationId, restarted);
   }
 
   if (GLOBAL_COMMANDS.back.test(prompt)) {
     if (!goBack(session)) {
-      return result(false, 'Already at the first step. Say "restart" to begin again.');
+      return result(
+        true,
+        undefined,
+        'Already at the first step. Say "restart" to begin again.',
+      );
     }
     saveSession(conversationId, session);
     return presentState(conversationId, session);
@@ -201,44 +284,12 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
     return result(true);
   }
 
-  if (session.status === 'awaiting_execute') {
-    return result(
-      false,
-      [
-        'Workflow inputs are complete.',
-        `Send \`${EXECUTE_PHRASE}\` to invoke the coding agent.`,
-        'To exit without invoking uno-prototype: say "terminate this process".',
-      ].join('\n'),
-    );
+  if (state.terminal) {
+    releaseSession(conversationId);
+    return result(true);
   }
 
-  if (state.id === 'awaiting_prd_synthesize' && hasPrdSignal(prompt, attachments)) {
-    storePrdContext(session.context, prompt.trim());
-    transitionSession(session, 'fidelity_select');
-    saveSession(conversationId, session);
-    return presentState(conversationId, session);
-  }
-
-  if (state.id === 'awaiting_prd_synthesize') {
-    return presentState(conversationId, session);
-  }
-
-  if (state.terminal && state.id !== 'awaiting_prd_synthesize') {
-    if (state.id === 'challenge_deliver' || state.id === 'flow_variety_deliver') {
-      clearIntakeQuestion();
-      clearSession(conversationId);
-      return result(
-        false,
-        [
-          formatQuestionMessage(state, session.context),
-          '',
-          'Workflow complete. The coding agent does not generate this artifact.',
-          'Say "terminate this process" or start a new message without prototype intent to continue.',
-        ].join('\n'),
-      );
-    }
-  }
-
+  const strict = isStrictGateState(state.id);
   const effectiveType = resolveType(state, session.context);
   const options = resolveOptions(state, session.context);
 
@@ -246,6 +297,10 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
   if (effectiveType === 'choice' && options) {
     const choice = parseChoice(prompt, options);
     if (!choice) {
+      if (!strict) {
+        releaseSession(conversationId);
+        return result(true);
+      }
       writeIntakeQuestion(conversationId, session, state);
       saveSession(conversationId, session);
       return result(
@@ -257,13 +312,11 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
     answer = choice;
   }
 
-  if (state.id === 'hi_figma_link' && session.context.pendingFigmaLink && /^no/i.test(answer)) {
-    transitionSession(session, 'hi_figma_link', { pendingFigmaLink: undefined });
-    saveSession(conversationId, session);
-    return presentState(conversationId, session);
-  }
-
   if (state.validate && !state.validate(answer, session.context, attachments)) {
+    if (!strict) {
+      releaseSession(conversationId);
+      return result(true);
+    }
     writeIntakeQuestion(conversationId, session, state);
     saveSession(conversationId, session);
     return result(
@@ -273,14 +326,16 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
     );
   }
 
-  if (state.id === 'prd_upload') {
-    if (session.context.pendingPrd && /^yes/i.test(answer)) {
-      storePrdContext(session.context, session.context.pendingPrd);
-      session.context.pendingPrd = undefined;
-    } else if (!session.context.pendingPrd || !/^yes/i.test(answer)) {
-      storePrdContext(session.context, answer);
-      session.context.pendingPrd = undefined;
-    }
+  if (state.id === 'challenge_other') {
+    session.context.challengeOtherNote = answer.trim();
+    session.context.challengeTool = 'custom';
+    session.context.branch = 'challenge';
+    releaseSession(conversationId);
+    return result(true);
+  }
+
+  if (state.id === 'prd_paste') {
+    storePrdContext(session.context, answer, conversationId);
   }
 
   if (!state.transition) {
@@ -306,23 +361,30 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
     return result(true);
   }
 
+  if (nextStateId === 'awaiting_prd_synthesize') {
+    releaseSession(conversationId);
+    return result(true, undefined, nextState.question);
+  }
+
   if (nextStateId === 'invoke_ready') {
     prepareInvoke(conversationId, session);
-    return presentState(conversationId, session);
+    clearSession(conversationId);
+    clearIntakeQuestion();
+    return result(
+      true,
+      undefined,
+      [
+        'Prototype briefing confirmed.',
+        `Send \`${EXECUTE_PHRASE}\` when you are ready to start the build, or continue in chat.`,
+        'The hook will not intercept further messages until you start a new prototype workflow.',
+      ].join(' '),
+    );
   }
 
   if (nextState.terminal && (nextStateId === 'challenge_deliver' || nextStateId === 'flow_variety_deliver')) {
-    clearIntakeQuestion();
-    saveSession(conversationId, session);
-    return result(
-      false,
-      [
-        formatQuestionMessage(nextState, session.context),
-        '',
-        'Workflow complete. The coding agent does not generate this artifact.',
-        'Say "terminate this process" to exit the workflow.',
-      ].join('\n'),
-    );
+    const agentMessage = terminalAgentMessage(nextState, session.context);
+    releaseSession(conversationId);
+    return result(true, undefined, agentMessage);
   }
 
   saveSession(conversationId, session);
@@ -344,8 +406,9 @@ function presentState(conversationId, session) {
   saveSession(conversationId, session);
 
   if (state.terminal) {
-    clearIntakeQuestion();
-    return result(false, formatQuestionMessage(state, session.context));
+    const agentMessage = terminalAgentMessage(state, session.context);
+    releaseSession(conversationId);
+    return result(true, undefined, agentMessage);
   }
 
   writeIntakeQuestion(conversationId, session, state);

@@ -36,11 +36,11 @@
 - **Fails if:** it re-does the full grounding ritual on every loop (waste) or skips re-grounding when the PRD actually changed
 
 ## S6 — intake: one question per turn
-- **Trigger:** `active-intake-question.json` exists at `prd_check` (or any FSM state) after the user says "prototype this"
+- **Trigger:** `active-intake-question.json` exists at a choice FSM state (e.g. `fidelity_select`) after the user says "prototype this" and shares a PRD
 - **Expected:** agent reads the JSON file and asks **exactly one** hook step this message — AskQuestion with `questions.length === 1`, or one plain-text question
 - **Fails if:** it batches PRD + fidelity + Figma (or any later steps) into one AskQuestion call · it lists a multi-step intake checklist · it improvises the full workflow when the JSON file is present
 
 ## S7 — intake: never skip a step
 - **Trigger:** user starts with inline PRD that already states high-fidelity, Figma link, and scope (e.g. "prototype this student dashboard" + deliverables in the same message)
-- **Expected:** hook still starts at `prd_check`; agent still asks each FSM step in order — verification wording when PRD hints exist, but **no auto-advance** past unanswered steps
-- **Fails if:** it skips `prd_check` or `fidelity_select` because the PRD already answers them · it starts grounding or building before intake JSON is cleared and `uno-prototype:execute` is sent
+- **Expected:** hook still starts at the PRD check choice (`prd_check`, AskQuestion); agent still asks each later FSM step in order — verification wording when PRD hints exist, but **no auto-advance** past unanswered steps
+- **Fails if:** it skips the PRD check or `fidelity_select` because the PRD already answers them · it starts grounding or building before intake JSON is cleared and `uno-prototype:execute` is sent

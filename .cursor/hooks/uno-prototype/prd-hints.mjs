@@ -110,3 +110,39 @@ export function mapFidelityOtherAnswer(value) {
 
   return null;
 }
+
+/**
+ * Best-effort extraction of hi-fi confirm fields from PRD text for the verification table.
+ * @param {string} text
+ * @returns {{ projectName?: string; scope?: string; requiredScreens?: string }}
+ */
+export function extractPrdSettings(text) {
+  if (!text || typeof text !== 'string') return {};
+
+  /** @type {{ projectName?: string; scope?: string; requiredScreens?: string }} */
+  const out = {};
+
+  const prdTitle = text.match(/^PRD:\s*(.+)$/im);
+  if (prdTitle) out.projectName = prdTitle[1].trim();
+
+  if (!out.projectName) {
+    const heading = text.match(/^#\s+(.+)$/m);
+    if (heading) out.projectName = heading[1].trim();
+  }
+
+  const scopeMatch = text.match(
+    /(?:^|\n)(?:scope|goal|overview|summary)[:\s]+([^\n]+(?:\n(?![#*\n-])[^\n]+)*)/i,
+  );
+  if (scopeMatch) {
+    out.scope = scopeMatch[1].trim().replace(/\s+/g, ' ');
+  }
+
+  const screenMatch = text.match(
+    /(?:core screen|required screen|screen[s]?|deliverable[s]?)[:\s]+([^\n]+)/i,
+  );
+  if (screenMatch) {
+    out.requiredScreens = screenMatch[1].trim();
+  }
+
+  return out;
+}

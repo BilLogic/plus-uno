@@ -7,22 +7,25 @@ export function isNonEmptyText(value) {
 }
 
 /**
+ * True when the user says they have no PRD yet (guided exit to uno-synthesize).
+ * Anchored to the whole message so a pasted PRD is never misread as "no".
+ * @param {string} value
+ * @returns {boolean}
+ */
+export function isNoPrdAnswer(value) {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim().toLowerCase().replace(/[.!]+$/, '');
+  return /^(no|nope|no prd|no,? i don'?t|i don'?t have (a |the )?prd|don'?t have (a |the )?prd|not yet)$/.test(
+    trimmed,
+  );
+}
+
+/**
  * @param {string} value
  * @returns {boolean}
  */
 export function isHttpLink(value) {
   return /^https?:\/\/\S+/i.test(value.trim());
-}
-
-/**
- * @param {string} value
- * @param {Array<{ type?: string; file_path?: string }>} [attachments]
- * @returns {boolean}
- */
-export function isUploadOrLink(value, attachments = []) {
-  if (isHttpLink(value)) return true;
-  if (/\.(pdf|md|docx?)$/i.test(value.trim())) return true;
-  return attachments.some((a) => a?.type === 'file' && a?.file_path);
 }
 
 /**
@@ -44,44 +47,6 @@ export function isFigmaDesignLink(value) {
 }
 
 /**
- * @param {string} value
- * @param {Array<{ type?: string; file_path?: string }>} [attachments]
- * @returns {boolean}
- */
-export function isPrdDocument(value, attachments = []) {
-  const v = value.trim();
-  if (isUploadOrLink(v, attachments)) {
-    if (/notion\.(so|site)/i.test(v)) return true;
-    if (/docs\.google\.com/i.test(v)) return true;
-    if (/\.(pdf|md)$/i.test(v)) return true;
-    if (attachments.length > 0) return true;
-  }
-  return hasInlinePrdSections(v);
-}
-
-/**
- * @param {string} text
- * @returns {boolean}
- */
-export function hasInlinePrdSections(text) {
-  const lower = text.toLowerCase();
-  const patterns = [
-    /acceptance criteria/,
-    /user flows?/,
-    /out of scope/,
-    /#+ prd/,
-    /## (scope|requirements)/,
-    /success metrics/,
-    /open questions/,
-  ];
-  let markers = 0;
-  for (const pattern of patterns) {
-    if (pattern.test(lower)) markers += 1;
-  }
-  return markers >= 2;
-}
-
-/**
  * @param {string} input
  * @param {string[]} options
  * @returns {string | null}
@@ -97,8 +62,10 @@ export function parseChoice(input, options) {
 
   const lower = trimmed.toLowerCase();
   for (const option of options) {
-    if (option.toLowerCase() === lower) return option;
-    if (lower.includes(option.toLowerCase())) return option;
+    const optLower = option.toLowerCase();
+    if (optLower === lower) return option;
+    // Substring match only for distinctive multi-word options (avoids "other" ⊂ "another").
+    if (optLower.length >= 8 && lower.includes(optLower)) return option;
   }
 
   return null;

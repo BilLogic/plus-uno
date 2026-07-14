@@ -1,0 +1,184 @@
+// Local workaround until DS PR #61 (PageLayout height:100% clip fix) merges.
+// PageLayout's inline height:100% on the content-wrapper/main mis-resolves
+// against its flex track at short viewports, so the layer grows past the shell
+// and the bottom actions get clipped by the shell's overflow:hidden. Once #61
+// lands this block can be deleted (route removal through uno-prototype).
+.plus-page-content-wrapper,
+.plus-page-main {
+    height: auto !important;
+}
+
+.cf {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-section-gap-md);
+    width: 100%;
+    flex-shrink: 0;
+
+    &__shell {
+        width: min(760px, 100%);
+        margin-inline: auto;
+    }
+
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-sm);
+    }
+
+    &__header-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--size-element-gap-md);
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface);
+    }
+
+    &__lede {
+        margin: 0;
+        color: var(--color-on-surface-variant);
+    }
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--size-element-gap-sm);
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--size-element-gap-md);
+        justify-content: flex-end;
+
+        &--single {
+            justify-content: flex-start;
+        }
+    }
+}
+
+.cf-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-on-surface-variant);
+
+    &__step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        border-radius: 50%;
+        background-color: var(--color-primary-state-08);
+        color: var(--color-primary);
+        font-weight: 700;
+    }
+}
+
+.cf-note-intro {
+    margin: 0 0 var(--size-element-gap-md);
+    color: var(--color-on-surface-variant);
+}
+
+.cf-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cf-note {
+    display: flex;
+    gap: var(--size-element-gap-md);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--color-surface-container-low);
+    border-inline-start: var(--size-element-stroke-lg, 3px) solid var(--color-primary);
+
+    &--strength {
+        border-inline-start-color: var(--color-success);
+        background-color: var(--color-success-state-08);
+    }
+
+    &--pattern {
+        border-inline-start-color: var(--color-primary);
+        background-color: var(--color-primary-state-08);
+    }
+
+    &--growth {
+        border-inline-start-color: var(--color-warning);
+        background-color: var(--color-warning-state-08);
+    }
+
+    &__icon {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 2rem;
+        block-size: 2rem;
+        border-radius: 50%;
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 0;
+    }
+
+    &__eyebrow {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-on-surface-variant);
+    }
+
+    &__title {
+        margin: 0;
+        color: var(--color-on-surface);
+    }
+
+    &__text {
+        margin: 0;
+        color: var(--color-on-surface);
+    }
+}
+
+.cf-recap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md);
+    margin: 0;
+
+    &__row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    &__label {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--color-on-surface-variant);
+    }
+
+    &__value {
+        margin: 0;
+        color: var(--color-on-surface);
+    }
+}

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-06-21",
+  "generatedAt": "2026-07-11",
   "playground": "playground/test-2",
   "localPreview": "npm run dev:test-2 (http://localhost:3025/)",
   "description": "Coaching dashboard — more complex multi-section roundtrip (header + 3-card stats row + 2-column form/alerts grid + footer).",

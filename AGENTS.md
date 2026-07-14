@@ -101,6 +101,7 @@ Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `siz
 16. Never write to a Notion surface outside the allowlist in `docs/conventions/notion.md`, and never create new select options, pillars, features, or OKRs there.
 17. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
 18. **uno-prototype intake is one step per message**: When `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly one hook step — AskQuestion with `questions.length === 1` or one plain question. Never batch PRD/fidelity/Figma into one turn; never skip a step because context already answers it.
+19. **Figma write-back uses the DS gate — never screenshot import as the final frame**: When `.cursor/hooks/briefings/active-writeback-gate.json` exists, follow it. Place library component instances per `design-system/figma/component-alignment.md` using `component-registry.json` + `token-registry.json`. **Forbidden:** `generate_figma_design` / html-to-design capture as the `[replica]` deliverable (reference-only if used at all). Complete `npm run validate:figma-writeback` + `npm run audit:figma-writeback` before `writeback:audit-passed`.
 
 ## Knowledge
 
@@ -134,7 +135,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
 | Implementation setup (aliases, playground, Vite) | `design-system/docs/setup.md` |
 | Design philosophy / agent role | `design-system/docs/guidelines.md` |
-| Figma link, implement-design, or design-to-code mapping | `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` (MANDATORY — load first); then `skills/uno-prototype/references/figma-registry-mandatory-load.md` + `figma-mcp-guide.md` |
+| Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/conventions/*.md` |
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |

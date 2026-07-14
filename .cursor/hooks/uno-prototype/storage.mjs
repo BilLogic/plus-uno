@@ -5,6 +5,7 @@ import { clearIntakeQuestion } from './intake-question.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = path.join(__dirname, '..', 'state');
+const PRD_CACHE_DIR = path.join(STATE_DIR, 'prd-cache');
 const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
 
 /**
@@ -18,7 +19,17 @@ const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
 
 function ensureDirs() {
   fs.mkdirSync(STATE_DIR, { recursive: true });
+  fs.mkdirSync(PRD_CACHE_DIR, { recursive: true });
   fs.mkdirSync(BRIEFING_DIR, { recursive: true });
+}
+
+/**
+ * @param {string} conversationId
+ * @returns {string}
+ */
+function prdCachePath(conversationId) {
+  const safe = conversationId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  return path.join(PRD_CACHE_DIR, `${safe}.json`);
 }
 
 /**
@@ -98,6 +109,54 @@ export function readBriefing(conversationId) {
  */
 export function clearBriefing(conversationId) {
   const file = briefingPath(conversationId);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+}
+
+/**
+ * @typedef {object} PrdCacheEntry
+ * @property {string} prd
+ * @property {Record<string, unknown>} prdHints
+ * @property {string} updatedAt
+ */
+
+/**
+ * @param {string} conversationId
+ * @param {{ prd: string; prdHints?: Record<string, unknown> }} entry
+ */
+export function savePrdCache(conversationId, entry) {
+  ensureDirs();
+  if (!entry?.prd?.trim()) return;
+  /** @type {PrdCacheEntry} */
+  const payload = {
+    prd: entry.prd.trim(),
+    prdHints: entry.prdHints || {},
+    updatedAt: new Date().toISOString(),
+  };
+  fs.writeFileSync(prdCachePath(conversationId), JSON.stringify(payload, null, 2));
+}
+
+/**
+ * @param {string} conversationId
+ * @returns {PrdCacheEntry | null}
+ */
+export function loadPrdCache(conversationId) {
+  ensureDirs();
+  const file = prdCachePath(conversationId);
+  if (!fs.existsSync(file)) return null;
+  try {
+    const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (!parsed?.prd?.trim()) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @param {string} conversationId
+ */
+export function clearPrdCache(conversationId) {
+  const file = prdCachePath(conversationId);
   if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 

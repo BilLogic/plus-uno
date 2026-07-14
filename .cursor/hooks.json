@@ -7,6 +7,12 @@
         "matcher": "UserPromptSubmit",
         "failClosed": true,
         "timeout": 10
+      },
+      {
+        "command": ".cursor/hooks/require-ds-writeback.sh",
+        "matcher": "UserPromptSubmit",
+        "failClosed": true,
+        "timeout": 10
       }
     ],
     "sessionEnd": [

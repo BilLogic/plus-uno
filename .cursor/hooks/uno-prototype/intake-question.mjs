@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveOptions, resolveQuestion, resolveType } from './states.mjs';
+import { resolveOptions, resolveQuestion, resolveType, buildConfirmTable } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
@@ -27,6 +27,7 @@ export function buildIntakePayload(conversationId, session, state) {
     oneQuestionOnly: true,
     neverSkipStep: true,
     verificationMode: Boolean(session.context?.prdHints && state.id === 'fidelity_select'),
+    prdResumed: Boolean(session.context?.prdResumed),
   };
 
   if (effectiveType === 'choice' && options?.length) {
@@ -36,9 +37,16 @@ export function buildIntakePayload(conversationId, session, state) {
     }));
   }
 
-  if (state.id === 'fidelity_other') {
+  if (state.id === 'challenge_other') {
     payload.allowTextInput = true;
     payload.textInputPrompt = resolveQuestion(state, session.context);
+  }
+
+  if (state.id === 'hi_confirm_table') {
+    payload.type = 'confirmation_table';
+    payload.table = buildConfirmTable(session.context);
+    payload.designSystemDefault = 'Plus Design System';
+    payload.designSystemConfigurable = false;
   }
 
   return payload;
@@ -72,7 +80,25 @@ export function buildAgentIntakeInstruction(state) {
 
   const effectiveType = state.type;
 
-  if (effectiveType === 'choice' || state.id === 'prd_upload' || state.id === 'fidelity_select' || state.id === 'hi_figma_link') {
+  if (state.id === 'hi_confirm_table') {
+    lines.push(
+      'Show the verification table from the `table` field in this message — do NOT ask project name, scope, fidelity, or required screens one-by-one.',
+      'Use AskQuestion with a `questions` array of length 1 — the prompt plus the two confirm/edit options from the JSON file.',
+      'Do NOT add a design system row or question — Plus Design System is always applied.',
+      'Do NOT load method.md, do NOT start building.',
+    );
+    return lines.join(' ');
+  }
+
+  if (
+    effectiveType === 'choice' ||
+    state.id === 'prd_check' ||
+    state.id === 'fidelity_select' ||
+    state.id === 'fidelity_level_pick' ||
+    state.id === 'low_fi_working_through' ||
+    state.id === 'challenge_question' ||
+    state.id === 'hi_figma_link'
+  ) {
     lines.push(
       'Use AskQuestion with a `questions` array of length 1 only — one prompt, one set of options from the JSON file.',
       'Forbidden: multiple entries in `questions`, combining steps, tables of later steps, or paraphrasing several hook states at once.',
