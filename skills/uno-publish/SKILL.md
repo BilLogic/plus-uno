@@ -53,11 +53,13 @@ Suggest this skill after `uno-review` passes a prototype. Every outward side eff
 
 ## Marketplace registration
 
-Today's destination is the repo catalog (`src/pages/PrototypeMarket/prototypes-data.js`); the notion-marketplace DB is the official target once stood up — its schema + publish procedure are specced in `references/notion-marketplace-db.md`. Flag that the DB isn't live yet on every handoff publish rather than inventing a destination; once built, publish dual-writes both surfaces per that spec.
+**Source of truth:** Notion Prototype Marketplace (`references/notion-marketplace-db.md`). Do **not** dual-write a JS marketplace UI (retired). `prototypes-data.js` is only a legacy routing registry for the live app shell — do not add new experiment IDs there for `main`.
 
-1. Build the entry: field-by-field contract in `references/marketplace-schema.md`, worked entries in `examples/marketplace-entry-example.md`. Auto-fill `id` (next number), `lastUpdated` (today), `upvotes: 0`; ask for the rest. Entry prose (title, description) goes through `writers/notion` voice rules only when it also lands in Notion — repo-catalog prose just follows `docs/conventions/writing-style.md`.
-2. **Validate before writing**: required fields present, `stage`/`productPillar` exact enum matches, `repoPath` ends with `/`. A schema-invalid entry never lands.
-3. Show the entry + target file, wait for confirmation, append, then verify `/market` renders the card (filters, modal, Loom embed, preview image — `npm run generate:previews` if missing).
+1. Deploy a **preview** (Deploy Preview / branch / standalone) per `references/deployment-guide.md`.
+2. Build the Notion row: Stage, Description, Repo path, Local path (if any), **Deployment URL** = preview URL. Link Project card when a Roadmap card exists.
+3. Show the draft, wait for confirmation, write via `writers/notion` / Notion MCP.
+4. Captures → Notion file/cover (not committed PNGs on `main`).
+5. When accepted: update Deployment URL to Storybook / live-app route; fold UI into specs + `prototypes/home-redesign/`.
 
 ## Tier-2 loads
 
@@ -65,7 +67,7 @@ Today's destination is the repo catalog (`src/pages/PrototypeMarket/prototypes-d
 |---|---|
 | always | `references/method.md` |
 | helping deploy a preview | `references/deployment-guide.md` |
-| building the marketplace entry | `references/marketplace-schema.md` + `examples/marketplace-entry-example.md` (+ `references/notion-marketplace-db.md` once the DB is live) |
+| building the marketplace entry | `references/notion-marketplace-db.md` (+ `references/marketplace-schema.md` / examples if dual-writing a routing registry) |
 | composing the share-out or checking sign-offs | `docs/conventions/slack.md` |
 | any human-facing text | `docs/conventions/writing-style.md` |
 

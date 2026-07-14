@@ -6,7 +6,7 @@
 #   bash skills/uno-review/scripts/run-review-checks.sh <target-dir>
 #
 # Example:
-#   bash skills/uno-review/scripts/run-review-checks.sh playground/home-redesign/src
+#   bash skills/uno-review/scripts/run-review-checks.sh prototypes/home-redesign/src
 #
 # Output: PASS / WARN / FAIL for each check.
 

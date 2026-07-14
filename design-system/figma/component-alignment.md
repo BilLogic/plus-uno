@@ -17,7 +17,7 @@ Without a binding layer, agents guess:
 ```
 Figma component set (instance on canvas)
         ↕  component-registry.json
-PLUS Button.jsx  ←  imported in playground via @/
+PLUS Button.jsx  ←  imported in prototypes via @/
         ↕  same tokens
 Figma Variables  ←  sync:tokens → design-system/src/tokens/
         ↕  token-registry.json
@@ -88,7 +88,7 @@ Requires: `figma-use` skill before canvas writes; prefer `figma-generate-design`
 - [x] Registry entry for Tonal buttons (`979:20977`)
 - [x] Registry entry for Filled buttons (`33:2470`)
 - [ ] Copy link for Text / Outline sets
-- [ ] Round-trip test on one playground page
+- [ ] Round-trip test on one prototypes page
 
 ## Drift prevention
 

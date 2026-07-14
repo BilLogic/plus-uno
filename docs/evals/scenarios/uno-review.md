@@ -21,6 +21,6 @@
 - **Fails if:** the review pass touches the artifact at all
 
 ## S4 — golden defect set
-- **Trigger:** quarterly benchmark against the defect fixture (`docs/evals/fixtures/README.md` § uno-review — currently `playground/home-redesign/src`, answer key in the 2026-07-08 run)
+- **Trigger:** quarterly benchmark against the defect fixture (`docs/evals/fixtures/README.md` § uno-review — currently `prototypes/home-redesign/src`, answer key in the 2026-07-08 run)
 - **Expected:** recall ≥80% and precision ≥80%; each finding names severity + re-entry point
 - **Fails if:** planted flaws slip through below the bar · phantom findings drag precision under 80%

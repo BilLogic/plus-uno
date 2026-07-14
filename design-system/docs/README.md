@@ -8,7 +8,7 @@ Single home for design-system knowledge (Option A). Agents and designers start h
 |------|------|---------|
 | `discovery.md` | Hand-authored | Agent router — load first for DS tasks |
 | `guidelines.md` | Hand-authored | Design and implementation philosophy |
-| `setup.md` | Hand-authored | Aliases, playground, Vite, imports |
+| `setup.md` | Hand-authored | Aliases, prototypes, Vite, imports |
 | `patterns/` | Hand-authored | Cross-component composition (layout, forms) |
 | `foundations/token-mapping.md` | Hand-authored | Figma ↔ CSS token mapping (SSOT) |
 | `knowledge-audit.json` | Hand-authored | Designer verification status |

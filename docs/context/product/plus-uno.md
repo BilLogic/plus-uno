@@ -6,8 +6,8 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 ## What This Is
 
 - **Design System** (`design-system/src/`) — 44 components, 20 form components, 42 DataViz charts, 7 spec areas, generated token SCSS. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
-- **Prototyping Workspace** (`playground/`) — 27 flat project directories (~20 feature prototypes + `starter/`, `templates/`, and `test-*` scaffolds). Discoverable via the Marketplace at `/market`.
-- **Storybook** (`.storybook/`) — Interactive component documentation and visual testing. Deployed to Netlify.
+- **Prototypes** (`prototypes/`) — on `main`: live app + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `home-redesign/` (+ content modules). Branch experiments catalogued in Notion.
+- **Storybook** (`.storybook/`) — Interactive component documentation. Site landing at `/storybook/`.
 - **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
 - **Product Documentation** (`docs/`) — context (descriptive), conventions (normative), evals, knowledge, plans.
 
@@ -22,7 +22,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 | Storybook | 10.2.7 | Component documentation |
 | SASS | 1.77.8 | CSS preprocessing |
 | Highcharts | 12.5.0 | Data visualization |
-| TypeScript | 5.9.3 | Type support (playground prototypes) |
+| TypeScript | 5.9.3 | Type support (prototypes) |
 | Framer Motion | 12.33.0 | Animations |
 | @assistant-ui/react | 0.12.3 | AI chat interface |
 
@@ -34,8 +34,8 @@ plus-vibe-coding-starting-kit/
 ├── loading-order.md           The loading contract (Tier 1 #2)
 ├── design-system/             Design system source (was packages/plus-ds/)
 │   └── src/                   Components, forms, DataViz, specs, tokens, styles
-├── playground/                ~20 feature prototypes + starter/templates/test scaffolds
-├── src/                       Vite app entry (App.jsx, main.jsx, index.css)
+├── prototypes/                home-redesign (live app) + branch experiment folders
+├── src/                       Vite SPA entry (Storybook redirect + live app routes)
 ├── skills/                    Six dual-face skills (SKILL.md + bot.md + references/method.md)
 ├── agents/                    researchers/ · reviewers/ · writers/ · uno-bot/ (Worker)
 ├── docs/
@@ -45,8 +45,7 @@ plus-vibe-coding-starting-kit/
 │   ├── knowledge/             Long-term memory (lessons, ADRs, changelog, archive/)
 │   └── plans/                 Dated implementation plans
 ├── .storybook/                Storybook configuration
-├── scripts/                   Multi-consumer tooling: Actions codegen (prompts/, lib/), token sync, link guard
-└── .claude/                   Claude Code settings
+└── scripts/                   Multi-consumer tooling: Actions codegen (prompts/, lib/), token sync, link guard
 ```
 
 ## Team

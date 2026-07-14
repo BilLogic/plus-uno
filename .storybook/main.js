@@ -15,8 +15,8 @@ const config = {
     '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
     // Playground prototypes selectively included in Storybook
-    // '../playground/storybook-ai-agent-llm-api/**/*.stories.{js,jsx,ts,tsx}',
-    // '../playground/training-onboarding/**/*.stories.{js,jsx,ts,tsx}',
+    // '../prototypes/storybook-ai-agent-llm-api/**/*.stories.{js,jsx,ts,tsx}',
+    // '../prototypes/training-onboarding/**/*.stories.{js,jsx,ts,tsx}',
   ],
 
   addons: [

@@ -216,7 +216,7 @@ export async function preflight(
       // the full bundle — Loom walkthrough + live preview + Decisions DB links.
       // The composing agent is told to gather these; this backstop makes it
       // code-enforced instead of best-effort.
-      if (/prototype|playground|scaffold/i.test(summary)) {
+      if (/prototype|prototypes|scaffold/i.test(summary)) {
         const haystack = collectStrings(input).join("\n");
         const missing: string[] = [];
         if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) {

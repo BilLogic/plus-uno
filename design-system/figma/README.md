@@ -82,7 +82,7 @@ npm run check:token-registry
 - [x] Filled buttons → `33:2470` → `Button` with `fill="filled"`
 - [ ] Text buttons — needs component-set `node-id`
 - [ ] Outline buttons — needs component-set `node-id`
-- [ ] Round-trip validated on playground page
+- [ ] Round-trip validated on prototypes page
 
 ## Quick commands
 
@@ -99,7 +99,7 @@ npm run check:token-registry
 npm run sync:tokens && npm run generate:tokens
 
 # Review a prototype for DS compliance
-bash skills/uno-review/scripts/run-review-checks.sh playground/<name>/src
+bash skills/uno-review/scripts/run-review-checks.sh prototypes/<name>/src
 ```
 
 ## Agent loading order

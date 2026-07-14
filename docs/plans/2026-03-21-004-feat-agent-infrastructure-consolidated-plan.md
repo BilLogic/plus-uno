@@ -214,9 +214,9 @@ AGENTS.md includes a loading order table (adapted from current SKILL.md):
 
 ## Skills Design
 
-### `/uno:prototype` — Scaffold and build a playground prototype
+### `/uno:prototype` — Scaffold and build a prototypes prototype
 
-**When to use**: Creating new feature prototypes or experiments in `playground/`
+**When to use**: Creating new feature prototypes or experiments in `prototypes/`
 
 **Skill-specific references** (in `references/`):
 - `tool-selection-guide.md` — When to use Figma MCP vs Stitch MCP vs hand-code. Decision tree for fidelity level → tool choice
@@ -230,7 +230,7 @@ AGENTS.md includes a loading order table (adapted from current SKILL.md):
 - Scaffold script (copy template, set up config)
 
 **Phases**:
-1. **Scope** — Feature purpose, owner, fidelity. Check `playground/templates/` for starters
+1. **Scope** — Feature purpose, owner, fidelity. Check `prototypes/templates/` for starters
 2. **Plan** — Which DS components? What data shape? What interactions?
 3. **Build** — Scaffold from template, implement with DS components + tokens
 4. **Validate** — Imports resolve? Tokens used? No hardcoded values? Storybook preview works?
@@ -400,7 +400,7 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
 1. Fetch and review the Design HQ hub: `https://www.notion.so/plus-tutors/Design-HQ-7965d76a998e47c19f11aef21ae1ab80`
 2. Fetch and review every design card from the design DB: `https://www.notion.so/plus-tutors/e3ef0e5a323c4a39a706f2842164bdc3?v=6360bd0ad95347ce91b1355a0d14a502`
 3. Fetch and review Tutor Onboarding Material: `https://plus-tutors.notion.site/Tutor-Onboarding-Material-26fb7cca49828000952fd7b346d1b09c`
-4. Cross-reference with existing codebase prototypes (`playground/prototyping/`) and specs (`packages/plus-ds/src/specs/`) for implementation status
+4. Cross-reference with existing codebase prototypes (`prototypes/prototyping/`) and specs (`packages/plus-ds/src/specs/`) for implementation status
 
 **Extract and document**:
 - **Users & Roles**: Tutors, Students, Supervisors/Admins — what each role does, their primary workflows
@@ -497,7 +497,7 @@ Windsurf:     Create .windsurfrules → AGENTS.md pointer
 - Existing `.agent/references/`: 16 guide files to merge
 - Existing `packages/plus-ds/guidelines/`: 16 guideline files to merge
 - Existing `docs/ideation/2026-03-17-toolkit-ia-revision-ideation.md`: product direction
-- Existing `playground/prototyping/`: feature prototypes revealing product features
+- Existing `prototypes/prototyping/`: feature prototypes revealing product features
 
 ### Product (Notion — to fetch in Phase 0)
 - Design HQ: https://www.notion.so/plus-tutors/Design-HQ-7965d76a998e47c19f11aef21ae1ab80

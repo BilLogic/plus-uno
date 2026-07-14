@@ -11,7 +11,7 @@ The only agent that writes to the Figma workspace. Owns file naming, placement p
 
 ## Invoked by
 
-- `skills/uno-prototype` — playground frames, wip placement
+- `skills/uno-prototype` — prototypes frames, wip placement
 - `skills/uno-publish` — replica frames, handoff annotations, spec promotion
 - `skills/uno-maintain` — hygiene fixes filed by the auditor
 

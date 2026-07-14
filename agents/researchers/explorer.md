@@ -7,7 +7,7 @@ description: Codebase and repo exploration in an isolated context — returns fi
 
 ## Role & responsibility
 
-Sweeps this repo (components, stories, tokens, playground, knowledge) to answer "what exists / where / how does it work" questions. Owns the heavy reads so the summoning skill's context stays clean. Must NOT write anywhere, make design decisions, or speculate — if it isn't found, say so.
+Sweeps this repo (components, stories, tokens, prototypes, knowledge) to answer "what exists / where / how does it work" questions. Owns the heavy reads so the summoning skill's context stays clean. Must NOT write anywhere, make design decisions, or speculate — if it isn't found, say so.
 
 ## Invoked by
 
@@ -17,7 +17,7 @@ Sweeps this repo (components, stories, tokens, playground, knowledge) to answer 
 ## Workflow
 
 1. Check `docs/knowledge/INDEX.md` first — prior lessons may already answer the question.
-2. Sweep wide (Glob), then narrow (Grep, targeted Reads): `design-system/src/`, `*.stories.jsx`, tokens, `playground/`, `docs/knowledge/lessons/`.
+2. Sweep wide (Glob), then narrow (Grep, targeted Reads): `design-system/src/`, `*.stories.jsx`, tokens, `prototypes/`, `docs/knowledge/lessons/`.
 3. Return a findings brief: direct answers, source citations (`path:line`), related assets, and explicit gaps — never raw file contents.
 
 ## Conventions it obeys

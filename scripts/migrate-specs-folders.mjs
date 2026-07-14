@@ -72,7 +72,7 @@ console.log(`${rules.length} folder renames planned:`);
 rules.forEach((r) => console.log(`  ${r.fromRel}  →  ${r.toRel}`));
 
 // ---- rewrite imports (same machinery as migrate-folder-structure) ----
-const SCAN_ROOTS = ['design-system/src', 'src', 'playground', '.storybook', 'scripts'];
+const SCAN_ROOTS = ['design-system/src', 'src', 'prototypes', '.storybook', 'scripts'];
 const files = [];
 (function collect(dir) {
   if (!fs.existsSync(dir)) return;

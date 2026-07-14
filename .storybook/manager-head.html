@@ -110,18 +110,21 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Local: Vite marketplace on :4100. Deployed Storybook lives under /storybook/ → site root.
+    // Notion marketplace catalog (in-app /market retired — landing is Storybook).
+    const NOTION_MARKETPLACE =
+      'https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c';
     const isLocal =
       location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    const marketplaceHref = isLocal ? 'http://localhost:4100' : '/';
+    const storybookHome = isLocal ? '/' : '/storybook/';
+    const marketplaceHref = NOTION_MARKETPLACE;
 
     const fab = document.createElement('div');
     fab.className = 'sb-nav-fab';
     fab.innerHTML = `
-      <a class="sb-nav-fab__trigger" href="${marketplaceHref}" title="Back to Marketplace">
+      <a class="sb-nav-fab__trigger" href="${storybookHome}" title="Storybook home">
         <i class="fa-solid fa-compass"></i>
       </a>
-      <a class="sb-nav-fab__action" href="${marketplaceHref}" title="Marketplace">
+      <a class="sb-nav-fab__action" href="${marketplaceHref}" target="_blank" rel="noopener noreferrer" title="Prototype Marketplace (Notion)">
         <i class="fa-solid fa-store"></i>
       </a>
       <button class="sb-nav-fab__action sb-nav-fab__action--ai" title="PLUS AI Agent (⌘+/)">

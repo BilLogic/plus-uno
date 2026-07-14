@@ -5,7 +5,7 @@ import '../design-system/src/styles/main.scss';
 // Docs-only Tailwind + shadcn (no Preflight; see storybook-tailwind.css)
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
-import StorybookAIAgent from '../playground/storybook-ai-agent-llm-api/StorybookAIAgent';
+import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
 
 /**

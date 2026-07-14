@@ -88,7 +88,7 @@ This should usually come last. It is the sandbox where a designer or engineer ca
 
 This guide defines *where* `Interactive` fits in the docs spine and *why* it belongs there.
 
-For the detailed policy on which controls to show/hide, how to categorize props, and how to keep the playground curated and designer-friendly, follow:
+For the detailed policy on which controls to show/hide, how to categorize props, and how to keep the prototypes curated and designer-friendly, follow:
 
 - [`storybook.md`](storybook.md)
 
@@ -195,7 +195,7 @@ The tables below summarize how current entries are organized today. The goal is 
 
 | Sidebar label | Docs profile | Top-level sections | Subcomponents merged? | Why it differs |
 |---|---|---|---|---|
-| `Label and Caption` | MDX-first | `Content`, `Layout` | No | More reference/pattern oriented; no interactive playground today. |
+| `Label and Caption` | MDX-first | `Content`, `Layout` | No | More reference/pattern oriented; no interactive prototypes today. |
 | `Input` | MDX-first, composed | `Content`, `Styles`, `Sizes`, `Interaction States`, `Interactive` | No | Strong standard spine, but uses inline composed docs rather than all story-backed canvases. |
 | `Textarea` | MDX-first | `Content`, `Layout`, `Sizes`, `Interaction States`, `Interactive` | No | Strong standard pattern. |
 | `Textarea ver 2` | MDX-first | `Styles`, `Interaction States`, `Interactive` | No | Minimal; content is not the main differentiator. |

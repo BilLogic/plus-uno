@@ -114,7 +114,7 @@ plus-vibe-coding-starting-kit/             (repo: github.com/BilLogic/plus-vibe-
 │   │   │   └── references/
 │   │   │
 │   │   │  ── WORKFLOW SKILLS (project-wide processes)
-│   │   ├── uno-prototype/                  Scaffold new playground prototype
+│   │   ├── uno-prototype/                  Scaffold new prototypes prototype
 │   │   │   ├── SKILL.md
 │   │   │   ├── references/
 │   │   │   ├── examples/
@@ -140,7 +140,7 @@ plus-vibe-coding-starting-kit/             (repo: github.com/BilLogic/plus-vibe-
 │       ├── integrations-index.json
 │       └── index-manifest.json
 │
-├── playground/                            PROTOTYPING WORKSPACE (flat, project-oriented)
+├── prototypes/                            PROTOTYPING WORKSPACE (flat, project-oriented)
 │   ├── home-redesign/                     Tutor home page redesign (was bill/)
 │   ├── monthly-report/                    Monthly report dashboard (was bill/)
 │   ├── research-assistant-chat/           AI research assistant in admin (was bill/)
@@ -212,7 +212,7 @@ plus-vibe-coding-starting-kit/             (repo: github.com/BilLogic/plus-vibe-
 '@plus-ds': path.resolve(__dirname, './design-system/src')
 ```
 
-Same pattern for all 16 playground vite configs — update relative paths from `../../packages/plus-ds/src` to `../../design-system/src`.
+Same pattern for all 16 prototypes vite configs — update relative paths from `../../packages/plus-ds/src` to `../../design-system/src`.
 
 ### Package.json Simplification
 
@@ -249,11 +249,11 @@ Same pattern for all 16 playground vite configs — update relative paths from `
 |------|--------|
 | `packages/` directory wrapper | Flattened to `design-system/` |
 | `packages/plus-ds/guidelines/` | Merged into `docs/design-system/` |
-| `playground/templates/` (entire directory) | Redundant — specs + Storybook serve this purpose (see below) |
-| `playground/Bill/` | Duplicate of `playground/prototyping/bill/` — content preserved in flattened structure |
-| `playground/Ashley/` | `storybook-ai-agent/` moved to `playground/storybook-ai-agent/`, then deleted |
-| `playground/prototyping/` | Entire directory flattened — all 12 prototypes now at `playground/` root |
-| `playground/*.html`, `*.json`, `*.cjs` | Loose test/debug files (home-test.html, static-badge files, lottie files, optimize script) |
+| `prototypes/templates/` (entire directory) | Redundant — specs + Storybook serve this purpose (see below) |
+| `prototypes/Bill/` | Duplicate of `prototypes/prototyping/bill/` — content preserved in flattened structure |
+| `prototypes/Ashley/` | `storybook-ai-agent/` moved to `prototypes/storybook-ai-agent/`, then deleted |
+| `prototypes/prototyping/` | Entire directory flattened — all 12 prototypes now at `prototypes/` root |
+| `prototypes/*.html`, `*.json`, `*.cjs` | Loose test/debug files (home-test.html, static-badge files, lottie files, optimize script) |
 | `.agent/AGENT.md` | Replaced by AGENTS.md |
 | `.agent/SKILL.md` | Split into AGENTS.md + docs/design-system/modes/ |
 | `.agent/references/` (entire directory) | Merged into `docs/design-system/` |
@@ -263,7 +263,7 @@ Same pattern for all 16 playground vite configs — update relative paths from `
 
 ### Templates Elimination — Specs Are the Source of Truth
 
-Investigation found `playground/templates/` is mostly empty scaffolding:
+Investigation found `prototypes/templates/` is mostly empty scaffolding:
 - `home/` contains only STRUCTURE.md pointing to specs — no implementation
 - `admin/` has HTML/JS prototypes less complete than the spec React components
 - Templates reference specs but add nothing over them
@@ -353,7 +353,7 @@ The marketplace (PrototypeMarket) **exists** at `src/pages/PrototypeMarket/` wit
 - `prototypes-data.js` — static data store
 - `.agent/skills/uno-post/SKILL.md` — agent skill for guided submission
 
-The marketplace is functional. Phase 2 (playground reorg) affects it since prototypes move from `playground/prototyping/{owner}/{name}` to `playground/{name}`. The `prototypes-data.js` file will need path and metadata updates to reflect the flat structure with project identifiers instead of creator groupings.
+The marketplace is functional. Phase 2 (prototypes reorg) affects it since prototypes move from `prototypes/prototyping/{owner}/{name}` to `prototypes/{name}`. The `prototypes-data.js` file will need path and metadata updates to reflect the flat structure with project identifiers instead of creator groupings.
 
 ## Already Done (from recent commits — do NOT redo)
 
@@ -382,7 +382,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 ### What Still Needs Doing
 
 1. Flatten `packages/plus-ds/` → `design-system/` (not done)
-2. Reorganize playground to flat/project-oriented (not done — includes Bryan prototype we missed)
+2. Reorganize prototypes to flat/project-oriented (not done — includes Bryan prototype we missed)
 3. Create `AGENTS.md` and rewire CLAUDE.md/.windsurfrules/cursorrules.md to point to it (updating what exists)
 4. Create `docs/project/plus-uno.md` and `docs/project/plus-app.md` (not done)
 5. Create `docs/project/conventions.md` and `docs/project/setup-guide.md` (not done)
@@ -390,8 +390,8 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 7. Create compound loop `docs/solutions/` (not done)
 8. **Reconcile skills architecture** — AGENT.md lists 4 phantom skills (learn-plus, design-consulting, building, maintaining) that have no SKILL.md files. Our plan adds 3 po- skills. Both need to be created.
 9. Create `docs/foundations/` to replace phantom `develop/` references in AGENT.md
-10. Update marketplace `prototypes-data.js` and `uno-post` skill after playground reorg
-11. Update Storybook globs (explicitly reference `playground/Ashley/**` and `playground/Bill/**`)
+10. Update marketplace `prototypes-data.js` and `uno-post` skill after prototypes reorg
+11. Update Storybook globs (explicitly reference `prototypes/Ashley/**` and `prototypes/Bill/**`)
 12. Clean up old files after migration (not done)
 13. Initialize memory system (not done)
 
@@ -403,10 +403,10 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 | AGENT.md foundations | References `develop/foundations/` which doesn't exist | Map to `docs/foundations/` (terminology, tech-stack, context-levels) |
 | AGENT.md repo structure table | Lists `develop/` and `packages/plus-ds/` | Update after restructure |
 | CLAUDE.md / .windsurfrules | Point to `.agent/SKILL.md` (not AGENTS.md) | Rewire in Phase 3 |
-| `prototypes-data.js` | All `repoPath` values use `playground/prototyping/{owner}/{name}/` | Update to `playground/{name}/` in Phase 2 |
-| `uno-post` SKILL.md | Hardcodes `playground/prototyping/{name}/{project}/` | Update to `playground/{project}/` in Phase 2 |
-| Storybook main.js | 3 explicit globs for `playground/prototyping/**`, `playground/Ashley/**`, `playground/Bill/**` | Simplify to single `playground/**` glob in Phase 2 |
-| Bryan prototype | `playground/prototyping/Bryan/` has `tutor-reflection-form/` and `starter/` — not in our reorg plan | Include in Phase 2 flatten |
+| `prototypes-data.js` | All `repoPath` values use `prototypes/prototyping/{owner}/{name}/` | Update to `prototypes/{name}/` in Phase 2 |
+| `uno-post` SKILL.md | Hardcodes `prototypes/prototyping/{name}/{project}/` | Update to `prototypes/{project}/` in Phase 2 |
+| Storybook main.js | 3 explicit globs for `prototypes/prototyping/**`, `prototypes/Ashley/**`, `prototypes/Bill/**` | Simplify to single `prototypes/**` glob in Phase 2 |
+| Bryan prototype | `prototypes/prototyping/Bryan/` has `tutor-reflection-form/` and `starter/` — not in our reorg plan | Include in Phase 2 flatten |
 
 ---
 
@@ -424,7 +424,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 
 ### Phase 1: Flatten `packages/` → `design-system/` — HIGHEST RISK
 
-> **Gate**: Storybook and playground prototypes MUST work before proceeding. If anything breaks, fix it here before moving on. Commit after this phase.
+> **Gate**: Storybook and prototypes prototypes MUST work before proceeding. If anything breaks, fix it here before moving on. Commit after this phase.
 
 4. `git mv packages/plus-ds design-system && rmdir packages`
 5. Update root `vite.config.js`:
@@ -435,8 +435,8 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
    - Line 50: static dir → `design-system/dist`
    - Line 51: assets path → `design-system/src/assets`
    - Line 70: srcPath → `design-system/src`
-7. Update all 16 playground `vite.config.js` files — relative paths to `design-system/src`
-8. Update 2 playground `tsconfig.json` files — path mappings
+7. Update all 16 prototypes `vite.config.js` files — relative paths to `design-system/src`
+8. Update 2 prototypes `tsconfig.json` files — path mappings
 9. Update `scripts/generate-all-tokens.js` and `scripts/restore-tokens.js`
 10. Simplify `design-system/package.json` — add `private: true`, strip all publishing fields (`files`, `exports`, `main`, `module`, `types`, `style`, `prepublishOnly`, `bundledDependencies`), move `highcharts` to devDependencies
 11. Delete `design-system/tutors.plus-design-system-0.1.0-pilot.11.tgz` (stale tarball)
@@ -448,38 +448,38 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 
 ---
 
-### Phase 2: Reorganize playground — MEDIUM RISK
+### Phase 2: Reorganize prototypes — MEDIUM RISK
 
 > Flatten from creator-grouped to project-oriented. No prototypes lost — just renamed/moved. Creator info moves to each prototype's README (marketplace metadata).
 
-17. Flatten all prototypes to `playground/` root (14 projects total):
-    - `prototyping/bill/home-redesign/` → `playground/home-redesign/`
-    - `prototyping/bill/monthly-report/` → `playground/monthly-report/`
-    - `prototyping/bill/research-assistant-chat/` → `playground/research-assistant-chat/`
-    - `prototyping/bill/sessions/` → `playground/in-session-ux/` (renamed — collision with victor)
-    - `prototyping/bill/weekly-report-demo/` → `playground/weekly-report-demo/`
-    - `prototyping/victor/sessions/` → `playground/session-management/` (renamed — collision)
-    - `prototyping/victor/training-progress/` → `playground/training-progress/`
-    - `prototyping/victor/tutor-performance/` → `playground/tutor-performance/`
-    - `prototyping/Ashley/group-modal/` → `playground/group-modal/`
-    - `prototyping/Ashley/group-performance-v2/` → `playground/group-performance-v2/`
-    - `prototyping/Ashley/tutor-risk-interventions/` → `playground/tutor-risk-interventions/`
-    - `Ashley/storybook-ai-agent/` → `playground/storybook-ai-agent/` (unique to Ashley/ root)
-    - `prototyping/Bryan/tutor-reflection-form/` → `playground/tutor-reflection-form/`
-    - `prototyping/Bryan/starter/` → `playground/starter/`
-18. Remove now-empty: `playground/prototyping/`, `playground/Bill/` (confirmed dup), `playground/Ashley/`
-19. Remove `playground/templates/` (redundant — specs + Storybook replace this)
+17. Flatten all prototypes to `prototypes/` root (14 projects total):
+    - `prototyping/bill/home-redesign/` → `prototypes/home-redesign/`
+    - `prototyping/bill/monthly-report/` → `prototypes/monthly-report/`
+    - `prototyping/bill/research-assistant-chat/` → `prototypes/research-assistant-chat/`
+    - `prototyping/bill/sessions/` → `prototypes/in-session-ux/` (renamed — collision with victor)
+    - `prototyping/bill/weekly-report-demo/` → `prototypes/weekly-report-demo/`
+    - `prototyping/victor/sessions/` → `prototypes/session-management/` (renamed — collision)
+    - `prototyping/victor/training-progress/` → `prototypes/training-progress/`
+    - `prototyping/victor/tutor-performance/` → `prototypes/tutor-performance/`
+    - `prototyping/Ashley/group-modal/` → `prototypes/group-modal/`
+    - `prototyping/Ashley/group-performance-v2/` → `prototypes/group-performance-v2/`
+    - `prototyping/Ashley/tutor-risk-interventions/` → `prototypes/tutor-risk-interventions/`
+    - `Ashley/storybook-ai-agent/` → `prototypes/storybook-ai-agent/` (unique to Ashley/ root)
+    - `prototyping/Bryan/tutor-reflection-form/` → `prototypes/tutor-reflection-form/`
+    - `prototyping/Bryan/starter/` → `prototypes/starter/`
+18. Remove now-empty: `prototypes/prototyping/`, `prototypes/Bill/` (confirmed dup), `prototypes/Ashley/`
+19. Remove `prototypes/templates/` (redundant — specs + Storybook replace this)
 20. Remove loose files: `home-test.html`, `static-badge-*.html`, `optimize-lottie.cjs`, `*.json` lottie files
 21. Update `.storybook/main.js` story globs — replace 3 explicit globs with single:
     ```js
-    '../playground/**/*.stories.{js,jsx,ts,tsx}'
+    '../prototypes/**/*.stories.{js,jsx,ts,tsx}'
     ```
 22. Update `src/pages/PrototypeMarket/prototypes-data.js`:
-    - All `repoPath` values: `playground/prototyping/{owner}/{name}/` → `playground/{name}/`
+    - All `repoPath` values: `prototypes/prototyping/{owner}/{name}/` → `prototypes/{name}/`
     - All `id` values: remove creator prefix (e.g., `bill-home-redesign` → `home-redesign`)
     - Update renamed projects: `bill-sessions` → `in-session-ux`, `victor-sessions` → `session-management`
 23. Update `.agent/skills/uno-post/SKILL.md`:
-    - Phase 1 path: `playground/prototyping/{name}/{project}/` → `playground/{project}/`
+    - Phase 1 path: `prototypes/prototyping/{name}/{project}/` → `prototypes/{project}/`
     - Auto-generate `id` from project folder name (not `{creator}-{project}`)
     - Confirmation template: update `repoPath` example
 24. Add marketplace metadata to each prototype's README.md:
@@ -494,12 +494,12 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
     description: Tutor home page redesign with skills radar, weekly load, student momentum
     ---
     ```
-25. Update `playground/README.md` — document flat structure, link to specs as starting point
+25. Update `prototypes/README.md` — document flat structure, link to specs as starting point
 26. Update root `package.json` dev scripts — paths may change for renamed prototypes
-27. Update playground vite.config.js relative paths to `design-system/src` (broken by both Phase 1 + Phase 2 moves)
+27. Update prototypes vite.config.js relative paths to `design-system/src` (broken by both Phase 1 + Phase 2 moves)
 28. **GATE: Verify `npm run dev:home-redesign` works**
 29. **GATE: Verify marketplace at `/market` shows all 14 prototypes correctly**
-30. **Commit**: `refactor: flatten playground to project-oriented structure`
+30. **Commit**: `refactor: flatten prototypes to project-oriented structure`
 
 ---
 
@@ -585,7 +585,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
     - `.agent/references/` → `docs/design-system/`
 61. Update `.agent/assets/README.md`
 62. Add STRUCTURE.md to spec directories that lack them (Toolkit, Training, Profile, Login, Universal)
-63. Grep entire repo for stale paths: `packages/`, `.agent/references/`, `playground/templates`, `playground/prototyping/`, `develop/`
+63. Grep entire repo for stale paths: `packages/`, `.agent/references/`, `prototypes/templates`, `prototypes/prototyping/`, `develop/`
 64. Fix any stragglers
 65. **Commit**: `chore: remove superseded files, fix all stale path references`
 
@@ -611,7 +611,7 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 76. Fresh Claude Code session — verify CLAUDE.md → AGENTS.md → AGENT.md chain loads
 77. Test: "help me learn about Button" → learn-plus skill activates
 78. Test: all 8 skill SKILL.md paths in AGENT.md resolve
-79. Grep for stale paths — zero results for: `packages/`, `develop/`, `playground/prototyping/`, `.agent/references/`
+79. Grep for stale paths — zero results for: `packages/`, `develop/`, `prototypes/prototyping/`, `.agent/references/`
 80. Confirm `docs/design-system/` has all merged docs with `<!-- ~NNN tokens -->` estimates
 81. Confirm `docs/foundations/` has terminology, tech-stack, context-levels
 
@@ -627,12 +627,12 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 - [ ] `npm run dev:home-redesign` works
 
 ### Cleanup
-- [ ] `playground/templates/` no longer exists
-- [ ] `playground/` is flat — 12 project directories, no creator subdirectories
-- [ ] `playground/prototyping/`, `playground/Bill/`, `playground/Ashley/` all removed
+- [ ] `prototypes/templates/` no longer exists
+- [ ] `prototypes/` is flat — 12 project directories, no creator subdirectories
+- [ ] `prototypes/prototyping/`, `prototypes/Bill/`, `prototypes/Ashley/` all removed
 - [ ] Each prototype has README.md with marketplace metadata (name, creator, date, status, area)
 - [ ] `bill/sessions` renamed to `in-session-ux`, `victor/sessions` renamed to `session-management`
-- [ ] Loose test files removed from `playground/`
+- [ ] Loose test files removed from `prototypes/`
 - [ ] Every spec directory has a STRUCTURE.md
 
 ### Agent Infrastructure
@@ -660,11 +660,11 @@ The current codebase uses **`.agent/SKILL.md` as the entry point** (not `AGENTS.
 ### Final Verification (Phase 9)
 - [ ] Storybook works with all stories
 - [ ] Vite dev works
-- [ ] All playground prototypes work
+- [ ] All prototypes prototypes work
 - [ ] Production build succeeds (`npm run build`)
 - [ ] Fresh Claude Code session loads AGENTS.md correctly
 - [ ] Mode routing works
-- [ ] Zero grep results for `packages/`, `.agent/references/`, `playground/templates`
+- [ ] Zero grep results for `packages/`, `.agent/references/`, `prototypes/templates`
 
 ## Sources
 

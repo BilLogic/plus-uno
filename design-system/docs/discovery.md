@@ -69,7 +69,7 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 
 | Topic | Path |
 |-------|------|
-| Aliases, imports, playground, Vite, bootstrap | `design-system/docs/setup.md` |
+| Aliases, imports, prototypes, Vite, bootstrap | `design-system/docs/setup.md` |
 | Design philosophy / agent role | `design-system/docs/guidelines.md` |
 
 ## Product Context (not DS knowledge)

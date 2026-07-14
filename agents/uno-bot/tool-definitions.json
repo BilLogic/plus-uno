@@ -406,7 +406,7 @@
   },
   {
     "name": "prototype_scaffold",
-    "description": "Scaffold a NEW playground prototype from a Figma design (page/screen/flow), by triggering the figma-implement-design GitHub Action to open a draft PR — SIDE EFFECT, routed through the confirmation gate. Use when the designer pastes a Figma URL and asks for a prototype (e.g. 'scaffold a playground for this frame', 'build this design <figma.com/...>'). A Notion PRD link is OPTIONAL but preferred — ask if they have one for better context; if not, offer to build straight from the frame and, on their OK, invoke with notion_prd_url omitted. Never invent a PRD URL. Do NOT use for named DS-library component work — that is component_implement.",
+    "description": "Scaffold a NEW prototypes prototype from a Figma design (page/screen/flow), by triggering the figma-implement-design GitHub Action to open a draft PR — SIDE EFFECT, routed through the confirmation gate. Use when the designer pastes a Figma URL and asks for a prototype (e.g. 'scaffold a prototypes for this frame', 'build this design <figma.com/...>'). A Notion PRD link is OPTIONAL but preferred — ask if they have one for better context; if not, offer to build straight from the frame and, on their OK, invoke with notion_prd_url omitted. Never invent a PRD URL. Do NOT use for named DS-library component work — that is component_implement.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -424,7 +424,7 @@
         },
         "slug": {
           "type": "string",
-          "description": "Optional kebab-case folder name for playground/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
+          "description": "Optional kebab-case folder name for prototypes/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
         },
         "notes": {
           "type": "string",

@@ -3,7 +3,7 @@
   "updated_for_branch": "main",
   "example_story_globs": [
     "design-system/src/**/*.stories.jsx",
-    "playground/**/*.stories.{js,jsx,ts,tsx}"
+    "prototypes/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "spec_roots": [
     "design-system/src/specs/Login",
@@ -12,7 +12,7 @@
     "design-system/src/specs/Profile"
   ],
   "template_roots": [
-    "playground/templates"
+    "prototypes/templates"
   ],
-  "prototype_root": "playground/prototyping"
+  "prototype_root": "prototypes/starter"
 }

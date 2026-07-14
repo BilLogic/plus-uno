@@ -1,4 +1,4 @@
-<!-- Tier: 2 | ~500 tokens | Load for: repo setup, imports, playground scaffolding, build tooling -->
+<!-- Tier: 2 | ~500 tokens | Load for: repo setup, imports, prototypes scaffolding, build tooling -->
 # PLUS Design System — Setup
 
 Implementation requirements only. For design rules, load `guidelines.md`. For component/token lists, use `discovery.md`.
@@ -12,7 +12,7 @@ Implementation requirements only. For design rules, load `guidelines.md`. For co
 
 | Alias | Resolves to |
 |-------|-------------|
-| `@` | `design-system/src` (Storybook, DS Vite, playground configs) |
+| `@` | `design-system/src` (Storybook, DS Vite, prototypes configs) |
 | `~` | `node_modules` |
 
 **Barrel exports — always import from index:**
@@ -38,20 +38,21 @@ design-system/
   docs/          # Hand-authored DS knowledge (discovery, patterns, token-mapping)
   agent-views/   # Generated agent views — mirrors src/ layout (excludes storybook-docs, assets)
   figma/         # Registries + alignment runbooks
-playground/{name}/     # Standalone prototypes
+prototypes/{name}/     # Standalone prototypes
 .storybook/            # Storybook config
 scripts/               # Token sync, registry + agent-view generation
 skills/         # Workflow skills (uno-prototype, uno-review, …)
 ```
 
-## Playground Conventions
+## Prototype conventions
 
-- Each prototype: `playground/{project-name}/` (flat, kebab-case)
-- **Starter template:** copy `playground/starter/` — includes DS aliases, SCSS config, shared React resolution
-- Update starter `package.json` name, `index.html` title, and pick an unused `server.port` (check `playground/*/vite.config.js`; range ~3000–3025)
+- Experiments: `prototypes/{project-name}/` on a **feature branch** (flat, kebab-case)
+- **Starter template:** copy `prototypes/starter/` — includes DS aliases, SCSS config, shared React resolution
+- Update starter `package.json` name, `index.html` title, and pick an unused `server.port` (check `prototypes/*/vite.config.js`; range ~3000–3025)
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
-- Register in `src/pages/PrototypeMarket/prototypes-data.js`
-- Root dev script: `"dev:{project-name}": "vite --config playground/{project-name}/vite.config.js"`
+- Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
+- Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)
+- **Production on `main`:** live app (`/home`) + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `prototypes/home-redesign/`
 
 **Starter includes:**
 
@@ -65,7 +66,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 **Minimal structure** (if not using starter):
 
 ```
-playground/{project-name}/
+prototypes/{project-name}/
 ├── index.html
 ├── src/App.jsx
 ├── src/main.jsx
@@ -75,7 +76,7 @@ playground/{project-name}/
 
 ## Example Selection
 
-When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `playground/**`. See `skills/uno-prototype/references/examples-index.json`.
+When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `prototypes/**`. See `skills/uno-prototype/references/examples-index.json`.
 
 ## Bootstrap & Providers
 

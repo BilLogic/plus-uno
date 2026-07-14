@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-# validate-prototype.sh — Quick sanity check for a playground prototype.
+# validate-prototype.sh — Quick sanity check for a prototypes prototype.
 #
 # Usage:
-#   bash skills/uno-prototype/scripts/validate-prototype.sh playground/my-project
+#   bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/my-project
 #
 # Checks:
 #   1. src/App.jsx exists

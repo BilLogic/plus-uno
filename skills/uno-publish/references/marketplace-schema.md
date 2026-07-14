@@ -18,7 +18,7 @@ Schema for entries in `src/pages/PrototypeMarket/prototypes-data.js`.
 | `contributors` | `string[]` | Yes | Array of contributor names. Defaults to same as creators. | `['Bill', 'Victor']` |
 | `productPillar` | `string` | Yes | Product area. Must be one of `PRODUCT_PILLARS`: `admin`, `home`, `login`, `profile`, `toolkit`, `training`, `universal`. | `'home'` |
 | `localPath` | `string \| null` | Yes | Route path in the root app (e.g., `'/1025'`). Null if not wired into root app router. | `'/1025'` or `null` |
-| `repoPath` | `string` | Yes | Path to the prototype directory relative to repo root. Always ends with `/`. | `'playground/student-onboarding-wizard/'` |
+| `repoPath` | `string` | Yes | Path to the prototype directory relative to repo root. Always ends with `/`. | `'prototypes/student-onboarding-wizard/'` |
 
 ## Enums
 

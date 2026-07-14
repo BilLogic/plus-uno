@@ -32,7 +32,7 @@ tags: [architecture, conventions]
 - **Date**: 2026-03-22
 - **Status**: Active
 - **Context**: String slugs caused naming collisions and awkward URL paths. Creator-based directory grouping did not scale.
-- **Decision**: Use 4-digit numeric IDs (1001+) for all prototype listings. Flat project-oriented playground structure with creator info as metadata.
+- **Decision**: Use 4-digit numeric IDs (1001+) for all prototype listings. Flat project-oriented prototypes structure with creator info as metadata.
 - **Source**: _archive/solutions/agent-infrastructure/marketplace-storybook-navigation-architecture.md
 
 ## ADR-005: All docs consolidated under docs/
@@ -46,7 +46,7 @@ tags: [architecture, conventions]
 - **Date**: 2026-03-21
 - **Status**: Active
 - **Context**: `packages/plus-ds/` was configured as a publishable npm package but will never be published. Publishing config (`files`, `exports`, `prepublishOnly`) was misleading.
-- **Decision**: Set `private: true`, strip all publishing fields. Keep the package where it is to avoid breaking relative path aliases in playground prototypes. Later flattened to `design-system/`.
+- **Decision**: Set `private: true`, strip all publishing fields. Keep the package where it is to avoid breaking relative path aliases in prototypes prototypes. Later flattened to `design-system/`.
 - **Source**: docs/plans/2026-03-21-006-refactor-strip-npm-publishing-simplify-package-plan.md
 
 ## ADR-007: Agent-agnostic skills under .agent/skills/

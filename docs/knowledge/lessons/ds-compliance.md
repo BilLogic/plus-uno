@@ -33,6 +33,6 @@ tags: [tokens, review, forbidden-patterns, figma, naming]
 
 ## [2026-03-22] File naming uses 4-digit numeric IDs, not slugs
 
-- **Pattern**: Marketplace prototype listings initially used string slugs for routing, which caused naming collisions and awkward URL paths. Creator-based directory grouping (`playground/{owner}/{name}/`) also caused collisions (both bill and victor had `sessions/`).
-- **Fix**: Adopted 4-digit numeric IDs (1001-1025) for all prototype listings. Clean URLs, no naming collisions. Flattened playground to project-oriented structure (`playground/{name}/`) with creator info as metadata, not directory structure.
+- **Pattern**: Marketplace prototype listings initially used string slugs for routing, which caused naming collisions and awkward URL paths. Creator-based directory grouping (`prototypes/{owner}/{name}/`) also caused collisions (both bill and victor had `sessions/`).
+- **Fix**: Adopted 4-digit numeric IDs (1001-1025) for all prototype listings. Clean URLs, no naming collisions. Flattened prototypes to project-oriented structure (`prototypes/{name}/`) with creator info as metadata, not directory structure.
 - **Source**: _archive/solutions/agent-infrastructure/marketplace-storybook-navigation-architecture.md
