@@ -476,6 +476,21 @@ export interface ArchivedCard {
 const READ_BLOCK_PAGES = 3; // cap pagination so a huge page can't blow the budget
 const READ_TEXT_CAP = 8000;
 
+// In-memory read cache: a back-and-forth thread re-reads the SAME page every
+// turn (1 page GET + up to 3 block-children GETs ≈ 4 subrequests each), and the
+// free tier caps an invocation at 50 subrequests. Caching successful reads for a
+// short window makes a repeat read cost 0. Per-isolate + best-effort by design
+// (no KV — dodges KV write limits); a cold isolate just re-fetches.
+const READ_CACHE_TTL_MS = 180_000; // 3 min
+const READ_CACHE_MAX = 50; // cap growth in a long-lived isolate
+const readCache = new Map<string, { at: number; value: NotionPageContent }>();
+
+// Drop a page's cached read so a subsequent read reflects a write we just made
+// (notionUpdate/archiveCard) instead of serving a stale copy.
+export function evictReadCache(pageId: string): void {
+  readCache.delete(pageId);
+}
+
 export interface NotionPageContent {
   id: string;
   title: string;
@@ -536,6 +551,11 @@ function blockText(block: Record<string, unknown>): string {
  */
 export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+
+  // Serve a fresh cached read (0 subrequests) if we read this page recently.
+  const cached = readCache.get(pageId);
+  if (cached && Date.now() - cached.at < READ_CACHE_TTL_MS) return cached.value;
+
   const headers = notionHeaders(env, { write: true });
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -580,7 +600,12 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       cursor = bData.next_cursor;
     }
 
-    return { id: pageId, title, properties, people, text: lines.join("\n").slice(0, READ_TEXT_CAP) };
+    const result: NotionPageContent = { id: pageId, title, properties, people, text: lines.join("\n").slice(0, READ_TEXT_CAP) };
+    // Cache only successful reads (never a throw). Clear when full — a long-lived
+    // isolate shouldn't grow this unbounded; simple beats an LRU here.
+    if (readCache.size >= READ_CACHE_MAX) readCache.clear();
+    readCache.set(pageId, { at: Date.now(), value: result });
+    return result;
   } finally {
     clearTimeout(timer);
   }
@@ -1133,6 +1158,9 @@ export async function notionUpdate(
       appended = children.length;
     }
 
+    // Drop any cached read so the next read reflects this write, not a stale copy.
+    if (updated.length || appended) evictReadCache(pageId);
+
     return { id: pageId, updated, skipped, appended };
   } finally {
     clearTimeout(timer);
@@ -1160,6 +1188,8 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
       const err = (await patchRes.json().catch(() => ({}))) as { message?: string };
       throw notionError(patchRes.status, err, "archive failed");
     }
+    // Drop any cached read so a subsequent read reflects the archive.
+    evictReadCache(pageId);
     return { id: pageId, title };
   } finally {
     clearTimeout(timer);
