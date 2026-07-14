@@ -6,7 +6,8 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "bundle:harness": "node scripts/bundle-harness.mjs",
+    "deploy": "npm run bundle:harness && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "tail": "wrangler tail"
   },

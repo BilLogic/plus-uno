@@ -4,8 +4,28 @@ import Tooltip from '@/components/overlays/Tooltip';
 import './NavFab.scss';
 
 const STORYBOOK_URL = import.meta.env.VITE_STORYBOOK_URL || '/storybook';
+const NOTION_MARKETPLACE_URL =
+  import.meta.env.VITE_NOTION_MARKETPLACE_URL ||
+  'https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c';
 
+/**
+ * Floating nav for prototype shells — live app, Storybook docs, Notion marketplace.
+ */
 const NAV_ITEMS = [
+  {
+    id: 'live-app',
+    label: 'Live app',
+    icon: 'fa-solid fa-house',
+    href: '/home',
+    external: false,
+  },
+  {
+    id: 'demo',
+    label: 'Full demo',
+    icon: 'fa-solid fa-clapperboard',
+    href: '/demo/home',
+    external: false,
+  },
   {
     id: 'storybook',
     label: 'Storybook',
@@ -15,10 +35,11 @@ const NAV_ITEMS = [
   },
   {
     id: 'marketplace',
-    label: 'Marketplace',
+    label: 'Marketplace (Notion)',
     icon: 'fa-solid fa-store',
-    href: '/'
-  }
+    href: NOTION_MARKETPLACE_URL,
+    external: true,
+  },
 ];
 
 export default function NavFab() {

@@ -109,7 +109,7 @@ server: {
 
 ## Sources
 
-- CompactReflectionBar pattern: `playground/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx`
+- CompactReflectionBar pattern: `prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx`
 - DS Tooltip: `design-system/src/components/Tooltip/Tooltip.jsx`
 - PageLayout floatingContent slot: `design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx:29`
 - Current BackToMarket: `src/App.jsx:10-25`, `src/App.scss:1-6`

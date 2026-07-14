@@ -41,7 +41,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -132,7 +132,7 @@ Node ID: 258-262669
  */
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <TutorPerformancePage
@@ -230,7 +230,7 @@ export const Interactive = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         selectedSchool: 'All Schools',
         selectedTutor: 'All Tutors',
         activeTab: 'performance',
@@ -273,7 +273,7 @@ export const WithModalOpen = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         modalOpen: true,
         modalTab: 'info',
         modalMode: 'edit',

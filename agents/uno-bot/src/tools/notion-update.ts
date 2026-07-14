@@ -6,10 +6,28 @@
 import type { Env } from "../types";
 import type { SlackContext } from "./dispatcher";
 import { postMessage } from "../slack/api";
-import { notionUpdate, parseNotionPageId, type PrdSection } from "../integrations/notion";
+import { notionUpdate, normalizeName, parseNotionPageId, type PrdSection } from "../integrations/notion";
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
+}
+
+// Render one confirmed change for the success echo: "*Real Name* → `new value`",
+// value codified. `entry` is notionUpdate's real schema name, optionally with a
+// "(note)" suffix; the value comes from the requested input matched by name.
+function echoUpdatedField(entry: string, properties?: Record<string, string>): string {
+  const m = entry.match(/^(.*?)(?:\s+\((.*)\))?$/);
+  const name = (m?.[1] ?? entry).trim();
+  const note = m?.[2];
+  let value = "";
+  if (properties) {
+    const target = normalizeName(name);
+    for (const [k, v] of Object.entries(properties)) {
+      if (normalizeName(k) === target) { value = v; break; }
+    }
+  }
+  const base = value ? `*${name}* → \`${value}\`` : `*${name}*`;
+  return note ? `${base} (${note})` : base;
 }
 
 function parseAppend(v: unknown): { sections?: PrdSection[]; text?: string } | undefined {
@@ -56,7 +74,9 @@ export async function executeNotionUpdate(
   try {
     const r = await notionUpdate(env, pageId, { properties, append });
     const parts: string[] = [];
-    if (r.updated.length) parts.push(`set ${r.updated.join(", ")}`);
+    // Name each concrete change with its NEW value codified, e.g.
+    // "set *Dev Status* → `Ready for Dev`" — not a bare property name (2026-07-14).
+    if (r.updated.length) parts.push(`set ${r.updated.map((u) => echoUpdatedField(u, properties)).join(", ")}`);
     if (r.appended) parts.push(`appended ${r.appended} block(s)`);
     const skippedNote = r.skipped.length ? ` — couldn't set: ${r.skipped.join("; ")}` : "";
 

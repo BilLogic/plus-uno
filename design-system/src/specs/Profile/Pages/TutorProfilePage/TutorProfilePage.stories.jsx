@@ -28,7 +28,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -73,7 +73,7 @@ export default {
         pageMode: 'live',
         changed: false,
         profileState: 'unfilled',
-        breakpoint: 'xl',
+        breakpoint: 'native',
     },
 };
 
@@ -492,14 +492,14 @@ export const Overview = {
         pageMode: 'shell',
         changed: false,
         profileState: 'unfilled',
-        breakpoint: 'xl',
+        breakpoint: 'native',
     },
     render: (args) => <TutorProfilePage changed={args.changed} profileState={args.profileState} />,
 };
 
 export const Variants = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         pageMode: 'shell',
         changed: false,
         profileState: 'unfilled',

@@ -4,7 +4,7 @@
 
 Design system, prototyping workspace, and agent infrastructure for the [PLUS tutoring platform](https://tutors.plus/) (500+ college tutors, 3,000+ K-12 students). This is a **prototype builder and design workspace — not a production app**.
 
-**Live site:** [plus-uno.netlify.app](https://plus-uno.netlify.app) (Prototype Marketplace + Storybook)
+**Live site:** [plus-uno.netlify.app](https://plus-uno.netlify.app) → **Storybook** (`/storybook/`). **Live app (Specs replica):** [/home](https://plus-uno.netlify.app/home). **Full demo:** [/demo/home](https://plus-uno.netlify.app/demo/home) (entry [/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html) frozen). Experiments: [Notion Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c).
 
 ## Quick Start
 
@@ -12,10 +12,10 @@ Design system, prototyping workspace, and agent infrastructure for the [PLUS tut
 git clone https://github.com/BilLogic/plus-uno.git
 cd plus-uno
 npm install
-npm run dev          # Vite (4100) + Storybook (4200) concurrent
+npm run dev          # Vite app shell (4100) + Storybook (4200)
 ```
 
-Open [localhost:4100](http://localhost:4100) for the Prototype Marketplace, [localhost:4200](http://localhost:4200) for Storybook.
+Open [localhost:4200](http://localhost:4200) for Storybook, [localhost:4100/home](http://localhost:4100/home) for the live app (`npm run dev:app`), or `npm run dev:demo` for the full walkthrough.
 
 ## What is uno?
 
@@ -65,10 +65,10 @@ plus-uno/
 │   ├── docs/                      # Hand-authored DS knowledge (discovery, patterns, token-mapping)
 │   ├── agent-views/               # Generated agent views (DO NOT EDIT BY HAND)
 │   └── figma/                     # Figma registries + alignment runbooks
-├── playground/                    # ~20 feature prototypes (+ starter/, templates/, test-*) — browse at /market
-├── src/                           # Vite app entry + Prototype Marketplace
+├── prototypes/                    # Live app shell (home-redesign) + branch experiments (starter/, …)
+├── src/                           # Vite SPA: Storybook landing redirect + live app routes
 ├── .storybook/                    # Storybook 10 configuration
-├── scripts/                       # Token sync, Figma automation, Actions codegen, preview generation
+├── scripts/                       # Token sync, Figma automation, Actions codegen
 │
 ├── docs/
 │   ├── context/                   # Descriptive — product, design-system foundations, onboarding
@@ -81,24 +81,30 @@ plus-uno/
 └── agents/                        # WHO — researchers/ · reviewers/ · writers/ + uno-bot/ (Slack Worker)
 ```
 
-## Prototype Marketplace
+## Prototype ritual
 
-The Marketplace at `/market` is the central hub for all design prototypes. Each prototype is a standalone Vite app under `playground/`.
+| Stage | Code | Hosting | Catalog |
+|-------|------|---------|---------|
+| **Experiment** | Feature branch · `prototypes/{slug}/` | Deploy Preview / branch deploy / standalone Netlify (many URLs OK) | Notion Marketplace row |
+| **Accepted** | Fold into `design-system/src/specs/…` + wire into `prototypes/home-redesign/` if in-product | Production Storybook + live app | Update Notion Deployment URL |
+| **On `main`** | Storybook + **live app** (`/home`) + **demo** (`/demo/demo.html`, id `1028`) | `plus-uno.netlify.app` | — |
 
-### Creating a new prototype
+Do **not** merge one-off experiments onto `main`. Captures go on the Notion row (or local `prototypes/{slug}/captures/`, gitignored).
 
-1. Copy `playground/starter/` as your template
-2. Build your prototype (use the design system components!)
-3. Invoke `uno-publish` to register it in the Marketplace
-4. Open a PR against `main` — Netlify auto-generates a **Deploy Preview** link
-5. Share the preview link for feedback — no merge needed
+### Creating an experiment
 
-### Browsing prototypes
+1. Copy `prototypes/starter/` on a feature branch
+2. Build with design-system components
+3. Open a PR → Deploy Preview URL (or standalone Netlify)
+4. `uno-publish` → Notion Marketplace with that **Deployment URL**
+5. When accepted: Storybook specs + live app integration; drop the branch-only folder from the merge when possible
 
-- **Local:** `npm run dev` → [localhost:4100/market](http://localhost:4100/market)
-- **Live:** [plus-uno.netlify.app/market](https://plus-uno.netlify.app/market)
+### Browsing
 
-Prototypes are filterable by fidelity stage (Low/Mid/High-fi) and product pillar (Admin, Home, Toolkit, Training, etc.).
+- **Docs:** [plus-uno.netlify.app/storybook/](https://plus-uno.netlify.app/storybook/)
+- **Live app:** [plus-uno.netlify.app/home](https://plus-uno.netlify.app/home)
+- **Full demo:** [plus-uno.netlify.app/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html)
+- **Experiments:** [Notion Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c)
 
 ## Design System
 
@@ -109,7 +115,7 @@ The component library lives in `design-system/src/`: **44 components, 20 form co
 - Never hardcode colors, spacing, or typography — use design tokens
 - Start at `design-system/docs/discovery.md` before building UI
 - After editing component MDX or token-mapping: `npm run generate:agent`
-- No Tailwind, Material UI, or Ant Design in components or prototypes — Bootstrap + SCSS only. (Tailwind appears in devDependencies solely for the internal Storybook docs pages under `design-system/src/storybook-docs/`; it is off-limits in DS components and playground prototypes.)
+- No Tailwind, Material UI, or Ant Design in components or prototypes — Bootstrap + SCSS only. (Tailwind appears in devDependencies solely for the internal Storybook docs pages under `design-system/src/storybook-docs/`; it is off-limits in DS components and prototypes.)
 
 ## Deployment
 
@@ -139,7 +145,9 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | Command | What |
 |---------|------|
 | `npm run dev` | Vite + Storybook concurrent (ports 4100 + 4200) |
-| `npm run dev:vite` | Vite only (port 4100) |
+| `npm run dev:vite` | Vite SPA shell only (port 4100) |
+| `npm run dev:app` | Live app shell only (`prototypes/home-redesign`) |
+| `npm run dev:demo` | Full Demo Walkthrough (preserves `/demo/demo.html`) |
 | `npm run storybook` | Storybook only (port 4200) |
 | `npm run build` | Production build |
 | `npm run build:all` | Build app + Storybook |
@@ -149,7 +157,6 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | `npm run generate:tokens` | Generate SCSS from token source |
 | `npm run generate:agent` | Regenerate agent-views + Figma registries + audit |
 | `npm run generate:figma-links` | Regenerate the component ↔ Figma links spreadsheet |
-| `npm run generate:previews` | Generate prototype preview images |
 | `npm run dev:<slug>` | Run a single prototype (e.g. `dev:home-redesign`, `dev:monthly-report`) |
 
 ## Documentation

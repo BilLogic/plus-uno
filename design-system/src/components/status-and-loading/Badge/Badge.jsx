@@ -65,8 +65,10 @@ export const Badge = ({
                 ${dismissible ? 'plus-badge--dismissible' : ''} 
                 ${className}
             `}
-            role={dismissible ? 'button' : undefined}
-            tabIndex={dismissible ? 0 : undefined}
+            // Only the dismiss button below is interactive — the badge itself
+            // has no click handler, so it must not carry button semantics too.
+            // (A `role="button"` wrapper here would nest one interactive
+            // control inside another, which is invalid per ARIA.)
         >
             {/* Leading Visual */}
             {leadingVisual && (
@@ -108,7 +110,7 @@ Badge.propTypes = {
     leadingVisual: PropTypes.node,
     trailingVisual: PropTypes.node,
     counter: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    dismissible: PropTypes.boolean,
+    dismissible: PropTypes.bool,
     onDismiss: PropTypes.func,
     className: PropTypes.string,
     id: PropTypes.string,

@@ -109,7 +109,16 @@ const DonutChart = ({
 
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            {/*
+              * Decorative: the segment values are already conveyed via the
+              * centered text overlay below, and Highcharts' default
+              * `role="img"` SVG has no accessible name without the
+              * accessibility module. Hide it from assistive tech rather than
+              * announcing an unlabeled image.
+              */}
+            <div aria-hidden="true">
+                <HighchartsReact highcharts={Highcharts} options={options} />
+            </div>
             <div style={{
                 position: 'absolute',
                 top: '50%',

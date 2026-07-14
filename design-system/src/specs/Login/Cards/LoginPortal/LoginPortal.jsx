@@ -10,7 +10,7 @@ import {
     LoginInstitutionField,
     LoginAccessCodeField,
     LoginOrDivider,
-} from '@/specs/Login/Elements/components';
+} from '@/specs/Login/Elements';
 
 import './LoginPortal.scss';
 

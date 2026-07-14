@@ -11,6 +11,7 @@ import { Toast } from '@/components/messaging/Toast';
 import * as InSessionModals from '../Modals/InSessionPopUpModal.stories';
 import { StartingZoomSession } from '../Modals/StartingZoomSession.stories';
 import { AddTutor, AddStudent } from '../Modals/AddModal.stories';
+import { RequestTutorOffCanvas } from '../Elements/RequestTutor/RequestTutorOffCanvas.jsx';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -173,6 +174,8 @@ const MainContent = ({
                     key={student.id || index}
                     studentName={student.name}
                     isNew={student.isNew}
+                    roomNumber={student.roomNumber}
+                    roomOutOfRange={student.roomOutOfRange}
                     status={student.status}
                     attendanceStatus={student.attendanceStatus}
                     engagementStatus={student.engagementStatus}
@@ -193,11 +196,11 @@ const defaultSessions = [
 
 // Default student data matching Figma design
 const defaultStudents = [
-    { id: 1, name: 'Arlene McCoy', isNew: false, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-    { id: 2, name: 'Morgan Reed', isNew: false, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-    { id: 3, name: 'Taylor Brooks', isNew: false, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-    { id: 4, name: 'Casey Jordan', isNew: false, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
-    { id: 5, name: 'Jordan Avery', isNew: false, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' }
+    { id: 1, name: 'Arlene McCoy', isNew: false, roomNumber: 1, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+    { id: 2, name: 'Morgan Reed', isNew: false, roomNumber: 2, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+    { id: 3, name: 'Taylor Brooks', isNew: false, roomNumber: 3, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+    { id: 4, name: 'Casey Jordan', isNew: false, roomNumber: 4, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' },
+    { id: 5, name: 'Jordan Avery', isNew: false, roomNumber: 5, status: 'needs-motivation', attendanceStatus: 'unknown', engagementStatus: 'unknown' }
 ];
 
 /**
@@ -576,6 +579,7 @@ const RegularTutorLoadedContent = ({
     onSessionChange,
     onAttendanceChange,
     onEngagementChange,
+    onRequestLeadTutor,
     isInteractive = false,
     showBanner = false,
     bannerSessionType = 'goal-setting',
@@ -626,6 +630,7 @@ const RegularTutorLoadedContent = ({
                 <SessionControlsConsolidated
                     role="tutor"
                     studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
+                    onRequestLeadTutor={onRequestLeadTutor}
                 />
             </div>
         </div>
@@ -638,6 +643,8 @@ const RegularTutorLoadedContent = ({
                     key={student.id || index}
                     studentName={student.name}
                     isNew={student.isNew}
+                    roomNumber={student.roomNumber}
+                    roomOutOfRange={student.roomOutOfRange}
                     status={student.status}
                     attendanceStatus={student.attendanceStatus}
                     engagementStatus={student.engagementStatus}
@@ -736,6 +743,7 @@ const LeadSupervisorLoadedContent = ({
     onSessionChange,
     onAttendanceChange,
     onEngagementChange,
+    onRequestTutors,
     isInteractive = false,
     showBanner = false,
     bannerSessionType = 'goal-setting',
@@ -786,6 +794,7 @@ const LeadSupervisorLoadedContent = ({
                 <SessionControlsConsolidated
                     role="lead"
                     studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
+                    onRequestTutors={onRequestTutors}
                 />
             </div>
         </div>
@@ -798,6 +807,8 @@ const LeadSupervisorLoadedContent = ({
                     key={student.id || index}
                     studentName={student.name}
                     isNew={student.isNew}
+                    roomNumber={student.roomNumber}
+                    roomOutOfRange={student.roomOutOfRange}
                     status={student.status}
                     attendanceStatus={student.attendanceStatus}
                     engagementStatus={student.engagementStatus}
@@ -900,6 +911,7 @@ const LeadSupervisorEmptyContent = ({
 const RegularTutorViewRender = (args) => {
     const [currentSession, setCurrentSession] = useState(defaultSessions[0]);
     const [students, setStudents] = useState(defaultStudents);
+    const [requestOpen, setRequestOpen] = useState(false);
 
     const handleAttendanceChange = (studentId, newStatus) => {
         setStudents(prev => prev.map(s =>
@@ -949,6 +961,7 @@ const RegularTutorViewRender = (args) => {
                             onSessionChange={setCurrentSession}
                             onAttendanceChange={handleAttendanceChange}
                             onEngagementChange={handleEngagementChange}
+                            onRequestLeadTutor={() => setRequestOpen(true)}
                             isInteractive={true}
                             showBanner={showBanner}
                             bannerSessionType={bannerSessionType}
@@ -994,6 +1007,14 @@ const RegularTutorViewRender = (args) => {
                         )}
                     </div>
                 )}
+
+                {/* Request lead tutor off-canvas — opened from the Session Controls overflow menu. */}
+                <RequestTutorOffCanvas
+                    role="tutor"
+                    open={requestOpen}
+                    onClose={() => setRequestOpen(false)}
+                    session={{ time: currentSession.time, class: currentSession.school, teacher: currentSession.teacher }}
+                />
         </div>
     );
 };
@@ -1059,6 +1080,7 @@ const scrim2ModalLabels = {
 const LeadSupervisorViewRender = (args) => {
     const [currentSession, setCurrentSession] = useState(defaultSessions[0]);
     const [students, setStudents] = useState(defaultStudents);
+    const [requestOpen, setRequestOpen] = useState(false);
 
     const handleAttendanceChange = (studentId, newStatus) => {
         setStudents(prev => prev.map(s => (s.id === studentId ? { ...s, attendanceStatus: newStatus } : s)));
@@ -1102,6 +1124,7 @@ const LeadSupervisorViewRender = (args) => {
                         onSessionChange={setCurrentSession}
                         onAttendanceChange={handleAttendanceChange}
                         onEngagementChange={handleEngagementChange}
+                        onRequestTutors={() => setRequestOpen(true)}
                         isInteractive={true}
                         showBanner={showBanner}
                         bannerSessionType={bannerSessionType}
@@ -1153,6 +1176,14 @@ const LeadSupervisorViewRender = (args) => {
                     <Scrim2Modal />
                 </div>
             )}
+
+            {/* Request tutor off-canvas — opened from the Session Controls overflow menu ("Request tutors"). */}
+            <RequestTutorOffCanvas
+                role="lead"
+                open={requestOpen}
+                onClose={() => setRequestOpen(false)}
+                session={{ time: currentSession.time, class: currentSession.school, teacher: currentSession.teacher }}
+            />
         </div>
     );
 };

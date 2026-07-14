@@ -1,0 +1,44 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as InstitutionSelectionStories from './InstitutionSelection.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={InstitutionSelectionStories} />
+
+<Title />
+
+States: empty · open · typing · filled (Figma `Dropdown / Institution Selection`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-1815"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Login/Elements/InstitutionSelection"
+    sets={[
+        { name: 'Elements frame', nodeId: '112:1200' },
+        { name: 'Dropdown / Institution Selection', nodeId: '112:1815' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Non-interactive spec strip so every dropdown state stays visible.</>}
+>
+    <Canvas
+        of={InstitutionSelectionStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

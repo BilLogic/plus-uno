@@ -56,7 +56,7 @@ function mapRel(rel) {
 }
 
 // ---------- collect files ----------
-const SCAN_ROOTS = ['design-system/src', 'src', 'playground', '.storybook'];
+const SCAN_ROOTS = ['design-system/src', 'src', 'prototypes', '.storybook'];
 const JS_EXT = ['.js', '.jsx', '.ts', '.tsx', '.mdx'];
 const files = [];
 (function walk(dir) {

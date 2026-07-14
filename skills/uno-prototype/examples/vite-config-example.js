@@ -1,12 +1,12 @@
 /**
- * Canonical Vite config for a playground prototype.
+ * Canonical Vite config for a prototypes prototype.
  *
- * Copy this file to playground/{your-project}/vite.config.js and update:
- *   1. The server.port — pick an unused port (check other playground configs)
+ * Copy this file to prototypes/{your-project}/vite.config.js and update:
+ *   1. The server.port — pick an unused port (check other prototypes configs)
  *   2. The comment at the top describing your prototype
  *
  * The alias paths use ../../../../ to reach design-system/src from
- * playground/{project}/ (two levels up to repo root, then into design-system).
+ * prototypes/{project}/ (two levels up to repo root, then into design-system).
  * If your prototype is nested differently, adjust the path depth.
  */
 
@@ -23,7 +23,7 @@ export default defineConfig({
      * root tells Vite where to find index.html.
      * Setting it to __dirname means Vite serves from this directory,
      * which is important when running from the repo root via
-     *   vite --config playground/{project}/vite.config.js
+     *   vite --config prototypes/{project}/vite.config.js
      */
     root: __dirname,
 
@@ -54,7 +54,7 @@ export default defineConfig({
     },
 
     server: {
-        /** Pick a unique port — avoid collisions with other playground prototypes */
+        /** Pick a unique port — avoid collisions with other prototypes prototypes */
         port: 3020,
         /** host: true makes the server accessible on the local network */
         host: true,

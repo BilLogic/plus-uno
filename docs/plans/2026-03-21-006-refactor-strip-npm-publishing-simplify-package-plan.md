@@ -12,7 +12,7 @@ related:
 
 ## Overview
 
-Now that npm publishing and Figma Code Connect are off the table (see plan 005), strip all publishing-related configuration from `packages/plus-ds/` while keeping the directory structure intact. The directory stays where it is — playground prototypes use relative path aliases to reach it, so moving it would break everything.
+Now that npm publishing and Figma Code Connect are off the table (see plan 005), strip all publishing-related configuration from `packages/plus-ds/` while keeping the directory structure intact. The directory stays where it is — prototypes prototypes use relative path aliases to reach it, so moving it would break everything.
 
 ## Problem Statement
 
@@ -29,10 +29,10 @@ Now that npm publishing and Figma Code Connect are off the table (see plan 005),
 
 ### Why Not Move the Directory?
 
-The project is a pseudo-monorepo with **no npm workspaces**. Every playground prototype resolves the design system via relative paths in its own `vite.config.js`:
+The project is a pseudo-monorepo with **no npm workspaces**. Every prototypes prototype resolves the design system via relative paths in its own `vite.config.js`:
 
 ```js
-// playground/prototyping/bill/home-redesign/vite.config.js
+// prototypes/prototyping/bill/home-redesign/vite.config.js
 resolve: {
   alias: {
     '@plus-ds': '../../../../../../packages/plus-ds/src'
@@ -40,7 +40,7 @@ resolve: {
 }
 ```
 
-Moving `packages/plus-ds/` to `design-system/` or `src/` would break every playground's vite config. The cost of restructuring is high and the benefit is zero — the directory name is just a namespace.
+Moving `packages/plus-ds/` to `design-system/` or `src/` would break every prototypes's vite config. The cost of restructuring is high and the benefit is zero — the directory name is just a namespace.
 
 ### What to Strip
 
@@ -158,14 +158,14 @@ Based on `.storybook/main.js` story globs pointing to `packages/plus-ds/src/**/*
 
 ### Import Pattern Changes
 
-**No import changes needed.** The `@` alias and relative paths in playground configs resolve to `packages/plus-ds/src/` regardless of package.json configuration. Imports like:
+**No import changes needed.** The `@` alias and relative paths in prototypes configs resolve to `packages/plus-ds/src/` regardless of package.json configuration. Imports like:
 
 ```jsx
 import { Button } from '@tutors.plus/design-system'  // ← this may need alias update
 import Alert from '@/components/Alert'                 // ← this works unchanged
 ```
 
-**One potential issue**: If any playground imports use the npm package name `@tutors.plus/design-system` and resolve it through node_modules (from the tarball), those imports will break when the tarball is deleted.
+**One potential issue**: If any prototypes imports use the npm package name `@tutors.plus/design-system` and resolve it through node_modules (from the tarball), those imports will break when the tarball is deleted.
 
 **Migration**: Grep for `@tutors.plus/design-system` imports and ensure they all resolve through vite aliases, not node_modules.
 
@@ -177,7 +177,7 @@ import Alert from '@/components/Alert'                 // ← this works unchang
 4. Delete `dist/` if it exists on disk
 5. Add comment to `vite.config.js` build section noting it's dormant
 6. Verify Storybook still works: `npm run storybook`
-7. Verify playground prototypes still work: `npm run dev:home-redesign`
+7. Verify prototypes prototypes still work: `npm run dev:home-redesign`
 8. `guidelines/` removal handled by plan 004
 
 ## Impact on Plan 004

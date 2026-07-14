@@ -8,6 +8,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import { TopBar, Sidebar } from '../../Sections';
+import { usePageLayoutShell } from './PageLayoutShellContext';
 
 /** Shared motion: sidebar + content grow/shrink in sync (Material-style decelerate, 280ms). */
 const SIDEBAR_TRANSITION = 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -40,59 +41,110 @@ const PageLayout = ({
     /** When true, force sidebar expanded (e.g. for Storybook/demos). Overrides breakpoint. */
     sidebarExpanded = false,
 }) => {
-    const [isSidebarVisible, setIsSidebarVisible] = useState(() => (sidebarExpanded || !sidebarHidden));
+    const pageShell = usePageLayoutShell();
+    const forceExpanded = sidebarExpanded || Boolean(pageShell?.forceSidebarExpanded);
+    const fullscreen = Boolean(pageShell?.fullscreen);
+    const [isSidebarVisible, setIsSidebarVisible] = useState(() => (forceExpanded || !sidebarHidden));
     const containerRef = React.useRef(null);
     /** When shell width is below lg, user-expanded sidebar must not be undone by ResizeObserver. */
     const manualNarrowExpandRef = React.useRef(false);
-    const breakpoint = 1024; // lg-min breakpoint per DS schema
+    const breakpoint = 1024; // lg-min breakpoint per DS schema — sidebar on at LG+; collapsed below
 
     const showSidebar = !sidebarHidden && isSidebarVisible;
 
     /** Sidebar expects `activeTabId`; specs often pass `activeTab`. Strip both before spread. */
     const sidebarProps = { ...(sidebarConfig || {}) };
-    const sidebarActiveCombined = sidebarProps.activeTabId ?? sidebarProps.activeTab;
+    if (pageShell?.enabled) {
+        if (pageShell.user) sidebarProps.user = pageShell.user;
+        if (pageShell.goHome) sidebarProps.onHomeClick = pageShell.goHome;
+        if (pageShell.onTabClick) sidebarProps.onTabClick = pageShell.onTabClick;
+    }
+    const sidebarActiveCombined =
+        (pageShell?.enabled && pageShell.activeTab ? pageShell.activeTab : null)
+        ?? sidebarProps.activeTabId
+        ?? sidebarProps.activeTab;
     delete sidebarProps.activeTabId;
     delete sidebarProps.activeTab;
 
-    // Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
-    // MD/LG breakpoints) starts with the Sidebar already collapsed — no expanded→collapsed flash.
-    useLayoutEffect(() => {
-        if (sidebarHidden || sidebarExpanded || !containerRef.current) return;
-        const w = containerRef.current.getBoundingClientRect().width;
-        if (w && w < breakpoint) setIsSidebarVisible(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    /**
+ * Read layout width using border-box so 1px borders don’t push LG (1024) under the threshold.
+ * @param {Element | null} el
+ * @param {ResizeObserverEntry} [entry]
+ * @returns {number}
+ */
+const readWidth = (el, entry) => {
+    const box = entry?.borderBoxSize?.[0];
+    if (box && typeof box.inlineSize === 'number') return box.inlineSize;
+    if (!el) return 0;
+    return el.getBoundingClientRect().width;
+};
 
-    useEffect(() => {
-        if (sidebarHidden) {
-            manualNarrowExpandRef.current = false;
-            setIsSidebarVisible(false);
-            return undefined;
-        }
-        if (sidebarExpanded) {
-            manualNarrowExpandRef.current = false;
-            setIsSidebarVisible(true);
-            return undefined;
-        }
-        if (!containerRef.current) return;
+/**
+ * Storybook ResponsiveFrame can set `data-plus-breakpoint` (md|lg|xl) so sidebar
+ * follows the toolbar simulation even when the frame fills a wider docs column.
+ * @param {Element | null} el
+ * @returns {'md' | 'lg' | 'xl' | null}
+ */
+const readForcedBreakpoint = (el) => {
+    const host = el?.closest?.('[data-plus-breakpoint]');
+    const bp = host?.getAttribute?.('data-plus-breakpoint');
+    if (bp === 'md' || bp === 'lg' || bp === 'xl') return bp;
+    return null;
+};
 
-        const observer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                const w = entry.contentRect.width;
-                if (w >= breakpoint) {
-                    manualNarrowExpandRef.current = false;
-                    setIsSidebarVisible(true);
-                } else {
-                    // Narrow: respect user overlay-open; otherwise collapse (default below lg).
-                    setIsSidebarVisible(manualNarrowExpandRef.current);
-                }
+/**
+ * @param {number} width
+ * @param {'md' | 'lg' | 'xl' | null} forced
+ * @returns {boolean} Whether the sidebar should be visible by default
+ */
+const sidebarVisibleFor = (width, forced) => {
+    if (forced === 'md') return false;
+    if (forced === 'lg' || forced === 'xl') return true;
+    return width >= breakpoint;
+};
+
+// Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
+// MD breakpoint) starts with the Sidebar already collapsed — no expanded→collapsed flash.
+useLayoutEffect(() => {
+    if (sidebarHidden || forceExpanded || !containerRef.current) return;
+    const el = containerRef.current;
+    const forced = readForcedBreakpoint(el);
+    const w = readWidth(el);
+    setIsSidebarVisible(sidebarVisibleFor(w, forced));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
+useEffect(() => {
+    if (sidebarHidden) {
+        manualNarrowExpandRef.current = false;
+        setIsSidebarVisible(false);
+        return undefined;
+    }
+    if (forceExpanded) {
+        manualNarrowExpandRef.current = false;
+        setIsSidebarVisible(true);
+        return undefined;
+    }
+    if (!containerRef.current) return undefined;
+
+    const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+            const forced = readForcedBreakpoint(entry.target);
+            const w = readWidth(entry.target, entry);
+            if (sidebarVisibleFor(w, forced)) {
+                manualNarrowExpandRef.current = false;
+                setIsSidebarVisible(true);
+            } else {
+                // Narrow / MD: respect user overlay-open; otherwise collapse.
+                setIsSidebarVisible(manualNarrowExpandRef.current);
             }
-        });
+        }
+    });
 
-        observer.observe(containerRef.current);
+    observer.observe(containerRef.current);
 
-        return () => observer.disconnect();
-    }, [sidebarHidden, sidebarExpanded]);
+    return () => observer.disconnect();
+}, [sidebarHidden, forceExpanded]);
 
     const handleSidebarToggle = (newMode) => {
         if (sidebarHidden) return;
@@ -111,19 +163,23 @@ const PageLayout = ({
         <div
             id={id}
             ref={containerRef}
-            className={`plus-page-layout ${className}`}
+            className={`plus-page-layout${fullscreen ? ' plus-page-layout--fullscreen' : ''} ${className}`}
             style={{
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
                 height: '100%',
+                minHeight: fullscreen ? 0 : undefined,
+                flex: fullscreen ? '1 1 auto' : undefined,
                 backgroundColor: 'var(--color-surface-container)',
                 overflow: 'hidden',
-                border: '1px solid var(--color-outline-variant)',
-                borderRadius: '8px',
+                border: fullscreen ? 'none' : '1px solid var(--color-outline-variant)',
+                borderRadius: fullscreen ? 0 : '8px',
                 boxSizing: 'border-box',
-                padding: 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)',
+                padding: fullscreen
+                    ? 'var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 16px)'
+                    : 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)',
                 gap: 'var(--size-element-gap-md, 16px)',
                 alignItems: 'flex-start',
                 ...style
@@ -189,7 +245,7 @@ const PageLayout = ({
                         pointerEvents: showSidebar ? 'auto' : 'none',
                     }}
                 >
-                    <div style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH, height: '100%', overflowY: 'auto' }}>
+                    <div style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH, height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
                         <Sidebar
                             {...sidebarProps}
                             activeTabId={sidebarActiveCombined}

@@ -64,7 +64,7 @@ No path from PRD to prototyping skips grounding, at any fidelity.
 - Pull user flows, constraints, and current-state context from `uno-blueprint`,
   **scoped to this project's Roadmap card** plus globally-flagged constraints.
   Summarize long records — grounding is scoped retrieval, never a blueprint dump.
-- Sweep for prior art: existing components, specs, and playground prototypes
+- Sweep for prior art: existing components, specs, and prototypes prototypes
   touching the same surface.
 - **Figma grounding when a frame is in play — the runtimes are NOT symmetric:**
   the **IDE** connects to Figma directly (`get_design_context`, `get_screenshot`,

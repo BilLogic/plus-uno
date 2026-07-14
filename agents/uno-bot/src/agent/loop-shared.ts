@@ -90,13 +90,62 @@ export const MAX_TOKENS = 16384;
 // dial raised 2026-07-09 — team prefers thorough over fast (user decision).
 // NOTE: 12 sits closer to the subrequest cliff than the old 6 — if "eyes then
 // silence" recurs on search-heavy turns, this is the first dial to look at.
+// Kept as a secondary hard COUNT backstop behind the weighted budget below.
 export const READONLY_TOOL_BUDGET = 12;
+
+// ── Weighted subrequest budget (the real guard) ───────────────────────────────
+//
+// Why weighted, not a flat count: the free plan hard-caps each Worker
+// invocation at 50 subrequests (Notion reads, Slack calls, DO hops, model call
+// — every fetch). A COUNT budget waves through 12 source_reads (~4 subrequests
+// each = ~48) and the request dies mid-flight — and because posting the error
+// ALSO costs a subrequest, it dies SILENTLY ("👀 then nothing"; live incident
+// 2026-07-13, Handoff thread). We estimate per-tool subrequest cost and reserve
+// a delivery budget that lookups can never spend. Conservative/high estimates +
+// a generous reserve keep us safely under 50; we log the estimate to calibrate.
+//
+// NOT real fetch-counting (design decision): this touches only the loop files,
+// so there's no "missed a fetch path" failure mode.
+
+// Estimated subrequests per read-only tool INCLUDING the model round-trip its
+// result triggers. Conservative (high) — better to synthesize early than die.
+const READONLY_TOOL_COST: Record<string, number> = {
+  source_read: 6,
+  blueprint_search: 6,
+  delegate: 6,
+  notion_search: 4,
+  roadmap_query: 4,
+  github_read: 4,
+  slack_search: 3,
+  slack_thread_read: 3,
+  slack_user_profile: 3,
+  slack_channel_members: 3,
+  slack_react: 2,
+};
+// Default for any unlisted read-only tool.
+const READONLY_TOOL_COST_DEFAULT = 4;
+
+/** Estimated subrequest cost of one read-only tool call (map value or default). */
+export function readOnlyToolCost(name: string): number {
+  return READONLY_TOOL_COST[name] ?? READONLY_TOOL_COST_DEFAULT;
+}
+
+// Tunable dials — recalibrate from the `[budget]` telemetry line.
+export const SUBREQUEST_CAP = 50; // Cloudflare free-plan hard cap per invocation.
+// Reserved for delivery — NEVER spent on lookups: final post + one retry + 2
+// history writes + the pre-send review-judge model call + margin.
+export const DELIVERY_RESERVE = 12;
+// Spent before grounding starts: Slack context load + initial model call + DO
+// reads before the first tool round.
+export const PRE_GROUNDING_OVERHEAD = 10;
+// What's actually left for grounding lookups (= 28).
+export const GROUNDING_BUDGET = SUBREQUEST_CAP - DELIVERY_RESERVE - PRE_GROUNDING_OVERHEAD;
 
 // ── Shared prompt strings (must read identically in both lanes) ───────────────
 
 /** Fed back as a tool_result when the read-only budget is spent. */
 export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
-  "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction).";
+  "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
 
 /** Injected as a final user turn to force a tools-disabled synthesis pass. */
 export const BUDGET_EXHAUSTED_SYNTHESIS =
@@ -170,13 +219,12 @@ export type ResolveValidation =
 export function validateProposalResolve(
   args: { decision?: unknown; message_to_user?: unknown } | undefined,
   pending: PendingProposal | null,
-  currentSenderId: string,
+  // Kept for signature stability + logging; no longer gated on — anyone in the
+  // thread may confirm/cancel (2026-07-14).
+  _currentSenderId: string,
 ): ResolveValidation {
   if (!pending) {
     return { ok: false, error: "no pending proposal in this thread — reply conversationally instead" };
-  }
-  if (currentSenderId !== pending.requesterUserId) {
-    return { ok: false, error: `not authorized — only <@${pending.requesterUserId}> can resolve this proposal` };
   }
   const decision = args?.decision;
   if (decision !== "confirm" && decision !== "cancel") {
@@ -221,7 +269,7 @@ async function executeSlackReact(
   if (emoji === "white_check_mark" || emoji === "x") {
     return JSON.stringify({
       ok: false,
-      error: "white_check_mark and x are reserved for the requester's confirm/cancel on proposal cards",
+      error: "white_check_mark and x are reserved for confirm/cancel on proposal cards",
     });
   }
   const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;

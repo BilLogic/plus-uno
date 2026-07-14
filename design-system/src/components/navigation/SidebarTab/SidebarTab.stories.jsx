@@ -57,7 +57,7 @@ export const InSidebar = () => {
         <div style={sidebarSurface}>
             <nav
                 aria-label="Example sidebar navigation"
-                style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-pad-x-sm, 4px)', width: '100%' }}
             >
                 {items.map((item) => (
                     <SidebarTab

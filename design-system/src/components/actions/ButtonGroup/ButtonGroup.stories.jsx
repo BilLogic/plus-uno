@@ -150,11 +150,11 @@ function ButtonGroupUseCasesDemos() {
                         style="secondary"
                         fill="outline"
                         buttons={[
-                            { leadingVisual: 'chevron-left' },
+                            { leadingVisual: 'chevron-left', props: { 'aria-label': 'Previous page' } },
                             { text: '1' },
                             { text: '2', active: true },
                             { text: '3' },
-                            { trailingVisual: 'chevron-right' }
+                            { trailingVisual: 'chevron-right', props: { 'aria-label': 'Next page' } }
                         ]}
                     />
                     <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Pagination Controls</span>
@@ -165,9 +165,9 @@ function ButtonGroupUseCasesDemos() {
                         style="tertiary"
                         fill="ghost"
                         buttons={[
-                            { leadingVisual: 'bold' },
-                            { leadingVisual: 'italic' },
-                            { leadingVisual: 'underline' }
+                            { leadingVisual: 'bold', props: { 'aria-label': 'Bold' } },
+                            { leadingVisual: 'italic', props: { 'aria-label': 'Italic' } },
+                            { leadingVisual: 'underline', props: { 'aria-label': 'Underline' } }
                         ]}
                     />
                     <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Text Formatting Toolbar</span>

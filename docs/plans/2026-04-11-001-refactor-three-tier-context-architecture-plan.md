@@ -40,7 +40,7 @@ deepened: 2026-04-11
 
 ### New Considerations Discovered
 - `cursorrules.md` and `.cursor/rules/plus-agent.mdc` need path updates (they reference AGENTS.md which is safe, but may contain internal path refs)
-- `playground/storybook-ai-agent/` (non-LLM variant) also has hardcoded doc paths — needs Phase 9 coverage
+- `prototypes/storybook-ai-agent/` (non-LLM variant) also has hardcoded doc paths — needs Phase 9 coverage
 - `context: fork` is appropriate for `uno-research` (isolated exploration) but NOT for `uno-prototype`/`uno-compound` (need conversation history)
 - Plain "See" references in AGENTS.md confirmed correct over `@import` for cross-agent compatibility and lazy loading
 - `docs/design-system/layout-grid.md` → merge into `foundations/layout.md` (decision made, no longer ambiguous)
@@ -226,7 +226,7 @@ mkdir -p .agent/skills/uno-plan/examples
 **`foundations/content-voice.md`** (~30-40 lines) — **Author with Bill** (no existing voice/tone doc in repo):
 - Voice: warm, direct, encouraging — tutors are college students, not enterprise users *(new — Bill to confirm)*
 - Tone shifts by context: instructional (training), supportive (in-session), professional (admin) *(new)*
-- Action-oriented labels: "Start Session" not "Session Initiation", "Call Off" not "Request Absence" *(derivable from playground prototypes by inspection)*
+- Action-oriented labels: "Start Session" not "Session Initiation", "Call Off" not "Request Absence" *(derivable from prototypes prototypes by inspection)*
 - Error messages: say what happened, what to do, no blame *(new)*
 - Terminology: use PLUS vocabulary (see `docs/context/conventions/terminology.md`) *(valid cross-ref)*
 - Capitalization: sentence case for UI labels, title case for page titles only *(new)*
@@ -235,14 +235,14 @@ mkdir -p .agent/skills/uno-plan/examples
 **`components/patterns.md`** (~60-80 lines) — **Extract from existing code + LAYOUT_CHEAT_SHEET.md:**
 - Page layout pattern: `<PageLayout>` wrapper with sidebar + content area *(extract from PLUS_LAYOUT_CHEAT_SHEET.md)*
 - Card-based content: `StudentCard`, data cards, info cards — bounded containers *(extract from `design-system/src/specs/`)*
-- Form patterns: single-column forms, inline validation, required field indicators *(inspect playground prototypes)*
+- Form patterns: single-column forms, inline validation, required field indicators *(inspect prototypes prototypes)*
 - Table patterns: sortable columns, pagination, row actions, empty state *(inspect TutorPerformancePage, GroupPerformancePage)*
-- Empty state pattern: illustration + message + primary action *(inspect playground prototypes)*
-- Loading pattern: skeleton screens for cards, spinners for actions *(inspect playground prototypes)*
+- Empty state pattern: illustration + message + primary action *(inspect prototypes prototypes)*
+- Loading pattern: skeleton screens for cards, spinners for actions *(inspect prototypes prototypes)*
 - Navigation: sidebar tree nav (3 categories: Toolkit, Training, Admin) *(from ideation/2026-03-17-toolkit-ia-revision)*
 - Modal pattern: confirmation dialogs, detail panels, form overlays *(inspect specs/Universal)*
 - Responsive behavior patterns *(inspect breakpoint usage across playgrounds)*
-- **Source files to examine:** `PLUS_LAYOUT_CHEAT_SHEET.md` (primary), `design-system/src/specs/Universal/`, `design-system/src/specs/Toolkit/`, playground prototypes
+- **Source files to examine:** `PLUS_LAYOUT_CHEAT_SHEET.md` (primary), `design-system/src/specs/Universal/`, `design-system/src/specs/Toolkit/`, prototypes prototypes
 
 **`agent-persona.md`** (~30-40 lines) — **Mostly extractable** (4/8 bullets have direct sources):
 - Name: PLUS Design Agent *(new naming decision — confirm with Bill)*
@@ -527,7 +527,7 @@ Rewrite to include:
 # Side-effect skills (create/modify files):
 ---
 name: uno-prototype
-description: Scaffold playground prototypes with PLUS DS integration. Use when...
+description: Scaffold prototypes prototypes with PLUS DS integration. Use when...
 disable-model-invocation: true  # Requires explicit user invocation
 allowed-tools: Read, Write, Bash(npm run *), Bash(mkdir *)
 ---
@@ -627,8 +627,8 @@ This is the highest-risk phase. **100+ path references** across the codebase mus
 10. **docs/design-system/integrations.md** — references to `.agent/references/figma-mcp-guide.md`
 11. **docs/design-system/platform-integration.md** — update architecture hierarchy
 12. **README.md** — 6+ references to old paths
-13. **playground/storybook-ai-agent-llm-api/StorybookAIAgent.jsx** — hardcoded `docs/project/` paths
-14. **playground/templates/*.md** — stale references (already broken, fix or delete)
+13. **prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx** — hardcoded `docs/project/` paths
+14. **prototypes/templates/*.md** — stale references (already broken, fix or delete)
 15. **.agent/assets/README.md** — redirect or delete
 16. **JSON index files** (now in skill references/) — self-references, path patterns
 
@@ -657,9 +657,9 @@ grep -r "docs/ideation/" --include="*.md"
 grep -r "docs/" cursorrules.md 2>/dev/null
 grep -r "docs/" .cursor/rules/ 2>/dev/null
 
-# Check BOTH playground agent variants:
-grep -r "docs/" playground/storybook-ai-agent/ --include="*.jsx" 2>/dev/null
-grep -r "docs/" playground/storybook-ai-agent-llm-api/ --include="*.jsx" 2>/dev/null
+# Check BOTH prototypes agent variants:
+grep -r "docs/" prototypes/storybook-ai-agent/ --include="*.jsx" 2>/dev/null
+grep -r "docs/" prototypes/storybook-ai-agent-llm-api/ --include="*.jsx" 2>/dev/null
 ```
 
 **Post-Phase-9 validation script** (run after all reference updates):
@@ -736,7 +736,7 @@ echo "Validation complete."
 | `docs/design-system/layout-grid.md` | Merge into `docs/context/design-system/foundations/layout.md` | Grid system content belongs in foundations |
 | `cursorrules.md` (repo root) | Update if it contains internal path refs beyond `@AGENTS.md` | Cross-agent compatibility file |
 | `.cursor/rules/plus-agent.mdc` | Check for internal path refs and update | Platform-specific rule file |
-| `playground/storybook-ai-agent/StorybookAIAgent.jsx` | Update hardcoded doc paths (same as LLM variant) | Both agent variants need path fixes |
+| `prototypes/storybook-ai-agent/StorybookAIAgent.jsx` | Update hardcoded doc paths (same as LLM variant) | Both agent variants need path fixes |
 | `.storybook/FORMS_DOCS_PLAN.md` | Keep (inside .storybook, not part of docs restructure) | Out of scope |
 | `figma/plans-access-and-permissions.md` | Keep (standalone reference) | Out of scope |
 
@@ -795,7 +795,7 @@ echo "Validation complete."
 - [ ] Zero broken path references in active files
 - [ ] Git history preserved for all moved files (use `git mv`)
 - [ ] No changes to `design-system/src/` (source code untouched)
-- [ ] No changes to `playground/` (except path reference fixes)
+- [ ] No changes to `prototypes/` (except path reference fixes)
 - [ ] No changes to `storybook-static/` or `node_modules/`
 
 ### Quality Gates

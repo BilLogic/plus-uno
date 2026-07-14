@@ -58,56 +58,72 @@ const ChoiceGrid = ({
 
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
+    const baseId = id || name || 'choice-grid';
+    const rowHeaderId = `${baseId}-row-header`;
+
     return (
         <div className={wrapperClasses} style={style} {...props}>
             <table className="plus-choice-grid-table">
                 <thead>
                     <tr>
-                        <th className="plus-choice-grid-row-header"></th>
+                        <th className="plus-choice-grid-row-header">
+                            <span className="plus-choice-grid-visually-hidden" id={rowHeaderId}>Row</span>
+                        </th>
                         {columns.map((column) => (
-                            <th key={column.id} className={`plus-choice-grid-column-header ${sizeClass}`}>
+                            <th
+                                key={column.id}
+                                id={`${baseId}-col-${column.id}`}
+                                className={`plus-choice-grid-column-header ${sizeClass}`}
+                            >
                                 {column.label}
                             </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {rows.map((row) => (
-                        <tr key={row.id} className="plus-choice-grid-row">
-                            <td className={`plus-choice-grid-row-label ${sizeClass}`}>
-                                {row.label}
-                            </td>
-                            {columns.map((column) => {
-                                const checked = isChecked(row.id, column.id);
-                                const inputId = `${id || name || 'choice-grid'}-${row.id}-${column.id}`;
-                                const inputName = type === 'radio' ? `${name || id || 'choice-grid'}-${row.id}` : inputId;
+                    {rows.map((row) => {
+                        const rowLabelId = `${baseId}-row-${row.id}-label`;
 
-                                return (
-                                    <td key={column.id} className="plus-choice-grid-cell">
-                                        {type === 'radio' ? (
-                                            <ChoiceGridRadioItem
-                                                id={inputId}
-                                                name={inputName}
-                                                checked={checked}
-                                                disabled={disabled}
-                                                size={size}
-                                                onChange={() => handleChange(row.id, column.id, true)}
-                                            />
-                                        ) : (
-                                            <ChoiceGridCheckboxItem
-                                                id={inputId}
-                                                name={inputName}
-                                                checked={checked}
-                                                disabled={disabled}
-                                                size={size}
-                                                onChange={(e) => handleChange(row.id, column.id, e.target.checked)}
-                                            />
-                                        )}
-                                    </td>
-                                );
-                            })}
-                        </tr>
-                    ))}
+                        return (
+                            <tr key={row.id} className="plus-choice-grid-row">
+                                <td id={rowLabelId} className={`plus-choice-grid-row-label ${sizeClass}`}>
+                                    {row.label}
+                                </td>
+                                {columns.map((column) => {
+                                    const checked = isChecked(row.id, column.id);
+                                    const inputId = `${baseId}-${row.id}-${column.id}`;
+                                    const inputName = type === 'radio' ? `${name || id || 'choice-grid'}-${row.id}` : inputId;
+                                    const columnHeaderId = `${baseId}-col-${column.id}`;
+
+                                    return (
+                                        <td key={column.id} className="plus-choice-grid-cell">
+                                            {type === 'radio' ? (
+                                                <ChoiceGridRadioItem
+                                                    id={inputId}
+                                                    name={inputName}
+                                                    checked={checked}
+                                                    disabled={disabled}
+                                                    size={size}
+                                                    aria-labelledby={`${rowLabelId} ${columnHeaderId}`}
+                                                    onChange={() => handleChange(row.id, column.id, true)}
+                                                />
+                                            ) : (
+                                                <ChoiceGridCheckboxItem
+                                                    id={inputId}
+                                                    name={inputName}
+                                                    checked={checked}
+                                                    disabled={disabled}
+                                                    size={size}
+                                                    aria-labelledby={`${rowLabelId} ${columnHeaderId}`}
+                                                    onChange={(e) => handleChange(row.id, column.id, e.target.checked)}
+                                                />
+                                            )}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>

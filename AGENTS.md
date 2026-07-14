@@ -9,7 +9,7 @@ Users remember six skills (or describe intent and get routed). Skills invoke age
 
 ## Identity
 
-You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a prototype builder and design-system workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students) — it is **not a production app**; never evaluate for auth/SSR/API hardening.
+You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **live app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — do not rename the entry). Branch experiments stay on Deploy Previews / standalone Netlify and are catalogued in Notion. It is still **not** a hardened product backend; never evaluate for auth/SSR/API production hardening.
 
 - Ground every product claim in `uno-blueprint`, every DS claim in `uno-storybook`; cite links.
 - The blueprint and the Notion Roadmap speak **different vocabularies** (service-blueprint vs project-management) — never mix them; the two-vocabularies table in `docs/conventions/terminology.md` is the law. "Roadmap", "card", "Design Status" are never blueprint words; "scenario", "layer", "step", "cell" are never Roadmap words.
@@ -54,7 +54,7 @@ Design System knowledge lives in `design-system/docs/` (hand-authored) and `desi
 
 ## Storybook MCP (agents: prefer this over grepping stories)
 
-`@storybook/addon-mcp` serves an MCP endpoint at **http://localhost:4200/mcp** while `npm run storybook` runs (registered in `.mcp.json` as `plus-storybook`). Use it as the primary interface to the design system:
+`@storybook/addon-mcp` serves an MCP endpoint at **http://localhost:4200/mcp** while `npm run storybook` runs (registered in `.mcp.json` as `storybook`). Use it as the primary interface to the design system:
 
 - `list-all-documentation` → inventory of docs pages; `get-documentation` / `get-documentation-for-story` → component API + usage (verify props here instead of inferring — never hallucinate props).
 - `get-storybook-story-instructions` → ALWAYS call before authoring new stories; follow it over generic CSF habits.
@@ -98,7 +98,7 @@ Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `siz
 13. Always validate in Storybook when component behavior is touched.
 14. Confirm implementation plan and touched files before large or risky edits.
 15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free.
-16. Never write to a Notion surface outside the allowlist in `docs/conventions/notion.md`, and never create new select options, pillars, features, or OKRs there.
+16. Notion writes follow `docs/conventions/notion.md` (convention surfaces + ✅-gated tools) — never invent select options, pillars, features, or OKRs; exact-match existing option names. Safety is the gate + schema match, not a hardcoded DB fence.
 17. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
 18. **uno-prototype intake is one step per message**: When `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly one hook step — AskQuestion with `questions.length === 1` or one plain question. Never batch PRD/fidelity/Figma into one turn; never skip a step because context already answers it.
 19. **Figma write-back uses the DS gate — never screenshot import as the final frame**: When `.cursor/hooks/briefings/active-writeback-gate.json` exists, follow it. Place library component instances per `design-system/figma/component-alignment.md` using `component-registry.json` + `token-registry.json`. **Forbidden:** `generate_figma_design` / html-to-design capture as the `[replica]` deliverable (reference-only if used at all). Complete `npm run validate:figma-writeback` + `npm run audit:figma-writeback` before `writeback:audit-passed`.
@@ -120,8 +120,8 @@ Check `docs/knowledge/INDEX.md` before starting work — past lessons may apply.
 | `npm run sync:tokens` | Sync tokens from Figma |
 | `npm run generate:tokens` | Generate SCSS/JS from token source |
 | `npm run generate:agent` | Regenerate agent-views + Figma registries + audit |
-| `npm run dev:home-redesign` | Home redesign prototype |
-| `npm run dev:monthly-report` | Monthly report prototype |
+| `npm run dev:app` / `dev:home-redesign` | Live app shell |
+| `npm run dev:demo` | Full Demo Walkthrough (`/demo/demo.html`) |
 
 ## Progressive loading
 
@@ -133,7 +133,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Building UI, using components or tokens | `design-system/agent-views/components/{Name}/{Name}.md` if exists, else `components/index.md` + `tokens/tokens.md` |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
 | Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
-| Implementation setup (aliases, playground, Vite) | `design-system/docs/setup.md` |
+| Implementation setup (aliases, prototypes, Vite) | `design-system/docs/setup.md` |
 | Design philosophy / agent role | `design-system/docs/guidelines.md` |
 | Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |

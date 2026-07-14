@@ -28,14 +28,31 @@ This entry is part of **Toolkit** specs (Storybook title `Specs/Toolkit/In-Sessi
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+### Regular tutor — interactive
 
 <DocsInteractivePlayground
-    of={StudentDashboardStories.Interactive}
+    of={StudentDashboardStories.RegularTutorView}
     description={
         <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+            Toggle <strong className="text-foreground">view state</strong>, goal banner, session type and
+            toasts from the controls below. Set the display <strong className="text-foreground">breakpoint</strong>{' '}
+            from the <strong className="text-foreground">Breakpoint</strong> toolbar (top bar).
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Lead &amp; supervisor — interactive
+
+<DocsInteractivePlayground
+    of={StudentDashboardStories.LeadSupervisorView}
+    description={
+        <>
+            Same controls as the tutor view, plus <strong className="text-foreground">Scrim 1 / Scrim 2</strong>{' '}
+            selectors to stack the in-session modals over the page.
         </>
     }
 />

@@ -16,7 +16,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -62,7 +62,7 @@ export default {
  */
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <OnboardingOverviewPage />
@@ -110,7 +110,7 @@ export const Interactive = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         sortBy: 'Name',
         sortOrder: 'A-Z',
         showEmptyState: false,

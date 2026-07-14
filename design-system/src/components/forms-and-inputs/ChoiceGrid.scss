@@ -9,6 +9,20 @@
     width: 100%;
 }
 
+// Visually hidden but accessible to screen readers (labels the corner
+// header cell above the row-label column, which has no visible text).
+.plus-choice-grid-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .plus-choice-grid-table {
     width: 100%;
     border-collapse: separate;
@@ -373,9 +387,17 @@
 }
 
 // Disabled grid wrapper
+// Uses a solid muted token for text instead of low opacity, so header and
+// row-label text keep sufficient color contrast (WCAG AA). Inputs already
+// carry their own solid `:disabled` colors.
 .plus-choice-grid-disabled {
-    opacity: 0.6;
     pointer-events: none;
+    cursor: not-allowed;
+
+    .plus-choice-grid-column-header,
+    .plus-choice-grid-row-label {
+        color: var(--color-on-surface-variant);
+    }
 }
 
 

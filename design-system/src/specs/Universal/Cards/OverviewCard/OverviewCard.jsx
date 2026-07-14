@@ -124,6 +124,7 @@ const OverviewCard = ({
     animateIntro = false,
     introDelay = 0,
     editLink,
+    titleAs: TitleTag = 'h6',
     className = '',
     style,
     ...props
@@ -408,7 +409,7 @@ const OverviewCard = ({
         >
             {/* Header: Title + Icon */}
             <div className="plus-overview-card__header">
-                <h6 className="plus-overview-card__title">{getTitle()}</h6>
+                <TitleTag className="plus-overview-card__title">{getTitle()}</TitleTag>
                 <div className="plus-overview-card__icon">
                     {icon || <i className="fas fa-circle-info" />}
                 </div>
@@ -500,6 +501,13 @@ OverviewCard.propTypes = {
     introDelay: PropTypes.number,
     /** Show edit link (for time-spent type) */
     editLink: PropTypes.bool,
+    /**
+     * Heading tag/level for the card title. Defaults to `h6` since the card
+     * is usually a low-level region, but consumers embedding this card
+     * directly under a shallower heading (e.g. an `h3` section) should pass
+     * `h4` here to keep the page's heading order sequential (axe: heading-order).
+     */
+    titleAs: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']),
     /** Additional CSS classes */
     className: PropTypes.string,
     /** Inline styles */

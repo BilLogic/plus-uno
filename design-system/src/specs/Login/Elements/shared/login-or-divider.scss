@@ -1,0 +1,18 @@
+.login-or-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-lg);
+    width: 100%;
+}
+
+.login-or-divider__line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-outline-variant);
+    border-radius: var(--size-border-radius-radius-0);
+}
+
+.login-or-divider__text {
+    color: var(--color-on-surface);
+}

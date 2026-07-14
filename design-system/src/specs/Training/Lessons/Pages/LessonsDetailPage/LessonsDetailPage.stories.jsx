@@ -19,7 +19,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -79,7 +79,7 @@ export const P1 = {
         />
     ),
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         lessonTitle: 'Giving Effective Praise',
         estimatedTime: '15 Minutes'
     }
@@ -100,7 +100,7 @@ export const P2 = {
         />
     ),
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         lessonTitle: 'Giving Effective Praise'
     }
 };
@@ -120,7 +120,7 @@ export const P3 = {
         />
     ),
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         lessonTitle: 'Giving Effective Praise'
     }
 };
@@ -140,7 +140,7 @@ export const P4 = {
         />
     ),
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         lessonTitle: 'Giving Effective Praise'
     }
 };
@@ -160,7 +160,7 @@ export const P5 = {
         />
     ),
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         lessonTitle: 'Giving Effective Praise'
     }
 };
@@ -230,7 +230,7 @@ export const Interactive = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         variant: 'P1',
         lessonTitle: 'Giving Effective Praise',
         estimatedTime: '15 Minutes'

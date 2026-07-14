@@ -57,7 +57,7 @@ writers/notion.
       Task `researchers/people-scout` directly for ranked candidates.
    2. Before any intro draft is sent or conversation planned: draft the study
       guide per method.md; `writers/notion` writes it to the Research & notes
-      DB. Read `docs/conventions/notion.md` before the write — allowlisted
+      DB. Read `docs/conventions/notion.md` before the write — convention
       surfaces only, never create select options. **Notion unreachable?** Draft
       the guide locally, flag it `⏳ pending Notion write`, and say so — the
       gate is satisfied by the guide existing and being shown, never by
@@ -92,7 +92,7 @@ change to this skill must keep all five passing.
 ## Constraints
 
 - **Read-only, one exception:** the study guide (and research notes), written
-  via writers/notion to allowlisted Notion surfaces only.
+  via writers/notion to convention Notion surfaces only.
 - **Cite everything** — a finding without a citation doesn't ship.
 - **Never contact people** — people-scout sources and drafts; humans send.
 - **Never conclude** — no takeaways, no go/no-go, no PRD. Hand the brief to

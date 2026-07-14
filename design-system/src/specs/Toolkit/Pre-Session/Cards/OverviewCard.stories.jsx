@@ -12,8 +12,10 @@ export default {
  * Icon Button Component
  * Small circular button with icon, matching Figma design
  */
-export const IconButton = ({ icon = 'fa-table-cells-large' }) => (
+export const IconButton = ({ icon = 'fa-table-cells-large', ariaLabel = 'View options' }) => (
     <button
+        type="button"
+        aria-label={ariaLabel}
         className="d-flex align-items-center justify-content-center"
         style={{
             backgroundColor: 'var(--color-primary-state-08)',
@@ -25,6 +27,7 @@ export const IconButton = ({ icon = 'fa-table-cells-large' }) => (
     >
         <i
             className={`fa-solid ${icon}`}
+            aria-hidden="true"
             style={{
                 fontSize: 'var(--font-size-fa-h6-solid)',
                 color: 'var(--color-secondary-text)',
@@ -38,7 +41,7 @@ export const IconButton = ({ icon = 'fa-table-cells-large' }) => (
  * Stat Card Component
  * Top portion with title, icon button, and large stat number
  */
-export const StatCard = ({ title = 'Card title', value = '{#}', icon }) => (
+export const StatCard = ({ title = 'Card title', value = '{#}', icon, iconAriaLabel = 'View options' }) => (
     <div
         style={{
             backgroundColor: 'var(--color-surface-container-lowest)',
@@ -58,7 +61,7 @@ export const StatCard = ({ title = 'Card title', value = '{#}', icon }) => (
             >
                 {title}
             </span>
-            <IconButton icon={icon} />
+            <IconButton icon={icon} ariaLabel={iconAriaLabel} />
         </div>
 
         {/* Large stat value */}

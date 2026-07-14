@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import './Dropdown.scss';
 
@@ -17,6 +17,11 @@ const Dropdown = ({
 }) => {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const menuRef = useRef(null);
+    // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
+    // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
+    // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
+    const [placement, setPlacement] = useState({ vertical: 'down', horizontal: 'start' });
 
     // Determine if controlled or uncontrolled
     const isControlled = controlledIsOpen !== undefined;
@@ -44,6 +49,51 @@ const Dropdown = ({
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [dropdownRef]);
+
+    // Measure available space and choose a placement so the menu stays on-screen.
+    const measurePlacement = useCallback(() => {
+        const toggleEl = dropdownRef.current;
+        const menuEl = menuRef.current;
+        if (!toggleEl || !menuEl) return;
+        const t = toggleEl.getBoundingClientRect();
+        const m = menuEl.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        const vw = window.innerWidth || document.documentElement.clientWidth;
+        const MARGIN = 8;
+
+        // Vertical: only the neutral 'dropdown' auto-flips; 'dropup' stays up, side directions stay put.
+        let vertical = direction === 'dropup' ? 'up' : 'down';
+        if (direction === 'dropdown') {
+            const below = vh - t.bottom;
+            const above = t.top;
+            if (below < m.height + MARGIN && above > below) vertical = 'up';
+        }
+
+        // Horizontal alignment for vertical menus: right-align if a left-aligned menu would overflow.
+        let horizontal = 'start';
+        if (direction === 'dropdown' || direction === 'dropup') {
+            if (t.left + m.width > vw - MARGIN && t.right - m.width > MARGIN) horizontal = 'end';
+        }
+
+        setPlacement((prev) =>
+            prev.vertical === vertical && prev.horizontal === horizontal ? prev : { vertical, horizontal }
+        );
+    }, [direction]);
+
+    useLayoutEffect(() => {
+        if (!show) {
+            setPlacement((prev) => (prev.vertical === 'down' && prev.horizontal === 'start' ? prev : { vertical: 'down', horizontal: 'start' }));
+            return;
+        }
+        measurePlacement();
+        const onReflow = () => measurePlacement();
+        window.addEventListener('resize', onReflow);
+        window.addEventListener('scroll', onReflow, true);
+        return () => {
+            window.removeEventListener('resize', onReflow);
+            window.removeEventListener('scroll', onReflow, true);
+        };
+    }, [show, measurePlacement]);
 
     const wrapperClasses = [
         'pdropdown',
@@ -83,6 +133,7 @@ const Dropdown = ({
                 onClick={toggleDropdown}
                 aria-haspopup="true"
                 aria-expanded={show}
+                aria-label={split ? `${buttonText || 'Toggle'} options` : undefined}
             >
                 {!split && <span>{buttonText}</span>}
             </button>
@@ -119,7 +170,14 @@ const Dropdown = ({
                 )
             )}
 
-            <div className={menuClasses}>
+            <div
+                className={menuClasses}
+                ref={menuRef}
+                style={{
+                    ...(placement.vertical === 'up' ? { top: 'auto', bottom: '100%' } : null),
+                    ...(placement.horizontal === 'end' ? { left: 'auto', right: 0 } : null),
+                }}
+            >
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
                         <button

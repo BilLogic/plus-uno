@@ -33,8 +33,9 @@
     }
     
     // Disabled state
+    // Text color is muted via solid tokens below (not opacity), so label/description
+    // keep sufficient color contrast (WCAG AA). The button handles its own disabled style.
     &.plus-file-upload-disabled {
-        opacity: 0.6;
         cursor: not-allowed;
     }
 }

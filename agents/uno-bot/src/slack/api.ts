@@ -148,7 +148,7 @@ export function warrantsReviewRequest(toolName: string): boolean {
 const REVIEW_VERB: Record<string, string> = {
   component_implement: "component implementation PR",
   prototype_scaffold: "new prototype scaffold PR",
-  notion_create: "new PRD / card",
+  notion_create: "new PRD / intake / decision",
 };
 
 export interface ReviewRequestInput {

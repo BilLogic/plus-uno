@@ -186,18 +186,10 @@ export const Overview = () => (
  * - Details actions
  * - Breakpoint toggle to preview at different screen sizes
  */
-export const Interactive = () => {
-    const [showAlert, setShowAlert] = useState(true);
+const InteractiveRender = (args) => {
+    const showAlert = args.alert;
     const [selectedTab, setSelectedTab] = useState('all-sessions');
-    const [breakpoint, setBreakpoint] = useState('xl');
     const [filters, setFilters] = useState(defaultFilters);
-
-    // Breakpoint widths from design system
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
 
     const handleFilterChange = (filterKey, value) => {
         setFilters(prev => ({ ...prev, [filterKey]: value }));
@@ -216,87 +208,41 @@ export const Interactive = () => {
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                {/* Alert Toggle */}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Alert:
-                </span>
-                <Button
-                    text={showAlert ? 'On' : 'Off'}
-                    size="small"
-                    style="primary"
-                    fill={showAlert ? 'filled' : 'outline'}
-                    onClick={() => setShowAlert(!showAlert)}
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Sessions' }
+                    ],
+                    user: { name: 'John Doe', role: 'Lead' }
+                }}
+                sidebarConfig={{
+                    user: 'supervisor',
+                    activeTab: 'sessions'
+                }}
+                id="all-sessions-page-interactive"
+            >
+                <MainContent
+                    showAlert={showAlert}
+                    onAlertClose={() => {}}
+                    tabs={tabs}
+                    selectedTab={selectedTab}
+                    onTabChange={setSelectedTab}
+                    sessions={defaultSessions}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onDetails={handleDetails}
                 />
-
-                <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--size-element-gap-sm)' }} />
-
-                {/* Breakpoint Toggle */}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Page Preview Container */}
-            <div style={{
-                width: `${breakpointWidths[breakpoint]}px`,
-                height: '100%',
-                margin: '0 auto',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-                transition: 'width 0.3s ease'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions' }
-                        ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: 'supervisor',
-                        activeTab: 'sessions'
-                    }}
-                    id="all-sessions-page-interactive"
-                >
-                    <MainContent
-                        showAlert={showAlert}
-                        onAlertClose={() => setShowAlert(false)}
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                        sessions={defaultSessions}
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                        onDetails={handleDetails}
-                    />
-                </PageLayout>
-            </div>
+            </PageLayout>
         </div>
     );
+};
+
+export const Interactive = {
+    render: InteractiveRender,
+    argTypes: {
+        alert: { control: 'boolean', name: 'Update alert', table: { category: 'State' } },
+    },
+    args: { alert: true },
 };

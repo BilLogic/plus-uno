@@ -193,7 +193,7 @@ For when the team is ready to publish properly:
 
 ### Documentation Strategy
 - [ ] `README.md` in package: installation, quick start, link to Storybook — NOT comprehensive docs
-- [ ] Storybook (deployed on Netlify): interactive component playground, auto-generated prop docs
+- [ ] Storybook (deployed on Netlify): interactive component prototypes, auto-generated prop docs
 - [ ] `docs/design-system/` in repo: agent-facing + contributor-facing reference docs
 - [ ] `CHANGELOG.md`: versioned change history for consumers
 

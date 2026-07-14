@@ -90,7 +90,7 @@ Full page layout for Tutor Training Progress section.
 
 export const Overview = {
     args: {
-        breakpoint: "xl"
+        breakpoint: 'native'
     },
     render: (args) => (
         <TutorTrainingProgressPage
@@ -131,7 +131,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         activeTab: 'trainingProgress',
         viewMode: 'By Tutor',
         currentPage: 1,

@@ -19,10 +19,11 @@
     }
 
     // Size variants
+    /* Figma Badges · Size=Thumbnail is 90×90 */
     &--thumbnail,
     &--small {
-        width: 100px;
-        height: 100px;
+        width: 90px;
+        height: 90px;
     }
 
     &--modal {

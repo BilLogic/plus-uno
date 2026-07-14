@@ -2,7 +2,7 @@ import React from 'react';
 import { CertifiedTutorBadge } from './CertifiedTutorBadge';
 
 export default {
-    title: 'Specs/Home/Elements/Certified Tutor Badge',
+    title: 'Specs/Home/Elements/Badges',
     component: CertifiedTutorBadge,
     parameters: {
         layout: 'centered',

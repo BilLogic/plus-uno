@@ -282,6 +282,7 @@ const TutorModal = ({
                                     onPageChange={setCurrentPage}
                                     type="icon"
                                     size="small"
+                                    ariaLabel="Tutor sessions pagination"
                                 />
                             </div>
                         </div>

@@ -24,19 +24,19 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={context.globals?.plusBreakpoint || context.args.breakpoint || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
     ],
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
     },
     argTypes: {
         breakpoint: {
             control: 'select',
-            options: ['md', 'lg', 'xl'],
-            description: 'Simulated viewport width — set it here in the Controls panel',
+            options: ['native', 'md', 'lg', 'xl'],
+            description: 'Simulated viewport width — Native fills available space; MD/LG/XL set a minimum width',
             table: { category: 'Layout' },
         },
     },
@@ -62,7 +62,7 @@ export default {
 export const Overview = {
     render: () => (
         <PageLayout
-            style={{ minHeight: 'min(680px, calc(100vh - 200px))', height: 'auto' }}
+            style={{ height: '100%', minHeight: '100%' }}
             sidebarConfig={{
                 user: 'tutor',
             }}
@@ -108,7 +108,7 @@ export const Overview = {
 export const Interactive = {
     render: (args) => (
         <PageLayout
-            style={{ minHeight: 'min(680px, calc(100vh - 200px))', height: 'auto' }}
+            style={{ height: '100%', minHeight: '100%' }}
             sidebarConfig={{
                 user: args.userType,
             }}

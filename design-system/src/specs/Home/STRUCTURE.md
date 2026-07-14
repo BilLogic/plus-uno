@@ -1,163 +1,64 @@
 # Home Organism Structure
 
-## Overview
-The Home organism contains components for the home page, including dashboard elements, data visualization, resource cards, and user feedback.
+Local organisms for the tutor Home experience. Source of truth:
+[Figma · Components (Local organisms)](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=134-175383) (`134:175383`).
 
-## Directory Structure
+## Directory layout
 
 ```
 design-system/src/specs/Home/
-├── STRUCTURE.md (this file)
-├── Home.stories.js (main organism overview story)
-│
+├── Overview.mdx
+├── STRUCTURE.md
+├── index.js
 ├── Elements/
-│   ├── ResourceType/
-│   │   ├── ResourceType.stories.js
-│   │   ├── ResourceType.scss
-│   │   └── index.js
-│   ├── ProductAreaDropdown/
-│   │   ├── ProductAreaDropdown.stories.js
-│   │   ├── ProductAreaDropdown.scss
-│   │   └── index.js
 │   ├── CardBadges/
-│   │   ├── CardBadges.stories.js
-│   │   ├── CardBadges.scss
-│   │   └── index.js
-│   └── ButtonContainer/
-│       ├── ButtonContainer.stories.js
-│       ├── ButtonContainer.scss
-│       └── index.js
-│
+│   ├── CertifiedTutorBadge/   # Figma: Badges
+│   ├── ButtonContainer/
+│   ├── ProductAreaDropdown/
+│   └── ResourceType/
 ├── Cards/
-│   ├── OverviewCard/
-│   │   ├── OverviewCard.stories.js
-│   │   ├── OverviewCard.scss
-│   │   ├── OverviewCard.Variants.stories.js
-│   │   └── index.js
-│   ├── ResourceCard/
-│   │   ├── ResourceCard.stories.js
-│   │   ├── ResourceCard.scss
-│   │   └── index.js
-│   ├── MetricsCard/
-│   │   ├── MetricsCard.stories.js
-│   │   ├── MetricsCard.scss
-│   │   ├── MetricsCard.Variants.stories.js
-│   │   └── index.js
 │   ├── DataVisualization/
-│   │   ├── DataVisualization.stories.js
-│   │   ├── DataVisualization.scss
-│   │   ├── DataVisualization.Variants.stories.js
-│   │   └── index.js
+│   ├── MetricsCard/           # Sessions (p1–3) + Lessons
 │   ├── RecommendedLessons/
-│   │   ├── RecommendedLessons.stories.js
-│   │   ├── RecommendedLessons.scss
-│   │   ├── RecommendedLessons.Variants.stories.js
-│   │   └── index.js
-│   └── TrainingProgressCard/
-│       ├── TrainingProgressCard.stories.js
-│       ├── TrainingProgressCard.scss
-│       ├── TrainingProgressCard.Variants.stories.js
-│       └── index.js
-│
-├── Tables/
-│   └── (to be added as needed)
-│
+│   ├── ResourceCard/
+│   ├── TrainingProgressCard/  # Figma: Overview Card / Training Progress
+│   └── BadgeCard/             # used inside Training Progress compositions
+├── Tables/                    # empty in Figma
 ├── Modals/
-│   └── UserFeedbackModal/
-│       ├── UserFeedbackModal.stories.js
-│       ├── UserFeedbackModal.scss
-│       ├── UserFeedbackModal.Variants.stories.js
-│       └── index.js
-│
+│   ├── UserFeedbackModal/     # problem | question | feedback
+│   └── UpdateNotification/    # Meet your AI Coach
 ├── Sections/
-│   ├── HomepageJumbotron/
-│   │   ├── HomepageJumbotron.stories.js
-│   │   ├── HomepageJumbotron.scss
-│   │   ├── HomepageJumbotron.Variants.stories.js
-│   │   └── index.js
-│   └── BottomDiv/
-│       ├── BottomDiv.stories.js
-│       ├── BottomDiv.scss
-│       ├── BottomDiv.Variants.stories.js
-│       └── index.js
-│
-├── Pages/
-│   ├── SkillsOverview/
-│   │   ├── SkillsOverview.stories.js
-│   │   ├── SkillsOverview.scss
-│   │   └── index.js
-│   └── SkillsHomePage/
-│       ├── SkillsHomePage.stories.js
-│       ├── SkillsHomePage.scss
-│       ├── SkillsHomePage.Variants.stories.js
-│       └── index.js
-│
-└── index.js (main export file for Home organism)
+│   ├── HomepageJumbotron/     # sign-up | session | reflection
+│   └── StudentsOverviewSection/
+└── Pages/
+    ├── TutorHomePageSkillsOverview/
+    ├── TutorHomePageSkillsProgress/
+    └── TutorHomePageSkillsOverviewDifferentLayout/
 ```
 
-## Component Breakdown from Figma
+## Figma mapping
 
-### Elements Section
-1. **ResourceType** (`Resource Type`)
-   - Types: pdf, link, video, image, slides
+| Figma | Storybook |
+| --- | --- |
+| Elements · Resource Type | `Elements/ResourceType` |
+| Elements · Product Area Dropdown | `Elements/ProductAreaDropdown` |
+| Elements · _Card Badges | `Elements/CardBadges` |
+| Elements · Button Container | `Elements/ButtonContainer` |
+| Elements · Badges | `Elements/CertifiedTutorBadge` (title: Badges) |
+| Cards · Resource Card | `Cards/ResourceCard` |
+| Cards · Metrics Card / Sessions | `Cards/MetricsCard` (pages 1–3) |
+| Cards · Metrics Card / Lessons | `Cards/MetricsCard` Lessons story |
+| Cards · Data Visualization | `Cards/DataVisualization` |
+| Cards · Recommended Lessons | `Cards/RecommendedLessons` |
+| Cards · Overview Card / Training Progress | `Cards/TrainingProgressCard` |
+| Modals · User Feedback Modal | `Modals/UserFeedbackModal` |
+| Modals · Update Notification | `Modals/UpdateNotification` |
+| Sections · Homepage Jumbotron | `Sections/HomepageJumbotron` |
+| Sections · Students Overview (Bottom Section) | `Sections/StudentsOverviewSection` |
+| Pages · Skills (Home Page) | `Pages/TutorHomePageSkillsOverview` (+ Progress / Different Layout variants) |
 
-2. **ProductAreaDropdown** (`Product Area Dropdown`)
-   - States: closed, open
+## Removed / archived vs Figma
 
-3. **CardBadges** (`_card badges`)
-   - States: increase, decrease
-
-4. **ButtonContainer** (`Button container`)
-   - States: disabled, enabled
-
-### Cards Section
-1. **OverviewCard** (`Overview Card`)
-   - Types: relationships, undefined, socio-emotional, mastering, advocacy, technology, status, completion, accuracy, avg-accuracy, avg-completion, time-spent, effort, progress
-
-2. **ResourceCard** (`Resource Card`)
-   - Resource card component
-
-3. **MetricsCard** (`Metrics Card`)
-   - Metrics card component
-
-4. **MetricsCard2** (`Metrics Card 2`)
-   - Variants: page=1, page=2, page=3
-
-5. **DataVisualization** (`Data Visualization`)
-   - Variants: page=skills progress, page=skills overview
-
-6. **RecommendedLessons** (`Recommended Lessons`)
-   - Variants: breakpoint=< XXL, breakpoint=XXL & above
-
-7. **TrainingProgressCard** (`Overview Card / Training Progress`)
-   - Sizes: default, small
-
-### Modals Section
-1. **UserFeedbackModal** (`User Feedback Modal`)
-   - Types: problem, question, feedback
-
-### Sections Section
-1. **HomepageJumbotron** (`Homepage Jumbotron`)
-   - Tabs: sign-up, session, reflection
-
-2. **BottomDiv** (`bottom div`)
-   - Variants: Property 1=Default, Property 1=Variant2
-
-### Pages Section
-1. **SkillsOverview** (`Skills Overview (Different Layout)`)
-   - Complete skills overview page
-
-2. **SkillsHomePage** (`Skills (Home Page)`)
-   - Variants: Property 1=skill overview, Property 1=skill progress
-
-## Storybook Organization
-
-Each subcategory (Elements, Cards, Tables, Modals, Sections, Pages) will have its own Storybook page/section, making it easy to navigate and view all components within that category.
-
-## Implementation Notes
-
-1. **Organisms vs Molecules**: Organisms are higher-level compositions that may use molecules and elements as building blocks
-2. **Token Usage**: Follow the same token reference guidelines, but may use tokens from multiple component types (elements, cards, sections, etc.)
-3. **Bootstrap Foundation**: Use Bootstrap 5.3 as functional foundation, then customize all styling to match Figma exactly
-4. **Figma Accuracy**: All components must match Figma designs pixel-perfectly
-
+- `LookForHelpModal`, `ReportProblemModal`, `ShareIdeasModal` — folded into `UserFeedbackModal` types
+- `BottomDiv` — duplicate of Students Overview
+- `SkillsSection`, `LearningSection` — legacy placeholders not on the Home canvas

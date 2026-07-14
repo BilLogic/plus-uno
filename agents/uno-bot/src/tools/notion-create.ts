@@ -1,16 +1,17 @@
-// notion_create executor — creates a page/card in an allowlisted Notion surface
-// (prd / intake), then posts the link. Side effect → routed through the ✅ gate.
-// Marketplace is NOT a surface here — its relation + rollup + dual-write shape is
-// an in-IDE writers/notion operation. Component PRDs and research notes are not
-// bot surfaces: component PRDs are regular feature PRDs on the Roadmap, and deep
-// research is an IDE-only skill that writes to the project hub's Research page.
+// notion_create executor — creates a page/card in a convention Notion surface
+// (prd / intake / decision), then posts the link. Side effect → routed through
+// the ✅ gate. Marketplace is NOT a surface here — its relation + rollup +
+// dual-write shape is an in-IDE writers/notion operation. Component PRDs and
+// research notes are not bot surfaces: component PRDs are regular feature PRDs
+// on the Roadmap, and deep research is an IDE-only skill that writes to the
+// project hub's Research page.
 
 import type { Env } from "../types";
 import type { SlackContext } from "./dispatcher";
 import { postMessage } from "../slack/api";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
 
-const SURFACES = new Set<NotionCreateSurface>(["prd", "intake"]);
+const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision"]);
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
@@ -29,6 +30,12 @@ function asStringArray(v: unknown): string[] {
   return v.map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean);
 }
 
+/**
+ * Create a Notion page on a convention surface and post the link in-thread.
+ * @param env - Worker bindings
+ * @param input - Tool args from the model
+ * @param slack - Thread context for the outcome message
+ */
 export async function executeNotionCreate(
   env: Env,
   input: Record<string, unknown>,
@@ -41,17 +48,37 @@ export async function executeNotionCreate(
   }
   if (!title) return JSON.stringify({ ok: false, error: "missing 'title'" });
 
-  // Split the model's freeform `properties` into productPillar (a real property)
-  // and everything else (rendered into the body as extras).
+  // Split the model's freeform `properties` into known keys and body extras.
   const props =
     input.properties && typeof input.properties === "object"
       ? (input.properties as Record<string, unknown>)
       : {};
   const productPillar = asString(props.product_pillar) || asString(input.product_pillar);
+  const roadmapCard =
+    asString(props.roadmap_card) ||
+    asString(props["Roadmap Card"]) ||
+    asString(input.roadmap_card);
+  const decisionStatus =
+    asString(props.status) || asString(props.Status) || asString(input.status);
+  const evidence =
+    asString(props.evidence) ||
+    asString(props.Evidence) ||
+    asString(input.evidence);
   const extras: Record<string, string> = {};
   for (const [k, v] of Object.entries(props)) {
-    if (k.toLowerCase() === "product_pillar") continue;
+    const key = k.toLowerCase().replace(/[\s_]+/g, "");
+    if (key === "productpillar" || key === "roadmapcard" || key === "status" || key === "evidence") {
+      continue;
+    }
     if (typeof v === "string" && v.trim()) extras[k] = v.trim();
+  }
+  if (evidence) extras.evidence = evidence;
+
+  if (surface === "decision" && !roadmapCard) {
+    return JSON.stringify({
+      ok: false,
+      error: "decision requires properties.roadmap_card (Roadmap page URL or id)",
+    });
   }
 
   try {
@@ -61,8 +88,10 @@ export async function executeNotionCreate(
       sections: asSections(input.sections),
       acceptanceCriteria: asStringArray(input.acceptance_criteria),
       productPillar: productPillar || undefined,
-      sourceUrl: asString(input.source_url) || undefined,
+      sourceUrl: asString(input.source_url) || evidence || undefined,
       extras,
+      roadmapCard: roadmapCard || undefined,
+      decisionStatus: decisionStatus || undefined,
     });
     await postMessage(env, {
       channel: slack.channel,

@@ -4,6 +4,21 @@
 
 [build.environment]
   VITE_STORYBOOK_URL = "https://plus-uno.netlify.app/storybook/"
+  # Notion Prototype Marketplace (team catalog — replaces in-app /market UI)
+  VITE_NOTION_MARKETPLACE_URL = "https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c"
+
+# Landing → Storybook docs (must come before SPA catch-all)
+[[redirects]]
+  from = "/"
+  to = "/storybook/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/market"
+  to = "/storybook/"
+  status = 302
+  force = true
 
 # Storybook static files — serve as-is (must come BEFORE the SPA catch-all)
 [[redirects]]
@@ -11,7 +26,19 @@
   to = "/storybook/:splat"
   status = 200
 
-# SPA catch-all for the React app (must come AFTER function routes)
+# Demo walkthrough SPA — keep deep links under /demo/* (e.g. /demo/home)
+# Frozen share URL /demo/demo.html still works (same HTML entry).
+[[redirects]]
+  from = "/demo"
+  to = "/demo/home"
+  status = 302
+
+[[redirects]]
+  from = "/demo/*"
+  to = "/demo/demo.html"
+  status = 200
+
+# SPA catch-all for live-app routes (must come AFTER Storybook + demo redirects).
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -4,9 +4,9 @@ description: >
   Turns a PRD or direction into a design artifact at a chosen fidelity —
   grounds the brief against uno-blueprint, then either engineers prompt-specs
   for external generative tools (low/mid fidelity) or builds hi-fi directly on
-  the design system in the playground. Use when the user says "prototype this",
+  the design system in the prototypes. Use when the user says "prototype this",
   "sketch the flow", "map the data flow", "generate a draft to validate",
-  "build this PRD", "scaffold a playground", "implement this Figma design",
+  "build this PRD", "scaffold a prototypes", "implement this Figma design",
   or has an approved requirement and needs a reviewable artifact. Not for
   critique (uno-review), sharing/handoff (uno-publish), or writing the PRD
   itself (uno-synthesize).
@@ -20,7 +20,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__no
 ## Agents it summons
 
 writers/blueprint (grounding reads) · researchers/explorer (prior art) ·
-reviewers/ds-lens (exit validation) · writers/figma (playground frames) —
+reviewers/ds-lens (exit validation) · writers/figma (prototypes frames) —
 defined in `agents/` (see `agents/README.md`). Per the interaction contract,
 these are summoned by this skill, never by users.
 
@@ -32,7 +32,7 @@ execution layer over it.
 
 **Use when** a **PRD is already available** (usually from uno-synthesize) and
 needs to become an artifact: a flow sketch, a data-flow map, an interactive
-draft, a working-UI proof, or a hi-fi playground build.
+draft, a working-UI proof, or a hi-fi prototypes build.
 
 **PRD is mandatory at entry (method §0).** Acceptable forms: Notion PRD URL,
 local `.md` path, or inline PRD body in the same message (user flows +
@@ -53,7 +53,7 @@ Method §2 in brief — the designer chooses, UNO routes, no gold-plating:
 |---|---|---|
 | "sketch / map / work through the flow" | low | prompt engineer — diagram-shaped spec for FigJam / Stitch |
 | "validate / prove it works" | mid | prompt engineer — interactive/functional spec for Claude design / Figma Make / Stitch / v0 / Google AI Studio |
-| "build it" (approved PRD) | high | builder — DS-compliant playground build against uno-storybook |
+| "build it" (approved PRD) | high | builder — DS-compliant prototypes build against uno-storybook |
 | designer draws it themselves | hand-craft | none — stay out of the way |
 
 ## Workflow (IDE execution of method.md)
@@ -118,15 +118,15 @@ intake one step at a time.
    Summon **writers/blueprint** for the grounding read: this card's flows,
    constraints, current-state context + global constraints. Summon
    **researchers/explorer** for prior art in the repo (components, specs,
-   `playground/` prototypes). Record the grounding snapshot in the working
+   `prototypes/` prototypes). Record the grounding snapshot in the working
    notes. On re-entry: diff first, re-ground only on change (method §1).
 2. **Gate: missing context** (method §5). Empty/error states, ambiguous
    interactions, missing Figma target or DS expectations → ask before building.
 3. **Route by fidelity** (method §2).
    - **Low/mid** → write the prompt-spec in the matching mode (method §3) and
      hand it to the designer for the external tool. Do not generate.
-   - **High** → build in `playground/`:
-     a. Scaffold from `playground/starter/` per `design-system/docs/setup.md`
+   - **High** → build in `prototypes/`:
+     a. Scaffold from `prototypes/starter/` per `design-system/docs/setup.md`
         (vite config: [`examples/vite-config-example.js`](examples/vite-config-example.js)).
      b. Load the DS agent-views (Tier-2 table below) **before any component
         or token use**; verify props against source + stories.
@@ -144,7 +144,7 @@ intake one step at a time.
    nearest existing composition, file a uno-maintain intake. Never hand-roll
    a lookalike.
 5. **Validate & exit** (method §6). Hi-fi: run
-   `bash skills/uno-prototype/scripts/validate-prototype.sh playground/{project}`.
+   `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`.
    All fidelities: summon **reviewers/ds-lens** for the conformance pass,
    write the one-line artifact manifest (fidelity · tools · PRD link), then
    hand to `skills/uno-review` for the stage lens.

@@ -39,18 +39,18 @@ const SidebarTab = ({
             iconColor: 'var(--color-on-surface-variant)' // FIX: changed from -primary-text to on-surface-variant
         },
         hover: {
-            backgroundColor: 'rgba(0, 101, 142, 0.12)', // primary-12
+            backgroundColor: 'var(--color-primary-state-12)',
             color: 'var(--color-primary-text)',
             iconColor: 'var(--color-primary)'
         },
         selected: {
-            backgroundColor: 'rgba(0, 101, 142, 0.16)', // primary-16
+            backgroundColor: 'var(--color-primary-state-16)',
             color: 'var(--color-primary-text)',
             iconColor: 'var(--color-primary)',
             fontWeight: 400
         },
         focus: {
-            backgroundColor: 'rgba(0, 101, 142, 0.12)', // primary-12
+            backgroundColor: 'var(--color-primary-state-12)',
             color: 'var(--color-primary-text)',
             iconColor: 'var(--color-primary)',
             outline: '2px solid var(--color-primary)',
@@ -58,9 +58,9 @@ const SidebarTab = ({
         },
         disabled: {
             backgroundColor: 'transparent',
-            color: 'var(--color-on-surface)',
+            color: 'var(--color-on-surface-variant)',
             iconColor: 'var(--color-on-surface-variant)',
-            opacity: 0.38
+            // Prefer solid muted color over opacity so disabled text still meets WCAG AA
         }
     };
 
@@ -73,11 +73,14 @@ const SidebarTab = ({
             className={`plus-sidebar-tab plus-sidebar-tab--${state} ${className}`}
             onClick={!disabled ? onClick : undefined}
             role="button"
+            aria-disabled={disabled || undefined}
             tabIndex={disabled ? -1 : 0}
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                width: '164px',
+                width: '100%',
+                maxWidth: '164px',
+                boxSizing: 'border-box',
                 padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg)',
                 gap: 'var(--size-element-gap-md)',
                 borderRadius: 'var(--size-modal-radius-md)',

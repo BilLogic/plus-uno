@@ -1,0 +1,33 @@
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+}
+
+.login-field__label {
+    color: var(--color-on-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+}
+
+.login-field__required {
+    color: var(--color-danger);
+}
+
+.login-field__caption {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-element-gap-sm);
+    color: var(--color-on-surface-variant);
+}
+
+.login-field__link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--color-primary-text);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+    cursor: pointer;
+}

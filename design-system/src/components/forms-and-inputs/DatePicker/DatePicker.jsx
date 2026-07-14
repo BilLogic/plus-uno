@@ -174,22 +174,17 @@ const DatePicker = ({
 
     // Styling logic based on legacy
     const sizeClass = size === 'small' ? 'small body3-txt' : (size === 'large' ? 'large body1-txt' : 'body2-txt');
+    const calendarId = `${id || name || 'date-picker'}-calendar`;
 
-    // Custom toggle to match legacy structure exactly
+    // Custom toggle to match legacy structure exactly.
+    // Renders as a non-interactive <div> (instead of a <button>) so the only
+    // focusable/interactive control is the inner <input> — a <button> wrapping
+    // a focusable <input> triggers the "nested-interactive" a11y violation.
     const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
-        <button
+        <div
             ref={ref}
-            type="button"
             className={`pdropdown-default-toggle dropdown-toggle ${sizeClass} ${selectedDate ? 'selected' : ''}`}
-            onClick={(e) => {
-                e.preventDefault();
-                onClick(e);
-            }}
-            disabled={disabled}
             style={readOnly || disabled ? { pointerEvents: 'none' } : {}}
-            id={id ? `${id}-toggle` : undefined}
-            aria-haspopup="true"
-            aria-expanded={isOpen}
         >
             <span className="plus-date-picker-content">
                 <input
@@ -201,16 +196,30 @@ const DatePicker = ({
                     disabled={disabled}
                     id={id}
                     name={name}
+                    role="combobox"
+                    aria-haspopup="dialog"
+                    aria-expanded={isOpen}
+                    aria-controls={calendarId}
                     style={{
                         border: 'none', background: 'transparent', padding: 0, margin: 0,
                         width: '100%', outline: 'none', fontFamily: 'inherit', fontSize: 'inherit',
                         fontWeight: 'inherit', lineHeight: 'inherit', cursor: disabled ? 'default' : 'pointer'
                     }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        onClick(e);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            onClick(e);
+                        }
+                    }}
                     onFocus={onFocus}
                     onBlur={onBlur}
                 />
             </span>
-        </button>
+        </div>
     ));
 
     return (
@@ -223,6 +232,7 @@ const DatePicker = ({
             <Dropdown.Toggle as={CustomToggle} />
 
             <Dropdown.Menu
+                id={calendarId}
                 className={`plus-date-picker-calendar plus-date-picker-calendar-align-${calendarAlign}`}
                 renderOnMount // Force render to ensure it exists
             >

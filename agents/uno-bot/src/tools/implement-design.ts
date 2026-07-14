@@ -1,4 +1,4 @@
-// Dispatch the figma-implement-design.yml workflow — scaffolds a NEW playground
+// Dispatch the figma-implement-design.yml workflow — scaffolds a NEW prototypes
 // prototype from a Figma frame. Sibling of tools/implement.ts (which updates an
 // existing DS-library component).
 //
@@ -96,6 +96,6 @@ export async function executeImplementDesign(
   return JSON.stringify({
     ok: true,
     status: "dispatched",
-    message: `figma-implement-design.yml triggered${rawSlug ? ` for playground/${rawSlug}/` : ""}. The workflow will scaffold the prototype and post the draft PR link in this thread when ready.`,
+    message: `figma-implement-design.yml triggered${rawSlug ? ` for prototypes/${rawSlug}/` : ""}. The workflow will scaffold the prototype and post the draft PR link in this thread when ready.`,
   });
 }

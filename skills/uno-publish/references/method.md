@@ -23,7 +23,7 @@ The unit of async sharing is a complete bundle, never a lone link:
 |---|---|---|
 | Loom walkthrough | behavior + rationale, narrated | always |
 | Live preview (Netlify) | hands-on use | always |
-| Decision log (Notion) | the whys, so rounds compound | always |
+| Decision log (Notion Decisions DB) | the whys, so rounds compound | always |
 | Figma replica | a surface to mark up | when the artifact is a prototype (interactive or coded); static/low-fi shares may omit |
 
 Before posting, the replica gets a visual diff against the coded prototype — drift there defeats its feedback purpose (rubric dimension: replica-fidelity). **Completeness is a hard gate: a partial bundle never posts.** A missing piece gets produced, not waived — the only legitimate omission is the replica on a non-prototype artifact. The replica is a feedback surface, not a source of truth: the coded prototype stays the real artifact. Don't confuse it with the handoff rail's componentized Figma spec, which *is* contractual.
@@ -44,7 +44,7 @@ Draft a directed feedback prompt — specific, stage-appropriate questions, neve
 
 ### Close the round
 
-Async rounds get synthesis too: consolidate the Slack thread + replica markup into Decision Log entries before the round counts as done. Acting on the feedback is not this skill — it re-enters prototyping.
+Async rounds get synthesis too: consolidate the Slack thread + replica markup into **Decisions DB** rows (Roadmap Card + Evidence) before the round counts as done. Acting on the feedback is not this skill — it re-enters prototyping.
 
 ## Handoff rail — exit: dev-ready package
 
@@ -59,7 +59,7 @@ Linear and gated; the order is load-bearing.
    - Rails writes with **no** live handoff are ordinary maintain intakes — full human gate, no pre-authorization.
 4. **Review gate — DS / UNO / a11y.** Run through `skills/uno-review`: design-system compliance, harness consistency (the spec agrees with what step 3 just wrote), accessibility. Review diagnoses; fixes go back through prototyping — they don't happen here.
 5. **Sign-off — the human gate.** The developer, the PM, and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/conventions/slack.md`). **No sign-off, no publish.** Two of three is not enough, and nobody proxies a missing one.
-6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake shows applied in the apply log); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, surface allowlist: `docs/conventions/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. Registration runs in-IDE via `writers/notion`; the Worker only searches the catalog.
+6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake shows applied in the apply log); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, conventions: `docs/conventions/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. Registration runs in-IDE via `writers/notion`; the Worker only searches the catalog.
 
 ## Boundaries
 

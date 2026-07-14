@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Scaffold a NEW playground prototype from a Figma frame using the Claude API.
+ * Scaffold a NEW prototypes prototype from a Figma frame using the Claude API.
  *
  * Sibling of implement-figma-changes.js (which UPDATES an existing DS-library
- * component). This script CREATES a new prototype under playground/{slug}/,
- * mirroring the playground/home-redesign reference structure.
+ * component). This script CREATES a new prototype under prototypes/{slug}/,
+ * mirroring the prototypes/home-redesign reference structure.
  *
  * Triggered by .github/workflows/figma-implement-design.yml on the
  * repository_dispatch event "implement-design-from-figma" (or a manual
@@ -45,7 +45,7 @@ const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
 const NOTION_PRD_URL = process.env.NOTION_PRD_URL || '';
 const NOTES = process.env.NOTES || '';
 
-const PLAYGROUND_DIR = resolve('playground');
+const PLAYGROUND_DIR = resolve('prototypes');
 const ROOT_PACKAGE_JSON = resolve('package.json');
 const TOKENS_DIR = resolve('design-system/src/tokens');
 const DOCS_DIR = resolve('docs/context/design-system/components');
@@ -262,7 +262,7 @@ function readRepoFileCapped(fp) {
 
 function normalizeRelPath(raw, slug) {
   let p = raw.trim().replace(/\\/g, '/').replace(/^\.\//, '');
-  const prefix = `playground/${slug}/`;
+  const prefix = `prototypes/${slug}/`;
   if (p.startsWith(prefix)) p = p.slice(prefix.length);
   return p;
 }
@@ -314,7 +314,7 @@ function wireRootDevScript(slug) {
     return;
   }
   pkg.scripts = pkg.scripts || {};
-  pkg.scripts[scriptName] = `vite --config playground/${slug}/vite.config.js`;
+  pkg.scripts[scriptName] = `vite --config prototypes/${slug}/vite.config.js`;
   // Round-trip to ensure we wrote valid JSON.
   const serialized = JSON.stringify(pkg, null, 2) + '\n';
   JSON.parse(serialized);
@@ -390,9 +390,9 @@ async function main() {
   const slug = deriveSlug(process.env.SLUG, nodeName);
   const prototypeDir = join(PLAYGROUND_DIR, slug);
   if (existsSync(prototypeDir)) {
-    throw new Error(`playground/${slug}/ already exists — choose a different slug or iterate in the IDE`);
+    throw new Error(`prototypes/${slug}/ already exists — choose a different slug or iterate in the IDE`);
   }
-  console.log(`   📁 Target: playground/${slug}/  (from ${process.env.SLUG ? 'slug input' : `node "${nodeName}"`})`);
+  console.log(`   📁 Target: prototypes/${slug}/  (from ${process.env.SLUG ? 'slug input' : `node "${nodeName}"`})`);
 
   // Fetch screenshot (multimodal input). Best-effort, never fatal.
   // Scale is dimension-aware: Anthropic rejects images whose longest edge
@@ -447,7 +447,7 @@ async function main() {
     type: 'text',
     text: [
       `## New Prototype: ${nodeName || slug}`,
-      `Scaffold a NEW playground prototype at \`playground/${slug}/\`. Output file paths RELATIVE to that directory (e.g. \`index.html\`, \`src/App.jsx\`).`,
+      `Scaffold a NEW prototypes prototype at \`prototypes/${slug}/\`. Output file paths RELATIVE to that directory (e.g. \`index.html\`, \`src/App.jsx\`).`,
       '',
       '## Figma Node Design Properties (colors, spacing, radius, layout)',
       '```json',
@@ -463,7 +463,7 @@ async function main() {
       '## Layout Cheat Sheet (page structural formulas)',
       layoutCheatSheet || 'Not available.',
       '',
-      '## Reference prototype structure — playground/home-redesign (mirror it exactly)',
+      '## Reference prototype structure — prototypes/home-redesign (mirror it exactly)',
       referenceScaffold || 'No reference scaffold found.',
       prdContext ? `\n## Notion PRD Context (designer intent + acceptance criteria)\n${prdContext}` : '',
       NOTES ? `\n## Designer Notes\n${NOTES}` : '',
@@ -509,7 +509,7 @@ async function main() {
   setStepOutput('files_written', String(written));
 
   console.log(`\n${'─'.repeat(50)}`);
-  console.log(`✅ Prototype scaffolded: playground/${slug}/ (${written} files). Run: npm run dev:${slug}`);
+  console.log(`✅ Prototype scaffolded: prototypes/${slug}/ (${written} files). Run: npm run dev:${slug}`);
 }
 
 main().catch((err) => {

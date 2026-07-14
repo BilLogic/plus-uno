@@ -150,6 +150,9 @@
         }
     }
 
+    // Warning uses on-warning-container (dark) instead of on-warning (white):
+    // white text on the solid --color-warning background falls below the
+    // 4.5:1 contrast ratio required at this font size/weight.
     &.warning {
 
         .plus-toast-header,
@@ -157,19 +160,19 @@
             background-color: var(--color-warning) !important;
 
             .plus-toast-icon i {
-                color: var(--color-on-warning) !important;
+                color: var(--color-on-warning-container) !important;
             }
 
             .plus-toast-title {
-                color: var(--color-on-warning) !important;
+                color: var(--color-on-warning-container) !important;
             }
 
             .plus-toast-timestamp {
-                color: var(--color-on-warning) !important;
+                color: var(--color-on-warning-container) !important;
             }
 
             .plus-toast-close i {
-                color: var(--color-on-warning) !important;
+                color: var(--color-on-warning-container) !important;
             }
         }
     }

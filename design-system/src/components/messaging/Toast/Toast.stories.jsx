@@ -17,7 +17,12 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        style: {
+            control: 'select',
+            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
+            description: 'Color style variant',
+            table: { category: 'Design' }
+        },
         position: {
             control: 'select',
             options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],

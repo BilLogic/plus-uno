@@ -7,22 +7,48 @@
 import type { Env } from "../types";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 
+// One shared confirmation footer on every card. Anyone in the thread may
+// confirm/cancel now (the requester lock was removed 2026-07-14), so it names no
+// approver — but it MUST keep the "go ahead" / "cancel" words the text parser
+// matches (bareResolution in loop-shared).
+export const CONFIRM_FOOTER =
+  `React :white_check_mark: / :x: — or just say "go ahead" / "cancel".`;
+
 export function formatProposal(
   toolName: string,
   input: Record<string, unknown>,
-  requesterUserId: string,
+  // Kept in the signature for callers that still pass it (the id is stored on the
+  // proposal for the record) — no longer rendered, since anyone can confirm.
+  _requesterUserId: string,
   previewText: string | undefined,
+  // Optional resolved-target line (e.g. "• *Target:* «title» — in «DB»") shown
+  // above the raw params, so the approver of a write sees the CONCRETE page it
+  // will touch, not just an opaque id. Used for notion_archive.
+  targetNote?: string,
 ): string {
   const body = renderParamsForHumans(input);
   const lines: string[] = [];
   if (previewText) {
     lines.push(previewText, "");
   }
-  lines.push(
-    `:warning: About to *${proposalVerb(toolName)}*:`,
-    body,
-    `React :white_check_mark: / :x: or just say "go ahead" / "cancel" — only <@${requesterUserId}> can confirm.`,
-  );
+  lines.push(`:warning: About to *${proposalVerb(toolName)}*:`);
+  if (targetNote) lines.push(targetNote);
+  lines.push(body, CONFIRM_FOOTER);
+  return lines.join("\n");
+}
+
+// notion_update gets its OWN conversational card (no ⚠️ preamble): a warm lead,
+// a named + linked card line, and a `current → new` diff — all built by the
+// caller (events.ts), which has the Notion reads. This just frames the lead +
+// body with the shared footer. `body` is the linked-card line + diff bullets.
+export function formatNotionUpdateProposal(
+  previewText: string | undefined,
+  body: string,
+): string {
+  const lines: string[] = [];
+  if (previewText) lines.push(previewText, "");
+  if (body) lines.push(body);
+  lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
 }
 
@@ -123,10 +149,7 @@ export async function buildImplementDesignProposal(
   });
   blocks.push({
     type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `React :white_check_mark: / :x: or just say "go ahead" / "cancel" — only <@${requesterUserId}> can confirm.`,
-    },
+    text: { type: "mrkdwn", text: CONFIRM_FOOTER },
   });
   return { text, blocks };
 }

@@ -45,6 +45,15 @@
 .plus-alert-text {
     white-space: pre-wrap;
     margin: 0;
+
+    // Links inherit the alert's on-container text color (already tuned for
+    // contrast against each theme's background) instead of Bootstrap's
+    // default link blue, which can fail contrast on light theme backgrounds.
+    a {
+        color: inherit;
+        text-decoration: underline;
+        font-weight: var(--font-weight-medium, 500);
+    }
 }
 
 .plus-alert-dismiss-btn {

@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import './Input.scss';
 
+/**
+ * Input — text field with optional leading/trailing visuals and validation.
+ * Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
+ */
 const Input = ({
     id,
     name,
@@ -14,7 +18,9 @@ const Input = ({
     inputRef,
     size = 'medium',
     disabled = false,
-    readonly = false,
+    readOnly,
+    /** @deprecated Prefer `readOnly` — kept for existing call sites */
+    readonly,
     validation = 'none', // 'none', 'invalid', 'success'
     validationMessage,
     leadingVisual,
@@ -28,6 +34,8 @@ const Input = ({
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    /** Prefer `readOnly`; honor legacy `readonly` when explicitly passed */
+    const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
 
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
     
@@ -46,7 +54,7 @@ const Input = ({
         `plus-input-${size}`,
         sizeClass,
         disabled ? 'plus-input-disabled' : '',
-        readonly ? 'plus-input-readonly' : '',
+        isReadOnly ? 'plus-input-readonly' : '',
         isFocused ? 'plus-input-focused' : '',
         validation !== 'none' ? `plus-input-${validation}` : '',
         className
@@ -86,7 +94,7 @@ const Input = ({
                     value={value}
                     ref={inputRef}
                     disabled={disabled}
-                    readOnly={readonly}
+                    readOnly={isReadOnly}
                     className={inputClasses}
                     style={style}
                     onChange={onChange}
@@ -132,6 +140,8 @@ Input.propTypes = {
     ]),
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    /** @deprecated Prefer `readOnly` */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
     validationMessage: PropTypes.string,

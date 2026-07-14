@@ -2,7 +2,7 @@ import React from 'react';
 import MetricsCard from './MetricsCard';
 
 export default {
-    title: 'Specs/Home/Cards/Metrics Card',
+    title: 'Specs/Home/Cards/Metrics Card Sessions',
     component: MetricsCard,
     tags: ['!dev', '!autodocs'],
     decorators: [
@@ -14,6 +14,9 @@ export default {
     ],
 };
 
+/**
+ * Metrics Card / Sessions — pages 1–3 (Figma 563:192464).
+ */
 export const Overview = () => (
     <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
         <MetricsCard page={1} />
@@ -22,7 +25,10 @@ export const Overview = () => (
     </div>
 );
 
-export const Alternative = () => (
+/**
+ * Metrics Card / Lessons (Figma 563:192596).
+ */
+export const Lessons = () => (
     <div style={{ width: '266.667px' }}>
         <MetricsCard page={4} />
     </div>

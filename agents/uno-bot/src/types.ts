@@ -27,11 +27,29 @@ export interface Env {
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;
+  /** Decisions DB under Design HQ — notion_create surface "decision" + search scope. */
+  NOTION_DECISIONS_DB_ID?: string;
   // "Third Party Applications" DB — read-only directory (Application Name /
   // Application Admin / Power Users) that notion_search scope:"apps" queries
   // for access-request ROUTING (who to ask for access; the grant stays human).
   // Optional — unset → the apps scope reports "not configured".
   NOTION_APPS_DB_ID?: string;
+  /** Tutor Help Center Content — notion_search scope "help_tutors". */
+  NOTION_HELP_TUTORS_DB_ID?: string;
+  /** Teacher Help Center Articles — notion_search scope "help_teachers". */
+  NOTION_HELP_TEACHERS_DB_ID?: string;
+  /** Prototype Marketplace — notion_search scope "marketplace". */
+  NOTION_MARKETPLACE_DB_ID?: string;
+  /** Design Running Notes — notion_search scope "running_notes". */
+  NOTION_RUNNING_NOTES_DB_ID?: string;
+  /** News (Content HQ) — notion_search scope "news". */
+  NOTION_NEWS_DB_ID?: string;
+  /** Success Stories — notion_search scope "success_stories". */
+  NOTION_SUCCESS_STORIES_DB_ID?: string;
+  /** Research Papers — notion_search scope "research_papers". */
+  NOTION_RESEARCH_PAPERS_DB_ID?: string;
+  /** Banners — notion_search scope "banners". */
+  NOTION_BANNERS_DB_ID?: string;
   // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
   // team REVIEW (D5). Optional — unset → no review fan-out.
   PLUS_DESIGN_CHANNEL_ID?: string;

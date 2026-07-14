@@ -1,23 +1,105 @@
 import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
-import * as LoginPagesStories from './Pages/Pages.stories.jsx';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as SignInPortalStories from './Pages/SignInPortal/SignInPortal.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
+{/* Figma Login canvas: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/?node-id=1-165 */}
 <Meta title="Specs/Login/Overview" />
 
 <Title>Login</Title>
 
-Authentication specs: the sign-in portal and its supporting organisms, organized
-Elements → Cards → Tables → Modals → Sections → Pages.
+Sign-in portal specs from the Web App Specs file. Organisms are organized the same way as
+Figma: **Elements → Cards → Modals → Pages** (Tables / Sections are empty in the current
+Login canvas and reserved for future work).
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=1-165"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Login"
+    sets={[
+        { name: 'Login canvas', nodeId: '1:165' },
+        { name: 'Components (local organisms)', nodeId: '112:1197' },
+        { name: 'Pages · Sign-in Portal', nodeId: '115:5078' },
+        { name: 'Cards · Login Portal', nodeId: '113:42363' },
+        { name: 'Modals · Notifications', nodeId: '115:4973' },
+        { name: 'Elements', nodeId: '112:1200' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<div className="sb-ds-doc-section">
+
+### Catalog
+
+<table>
+    <thead>
+        <tr>
+            <th>Figma section</th>
+            <th>Storybook docs</th>
+            <th>Contents</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Elements</strong></td>
+            <td>
+                <a href="?path=/docs/specs-login-elements-institution-selection--docs">Institution Selection</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-institution-form--docs">Institution Form</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-access-code-form--docs">Access Code Form</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-auth-buttons--docs">Auth Buttons</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-login-buttons--docs">Login Buttons</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-login-alert--docs">Login Alert</a> ·{' '}
+                <a href="?path=/docs/specs-login-elements-login-footer--docs">Login Footer</a>
+            </td>
+            <td>Alert · Auth buttons · Misc buttons · Institution dropdown · Access-code form · Institution form · Footer</td>
+        </tr>
+        <tr>
+            <td><strong>Cards</strong></td>
+            <td><a href="?path=/docs/specs-login-cards-login-portal--docs">Login Portal</a></td>
+            <td>Login Portal (<code>official</code> / <code>demo</code> × steps 1–3b)</td>
+        </tr>
+        <tr>
+            <td><strong>Modals</strong></td>
+            <td><a href="?path=/docs/specs-login-modals-login-notifications-modal--docs">Login Notifications Modal</a></td>
+            <td>Notifications modal types A &amp; B</td>
+        </tr>
+        <tr>
+            <td><strong>Pages</strong></td>
+            <td><a href="?path=/docs/specs-login-pages-sign-in-portal--docs">Sign-in Portal</a></td>
+            <td>Sign-in Portal full page</td>
+        </tr>
+        <tr>
+            <td>Tables / Sections</td>
+            <td>—</td>
+            <td>Empty / archived in Figma (Jul 2026) — no Storybook docs yet</td>
+        </tr>
+    </tbody>
+</table>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Featured page — Sign-in portal
 
-<Canvas of={LoginPagesStories.SignInPortal} />
+Full-page composition: logo, Login Portal card (official · step 1), and help footer.
+Matches Figma **Pages → Sign-in Portal**. Browse the catalog links above for Elements, Cards, and Modals.
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Official step-1 portal on the surface-container page shell.</>}
+>
+    <Canvas
+        of={SignInPortalStories.Overview}
+        story={{ inline: true }}
+        layout="fullscreen"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
 
 </div>

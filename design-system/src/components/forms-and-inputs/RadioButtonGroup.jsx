@@ -19,6 +19,8 @@ const RadioButton = ({
     onFocus,
     onBlur,
     className = '',
+    'aria-labelledby': ariaLabelledBy,
+    'aria-label': ariaLabel,
     ...props
 }) => {
     const wrapperClasses = [
@@ -27,10 +29,12 @@ const RadioButton = ({
         className
     ].filter(Boolean).join(' ');
 
+    const labelId = label && id ? `${id}-label` : undefined;
+
     return (
         <div className={wrapperClasses}>
             {label && (
-                <div className="plus-radio-button-label body2-txt">
+                <div id={labelId} className="plus-radio-button-label body2-txt">
                     {label}
                 </div>
             )}
@@ -45,6 +49,8 @@ const RadioButton = ({
                 onFocus={onFocus}
                 onBlur={onBlur}
                 className="plus-radio-button"
+                aria-labelledby={ariaLabelledBy || labelId}
+                aria-label={!ariaLabelledBy && !labelId ? (ariaLabel || (typeof value === 'string' ? value : undefined)) : ariaLabel}
                 {...props}
             />
         </div>
@@ -132,10 +138,11 @@ const Scale = ({
                         const optionValue = option.value !== undefined ? option.value : option;
                         const optionLabel = option.label !== undefined ? option.label : (typeof option === 'string' ? option : 'Text');
                         const isChecked = currentValue === optionValue;
+                        const optionLabelId = `${optionId}-label`;
 
                         return (
                             <div key={index} className="plus-scale-option">
-                                <div className="plus-scale-option-label body2-txt">
+                                <div id={optionLabelId} className="plus-scale-option-label body2-txt">
                                     {optionLabel}
                                 </div>
                                 <RadioButton
@@ -145,6 +152,7 @@ const Scale = ({
                                     checked={isChecked}
                                     disabled={disabled}
                                     onChange={() => handleChange(optionValue)}
+                                    aria-labelledby={optionLabelId}
                                 />
                             </div>
                         );

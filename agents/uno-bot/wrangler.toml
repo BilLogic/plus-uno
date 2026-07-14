@@ -47,6 +47,8 @@ GITHUB_MCP_ENABLED = "true"
 # Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
+# Decisions DB (Design HQ) — notion_create surface "decision".
+NOTION_DECISIONS_DB_ID = "6279ea4a-cd84-4d51-90e1-e6b6af53bb19"
 # Notion "Team Member Database" — read-only roster (name, role, bio, LinkedIn)
 # that notion_search (scope: "team") queries to suggest collaborators/SMEs for a topic.
 NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
@@ -56,6 +58,27 @@ NOTION_TEAM_DB_ID = "134b7cca-4982-801d-a91d-d678e79d6e27"
 # who to ask, pre-fill the ask; the grant itself stays human. This is the
 # DATABASE id (parent of data source 207b7cca-4982-808f-912f-000bb2a97185).
 NOTION_APPS_DB_ID = "207b7cca-4982-801b-a80f-e7e1c69c3d3c"
+# ── notion_search catalog scopes (Tier 1 + Tier 2) — DATABASE ids, not data
+# sources. Each scope queries databases/{id}/query + fuzzy-matches titles in
+# the Worker (same pattern as apps / roadmap_query). Share each DB with the
+# uno-bot Notion integration (Connections) or the scope returns empty.
+# Tier 1 — frequent grounding
+NOTION_HELP_TUTORS_DB_ID = "24dadbad-35c8-47fa-8b3d-48a28184bdd5"
+# Tutor Help Center Content (ds c19bb103-ad67-43b5-bd95-363724b0e3ba). Parent
+# also hosts Tasks Tracker — Worker skips "Task name" title rows.
+NOTION_HELP_TEACHERS_DB_ID = "379b7cca-4982-800b-ae0f-ed31e7c0ec78"
+# Teacher Help Center Articles (ds c24b7cca-4982-82fc-bbf9-079585b06629).
+NOTION_MARKETPLACE_DB_ID = "397b7cca-4982-8002-826c-c45e2baa8e4f"
+# Prototype Marketplace under Design HQ (ds 397b7cca-4982-80d8-9967-000b69521ce9).
+NOTION_RUNNING_NOTES_DB_ID = "3ee43141-b0ce-4517-badc-cb52a7b97bdb"
+# Design Running Notes (ds 819a7daa-c9a1-4b1d-a24f-6ec2e169ee03).
+# Tier 2 — Content Management Systems (read radar)
+NOTION_NEWS_DB_ID = "18ab7cca-4982-80b7-9168-db5c5ab201e9"
+NOTION_SUCCESS_STORIES_DB_ID = "55c702c6-18dd-4b5c-8cea-eac797c02257"
+NOTION_RESEARCH_PAPERS_DB_ID = "85af6f14-7e96-4ed7-aa92-687579a14b4f"
+NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
+# NOT tracked (deliberate): Help Center Articles Dev Page, Tasks Tracker on HC
+# Content, Content HQ editorial/meeting/social DBs, demo pages.
 # NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
 # surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
 # research is an IDE-only skill that writes to the project hub's Research page.

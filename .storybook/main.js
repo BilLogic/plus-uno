@@ -15,8 +15,8 @@ const config = {
     '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
     // Playground prototypes selectively included in Storybook
-    // '../playground/storybook-ai-agent-llm-api/**/*.stories.{js,jsx,ts,tsx}',
-    // '../playground/training-onboarding/**/*.stories.{js,jsx,ts,tsx}',
+    // '../prototypes/storybook-ai-agent-llm-api/**/*.stories.{js,jsx,ts,tsx}',
+    // '../prototypes/training-onboarding/**/*.stories.{js,jsx,ts,tsx}',
   ],
 
   addons: [
@@ -39,14 +39,7 @@ const config = {
     reactDocgen: 'react-docgen',
   },
 
-  features: {
-    storyStoreV7: true,
-  },
-
-  server: {
-    host: '0.0.0.0',
-    port: 6006,
-  },
+  // storyStoreV7 is default in Storybook 10 — no features flag needed.
 
   staticDirs: (() => {
     const staticDirs = [];

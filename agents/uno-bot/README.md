@@ -118,7 +118,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider + MCP health:** `GET /debug/gemini` (live Gemini round-trip), `GET /debug/mcp` (attached MCP servers; also cron-probed every 15 min with alerts to `#uno-bot`).
-- **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `playground/test-prototype/` + a root `dev:test-prototype` script; `npm install && npm run dev:test-prototype` boots it.
+- **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/test-prototype/` + a root `dev:test-prototype` script; `npm install && npm run dev:test-prototype` boots it.
 
 ## Gotchas
 
@@ -126,5 +126,5 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 - **Provider drift:** capabilities differ by lane (see the table above) — if the bot stops using `delegate`/`web_search` or hosted-MCP reads, check `MODEL_PROVIDER` before debugging anything else.
 - **Oversized Figma frames:** whole-board nodes blow past Figma's render limit + the 8000px image cap; the script falls back (smaller scale → design-properties only). Point at a single screen frame for visual parity.
 - **Notion PRD access:** the PRD page must be shared with the Notion integration, else codegen proceeds without PRD context (graceful, lower fidelity).
-- **Slug collisions:** the scaffold refuses to overwrite an existing `playground/{slug}/` (Action fails, Slack gets ❌). Pick a fresh slug.
+- **Slug collisions:** the scaffold refuses to overwrite an existing `prototypes/{slug}/` (Action fails, Slack gets ❌). Pick a fresh slug.
 - **Cost:** each `prototype_scaffold` run is one large multimodal LLM call (~$0.30–0.80).

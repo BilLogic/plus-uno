@@ -83,6 +83,7 @@ function PaginationContentDemos() {
                         totalPages={10}
                         type="icon"
                         size="default"
+                        ariaLabel="Icon pagination example"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
@@ -96,6 +97,7 @@ function PaginationContentDemos() {
                         size="default"
                         prevText="Previous"
                         nextText="Next"
+                        ariaLabel="Text pagination example"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
@@ -114,9 +116,9 @@ function PaginationSizesDemos() {
                 </p>
                 <div style={contentVariantCard}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <Pagination currentPage={1} totalPages={10} type="icon" size="small" onPageChange={(p) => console.log('Page:', p)} />
-                        <Pagination currentPage={1} totalPages={10} type="icon" size="default" onPageChange={(p) => console.log('Page:', p)} />
-                        <Pagination currentPage={1} totalPages={10} type="icon" size="large" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="icon" size="small" ariaLabel="Icon pagination, small size" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="icon" size="default" ariaLabel="Icon pagination, default size" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="icon" size="large" ariaLabel="Icon pagination, large size" onPageChange={(p) => console.log('Page:', p)} />
                     </div>
                 </div>
             </section>
@@ -127,9 +129,9 @@ function PaginationSizesDemos() {
                 </p>
                 <div style={contentVariantCard}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <Pagination currentPage={1} totalPages={10} type="text" size="small" prevText="Previous" nextText="Next" onPageChange={(p) => console.log('Page:', p)} />
-                        <Pagination currentPage={1} totalPages={10} type="text" size="default" prevText="Previous" nextText="Next" onPageChange={(p) => console.log('Page:', p)} />
-                        <Pagination currentPage={1} totalPages={10} type="text" size="large" prevText="Previous" nextText="Next" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="text" size="small" prevText="Previous" nextText="Next" ariaLabel="Text pagination, small size" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="text" size="default" prevText="Previous" nextText="Next" ariaLabel="Text pagination, default size" onPageChange={(p) => console.log('Page:', p)} />
+                        <Pagination currentPage={1} totalPages={10} type="text" size="large" prevText="Previous" nextText="Next" ariaLabel="Text pagination, large size" onPageChange={(p) => console.log('Page:', p)} />
                     </div>
                 </div>
             </section>
@@ -151,6 +153,7 @@ function PaginationInteractionStatesDemos() {
                         totalPages={10}
                         type="icon"
                         size="default"
+                        ariaLabel="First page pagination example"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
@@ -166,6 +169,7 @@ function PaginationInteractionStatesDemos() {
                         totalPages={10}
                         type="icon"
                         size="default"
+                        ariaLabel="Last page pagination example"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>
@@ -181,6 +185,7 @@ function PaginationInteractionStatesDemos() {
                         totalPages={10}
                         type="icon"
                         size="default"
+                        ariaLabel="Middle page pagination example"
                         onPageChange={(p) => console.log('Page:', p)}
                     />
                 </div>

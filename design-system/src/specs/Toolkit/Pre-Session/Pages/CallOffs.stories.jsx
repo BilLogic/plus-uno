@@ -210,18 +210,10 @@ export const Overview = () => (
  * - Action buttons
  * - Breakpoint toggle to preview at different screen sizes
  */
-export const Interactive = () => {
+const InteractiveRender = (args) => {
     const [selectedTab, setSelectedTab] = useState('call-offs');
-    const [callOffState, setCallOffState] = useState('pending');
-    const [timeframe, setTimeframe] = useState('This week');
-    const [breakpoint, setBreakpoint] = useState('xl');
-
-    // Breakpoint widths from design system
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
+    const callOffState = args.callOffState;
+    const timeframe = 'This week';
 
     const tabs = [
         { id: 'my-sessions', label: 'My sessions', count: 20 },
@@ -239,94 +231,44 @@ export const Interactive = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Breakpoint Toggle Controls */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                flexWrap: 'wrap'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
-                    Breakpoint:
-                </span>
-                {Object.entries(breakpointWidths).map(([bp, width]) => (
-                    <Button
-                        key={bp}
-                        text={`${bp.toUpperCase()} (${width}px)`}
-                        size="small"
-                        style="primary"
-                        fill={breakpoint === bp ? 'filled' : 'outline'}
-                        onClick={() => setBreakpoint(bp)}
-                    />
-                ))}
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                    Current: <strong>{breakpointWidths[breakpoint]}px</strong>
-                </span>
-            </div>
-
-            {/* Current State Info */}
-            <div style={{
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                display: 'flex',
-                gap: 'var(--size-element-gap-lg)'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Call-off State: <strong>{callOffState}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Timeframe: <strong>{timeframe}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Showing: <strong>{currentCallOffs.length}</strong> call-offs
-                </span>
-            </div>
-
-            {/* Page Preview Container */}
-            <div style={{
-                width: `${breakpointWidths[breakpoint]}px`,
-                height: '100%',
-                margin: '0 auto',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-                transition: 'width 0.3s ease'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions' }
-                        ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: 'tutor',
-                        activeTab: 'sessions'
-                    }}
-                    id="call-offs-page-interactive"
-                >
-                    <MainContent
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                        callOffs={currentCallOffs}
-                        callOffState={callOffState}
-                        onCallOffStateChange={setCallOffState}
-                        timeframe={timeframe}
-                        onTimeframeChange={setTimeframe}
-                        onAction={handleAction}
-                        interactive={true}
-                    />
-                </PageLayout>
-            </div>
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Sessions' }
+                    ],
+                    user: { name: 'John Doe', role: 'Lead' }
+                }}
+                sidebarConfig={{
+                    user: 'tutor',
+                    activeTab: 'sessions'
+                }}
+                id="call-offs-page-interactive"
+            >
+                <MainContent
+                    tabs={tabs}
+                    selectedTab={selectedTab}
+                    onTabChange={setSelectedTab}
+                    callOffs={currentCallOffs}
+                    callOffState={callOffState}
+                    onCallOffStateChange={() => {}}
+                    timeframe={timeframe}
+                    onTimeframeChange={() => {}}
+                    onAction={handleAction}
+                    interactive={true}
+                />
+            </PageLayout>
         </div>
     );
+};
+
+export const Interactive = {
+    render: InteractiveRender,
+    argTypes: {
+        callOffState: { control: 'radio', options: ['pending', 'past'], name: 'Call-off state', table: { category: 'State' } },
+    },
+    args: { callOffState: 'pending' },
 };
 
 /**

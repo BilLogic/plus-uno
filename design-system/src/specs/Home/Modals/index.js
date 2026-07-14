@@ -1,17 +1,7 @@
 /**
  * @fileoverview Home Organism - Modals Index
- * Modal dialogs used in home page flows.
+ * Modal dialogs used on the Home canvas (Figma 134:175598).
  */
 
-// User Feedback Modal
 export { default as UserFeedbackModal } from './UserFeedbackModal';
-
-// Report Problem Modal
-export { default as ReportProblemModal } from './ReportProblemModal';
-
-// Look for Help Modal
-export { default as LookForHelpModal } from './LookForHelpModal';
-
-// Share Ideas Modal
-export { default as ShareIdeasModal } from './ShareIdeasModal';
-
+export { default as UpdateNotification } from './UpdateNotification';

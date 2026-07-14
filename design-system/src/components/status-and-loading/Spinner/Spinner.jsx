@@ -50,7 +50,7 @@ const Spinner = ({
 
 Spinner.propTypes = {
     variant: PropTypes.oneOf(['border', 'grow', 'growing', 'rotating', 'stacking', 'default']),
-    size: PropTypes.string,
+    size: PropTypes.oneOf(['sm']),
     className: PropTypes.string,
     role: PropTypes.string
 };

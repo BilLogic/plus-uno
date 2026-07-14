@@ -25,7 +25,7 @@ Technical properties used primarily for implementation details or developer over
 
 ## Interactive Playground Policy
 
-The docs-bottom `Interactive` section should be a **curated playground**, not a full prop inspector.
+The docs-bottom `Interactive` section should be a **curated prototypes**, not a full prop inspector.
 
 Its primary audience is designers reviewing how a component changes across a few meaningful inputs. Developers can still use the story source, docs table, and story file for the full API surface.
 
@@ -44,7 +44,7 @@ Good fits:
 
 Hide or demote props that are mainly implementation details, escape hatches, or engineering hooks.
 
-Usually hide from the main docs playground:
+Usually hide from the main docs prototypes:
 
 - `id`, `className`, `name`, `testId`
 - callback props such as `onClick`, `onChange`, `onDismiss`

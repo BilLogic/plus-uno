@@ -71,8 +71,11 @@ const Carousel = ({
             style={style}
             prevIcon={prevIcon || defaultPrevIcon}
             nextIcon={nextIcon || defaultNextIcon}
-            prevLabel={null}
-            nextLabel={null}
+            // Visually-hidden text (react-bootstrap renders it wrapped in a
+            // `.visually-hidden` span) so prev/next controls have an
+            // accessible name — omitting it fails the "link-name" a11y rule.
+            prevLabel="Previous slide"
+            nextLabel="Next slide"
             {...props}
         >
             {content}

@@ -157,7 +157,15 @@ InputGroupText.propTypes = {
 };
 
 // Subcomponent: Checkbox
-const InputGroupCheckbox = ({ checked = false, size = 'medium', disabled = false, onChange, className = '', ...props }) => {
+const InputGroupCheckbox = ({
+    checked = false,
+    size = 'medium',
+    disabled = false,
+    onChange,
+    className = '',
+    'aria-label': ariaLabel = 'Toggle option',
+    ...props
+}) => {
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
     return (
         <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-checkbox ${sizeClass} ${className}`} {...props}>
@@ -167,6 +175,7 @@ const InputGroupCheckbox = ({ checked = false, size = 'medium', disabled = false
                     checked={checked}
                     disabled={disabled}
                     onChange={onChange}
+                    aria-label={ariaLabel}
                 />
             </div>
         </BootstrapInputGroup.Text>
@@ -178,11 +187,20 @@ InputGroupCheckbox.propTypes = {
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
-    className: PropTypes.string
+    className: PropTypes.string,
+    'aria-label': PropTypes.string
 };
 
 // Subcomponent: Radio
-const InputGroupRadio = ({ checked = false, size = 'medium', disabled = false, onChange, className = '', ...props }) => {
+const InputGroupRadio = ({
+    checked = false,
+    size = 'medium',
+    disabled = false,
+    onChange,
+    className = '',
+    'aria-label': ariaLabel = 'Select option',
+    ...props
+}) => {
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
     return (
         <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-radio ${sizeClass} ${className}`} {...props}>
@@ -192,6 +210,7 @@ const InputGroupRadio = ({ checked = false, size = 'medium', disabled = false, o
                     checked={checked}
                     disabled={disabled}
                     onChange={onChange}
+                    aria-label={ariaLabel}
                 />
             </div>
         </BootstrapInputGroup.Text>
@@ -203,7 +222,8 @@ InputGroupRadio.propTypes = {
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
-    className: PropTypes.string
+    className: PropTypes.string,
+    'aria-label': PropTypes.string
 };
 
 // Subcomponent: Icon (Plus)

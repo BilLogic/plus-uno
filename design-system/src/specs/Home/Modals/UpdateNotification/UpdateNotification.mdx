@@ -1,0 +1,57 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as UpdateNotificationStories from './UpdateNotification.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={UpdateNotificationStories} />
+
+<Title />
+
+Home announcement modal introducing AI Coach — illustration, short copy, and two actions (Watch tutorial · Try AI Coach).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=7283-416854"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Modals/UpdateNotification"
+    sets={[
+        { name: 'Home Modals canvas', nodeId: '134:175598' },
+        { name: 'Update Notification', nodeId: '7283:416854' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+Tutor home with scrim and the notification open.
+
+<DocsCanvasShell
+    description={<>App chrome + overlay + open Update Notification.</>}
+>
+    <Canvas
+        of={UpdateNotificationStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Dialog
+
+<DocsInteractivePlayground
+    of={UpdateNotificationStories.Dialog}
+    description={<>Isolated dialog for inspecting layout and actions.</>}
+/>
+
+</div>
+
+</div>

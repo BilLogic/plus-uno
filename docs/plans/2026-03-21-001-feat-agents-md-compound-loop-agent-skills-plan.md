@@ -140,9 +140,9 @@ Platform pointers (all point to AGENTS.md):
 **Tasks:**
 
 - [ ] Create `docs/agent-context/product-landscape.md` (~50 lines):
-  - What is plus-uno, tech stack, DS inventory, token system, playground, deployment, integrations
+  - What is plus-uno, tech stack, DS inventory, token system, prototypes, deployment, integrations
 - [ ] Create `docs/agent-context/conventions.md` (~40 lines):
-  - File naming, import patterns, playground structure, git conventions, docs pipeline, token workflow, known gotchas
+  - File naming, import patterns, prototypes structure, git conventions, docs pipeline, token workflow, known gotchas
 - [ ] Create `docs/agent-context/setup-guide.md` (~50 lines):
   - Recommended CE skills: `/ce:plan`, `/ce:work`, `/ce:review`, `/ce:compound`, `/ce:brainstorm`, `/ce:ideate`
   - MCP servers: Figma (required), Stitch (required for wireframes), Playwright (optional), Context7 (recommended)

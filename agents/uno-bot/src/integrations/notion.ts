@@ -1,4 +1,5 @@
-// Worker-safe Notion client: notionCreate (PRD/intake cards on the Roadmap
+// Worker-safe Notion client: notionCreate (PRD/intake on Roadmap; decision rows
+// on Decisions DB), notionUpdate (any shared page), archive, search helpers.
 // database, placed in "Need PRD / Under Playground"), notionUpdate,
 // archiveCard, notionSearch, readNotionPage, findTeamMembers, queryRoadmapCards.
 //
@@ -261,53 +262,168 @@ const APPS_MAX_PAGES = 2;
  * ids, status). Classic databases/{id}/query — one page of 100 rows ≈ one
  * subrequest. Throws on failure (caller surfaces it honestly).
  */
-export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
-  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  if (!env.NOTION_APPS_DB_ID) throw new Error("NOTION_APPS_DB_ID not configured");
+// A raw row from databases/{id}/query. The property intersection carries the
+// extras individual readers need (unique_id for Roadmap card numbers, relation
+// for Power Users) on top of the shared NotionProperty shape.
+interface DbQueryRow {
+  id?: string;
+  url?: string;
+  archived?: boolean;
+  properties?: Record<string, NotionProperty & {
+    unique_id?: { number?: number | null };
+    relation?: { id?: string }[];
+  }>;
+}
 
-  const apps: ThirdPartyApp[] = [];
+// Shared paginated database read: the API-key guard, AbortController/timer,
+// fixed-page loop, POST databases/{id}/query, error + has_more handling that
+// every catalog reader (apps / catalog scopes / roadmap) had copied verbatim.
+// Each caller supplies only its per-row `mapRow` (return null to drop a row).
+async function queryDatabaseRows<T>(
+  env: Env,
+  databaseId: string,
+  opts: { maxPages: number; pageSize?: number; filter?: unknown; errorLabel: string },
+  mapRow: (row: DbQueryRow) => T | null,
+): Promise<T[]> {
+  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+  if (!databaseId) throw new Error("database id is empty");
+  const out: T[] = [];
   let cursor: string | undefined;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    for (let page = 0; page < APPS_MAX_PAGES; page++) {
-      const res = await fetch(`${NOTION_API}/databases/${env.NOTION_APPS_DB_ID}/query`, {
+    for (let page = 0; page < opts.maxPages; page++) {
+      const res = await fetch(`${NOTION_API}/databases/${databaseId}/query`, {
         method: "POST",
         headers: notionHeaders(env, { write: true }),
         body: JSON.stringify({
-          page_size: APPS_PAGE_SIZE,
+          page_size: opts.pageSize ?? 100,
           ...(cursor ? { start_cursor: cursor } : {}),
+          ...(opts.filter ? { filter: opts.filter } : {}),
         }),
         signal: controller.signal,
       });
       const data = (await res.json()) as {
-        results?: Array<{ id?: string; url?: string; archived?: boolean; properties?: ThirdPartyAppProps }>;
-        has_more?: boolean; next_cursor?: string | null; message?: string; code?: string;
+        results?: DbQueryRow[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string;
       };
-      if (!res.ok) {
-        throw notionError(res.status, data, "third-party apps query failed");
-      }
+      if (!res.ok) throw notionError(res.status, data, opts.errorLabel);
       for (const r of data.results ?? []) {
-        if (!r.id || r.archived) continue;
-        const p = r.properties ?? {};
-        const name = plain(p["Application Name"]?.title);
-        if (!name) continue;
-        apps.push({
-          name,
-          url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
-          admins: (p["Application Admin"]?.people ?? []).map((u) => u.name ?? "").filter(Boolean),
-          powerUserPageIds: (p["Power User(s)"]?.relation ?? []).map((rel) => rel.id ?? "").filter(Boolean),
-          usageStatus: p["Usage Status"]?.status?.name ?? undefined,
-          licenseTypes: (p["License Type"]?.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean),
-        });
+        const mapped = mapRow(r);
+        if (mapped != null) out.push(mapped);
       }
       if (!data.has_more || !data.next_cursor) break;
       cursor = data.next_cursor;
     }
-    return apps;
+    return out;
   } finally {
     clearTimeout(timer);
   }
+}
+
+export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
+  if (!env.NOTION_APPS_DB_ID) throw new Error("NOTION_APPS_DB_ID not configured");
+  return queryDatabaseRows(
+    env,
+    env.NOTION_APPS_DB_ID,
+    { maxPages: APPS_MAX_PAGES, pageSize: APPS_PAGE_SIZE, errorLabel: "third-party apps query failed" },
+    (r): ThirdPartyApp | null => {
+      if (!r.id || r.archived) return null;
+      const p = (r.properties ?? {}) as ThirdPartyAppProps;
+      const name = plain(p["Application Name"]?.title);
+      if (!name) return null;
+      return {
+        name,
+        url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
+        admins: (p["Application Admin"]?.people ?? []).map((u) => u.name ?? "").filter(Boolean),
+        powerUserPageIds: (p["Power User(s)"]?.relation ?? []).map((rel) => rel.id ?? "").filter(Boolean),
+        usageStatus: p["Usage Status"]?.status?.name ?? undefined,
+        licenseTypes: (p["License Type"]?.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean),
+      };
+    },
+  );
+}
+
+// ─── Generic catalog DB query (notion_search scoped catalogs) ────────────────
+// Same lesson as apps / roadmap_query: /v1/search misses literal titles inside
+// known DBs. Query databases/{id} directly (1–2 subrequests) and match in-Worker.
+
+const CATALOG_PAGE_SIZE = 100;
+const CATALOG_MAX_PAGES = 2;
+/** Cap how many select/status/url/rich_text fields we surface per row. */
+const CATALOG_META_CAP = 6;
+
+export interface CatalogRow {
+  id: string;
+  title: string;
+  url: string;
+  /** Compact property bag (status/select/url/short text) for the model. */
+  meta: Record<string, string>;
+}
+
+/**
+ * Pull a title from a property bag, skipping named title props (e.g. "Task name"
+ * on the Help Center Content multi-source parent so Tasks Tracker rows drop out).
+ */
+function catalogTitle(
+  props: Record<string, NotionProperty>,
+  skipTitleNames: string[] = [],
+): string | null {
+  const skip = new Set(skipTitleNames.map((n) => n.toLowerCase()));
+  for (const [name, prop] of Object.entries(props)) {
+    if (prop.type !== "title") continue;
+    if (skip.has(name.toLowerCase())) continue;
+    const t = plain(prop.title);
+    if (t) return t;
+  }
+  return null;
+}
+
+/**
+ * Compact non-title properties into a small string map for search results.
+ */
+function catalogMeta(props: Record<string, NotionProperty>): Record<string, string> {
+  const meta: Record<string, string> = {};
+  for (const [name, prop] of Object.entries(props)) {
+    if (Object.keys(meta).length >= CATALOG_META_CAP) break;
+    if (prop.type === "title") continue;
+    if (!["status", "select", "multi_select", "url", "rich_text", "date", "checkbox", "number", "people"].includes(prop.type)) {
+      continue;
+    }
+    const v = renderProperty(prop);
+    if (v && v.length <= 200) meta[name] = v;
+  }
+  return meta;
+}
+
+/**
+ * Read rows from any Notion database the integration can see. Generic title +
+ * meta extraction — used by notion_search catalog scopes. Throws on failure.
+ *
+ * @param databaseId - Notion DATABASE id (not data-source id)
+ * @param opts.skipTitleNames - title property names to ignore (multi-source DBs)
+ */
+export async function queryCatalogDatabase(
+  env: Env,
+  databaseId: string,
+  opts: { skipTitleNames?: string[] } = {},
+): Promise<CatalogRow[]> {
+  return queryDatabaseRows(
+    env,
+    databaseId,
+    { maxPages: CATALOG_MAX_PAGES, pageSize: CATALOG_PAGE_SIZE, errorLabel: "catalog query failed" },
+    (r): CatalogRow | null => {
+      if (!r.id || r.archived) return null;
+      const props = r.properties ?? {};
+      const title = catalogTitle(props, opts.skipTitleNames);
+      if (!title) return null;
+      return {
+        id: r.id.replace(/-/g, ""),
+        title,
+        url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
+        meta: catalogMeta(props),
+      };
+    },
+  );
 }
 
 /**
@@ -360,6 +476,21 @@ export interface ArchivedCard {
 const READ_BLOCK_PAGES = 3; // cap pagination so a huge page can't blow the budget
 const READ_TEXT_CAP = 8000;
 
+// In-memory read cache: a back-and-forth thread re-reads the SAME page every
+// turn (1 page GET + up to 3 block-children GETs ≈ 4 subrequests each), and the
+// free tier caps an invocation at 50 subrequests. Caching successful reads for a
+// short window makes a repeat read cost 0. Per-isolate + best-effort by design
+// (no KV — dodges KV write limits); a cold isolate just re-fetches.
+const READ_CACHE_TTL_MS = 180_000; // 3 min
+const READ_CACHE_MAX = 50; // cap growth in a long-lived isolate
+const readCache = new Map<string, { at: number; value: NotionPageContent }>();
+
+// Drop a page's cached read so a subsequent read reflects a write we just made
+// (notionUpdate/archiveCard) instead of serving a stale copy.
+export function evictReadCache(pageId: string): void {
+  readCache.delete(pageId);
+}
+
 export interface NotionPageContent {
   id: string;
   title: string;
@@ -379,6 +510,7 @@ interface NotionProperty {
   select?: { name?: string } | null;
   status?: { name?: string } | null;
   multi_select?: { name?: string }[];
+  relation?: { id?: string }[];
   date?: { start?: string; end?: string | null } | null;
   url?: string | null;
   email?: string | null;
@@ -420,6 +552,11 @@ function blockText(block: Record<string, unknown>): string {
  */
 export async function readNotionPage(env: Env, pageId: string): Promise<NotionPageContent> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
+
+  // Serve a fresh cached read (0 subrequests) if we read this page recently.
+  const cached = readCache.get(pageId);
+  if (cached && Date.now() - cached.at < READ_CACHE_TTL_MS) return cached.value;
+
   const headers = notionHeaders(env, { write: true });
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -464,7 +601,12 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       cursor = bData.next_cursor;
     }
 
-    return { id: pageId, title, properties, people, text: lines.join("\n").slice(0, READ_TEXT_CAP) };
+    const result: NotionPageContent = { id: pageId, title, properties, people, text: lines.join("\n").slice(0, READ_TEXT_CAP) };
+    // Cache only successful reads (never a throw). Clear when full — a long-lived
+    // isolate shouldn't grow this unbounded; simple beats an LRU here.
+    if (readCache.size >= READ_CACHE_MAX) readCache.clear();
+    readCache.set(pageId, { at: Date.now(), value: result });
+    return result;
   } finally {
     clearTimeout(timer);
   }
@@ -486,24 +628,32 @@ export interface NotionSearchHit {
 export async function notionSearch(
   env: Env,
   query: string,
-  limit = 8,
+  limit = 12,
 ): Promise<NotionSearchHit[]> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
+    // No object filter — Notion only allows page OR database per call; omitting
+    // the filter returns both. Prefer a scoped catalog query when the surface
+    // is known (help_tutors / marketplace / decisions / …).
     const res = await fetch(`${NOTION_API}/search`, {
       method: "POST",
       headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
         query,
-        filter: { property: "object", value: "page" },
         page_size: Math.min(Math.max(limit, 1), 20),
       }),
       signal: controller.signal,
     });
     const data = (await res.json()) as {
-      results?: Array<{ id?: string; url?: string; properties?: Record<string, NotionProperty> }>;
+      results?: Array<{
+        object?: string;
+        id?: string;
+        url?: string;
+        title?: NotionRichText;
+        properties?: Record<string, NotionProperty>;
+      }>;
       message?: string;
       code?: string;
     };
@@ -514,11 +664,16 @@ export async function notionSearch(
     for (const r of data.results ?? []) {
       if (!r.id) continue;
       let title = "(untitled)";
-      for (const prop of Object.values(r.properties ?? {})) {
-        if (prop.type === "title") {
-          const t = plain(prop.title);
-          if (t) title = t;
-          break;
+      if (r.object === "database" && r.title) {
+        const t = plain(r.title);
+        if (t) title = t;
+      } else {
+        for (const prop of Object.values(r.properties ?? {})) {
+          if (prop.type === "title") {
+            const t = plain(prop.title);
+            if (t) title = t;
+            break;
+          }
         }
       }
       const bareId = r.id.replace(/-/g, "");
@@ -530,14 +685,14 @@ export async function notionSearch(
   }
 }
 
-// ─── Generic create across allowlisted surfaces (for notion_create) ──────────
+// ─── Generic create across convention surfaces (for notion_create) ───────────
 // The mechanical half of a Notion create: resolve the destination DB + the
 // surface's base properties, build the body, POST. The editorial half (what a
 // good PRD says, which pillar) lives in the conventions the bot loads. Marketplace
 // is intentionally NOT here — its relation + rollup + dual-write shape is an
 // in-IDE writers/notion operation, not a one-shot Worker write.
 
-export type NotionCreateSurface = "prd" | "intake";
+export type NotionCreateSurface = "prd" | "intake" | "decision";
 
 export interface NotionCreateInput {
   title: string;
@@ -548,6 +703,10 @@ export interface NotionCreateInput {
   sourceUrl?: string;
   /** Surface-specific extras rendered into the body (e.g. evidence link, tier). */
   extras?: Record<string, string>;
+  /** Decisions DB: Roadmap card page URL/id for the Roadmap Card relation. */
+  roadmapCard?: string;
+  /** Decisions DB: Status select — Proposed | Accepted | Rejected | Superseded. */
+  decisionStatus?: string;
 }
 
 interface SurfacePlan {
@@ -584,6 +743,24 @@ function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreate
         },
         label: "Roadmap (maintenance intake)",
       };
+    case "decision": {
+      const status = (input.decisionStatus?.trim() || "Proposed");
+      const properties: Record<string, unknown> = {
+        Status: { select: { name: status } },
+        Date: { date: { start: new Date().toISOString().slice(0, 10) } },
+      };
+      const cardIds = input.roadmapCard ? extractNotionIds(input.roadmapCard) : [];
+      if (cardIds.length) {
+        properties["Roadmap Card"] = { relation: cardIds.map((id) => ({ id })) };
+      }
+      const evidence = input.sourceUrl?.trim() || input.extras?.evidence?.trim();
+      if (evidence) properties.Evidence = { url: evidence };
+      return {
+        databaseId: env.NOTION_DECISIONS_DB_ID,
+        properties,
+        label: "Design HQ → Decisions DB",
+      };
+    }
   }
 }
 
@@ -598,6 +775,20 @@ export async function notionCreate(
   const plan = planSurface(env, surface, input);
   if (!plan.databaseId) {
     throw new Error(`${surface}: destination database not configured on the Worker`);
+  }
+  if (surface === "decision") {
+    // Require an EXTRACTABLE Roadmap id, not just a non-empty string — a bare
+    // name ("the onboarding card") or a view-only link yields zero ids, so the
+    // relation would be silently dropped and the decision filed UNLINKED, which
+    // defeats the whole point of the surface (review 2026-07-13).
+    if (!extractNotionIds(input.roadmapCard ?? "").length) {
+      throw new Error("decision: properties.roadmap_card must be a Roadmap page URL or id (a link carrying the card's id) — a bare name won't link the decision");
+    }
+    const status = input.decisionStatus?.trim() || "Proposed";
+    const allowed = new Set(["Proposed", "Accepted", "Rejected", "Superseded"]);
+    if (!allowed.has(status)) {
+      throw new Error(`decision: Status "${status}" is not an existing option`);
+    }
   }
 
   // Fold surface-specific extras into a body section so nothing is silently lost.
@@ -672,19 +863,35 @@ interface NotionSchemaProp {
 }
 
 // Match a requested property name to a schema name ignoring case, spaces, and
-// underscores ("dev status" == "Dev_Status" == "DevStatus").
-function normalizeName(s: string): string {
+// underscores ("dev status" == "Dev_Status" == "DevStatus"). Exported so the
+// proposal card can line up a requested field against the page's real property.
+export function normalizeName(s: string): string {
   return s.toLowerCase().replace(/[\s_]+/g, "").trim();
 }
 
 // Pull Notion ids (uuid form, dashes optional) out of a value — for relation /
-// people writes where the model passes a page/user id or a Notion URL.
+// people writes where the model passes a page/user id or a Notion URL. Strips
+// the query string FIRST: a "copy link to view" URL carries the VIEW id in
+// ?v=<id>, which would otherwise be captured alongside the page id and rejected
+// as an unknown relation target (live review 2026-07-13). De-duped.
 function extractNotionIds(v: string): string[] {
+  const base = v.split("?")[0] ?? v;
   const out: string[] = [];
+  const seen = new Set<string>();
   const re = /[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}/gi;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(v))) out.push(m[0].replace(/-/g, ""));
+  while ((m = re.exec(base))) {
+    const id = m[0].replace(/-/g, "").toLowerCase();
+    if (!seen.has(id)) { seen.add(id); out.push(id); }
+  }
   return out;
+}
+
+// A date/datetime Notion's API will accept: YYYY-MM-DD, optionally with a time.
+// Anything else (e.g. "next Monday") is rejected — and a bad date in a PATCH
+// fails the WHOLE properties write, so we skip-on-unparseable like number/select.
+function isIsoDate(s: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$/.test(s);
 }
 
 // Format a single value for the property's REAL Notion type. Returns either a
@@ -706,8 +913,12 @@ function formatPropByType(prop: NotionSchemaProp, raw: string): { value?: unknow
     case "checkbox":
       return { value: { checkbox: /^(true|yes|y|1|checked|done|✅)$/i.test(v) } };
     case "date": {
-      const [start, end] = v.split(/\s*(?:→|-->|\.\.|\bto\b)\s*/i);
-      return { value: { date: { start: (start ?? v).trim(), ...(end ? { end: end.trim() } : {}) } } };
+      const [start, end] = v.split(/\s*(?:→|-->|\.\.|\bto\b|\s-\s)\s*/i);
+      const s = (start ?? v).trim();
+      if (!isIsoDate(s)) return { skip: `"${v}" isn't an ISO date (use YYYY-MM-DD)` };
+      const e = end?.trim();
+      if (e && !isIsoDate(e)) return { skip: `end date "${e}" isn't ISO (use YYYY-MM-DD)` };
+      return { value: { date: { start: s, ...(e ? { end: e } : {}) } } };
     }
     case "select": {
       const real = prop.options?.get(v.toLowerCase());
@@ -763,8 +974,28 @@ export interface NotionUpdateResult {
 // applies). Uses the caller's signal to share the request-timeout budget.
 interface PageSchema {
   title: string;
-  parentKind: "database" | "page" | "workspace" | "unknown";
+  inDatabase: boolean;
   schema: Map<string, NotionSchemaProp>; // keyed by normalizeName(realName)
+}
+
+// Just the page title (one GET) — for callers that need the title but NOT the
+// parent-DB schema (e.g. the archive confirmation echo), so they don't pay the
+// extra /databases fetch fetchPageSchema does.
+async function fetchPageTitle(
+  env: Env,
+  pageId: string,
+  headers: Record<string, string>,
+  signal: AbortSignal,
+): Promise<string> {
+  const res = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
+  const page = (await res.json()) as {
+    id?: string; message?: string; code?: string; properties?: Record<string, NotionProperty>;
+  };
+  if (!res.ok || !page.id) throw notionError(res.status, page, "page not found");
+  for (const prop of Object.values(page.properties ?? {})) {
+    if (prop.type === "title") { const t = plain(prop.title); if (t) return t; }
+  }
+  return "(untitled)";
 }
 
 async function fetchPageSchema(
@@ -789,10 +1020,7 @@ async function fetchPageSchema(
   const dbId = page.parent?.database_id;
   const schema = new Map<string, NotionSchemaProp>();
   if (!dbId) {
-    const kind =
-      page.parent?.type === "page_id" ? "page" :
-      page.parent?.type === "workspace" ? "workspace" : "unknown";
-    return { title, parentKind: kind, schema };
+    return { title, inDatabase: false, schema };
   }
   const dbRes = await fetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal });
   const db = (await dbRes.json()) as {
@@ -816,7 +1044,90 @@ async function fetchPageSchema(
     }
     schema.set(normalizeName(name), { name, type: def.type, options });
   }
-  return { title, parentKind: "database", schema };
+  return { title, inDatabase: true, schema };
+}
+
+// A field's current value on the page, read back for a notion_update card's
+// `current → new` diff. `label` is the property's REAL name (so the bullet reads
+// "Dev Status", not the model's "dev_status"); `value` is empty when unset.
+export interface CurrentFieldValue {
+  label: string;
+  value: string;
+}
+
+export interface NotionTargetDescription {
+  title: string;
+  parent: string;
+  /** Canonical page URL, for the linked-card line (never a bare hex). */
+  url: string;
+  /** Current values of the changed fields, keyed by normalizeName(fieldName). */
+  current: Record<string, CurrentFieldValue>;
+}
+
+// Resolve a page's human label + parent-database name for a PROPOSAL card, so an
+// approver sees the CONCRETE target of a notion_update / notion_archive (title +
+// which DB) instead of a bare id — the human read is the backstop now that writes
+// aren't DB-allowlisted (review 2026-07-13). Also returns the canonical URL and,
+// for any `changedFields` passed, each field's CURRENT value (so a notion_update
+// card can show `current → new`). Best-effort: returns null on any failure so the
+// proposal still posts.
+export async function describeNotionTarget(
+  env: Env,
+  rawUrlOrId: string,
+  changedFields: string[] = [],
+): Promise<NotionTargetDescription | null> {
+  const pageId = parseNotionPageId(rawUrlOrId);
+  if (!pageId || !env.NOTION_API_KEY) return null;
+  const headers = notionHeaders(env, { write: true });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
+    const page = (await res.json()) as {
+      id?: string;
+      url?: string;
+      parent?: { type?: string; database_id?: string };
+      properties?: Record<string, NotionProperty>;
+    };
+    if (!res.ok || !page.id) return null;
+    let title = "(untitled)";
+    for (const prop of Object.values(page.properties ?? {})) {
+      if (prop.type === "title") { title = plain(prop.title) || title; break; }
+    }
+
+    // Read back the current value of each field being changed. Relation values
+    // render as page titles (not ids) via a best-effort title fetch.
+    const current: Record<string, CurrentFieldValue> = {};
+    if (changedFields.length) {
+      const wanted = new Set(changedFields.map(normalizeName));
+      for (const [name, prop] of Object.entries(page.properties ?? {})) {
+        const key = normalizeName(name);
+        if (!wanted.has(key)) continue;
+        let value = renderProperty(prop);
+        if (prop.type === "relation" && prop.relation?.length) {
+          const ids = prop.relation.map((r) => r.id).filter((x): x is string => !!x);
+          const titles = ids.length ? await fetchPageTitles(env, ids).catch(() => []) : [];
+          if (titles.length) value = titles.join(", ");
+        }
+        current[key] = { label: name, value };
+      }
+    }
+
+    const url = page.url || `https://www.notion.so/${pageId}`;
+    const dbId = page.parent?.database_id;
+    if (!dbId) {
+      const parent = page.parent?.type === "page_id" ? "a sub-page" : "a standalone page";
+      return { title, parent, url, current };
+    }
+    const dbRes = await fetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal: controller.signal });
+    if (!dbRes.ok) return { title, parent: "a database", url, current };
+    const db = (await dbRes.json()) as { title?: NotionRichText };
+    return { title, parent: plain(db.title) || "a database", url, current };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function notionUpdate(
@@ -837,14 +1148,14 @@ export async function notionUpdate(
     //    fetch the schema when there ARE properties to set (append-only skips the
     //    two extra reads). No DB allowlist: the ✅ gate already approved this write.
     if (input.properties && Object.keys(input.properties).length) {
-      const { schema, parentKind } = await fetchPageSchema(env, pageId, headers, controller.signal);
+      const { schema, inDatabase } = await fetchPageSchema(env, pageId, headers, controller.signal);
       const props: Record<string, unknown> = {};
       for (const [reqName, value] of Object.entries(input.properties)) {
         if (typeof value !== "string") { skipped.push(`${reqName} (non-text value)`); continue; }
         const match = schema.get(normalizeName(reqName));
         if (!match) {
           skipped.push(
-            parentKind === "database"
+            inDatabase
               ? `${reqName} (no such property on this database)`
               : `${reqName} (this page isn't in a database, so it has no editable properties)`,
           );
@@ -891,6 +1202,9 @@ export async function notionUpdate(
       appended = children.length;
     }
 
+    // Drop any cached read so the next read reflects this write, not a stale copy.
+    if (updated.length || appended) evictReadCache(pageId);
+
     return { id: pageId, updated, skipped, appended };
   } finally {
     clearTimeout(timer);
@@ -906,7 +1220,7 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const { title } = await fetchPageSchema(env, pageId, headers, controller.signal);
+    const title = await fetchPageTitle(env, pageId, headers, controller.signal);
 
     const patchRes = await fetch(`${NOTION_API}/pages/${pageId}`, {
       method: "PATCH",
@@ -918,6 +1232,8 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
       const err = (await patchRes.json().catch(() => ({}))) as { message?: string };
       throw notionError(patchRes.status, err, "archive failed");
     }
+    // Drop any cached read so a subsequent read reflects the archive.
+    evictReadCache(pageId);
     return { id: pageId, title };
   } finally {
     clearTimeout(timer);
@@ -946,19 +1262,6 @@ export interface RoadmapCard {
   people: Record<string, string[]>;
 }
 
-interface RoadmapQueryPage {
-  results?: Array<{
-    id?: string;
-    url?: string;
-    archived?: boolean;
-    properties?: Record<string, NotionProperty & { unique_id?: { number?: number | null } }>;
-  }>;
-  next_cursor?: string | null;
-  has_more?: boolean;
-  message?: string;
-  code?: string;
-}
-
 const ROADMAP_PAGE_SIZE = 100;
 const ROADMAP_MAX_PAGES = 2;
 
@@ -966,72 +1269,53 @@ export async function queryRoadmapCards(
   env: Env,
   opts: { designStatus?: string } = {},
 ): Promise<RoadmapCard[]> {
-  if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
-
-  const cards: RoadmapCard[] = [];
-  let cursor: string | undefined;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    for (let page = 0; page < ROADMAP_MAX_PAGES; page++) {
-      const res = await fetch(`${NOTION_API}/databases/${env.NOTION_ROADMAP_DB_ID}/query`, {
-        method: "POST",
-        headers: notionHeaders(env, { write: true }),
-        body: JSON.stringify({
-          page_size: ROADMAP_PAGE_SIZE,
-          ...(cursor ? { start_cursor: cursor } : {}),
-          ...(opts.designStatus
-            ? { filter: { property: "Design Status", status: { equals: opts.designStatus } } }
-            : {}),
-        }),
-        signal: controller.signal,
-      });
-      const data = (await res.json()) as RoadmapQueryPage;
-      if (!res.ok) {
-        throw notionError(res.status, data, "roadmap query failed");
-      }
-      for (const r of data.results ?? []) {
-        if (!r.id || r.archived) continue;
-        const props = r.properties ?? {};
-        let title = "(untitled)";
-        let cardNumber: number | null = null;
-        let designStatus: string | null = null;
-        let devStatus: string | null = null;
-        let pillars: string[] = [];
-        const people: Record<string, string[]> = {};
-        for (const [name, prop] of Object.entries(props)) {
-          if (prop.type === "title") {
-            const t = plain(prop.title);
-            if (t) title = t;
-          } else if (prop.type === "unique_id") {
-            cardNumber = prop.unique_id?.number ?? null;
-          } else if (prop.type === "status" && name === "Design Status") {
-            designStatus = prop.status?.name ?? null;
-          } else if (prop.type === "status" && name === "Dev Status") {
-            devStatus = prop.status?.name ?? null;
-          } else if (prop.type === "multi_select" && name === "Product Pillar") {
-            pillars = (prop.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean);
-          } else if (prop.type === "people") {
-            const names = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
-            if (names.length) people[name] = names;
-          }
+  return queryDatabaseRows(
+    env,
+    env.NOTION_ROADMAP_DB_ID,
+    {
+      maxPages: ROADMAP_MAX_PAGES,
+      pageSize: ROADMAP_PAGE_SIZE,
+      errorLabel: "roadmap query failed",
+      filter: opts.designStatus
+        ? { property: "Design Status", status: { equals: opts.designStatus } }
+        : undefined,
+    },
+    (r): RoadmapCard | null => {
+      if (!r.id || r.archived) return null;
+      const props = r.properties ?? {};
+      let title = "(untitled)";
+      let cardNumber: number | null = null;
+      let designStatus: string | null = null;
+      let devStatus: string | null = null;
+      let pillars: string[] = [];
+      const people: Record<string, string[]> = {};
+      for (const [name, prop] of Object.entries(props)) {
+        if (prop.type === "title") {
+          const t = plain(prop.title);
+          if (t) title = t;
+        } else if (prop.type === "unique_id") {
+          cardNumber = prop.unique_id?.number ?? null;
+        } else if (prop.type === "status" && name === "Design Status") {
+          designStatus = prop.status?.name ?? null;
+        } else if (prop.type === "status" && name === "Dev Status") {
+          devStatus = prop.status?.name ?? null;
+        } else if (prop.type === "multi_select" && name === "Product Pillar") {
+          pillars = (prop.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean);
+        } else if (prop.type === "people") {
+          const names = (prop.people ?? []).map((u) => u.name ?? "").filter(Boolean);
+          if (names.length) people[name] = names;
         }
-        cards.push({
-          title,
-          url: r.url ?? "",
-          card_number: cardNumber,
-          design_status: designStatus,
-          dev_status: devStatus,
-          pillars,
-          people,
-        });
       }
-      if (!data.has_more || !data.next_cursor) break;
-      cursor = data.next_cursor;
-    }
-    return cards;
-  } finally {
-    clearTimeout(timer);
-  }
+      return {
+        title,
+        url: r.url ?? "",
+        card_number: cardNumber,
+        design_status: designStatus,
+        dev_status: devStatus,
+        pillars,
+        people,
+      };
+    },
+  );
 }

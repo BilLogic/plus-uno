@@ -204,20 +204,21 @@ export const InteractionStates = () => (
 );
 
 export const Interactive = (args) => {
-    const options = Array.from({ length: args.optionCount }, (_, index) => ({
+    const { optionCount, selectedIndex, ...scaleArgs } = args;
+    const options = Array.from({ length: optionCount }, (_, index) => ({
         value: `option${index + 1}`,
         label: 'Text'
     }));
-    const [value, setValue] = useState(`option${args.selectedIndex}`);
+    const [value, setValue] = useState(`option${selectedIndex}`);
 
     useEffect(() => {
-        setValue(`option${Math.min(args.selectedIndex, args.optionCount)}`);
-    }, [args.selectedIndex, args.optionCount]);
+        setValue(`option${Math.min(selectedIndex, optionCount)}`);
+    }, [selectedIndex, optionCount]);
 
     return (
         <div style={{ maxWidth: '800px' }}>
             <Scale
-                {...args}
+                {...scaleArgs}
                 options={options}
                 value={value}
                 onChange={setValue}
@@ -226,6 +227,8 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = {
+    id: 'scale-interactive',
+    name: 'scale-interactive',
     label: 'Scale',
     required: false,
     lowestLabel: 'Lowest',

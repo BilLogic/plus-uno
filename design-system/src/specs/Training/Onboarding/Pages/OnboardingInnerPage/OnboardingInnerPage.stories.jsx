@@ -16,7 +16,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
@@ -76,7 +76,7 @@ export default {
  */
 export const Overview = {
     args: {
-        breakpoint: 'xl'
+        breakpoint: 'native'
     },
     render: (args) => (
         <OnboardingInnerPage
@@ -95,7 +95,7 @@ export const Overview = {
  */
 export const WithCompletionModal = {
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         showCompletionModal: false
     },
     render: (args) => (
@@ -143,7 +143,7 @@ export const Interactive = {
         );
     },
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
         moduleTitle: 'Welcome to PLUS',
         moduleDescription: 'This module introduces you to the PLUS tutoring platform and its core features.',
         moduleDuration: 'Estimated Time: 9 minutes',

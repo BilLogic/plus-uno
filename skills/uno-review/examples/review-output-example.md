@@ -3,7 +3,7 @@
 ## PASS — No violations
 
 ```
-PLUS Review: playground/home-redesign/src
+PLUS Review: prototypes/home-redesign/src
 ===
   PASS  No hardcoded hex colors
   PASS  No raw HTML form elements (using DS components)
@@ -21,7 +21,7 @@ STATUS: PASS
 ## WARN — Minor issues, can ship with notes
 
 ```
-PLUS Review: playground/tutor-scheduling/src
+PLUS Review: prototypes/tutor-scheduling/src
 ===
   PASS  No hardcoded hex colors
   WARN  Found 2 lines with raw HTML elements (use DS components)
@@ -44,7 +44,7 @@ STATUS: WARN
 ## FAIL — Violations that must be fixed
 
 ```
-PLUS Review: playground/parent-dashboard/src
+PLUS Review: prototypes/parent-dashboard/src
 ===
   WARN  Found 5 lines with hardcoded hex colors (use var(--color-*) tokens)
     src/components/StatusBadge.jsx:8: color: '#ff4444'

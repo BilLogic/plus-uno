@@ -58,6 +58,10 @@ reference/production/
 # Local Netlify folder
 .netlify
 
+# Prototype screen captures — attach to Notion Marketplace; do not merge PNG dumps to main
+prototypes/**/captures/
+public/prototype-previews/
+
 # Figma automation temp files
 .figma-sync-context/
 .agent/handoffs/

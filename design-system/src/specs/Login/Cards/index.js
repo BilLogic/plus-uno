@@ -4,4 +4,3 @@
  */
 
 export { default as LoginPortal } from './LoginPortal/LoginPortal';
-

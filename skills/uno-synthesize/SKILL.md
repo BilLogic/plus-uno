@@ -63,7 +63,7 @@ No-go and not-sure outcomes at step 3 are deliverables too — see method § 3.
 `writers/notion` · `writers/blueprint` — defined in `agents/` (see
 `agents/README.md`). Per the interaction contract they are summoned by this skill,
 never by users. writers/blueprint enforces the paired-write contract; writers/notion
-enforces the allowlist and exact-match selects.
+enforces convention surfaces and exact-match selects.
 
 ## Tier-2 loads
 
@@ -86,8 +86,7 @@ scenarios: `docs/evals/scenarios/uno-synthesize.md`.
   implements code.
 - Stays scoped to the provided context — expanding into adjacent evidence-gathering
   is uno-research's job.
-- All external writes go through the writers; never touch a Notion surface outside
-  the allowlist.
+- All external writes go through the writers; follow `docs/conventions/notion.md` (never invent select options).
 
 ## Hand-offs
 

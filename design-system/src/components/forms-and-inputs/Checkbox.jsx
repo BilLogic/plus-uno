@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import './Checkbox.scss';
 
+/**
+ * Checkbox — single boolean control with optional indeterminate state.
+ * Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
+ */
 const Checkbox = ({
     id,
     name,

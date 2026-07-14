@@ -27,7 +27,7 @@
   },
   {
     "name": "notion_search",
-    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL — 'what did we decide about onboarding', 'is there a study guide for X', 'who should I talk to about assessments', 'show me toolkit prototypes'. Scope 'apps' answers access-request routing — 'can I get access to X', 'who owns/admins tool Y': the Third Party Applications directory returns the Application Admin (who can GRANT access) and Power Users (day-to-day experts). Name the right person and pre-fill a short suggested request message they can copy; NEVER claim to grant, request, or change access yourself — the grant stays human. NOT for Roadmap cards — use roadmap_query for anything about cards/status/owners on the Roadmap board (this keyword search misses existing cards; roadmap_query is exact and complete). Returns matching page titles + Notion URLs (plus key properties); follow up with source_read to pull a specific page's full content. Prefer a narrow `scope` when you know which surface you want — a scoped query against a known database is far more reliable than an open workspace search. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Search Notion for pages and database entries by keyword when you do NOT already have a URL. Prefer a narrow `scope` when you know the surface — scoped queries hit the live database directly (complete scan + fuzzy title match) and beat workspace search. Scopes: 'team' (SME roster), 'apps' (access-request routing — Application Admin grants; you only route), 'marketplace' (prototype catalog), 'help_tutors' / 'help_teachers' (Help Center articles), 'decisions' (Decisions DB), 'running_notes' (Design Running Notes), 'news' / 'success_stories' / 'research_papers' / 'banners' (Content HQ read radar), 'any' (workspace title search — last resort). NOT for Roadmap cards — use roadmap_query. Returns titles + URLs (+ key properties); follow up with source_read for full content. Only pages the uno-bot integration is connected to are searchable; if nothing comes back, say so rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -37,16 +37,25 @@
       "properties": {
         "query": {
           "type": "string",
-          "description": "What to find, in plain words, e.g. 'PRD for tutor matching', 'onboarding decision', 'high-fi toolkit prototypes'."
+          "description": "What to find, in plain words, e.g. 'PRD for tutor matching', 'onboarding decision', 'high-fi toolkit prototypes', 'session count help article'."
         },
         "scope": {
           "type": "string",
           "enum": [
             "team",
             "apps",
+            "marketplace",
+            "help_tutors",
+            "help_teachers",
+            "decisions",
+            "running_notes",
+            "news",
+            "success_stories",
+            "research_papers",
+            "banners",
             "any"
           ],
-          "description": "'team' = the Team Member Database roster (people/SME lookups). 'apps' = the Third Party Applications directory (access-request routing — query is the tool/service name, e.g. 'Figma'). 'any' = workspace-wide title search. Card lookups should use roadmap_query instead."
+          "description": "'team' = Team Member roster. 'apps' = Third Party Applications (access routing). 'marketplace' = Prototype Marketplace. 'help_tutors' / 'help_teachers' = Help Center article DBs. 'decisions' = Decisions DB. 'running_notes' = Design Running Notes. 'news' / 'success_stories' / 'research_papers' / 'banners' = Content HQ. 'any' = workspace-wide title search (prefer a catalog scope when you know the surface). Card lookups → roadmap_query."
         }
       }
     }
@@ -163,7 +172,7 @@
   },
   {
     "name": "slack_react",
-    "description": "Add an emoji reaction AS UNO-BOT to a message in the current thread. Use freely to acknowledge, celebrate, or signal state — any workspace emoji name (without colons), e.g. 'tada', 'eyes', 'raised_hands', or a custom workspace emoji. Reactions are reversible and ungated. Do NOT react with white_check_mark or x on proposal cards (those are reserved for the requester's confirm/cancel). If message_ts is omitted, reacts to the user's current message.",
+    "description": "Add an emoji reaction AS UNO-BOT to a message in the current thread. Use freely to acknowledge, celebrate, or signal state — any workspace emoji name (without colons), e.g. 'tada', 'eyes', 'raised_hands', or a custom workspace emoji. Reactions are reversible and ungated. Do NOT react with white_check_mark or x on proposal cards (those are reserved for confirm/cancel). If message_ts is omitted, reacts to the user's current message.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -236,7 +245,7 @@
   },
   {
     "name": "notion_create",
-    "description": "Create a new page or card in an allowlisted Notion surface — SIDE EFFECT, routed through the confirmation gate. `surface` selects WHERE and WHAT is created: 'prd' (a design PRD on the Roadmap board — feature and DS-component PRDs alike) or 'intake' (a maintenance intake card on the Roadmap board). Research docs and marketplace entries are NOT bot surfaces — they run in-IDE. Draft the content conversationally first and let the designer refine it; only invoke once they approve. Follow docs/conventions/notion.md for the surface's required properties and body shape — NEVER create select options / pillars / OKRs; exact-match existing option names. Keep content grounded in the conversation; put genuine unknowns under an 'Open Questions' section rather than inventing.",
+    "description": "Create a new page or card — SIDE EFFECT, routed through the confirmation gate. `surface` selects WHERE and WHAT is created: 'prd' (design PRD on the Roadmap board), 'intake' (maintenance intake on the Roadmap board), or 'decision' (Decisions DB row under Design HQ — requires properties.roadmap_card). Research docs and marketplace entries are NOT bot surfaces — they run in-IDE. Draft the content conversationally first and let the designer refine it; only invoke once they approve. Follow docs/conventions/notion.md for required properties and body shape — NEVER create select options / pillars / OKRs; exact-match existing option names. Keep content grounded in the conversation; put genuine unknowns under an 'Open Questions' section rather than inventing.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -249,9 +258,10 @@
           "type": "string",
           "enum": [
             "prd",
-            "intake"
+            "intake",
+            "decision"
           ],
-          "description": "Where to file it: 'prd' (feature or DS-component PRD card on the Roadmap board) or 'intake' (maintenance/request intake card, Product Pillar: Universal + Product Tag: Maintenance). These are the only live surfaces — research docs and marketplace entries are created in-IDE, not by the bot."
+          "description": "Where to file it: 'prd' (feature or DS-component PRD card on the Roadmap board), 'intake' (maintenance/request intake card, Product Pillar: Universal + Product Tag: Maintenance), or 'decision' (Decisions DB row — requires properties.roadmap_card; optional Status/Evidence). Research docs and marketplace entries are created in-IDE, not by the bot."
         },
         "title": {
           "type": "string",
@@ -290,7 +300,7 @@
         },
         "properties": {
           "type": "object",
-          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (PRD: product_pillar; intake: evidence_link, suggested_tier). Only include what the conversation supports; never invent option names.",
+          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (PRD: product_pillar; intake: evidence_link, suggested_tier; decision: roadmap_card [required], status, evidence). Only include what the conversation supports; never invent option names.",
           "additionalProperties": true
         },
         "source_url": {
@@ -302,7 +312,7 @@
   },
   {
     "name": "notion_update",
-    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Works on ANY page or database the bot is shared on (not just the Roadmap board): Roadmap cards, project Decision Logs, per-person running-notes pages, any DB. Two uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema and matches your property name to it case/space/underscore-insensitively, then writes by the REAL type, so \"Dev Status\", \"Dev_Status\", a Date, a Person, a URL, a number, a checkbox all work. It NEVER invents a select/status option — if a value isn't an existing option it reports back instead of guessing (Notion auto-creates on mismatch). (2) append narrative blocks via `append` — append, never overwrite a human-owned body. Pass the page URL.",
+    "description": "Update an existing Notion page/card — SIDE EFFECT, routed through the confirmation gate. Works on ANY page or database the bot is shared on (not just the Roadmap board): Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB. Two uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema and matches your property name to it case/space/underscore-insensitively, then writes by the REAL type, so \"Dev Status\", \"Dev_Status\", a Date, a Person, a URL, a number, a checkbox all work. It NEVER invents a select/status option — if a value isn't an existing option it reports back instead of guessing (Notion auto-creates on mismatch). (2) append narrative blocks via `append` — append, never overwrite a human-owned body. Pass the page URL.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -345,7 +355,7 @@
             },
             "text": {
               "type": "string",
-              "description": "A single block of text to append (use when no heading is needed, e.g. a dated Decision Log entry)."
+              "description": "A single block of text to append (use when no heading is needed, e.g. a dated progress pulse)."
             }
           }
         }
@@ -396,7 +406,7 @@
   },
   {
     "name": "prototype_scaffold",
-    "description": "Scaffold a NEW playground prototype from a Figma design (page/screen/flow), by triggering the figma-implement-design GitHub Action to open a draft PR — SIDE EFFECT, routed through the confirmation gate. Use when the designer pastes a Figma URL and asks for a prototype (e.g. 'scaffold a playground for this frame', 'build this design <figma.com/...>'). A Notion PRD link is OPTIONAL but preferred — ask if they have one for better context; if not, offer to build straight from the frame and, on their OK, invoke with notion_prd_url omitted. Never invent a PRD URL. Do NOT use for named DS-library component work — that is component_implement.",
+    "description": "Scaffold a NEW prototypes prototype from a Figma design (page/screen/flow), by triggering the figma-implement-design GitHub Action to open a draft PR — SIDE EFFECT, routed through the confirmation gate. Use when the designer pastes a Figma URL and asks for a prototype (e.g. 'scaffold a prototypes for this frame', 'build this design <figma.com/...>'). A Notion PRD link is OPTIONAL but preferred — ask if they have one for better context; if not, offer to build straight from the frame and, on their OK, invoke with notion_prd_url omitted. Never invent a PRD URL. Do NOT use for named DS-library component work — that is component_implement.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -414,7 +424,7 @@
         },
         "slug": {
           "type": "string",
-          "description": "Optional kebab-case folder name for playground/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
+          "description": "Optional kebab-case folder name for prototypes/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
         },
         "notes": {
           "type": "string",
@@ -495,7 +505,7 @@
   },
   {
     "name": "proposal_resolve",
-    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). If the user asks an unrelated question or is still discussing without deciding, do NOT invoke — reply conversationally and the proposal sits until ✅, ❌, or 60-minute expiry. If the system prompt indicates the current sender is NOT the original requester, do NOT invoke — reply that only the requester can confirm.",
+    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). Anyone in the thread may confirm or cancel — not just the original requester. If the user asks an unrelated question or is still discussing without deciding, do NOT invoke — reply conversationally and the proposal sits until ✅, ❌, or 60-minute expiry.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

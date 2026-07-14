@@ -2,7 +2,7 @@
 
 > status: completed — forms + stories shipped in Storybook (2026-07-08 plans sweep)
 
-This plan aligns **Forms** stories and MDX with the **Components** pattern used for **Button**: shared section headings, `sb-ds-component-docs` / `sb-ds-doc-section`, `DocsCanvasShell` + `Canvas`, and a single **Interactive** playground where applicable.
+This plan aligns **Forms** stories and MDX with the **Components** pattern used for **Button**: shared section headings, `sb-ds-component-docs` / `sb-ds-doc-section`, `DocsCanvasShell` + `Canvas`, and a single **Interactive** prototypes where applicable.
 
 ## Reference spine (match when applicable)
 

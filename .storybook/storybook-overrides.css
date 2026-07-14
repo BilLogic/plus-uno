@@ -105,31 +105,37 @@ html {
 }
 
 /*
- * Page MDX with embedded `ResponsiveFrame` (Admin / Training full-page specs):
- * widen the docs body so the 1440px XL frame doesn't get clipped, and tame the
- * sticky toolbar / 100vh minimums that ResponsiveFrame uses for solo Canvas view.
+ * Any docs page that embeds a `ResponsiveFrame` (every Specs *Page*) goes FULL-WIDTH,
+ * responsive to the iframe edge (minus the comfortable side padding inherited from
+ * `.sbdocs-wrapper`). The featured screen inside is width-constrained to the selected
+ * breakpoint by ResponsiveFrame itself; when that width exceeds the well, the WELL scrolls
+ * horizontally — the docs page itself never does. This is what makes the Breakpoint toolbar
+ * actually simulate MD/LG/XL instead of the page just filling whatever space it's given.
  *
  * `:has()` is Chrome 105+ / Safari 15.4+ / Firefox 121+ — Storybook is typically viewed in Chromium.
  */
+.sbdocs-wrapper:has(.responsive-frame-root),
 .sbdocs-wrapper:has(.sb-ds-component-docs--page-fullbleed) {
-    max-width: 112rem !important; /* ~1792px — fits 1440px frame + canvas padding with room to spare */
+    max-width: none !important;
 }
 
 /* The breakpoint switcher pins itself to `top: 0` of the scroll container. In docs each Story
    becomes a separate ResponsiveFrame and the docs body scrolls — multiple sticky toolbars would
    pile on top of each other. Pin them to the start of their frame instead. */
-.sbdocs .sb-ds-component-docs--page-fullbleed .responsive-frame-toolbar {
+.sbdocs .responsive-frame-toolbar {
     position: static !important;
 }
 
-/* ResponsiveFrame: Fullscreen API — fill the physical display so MD/LG/XL previews can use full width */
+/* ResponsiveFrame: Fullscreen API — fill the physical display */
 .responsive-frame-root:fullscreen,
 .responsive-frame-root:-webkit-full-screen {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
     max-width: 100vw;
     max-height: 100vh;
     box-sizing: border-box;
+    background: var(--color-surface-container, #edeef0);
 }
 
 .responsive-frame-root--browser-fullscreen .responsive-frame-wrapper {
@@ -138,11 +144,40 @@ html {
     overflow: auto;
 }
 
-/* PageLayout relies on `height: 100%` resolving against its parent. ResponsiveFrame’s inner
-   provides that via `min-height: calc(100vh - 120px)`; in docs the docs body is the scroll
-   container, but the inner’s height still needs a definite floor so the in-page Sidebar /
-   Main flex column doesn’t collapse to 0 and disappear. The outer root’s `min-height: 100vh`
-   is fine — each page section stays one viewport tall, which matches the “full-page” intent. */
+/* Page layouts in docs: keep the ResponsiveFrame height definite so PageLayout's
+   height:100% fills the well (instead of hugging / clipping mid-content). */
+.sbdocs .docs-story:has(.responsive-frame-root) {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 720px !important;
+}
+
+.sbdocs .docs-story:has(.responsive-frame-root) > div[scale="1"] {
+    height: 720px !important;
+    min-height: 720px !important;
+    max-height: 720px !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+}
+
+.sbdocs .docs-story:has(.responsive-frame-root) .innerZoomElementWrapper,
+.sbdocs .docs-story:has(.responsive-frame-root) .innerZoomElementWrapper > * {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Attached preview wells that host a page frame: flush page surface (no card padding). */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story:has(.responsive-frame-root) > *:first-child {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
+}
 
 @media (min-width: 768px) {
     .sbdocs-wrapper {
@@ -510,28 +545,29 @@ h2.toc-title {
 }
 
 /*
- * Preview row: match .sb-ds-docs-preview-well (muted fill only — no extra border/shadow).
+ * Preview row: match DocsPreviewCard — surface-container-lowest + outline border + padded.
  * Rounded top only; bottom is straight so it meets the code strip flush.
+ * Padding lives on this row (often the same node as div[scale=1]); do not zero it out below
+ * for component canvases or widgets sit flush against the card edge.
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
     display: flex !important;
     flex-direction: column !important;
-    /* stretch: full-width column; innerZoomElementWrapper flex-row + justify:center centers shrink-wrap previews */
     align-items: stretch !important;
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
-    /* 2.5rem top / 3.5rem bottom: keep clear air between the component and the
-       attached controls/code strip below (was a cramped 2rem all around). */
-    padding: 2.5rem clamp(1rem, 4vw, 2.5rem) 3.5rem !important;
+    padding: 2.5rem clamp(1.5rem, 4vw, 3.5rem) !important;
     border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
-    background: color-mix(in srgb, var(--color-muted, #e0e3e7) 40%, transparent);
-    border: none !important;
+    background: var(--color-surface-container-lowest, #f8f9fa) !important;
+    border: 1px solid var(--color-outline-variant, #bec8ca) !important;
+    border-bottom: none !important;
     box-shadow: none !important;
 }
 
 .sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
-    background: color-mix(in srgb, var(--color-muted, #3f4847) 25%, transparent);
+    background: var(--color-surface-container-lowest, #191c1e) !important;
+    border-color: var(--color-outline-variant, #3f4847) !important;
 }
 
 /* Drop Storybook’s default preview chrome (border/shadow) inside attached canvases */
@@ -554,9 +590,10 @@ h2.toc-title {
 
 /*
  * Storybook ActionBar defaults to position:absolute; bottom:0 inside .docs-story (floating on the preview).
- * Pull it into normal flow so it sits between the rounded canvas and the source block.
+ * Pull it into normal flow for ALL docs canvases so Show code / Copy code never overlay the story.
+ * Attached shells keep the richer bordered strip styling below.
  */
-.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
+.sbdocs .docs-story > *:last-child:not(:only-child) {
     position: relative !important;
     bottom: auto !important;
     right: auto !important;
@@ -575,9 +612,22 @@ h2.toc-title {
     border: none !important;
     border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 50%, transparent) !important;
     border-radius: 0 !important;
-    margin-top: 0 !important;
     box-shadow: none !important;
     z-index: 1;
+}
+
+.sbdocs .docs-story > *:last-child:not(:only-child) button {
+    position: relative !important;
+    margin: 0 !important;
+    border-radius: 0.25rem !important;
+}
+
+/* ActionBar strip under attached previews: match card sides + bottom radius when code collapsed */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
+    border-left: 1px solid var(--color-outline-variant, #bec8ca) !important;
+    border-right: 1px solid var(--color-outline-variant, #bec8ca) !important;
+    border-top: 1px solid var(--color-outline-variant, #bec8ca) !important;
+    background: var(--color-surface-container-lowest, #f8f9fa) !important;
 }
 
 /* Code collapsed: round the bottom of the toolbar to mirror the preview’s top radius */
@@ -626,15 +676,28 @@ h2.toc-title {
   height: auto !important;
 }
 
-/* Roomier docs canvases: the default ~32px canvas padding puts the bottom
-   controls/show-code bar too close to the rendered component. Give inline
-   (scale=1) canvases more air, especially at the bottom. Contexts that
-   deliberately run flush re-zero below (source order wins the !important tie). */
+/* Default Storybook canvas padding for unscoped docs stories. */
 .sbdocs .docs-story > div[scale="1"] {
-  padding: 40px 40px 56px !important;
+  padding: 2.5rem clamp(1.5rem, 4vw, 3.5rem) !important;
 }
+
+/* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div[scale="1"],
 .sbdocs .sb-ds-docs-preview-well .docs-story > div[scale="1"],
 .sbdocs .sb-button-docs-preview-well .docs-story > div[scale="1"] {
   padding: 0 !important;
+}
+
+/*
+ * Attached component canvases: first-child IS often div[scale=1]. Keep the card padding
+ * from the first-child rule above — do NOT zero it (that caused flush widgets).
+ * Page frames stay flush via the :has(.responsive-frame-root) rules.
+ */
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story:not(:has(.responsive-frame-root)) > div[scale="1"] {
+  padding: 2.5rem clamp(1.5rem, 4vw, 3.5rem) !important;
+  background: var(--color-surface-container-lowest, #f8f9fa) !important;
+  border: 1px solid var(--color-outline-variant, #bec8ca) !important;
+  border-bottom: none !important;
+  border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
+  box-sizing: border-box !important;
 }

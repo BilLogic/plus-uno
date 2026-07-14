@@ -317,6 +317,7 @@ const TreeSelect = ({
                     disabled={disabled}
                     className={`plus-tree-select-input ${isOpen ? 'plus-tree-select-input-open' : ''}`}
                     onClick={handleInputClick}
+                    role="combobox"
                     aria-haspopup="tree"
                     aria-expanded={isOpen}
                     {...props}

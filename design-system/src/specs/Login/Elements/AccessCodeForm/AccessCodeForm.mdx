@@ -1,0 +1,44 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AccessCodeFormStories from './AccessCodeForm.stories.jsx';
+import {
+    DocsCanvasShell,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AccessCodeFormStories} />
+
+<Title />
+
+States: default · invalid (Figma `Form / Access Code`).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=113-38704"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Login/Elements/AccessCodeForm"
+    sets={[
+        { name: 'Elements frame', nodeId: '112:1200' },
+        { name: 'Form / Access Code', nodeId: '113:38704' },
+    ]}
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Required access-code field with helper caption and validation message.</>}
+>
+    <Canvas
+        of={AccessCodeFormStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+</div>

@@ -3,9 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/main.scss';
-import '../playground/home-redesign/src/styles/plus-tokens.scss';
-import '../playground/research-assistant-chat/src/styles/plus-tokens.scss';
-import '../playground/research-assistant-chat/src/index.css';
+import '../prototypes/home-redesign/src/styles/plus-tokens.scss';
 import App from './App';
 import './index.css';
 

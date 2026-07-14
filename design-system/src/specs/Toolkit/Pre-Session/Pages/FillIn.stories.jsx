@@ -215,19 +215,11 @@ export const OverviewSupervisor = () => (
  * - Fill-in actions
  * - Breakpoint toggle to preview at different screen sizes
  */
-export const Interactive = () => {
+const InteractiveRender = (args) => {
     const [selectedTab, setSelectedTab] = useState('fill-ins');
-    const [breakpoint, setBreakpoint] = useState('xl');
     const [filters, setFilters] = useState(defaultFilters);
     const [filledInSessions, setFilledInSessions] = useState([]);
-    const [userView, setUserView] = useState('tutor');
-
-    // Breakpoint widths from design system
-    const breakpointWidths = {
-        'md': 768,
-        'lg': 1024,
-        'xl': 1440,
-    };
+    const userView = args.userView;
 
     const handleFilterChange = (filterKey, value) => {
         setFilters(prev => ({ ...prev, [filterKey]: value }));
@@ -259,108 +251,40 @@ export const Interactive = () => {
     const tabs = userView === 'supervisor' ? supervisorTabsInteractive : tutorTabsInteractive;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-            {/* Controls */}
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)',
-            }}>
-                {/* User View Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '80px' }}>
-                        User View:
-                    </span>
-                    <Button
-                        text="Tutor"
-                        size="small"
-                        style="primary"
-                        fill={userView === 'tutor' ? 'filled' : 'outline'}
-                        onClick={() => setUserView('tutor')}
-                    />
-                    <Button
-                        text="Supervisor"
-                        size="small"
-                        style="primary"
-                        fill={userView === 'supervisor' ? 'filled' : 'outline'}
-                        onClick={() => setUserView('supervisor')}
-                    />
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                        Current: <strong>{userView === 'supervisor' ? 'Supervisor (with All sessions)' : 'Tutor'}</strong>
-                    </span>
-                </div>
-
-                {/* Breakpoint Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '80px' }}>
-                        Breakpoint:
-                    </span>
-                    {Object.entries(breakpointWidths).map(([bp, width]) => (
-                        <Button
-                            key={bp}
-                            text={`${bp.toUpperCase()} (${width}px)`}
-                            size="small"
-                            style="primary"
-                            fill={breakpoint === bp ? 'filled' : 'outline'}
-                            onClick={() => setBreakpoint(bp)}
-                        />
-                    ))}
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>
-                        Width: <strong>{breakpointWidths[breakpoint]}px</strong>
-                    </span>
-                </div>
-            </div>
-
-            {/* Fill-in Status */}
-            <div style={{
-                padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
-                borderRadius: 'var(--size-card-radius-sm)'
-            }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Filled in for: <strong>{filledInSessions.length}</strong> session(s)
-                </span>
-            </div>
-
-            {/* Page Preview Container */}
-            <div style={{
-                width: `${breakpointWidths[breakpoint]}px`,
-                height: '100%',
-                margin: '0 auto',
-                border: '2px dashed var(--color-outline-variant)',
-                borderRadius: 'var(--size-card-radius-sm)',
-                overflow: 'hidden',
-                transition: 'width 0.3s ease'
-            }}>
-                <PageLayout
-                    topBarConfig={{
-                        breadcrumbs: [
-                            { text: 'Home', href: '#' },
-                            { text: 'Sessions' }
-                        ],
-                        user: { name: 'John Doe', role: 'Lead' }
-                    }}
-                    sidebarConfig={{
-                        user: userView,
-                        activeTab: 'sessions'
-                    }}
-                    id="fill-in-page-interactive"
-                >
-                    <MainContent
-                        tabs={tabs}
-                        selectedTab={selectedTab}
-                        onTabChange={setSelectedTab}
-                        sessions={defaultSessions}
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                        onFillIn={handleFillIn}
-                        user={userView}
-                    />
-                </PageLayout>
-            </div>
+        <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Home', href: '#' },
+                        { text: 'Sessions' }
+                    ],
+                    user: { name: 'John Doe', role: 'Lead' }
+                }}
+                sidebarConfig={{
+                    user: userView,
+                    activeTab: 'sessions'
+                }}
+                id="fill-in-page-interactive"
+            >
+                <MainContent
+                    tabs={tabs}
+                    selectedTab={selectedTab}
+                    onTabChange={setSelectedTab}
+                    sessions={defaultSessions}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onFillIn={handleFillIn}
+                    user={userView}
+                />
+            </PageLayout>
         </div>
     );
+};
+
+export const Interactive = {
+    render: InteractiveRender,
+    argTypes: {
+        userView: { control: 'radio', options: ['tutor', 'supervisor'], name: 'User view', table: { category: 'View' } },
+    },
+    args: { userView: 'tutor' },
 };

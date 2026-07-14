@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Radio from '@/components/forms-and-inputs/Radio';
-import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import { ListOption as ListOptionComponent } from './ListOption';
+import SelectionIndicator from './SelectionIndicator';
 import './ListGroup.scss';
 
 /**
@@ -102,29 +102,8 @@ export const ListGroupItem = ({
                 tabIndex={disabled ? -1 : 0}
                 {...props}
             >
-                {selectable === 'multi' ? (
-                    <Checkbox
-                        name={name}
-                        value={value}
-                        checked={selected}
-                        disabled={disabled}
-                        label={displayLabel}
-                        size="small"
-                        onChange={() => { }} // Handled by parent onClick
-                        className="plus-list-option-checkbox"
-                    />
-                ) : (
-                    <Radio
-                        name={name}
-                        value={value}
-                        checked={selected}
-                        disabled={disabled}
-                        label={displayLabel}
-                        size="small"
-                        onChange={() => { }} // Handled by parent onClick
-                        className="plus-list-option-radio"
-                    />
-                )}
+                <SelectionIndicator mode={selectable} selected={selected} disabled={disabled} />
+                <span className="plus-list-option-label">{displayLabel}</span>
             </div>
         );
     }
@@ -168,6 +147,38 @@ ListGroupItem.propTypes = {
     as: PropTypes.elementType
 };
 
+/**
+ * A list is only a valid ARIA `listbox` if every option-like child carries
+ * `role="option"` (i.e. `ListGroup.Item selectable="single|multi"` or
+ * `ListGroup.Option`). Plain navigation/action items don't get that role, so
+ * mixing them in must not trigger `listbox` semantics on the container.
+ *
+ * @param {React.ReactNode} children
+ * @returns {{ isOptionList: boolean, isMultiSelect: boolean }}
+ */
+const getOptionListInfo = (children) => {
+    const childArray = React.Children.toArray(children);
+    let isOptionList = childArray.length > 0;
+    let isMultiSelect = false;
+
+    childArray.forEach((child) => {
+        if (!React.isValidElement(child)) {
+            isOptionList = false;
+            return;
+        }
+        if (child.type === ListGroupItem) {
+            if (child.props.selectable === 'multi') isMultiSelect = true;
+            else if (child.props.selectable !== 'single') isOptionList = false;
+        } else if (child.type === ListOptionComponent) {
+            if (child.props.mode === 'multi') isMultiSelect = true;
+        } else {
+            isOptionList = false;
+        }
+    });
+
+    return { isOptionList, isMultiSelect };
+};
+
 const ListGroup = ({
     children,
     flush = false,
@@ -185,8 +196,15 @@ const ListGroup = ({
         className
     ].filter(Boolean).join(' ');
 
+    // role="option" children need a `listbox` (or `group`) ancestor per ARIA;
+    // only add it when every child is actually option-shaped.
+    const { isOptionList, isMultiSelect } = getOptionListInfo(children);
+    const listboxProps = isOptionList
+        ? { role: 'listbox', 'aria-multiselectable': isMultiSelect || undefined }
+        : {};
+
     return (
-        <Tag className={classes} {...props}>
+        <Tag className={classes} {...listboxProps} {...props}>
             {children}
         </Tag>
     );
@@ -203,15 +221,8 @@ ListGroup.propTypes = {
 // Sub-component exports
 ListGroup.Item = ListGroupItem;
 
-// Import and attach ListOption for individual option use cases
-import { ListOption as ListOptionComponent } from './ListOption';
+// Attach ListOption for individual option use cases
 ListGroup.Option = ListOptionComponent;
-
-// Import and attach OptionList for full option list container use cases
-// This consolidates OptionList into ListGroup as ListGroup.OptionList
-import OptionListComponent from '@/components/forms-and-inputs/OptionList';
-ListGroup.OptionList = OptionListComponent;
 
 export default ListGroup;
 export { ListOption as ListOptionComponent } from './ListOption';
-export { default as OptionList } from '@/components/forms-and-inputs/OptionList';

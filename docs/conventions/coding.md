@@ -6,13 +6,13 @@
 
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `Alert/Alert.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
-- **Prototypes**: kebab-case directories (e.g., `playground/home-redesign/`)
+- **Prototypes**: kebab-case directories (e.g., `prototypes/home-redesign/`)
 - **Docs**: kebab-case with date prefix for plans/ideation (e.g., `2026-03-21-007-refactor-optimal-repo-structure-plan.md`)
 
 ## Imports
 
 **Alias resolution:**
-- `@` maps to `design-system/src` (in Storybook, DS Vite config, and playground configs)
+- `@` maps to `design-system/src` (in Storybook, DS Vite config, and prototypes configs)
 - `~` maps to `node_modules`
 
 **Barrel exports — always import from index, never deep paths:**
@@ -53,7 +53,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 
 ## Playground
 
-- Each prototype lives at `playground/{project-name}/` (flat, no creator grouping)
+- Each prototype lives at `prototypes/{project-name}/` (flat, no creator grouping)
 - Each has its own `vite.config.js` with `@` alias pointing to `../../design-system/src`
 - Creator info is metadata in the prototype's README or marketplace data, not the directory name
 - Register new prototypes in `src/pages/PrototypeMarket/prototypes-data.js`
@@ -88,7 +88,7 @@ docs/knowledge/ideations.md → docs/plans/ → implementation → docs/knowledg
 
 | Gotcha | What Happens | Fix |
 |--------|-------------|-----|
-| Prototype vite configs need own aliases | `@` doesn't resolve in playground without config | Add `@: path.resolve(...)` to each prototype's vite.config.js |
+| Prototype vite configs need own aliases | `@` doesn't resolve in prototypes without config | Add `@: path.resolve(...)` to each prototype's vite.config.js |
 | Token generation must follow sync | Generated files overwrite manual edits | Always run sync first, then generate |
 | `design-system/src/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
 | Storybook uses autodocs | Missing JSDoc = empty docs page | Add JSDoc to component exports |

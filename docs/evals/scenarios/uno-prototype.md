@@ -13,7 +13,7 @@
 - **Fails if:** it gold-plates a hi-fi build for a sketch ask · it skips grounding because "it's just low-fi"
 
 ## S2 — hi-fi: build against the design system
-- **Trigger:** "build the approved monthly-report PRD in the playground"
+- **Trigger:** "build the approved monthly-report PRD in the prototypes"
 - **Expected:**
   - Grounding reads via writers/blueprint (live, this card's scope) + researchers/explorer for prior art
   - Built directly against uno-storybook; agent-views consulted before any component/token use

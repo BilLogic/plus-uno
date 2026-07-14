@@ -24,19 +24,16 @@ const RecommendedLessons = ({
     className = '',
     style
 }) => {
-    const renderStatusIcon = () => {
-        if (status === 'in-progress') {
-            return <i className="fas fa-spinner" aria-hidden="true"></i>;
-        }
-        return null;
-    };
-
+    /**
+     * AI recommended glyph — FA Free has `wand-magic-sparkles` (not `sparkles`).
+     * @returns {React.ReactElement|null}
+     */
     const renderAIIndicator = () => {
         if (!aiRecommended) return null;
 
         return (
-            <div className="plus-recommended-lessons-ai-indicator">
-                <i className="fas fa-star" aria-hidden="true"></i>
+            <div className="plus-recommended-lessons-ai-indicator" title="AI recommended">
+                <i className="fa-solid fa-wand-magic-sparkles" aria-hidden="true" />
             </div>
         );
     };
@@ -53,11 +50,10 @@ const RecommendedLessons = ({
         className
     ].filter(Boolean).join(' ');
 
-    // Width based on breakpoint - fixed widths per Figma spec
-    // < XXL: 275.33px (fixed width to match Figma)
-    // XXL & above: 368px (fixed width per Figma spec)
+    // Width based on breakpoint — Figma Recommended Lessons frame
+    // < XXL: 275.33px · XXL & above: 285px
     const width = breakpoint === 'XXL & above'
-        ? '368px'
+        ? '285px'
         : '275.33px';
 
     return (
@@ -100,7 +96,7 @@ const RecommendedLessons = ({
                             </>
                         )}
                     </div>
-                    <h5 className="plus-recommended-lessons-title">{title}</h5>
+                    <div className="h5 plus-recommended-lessons-title" title={title}>{title}</div>
                 </div>
 
                 {/* Divider */}
@@ -121,8 +117,8 @@ const RecommendedLessons = ({
                     />
                     <div className="plus-recommended-lessons-indicators">
                         {status === 'in-progress' && (
-                            <div className="plus-recommended-lessons-status">
-                                <i className="fas fa-spinner" aria-hidden="true"></i>
+                            <div className="plus-recommended-lessons-status" title="In progress">
+                                <i className="fa-solid fa-spinner" aria-hidden="true" />
                             </div>
                         )}
                         {renderAIIndicator()}

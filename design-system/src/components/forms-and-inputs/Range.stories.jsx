@@ -78,6 +78,7 @@ export const Overview = () => {
         <div style={{ maxWidth: '600px' }}>
             <Range
                 id="range-overview"
+                aria-label="Range value"
                 min={0}
                 max={100}
                 value={value}
@@ -105,6 +106,7 @@ export const Sizes = () => {
             </p>
             <Range
                 id="range-small"
+                aria-label="Small range value"
                 min={0}
                 max={100}
                 value={value1}
@@ -113,6 +115,7 @@ export const Sizes = () => {
             />
             <Range
                 id="range-medium"
+                aria-label="Medium range value"
                 min={0}
                 max={100}
                 value={value2}
@@ -121,6 +124,7 @@ export const Sizes = () => {
             />
             <Range
                 id="range-large"
+                aria-label="Large range value"
                 min={0}
                 max={100}
                 value={value3}
@@ -142,6 +146,7 @@ export const Interactive = (args) => {
         <div style={{ maxWidth: '600px' }}>
             <Range
                 id="range-interactive"
+                aria-label="Range value"
                 value={value}
                 onChange={(e) => setValue(parseFloat(e.target.value))}
                 size={args.size}

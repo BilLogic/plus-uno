@@ -183,6 +183,8 @@ export const Interactive = (args) => {
                 ) : null}
             </NavPills>
             <div
+                tabIndex={0}
+                aria-label="Tab panel content"
                 style={{
                     flex: isVertical ? 1 : undefined,
                     minWidth: 0,

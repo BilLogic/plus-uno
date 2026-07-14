@@ -83,7 +83,13 @@ const Modal = ({
                 </>
             )}
 
-            <div className={`plus-modal-body ${type === 'scrollable' ? 'plus-modal-body-scrollable' : ''}`}>
+            <div
+                className={`plus-modal-body ${type === 'scrollable' ? 'plus-modal-body-scrollable' : ''}`}
+                // A scrollable region must itself be reachable by keyboard
+                // (axe: scrollable-region-focusable) since its content isn't
+                // otherwise guaranteed to contain a focusable element.
+                tabIndex={type === 'scrollable' ? 0 : undefined}
+            >
                 <div className="plus-modal-content">
                     {body && (typeof body === 'string' ? <div className="body1-txt">{body}</div> : body)}
                     {children}

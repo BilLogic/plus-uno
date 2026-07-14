@@ -213,9 +213,9 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Verify existing navigation still works identically
 
 **Files modified:**
-- `playground/prototyping/bill/home-redesign/src/App.jsx` — remove maps, use manifest
-- New: `playground/prototyping/bill/home-redesign/src/config/routeManifest.js`
-- New: `playground/prototyping/bill/home-redesign/src/utils/matchRoute.js`
+- `prototypes/prototyping/bill/home-redesign/src/App.jsx` — remove maps, use manifest
+- New: `prototypes/prototyping/bill/home-redesign/src/config/routeManifest.js`
+- New: `prototypes/prototyping/bill/home-redesign/src/utils/matchRoute.js`
 
 **Success criteria:**
 - All existing routes behave identically
@@ -269,9 +269,9 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Handle browser back/forward: re-activate correct sub-tab on popstate
 
 **Files modified:**
-- New: `playground/prototyping/bill/home-redesign/src/hooks/useSubTabs.js`
-- New: `playground/prototyping/bill/home-redesign/src/context/SubTabContext.js`
-- `playground/prototyping/bill/home-redesign/src/App.jsx` — integrate SubTabContext, wire to sidebar
+- New: `prototypes/prototyping/bill/home-redesign/src/hooks/useSubTabs.js`
+- New: `prototypes/prototyping/bill/home-redesign/src/context/SubTabContext.js`
+- `prototypes/prototyping/bill/home-redesign/src/App.jsx` — integrate SubTabContext, wire to sidebar
 
 **Success criteria:**
 - Opening a session/student/reflection spawns a sub-tab in the sidebar
@@ -298,14 +298,14 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Update sidebar `onTabClick` targets (or manifest handles this automatically from Phase 1)
 
 **Files modified:**
-- New: `playground/prototyping/bill/home-redesign/src/pages/SessionsListPage.jsx`
-- New: `playground/prototyping/bill/home-redesign/src/pages/SessionDetailPage.jsx`
-- New: `playground/prototyping/bill/home-redesign/src/pages/StudentsListPage.jsx`
-- New: `playground/prototyping/bill/home-redesign/src/pages/StudentDetailPage.jsx`
-- New: `playground/prototyping/bill/home-redesign/src/pages/ReflectionsListPage.jsx`
-- New: `playground/prototyping/bill/home-redesign/src/pages/ReflectionDetailPage.jsx`
-- `playground/prototyping/bill/home-redesign/src/App.jsx` — add routes
-- `playground/prototyping/bill/home-redesign/src/config/routeManifest.js` — add entries
+- New: `prototypes/prototyping/bill/home-redesign/src/pages/SessionsListPage.jsx`
+- New: `prototypes/prototyping/bill/home-redesign/src/pages/SessionDetailPage.jsx`
+- New: `prototypes/prototyping/bill/home-redesign/src/pages/StudentsListPage.jsx`
+- New: `prototypes/prototyping/bill/home-redesign/src/pages/StudentDetailPage.jsx`
+- New: `prototypes/prototyping/bill/home-redesign/src/pages/ReflectionsListPage.jsx`
+- New: `prototypes/prototyping/bill/home-redesign/src/pages/ReflectionDetailPage.jsx`
+- `prototypes/prototyping/bill/home-redesign/src/App.jsx` — add routes
+- `prototypes/prototyping/bill/home-redesign/src/config/routeManifest.js` — add entries
 
 **Success criteria:**
 - Each category has a working list page and detail page
@@ -451,9 +451,9 @@ This hook lives in `ShellLayout` and is passed down via context (or a new `SubTa
 - Sidebar component: `packages/plus-ds/src/components/Sidebar/Sidebar.jsx`
 - SidebarTab component: `packages/plus-ds/src/components/SidebarTab/SidebarTab.jsx`
 - Accordion component: `packages/plus-ds/src/components/Accordion/Accordion.jsx`
-- ShellLayout / routing: `playground/prototyping/bill/home-redesign/src/App.jsx`
-- ShellContext: `playground/prototyping/bill/home-redesign/src/context/ShellContext.js`
-- Sessions page: `playground/Bill/sessions/InSessionContent.jsx`
+- ShellLayout / routing: `prototypes/prototyping/bill/home-redesign/src/App.jsx`
+- ShellContext: `prototypes/prototyping/bill/home-redesign/src/context/ShellContext.js`
+- Sessions page: `prototypes/Bill/sessions/InSessionContent.jsx`
 - PageLayout: `packages/plus-ds/src/specs/Universal/Pages/PageLayout/PageLayout.jsx`
 - Toolkit specs: `packages/plus-ds/src/specs/Toolkit/{pre,in,post}-session/`
 

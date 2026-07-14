@@ -53,7 +53,7 @@ Every skill follows the same structure:
 
 ## Skill 1: `/uno:prototype`
 
-**Purpose:** Scaffold and build a new playground prototype. Guides users through what tools to use when, and how to think about tackling problems at each phase.
+**Purpose:** Scaffold and build a new prototypes prototype. Guides users through what tools to use when, and how to think about tackling problems at each phase.
 
 ### Directory Structure
 
@@ -75,7 +75,7 @@ Every skill follows the same structure:
 ---
 name: uno-prototype
 description: >
-  Scaffold and build a new playground prototype using the plus-uno design system.
+  Scaffold and build a new prototypes prototype using the plus-uno design system.
   Guides you through template selection, tool choices, DS component integration,
   and validation. Use when creating new feature prototypes or experiments.
 argument-hint: [owner/feature-name]
@@ -86,8 +86,8 @@ argument-hint: [owner/feature-name]
 
 | Phase | What Happens | Tools & Thinking | Gate |
 |-------|-------------|-----------------|------|
-| 1. Scope | Clarify feature purpose, owner, fidelity. | **Think:** What user problem does this solve? What fidelity — wireframe (Consulting), variations (Iteration), or production (Finalization)? **Tools:** Browse `playground/` for similar work. Figma MCP `get_screenshot` if design exists. Check `docs/solutions/` for past learnings. | Present plan, wait for approval |
-| 2. Scaffold | Copy template → vite config → dev script → src/ structure | **Think:** Which template is closest? (See `references/template-selection-guide.md`). Single-page or routing needed? **Tools:** `ls playground/templates/`. Copy from `examples/vite-config-example.js`. | Files exist, dev server starts |
+| 1. Scope | Clarify feature purpose, owner, fidelity. | **Think:** What user problem does this solve? What fidelity — wireframe (Consulting), variations (Iteration), or production (Finalization)? **Tools:** Browse `prototypes/` for similar work. Figma MCP `get_screenshot` if design exists. Check `docs/solutions/` for past learnings. | Present plan, wait for approval |
+| 2. Scaffold | Copy template → vite config → dev script → src/ structure | **Think:** Which template is closest? (See `references/template-selection-guide.md`). Single-page or routing needed? **Tools:** `ls prototypes/templates/`. Copy from `examples/vite-config-example.js`. | Files exist, dev server starts |
 | 3. Build | Implement with DS components, tokens, pattern rules | **Think:** What components exist? Check index before building custom. Which mode fits the build? **Tools:** `.agent/assets/components-index.json` for lookup. Figma MCP for design. Stitch MCP for wireframes. `npm run storybook` for component reference. | Code compiles, renders |
 | 4. Validate | Run validation checklist | **Think:** Would this pass `/uno:review`? **Tools:** `scripts/validate-prototype.sh`. Dev server. Grep for catch patterns. | All checks pass |
 | 5. Ship | Update docs, consider `/uno:compound` and `/uno:post` | **Think:** Did we learn anything worth compounding? Should this go on the marketplace? | Docs updated |
@@ -381,7 +381,7 @@ Skills never conflict with modes — they operate at different levels.
 - [ ] `/uno:prototype bill/test-feature` triggers prototype lifecycle
 - [ ] `/uno:compound "fixed storybook alias"` creates solution doc with correct template
 - [ ] `/uno:review src/` runs catch patterns and produces pass/fail report
-- [ ] `/uno:post playground/Bill/home-redesign` triggers marketplace posting
+- [ ] `/uno:post prototypes/Bill/home-redesign` triggers marketplace posting
 
 ## Dependencies & Risks
 

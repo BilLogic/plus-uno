@@ -47,7 +47,8 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **uno-bot** | uno's Slack embodiment — the Cloudflare Worker in `agents/uno-bot/` | "Slackbot" |
 | **uno-blueprint** | product source of truth (Supabase) — query at task time, never cache | "the database" |
 | **uno-storybook** | design-system source of truth (stories + MDX → /storybook) | "the docs site" |
-| **share-out** | a feedback-rail publish: Loom + preview + decision log (+ replica for prototypes) | "post", "update" |
+| **share-out** | a feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes) | "post", "update" |
+| **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
 | **Tier 1 / Tier 2** (maintenance) | trivial auto-applied fix vs PR+PRD through a Slack verdict | — |

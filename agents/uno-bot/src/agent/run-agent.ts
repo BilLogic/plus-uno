@@ -32,6 +32,8 @@ import {
   MAX_ITERATIONS,
   MAX_TOKENS,
   READONLY_TOOL_BUDGET,
+  GROUNDING_BUDGET,
+  readOnlyToolCost,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
@@ -262,6 +264,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   let cacheWriteTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
+  // Weighted grounding cost (estimated subrequests spent on lookups this turn).
+  // The real guard behind the READONLY_TOOL_BUDGET count backstop — see
+  // GROUNDING_BUDGET (free-tier 50-subrequest cap; live incident 2026-07-13).
+  let groundingCostUsed = 0;
   // Usage monitoring: which tools people actually exercise per request. Local
   // tool_use + server_tool_use names in call order; MCP inline calls are a
   // simple count (mcp:N) since their names are server-namespaced.
@@ -290,6 +296,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   };
   const finish = (result: AgentResult): AgentResult => {
     const toolsList = [...toolNamesUsed, ...(mcpCallsUsed > 0 ? [`mcp:${mcpCallsUsed}`] : [])];
+    // Weighted-budget telemetry for later calibration of the estimates/reserve.
+    console.log(
+      `[budget] grounding est: ${groundingCostUsed}/${GROUNDING_BUDGET} subrequests, ${toolCallsUsed} tools`,
+    );
     console.log(
       `[uno-bot] request done build=${BUILD} tier=${tier} route=${routeReason} model=${model} iterations=${iterations} ` +
         `tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
@@ -395,7 +405,14 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       messages.push({ role: "assistant", content: response.content });
       const toolResults: Anthropic.ToolResultBlockParam[] = [];
       for (const tu of toolUses) {
-        if (toolCallsUsed >= READONLY_TOOL_BUDGET) {
+        // Fire when EITHER the weighted subrequest budget (checked BEFORE the
+        // call, using its projected cost) or the count backstop is hit. Gate
+        // applies to LOOKUPS only — side-effect tools were already peeled off
+        // above and stay allowed even when the lookup budget is spent.
+        if (
+          toolCallsUsed >= READONLY_TOOL_BUDGET ||
+          groundingCostUsed + readOnlyToolCost(tu.name) > GROUNDING_BUDGET
+        ) {
           toolResults.push({
             type: "tool_result",
             tool_use_id: tu.id,
@@ -408,6 +425,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
           continue;
         }
         toolCallsUsed++;
+        groundingCostUsed += readOnlyToolCost(tu.name);
         const resultText =
           tu.name === "delegate"
             ? await runDelegateTasks(tu.input as Record<string, unknown>)

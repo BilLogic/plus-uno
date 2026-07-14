@@ -31,13 +31,13 @@ export default {
     tags: ['!dev', '!autodocs'],
     decorators: [
         (Story, context) => (
-            <ResponsiveFrame breakpoint={context.args.breakpoint || 'xl'}>
+            <ResponsiveFrame breakpoint={(context.globals?.plusBreakpoint || context.args.breakpoint || 'native') || 'native'}>
                 <Story />
             </ResponsiveFrame>
         ),
     ],
     args: {
-        breakpoint: 'xl',
+        breakpoint: 'native',
     },
     argTypes: {
         breakpoint: {

@@ -2,7 +2,7 @@
 
 # Production Readiness Checklist
 
-Use with **uno-review** when implementing approved designs for production (not disposable playground prototypes).
+Use with **uno-review** when implementing approved designs for production (not disposable prototypes prototypes).
 
 ## Interactive States (verify each)
 
