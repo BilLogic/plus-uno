@@ -27,6 +27,8 @@ import {
   MAX_ITERATIONS,
   MAX_TOKENS,
   READONLY_TOOL_BUDGET,
+  GROUNDING_BUDGET,
+  readOnlyToolCost,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
@@ -143,9 +145,17 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   let thinkingTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
+  // Weighted grounding cost (estimated subrequests spent on lookups this turn).
+  // The real guard behind the READONLY_TOOL_BUDGET count backstop — see
+  // GROUNDING_BUDGET (free-tier 50-subrequest cap; live incident 2026-07-13).
+  let groundingCostUsed = 0;
   const toolNamesUsed: string[] = [];
 
   const finish = (result: AgentResult): AgentResult => {
+    // Weighted-budget telemetry for later calibration of the estimates/reserve.
+    console.log(
+      `[budget] grounding est: ${groundingCostUsed}/${GROUNDING_BUDGET} subrequests, ${toolCallsUsed} tools`,
+    );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
         `iterations=${iterations} tokens_in=${inputTokens} tokens_out=${outputTokens} thinking=${thinkingTokens} ` +
@@ -269,7 +279,14 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       const name = fc.functionCall!.name!;
       const args = (fc.functionCall!.args ?? {}) as Record<string, unknown>;
       let resultText: string;
-      if (toolCallsUsed >= READONLY_TOOL_BUDGET) {
+      // Fire when EITHER the weighted subrequest budget (checked BEFORE the
+      // call, using its projected cost) or the count backstop is hit. Gate
+      // applies to LOOKUPS only — side-effect tools were already peeled off
+      // above and stay allowed even when the lookup budget is spent.
+      if (
+        toolCallsUsed >= READONLY_TOOL_BUDGET ||
+        groundingCostUsed + readOnlyToolCost(name) > GROUNDING_BUDGET
+      ) {
         resultText = JSON.stringify({
           ok: false,
           error: "no more lookups available this turn",
@@ -277,6 +294,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         });
       } else {
         toolCallsUsed++;
+        groundingCostUsed += readOnlyToolCost(name);
         resultText = await executeReadOnlyTool(env, name, args, slack);
       }
       responseParts.push({ functionResponse: { name, response: { result: resultText } } });
