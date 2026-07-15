@@ -20,7 +20,7 @@ import type { Env } from "../types";
 import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { routeRequest } from "./anthropic-client";
+import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
 import { BUILD } from "../version";
 import {

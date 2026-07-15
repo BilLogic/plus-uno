@@ -1,11 +1,10 @@
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
-import { startNotionOAuth, handleNotionOAuthCallback } from "./oauth/notion";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
-import { handleMcpHealth, runScheduledMcpHealthCheck } from "./debug/mcp-health";
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
-import { postMessage } from "./slack/api";
+import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
+import { MODELS } from "./agent/routing";
 import { BUILD } from "./version";
 
 export default {
@@ -14,15 +13,6 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/health") {
       return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
-    }
-
-    // Per-server hosted-MCP handshake probe — identifies WHICH server is failing
-    // when the Anthropic connector reports its unnamed "Connection error". Safe
-    // output (names/status/latency only), doubles as the uptime-monitoring hook.
-    // Auth-gated: it runs credentialed handshakes, so it must not be public.
-    if (request.method === "GET" && url.pathname === "/debug/mcp") {
-      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-      return handleMcpHealth(env);
     }
 
     // Gemini credential + reachability smoke test (dual-provider phase 1).
@@ -42,21 +32,31 @@ export default {
       return Response.json({ auth: mode, ...result, text: result.text?.slice(0, 100) });
     }
 
+    // Claude-on-Vertex credential + reachability smoke test. Confirms the
+    // service-account token reaches the Anthropic partner models before flipping
+    // MODEL_PROVIDER="vertex-claude". Auth-gated: it triggers a live (billable)
+    // model call, so it must not be public.
+    if (request.method === "GET" && url.pathname === "/debug/vertex-claude") {
+      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+      if (!claudeVertexConfigured(env)) {
+        return Response.json({ ok: false, error: "no Vertex-Claude credential (need GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID)" });
+      }
+      const model = env.CLAUDE_MODEL ?? MODELS.sonnet;
+      const result = await claudeVertexGenerate(env, {
+        model,
+        prompt: "Reply with exactly: uno-bot vertex-claude link ok",
+        maxTokens: 100,
+      });
+      return Response.json({ ...result, text: result.text?.slice(0, 100) });
+    }
+
     if (request.method === "POST" && url.pathname === "/slack/events") {
       return handleSlackEventsRequest(request, env, ctx);
     }
 
-    // One-time Notion OAuth (hosted-MCP READ path). Visit /oauth/notion/start
-    // once as an admin/service Notion account to authorize; Notion redirects to
-    // /oauth/notion/callback, which exchanges the code and stores the token.
-    if (request.method === "GET" && url.pathname === "/oauth/notion/start") {
-      return startNotionOAuth(env);
-    }
-    if (request.method === "GET" && url.pathname === "/oauth/notion/callback") {
-      return handleNotionOAuthCallback(request, env);
-    }
-
-    // One-time Slack OAuth (hosted-MCP read + write path).
+    // One-time Slack OAuth — issues the user token that slack_search needs
+    // (Slack's search Web API rejects bot tokens). Reads only; writes post as
+    // uno-bot via the bot token.
     if (request.method === "GET" && url.pathname === "/oauth/slack/start") {
       return startSlackOAuth(env);
     }
@@ -65,20 +65,6 @@ export default {
     }
 
     return new Response("not found", { status: 404 });
-  },
-
-  // Cron (wrangler.toml [triggers]): MCP health watchdog. Probes every attached
-  // server and posts a throttled alert to #uno-bot when one is down, so outages
-  // like the Slack-toggle incident (2026-07-09) surface in minutes, not on the
-  // next confused user.
-  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(
-      runScheduledMcpHealthCheck(env, (e, args) =>
-        postMessage(e, { channel: args.channel, text: args.text }),
-      ).catch((err) => {
-        console.error(`[mcp-health] scheduled check failed: ${err instanceof Error ? err.message : String(err)}`);
-      }),
-    );
   },
 };
 

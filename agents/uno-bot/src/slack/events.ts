@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 import { runAgent, type AgentResult } from "../agent/run-agent";
 import { bareResolution } from "../agent/loop-shared";
-import { routeRequest } from "../agent/anthropic-client";
+import { routeRequest } from "../agent/routing";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,

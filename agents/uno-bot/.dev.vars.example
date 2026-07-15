@@ -12,19 +12,19 @@ SLACK_SIGNING_SECRET=
 # api.slack.com/apps -> your app -> OAuth & Permissions -> "Bot User OAuth Token" (starts xoxb-)
 SLACK_BOT_TOKEN=
 
-# Secret for the static Slack MCP OAuth client (its client_id is the non-secret
-# SLACK_MCP_CLIENT_ID in wrangler.toml [vars]). Only needed for Slack MCP reads.
+# Secret for the static Slack OAuth client (its client_id is the non-secret
+# SLACK_MCP_CLIENT_ID in wrangler.toml [vars]). Powers the slack_search user token.
 SLACK_MCP_CLIENT_SECRET=
 
 # --- Model providers (which one runs is wrangler.toml MODEL_PROVIDER) ---
-# console.anthropic.com -> API Keys (used when MODEL_PROVIDER = "anthropic")
-ANTHROPIC_API_KEY=
-
-# Gemini path (used when MODEL_PROVIDER = "gemini"): EITHER an AI Studio key…
-GEMINI_API_KEY=
-# …OR a Vertex service-account pair (API key takes precedence if both set).
+# Two lanes: "gemini" (default) and "vertex-claude". Both can run on the SAME
+# Vertex service-account pair below; Claude bills to the GCP project. Set the
+# service account (Vertex) — this is what production and Vertex-Claude use:
 GEMINI_SA_EMAIL=
 GEMINI_SA_PRIVATE_KEY=
+# …OR, for the Gemini lane only, an AI Studio key (takes precedence for Gemini;
+# it CANNOT reach Claude — only the Vertex SA path can):
+GEMINI_API_KEY=
 
 # --- GitHub ---
 # github.com/settings/tokens -> Generate new (classic) with `repo` scope, OR
@@ -43,8 +43,6 @@ FIGMA_ACCESS_TOKEN=
 # --- Supabase (uno-blueprint) ---
 # Publishable/anon read key for blueprint_search (SUPABASE_URL is a [vars] entry)
 SUPABASE_ANON_KEY=
-# Personal Access Token for the hosted Supabase MCP (URL pins read_only=true)
-SUPABASE_MCP_TOKEN=
 
 # --- Gmail (email_send) ---
 GMAIL_SENDER=

@@ -5,23 +5,21 @@ compatibility_flags = ["nodejs_compat"]
 
 # Workers Logs / Observability. This block MUST stay in the file: it was first
 # enabled from the dashboard mid-incident (2026-07-09), and the next CI deploy
-# silently reverted it — wrangler treats a missing block as "disabled", which
-# blinds the `mcp=` telemetry the trial run depends on.
+# silently reverted it — wrangler treats a missing block as "disabled".
 [observability]
 enabled = true
 head_sampling_rate = 1
 
-# MCP health watchdog — see the scheduled() handler in src/index.ts. Probes all
-# attached MCP servers every 15 minutes; posts a throttled alert to #uno-bot on
-# failure.
-[triggers]
-crons = ["*/15 * * * *"]
-
 # ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
 # plan; design within these, don't fight them) ────────────────────────────────
-#   • 50 subrequests per invocation. One agent turn spends most of it (20
-#     harness fetches + Slack + DO + model API), which is why the AgentRunner
-#     processes exactly ONE job per alarm firing (fresh budget each firing).
+#   • 50 subrequests per invocation. One agent turn spends most of it (Slack +
+#     DO hops + grounding tool calls + model API), which is why the AgentRunner
+#     processes exactly ONE job per alarm firing (fresh budget each firing) and
+#     the loop enforces a weighted subrequest budget (agent/loop-shared.ts).
+#     NOTE: the harness (persona + skills) is baked into the Worker BUNDLE at
+#     build time (src/generated/harness.ts, via `npm run bundle:harness`), so
+#     serving it costs ZERO subrequests — it updates on DEPLOY, not on a push to
+#     main. (This replaced an older runtime GitHub-Raw fetch that cost ~20.)
 #   • ~10ms CPU/request soft budget — agent work is I/O-bound, but keep
 #     CPU-heavy paths (base64 of images) modest.
 #   • Workers Logs: 200K events/day, then sampling.
@@ -31,19 +29,12 @@ crons = ["*/15 * * * *"]
 # Plain vars (non-secret). Override per-env below.
 #
 # IMPORTANT — both values below must point at the GitHub repo whose `main`
-# branch holds the harness (AGENTS.md, skills/*/bot.md + method.md,
-# docs/conventions/). The bot fetches those files from SKILLS_BASE_URL at
-# runtime (see src/agent/skills.ts SKILL_PATHS) and dispatches
-# repository_dispatch events against GITHUB_REPO.
+# branch holds the harness source (AGENTS.md, skills/*/bot.md + method.md,
+# docs/conventions/). `bundle:harness` reads those at build time; the Worker
+# dispatches repository_dispatch events against GITHUB_REPO.
 [vars]
 GITHUB_REPO = "BilLogic/plus-uno"
 SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
-# Attaches the GitHub hosted-MCP read path (read-only repos toolset at
-# api.githubcopilot.com, authenticated with GITHUB_TOKEN). ENABLED 2026-07-09 after
-# a live auth check (a plain PAT completes the MCP initialize handshake — no Copilot
-# license needed). github_read is kept as a fallback for now; it can be retired once
-# the MCP is confirmed in real bot usage.
-GITHUB_MCP_ENABLED = "true"
 # Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"
@@ -79,11 +70,6 @@ NOTION_RESEARCH_PAPERS_DB_ID = "85af6f14-7e96-4ed7-aa92-687579a14b4f"
 NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
 # NOT tracked (deliberate): Help Center Articles Dev Page, Tasks Tracker on HC
 # Content, Content HQ editorial/meeting/social DBs, demo pages.
-# NOTE: DS-component PRDs and research notes are intentionally NOT separate bot
-# surfaces. Component PRDs are regular feature PRDs on the Roadmap board; deep
-# research is an IDE-only skill that writes to the project hub's Research page.
-# Maintenance intake is a Roadmap card (Product Pillar: Universal + Product Tag:
-# Maintenance), surfaced via a filtered view — not its own DB.
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
@@ -95,20 +81,12 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # (distinct from the reviews channel above). Leave blank → shareout falls back
 # to the origin thread.
 PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
-# Notion hosted-MCP READ path. mcp.notion.com is its own OAuth 2.1 server with
-# PKCE + dynamic client registration — NO manual Notion OAuth app and NO client
-# secret are needed (the Worker self-registers a public client, cached in KV).
-# Only this redirect URI is required; it must be reachable at the deployed Worker.
-NOTION_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/notion/callback"
-# NOTE: no Figma hosted-MCP path — mcp.figma.com is a closed catalog (only
-# Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker
-# 403s) and the local MCP needs the desktop app. The bot surfaces Figma context
-# from Notion + routes real Figma work to the IDE. FIGMA_ACCESS_TOKEN (secret,
-# below) still powers the prototype_scaffold proposal's screenshot fetch.
-# Slack hosted-MCP (read + write) path. Slack has NO dynamic registration → a
-# STATIC pre-registered client is used. The client_id is non-secret (below); the
-# client_secret is a wrangler secret (see SLACK_MCP_CLIENT_SECRET). This redirect
-# URI must match the one registered on the Slack app.
+# Slack login for slack_search. slack_search calls Slack's search Web API, which
+# rejects bot tokens, so it needs a USER token issued via a one-time OAuth
+# consent (/oauth/slack/start). Slack has NO dynamic registration → a STATIC
+# pre-registered client is used: the client_id is non-secret (here); the
+# client_secret is a wrangler secret (SLACK_MCP_CLIENT_SECRET). The redirect URI
+# must match the one registered on the Slack app.
 SLACK_MCP_CLIENT_ID = "12186538800.10808020289637"
 SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback"
 # Visibility firewall for workspace search (src/tools/slack-search.ts). The
@@ -125,48 +103,50 @@ SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slac
 #   plus-marketing C052BG9NE86 · plus-training C07L5RZV6DR ·
 #   plus-universal C072E8SFLKV
 SLACK_SEARCH_PRIVATE_ALLOWLIST = "C03DVDS4LN9,C07PZJD3HD5,C09EPEJEQ9K,C07LU2K8DQW,C089A3E9CCW,C074QG2V7DJ,C052BG9NE86,C07L5RZV6DR,C072E8SFLKV"
-# ── Dual-provider adapter ─────────────────────────────────────────────────────
-# MODEL_PROVIDER: "anthropic" | "gemini". Flipping this var IS the switch —
-# runAgent dispatches the whole turn to the matching loop (src/agent/
-# gemini-agent.ts for gemini: client-side tool loop, local tools only — Gemini
-# has no server-side MCP; hosted-MCP reach returns when switching back).
-# Switched to "gemini" 2026-07-10 (Anthropic budget exhausted — user decision).
+# ── Model provider adapter ────────────────────────────────────────────────────
+# MODEL_PROVIDER: "gemini" | "vertex-claude". Flipping this var IS the switch —
+# runAgent dispatches the whole turn to the matching loop (src/agent/run-agent.ts).
+#   gemini        → src/agent/gemini-agent.ts (local tools + googleSearch/
+#                   urlContext; the production default).
+#   vertex-claude → src/agent/claude-agent.ts (Claude via Vertex AI on the SAME
+#                   GCP service account as Gemini; billed to the GCP project;
+#                   local tools + Claude web_search). Requires the Vertex-Claude
+#                   models enabled in the project's Model Garden. Smoke-test with
+#                   GET /debug/vertex-claude before flipping.
 MODEL_PROVIDER = "gemini"
 # Vertex service-account path (project the SA belongs to; region "global").
+# Shared by BOTH the Gemini-Vertex and the Vertex-Claude lanes.
 GEMINI_PROJECT_ID = "hcii-plus"
 GEMINI_REGION = "global"
-# A/B trial verdict (2026-07-10): gemini-3.1-flash-lite handled simple lookups
-# fine but FABRICATED grounding on multi-source answers (invented a GitHub org
-# in links, skipped fallback-chain rules) — disqualifying for a grounding-first
-# bot. 3.5-flash is the default; the loop auto-adjusts thinking dials if a lite
-# model is ever set here again.
+# Active Gemini model. A/B trial verdict (2026-07-10): gemini-3.1-flash-lite
+# fabricated grounding on multi-source answers — disqualifying for a
+# grounding-first bot. 3.5-flash is the default.
 GEMINI_MODEL = "gemini-3.5-flash"
+# Vertex-Claude sonnet-lane model id (only read when MODEL_PROVIDER=vertex-claude;
+# haiku/opus tiers are fixed in src/agent/routing.ts). Optional — defaults to
+# "claude-sonnet-5".
+CLAUDE_MODEL = "claude-sonnet-5"
 
 # Secrets are set via `wrangler secret put`. Expected names:
-#   SLACK_SIGNING_SECRET
-#   SLACK_BOT_TOKEN
-#   ANTHROPIC_API_KEY
-#   GITHUB_TOKEN          (PAT with repo:dispatch scope)
-#   FIGMA_ACCESS_TOKEN    (Figma PAT with read access to the prototypes file;
-#                          used by the prototype_scaffold proposal-time screenshot
-#                          fetch in events.ts — Phase 4)
-#   NOTION_API_KEY        (Notion internal integration token, connected to the
-#                          Roadmap board; used by notion_create to add PRD cards)
-#   GMAIL_SENDER          (the authorized "From" mailbox for email_send)
-#   GMAIL_CLIENT_ID       (Google OAuth client id)
-#   GMAIL_CLIENT_SECRET   (Google OAuth client secret)
-#   GMAIL_REFRESH_TOKEN   (offline refresh token with the gmail.send scope)
-#   SUPABASE_ANON_KEY     (publishable/anon read key; blueprint_search is read-only)
-#   (SUPABASE_URL is a non-secret [vars] entry above, not a secret)
-#   SUPABASE_MCP_TOKEN    (Supabase Personal Access Token for the hosted MCP;
-#                          the MCP URL pins read_only=true so it's a read path)
-#   SLACK_MCP_CLIENT_SECRET (secret for the STATIC Slack MCP OAuth client whose
-#                          id is SLACK_MCP_CLIENT_ID above)
-#   GEMINI_SA_EMAIL       (Gemini/Vertex service-account client_email)
-#   GEMINI_SA_PRIVATE_KEY (Gemini/Vertex service-account private_key — the full
-#                          "-----BEGIN PRIVATE KEY-----…" PEM string)
-#   GEMINI_API_KEY        (optional alternative: AI Studio API key — if set it
-#                          takes precedence over the service-account pair)
+#   SLACK_SIGNING_SECRET     (verify incoming Slack request signatures)
+#   SLACK_BOT_TOKEN          (xoxb-… — chat.postMessage / reactions.add / replies)
+#   SLACK_MCP_CLIENT_SECRET  (secret for the static Slack OAuth client whose
+#                             id is SLACK_MCP_CLIENT_ID above; powers slack_search)
+#   GITHUB_TOKEN             (PAT with repo:dispatch scope + Contents:Read)
+#   FIGMA_ACCESS_TOKEN       (Figma read PAT — the prototype_scaffold proposal
+#                             screenshot fetch in events.ts)
+#   NOTION_API_KEY           (Notion internal integration token — notion_create/
+#                             update/archive + the notion_search catalog reads)
+#   GMAIL_SENDER             (authorized "From" mailbox for email_send)
+#   GMAIL_CLIENT_ID / GMAIL_CLIENT_SECRET / GMAIL_REFRESH_TOKEN  (Gmail OAuth)
+#   SUPABASE_ANON_KEY        (publishable/anon read key; blueprint_search read-only)
+#   GEMINI_SA_EMAIL          (Vertex service-account client_email — powers BOTH
+#                             the Gemini-Vertex and Vertex-Claude lanes)
+#   GEMINI_SA_PRIVATE_KEY    (Vertex service-account private_key — full PEM)
+#   GEMINI_API_KEY           (optional: AI Studio key — Gemini Developer API only;
+#                             CANNOT reach Claude. Takes precedence over the SA
+#                             pair for the Gemini lane if set.)
+#   DEBUG_TOKEN              (gates the /debug/* routes; sent as x-debug-token)
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.
 [[durable_objects.bindings]]
@@ -190,23 +170,15 @@ new_sqlite_classes = ["ThreadState"]
 tag = "v2"
 new_sqlite_classes = ["AgentRunner"]
 
-# KV — stores the exchanged Notion OAuth token (hosted-MCP READ path). Create it
-# once: `npx wrangler kv namespace create NOTION_OAUTH_KV`, paste the returned id
-# below (add a `preview_id` too if you use `wrangler dev`).
-[[kv_namespaces]]
-binding = "NOTION_OAUTH_KV"
-id = "587f85559dda488a89ff237bf117a5a6"
-
-# KV — Slack hosted-MCP: stores the STATIC client's issued user token (and PKCE
-# verifiers during the flow). Slack has no dynamic registration, so no client blob
-# is cached here — only the token.
+# KV — Slack login: stores the issued user (xoxp) token that slack_search uses
+# (and PKCE verifiers during the one-time OAuth consent).
 [[kv_namespaces]]
 binding = "SLACK_OAUTH_KV"
 id = "18b58372d9bc430489d634c2c9a0b0c4"
 
 # KV — harness resilience: last-known-good system-prompt assembly + alert
-# throttle. When GitHub Raw fetches fail, the bot serves this copy and pings
-# #uno-bot instead of silently running with harness files missing.
+# throttle. (The harness is baked into the bundle; this is the fallback/alert
+# path — see src/agent/skills.ts.)
 [[kv_namespaces]]
 binding = "HARNESS_KV"
 id = "10e5f980215e4f7e817bf55ac69dda43"
