@@ -325,7 +325,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     ]);
   } catch (err) {
     console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    await postVisibleFailure(env, channel, threadTs, userMsgTs, err);
     return;
   }
 
@@ -409,7 +409,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    await postVisibleFailure(env, channel, threadTs, userMsgTs, err);
     return;
   } finally {
     clearTimeout(interimTimer);
