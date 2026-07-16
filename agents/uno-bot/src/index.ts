@@ -5,6 +5,9 @@ import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
+import { runAgent } from "./agent/run-agent";
+import { preflight } from "./agent/preflight";
+import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
 
 export default {
@@ -50,6 +53,20 @@ export default {
       return Response.json({ ...result, text: result.text?.slice(0, 100) });
     }
 
+    // One HEADLESS agent turn for evals + reasoning investigation. Runs the
+    // exact runAgent the Slack pipeline uses, but with a synthetic context and
+    // NO delivery: replies come back as JSON, proposals come back as data
+    // (nothing is staged or posted — staging/posting live a layer up in
+    // events.ts), and the preflight clarify-gate verdict is included so eval
+    // assertions see the same gating production applies. Multi-turn flows are
+    // driven by the CALLER passing history/pending back in (the DO is never
+    // touched). Auth-gated: every call is a live billable model run.
+    // Driven by scripts/run-evals.mjs; scenarios in docs/evals/.
+    if (request.method === "POST" && url.pathname === "/debug/eval") {
+      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+      return handleEvalTurn(request, env);
+    }
+
     if (request.method === "POST" && url.pathname === "/slack/events") {
       return handleSlackEventsRequest(request, env, ctx);
     }
@@ -67,6 +84,78 @@ export default {
     return new Response("not found", { status: 404 });
   },
 };
+
+// /debug/eval body: one turn of a (possibly multi-turn) eval conversation.
+interface EvalTurnBody {
+  prompt?: string;
+  history?: HistoryTurn[];
+  /** Minimal pending-proposal shape; synthetic fields are filled in here. */
+  pending?: { toolName: string; input: Record<string, unknown> } | null;
+}
+
+async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
+  let body: EvalTurnBody;
+  try {
+    body = (await request.json()) as EvalTurnBody;
+  } catch {
+    return Response.json({ ok: false, error: "bad json" }, { status: 400 });
+  }
+  const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
+  if (!prompt) return Response.json({ ok: false, error: "missing prompt" }, { status: 400 });
+
+  const history: HistoryTurn[] = Array.isArray(body.history)
+    ? body.history.filter(
+        (t): t is HistoryTurn =>
+          !!t && (t.role === "user" || t.role === "assistant") && typeof t.content === "string",
+      )
+    : [];
+  const pending: PendingProposal | null = body.pending?.toolName
+    ? {
+        toolName: body.pending.toolName,
+        input: body.pending.input ?? {},
+        channel: "C_EVAL",
+        threadTs: "0",
+        userMsgTs: "0",
+        proposalTs: "0",
+        proposalText: "(eval)",
+        requesterUserId: "U_EVAL",
+      }
+    : null;
+
+  const narration: string[] = [];
+  const startedAt = Date.now();
+  try {
+    const result = await runAgent({
+      env,
+      userText: prompt,
+      history,
+      slack: { channel: "C_EVAL", threadTs: "0", userMsgTs: "0", requestedBy: "U_EVAL" },
+      currentSender: { userId: "U_EVAL" },
+      pending,
+      onInterim: (t) => narration.push(t),
+    });
+    // Mirror production's clarify gate: when a proposal comes back, report what
+    // preflight would have asked (events.ts applies this before staging).
+    let gateAsk: string | null = null;
+    if (result.kind === "proposal") {
+      const gate = await preflight(result.toolName, result.input, {
+        env,
+        prd: null,
+        implementPrdUrl: undefined,
+      }).catch(() => null);
+      gateAsk = gate?.ask ?? null;
+    }
+    return Response.json({ ok: true, build: BUILD, ms: Date.now() - startedAt, narration, gateAsk, result });
+  } catch (err) {
+    return Response.json({
+      ok: false,
+      build: BUILD,
+      ms: Date.now() - startedAt,
+      narration,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
 
 // Gate for /debug/* routes. Requires DEBUG_TOKEN to be configured AND matched
 // by the x-debug-token header via a constant-time compare — an unconfigured
