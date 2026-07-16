@@ -1,0 +1,38 @@
+name: uno-bot — embed blueprint (semantic_search)
+
+# Backfills / refreshes semantic_search.corpus_chunks from the blueprint:
+# reads the read-only source view, embeds each chunk with Vertex
+# text-embedding-005, upserts into the index. Additive + read-only w.r.t. the
+# blueprint (never writes to public.*).
+#
+# Run it by hand (Actions → this workflow → Run workflow) or let the nightly
+# schedule refresh changed cells.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_SERVICE_ROLE_KEY   service-role key for the UNO Blueprint project
+#   GEMINI_SA_EMAIL             Vertex service-account client_email
+#   GEMINI_SA_PRIVATE_KEY       Vertex service-account private_key (PEM)
+# Non-secret values are set inline below.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 7 * * *" # 07:00 UTC nightly
+
+jobs:
+  embed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Embed + upsert blueprint chunks
+        env:
+          SUPABASE_URL: "https://osybxeojvsqcwxkgnalm.supabase.co"
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_PROJECT_ID: "hcii-plus"
+          GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
+          GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
+          EMBED_REGION: "us-central1"
+        run: node agents/uno-bot/scripts/backfill-semantic-search.mjs
