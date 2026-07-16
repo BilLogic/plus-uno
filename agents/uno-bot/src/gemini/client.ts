@@ -116,7 +116,11 @@ export async function geminiGenerate(
       maxOutputTokens: opts.maxTokens ?? 2048,
       // thinking_level nests under thinkingConfig on the REST generateContent
       // surface (live 400 confirmed it's not a direct generationConfig field).
-      ...(opts.thinkingLevel ? { thinkingConfig: { thinkingLevel: opts.thinkingLevel } } : {}),
+      // Gemini 3.x only — 2.5-gen models reject it ("not supported by this
+      // model", probed 2026-07-16), so it's gated on the model generation.
+      ...(opts.thinkingLevel && /^gemini-3/.test(model)
+        ? { thinkingConfig: { thinkingLevel: opts.thinkingLevel } }
+        : {}),
     },
     ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
   };

@@ -138,6 +138,11 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // thinking_level dials the full flash/pro models do.
   const isLite = model.includes("flash-lite");
   const thinkingLevel = isLite || tier === "haiku" ? "minimal" : "high";
+  // thinking_level is a Gemini 3.x dial — 2.5-gen models 400 on it ("not
+  // supported by this model", probed live 2026-07-16 during the quota incident
+  // when GEMINI_MODEL was temporarily pointed at gemini-2.5-pro). Older models
+  // just use their default dynamic thinking budget.
+  const supportsThinkingLevel = /^gemini-3/.test(model);
 
   const startedAt = Date.now();
   let inputTokens = 0;
@@ -195,7 +200,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         : {}),
       generationConfig: {
         maxOutputTokens: MAX_TOKENS,
-        thinkingConfig: { thinkingLevel },
+        ...(supportsThinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
       },
     };
     const { status, data } = await geminiGenerateRaw(env, model, body);

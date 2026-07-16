@@ -126,7 +126,11 @@ async function judgeCase(token, c, transcript) {
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         systemInstruction: { parts: [{ text: JUDGE_SYSTEM }] },
-        generationConfig: { maxOutputTokens: 2000, thinkingConfig: { thinkingLevel: "low" } },
+        generationConfig: {
+          maxOutputTokens: 2000,
+          // thinking_level is Gemini 3.x-only; 2.5-gen models 400 on it.
+          ...(/^gemini-3/.test(JUDGE_MODEL) ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
+        },
       }),
     });
     const data = await res.json();

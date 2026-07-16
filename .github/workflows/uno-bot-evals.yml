@@ -32,6 +32,9 @@ jobs:
           GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
           GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
           GEMINI_PROJECT_ID: "hcii-plus"
+          # Judge on the model with quota headroom (2026-07-16 incident: the
+          # flash tier is exhausted). Revert to gemini-3.5-flash with the bot.
+          JUDGE_MODEL: "gemini-2.5-pro"
         run: node agents/uno-bot/scripts/run-evals.mjs
       - name: Upload transcripts
         if: always()
