@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 import { runAgent, type AgentResult } from "../agent/run-agent";
 import { bareResolution } from "../agent/loop-shared";
-import { routeRequest } from "../agent/anthropic-client";
+import { routeRequest } from "../agent/routing";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -362,7 +362,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     ]);
   } catch (err) {
     console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    await postVisibleFailure(env, channel, threadTs, userMsgTs, err);
     return;
   }
 
@@ -464,7 +464,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    await postVisibleFailure(env, channel, threadTs, userMsgTs, err);
     return;
   } finally {
     clearTimeout(interimTimer);

@@ -1,0 +1,44 @@
+name: uno-bot — evals (R-scenarios vs live Worker)
+
+# Runs docs/evals/fixtures/uno-bot-cases.json through the DEPLOYED Worker's
+# /debug/eval route (headless agent turns — nothing posts to Slack/Notion;
+# proposals come back as data) and scores each case with deterministic checks
+# + a Gemini judge against the D1-D9 rubric. A failing BLOCKER case fails the
+# job. Full transcripts upload as the eval-results artifact for reasoning
+# investigation.
+#
+# Run AFTER a `wrangler deploy` to regression-check the new build (the evals
+# hit the live Worker, so they test what's actually serving).
+#
+# Required repo secrets: DEBUG_TOKEN, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 8 * * 1" # Mondays 08:00 UTC — weekly drift check
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run eval cases against the live Worker
+        env:
+          WORKER_URL: "https://uno-bot.bryanhuang628.workers.dev"
+          DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
+          GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
+          GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
+          GEMINI_PROJECT_ID: "hcii-plus"
+          # Judge on the model with quota headroom (2026-07-16 incident: the
+          # flash tier is exhausted). Revert to gemini-3.5-flash with the bot.
+          JUDGE_MODEL: "gemini-2.5-pro"
+        run: node agents/uno-bot/scripts/run-evals.mjs
+      - name: Upload transcripts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: eval-results.json

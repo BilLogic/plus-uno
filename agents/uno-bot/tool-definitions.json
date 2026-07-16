@@ -209,41 +209,6 @@
     }
   },
   {
-    "name": "delegate",
-    "description": "Fan out up to 3 independent research subtasks to fast subagents that run IN PARALLEL — each one can search and read Notion, GitHub, Supabase, and Slack on its own. Use whenever grounding needs several separate lookups (fetch specific cards and report their status; find a person's roster page; pull a doc and extract fields) so you stay focused on reasoning and synthesis instead of doing every lookup serially yourself. Each task must be a SELF-CONTAINED goal with the names/links/IDs the subagent needs. Results come back as compact bullet facts with links. READ-ONLY; ungated; counts as one tool call.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "tasks"
-      ],
-      "properties": {
-        "tasks": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 3,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "goal"
-            ],
-            "properties": {
-              "goal": {
-                "type": "string",
-                "description": "Self-contained instruction, e.g. 'Fetch Notion card 2154 (Goal-Setting Feature) and report its Design Status, Product Pillar, and Contributors with the page link.'"
-              },
-              "context": {
-                "type": "string",
-                "description": "Optional extra context: links, constraints, disambiguation."
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  {
     "name": "notion_create",
     "description": "Create a new page or card — SIDE EFFECT, routed through the confirmation gate. `surface` selects WHERE and WHAT is created: 'prd' (design PRD on the Roadmap board), 'intake' (maintenance intake on the Roadmap board), or 'decision' (Decisions DB row under Design HQ — requires properties.roadmap_card). Research docs and marketplace entries are NOT bot surfaces — they run in-IDE. Draft the content conversationally first and let the designer refine it; only invoke once they approve. Follow docs/conventions/notion.md for required properties and body shape — NEVER create select options / pillars / OKRs; exact-match existing option names. Keep content grounded in the conversation; put genuine unknowns under an 'Open Questions' section rather than inventing.",
     "input_schema": {

@@ -15,13 +15,8 @@ export interface SlackContext {
 export interface Env {
   SLACK_SIGNING_SECRET: string;
   SLACK_BOT_TOKEN: string;
-  ANTHROPIC_API_KEY: string;
   GITHUB_TOKEN: string;
   GITHUB_REPO: string;
-  // Turn on the GitHub hosted-MCP read path (api.githubcopilot.com, read-only
-  // repos toolset, PAT bearer). "true" → attach it; anything else → stay on the
-  // bespoke github_read tool. Kept off until verified live. See agent/mcp.ts.
-  GITHUB_MCP_ENABLED?: string;
   SKILLS_BASE_URL: string;
   FIGMA_ACCESS_TOKEN: string;
   NOTION_API_KEY: string;
@@ -57,6 +52,9 @@ export interface Env {
   // from the reviews channel above). Optional — unset → shareout_post falls back
   // to the origin thread.
   PLUS_DESIGN_FEEDBACK_CHANNEL_ID?: string;
+  // Channel for operational alerts (capacity/quota outages). Unset → defaults to
+  // #uno-bot. See slack/delivery.ts alertCapacity.
+  UNO_BOT_ALERT_CHANNEL?: string;
   // Gmail send (D6 connector). All optional — when unset, send_email fails
   // gracefully with a "not configured" error instead of sending.
   GMAIL_SENDER?: string;
@@ -68,46 +66,29 @@ export interface Env {
   // fabricating.
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
+  // Kill-switch for the semantic (vector) blueprint search. Unset/"on" → vector
+  // first with keyword fallback; "off" → keyword only (instant rollback via a
+  // var change + redeploy). See integrations/blueprint.ts.
+  SEMANTIC_SEARCH?: string;
   THREAD_STATE: DurableObjectNamespace;
   // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
   // wall-clock cancellation that silently killed long agent runs (👀-then-
   // silence, 2026-07-09). See agent-runner.ts.
   AGENT_RUNNER: DurableObjectNamespace;
   // Harness resilience: stores the last fully-successful system-prompt assembly
-  // (all 20+ SKILL_PATHS files fetched clean) + the alert-throttle timestamp.
-  // Unset → behavior degrades to pre-KV (partial harness on fetch failures, no
-  // Slack alert). See agent/skills.ts.
+  // + the alert-throttle timestamp. (The harness itself is now baked into the
+  // Worker bundle at build time — src/generated/harness.ts — so serving it costs
+  // zero subrequests; this KV is the fallback/alert path. See agent/skills.ts.)
   HARNESS_KV?: KVNamespace;
-  // --- Notion hosted-MCP (READS only) — grounding via mcp.notion.com ---------
-  // mcp.notion.com is its own OAuth 2.1 server (PKCE + dynamic client
-  // registration) — no manual Notion OAuth app and no client secret are needed;
-  // the Worker self-registers a public client. Only the redirect URI + KV are
-  // required. Unset → the Notion MCP stays off and the bot falls back to the REST
-  // notion_* read tools. Writes are NEVER exposed via MCP (they'd bypass the ✅
-  // gate) — notion_create/update/archive stay as the bot's own gated tools.
-  //
-  // The registered client + issued token both live in NOTION_OAUTH_KV.
-  NOTION_OAUTH_REDIRECT_URI?: string;
-  NOTION_OAUTH_KV?: KVNamespace;
 
-  // --- Supabase hosted-MCP (READS only) — uno-blueprint grounding ------------
-  // Personal Access Token (static bearer). The Supabase MCP URL is pinned to
-  // read_only=true server-side, so this stays a read path even though the token
-  // itself may be broad. Unset → the Supabase MCP server is not attached. NEVER
-  // add a Supabase write key here (blueprint writes route to the IDE).
-  SUPABASE_MCP_TOKEN?: string;
-
-  // NOTE: Figma has NO hosted-MCP path for the bot — mcp.figma.com is a closed
-  // catalog (Claude Code / Cursor / VS Code only; a custom Worker 403s), and the
-  // local MCP needs the desktop app. So there are no FIGMA_OAUTH_* vars. The bot
-  // surfaces Figma context from Notion + routes real Figma work to the IDE.
-  // (FIGMA_ACCESS_TOKEN above still powers implement_design's screenshot fetch.)
-
-  // --- Slack hosted-MCP (read + WRITE) — mcp.slack.com -----------------------
-  // Slack has NO dynamic registration → a STATIC pre-registered client is used
-  // (client_id is a non-secret [vars] entry, client_secret is a wrangler secret).
-  // The issued user token lives in SLACK_OAUTH_KV. Unset → the Slack MCP stays
-  // off (reads-only allowlist; writes go through the bot token).
+  // --- Slack login (user token for slack_search) -----------------------------
+  // slack_search calls Slack's search Web API, which REJECTS bot tokens, so it
+  // needs a user (xoxp) token issued via a one-time OAuth consent. Slack has no
+  // dynamic client registration → a STATIC pre-registered client is used
+  // (SLACK_MCP_CLIENT_ID is a non-secret [vars] entry; SLACK_MCP_CLIENT_SECRET
+  // is a wrangler secret). The issued user token lives in SLACK_OAUTH_KV. Unset
+  // → slack_search reports "not configured". All bot writes (messages,
+  // reactions) go through SLACK_BOT_TOKEN and post as uno-bot.
   SLACK_MCP_CLIENT_ID?: string;
   SLACK_MCP_CLIENT_SECRET?: string;
   SLACK_OAUTH_REDIRECT_URI?: string;
@@ -117,21 +98,26 @@ export interface Env {
   // game. Everything else private, and all DMs/group DMs, is hard-dropped by
   // the Worker before the model sees search results. Empty/unset → public only.
   SLACK_SEARCH_PRIVATE_ALLOWLIST?: string;
-  // --- Gemini provider (dual-provider adapter, phase 1) ----------------------
-  // MODEL_PROVIDER selects the runtime brain: "anthropic" (default) | "gemini".
-  // Phase 1 ships the credential layer + /debug/gemini smoke test only; the
-  // agent loop stays on Anthropic until the phase-2 adapter PR.
+  // --- Model provider adapter ------------------------------------------------
+  // MODEL_PROVIDER selects the runtime brain: "gemini" (DEFAULT / production) |
+  // "vertex-claude" (Claude via Google Vertex AI, billed to the GCP project).
+  // Flipping it is the whole switch — see agent/run-agent.ts.
   MODEL_PROVIDER?: string;
-  // Auth mode auto-selected by which credential exists (see gemini/client.ts).
-  // RULE (2026-07-16): the Vertex service-account pair (GEMINI_SA_EMAIL +
-  // GEMINI_SA_PRIVATE_KEY) is canonical and takes precedence. GEMINI_API_KEY
-  // (AI Studio) is a local-dev fallback only — never set it on the Worker.
+  // Gemini auth mode auto-selected by which credential exists (gemini/client.ts).
+  // RULE (2026-07-16, ADR-018): the Vertex service-account pair (GEMINI_SA_EMAIL
+  // + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID) is canonical and takes
+  // precedence; it ALSO powers the Vertex-Claude lane (vertex/claude.ts) — same
+  // token. GEMINI_API_KEY (AI Studio) is a local-dev fallback only — never set
+  // it on the Worker.
   GEMINI_API_KEY?: string;
   GEMINI_SA_EMAIL?: string;
   GEMINI_SA_PRIVATE_KEY?: string;
   GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.5-flash"
+  // Vertex-Claude model id for the sonnet lane (haiku/opus are fixed in
+  // routing.ts). Optional — defaults to MODELS.sonnet ("claude-sonnet-5").
+  CLAUDE_MODEL?: string;
 
   // --- Operational guards ----------------------------------------------------
   // Shared secret gating the /debug/* routes (they trigger a live model call
