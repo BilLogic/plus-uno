@@ -63,6 +63,10 @@ export interface Env {
   // fabricating.
   SUPABASE_URL?: string;
   SUPABASE_ANON_KEY?: string;
+  // Kill-switch for the semantic (vector) blueprint search. Unset/"on" → vector
+  // first with keyword fallback; "off" → keyword only (instant rollback via a
+  // var change + redeploy). See integrations/blueprint.ts.
+  SEMANTIC_SEARCH?: string;
   THREAD_STATE: DurableObjectNamespace;
   // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
   // wall-clock cancellation that silently killed long agent runs (👀-then-

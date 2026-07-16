@@ -73,6 +73,11 @@ NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
+# blueprint_search engine: "on" (default) = semantic (vector) search over the
+# semantic_search.corpus_chunks index, with keyword search as the fallback;
+# "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
+# as the model lane) + the semantic_search schema exposed to the API.
+SEMANTIC_SEARCH = "on"
 # #plus-design channel id — reviewable artifacts (component_implement /
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
