@@ -20,6 +20,14 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: "0 7 * * *" # 07:00 UTC nightly
+  # Runs when this workflow or the backfill script changes on the dev branch,
+  # so the initial backfill can run before the branch is merged to main (where
+  # workflow_dispatch becomes available). Remove this block after merge.
+  push:
+    branches: [claude/uno-bot-infra-upgrade-wq9g5n]
+    paths:
+      - .github/workflows/uno-bot-embed-blueprint.yml
+      - agents/uno-bot/scripts/backfill-semantic-search.mjs
 
 jobs:
   embed:
