@@ -48,9 +48,17 @@ export async function buildSystemBlocks(
   const blocks: SystemBlock[] = [
     { type: "text", text: stable, cache_control: { type: "ephemeral", ttl: "1h" } },
   ];
+  // Per-request, uncached (after the cached stable block so the cache prefix
+  // stays stable): who sent the current message. Without this the model knows
+  // the whole team roster (harness) but NOT who it's talking to — and a weaker
+  // model will guess a roster name for the person speaking ("Hi Meryem!" to
+  // Bill, live incident 2026-07-16 on the gemini-2.5-pro fallback lane).
+  if (sender && SLACK_USER_ID.test(sender.userId)) {
+    blocks.push({ type: "text", text: renderSenderBlock(sender.userId) });
+  }
   // Per-request, uncached (varies per thread): what the user has open in the
-  // assistant panel. Kept AFTER the cached stable block so the cache prefix is
-  // stable. Advisory only — the prompt tells the model not to over-index on it.
+  // assistant panel. Advisory only — the prompt tells the model not to
+  // over-index on it.
   if (assistantContext) {
     blocks.push({ type: "text", text: renderAssistantContextBlock(assistantContext) });
   }
@@ -58,6 +66,19 @@ export async function buildSystemBlocks(
     blocks.push({ type: "text", text: renderPendingBlock(pending, sender) });
   }
   return blocks;
+}
+
+// Same validation discipline as the panel-context channel id: this string
+// lands in a system block, so only a shape-checked Slack user id may pass.
+const SLACK_USER_ID = /^[UW][A-Z0-9]{2,20}$/;
+
+function renderSenderBlock(userId: string): string {
+  return [
+    "<current_sender>",
+    `The current message was sent by <@${userId}>. If you address them, use exactly that mention token — Slack renders it as their name.`,
+    "You do NOT otherwise know who is speaking. NEVER address a user by a guessed name: the team-roster names in your instructions are routing candidates (\"who should I ask about X\"), not the identity of the person in this conversation.",
+    "</current_sender>",
+  ].join("\n");
 }
 
 function renderAssistantContextBlock(ctx: string): string {
