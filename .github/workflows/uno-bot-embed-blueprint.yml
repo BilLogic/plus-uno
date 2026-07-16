@@ -8,9 +8,12 @@ name: uno-bot — embed blueprint (semantic_search)
 # Run it by hand (Actions → this workflow → Run workflow) or let the nightly
 # schedule refresh changed cells.
 #
-# Required repo secrets (Settings → Secrets and variables → Actions) — just TWO:
+# Required repo secrets (Settings → Secrets and variables → Actions):
 #   SUPABASE_SERVICE_ROLE_KEY   service-role key for the UNO Blueprint project
-#   GEMINI_API_KEY              AI Studio key (aistudio.google.com → Get API key)
+#   GEMINI_SA_EMAIL             Vertex service-account client_email (same account
+#                               the bot uses — the one that also enables Claude-on-Vertex)
+#   GEMINI_SA_PRIVATE_KEY       Vertex service-account private_key (full PEM block)
+# (Alternatively a single GEMINI_API_KEY works too; the script auto-detects.)
 # Non-secret values are set inline below.
 
 on:
@@ -30,5 +33,11 @@ jobs:
         env:
           SUPABASE_URL: "https://osybxeojvsqcwxkgnalm.supabase.co"
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Embedding credential — the Vertex service account (same one the bot
+          # uses). GEMINI_API_KEY is an optional alternative; the script auto-detects.
+          GEMINI_PROJECT_ID: "hcii-plus"
+          GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
+          GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EMBED_REGION: "us-central1"
         run: node agents/uno-bot/scripts/backfill-semantic-search.mjs
