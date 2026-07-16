@@ -17,6 +17,7 @@
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
 import { saveAssistantContext } from "../thread-state-client";
+import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
 import type {
   AssistantContext,
   SlackAssistantThreadStartedEvent,
@@ -110,20 +111,44 @@ const WELCOME =
   "or design-system components — or drop a Notion/Figma link and I'll dig in. " +
   "Anything I'd create or change in Notion or GitHub waits for your :white_check_mark: first.";
 
+// First-contact onboarding (ADR-020): when the panel opens for someone who
+// hasn't connected their own Slack history, the welcome carries the one-tap
+// consent link. Shown only here (panel open) — not per message, never naggy.
+function connectNudge(url: string): string {
+  return (
+    `\n\n:link: *Optional:* <${url}|connect your Slack history> (10 seconds) and my searches for you ` +
+    "will cover everything *you* can see — your DMs, group chats, and private channels. " +
+    "Those results only ever appear here in our DM, and only for you."
+  );
+}
+
 export async function handleAssistantThreadStarted(
   env: Env,
   event: SlackAssistantThreadStartedEvent,
 ): Promise<void> {
   const { channel_id, thread_ts, context } = event.assistant_thread;
+  const userId = event.assistant_thread.user_id;
   // Persist the opening context so the first message can use it (message.im
   // events carry no context of their own).
   if (context) {
     await saveAssistantContext(env, channel_id, thread_ts, context);
   }
+  // Detect-and-direct: offer the consent link only when it's actionable
+  // (OAuth configured, user not yet connected). Best-effort — a failed token
+  // lookup just means a plain welcome.
+  let welcome = WELCOME;
+  try {
+    const url = slackConnectUrl(env);
+    if (url && userId && !(await hasOwnSlackToken(env, userId))) {
+      welcome += connectNudge(url);
+    }
+  } catch {
+    /* plain welcome */
+  }
   // Fire the three decorations together — independent, all best-effort.
   // allSettled (not all): one rejection must not cancel the in-flight siblings.
   await Promise.allSettled([
-    postMessage(env, { channel: channel_id, thread_ts, text: WELCOME }),
+    postMessage(env, { channel: channel_id, thread_ts, text: welcome }),
     setSuggestedPrompts(env, channel_id, thread_ts, SUGGESTED_PROMPTS, "How can I help?"),
     setAssistantTitle(env, channel_id, thread_ts, "Chat with UNO Bot"),
   ]);

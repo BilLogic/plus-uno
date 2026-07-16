@@ -14,9 +14,11 @@ import type { Env } from "../types";
 import type { SlackAppHomeOpenedEvent } from "./types";
 import { slackCall } from "./api";
 import { SUGGESTED_PROMPTS } from "./assistant";
+import { slackConnectUrl } from "../oauth/slack";
 
-// The Home view is a fixed Block Kit document — typed loosely (Slack's block
-// schema is large and we hand-author valid blocks).
+// The Home view is a Block Kit document built per publish (cheap — no state,
+// just env-derived links) — typed loosely (Slack's block schema is large and
+// we hand-author valid blocks).
 const HOME_VIEW = {
   type: "home",
   blocks: [
@@ -98,8 +100,42 @@ const HOME_VIEW = {
   ],
 };
 
+// ADR-020 onboarding: the Home tab documents the own-visibility option with a
+// one-tap connect button. Static per env (we don't check per-user token state
+// here — the view is documentation; the panel welcome does the targeted nudge).
+function buildHomeView(env: Env) {
+  const url = slackConnectUrl(env);
+  if (!url) return HOME_VIEW;
+  return {
+    ...HOME_VIEW,
+    blocks: [
+      ...HOME_VIEW.blocks,
+      { type: "divider" },
+      { type: "section", text: { type: "mrkdwn", text: "*Search your own Slack — optional*" } },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            "Connect your Slack history and my searches *for you* cover everything you can see — your DMs, group chats, and private channels. Those results only ever appear in your own DM with me, and only for you. Disconnect anytime from Slack's app settings.",
+        },
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: { type: "plain_text", text: "🔗 Connect your Slack history", emoji: true },
+            url,
+          },
+        ],
+      },
+    ],
+  };
+}
+
 async function publishHomeView(env: Env, userId: string): Promise<void> {
-  await slackCall(env, "views.publish", { user_id: userId, view: HOME_VIEW });
+  await slackCall(env, "views.publish", { user_id: userId, view: buildHomeView(env) });
 }
 
 export async function handleAppHomeOpened(env: Env, event: SlackAppHomeOpenedEvent): Promise<void> {

@@ -161,6 +161,25 @@ export async function getSlackAccessToken(env: Env): Promise<string | null> {
   return getAccessToken(config(env));
 }
 
+/** True when this user has connected their own Slack history (per-user token
+ *  slot exists and is valid). Drives the first-contact onboarding nudge. */
+export async function hasOwnSlackToken(env: Env, userId: string): Promise<boolean> {
+  if (!slackOAuthConfigured(env)) return false;
+  if (!/^[UW][A-Z0-9]{2,20}$/.test(userId)) return false;
+  return (await getAccessToken(config(env), userId)) !== null;
+}
+
+/** User-facing consent URL (the OAuth entry point), derived from the
+ *  configured redirect. Null when the OAuth path isn't set up. */
+export function slackConnectUrl(env: Env): string | null {
+  if (!env.SLACK_OAUTH_REDIRECT_URI) return null;
+  try {
+    return `${new URL(env.SLACK_OAUTH_REDIRECT_URI).origin}/oauth/slack/start`;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Requester-scoped credential (ADR-020): the requester's OWN token when they
  * have consented at /oauth/slack/start (own=true — carries exactly their Slack
