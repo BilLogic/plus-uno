@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22" # wrangler v4.97+ requires Node >= 22
       - name: Install deps
         working-directory: agents/uno-bot
         run: npm ci
