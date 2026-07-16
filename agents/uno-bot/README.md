@@ -68,7 +68,9 @@ uno-bot/
     └── version.ts        BUILD string returned by /health
 ```
 
-Regression tests: the **UNO-Bot Test Plan** in Notion (13 `TC-*` cases run one-per-thread in `#uno-bot-sandbox`, hand- or judge-scored 0–3; latest round 2026-07-11 averaged 2.48). Legacy R1–R12 prompts remain in `docs/evals/scenarios/uno-bot.md`.
+Regression tests, two layers:
+- **Automated:** the `uno-bot — evals` GitHub Action drives `docs/evals/fixtures/uno-bot-cases.json` (machine-readable R-scenarios) through the live Worker's `/debug/eval` route — headless agent turns, deterministic checks + a Gemini judge against the D1–D9 rubric; blocker failures fail the job, full transcripts upload as an artifact. Run it after every deploy.
+- **Manual:** the **UNO-Bot Test Plan** in Notion (13 `TC-*` cases run one-per-thread in `#uno-bot-sandbox`, hand- or judge-scored 0–3; latest round 2026-07-11 averaged 2.48). Source prompts in `docs/evals/scenarios/uno-bot.md`.
 
 ## Local dev
 
