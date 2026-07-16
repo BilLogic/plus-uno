@@ -37,23 +37,11 @@ export async function embedText(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    if (env.GEMINI_API_KEY) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${AISTUDIO_MODEL}:embedContent?key=${env.GEMINI_API_KEY}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          model: `models/${AISTUDIO_MODEL}`,
-          content: { parts: [{ text: t }] },
-          taskType,
-          outputDimensionality: EMBED_DIM,
-        }),
-        signal: controller.signal,
-      });
-      if (!res.ok) return null;
-      const data = (await res.json()) as { embedding?: { values?: number[] } };
-      return data.embedding?.values ?? null;
-    }
+    // ORDER MATTERS: prefer the Vertex SA path (text-embedding-005) — the
+    // semantic_search index is built with 005, and vectors from different
+    // models are NOT comparable. The AI-Studio key (004) is a fallback for
+    // deployments without an SA; mixing it against an 005 index would silently
+    // degrade every similarity score below the floor.
     if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
       const token = await getGoogleAccessToken(env);
       const url =
@@ -73,6 +61,23 @@ export async function embedText(
         predictions?: Array<{ embeddings?: { values?: number[] } }>;
       };
       return data.predictions?.[0]?.embeddings?.values ?? null;
+    }
+    if (env.GEMINI_API_KEY) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${AISTUDIO_MODEL}:embedContent?key=${env.GEMINI_API_KEY}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          model: `models/${AISTUDIO_MODEL}`,
+          content: { parts: [{ text: t }] },
+          taskType,
+          outputDimensionality: EMBED_DIM,
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as { embedding?: { values?: number[] } };
+      return data.embedding?.values ?? null;
     }
     return null;
   } catch {

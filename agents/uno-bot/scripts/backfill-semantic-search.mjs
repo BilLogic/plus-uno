@@ -11,11 +11,12 @@
 // Env required:
 //   SUPABASE_URL                e.g. https://osybxeojvsqcwxkgnalm.supabase.co
 //   SUPABASE_SERVICE_ROLE_KEY   service-role key (bypasses RLS; keep it secret)
-//   and ONE embedding credential:
-//     GEMINI_API_KEY            AI Studio key (SIMPLEST — one key from
-//                               aistudio.google.com). Preferred if set.
-//   …or the Vertex service account (bills to GCP; only if no API key):
-//     GEMINI_PROJECT_ID, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY
+//   and ONE embedding credential (the SA is PREFERRED when both exist, so the
+//   index model stays text-embedding-005 — mixing embedding models in one
+//   index breaks similarity comparisons):
+//     GEMINI_PROJECT_ID, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY  (Vertex SA)
+//   …or, only when no SA is configured:
+//     GEMINI_API_KEY            AI Studio key (text-embedding-004)
 // Optional:
 //   EMBED_MODEL    default "text-embedding-004" (AI Studio) / "text-embedding-005" (Vertex)
 //   EMBED_REGION   default "us-central1"  (Vertex path only; "global" does not serve embeddings)
@@ -33,11 +34,13 @@ const {
   GEMINI_SA_EMAIL,
   GEMINI_SA_PRIVATE_KEY,
   EMBED_REGION = "us-central1",
-  EMBED_MODEL = GEMINI_API_KEY ? "text-embedding-004" : "text-embedding-005",
   BLUEPRINT_URL = "https://uno-blueprint.netlify.app/",
 } = process.env;
 
-const USE_API_KEY = Boolean(GEMINI_API_KEY);
+// SA first (text-embedding-005 — what the live index is built with); the AI
+// Studio key (004) only when no SA exists. Never mix models in one index.
+const USE_API_KEY = !(GEMINI_SA_EMAIL && GEMINI_SA_PRIVATE_KEY && GEMINI_PROJECT_ID) && Boolean(GEMINI_API_KEY);
+const EMBED_MODEL = process.env.EMBED_MODEL ?? (USE_API_KEY ? "text-embedding-004" : "text-embedding-005");
 
 const SCHEMA = "semantic_search";
 const EMBED_DIM = 768;

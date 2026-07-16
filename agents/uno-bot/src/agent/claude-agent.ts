@@ -114,7 +114,9 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   };
   const recordToolUses = (content: ContentBlock[]): void => {
     for (const b of content) {
-      if (b.type === "tool_use") toolNamesUsed.push((b as ToolUseBlock).name);
+      if (b.type === "tool_use" || b.type === "server_tool_use") {
+        toolNamesUsed.push((b as ToolUseBlock).name ?? "(server)");
+      }
     }
   };
   const finish = (result: AgentResult): AgentResult => {
@@ -162,6 +164,14 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
 
     if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
       return finish({ kind: "text", text: extractFinalText(response.content) || "(empty response)" });
+    }
+
+    // Server-side tool work (web_search) can pause a long turn: resume by
+    // echoing the paused assistant content and calling again. Without this the
+    // loop would surface "(internal: unexpected stop_reason: pause_turn)".
+    if (response.stop_reason === "pause_turn") {
+      messages.push({ role: "assistant", content: response.content });
+      continue;
     }
 
     if (response.stop_reason === "tool_use") {
