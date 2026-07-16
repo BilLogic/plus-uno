@@ -33,7 +33,9 @@ const {
 } = process.env;
 
 const TURN_TIMEOUT_MS = 8 * 60_000; // agent turns can legally run for minutes
-const PAUSE_BETWEEN_CASES_MS = 2_000;
+const PAUSE_BETWEEN_CASES_MS = 10_000; // stay clear of per-minute model quotas
+const TRANSIENT_RETRIES = 2; // extra attempts per turn on 429/quota/overload
+const TRANSIENT_BACKOFF_MS = 65_000; // sit out the per-minute quota window
 
 function required(name, v) {
   if (!v) {
@@ -74,8 +76,8 @@ async function googleToken() {
   return data.access_token;
 }
 
-// ── One headless agent turn ───────────────────────────────────────────────────
-async function evalTurn(prompt, history, pending) {
+// ── One headless agent turn (with transient-error retries) ────────────────────
+async function evalTurnOnce(prompt, history, pending) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TURN_TIMEOUT_MS);
   try {
@@ -88,6 +90,23 @@ async function evalTurn(prompt, history, pending) {
     return await res.json();
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// Rate limits are a property of the moment, not the bot — retry 429/quota/
+// overload with a long backoff instead of failing the case (first live run
+// 2026-07-16: every case "failed" on a starved model quota).
+async function evalTurn(prompt, history, pending) {
+  for (let attempt = 0; ; attempt++) {
+    const resp = await evalTurnOnce(prompt, history, pending).catch((err) => ({
+      ok: false,
+      error: String(err?.message ?? err),
+    }));
+    const msg = String(resp?.error ?? "");
+    const transient = /429|quota|exhaust|rate.?limit|overload|503|529/i.test(msg);
+    if (resp?.ok || !transient || attempt >= TRANSIENT_RETRIES) return resp;
+    console.log(`  … transient model error (${msg.slice(0, 80)}) — retrying in ${TRANSIENT_BACKOFF_MS / 1000}s`);
+    await new Promise((r) => setTimeout(r, TRANSIENT_BACKOFF_MS));
   }
 }
 
