@@ -11,13 +11,14 @@
 // Env required:
 //   SUPABASE_URL                e.g. https://osybxeojvsqcwxkgnalm.supabase.co
 //   SUPABASE_SERVICE_ROLE_KEY   service-role key (bypasses RLS; keep it secret)
-//   GEMINI_PROJECT_ID           GCP project, e.g. hcii-plus
-//   GEMINI_SA_EMAIL             Vertex service-account client_email
-//   GEMINI_SA_PRIVATE_KEY       Vertex service-account private_key (PEM)
+//   and ONE embedding credential:
+//     GEMINI_API_KEY            AI Studio key (SIMPLEST — one key from
+//                               aistudio.google.com). Preferred if set.
+//   …or the Vertex service account (bills to GCP; only if no API key):
+//     GEMINI_PROJECT_ID, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY
 // Optional:
-//   EMBED_REGION   default "us-central1"  (embeddings are regional; "global"
-//                                          does not serve text-embedding-005)
-//   EMBED_MODEL    default "text-embedding-005"
+//   EMBED_MODEL    default "text-embedding-004" (AI Studio) / "text-embedding-005" (Vertex)
+//   EMBED_REGION   default "us-central1"  (Vertex path only; "global" does not serve embeddings)
 //   BLUEPRINT_URL  default "https://uno-blueprint.netlify.app/"  (citation base)
 //
 // Run:  node scripts/backfill-semantic-search.mjs
@@ -27,13 +28,16 @@ import { createSign } from "node:crypto";
 const {
   SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY,
+  GEMINI_API_KEY,
   GEMINI_PROJECT_ID,
   GEMINI_SA_EMAIL,
   GEMINI_SA_PRIVATE_KEY,
   EMBED_REGION = "us-central1",
-  EMBED_MODEL = "text-embedding-005",
+  EMBED_MODEL = GEMINI_API_KEY ? "text-embedding-004" : "text-embedding-005",
   BLUEPRINT_URL = "https://uno-blueprint.netlify.app/",
 } = process.env;
+
+const USE_API_KEY = Boolean(GEMINI_API_KEY);
 
 const SCHEMA = "semantic_search";
 const EMBED_DIM = 768;
@@ -83,8 +87,28 @@ async function getGoogleToken() {
   return data.access_token;
 }
 
-// ── Vertex text embeddings (batched) ──────────────────────────────────────────
+// ── Text embeddings (batched) — AI Studio key path OR Vertex SA path ──────────
 async function embedBatch(token, texts) {
+  if (USE_API_KEY) {
+    // AI Studio (generativelanguage) batchEmbedContents — one simple key.
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBED_MODEL}:batchEmbedContents?key=${GEMINI_API_KEY}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        requests: texts.map((text) => ({
+          model: `models/${EMBED_MODEL}`,
+          content: { parts: [{ text }] },
+          taskType: "RETRIEVAL_DOCUMENT",
+          outputDimensionality: EMBED_DIM,
+        })),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(`embed failed (${res.status}): ${JSON.stringify(data).slice(0, 300)}`);
+    return data.embeddings.map((e) => e.values);
+  }
+  // Vertex predict (service-account bearer token).
   const url =
     `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${GEMINI_PROJECT_ID}` +
     `/locations/${EMBED_REGION}/publishers/google/models/${EMBED_MODEL}:predict`;
@@ -132,7 +156,8 @@ async function upsertChunks(rows) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  const token = await getGoogleToken();
+  // Only the Vertex SA path needs a Google token; the API-key path doesn't.
+  const token = USE_API_KEY ? null : await getGoogleToken();
   const src = await fetchSourceRows();
   console.log(`[backfill] ${src.length} blueprint chunks to embed`);
 
