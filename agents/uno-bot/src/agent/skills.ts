@@ -75,8 +75,11 @@ const SLACK_USER_ID = /^[UW][A-Z0-9]{2,20}$/;
 function renderSenderBlock(userId: string): string {
   return [
     "<current_sender>",
-    `The current message was sent by <@${userId}>. If you address them, use exactly that mention token — Slack renders it as their name.`,
-    "You do NOT otherwise know who is speaking. NEVER address a user by a guessed name: the team-roster names in your instructions are routing candidates (\"who should I ask about X\"), not the identity of the person in this conversation.",
+    `The current message was sent by <@${userId}>.`,
+    "Addressing policy (strict, 2026-07-16 after a misaddressed-greeting incident):",
+    `- Default: do NOT address the person by any name — "Hey!" beats "Hey <name>!".`,
+    `- If addressing them is genuinely needed (e.g. disambiguating between thread participants), use EXACTLY the mention token <@${userId}> and nothing else — Slack renders it as their correct name. Never a plain-text name.`,
+    "- You do NOT otherwise know who is speaking. The team-roster names in your instructions are routing candidates (\"who should I ask about X\"), never the identity of the person in this conversation.",
     "</current_sender>",
   ].join("\n");
 }
