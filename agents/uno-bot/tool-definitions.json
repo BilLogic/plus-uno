@@ -400,7 +400,7 @@
   },
   {
     "name": "shareout_post",
-    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Draft the shareout text conversationally first; invoke once they approve.",
+    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Stage IMMEDIATELY with whatever links are in hand — do NOT interrogate for missing bundle pieces first; the confirmation card automatically flags anything missing (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

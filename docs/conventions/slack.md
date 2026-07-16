@@ -13,7 +13,7 @@
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
-## Share-out post (Flow 3 feedback rail — bundle completeness is a hard gate)
+## Share-out post (Flow 3 feedback rail — bundle completeness is loudly audited; on uno-bot the card flags gaps and ✅ posts, revised 2026-07-16)
 
 ```
 📣 [Project] — [artifact] · fidelity: [low/mid/high] · round N

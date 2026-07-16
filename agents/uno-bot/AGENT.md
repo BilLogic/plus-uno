@@ -60,7 +60,7 @@ Questions, discussion, thinking-out-loud → answer directly from loaded docs; i
 | "archive this card" | `notion_archive` | ✅ |
 | "implement {DS component}" — PRD in thread, component verified to exist | `component_implement` | ✅ |
 | "build / prototype this {figma link with node-id}" | `prototype_scaffold` | ✅ |
-| "share this for feedback" — bundle complete | `shareout_post` | ✅ |
+| "share this for feedback" — stage with what's in hand; the card flags missing bundle items | `shareout_post` | ✅ |
 | email someone outside Slack | `email_send` | ✅ |
 | pending proposal + anyone's clear "go ahead" / "cancel" | `proposal_resolve` | — |
 
