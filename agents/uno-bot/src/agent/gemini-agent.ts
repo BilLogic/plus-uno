@@ -133,24 +133,40 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // predates thinkingLevel, so a cheaper fast-lane model would need different
   // dials — one model keeps this simple and cache-friendly).
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
-  const model = env.GEMINI_MODEL ?? "gemini-3.5-flash";
-  // flash-lite is the minimal-thinking tier — it doesn't take the higher
-  // thinking_level dials the full flash/pro models do.
-  const isLite = model.includes("flash-lite");
-  const thinkingLevel = isLite || tier === "haiku" ? "minimal" : "high";
-  // thinking_level is a Gemini 3.x dial — 2.5-gen models 400 on it ("not
-  // supported by this model", probed live 2026-07-16 during the quota incident
-  // when GEMINI_MODEL was temporarily pointed at gemini-2.5-pro). Older models
-  // just use their default dynamic thinking budget.
-  const isGemini3 = /^gemini-3/.test(model);
-  const supportsThinkingLevel = isGemini3;
-  // Gemini 2.x REJECTS mixing local function declarations with built-in search
-  // tools: "Multiple tools are supported only when they are all search tools"
-  // (400, probed live 2026-07-16 — this is what broke every turn on the
-  // 2.5-pro bridge). Gemini 3.x allows the mix. The bot's LOCAL tools are
-  // load-bearing (all grounding runs through them); googleSearch/urlContext are
-  // a nice-to-have, so on 2.x we keep the function tools and drop the built-ins.
-  const builtinSearchTools = isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [];
+
+  // All model-generation-specific dials, derived together so a mid-turn model
+  // fallback (below) recomputes them consistently:
+  //   • thinkingLevel — flash-lite is the minimal-thinking tier; it doesn't
+  //     take the higher thinking_level dials the full flash/pro models do.
+  //   • supportsThinkingLevel — thinking_level is a Gemini 3.x dial; 2.5-gen
+  //     models 400 on it ("not supported by this model", probed live 2026-07-16
+  //     during the quota incident on the gemini-2.5-pro bridge).
+  //   • builtinSearchTools — Gemini 2.x REJECTS mixing local function
+  //     declarations with built-in search tools ("Multiple tools are supported
+  //     only when they are all search tools", 400, probed live 2026-07-16).
+  //     The bot's LOCAL tools are load-bearing (all grounding runs through
+  //     them); googleSearch/urlContext are a nice-to-have, so on 2.x we keep
+  //     the function tools and drop the built-ins.
+  const modelDials = (m: string) => {
+    const isGemini3 = /^gemini-3/.test(m);
+    return {
+      thinkingLevel: (m.includes("flash-lite") || tier === "haiku" ? "minimal" : "high") as string,
+      supportsThinkingLevel: isGemini3,
+      builtinSearchTools: isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [],
+    };
+  };
+  let model = env.GEMINI_MODEL ?? "gemini-3.5-flash";
+  let { thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model);
+
+  // Backup-model failover (2026-07-16 quota incident — flash quota exhausted,
+  // every turn 429'd, bot down in Slack for an afternoon). When the active
+  // model fails with a capacity/availability status, the turn switches to
+  // GEMINI_FALLBACK_MODEL once and continues there — degraded (pricier/slower)
+  // beats down. If the backup also fails, the error propagates and the
+  // capacity alerting in slack/delivery.ts takes over as before.
+  const FALLBACK_STATUSES = new Set([404, 429, 500, 503]);
+  const fallbackModel = env.GEMINI_FALLBACK_MODEL ?? "gemini-2.5-pro";
+  let fellBack = false;
 
   const startedAt = Date.now();
   let inputTokens = 0;
@@ -171,6 +187,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
+        `fallback=${fellBack ? "yes" : "no"} ` +
         `iterations=${iterations} tokens_in=${inputTokens} tokens_out=${outputTokens} thinking=${thinkingTokens} ` +
         `ms=${Date.now() - startedAt} tools=[${toolNamesUsed.join(",")}] mcp=off outcome=${result.kind}`,
     );
@@ -212,6 +229,19 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     const { status, data } = await geminiGenerateRaw(env, model, body);
     const parsed = data as GeminiResponseData;
     if (status !== 200) {
+      // One-shot failover to the backup model on capacity/availability
+      // failures — mid-turn is fine, the conversation contents are
+      // model-agnostic. Dials recompute for the new model's generation.
+      if (!fellBack && FALLBACK_STATUSES.has(status) && fallbackModel && fallbackModel !== model) {
+        fellBack = true;
+        console.warn(
+          `[gemini] ${model} failed (${status}: ${parsed.error?.message ?? "?"}) — ` +
+            `falling back to ${fallbackModel} for the rest of this turn`,
+        );
+        model = fallbackModel;
+        ({ thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model));
+        return callGemini(disableTools);
+      }
       throw new Error(`Gemini ${status}: ${parsed.error?.message ?? "generateContent failed"}`.slice(0, 400));
     }
     iterations++;

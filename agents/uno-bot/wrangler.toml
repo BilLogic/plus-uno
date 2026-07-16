@@ -126,14 +126,15 @@ GEMINI_REGION = "global"
 # Active Gemini model. A/B trial verdict (2026-07-10): gemini-3.1-flash-lite
 # fabricated grounding on multi-source answers — disqualifying for a
 # grounding-first bot. gemini-3.5-flash is the intended default.
-#
-# ⚠️ TEMPORARY (2026-07-16 quota incident): the project's Vertex quota for BOTH
-# flash models (3.5-flash and 2.5-flash) is exhausted — every turn 429'd, bot
-# down in Slack. gemini-2.5-pro probed healthy (HTTP 200) and serves as the
-# bridge. It costs more per token — REVERT to "gemini-3.5-flash" once the flash
-# quota resets (daily reset ~midnight Pacific) or a quota increase is approved
-# (GCP Console → IAM & Admin → Quotas → filter "Vertex AI" + "gemini").
-GEMINI_MODEL = "gemini-2.5-pro"
+# (2026-07-16 quota incident: flash quota exhausted → bridged on gemini-2.5-pro
+# for the afternoon; reverted same day once flash had headroom again. The
+# lesson is now code: GEMINI_FALLBACK_MODEL below fails over automatically.)
+GEMINI_MODEL = "gemini-3.5-flash"
+# Backup model — a turn that hits a capacity/availability error (404/429/500/
+# 503) on GEMINI_MODEL retries once on this model and finishes there, instead
+# of dying like the 2026-07-16 outage. Pick one with a SEPARATE quota pool from
+# the active model (pro vs flash); degraded-but-answering beats down.
+GEMINI_FALLBACK_MODEL = "gemini-2.5-pro"
 # Vertex-Claude sonnet-lane model id (only read when MODEL_PROVIDER=vertex-claude;
 # haiku/opus tiers are fixed in src/agent/routing.ts). Optional — defaults to
 # "claude-sonnet-5".

@@ -113,6 +113,11 @@ export interface Env {
   GEMINI_SA_EMAIL?: string;
   GEMINI_SA_PRIVATE_KEY?: string;
   GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
+  // Backup model for the one-shot mid-turn failover when the active model
+  // returns a capacity/availability error (404/429/500/503) — see
+  // agent/gemini-agent.ts. Default "gemini-2.5-pro" (separate quota pool from
+  // the flash models, probed healthy during the 2026-07-16 quota incident).
+  GEMINI_FALLBACK_MODEL?: string;
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.5-flash"
   // Vertex-Claude model id for the sonnet lane (haiku/opus are fixed in
