@@ -38,8 +38,17 @@ interface GenerateContentResponse {
 }
 
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
+  // SA FIRST (flipped 2026-07-16, live incident): the service account carries
+  // the GCP project's real Vertex quota and matches the credential used
+  // everywhere else (Claude lane, embeddings, backfill). An AI-Studio
+  // GEMINI_API_KEY used to take precedence — free-tier keys have small daily
+  // caps, and when one is set on the Worker it starved EVERY turn with 429s
+  // (bot down in Slack + the whole eval run). API key remains the fallback for
+  // deployments without an SA.
+  if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
+    return "service-account";
+  }
   if (env.GEMINI_API_KEY) return "api-key";
-  if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY) return "service-account";
   return null;
 }
 
