@@ -142,7 +142,15 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // supported by this model", probed live 2026-07-16 during the quota incident
   // when GEMINI_MODEL was temporarily pointed at gemini-2.5-pro). Older models
   // just use their default dynamic thinking budget.
-  const supportsThinkingLevel = /^gemini-3/.test(model);
+  const isGemini3 = /^gemini-3/.test(model);
+  const supportsThinkingLevel = isGemini3;
+  // Gemini 2.x REJECTS mixing local function declarations with built-in search
+  // tools: "Multiple tools are supported only when they are all search tools"
+  // (400, probed live 2026-07-16 — this is what broke every turn on the
+  // 2.5-pro bridge). Gemini 3.x allows the mix. The bot's LOCAL tools are
+  // load-bearing (all grounding runs through them); googleSearch/urlContext are
+  // a nice-to-have, so on 2.x we keep the function tools and drop the built-ins.
+  const builtinSearchTools = isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [];
 
   const startedAt = Date.now();
   let inputTokens = 0;
@@ -188,13 +196,11 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     const body: Record<string, unknown> = {
       contents,
       systemInstruction: { parts: [{ text: systemText }] },
-      // Built-in tools run on Google's infra (zero Worker subrequests) and mix
-      // with function declarations on Gemini 3:
-      //   googleSearch — web grounding (the web_search replacement here;
-      //     user directive 2026-07-10: "we definitely must incorporate").
-      //   urlContext  — server-side URL fetching, complements source_read
-      //     for public web links at zero subrequest cost.
-      tools: [{ functionDeclarations }, { googleSearch: {} }, { urlContext: {} }],
+      // Built-in tools (googleSearch web grounding + urlContext server-side URL
+      // fetch) run on Google's infra at zero Worker subrequests and mix with
+      // function declarations ONLY on Gemini 3 — see builtinSearchTools above;
+      // on 2.x they're dropped so the request doesn't 400.
+      tools: [{ functionDeclarations }, ...builtinSearchTools],
       ...(disableTools
         ? { toolConfig: { functionCallingConfig: { mode: "NONE" } } }
         : {}),
