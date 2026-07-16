@@ -102,10 +102,17 @@ function parseSlackToken(json: Record<string, unknown>): StoredToken {
       : typeof json.expires_in === "number"
         ? json.expires_in
         : undefined;
+  // Who consented — keys the per-user token slot (ADR-020: requester-scoped
+  // visibility). Shape-validated before it can become part of a KV key.
+  const identity =
+    typeof authedUser.id === "string" && /^[UW][A-Z0-9]{2,20}$/.test(authedUser.id)
+      ? authedUser.id
+      : undefined;
   return {
     access_token: access,
     refresh_token: refresh,
     expires_at: expiresIn ? Date.now() + expiresIn * 1000 : undefined,
+    identity,
   };
 }
 
@@ -152,4 +159,23 @@ export async function handleSlackOAuthCallback(request: Request, env: Env): Prom
 export async function getSlackAccessToken(env: Env): Promise<string | null> {
   if (!slackOAuthConfigured(env)) return null;
   return getAccessToken(config(env));
+}
+
+/**
+ * Requester-scoped credential (ADR-020): the requester's OWN token when they
+ * have consented at /oauth/slack/start (own=true — carries exactly their Slack
+ * visibility, DMs included), else the legacy workspace token (own=false — the
+ * caller must keep the hard visibility firewall). Null when nothing is stored.
+ */
+export async function getSlackAccessTokenFor(
+  env: Env,
+  userId?: string,
+): Promise<{ token: string; own: boolean } | null> {
+  if (!slackOAuthConfigured(env)) return null;
+  if (userId && /^[UW][A-Z0-9]{2,20}$/.test(userId)) {
+    const own = await getAccessToken(config(env), userId);
+    if (own) return { token: own, own: true };
+  }
+  const legacy = await getAccessToken(config(env));
+  return legacy ? { token: legacy, own: false } : null;
 }

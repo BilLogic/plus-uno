@@ -193,7 +193,7 @@
   },
   {
     "name": "slack_search",
-    "description": "Search Slack workspace messages. Results are PRE-CLEARED for sharing: public channels plus the team-designated private channels only — DMs and other private spaces are filtered out before you see them, so everything returned is safe to quote in your reply. The response includes withheld_private_matches (a count of hits that existed in non-shareable spaces); if it's >0 and relevant, you may say matches exist in private spaces you can't surface — never speculate about their content. Use for 'find the discussion about X', sign-off tallies across channels, locating past decisions. READ-ONLY, ungated.",
+    "description": "READ-ONLY. Search Slack messages. Results arrive PRE-CLEARED by a Worker-side visibility firewall — safe to quote as returned. Two modes (see result.visibility): 'workspace-filtered' (public + team-allowlisted private channels only; DMs never included) and 'requester-own' (active only when the requester has connected their Slack history AND is asking in their own DM with you — results then include their DMs, group DMs, and private channels, i.e. exactly what they can already see). Requester-own results answer that requester in that DM only — never repeat DM-derived content anywhere else. If the result carries a `note` with a connect link, offer it when the requester wanted DM coverage.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

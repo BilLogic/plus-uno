@@ -252,7 +252,7 @@ export async function executeReadOnlyTool(
   if (name === "source_read") return executeReadSource(env, input);
   if (name === "github_read") return executeGithubRead(env, input);
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
-  if (name === "slack_search") return executeSlackSearch(env, input);
+  if (name === "slack_search") return executeSlackSearch(env, input, slack);
   if (name === "slack_react") return executeSlackReact(env, input, slack);
   if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
   if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
