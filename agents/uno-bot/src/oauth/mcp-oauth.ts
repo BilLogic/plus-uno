@@ -62,6 +62,10 @@ export interface ProviderConfig {
   parseTokenResponse?: (json: Record<string, unknown>) => StoredToken;
   /** Text shown on the success page after callback. */
   successMessage?: string;
+  /** Optional async post-exchange hook (e.g. resolve the token owner via the
+   *  provider's whoami endpoint when the token response omits it). Runs before
+   *  storage; a throw fails the callback visibly. */
+  enrichToken?: (token: StoredToken) => Promise<StoredToken>;
 }
 
 // ─── KV key helpers (namespaced per provider; each provider also has its own KV
@@ -233,12 +237,13 @@ export async function handleOAuthCallback(cfg: ProviderConfig, request: Request)
 
   try {
     const client = await getClient(cfg);
-    const token = await tokenRequest(cfg, client, {
+    let token = await tokenRequest(cfg, client, {
       grant_type: "authorization_code",
       code,
       redirect_uri: cfg.redirectUri,
       code_verifier: verifier,
     });
+    if (cfg.enrichToken) token = await cfg.enrichToken(token);
     if (token.identity) {
       // Per-identity slot: this user's reads run with their own visibility.
       await cfg.kv.put(tokenKeyFor(cfg, token.identity), JSON.stringify(token));

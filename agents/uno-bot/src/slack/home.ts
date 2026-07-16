@@ -111,13 +111,13 @@ function buildHomeView(env: Env) {
     blocks: [
       ...HOME_VIEW.blocks,
       { type: "divider" },
-      { type: "section", text: { type: "mrkdwn", text: "*Search your own Slack — optional*" } },
+      { type: "section", text: { type: "mrkdwn", text: "*Let me search your side of Slack — optional*" } },
       {
         type: "section",
         text: {
           type: "mrkdwn",
           text:
-            "Connect your Slack history and my searches *for you* cover everything you can see — your DMs, group chats, and private channels. Those results only ever appear in your own DM with me, and only for you. Disconnect anytime from Slack's app settings.",
+            "Link your Slack and I can pull answers from your own DMs, group chats, and private channels — the conversations only you can see. Whatever I find stays in your DM with me; nobody else ever sees it. Unlink anytime in Slack's app settings.",
         },
       },
       {
@@ -125,7 +125,7 @@ function buildHomeView(env: Env) {
         elements: [
           {
             type: "button",
-            text: { type: "plain_text", text: "🔗 Connect your Slack history", emoji: true },
+            text: { type: "plain_text", text: "🔗 Link your Slack", emoji: true },
             url,
           },
         ],

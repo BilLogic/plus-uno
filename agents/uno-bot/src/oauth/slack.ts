@@ -130,7 +130,28 @@ function config(env: Env): ProviderConfig {
     redirectUri: env.SLACK_OAUTH_REDIRECT_URI!,
     kv: env.SLACK_OAUTH_KV!,
     parseTokenResponse: parseSlackToken,
-    successMessage: "✅ uno-bot connected to Slack (hosted MCP). You can close this tab.",
+    // The oauth.v2.user.access response omits authed_user.id in practice
+    // (observed live 2026-07-16: Bill's consent produced an identity-less
+    // token), so resolve the owner authoritatively via auth.test — the
+    // identity keys the per-user slot (ADR-020).
+    enrichToken: async (token) => {
+      if (token.identity) return token;
+      try {
+        const res = await fetch("https://slack.com/api/auth.test", {
+          method: "POST",
+          headers: { authorization: `Bearer ${token.access_token}` },
+        });
+        const data = (await res.json()) as { ok?: boolean; user_id?: string };
+        if (data.ok && typeof data.user_id === "string" && /^[UW][A-Z0-9]{2,20}$/.test(data.user_id)) {
+          token.identity = data.user_id;
+        }
+      } catch {
+        // best-effort: an identity-less token still lands in the legacy slot
+      }
+      return token;
+    },
+    successMessage:
+      "✅ Slack linked. Searches you ask for in your DM with uno-bot now cover everything you can see. You can close this tab.",
   };
 }
 

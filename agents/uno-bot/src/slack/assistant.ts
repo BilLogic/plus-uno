@@ -116,9 +116,10 @@ const WELCOME =
 // consent link. Shown only here (panel open) — not per message, never naggy.
 function connectNudge(url: string): string {
   return (
-    `\n\n:link: *Optional:* <${url}|connect your Slack history> (10 seconds) and my searches for you ` +
-    "will cover everything *you* can see — your DMs, group chats, and private channels. " +
-    "Those results only ever appear here in our DM, and only for you."
+    `\n\nPS — I can also search *your* side of Slack: your DMs, group chats, and private channels, ` +
+    `for asks like _"what did Cindy and I decide about the quota?"_ ` +
+    `<${url}|Link your Slack> — takes 10 seconds, totally optional. ` +
+    "Whatever I find there stays here between us."
   );
 }
 
