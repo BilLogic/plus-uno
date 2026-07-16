@@ -122,9 +122,10 @@ export interface Env {
   // Phase 1 ships the credential layer + /debug/gemini smoke test only; the
   // agent loop stays on Anthropic until the phase-2 adapter PR.
   MODEL_PROVIDER?: string;
-  // Auth mode auto-selected by which credential exists (see gemini/client.ts):
-  // GEMINI_API_KEY (secret, Developer API — simplest) OR the service-account
-  // pair (secrets, Vertex AI): GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY.
+  // Auth mode auto-selected by which credential exists (see gemini/client.ts).
+  // RULE (2026-07-16): the Vertex service-account pair (GEMINI_SA_EMAIL +
+  // GEMINI_SA_PRIVATE_KEY) is canonical and takes precedence. GEMINI_API_KEY
+  // (AI Studio) is a local-dev fallback only — never set it on the Worker.
   GEMINI_API_KEY?: string;
   GEMINI_SA_EMAIL?: string;
   GEMINI_SA_PRIVATE_KEY?: string;

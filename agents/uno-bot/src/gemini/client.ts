@@ -1,11 +1,16 @@
 // Minimal Gemini client for the provider adapter (phase 1, 2026-07-10).
 //
 // Supports BOTH access paths, auto-selected by which credential is present:
-//   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
-//                                 googleapis.com) — plain key header. The path
-//                                 Google recommends; simplest on Workers.
 //   • GEMINI_SA_* service acct  → Vertex AI (aiplatform.googleapis.com) with
-//                                 an OAuth token minted in ./auth.ts.
+//                                 an OAuth token minted in ./auth.ts. THE
+//                                 CANONICAL PATH — always wins when configured
+//                                 (rule set 2026-07-16 after the Vertex-vs-AI-
+//                                 Studio key mixup; docs/knowledge/decisions.md
+//                                 ADR-018).
+//   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
+//                                 googleapis.com) — plain key header. Emergency
+//                                 fallback only; do NOT set this secret on the
+//                                 deployed Worker.
 //
 // Phase 1 scope: non-streaming generateContent with a system prompt and plain
 // text — enough for the /debug/gemini smoke test and the delegate-subagent
@@ -38,8 +43,16 @@ interface GenerateContentResponse {
 }
 
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
-  if (env.GEMINI_API_KEY) return "api-key";
+  // Vertex (service account) is the canonical path and always takes precedence;
+  // an AI Studio key only ever applies when the SA pair is absent.
   if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY) return "service-account";
+  if (env.GEMINI_API_KEY) {
+    // Loud on purpose: the SA pair going missing (rotation, rename, typo)
+    // silently shifting traffic to a different auth/billing boundary is the
+    // failure mode the 2026-07-16 rule exists to catch.
+    console.warn("[gemini] Vertex SA pair not set — falling back to the AI Studio key (emergency path)");
+    return "api-key";
+  }
   return null;
 }
 

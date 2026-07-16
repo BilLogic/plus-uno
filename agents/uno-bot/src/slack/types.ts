@@ -25,6 +25,48 @@ export interface SlackMessageEvent {
   files?: SlackEventFile[];
 }
 
+/** The surface the user has open in the workspace while chatting in the assistant
+ *  panel — delivered on assistant_thread_started and every context change. All
+ *  fields optional: the user may have no channel focused. */
+export interface AssistantContext {
+  channel_id?: string;
+  team_id?: string;
+  enterprise_id?: string;
+}
+
+/** Shared payload for the two assistant-panel lifecycle events (identical wire
+ *  shape; only the `type` literal differs). `started` fires when a user opens
+ *  the app's assistant panel — the place to greet + set suggested prompts;
+ *  `context_changed` fires when they switch what they're viewing with the
+ *  panel open. `context` is what they currently have open. */
+interface SlackAssistantThreadEventBase {
+  assistant_thread: {
+    user_id: string;
+    channel_id: string;
+    thread_ts: string;
+    context?: AssistantContext;
+  };
+  event_ts: string;
+}
+
+export interface SlackAssistantThreadStartedEvent extends SlackAssistantThreadEventBase {
+  type: "assistant_thread_started";
+}
+
+export interface SlackAssistantThreadContextChangedEvent extends SlackAssistantThreadEventBase {
+  type: "assistant_thread_context_changed";
+}
+
+/** Fires when a user opens the app's App Home. `tab` distinguishes the Home tab
+ *  (publish the landing view) from the Messages tab (ignore). */
+export interface SlackAppHomeOpenedEvent {
+  type: "app_home_opened";
+  user: string;
+  channel: string;
+  tab?: "home" | "messages";
+  event_ts: string;
+}
+
 export interface SlackAppMentionEvent {
   type: "app_mention";
   channel: string;
@@ -47,6 +89,9 @@ export type SlackInnerEvent =
   | SlackMessageEvent
   | SlackAppMentionEvent
   | SlackReactionAddedEvent
+  | SlackAssistantThreadStartedEvent
+  | SlackAssistantThreadContextChangedEvent
+  | SlackAppHomeOpenedEvent
   | { type: string };
 
 export interface SlackEventCallback {

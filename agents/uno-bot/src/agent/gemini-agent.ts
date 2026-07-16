@@ -126,7 +126,7 @@ function textOf(parts: GeminiPart[]): string {
 // ── The loop ─────────────────────────────────────────────────────────────────
 
 export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
-  const { env, userText, history, currentSender, pending, images, slack } = input;
+  const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
 
   // Same three lanes as the Anthropic path; Gemini expresses the lane through
   // thinkingLevel on ONE model rather than a model swap (the 2.5-lite tier
@@ -171,7 +171,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   const pendingForSystem = pending
     ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
     : null;
-  const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender);
+  const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
   const systemText = (systemBlocks as Array<{ text?: string }>)
     .map((b) => b.text ?? "")
     .join("\n\n");

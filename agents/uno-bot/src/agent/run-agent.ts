@@ -49,7 +49,7 @@ import { BUILD } from "../version";
 export type { HistoryTurn, AgentInput, AgentResult, AgentImage } from "./loop-shared";
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
-  const { env, userText, history, currentSender, pending, images, slack } = input;
+  const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
 
   // Provider switch (phase 2): MODEL_PROVIDER="gemini" routes the whole turn
   // through the Gemini loop (agent/gemini-agent.ts) — same AgentResult contract,
@@ -314,7 +314,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const pendingForSystem = pending
     ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
     : null;
-  const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender);
+  const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
 
   const messages = buildMessages(history, userText, images);
 

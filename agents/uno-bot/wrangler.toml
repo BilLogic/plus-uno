@@ -165,8 +165,10 @@ GEMINI_MODEL = "gemini-3.5-flash"
 #   GEMINI_SA_EMAIL       (Gemini/Vertex service-account client_email)
 #   GEMINI_SA_PRIVATE_KEY (Gemini/Vertex service-account private_key — the full
 #                          "-----BEGIN PRIVATE KEY-----…" PEM string)
-#   GEMINI_API_KEY        (optional alternative: AI Studio API key — if set it
-#                          takes precedence over the service-account pair)
+#   GEMINI_API_KEY        (AI Studio key — DO NOT SET on the Worker. RULE
+#                          2026-07-16: Vertex SA is the only production path
+#                          and takes precedence in code; the AI Studio key is
+#                          a local-dev emergency fallback only)
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.
 [[durable_objects.bindings]]

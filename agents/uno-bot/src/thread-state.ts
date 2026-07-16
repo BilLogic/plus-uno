@@ -2,6 +2,7 @@
 //   (a) conversation history per Slack thread
 //   (b) pending tool-call proposals awaiting ✅ confirmation
 //   (c) processed Slack event_id dedup (defeats Slack retry double-delivery)
+//   (d) latest assistant-panel context per thread (what surface the user has open)
 //
 // Single instance per workspace (selected via env.THREAD_STATE.idFromName("uno-bot")).
 // Routes inside fetch():
@@ -10,9 +11,12 @@
 //   POST   /proposals  body { ts, payload }                     -> { ok: true }
 //   GET    /proposals?ts=…                                      -> payload | 404
 //   DELETE /proposals?ts=…                                      -> { ok: true }
+//   POST   /assistant-context body { channel, thread, context } -> { ok: true }
+//   GET    /assistant-context?channel=…&thread=…                -> { ok, context }
 //   POST   /events/check-and-record body { event_id }           -> { ok: true, seen: boolean }
 //
-// Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `event:{event_id}`.
+// Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `event:{event_id}`,
+// `actx:{channel}:{thread}`.
 
 import type { Env } from "./types";
 
@@ -29,6 +33,14 @@ interface HistoryRecord {
 interface ProposalRecord {
   payload: unknown;
   createdAt: number;
+}
+
+// Latest assistant-panel context (what surface the user has open) per thread.
+// Written on assistant_thread_started / _context_changed, read by the next
+// message. Stored opaque (the Slack AssistantContext shape) — the client types it.
+interface AssistantContextRecord {
+  context: unknown;
+  updatedAt: number;
 }
 
 interface EventRecord {
@@ -98,6 +110,11 @@ export class ThreadState implements DurableObject {
       if (now - rec.createdAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
       else remaining++;
     }
+    const actx = await this.storage.list<AssistantContextRecord>({ prefix: "actx:" });
+    for (const [key, rec] of actx) {
+      if (now - rec.updatedAt > HISTORY_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
 
     if (remaining > 0) await this.storage.setAlarm(now + GC_INTERVAL_MS);
   }
@@ -114,6 +131,8 @@ export class ThreadState implements DurableObject {
       if (path === "/proposals" && method === "GET")  return this.getProposal(url);
       if (path === "/proposals" && method === "DELETE") return this.deleteProposal(url);
       if (path === "/proposals/by-thread" && method === "GET") return this.getProposalByThread(url);
+      if (path === "/assistant-context" && method === "POST") return this.putAssistantContext(request);
+      if (path === "/assistant-context" && method === "GET")  return this.getAssistantContext(url);
       if (path === "/events/check-and-record" && method === "POST") return this.checkAndRecordEvent(request);
     } catch (err) {
       console.error(`[thread-state] ${method} ${path} failed:`, err);
@@ -212,6 +231,33 @@ export class ThreadState implements DurableObject {
     return json({ ok: true, payload: best.payload, createdAt: best.createdAt });
   }
 
+  // ----- assistant context -----
+
+  private async putAssistantContext(request: Request): Promise<Response> {
+    const body = await request.json<{ channel: string; thread: string; context: unknown }>();
+    if (!body?.channel || !body?.thread) return json({ ok: false, error: "missing channel/thread" }, 400);
+    await this.storage.put<AssistantContextRecord>(assistantContextKey(body.channel, body.thread), {
+      context: body.context ?? {},
+      updatedAt: Date.now(),
+    });
+    await this.ensureGcAlarm();
+    return json({ ok: true });
+  }
+
+  private async getAssistantContext(url: URL): Promise<Response> {
+    const channel = url.searchParams.get("channel");
+    const thread = url.searchParams.get("thread");
+    if (!channel || !thread) return json({ ok: false, error: "missing channel/thread" }, 400);
+    const key = assistantContextKey(channel, thread);
+    const rec = await this.storage.get<AssistantContextRecord>(key);
+    if (!rec) return json({ ok: true, context: null });
+    if (Date.now() - rec.updatedAt > HISTORY_TTL_MS) {
+      await this.storage.delete(key);
+      return json({ ok: true, context: null });
+    }
+    return json({ ok: true, context: rec.context });
+  }
+
   // ----- event dedup -----
 
   // Slack retries event delivery on timeout or non-200, so the same event_id
@@ -270,6 +316,10 @@ function proposalKey(ts: string): string {
 
 function eventKey(eventId: string): string {
   return `event:${eventId}`;
+}
+
+function assistantContextKey(channel: string, thread: string): string {
+  return `actx:${channel}:${thread}`;
 }
 
 function json(body: unknown, status = 200): Response {

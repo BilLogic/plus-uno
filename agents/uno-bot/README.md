@@ -24,7 +24,7 @@ So **pushing guidance to `main` reprograms the bot within ~5 minutes** (KV-cache
 | Model | `sonnet` for every real ask (adaptive thinking); "think hard" → `opus`; proposal confirm/cancel → `haiku` | `GEMINI_MODEL` (`gemini-3.5-flash`) via `src/agent/gemini-agent.ts` |
 | Extra tools | server-side `web_search`, `advisor` (opus consult), `delegate` (≤3 parallel haiku subagents) | none — local tools only |
 | Hosted MCP reads (Notion / Supabase / GitHub / Slack) | attached | **not available** |
-| Auth | `ANTHROPIC_API_KEY` | `GEMINI_API_KEY` (AI Studio) **or** `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` (Vertex) |
+| Auth | `ANTHROPIC_API_KEY` | `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` (Vertex — canonical) **or** `GEMINI_API_KEY` (AI Studio, local-dev fallback only) |
 
 Both lanes share the same local tool roster, gate protocol, iteration cap (16) and output-token cap (16384). Smoke-test the Gemini path with `GET /debug/gemini`, MCP health with `GET /debug/mcp`.
 
@@ -93,7 +93,7 @@ curl http://localhost:8787/health
 | `SLACK_BOT_TOKEN` | `xoxb-…` for `chat.postMessage`, `reactions.add`, `conversations.replies` |
 | `SLACK_MCP_CLIENT_SECRET` | Secret for the static Slack MCP OAuth client |
 | `ANTHROPIC_API_KEY` | Anthropic lane auth |
-| `GEMINI_API_KEY` *or* `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Gemini lane auth (API key wins if both set) |
+| `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` *or* `GEMINI_API_KEY` | Gemini lane auth (Vertex SA is canonical and wins if both set — rule 2026-07-16; never set the AI Studio key on the Worker) |
 | `GITHUB_TOKEN` | PAT for `repository_dispatch` + GitHub MCP reads |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive`) |
 | `FIGMA_ACCESS_TOKEN` | Figma read token — the `prototype_scaffold` proposal screenshot |

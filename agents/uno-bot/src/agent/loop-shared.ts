@@ -46,6 +46,10 @@ export interface AgentInput {
   pending: PendingProposal | null;
   /** Vision input for the current turn only. History turns stay plain text. */
   images?: AgentImage[];
+  /** Pre-rendered one-line description of what the user has open in the
+   *  assistant panel (e.g. "channel <#C123>"), when chatting from the panel.
+   *  Injected as an advisory system block. Absent for channel/@mention turns. */
+  assistantContext?: string;
   /** Called with short, FILTERED progress lines (the model's between-tool
    *  narration, capped + capped-count) so the Worker can post them as separate
    *  interim messages. Never receives the full working monologue. */

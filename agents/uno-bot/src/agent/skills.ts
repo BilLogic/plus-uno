@@ -39,6 +39,7 @@ export async function buildSystemBlocks(
   env: Env,
   pending: PendingContext | null,
   sender: SenderContext | null,
+  assistantContext?: string | null,
 ): Promise<SystemBlock[]> {
   const stable = getStableSystem(env);
   // 1h cache TTL on the stable block: design-team traffic gaps blow the 5-min
@@ -47,10 +48,28 @@ export async function buildSystemBlocks(
   const blocks: SystemBlock[] = [
     { type: "text", text: stable, cache_control: { type: "ephemeral", ttl: "1h" } },
   ];
+  // Per-request, uncached (varies per thread): what the user has open in the
+  // assistant panel. Kept AFTER the cached stable block so the cache prefix is
+  // stable. Advisory only — the prompt tells the model not to over-index on it.
+  if (assistantContext) {
+    blocks.push({ type: "text", text: renderAssistantContextBlock(assistantContext) });
+  }
   if (pending) {
     blocks.push({ type: "text", text: renderPendingBlock(pending, sender) });
   }
   return blocks;
+}
+
+function renderAssistantContextBlock(ctx: string): string {
+  return [
+    "<assistant_panel_context>",
+    `The user is chatting from the assistant panel and currently has this open: ${ctx}.`,
+    // Deictic examples must map to real tool lanes: "who's in here" →
+    // slack_channel_members, "this channel" → disambiguation only. "What's
+    // happening here" was cut — no tool reads a channel's recent history yet.
+    'Use this ONLY to disambiguate a vague, deictic ask ("this channel", "who\'s in here") — never assume it is the subject of a specific question. When in doubt, answer the words, not the panel.',
+    "</assistant_panel_context>",
+  ].join("\n");
 }
 
 function renderPendingBlock(p: PendingContext, sender: SenderContext | null): string {

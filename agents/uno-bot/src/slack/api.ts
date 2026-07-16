@@ -35,7 +35,9 @@ async function parseSlackResponse<T extends SlackResponse>(res: Response, method
   return data;
 }
 
-async function slackCall<T extends SlackResponse>(
+// Exported: assistant.ts / home.ts reuse this rather than hand-rolling their
+// own POST wrapper — api.ts stays the single Slack egress point.
+export async function slackCall<T extends SlackResponse>(
   env: Env,
   method: string,
   payload: Record<string, unknown>,

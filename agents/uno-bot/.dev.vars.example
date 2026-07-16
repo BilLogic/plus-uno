@@ -20,11 +20,13 @@ SLACK_MCP_CLIENT_SECRET=
 # console.anthropic.com -> API Keys (used when MODEL_PROVIDER = "anthropic")
 ANTHROPIC_API_KEY=
 
-# Gemini path (used when MODEL_PROVIDER = "gemini"): EITHER an AI Studio key…
-GEMINI_API_KEY=
-# …OR a Vertex service-account pair (API key takes precedence if both set).
+# Gemini path (used when MODEL_PROVIDER = "gemini").
+# RULE (2026-07-16): Vertex service-account is the canonical credential and
+# takes precedence whenever set. Leave GEMINI_API_KEY (AI Studio) empty —
+# it exists only as a local-dev emergency fallback, never on the Worker.
 GEMINI_SA_EMAIL=
 GEMINI_SA_PRIVATE_KEY=
+GEMINI_API_KEY=
 
 # --- GitHub ---
 # github.com/settings/tokens -> Generate new (classic) with `repo` scope, OR

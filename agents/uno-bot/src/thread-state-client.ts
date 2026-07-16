@@ -3,6 +3,7 @@
 
 import type { Env } from "./types";
 import type { HistoryTurn } from "./thread-state";
+import type { AssistantContext } from "./slack/types";
 
 export type { HistoryTurn };
 
@@ -75,6 +76,47 @@ export async function recordExchange(
 ): Promise<void> {
   await appendHistory(env, channel, thread_ts, { role: "user", content: userText });
   await appendHistory(env, channel, thread_ts, { role: "assistant", content: assistantText });
+}
+
+// ----- assistant context -----
+
+// Persist the surface the user has open in the assistant panel (from
+// assistant_thread_started / _context_changed) so the next message.im turn can
+// read it — those message events carry no context of their own. Best-effort:
+// like the load, failures are swallowed here so callers don't each re-catch.
+export async function saveAssistantContext(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+  context: AssistantContext,
+): Promise<void> {
+  try {
+    await call(env, "/assistant-context", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ channel, thread: thread_ts, context }),
+    });
+  } catch {
+    // advisory state only — losing one context write never blocks the turn
+  }
+}
+
+export async function loadAssistantContext(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+): Promise<AssistantContext | null> {
+  try {
+    const res = await call(
+      env,
+      `/assistant-context?channel=${encodeURIComponent(channel)}&thread=${encodeURIComponent(thread_ts)}`,
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as { context?: AssistantContext | null };
+    return body.context ?? null;
+  } catch {
+    return null;
+  }
 }
 
 // ----- proposals -----
