@@ -34,9 +34,11 @@ Both lanes are **local tools only** (no hosted MCP), and share the same tool ros
 
 **Can, behind the ✅ gate (proposal card, 60-min expiry, requester-only confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
 
+**Autonomous (no ask, no gate — cron):** the **Figma library poll** (`src/figma-poll.ts`, `[triggers]` in `wrangler.toml`) checks the DS Figma file every 15 min during work hours, and on a publish files a PRD on the Roadmap board and posts the "🎨 Figma Design System Updated" card to `#uno-bot` — reply `implement <component>` in that thread to kick off the gated implement flow. (This is the v1 `figma-library-poll.yml` automation, re-homed in the Worker 2026-07-16.)
+
 **Quality loop, pre-send:** substantive text drafts (≥1500 chars — deliverable-shaped output, not ordinary replies) get ONE cheap judge call against a condensed D1–D9 rubric (`src/agent/draft-judge.ts`) and are revised once if flagged; short replies skip it, and any judge error/timeout ships the original draft (fail open). Verdicts land in the telemetry stream as `[uno-bot] draft-judge …` lines.
 
-**Partially — Figma:** no Figma MCP for the Worker (closed catalog; only approved apps like Claude Code/Cursor connect). A pasted frame link (with `node-id`) arrives with a rendered screenshot the model can *see*, plus structure/text layers over REST (`source_read`) — so qualitative review works. Variables, tokens, and computed values (exact spacing, contrast ratios) stay IDE-only. The bot never writes to Figma; `FIGMA_ACCESS_TOKEN` only powers the proposal-card screenshot.
+**Partially — Figma:** no Figma MCP for the Worker (closed catalog; only approved apps like Claude Code/Cursor connect). A pasted frame link (with `node-id`) arrives with a rendered screenshot the model can *see*, plus structure/text layers over REST (`source_read`) — so qualitative review works. Variables, tokens, and computed values (exact spacing, contrast ratios) stay IDE-only. The bot never writes to Figma; `FIGMA_ACCESS_TOKEN` powers only the proposal-card screenshot and the library poll's reads.
 
 **Can't:** edit repo files, run shell/`npm`/`git`, or spawn IDE subagents — it's a Worker, not an IDE agent. It routes that work to Claude Code/Cursor via ready-to-paste handoff prompts. Blueprint and marketplace-catalog writes are deliberately not bot tools (they run in-IDE via `writers/blueprint` / `writers/notion`).
 
@@ -52,7 +54,8 @@ uno-bot/
 ├── package.json / tsconfig.json / .dev.vars.example
 └── src/
     ├── index.ts          Fetch handler / routes: /health · /debug/gemini ·
-    │                     /debug/vertex-claude · /slack/events · /oauth/slack/{start,callback}
+    │                     /debug/vertex-claude · /debug/figma-poll · /slack/events ·
+    │                     /oauth/slack/{start,callback} — plus the cron scheduled() handler
     ├── agent/            run-agent.ts (provider dispatcher) · gemini-agent.ts · claude-agent.ts ·
     │                     routing.ts (tiers/model ids) · skills.ts (bundled-harness assembly) ·
     │                     preflight · draft-judge · tool schemas
@@ -62,6 +65,8 @@ uno-bot/
     ├── tools/            Local tool implementations (dispatcher + one file per tool family)
     ├── integrations/     notion · figma · blueprint (Supabase) · github · gmail · ds-components
     ├── oauth/            Slack OAuth (static client) — the user token slack_search needs
+    ├── figma-poll.ts     Cron: DS-publish detection → Roadmap PRD → #uno-bot card
+    │                     (KV snapshot diffing; v1's poll-figma-library.js, Worker-native)
     ├── thread-state.ts   Durable Object: per-thread history + pending proposals (60-min TTL)
     ├── agent-runner.ts   Durable Object: runs the agent turn in an alarm — outlives the ~30s
     │                     waitUntil() cancellation window that killed long runs
@@ -84,7 +89,7 @@ curl http://localhost:8787/health
 
 ## Config
 
-**Plain vars** (`wrangler.toml` `[vars]` — commented inline there): `GITHUB_REPO` + `SKILLS_BASE_URL` (both must point at the harness repo, `BilLogic/plus-uno`) · `MODEL_PROVIDER` + `GEMINI_PROJECT_ID` / `GEMINI_REGION` / `GEMINI_MODEL` / `CLAUDE_MODEL` · Notion DB ids · `SUPABASE_URL` · Slack channel ids (`PLUS_DESIGN_CHANNEL_ID`, `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`) · `SLACK_SEARCH_PRIVATE_ALLOWLIST` (the privacy firewall) · `SLACK_MCP_CLIENT_ID` + `SLACK_OAUTH_REDIRECT_URI` (the slack_search login).
+**Plain vars** (`wrangler.toml` `[vars]` — commented inline there): `GITHUB_REPO` + `SKILLS_BASE_URL` (both must point at the harness repo, `BilLogic/plus-uno`) · `MODEL_PROVIDER` + `GEMINI_PROJECT_ID` / `GEMINI_REGION` / `GEMINI_MODEL` / `CLAUDE_MODEL` · Notion DB ids · `SUPABASE_URL` · Slack channel ids (`UNO_BOT_CHANNEL_ID`, `PLUS_DESIGN_CHANNEL_ID`, `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`) · `FIGMA_FILE_KEY` (the DS file the library poll watches) · `SLACK_SEARCH_PRIVATE_ALLOWLIST` (the privacy firewall) · `SLACK_MCP_CLIENT_ID` + `SLACK_OAUTH_REDIRECT_URI` (the slack_search login).
 
 **Bindings:** Durable Objects `THREAD_STATE` + `AGENT_RUNNER`; KV `HARNESS_KV` (harness fallback/alert), `SLACK_OAUTH_KV` (slack_search user token).
 
@@ -98,7 +103,7 @@ curl http://localhost:8787/health
 | `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Vertex service account — powers BOTH the Gemini and Vertex-Claude lanes (billed to the GCP project). Canonical credential, wins whenever fully set (ADR-018); `GEMINI_API_KEY` (AI Studio) is a local-dev fallback for the Gemini lane only — never set it on the Worker |
 | `GITHUB_TOKEN` | PAT for `repository_dispatch` + `github_read` |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive` + catalog reads) |
-| `FIGMA_ACCESS_TOKEN` | Figma read token — the `prototype_scaffold` proposal screenshot |
+| `FIGMA_ACCESS_TOKEN` | Figma read token — the `prototype_scaffold` proposal screenshot + the library poll's reads |
 | `SUPABASE_ANON_KEY` | read-only blueprint key (`blueprint_search`) |
 | `GMAIL_*` | OAuth for `email_send` (sender, client id/secret, refresh token) |
 | `DEBUG_TOKEN` | gates the `/debug/*` routes (sent as the `x-debug-token` header) |
@@ -120,6 +125,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider health (both auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) and `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run this before flipping `MODEL_PROVIDER="vertex-claude"`).
+- **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/test-prototype/` + a root `dev:test-prototype` script; `npm install && npm run dev:test-prototype` boots it.
 
 ## Gotchas

@@ -10,6 +10,15 @@ compatibility_flags = ["nodejs_compat"]
 enabled = true
 head_sampling_rate = 1
 
+# Figma library poll (src/figma-poll.ts) — every 15 min during work hours
+# (Mon–Fri, 13:00–23:45 UTC = 9am–7:45pm ET), the SAME cadence the retired
+# figma-library-poll.yml GitHub Action ran on before it was removed (2026-07-09,
+# PR #38). Detects DS publishes, files a PRD, posts the update card to #uno-bot.
+# Scheduled invocations get a fresh subrequest budget + a 15-min wall clock, so
+# the poll never competes with an agent turn. Manual firing: GET /debug/figma-poll.
+[triggers]
+crons = ["*/15 13-23 * * 1-5"]
+
 # ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
 # plan; design within these, don't fight them) ────────────────────────────────
 #   • 50 subrequests per invocation. One agent turn spends most of it (Slack +
@@ -78,6 +87,16 @@ SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 # "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
 # as the model lane) + the semantic_search schema exposed to the API.
 SEMANTIC_SEARCH = "on"
+# ── Figma library poll (the [triggers] cron above) ──────────────────────────
+# DS design-system Figma file key — non-secret (it's the path segment of every
+# shared Figma URL; see design-system/figma/component-figma-links.md). The poll
+# diffs this file's components/versions against a KV snapshot (HARNESS_KV,
+# key "figma-poll:snapshot"). Leave blank to disable the poll.
+FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
+# #uno-bot channel id — the poll's "🎨 Figma Design System Updated" card lands
+# here (docs/conventions/slack.md: docs saying "#figma-sync" mean this channel).
+# Leave blank → the poll still diffs + files the PRD but skips the Slack post.
+UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # #plus-design channel id — reviewable artifacts (component_implement /
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
@@ -147,7 +166,8 @@ CLAUDE_MODEL = "claude-sonnet-5"
 #                             id is SLACK_MCP_CLIENT_ID above; powers slack_search)
 #   GITHUB_TOKEN             (PAT with repo:dispatch scope + Contents:Read)
 #   FIGMA_ACCESS_TOKEN       (Figma read PAT — the prototype_scaffold proposal
-#                             screenshot fetch in events.ts)
+#                             screenshot fetch in events.ts + the library poll's
+#                             component/version reads in figma-poll.ts)
 #   NOTION_API_KEY           (Notion internal integration token — notion_create/
 #                             update/archive + the notion_search catalog reads)
 #   GMAIL_SENDER             (authorized "From" mailbox for email_send)
@@ -193,7 +213,9 @@ id = "18b58372d9bc430489d634c2c9a0b0c4"
 
 # KV — harness resilience: last-known-good system-prompt assembly + alert
 # throttle. (The harness is baked into the bundle; this is the fallback/alert
-# path — see src/agent/skills.ts.)
+# path — see src/agent/skills.ts.) Also hosts the Figma poll's component
+# snapshot under "figma-poll:*" (src/figma-poll.ts) — one ~400KB value didn't
+# warrant a namespace of its own.
 [[kv_namespaces]]
 binding = "HARNESS_KV"
 id = "10e5f980215e4f7e817bf55ac69dda43"

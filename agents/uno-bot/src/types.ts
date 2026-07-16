@@ -19,6 +19,12 @@ export interface Env {
   GITHUB_REPO: string;
   SKILLS_BASE_URL: string;
   FIGMA_ACCESS_TOKEN: string;
+  // Figma library poll (figma-poll.ts, cron-fired). Both optional — unset →
+  // the poll logs a skip and does nothing. FIGMA_FILE_KEY is the DS file
+  // (non-secret: it's in every shared Figma URL); UNO_BOT_CHANNEL_ID is where
+  // the "🎨 Figma Design System Updated" card lands (#uno-bot).
+  FIGMA_FILE_KEY?: string;
+  UNO_BOT_CHANNEL_ID?: string;
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;

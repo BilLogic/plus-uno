@@ -9,8 +9,21 @@ import { runAgent } from "./agent/run-agent";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
+import { runFigmaPoll } from "./figma-poll";
 
 export default {
+  // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
+  // publishes, file the PRD, post the "🎨 Figma Design System Updated" card to
+  // #uno-bot. Scheduled invocations get their own subrequest budget and a
+  // 15-minute wall clock, so the poll runs here, not in a DO alarm.
+  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      runFigmaPoll(env)
+        .then((r) => console.log(`[figma-poll] ${r.summary}`))
+        .catch((err) => console.error(`[figma-poll] failed: ${err instanceof Error ? err.message : String(err)}`)),
+    );
+  },
+
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
@@ -65,6 +78,20 @@ export default {
     if (request.method === "POST" && url.pathname === "/debug/eval") {
       if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
       return handleEvalTurn(request, env);
+    }
+
+    // Manual firing of the Figma library poll (same code path as the cron).
+    // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
+    // Auth-gated: a live run posts to Slack and files a PRD.
+    if (request.method === "GET" && url.pathname === "/debug/figma-poll") {
+      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+      const dryRun = url.searchParams.get("dry_run") === "1";
+      try {
+        const result = await runFigmaPoll(env, { dryRun });
+        return Response.json({ ok: true, build: BUILD, dryRun, ...result });
+      } catch (err) {
+        return Response.json({ ok: false, build: BUILD, dryRun, error: err instanceof Error ? err.message : String(err) });
+      }
     }
 
     if (request.method === "POST" && url.pathname === "/slack/events") {

@@ -9,7 +9,7 @@ An automation absent from this table is undocumented by definition.
 
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Owner | Status |
 |---|---|---|---|---|---|---|
-| Figma library sync | manual run (was: 15-min poll of BS4 publishes) | uno-synthesize (DS-component PRD creation) | writers/notion | `scripts/poll-figma-library.js` (`npm run figma:poll`) + `create-notion-prd.js` — the `figma-library-poll.yml` workflow was removed when registries went generated-only | Bill | ⏸ paused (script-only) |
+| Figma library sync | Worker cron `*/15 13-23 * * 1-5` (restored 2026-07-16; was GitHub Actions until 2026-07-09) | uno-synthesize (DS-component PRD creation) | uno-bot | `agents/uno-bot/src/figma-poll.ts` (scheduled handler; snapshot in KV; PRD via `notion_create` "prd" surface; card → `#uno-bot`). Manual: `GET /debug/figma-poll`. Legacy script kept: `scripts/poll-figma-library.js` (`npm run figma:poll`) | Bill | ✅ live (on deploy) |
 | Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` | Bill | ✅ live |
 | Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` | Bill | ✅ live |
 | Marketplace add/edit | `repository_dispatch` | uno-publish (registration) | writers/notion (entry) | `marketplace-add.yml` / `marketplace-edit.yml` | Bill | ✅ live |
