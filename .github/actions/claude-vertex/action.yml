@@ -116,10 +116,19 @@ runs:
         # Prompt goes in via STDIN: our prompt files start with `---` YAML
         # frontmatter, and a prompt passed as the -p argument gets parsed as
         # a CLI option ("error: unknown option '---'").
+        RC=0
         claude -p \
           "${PERM_ARGS[@]}" \
           --max-turns "$MAX_TURNS" \
-          --output-format text < "$PROMPT_FILE" > "$OUTPUT_FILE"
+          --output-format text < "$PROMPT_FILE" > "$OUTPUT_FILE" || RC=$?
+        if [ "$RC" -ne 0 ]; then
+          # Startup/API errors land on stdout, which we deliberately don't
+          # publish. On failure, surface only the HEAD of the output — error
+          # messages print before any transcript exists, so this stays safe.
+          echo "::error::claude exited $RC — first lines of output follow"
+          head -c 1500 "$OUTPUT_FILE" || true
+          exit "$RC"
+        fi
 
         # SECURITY: this repo is PUBLIC — job summaries and logs are world-
         # readable, and secret-masking is substring-based (defeated by any
