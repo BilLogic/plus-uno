@@ -12,6 +12,8 @@ description: >
   disagree", "the skill/persona is off", "fix this typo", "run the staleness
   sweep", "document this", "capture this lesson", or after a feature ships and
   the DS/harness need reconciling.
+user-invocable: true
+argument-hint: [intake / sweep-name / lesson-to-capture]
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 ---
 
@@ -25,6 +27,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 |---|---|
 | Human spot | "this is wrong / stale / off" — any of the four trigger types |
 | Auditor sweep | `reviewers/auditor` files intakes from a named registry checklist |
+| Headless sweep queue | open GitHub issues labeled `harness-intake` (filed by the cron sweeps — method §1 headless surrogate). **Drain first on every maintain session**: `gh issue list --label harness-intake --state open`, triage each into the pipeline, close as incorporated |
 | DS gap from prototyping | `uno-prototype` hits a missing/broken component or token |
 | Legacy-source conflict | a legacy Notion/Figma page contradicts repo-canonical `docs/conventions/*` (method §6) |
 | Post-ship reconciliation | a handoff shipped; DS + harness reconcile against built reality |
@@ -44,6 +47,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 ## Sweeps & audits
 
 - Summon `reviewers/auditor` with a named checklist from the registry — `docs/conventions/automations.md` owns the sweep names (shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity · comment sweep). The auditor inspects and files intakes; writers fix.
+- The integrity sweep, Tier-1 digest, and shipped watchdog also run **headlessly on cron** — adapters in `scripts/prompts/uno-*/`, registry rows in `docs/conventions/automations.md`. Spot-run one with `gh workflow run <workflow-file>`; outcomes land in the Actions job summary (`gh run view`). Their findings arrive via the headless sweep queue above, so don't re-run a sweep whose issues are still undrained.
 - Integrity sweep checklist: [`references/staleness-sweep.md`](references/staleness-sweep.md) (canonicality headers + agents↔docs cross-references + path integrity).
 - Scored audits (rubric against an artifact) → summon `reviewers/rubric-applier`.
 - Skill-quality audit (a skill is the target artifact): run [`references/skill-quality/audit-workflow.md`](references/skill-quality/audit-workflow.md) with [`references/skill-quality/checklist.md`](references/skill-quality/checklist.md) as criteria; report per `output-template.md`.

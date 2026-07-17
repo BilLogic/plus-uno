@@ -1,0 +1,63 @@
+name: Weekly Tier-1 Digest
+
+# Weekly digest of auto-applied Tier-1 fixes → #plus-design (registry:
+# docs/conventions/automations.md). Loop shape: time-based cron → single pass →
+# post → sentinel-verified stop. The Tier-1 rules live in
+# skills/uno-maintain/references/method.md §4; the prompt file is only the
+# headless adapter. Spot-run: `gh workflow run weekly-tier1-digest.yml`.
+#
+# Executor: Claude Code CLI on Vertex, billed to hcii-plus (ADR-018).
+# Model: action default (sonnet). Required secrets: GEMINI_SA_EMAIL,
+# GEMINI_SA_PRIVATE_KEY, SLACK_BOT_TOKEN.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC — lands after the Monday evals run (08:00)
+
+permissions:
+  contents: read
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Compose and post digest (Claude on Vertex)
+        id: claude
+        uses: ./.github/actions/claude-vertex
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          GH_TOKEN: ${{ github.token }} # read-only: `gh run list` for the missed-run window check
+        with:
+          prompt-file: scripts/prompts/uno-tier1-digest/SKILL.md
+          max-turns: "20"
+          # Injection boundary: repo reads, payload composition, and ONLY the
+          # Slack chat.postMessage endpoint — no arbitrary curl targets.
+          allowed-tools: "Read,Grep,Glob,Write,Bash(jq:*),Bash(date:*),Bash(gh run list:*),Bash(curl -s -X POST https://slack.com/api/chat.postMessage:*)"
+          sa-email: ${{ secrets.GEMINI_SA_EMAIL }}
+          sa-private-key: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
+
+      - name: Verify outcome sentinel
+        env:
+          OUTPUT_FILE: ${{ steps.claude.outputs.output-file }}
+        run: |
+          # Headless sessions can't set the CLI exit code, so a failed Slack
+          # post would otherwise leave a green run — indistinguishable from a
+          # quiet week. The adapter must emit exactly one sentinel; anything
+          # else (including DIGEST_POST_FAILED) turns the run red.
+          if grep -q "DIGEST_POSTED" "$OUTPUT_FILE"; then
+            echo "digest posted"
+          elif grep -q "NO_TIER1_THIS_WEEK" "$OUTPUT_FILE"; then
+            echo "quiet week — nothing posted"
+          else
+            echo "::error::no success sentinel in agent output (post failed or run derailed)"
+            grep -o "DIGEST_POST_FAILED.*" "$OUTPUT_FILE" || true
+            exit 1
+          fi

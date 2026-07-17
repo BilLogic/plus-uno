@@ -1,0 +1,57 @@
+name: Shipped Watchdog
+
+# Weekly post-ship reconciliation check (registry: docs/conventions/automations.md).
+# Loop shape: time-based cron → single-pass reconcile of recently shipped Roadmap
+# cards → issue intakes → stop. The reconciliation duty and check set live in
+# skills/uno-maintain/references/method.md §6; the prompt file is only the
+# adapter. Spot-run: `gh workflow run shipped-watchdog.yml`.
+#
+# Executor: Claude Code CLI on Vertex, billed to hcii-plus (ADR-018).
+# Model: opus — cross-estate reconciliation is the judgment-heavy sweep.
+# Required secrets: GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, NOTION_API_KEY.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 9 * * 3" # Wednesdays 09:00 UTC
+
+permissions:
+  contents: read
+  issues: write # drift findings are filed as `harness-intake` issues
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Ensure intake labels exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create harness-intake --repo "$GITHUB_REPOSITORY" \
+            --description "Headless sweep finding awaiting uno-maintain triage" \
+            --color D93F0B || true
+          gh label create automation-blocked --repo "$GITHUB_REPOSITORY" \
+            --description "A scheduled automation could not run — ops signal, not a design intake" \
+            --color B60205 || true
+
+      - name: Run shipped watchdog (Claude on Vertex)
+        uses: ./.github/actions/claude-vertex
+        env:
+          GH_TOKEN: ${{ github.token }} # for `gh issue` intake filing
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        with:
+          prompt-file: scripts/prompts/uno-shipped-watchdog/SKILL.md
+          model: claude-opus-4-8
+          max-turns: "60"
+          # Injection boundary: repo reads, issue filing, and ONLY the Notion
+          # API endpoint — an injected instruction cannot curl anywhere else.
+          allowed-tools: "Read,Grep,Glob,Bash(jq:*),Bash(date:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(curl -s https://api.notion.com/:*),Bash(curl -s -X POST https://api.notion.com/:*)"
+          sa-email: ${{ secrets.GEMINI_SA_EMAIL }}
+          sa-private-key: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}

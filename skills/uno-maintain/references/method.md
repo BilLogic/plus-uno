@@ -27,6 +27,14 @@ The taxonomy is the harness map — when a new component joins the harness, this
 
 **Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/conventions/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
 
+**Headless surrogate:** scheduled sweeps run without Notion access and file
+their intakes as GitHub issues labeled `harness-intake` (transport contract:
+`scripts/prompts/references/headless-intake.md`). That queue feeds THIS
+pipeline: every maintain session's intake step starts by draining it — triage
+each open `harness-intake` issue into a Roadmap card (or straight into §2–§4
+when acted on immediately), then close the issue as incorporated. An
+unwatched surrogate queue silently defeats every sweep that files into it.
+
 **Cross-estate inconsistencies are a known open area.** When two estates disagree, decide which side is believed wrong (DS precedence: uno-storybook > BS4 Foundation library > Figma spec pages), route there, and **flag the intake as cross-estate** — don't improvise a routing convention.
 
 ## 2 · Draft first, judge second
@@ -42,7 +50,7 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 ## 4 · Tier classification
 
-- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` (the weekly digest posts from it to the design channel — `docs/conventions/slack.md`); the monthly retro reviews the digest.
+- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/conventions/slack.md`); the monthly retro reviews the digest.
 - **Tier 2 — substantive:** everything else → the pipeline in §5.
 
 ## 5 · Tier 2 — PR + PRD → verdict → apply log
@@ -59,7 +67,11 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
 - **Standing sweeps:** named in `docs/conventions/automations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
-- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness against built reality — routine, not exceptional.
+- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness against built reality — routine, not exceptional. The check set, per shipped card:
+  - `design-system/` stories/MDX reflect the shipped surface where they reference it;
+  - harness docs (`docs/context/*`, conventions, skill references) don't describe pre-ship behavior as current;
+  - deployment/marketplace references (per uno-publish's references) still point at live URLs.
+  The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
 
 ## 7 · Knowledge capture
 

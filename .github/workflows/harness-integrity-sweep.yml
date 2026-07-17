@@ -1,0 +1,57 @@
+name: Harness Integrity Sweep
+
+# Monthly conventions-integrity sweep (registry: docs/conventions/automations.md).
+# Loop shape: time-based cron → single-pass checklist → issue intakes → stop.
+# The checklist lives in skills/uno-maintain/references/staleness-sweep.md; the
+# prompt file is only the headless adapter (never duplicate the logic here).
+# Spot-run: `gh workflow run harness-integrity-sweep.yml`.
+#
+# Executor: Claude Code CLI on Vertex — billed to the hcii-plus GCP project via
+# the same service account as uno-bot (ADR-018). Model: action default (sonnet).
+# Required repo secrets: GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 9 1 * *" # 1st of the month, 09:00 UTC — feeds the monthly retro
+
+permissions:
+  contents: read
+  issues: write # findings are filed as `harness-intake` issues
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false # gh uses GH_TOKEN from env; no token in .git/config
+
+      - name: Ensure intake labels exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # `gh issue create --label X` errors if the label is missing —
+          # ensure both intake labels deterministically, idempotently.
+          gh label create harness-intake --repo "$GITHUB_REPOSITORY" \
+            --description "Headless sweep finding awaiting uno-maintain triage" \
+            --color D93F0B || true
+          gh label create automation-blocked --repo "$GITHUB_REPOSITORY" \
+            --description "A scheduled automation could not run — ops signal, not a design intake" \
+            --color B60205 || true
+
+      - name: Run integrity sweep (Claude on Vertex)
+        uses: ./.github/actions/claude-vertex
+        env:
+          GH_TOKEN: ${{ github.token }} # for `gh issue` intake filing
+        with:
+          prompt-file: scripts/prompts/uno-integrity-sweep/SKILL.md
+          max-turns: "60"
+          # Injection boundary: repo reads + issue filing + the checklist's
+          # named script. No arbitrary shell, no network beyond gh.
+          allowed-tools: "Read,Grep,Glob,Bash(gh issue list:*),Bash(gh issue create:*),Bash(bash scripts/validate-doc-links.sh:*)"
+          sa-email: ${{ secrets.GEMINI_SA_EMAIL }}
+          sa-private-key: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
