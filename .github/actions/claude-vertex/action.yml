@@ -113,10 +113,13 @@ runs:
           PERM_ARGS=(--allowedTools "$ALLOWED_TOOLS")
         fi
 
-        claude -p "$(cat "$PROMPT_FILE")" \
+        # Prompt goes in via STDIN: our prompt files start with `---` YAML
+        # frontmatter, and a prompt passed as the -p argument gets parsed as
+        # a CLI option ("error: unknown option '---'").
+        claude -p \
           "${PERM_ARGS[@]}" \
           --max-turns "$MAX_TURNS" \
-          --output-format text > "$OUTPUT_FILE"
+          --output-format text < "$PROMPT_FILE" > "$OUTPUT_FILE"
 
         # SECURITY: this repo is PUBLIC — job summaries and logs are world-
         # readable, and secret-masking is substring-based (defeated by any
