@@ -17,11 +17,24 @@
 // `grant execute ... to anon` to get the single-subrequest path.
 
 import type { Env } from "../types";
+import { embedText, embeddingsConfigured } from "../vertex/embed";
 
 const REQUEST_TIMEOUT_MS = 10000;
 const RPC_NAME = "search_blueprint";
 const PER_TABLE_LIMIT = 8;
 const MAX_ROWS = 30;
+
+// ── semantic_search (vector) path ─────────────────────────────────────────────
+// Primary retrieval: embed the query, ask semantic_search.match_corpus_chunks
+// for the nearest blueprint chunks (~2 subrequests total). Falls back to the
+// keyword paths below on any miss, so it never regresses. Disable by setting the
+// SEMANTIC_SEARCH var to "off".
+const SEMANTIC_RPC = "match_corpus_chunks";
+const SEMANTIC_SCHEMA = "semantic_search";
+const SEMANTIC_MATCH_COUNT = 6;
+// Cosine-similarity floor: below this, treat as no confident match and fall back
+// to keyword search. Tunable from the semantic-quality of real queries.
+const SEMANTIC_MIN_SIMILARITY = 0.5;
 
 export interface BlueprintRow {
   kind: string;
@@ -33,6 +46,8 @@ export interface BlueprintRow {
   step?: string;
   scenario?: string;
   phase?: string;
+  /** Cosine similarity, present only on semantic (vector) matches. */
+  score?: number;
 }
 
 export class BlueprintUnavailableError extends Error {}
@@ -80,6 +95,16 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
+    // Primary: semantic (vector) search. Any miss/failure → keyword paths below.
+    if (env.SEMANTIC_SEARCH !== "off" && embeddingsConfigured(env)) {
+      const sem = await trySemantic(env, base, key, q, controller.signal).catch(() => null);
+      if (sem && sem.length) {
+        console.log(`[blueprint] semantic hit (${sem.length})`);
+        searchCache.set(cacheKey, { at: Date.now(), rows: sem });
+        return sem;
+      }
+    }
+
     const rpc = await tryRpc(base, key, q, controller.signal);
     const rows = rpc !== null
       ? rpc.slice(0, MAX_ROWS)
@@ -90,6 +115,53 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
   } finally {
     clearTimeout(timer);
   }
+}
+
+// Embed the query + call semantic_search.match_corpus_chunks. Returns null on
+// any failure (unconfigured, embed error, RPC error, or nothing above the
+// similarity floor) so the caller falls back to keyword search.
+async function trySemantic(
+  env: Env,
+  base: string,
+  key: string,
+  q: string,
+  signal: AbortSignal,
+): Promise<BlueprintRow[] | null> {
+  const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
+  if (!embedding) return null;
+  const res = await fetch(`${base}/rest/v1/rpc/${SEMANTIC_RPC}`, {
+    method: "POST",
+    headers: {
+      ...headers(key),
+      "content-type": "application/json",
+      // The match function lives in the semantic_search schema (exposed to the API).
+      "content-profile": SEMANTIC_SCHEMA,
+    },
+    body: JSON.stringify({
+      query_embedding: embedding,
+      match_count: SEMANTIC_MATCH_COUNT,
+      filter_source: "blueprint",
+    }),
+    signal,
+  });
+  if (!res.ok) return null;
+  const data = (await res.json().catch(() => [])) as Array<{
+    title?: string;
+    chunk?: string;
+    ref_url?: string;
+    similarity?: number;
+  }>;
+  if (!Array.isArray(data)) return null;
+  const rows = data
+    .filter((r) => (r.similarity ?? 0) >= SEMANTIC_MIN_SIMILARITY)
+    .map((r): BlueprintRow => ({
+      kind: "cell",
+      id: "",
+      title: r.title ?? "",
+      snippet: r.chunk ?? "",
+      score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
+    }));
+  return rows.length ? rows : null;
 }
 
 // Returns rows, or null if the function doesn't exist (so the caller falls back).

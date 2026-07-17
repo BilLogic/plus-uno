@@ -66,8 +66,8 @@ export class AgentRunner {
   async alarm(): Promise<void> {
     // ONE job per alarm invocation — free-tier Workers cap subrequests at 50
     // per invocation, and a single agent turn spends most of that budget
-    // (20 harness fetches + Slack + DO + model API). Processing a second job
-    // in the same invocation blew the cap live (2026-07-10: "Too many
+    // (Slack + DO hops + grounding tool calls + model API). Processing a second
+    // job in the same invocation blew the cap live (2026-07-10: "Too many
     // subrequests"), killing the first job's reply delivery. Each alarm
     // firing gets a FRESH budget, so drain the queue one job per firing.
     const jobs = await this.state.storage.list<RunnerJob>({ prefix: JOB_PREFIX, limit: 1 });

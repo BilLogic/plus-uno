@@ -3,9 +3,10 @@
 // account's RSA key via WebCrypto and exchanging it at the token endpoint.
 // Tokens live ~1h; cached in-memory per isolate with a 5-min safety margin.
 //
-// Two auth modes for Gemini (provider adapter, 2026-07-10):
-//   GEMINI_API_KEY set        → Developer API, plain key header, this file unused.
-//   GEMINI_SA_* secrets set   → Vertex AI with this OAuth flow.
+// Two auth modes for Gemini (provider adapter, 2026-07-10; precedence flipped
+// 2026-07-16 — Vertex SA is canonical and wins whenever set, see client.ts):
+//   GEMINI_SA_* secrets set   → Vertex AI with this OAuth flow (production path).
+//   GEMINI_API_KEY only       → Developer API, plain key header, this file unused.
 
 import type { Env } from "../types";
 

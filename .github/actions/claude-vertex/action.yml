@@ -1,0 +1,148 @@
+name: "Claude on Vertex (headless)"
+description: >
+  Runs Claude Code CLI in agentic headless mode against Claude-on-Vertex,
+  authenticated with the SAME Vertex service account the uno-bot Worker uses
+  (ADR-018) — so every scheduled automation bills to the hcii-plus GCP project,
+  not an Anthropic API account. Model routing follows the bot's tier table
+  (source of truth: agents/uno-bot/src/agent/routing.ts).
+
+inputs:
+  prompt-file:
+    description: "Path to the prompt file to execute (scripts/prompts/*/SKILL.md)"
+    required: true
+  model:
+    description: "Vertex model id — route by difficulty (sonnet default / opus hard)"
+    required: false
+    # hcii-plus Model Garden enablement (probed 2026-07-16 via CLI errors):
+    # sonnet tier has ONLY claude-sonnet-4-5@20250929; claude-sonnet-5 and
+    # claude-sonnet-4-6 are NOT enabled; claude-opus-4-8 IS. Bump when the
+    # admin enables newer sonnets — the Worker's routing.ts sonnet tier
+    # (claude-sonnet-5) will hit the same wall if its vertex-claude lane is
+    # switched on first.
+    default: "claude-sonnet-4-5@20250929"
+  max-turns:
+    description: "Hard agentic-turn cap (cost control — every loop needs a stop)"
+    required: false
+    default: "50"
+  allowed-tools:
+    description: >
+      Comma-separated --allowedTools list (e.g. 'Read,Grep,Bash(gh issue list:*)').
+      When set, the CLI runs WITHOUT --dangerously-skip-permissions and denies
+      everything outside the list — this is the enforcement boundary against
+      prompt injection from untrusted content (issue bodies, Notion pages),
+      which prose instructions alone cannot provide. Leave empty only for
+      trusted-input prompts.
+    required: false
+    default: ""
+  sa-email:
+    description: "Vertex service-account client_email (secrets.GEMINI_SA_EMAIL)"
+    required: true
+  sa-private-key:
+    description: "Vertex service-account private_key PEM (secrets.GEMINI_SA_PRIVATE_KEY)"
+    required: true
+  project-id:
+    description: "GCP project that hosts (and is billed for) the models"
+    required: false
+    default: "hcii-plus"
+  region:
+    description: "Vertex region — global endpoint carries the newest Claude models"
+    required: false
+    default: "global"
+
+outputs:
+  output-file:
+    description: "Path to the full agent transcript (runner-local only — never published)"
+    value: ${{ steps.run.outputs.output-file }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Write GCP application-default credentials
+      shell: bash
+      env:
+        SA_EMAIL: ${{ inputs.sa-email }}
+        SA_KEY: ${{ inputs.sa-private-key }}
+        PROJECT_ID: ${{ inputs.project-id }}
+      run: |
+        # Fail fast on missing secrets — an empty ADC file would surface later
+        # as an opaque Vertex auth error after the install step.
+        if [ -z "$SA_EMAIL" ] || [ -z "$SA_KEY" ]; then
+          echo "::error::GEMINI_SA_EMAIL / GEMINI_SA_PRIVATE_KEY secrets are missing"
+          exit 1
+        fi
+        # The repo stores the SA as two secrets (email + PEM), not a key JSON —
+        # synthesize the minimal service_account file google-auth needs. Some
+        # secret stores flatten newlines to literal "\n"; normalize either way.
+        # The key is read via env (jq env.SA_KEY), never placed on an argv.
+        SA_KEY="${SA_KEY//\\n/$'\n'}" ADC_FILE="$RUNNER_TEMP/gcp-sa.json"
+        export SA_KEY
+        jq -n --arg email "$SA_EMAIL" --arg proj "$PROJECT_ID" \
+          '{type:"service_account", project_id:$proj, client_email:$email, private_key:env.SA_KEY, token_uri:"https://oauth2.googleapis.com/token"}' \
+          > "$ADC_FILE"
+        echo "GOOGLE_APPLICATION_CREDENTIALS=$ADC_FILE" >> "$GITHUB_ENV"
+
+    - name: Setup Node.js
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: "24"
+
+    - name: Install Claude Code CLI
+      shell: bash
+      # Pinned: an unpinned `latest` on a cron runner holding live tokens is a
+      # supply-chain exposure and breaks all crons at once on a bad release.
+      # Bump deliberately.
+      run: npm install -g @anthropic-ai/claude-code@2.1.212
+
+    - name: Run prompt
+      id: run
+      shell: bash
+      env:
+        CLAUDE_CODE_USE_VERTEX: "1"
+        ANTHROPIC_VERTEX_PROJECT_ID: ${{ inputs.project-id }}
+        # "global" has no pricing premium and serves the newest models (see
+        # agents/uno-bot/src/vertex/claude.ts). If a model 404s here, fall back
+        # to a regional host (e.g. us-east5) — same as the Worker's rule.
+        CLOUD_ML_REGION: ${{ inputs.region }}
+        ANTHROPIC_MODEL: ${{ inputs.model }}
+        PROMPT_FILE: ${{ inputs.prompt-file }}
+        MAX_TURNS: ${{ inputs.max-turns }}
+        ALLOWED_TOOLS: ${{ inputs.allowed-tools }}
+      run: |
+        OUTPUT_FILE="$RUNNER_TEMP/claude-output.txt"
+        echo "output-file=$OUTPUT_FILE" >> "$GITHUB_OUTPUT"
+
+        # Permission mode: allowlist when provided (the injection boundary),
+        # legacy skip-permissions otherwise. The list is comma-separated and
+        # passed as ONE argument — tool patterns contain spaces.
+        PERM_ARGS=(--dangerously-skip-permissions)
+        if [ -n "$ALLOWED_TOOLS" ]; then
+          PERM_ARGS=(--allowedTools "$ALLOWED_TOOLS")
+        fi
+
+        # Prompt goes in via STDIN: our prompt files start with `---` YAML
+        # frontmatter, and a prompt passed as the -p argument gets parsed as
+        # a CLI option ("error: unknown option '---'").
+        RC=0
+        claude -p \
+          "${PERM_ARGS[@]}" \
+          --max-turns "$MAX_TURNS" \
+          --output-format text < "$PROMPT_FILE" > "$OUTPUT_FILE" || RC=$?
+        if [ "$RC" -ne 0 ]; then
+          # Startup/API errors land on stdout, which we deliberately don't
+          # publish. On failure, surface only the HEAD of the output — error
+          # messages print before any transcript exists, so this stays safe.
+          echo "::error::claude exited $RC — first lines of output follow"
+          head -c 1500 "$OUTPUT_FILE" || true
+          exit "$RC"
+        fi
+
+        # SECURITY: this repo is PUBLIC — job summaries and logs are world-
+        # readable, and secret-masking is substring-based (defeated by any
+        # reformatting), so the raw transcript must NEVER be published. Only
+        # the agent's explicitly marked run summary (bounded) reaches the job
+        # summary; the full transcript stays in RUNNER_TEMP for same-job
+        # verification steps and dies with the runner.
+        {
+          echo "### Run finished (model: $ANTHROPIC_MODEL)"
+          awk '/^===RUN-SUMMARY===$/{found=1; next} found' "$OUTPUT_FILE" | head -40
+        } >> "$GITHUB_STEP_SUMMARY"

@@ -22,6 +22,11 @@ export interface StoredToken {
   access_token: string;
   refresh_token?: string;
   expires_at?: number; // epoch ms; absent → non-expiring
+  /** Provider-side identity of the consenting user (e.g. Slack authed_user.id).
+   *  When a provider's parseTokenResponse sets this, the token is ALSO stored
+   *  under a per-identity key so reads can run with the requester's own
+   *  visibility (ADR-020, 2026-07-16). */
+  identity?: string;
 }
 
 interface StoredClient {
@@ -57,12 +62,20 @@ export interface ProviderConfig {
   parseTokenResponse?: (json: Record<string, unknown>) => StoredToken;
   /** Text shown on the success page after callback. */
   successMessage?: string;
+  /** Optional async post-exchange hook (e.g. resolve the token owner via the
+   *  provider's whoami endpoint when the token response omits it). Runs before
+   *  storage; a throw fails the callback visibly. */
+  enrichToken?: (token: StoredToken) => Promise<StoredToken>;
 }
 
 // ─── KV key helpers (namespaced per provider; each provider also has its own KV
 //     namespace, so this is belt-and-suspenders) ───────────────────────────────
 const PKCE_TTL_S = 600;
 const tokenKey = (cfg: ProviderConfig) => `${cfg.name}_oauth_token`;
+// Per-identity slot (requester-scoped visibility). The suffix is a provider
+// user id, validated by the caller before it reaches a KV key.
+const tokenKeyFor = (cfg: ProviderConfig, identity?: string) =>
+  identity ? `${cfg.name}_oauth_token:user:${identity}` : tokenKey(cfg);
 const clientKey = (cfg: ProviderConfig) => `${cfg.name}_oauth_client`;
 const pkceKey = (cfg: ProviderConfig, state: string) => `${cfg.name}_oauth_pkce:${state}`;
 
@@ -224,13 +237,25 @@ export async function handleOAuthCallback(cfg: ProviderConfig, request: Request)
 
   try {
     const client = await getClient(cfg);
-    const token = await tokenRequest(cfg, client, {
+    let token = await tokenRequest(cfg, client, {
       grant_type: "authorization_code",
       code,
       redirect_uri: cfg.redirectUri,
       code_verifier: verifier,
     });
-    await cfg.kv.put(tokenKey(cfg), JSON.stringify(token));
+    if (cfg.enrichToken) token = await cfg.enrichToken(token);
+    if (token.identity) {
+      // Per-identity slot: this user's reads run with their own visibility.
+      await cfg.kv.put(tokenKeyFor(cfg, token.identity), JSON.stringify(token));
+      // The legacy workspace slot is only BOOTSTRAPPED by the first-ever
+      // consent — later consents must not swap whose visibility powers the
+      // filtered workspace fallback.
+      if (!(await cfg.kv.get(tokenKey(cfg)))) {
+        await cfg.kv.put(tokenKey(cfg), JSON.stringify(token));
+      }
+    } else {
+      await cfg.kv.put(tokenKey(cfg), JSON.stringify(token));
+    }
     const msg = cfg.successMessage ?? `✅ uno-bot connected to ${cfg.name} (hosted MCP). You can close this tab.`;
     return new Response(msg, { status: 200, headers: { "Content-Type": "text/plain" } });
   } catch (e) {
@@ -241,7 +266,7 @@ export async function handleOAuthCallback(cfg: ProviderConfig, request: Request)
 }
 
 // ─── Refresh a rotating token ────────────────────────────────────────────────
-async function refresh(cfg: ProviderConfig, stored: StoredToken): Promise<StoredToken> {
+async function refresh(cfg: ProviderConfig, stored: StoredToken, key: string): Promise<StoredToken> {
   if (!stored.refresh_token) return stored;
   const client = await getClient(cfg);
   const next = await tokenRequest(cfg, client, {
@@ -249,17 +274,21 @@ async function refresh(cfg: ProviderConfig, stored: StoredToken): Promise<Stored
     refresh_token: stored.refresh_token,
   });
   if (!next.refresh_token) next.refresh_token = stored.refresh_token; // server may not re-send it
-  await cfg.kv.put(tokenKey(cfg), JSON.stringify(next));
+  if (!next.identity) next.identity = stored.identity; // refresh responses may omit it
+  await cfg.kv.put(key, JSON.stringify(next));
   return next;
 }
 
 /**
  * Get a valid access token, refreshing when near expiry. Returns null when no
  * token is stored yet (or a refresh fails) — the caller then simply doesn't
- * attach the MCP server (REST/native fallbacks still work).
+ * attach the MCP server (REST/native fallbacks still work). Pass `identity` to
+ * read a per-user slot (requester-scoped visibility, ADR-020) instead of the
+ * legacy workspace slot.
  */
-export async function getAccessToken(cfg: ProviderConfig): Promise<string | null> {
-  const raw = await cfg.kv.get(tokenKey(cfg));
+export async function getAccessToken(cfg: ProviderConfig, identity?: string): Promise<string | null> {
+  const key = tokenKeyFor(cfg, identity);
+  const raw = await cfg.kv.get(key);
   if (!raw) return null;
   let stored: StoredToken;
   try {
@@ -273,7 +302,7 @@ export async function getAccessToken(cfg: ProviderConfig): Promise<string | null
     // entire request, naming no server). No refresh token → treat as logged out.
     if (!stored.refresh_token) return null;
     try {
-      stored = await refresh(cfg, stored);
+      stored = await refresh(cfg, stored, key);
     } catch {
       return null; // refresh failed → drop to fallback rather than 500
     }

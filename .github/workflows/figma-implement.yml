@@ -71,7 +71,7 @@ jobs:
             --data-urlencode "timestamp=$MESSAGE_TS" || true
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -96,7 +96,7 @@ jobs:
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
 
@@ -125,27 +125,67 @@ jobs:
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Run machine checks (uno-prototype method §6, headless post-step)
+        if: steps.commit.outputs.changes == 'true'
+        id: checks
+        continue-on-error: true # findings go to the human PR review, they don't block the PR existing
+        run: |
+          # Scope checks to the directories this change actually touched —
+          # a whole-tree run would drown the diff's findings in pre-existing noise.
+          git fetch origin main --depth=1
+          DIRS=$(git diff --name-only origin/main...HEAD -- 'design-system/src/' 'playground/' \
+            | xargs -n1 dirname 2>/dev/null | sort -u)
+          if [ -z "$DIRS" ]; then
+            echo "no checkable dirs in diff" | tee checks-output.txt
+            exit 0
+          fi
+          : > checks-output.txt
+          RC=0
+          while IFS= read -r d; do
+            [ -d "$d" ] || continue
+            bash skills/uno-review/scripts/run-review-checks.sh "$d" | tee -a checks-output.txt || RC=1
+          done <<< "$DIRS"
+          exit $RC
+
       - name: Create draft PR
         if: steps.commit.outputs.changes == 'true'
         id: create-pr
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           # Read payload values from env inside the JS, never interpolate them
           # inline into the script (a stray quote would break out / inject).
           COMPONENT: ${{ steps.payload.outputs.component }}
           BRANCH: ${{ steps.branch.outputs.branch }}
           PRD_URL: ${{ steps.payload.outputs.notion_prd_url }}
+          CHECKS_OUTCOME: ${{ steps.checks.outcome }}
         with:
           script: |
             const component = process.env.COMPONENT || '';
             const branch = process.env.BRANCH || '';
             const prdUrl = process.env.PRD_URL || '';
 
+            const fs = require('fs');
+            const checksRaw = fs.existsSync('checks-output.txt')
+              ? fs.readFileSync('checks-output.txt', 'utf8').slice(0, 3000)
+              : '(checks step produced no output)';
+            const checksBadge = process.env.CHECKS_OUTCOME === 'success' ? '✅ passed' : '❌ FAILED — fix before review sign-off';
+
             const body = [
               `## Figma DS Update: ${component}`,
               '',
               prdUrl ? `**Notion PRD:** ${prdUrl}` : '',
               `**Figma:** https://www.figma.com/design/${{ secrets.FIGMA_FILE_KEY }}`,
+              '',
+              '---',
+              `## Machine checks (${checksBadge})`,
+              '',
+              '<details><summary>run-review-checks.sh output (changed dirs only)</summary>',
+              '',
+              '```',
+              checksRaw,
+              '```',
+              '',
+              '</details>',
               '',
               '---',
               '## DS Review Checklist',

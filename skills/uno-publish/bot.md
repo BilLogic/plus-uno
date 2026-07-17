@@ -7,14 +7,14 @@ Get work in front of people: feedback share-outs (`shareout_post`), handoff sign
 
 ## Route first
 
-- "share this", "post for feedback", "get eyes on this" → feedback rail: `shareout_post`, bundle gate applies.
+- "share this", "post for feedback", "get eyes on this" → feedback rail: `shareout_post` — stage immediately; the card audits the bundle.
 - "register this prototype", "add to the marketplace/catalog" → marketplace publishing runs in-IDE via `writers/notion`, not a bot tool; the Worker only *searches* the catalog. Never route a share-out into catalog publishing.
 - "post this in slack", other ambiguity → ask which they mean; a plain message is ordinary conversation, no publish machinery.
 - Rails never re-merge (method.md) — one request, one rail.
 
 ## Execute
 
-- **`shareout_post(summary, link?, reviewers?, deadline?)`** — gated (it pings people). Posts the share-out per docs/conventions/slack.md (shape, ≤3 questions + NOT-looking-for line, channel). **The bundle gate is a hard rule** (contract: method.md): the Worker preflight REJECTS a prototype share-out missing the bundle (Loom + live preview + Decisions DB links; replica for prototypes) — don't invoke until it's complete; gather missing links conversationally. Replica creation + visual diff remain IDE work (the Worker can't build Figma frames). Draft the post text first; invoke once approved. `reviewers`: Slack user ids (U…) get @-mentioned — pick real people via `notion_search` (scope: "team") or the PRD Owner.
+- **`shareout_post(summary, link?, reviewers?, deadline?)`** — gated (it pings people). Posts the share-out per docs/conventions/slack.md (shape, ≤3 questions + NOT-looking-for line, channel). **Bundle policy (revised 2026-07-16 — "stage, but flag gaps loudly"):** stage the proposal IMMEDIATELY with whatever links are in hand — never interrogate for missing bundle pieces before staging (the ask-then-stage round-trip read as stonewalling an approval). The confirmation card carries a code-enforced bundle audit listing anything missing (Loom + live preview + Decisions DB for prototype share-outs); ✅ is informed consent to post without them, or the user drops links in-thread first and you fold them into the proposal. Replica creation + visual diff remain IDE work (the Worker can't build Figma frames). `reviewers`: Slack user ids (U…) get @-mentioned — pick real people via `notion_search` (scope: "team") or the PRD Owner.
 - **Handoff sign-offs (H4b):** uno-bot collects the dev + PM + stakeholder ✅ in the handoff thread (reviewer-verdict convention, slack.md). Use `slack_thread_read` to tally the sign-offs / reviewer verdicts from the thread. Report status on request; never mark the gate passed with fewer than three, never proxy one. **Tally wall:** sign-off tallies read ≤~50 thread messages — a longer thread gets a partial tally, labeled as such.
 - **Sync feedback session:** logistics only — offer scheduling and recording/transcription setup. Study guide → uno-research; transcript synthesis → uno-synthesize. Decline to write guides or analyze sessions.
 - **Catalog search: `notion_search(scope: "marketplace", query)`** — read-only, no gate, call freely; direct scan of the Prototype Marketplace DB (prefer over scope `"any"`). Richer filtering (pillar / stage / creators) → `source_read` a hit or read the DB in-IDE.

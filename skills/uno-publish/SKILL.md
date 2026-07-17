@@ -33,7 +33,7 @@ Suggest this skill after `uno-review` passes a prototype. Every outward side eff
    - Live preview — if none exists, help deploy per `references/deployment-guide.md` (never auto-deploy).
    - Decisions — summon `writers/notion` to create/update Decisions DB rows for this Roadmap card (Evidence = share-out / thread permalink when available).
    - Figma replica (prototypes only) — summon `writers/figma` to build `[replica]`-prefixed frames from the coded prototype.
-2. **Gate check.** Any required piece missing → produce it before going further. A partial bundle never posts.
+2. **Gate check.** Any required piece missing → produce it before going further. In this IDE flow a partial bundle never posts. (uno-bot's quick feedback rail differs since 2026-07-16: it stages immediately and flags gaps on the confirmation card — ✅ there is informed consent to post partial.)
 3. **Compose the share-out** per `docs/conventions/slack.md`: ≤3 stage-specific feedback questions + a NOT-looking-for line, all bundle links.
 4. **Distribute.** Posting and reviewer-tagging is uno-bot's job — hand it the composed post; if the bot is unavailable, give the designer the exact text to paste in the right channel.
 5. **Close the round.** Consolidate thread + replica markup into **Decisions DB** rows (via `writers/notion`, Roadmap Card + Evidence) before calling the round done. Acting on feedback → back to `skills/uno-prototype`.
@@ -80,7 +80,7 @@ Summoned writers load their own conventions (`notion.md`, `figma-workspace.md`) 
 ## Constraints
 
 - Rails never re-merge; re-entry means choosing again from the top.
-- A partial bundle never posts; a schema-invalid entry never lands; no sign-off, no publish.
+- A partial bundle never posts from this flow (uno-bot's feedback rail stages-and-flags instead, 2026-07-16); a schema-invalid entry never lands; no sign-off, no publish.
 - Rails writes only inside a live, designer-confirmed handoff — otherwise `skills/uno-maintain`.
 - Publish doesn't judge (that's `uno-review`), doesn't act on feedback (re-enters prototyping), doesn't write study guides or synthesize transcripts.
 - Never auto-deploy; never post, write, or propagate without explicit confirmation.

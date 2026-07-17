@@ -17,11 +17,12 @@
 //     `wrangler tail` / Workers Logs.
 //
 // Provider-aware like the agent loops: Gemini lane → one generateContent on
-// the active GEMINI_MODEL (low thinking); Anthropic lane → one haiku call.
+// the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one haiku call.
 
 import type { Env } from "../types";
 import { geminiConfigured, geminiGenerate } from "../gemini/client";
-import { makeAnthropicClient, MODELS } from "./anthropic-client";
+import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
+import { MODELS } from "./routing";
 import { BUILD } from "../version";
 
 // Drafts under this length are never judged. 1500 chars targets deliverable-
@@ -94,8 +95,20 @@ async function callJudgeModel(env: Env, userText: string, draft: string): Promis
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
     `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}`;
 
-  const provider = (env.MODEL_PROVIDER ?? "anthropic").toLowerCase();
-  if (provider === "gemini" && geminiConfigured(env)) {
+  // Judge on the active lane, defaulting to Gemini (production).
+  const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
+  if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
+    const res = await claudeVertexGenerate(env, {
+      model: MODELS.haiku,
+      system: JUDGE_SYSTEM,
+      prompt,
+      maxTokens: 6000, // room for a full revised draft
+    });
+    if (!res.ok) throw new Error(res.error ?? "vertex-claude judge call failed");
+    return res.text ?? null;
+  }
+
+  if (geminiConfigured(env)) {
     const res = await geminiGenerate(env, {
       system: JUDGE_SYSTEM,
       prompt,
@@ -104,20 +117,6 @@ async function callJudgeModel(env: Env, userText: string, draft: string): Promis
     });
     if (!res.ok) throw new Error(res.error ?? "gemini judge call failed");
     return res.text ?? null;
-  }
-
-  if (env.ANTHROPIC_API_KEY) {
-    const client = makeAnthropicClient(env);
-    const msg = await client.messages.create({
-      model: MODELS.haiku,
-      max_tokens: 6000,
-      system: JUDGE_SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    });
-    return msg.content
-      .filter((b): b is { type: "text"; text: string } & typeof b => b.type === "text")
-      .map((b) => b.text)
-      .join("\n");
   }
 
   return null; // no judge credential — caller treats as skip

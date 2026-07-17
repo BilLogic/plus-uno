@@ -1,0 +1,46 @@
+name: uno-bot — deploy Worker
+
+# Deploys agents/uno-bot to Cloudflare from CI — the push-button replacement for
+# a local `npx wrangler deploy`. Runs `npm run deploy`, which bundles the harness
+# (bundle:harness → src/generated/harness.ts) and ships src/ via wrangler, then
+# verifies /health responds with the fresh build stamp.
+#
+# Deliberately manual-only (workflow_dispatch): deploying on every push to main
+# would ship half-reviewed Worker changes; a human (or an agent asked by one)
+# presses the button.
+#
+# Required repo secret:
+#   CLOUDFLARE_API_TOKEN   API token with the "Edit Cloudflare Workers" template
+#                          (dash.cloudflare.com/profile/api-tokens), scoped to
+#                          the Bryanhuang628 account.
+# The account id is non-secret and pinned below (the account that hosts uno-bot).
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22" # wrangler v4.97+ requires Node >= 22
+      - name: Install deps
+        working-directory: agents/uno-bot
+        run: npm ci
+      - name: Bundle harness + deploy
+        working-directory: agents/uno-bot
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: "747a73feeb756fad6c1164df234628e9"
+        run: npm run deploy
+      - name: Verify health
+        run: |
+          sleep 5
+          BUILD=$(curl -s --max-time 15 https://uno-bot.bryanhuang628.workers.dev/health)
+          echo "health: $BUILD"
+          case "$BUILD" in
+            "uno-bot ok "*) echo "worker is serving" ;;
+            *) echo "unexpected health response" && exit 1 ;;
+          esac

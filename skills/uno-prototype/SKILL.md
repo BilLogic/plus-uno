@@ -143,11 +143,23 @@ intake one step at a time.
    `design-system/agent-views/components/index.md` → name it, propose the
    nearest existing composition, file a uno-maintain intake. Never hand-roll
    a lookalike.
-5. **Validate & exit** (method §6). Hi-fi: run
-   `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`.
+5. **Validate & exit** (method §6 — the validation loop). Hi-fi: iterate
+   until clean, max 3 attempts (stop conditions and the goal-loop note live
+   in method §6). This face's check set — the interactive-IDE set; a runtime
+   without Storybook MCP or a browser runs the two scripts and records the
+   rest as unavailable, not as failures:
+   - `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`
+   - `bash skills/uno-review/scripts/run-review-checks.sh prototypes/{project}`
+     — a pre-flight of review's deterministic catches; fixing them here saves
+     a review round-trip (the review lenses still run on exit).
+   - Stories touched → Storybook MCP `run-story-tests` (a11y included).
+   - Open the running preview and verify the pages render, key interactions
+     work, and the console is clean — scripts can pass while the page is
+     visibly broken; the browser is the check of record for UI.
    All fidelities: summon **reviewers/ds-lens** for the conformance pass,
-   write the one-line artifact manifest (fidelity · tools · PRD link), then
-   hand to `skills/uno-review` for the stage lens.
+   write the one-line artifact manifest (fidelity · tools · PRD link · any
+   unresolved check failures), then hand to `skills/uno-review` for the
+   stage lens.
 
 ## Tier-2 loads (mirrors AGENTS.md § Progressive loading)
 

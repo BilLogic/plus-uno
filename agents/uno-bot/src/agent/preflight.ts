@@ -27,8 +27,9 @@ export interface PreflightAsk {
 // ---- cheap, null-safe helpers (inputs are Record<string, unknown>) ----
 
 /** All string values in the payload, one level deep into arrays/objects —
- *  enough to see summary, link, section bodies, recipients. */
-function collectStrings(input: Record<string, unknown>): string[] {
+ *  enough to see summary, link, section bodies, recipients. (Also used by the
+ *  share-out bundle audit in slack/proposal-render.ts.) */
+export function collectStrings(input: Record<string, unknown>): string[] {
   const out: string[] = [];
   for (const v of Object.values(input)) {
     if (typeof v === "string") out.push(v);
@@ -212,31 +213,12 @@ export async function preflight(
         };
       }
 
-      // Bundle check (uno-publish contract): a PROTOTYPE share-out must carry
-      // the full bundle — Loom walkthrough + live preview + Decisions DB links.
-      // The composing agent is told to gather these; this backstop makes it
-      // code-enforced instead of best-effort.
-      if (/prototype|prototypes|scaffold/i.test(summary)) {
-        const haystack = collectStrings(input).join("\n");
-        const missing: string[] = [];
-        if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) {
-          missing.push("a *Loom walkthrough* link (loom.com)");
-        }
-        if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev)/i.test(haystack)) {
-          missing.push("a *live preview* link (netlify.app / workers.dev)");
-        }
-        if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
-          missing.push("a *Decisions DB / Notion* link (project Decisions view or hub)");
-        }
-        if (missing.length > 0) {
-          return {
-            ask:
-              ":mega: A prototype share-out posts with the full bundle — this one is missing:\n" +
-              missing.map((m) => `• ${m}`).join("\n") +
-              "\nDrop those links in and I'll stage the post. (Replica creation + visual diff are IDE work — I only collect the links.)",
-          };
-        }
-      }
+      // Bundle policy changed 2026-07-16 (Bill: "stage, but flag gaps loudly"):
+      // preflight no longer REJECTS a prototype share-out with missing bundle
+      // pieces — the ask-then-stage round-trip read as the bot stonewalling an
+      // approval. Staging proceeds with what's in hand, and the confirmation
+      // card carries a deterministic bundle audit (proposal-render.ts:
+      // shareoutBundleNote) so ✅ is informed consent to post partial.
       return null;
     }
 

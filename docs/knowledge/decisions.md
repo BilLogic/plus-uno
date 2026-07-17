@@ -140,3 +140,30 @@ tags: [architecture, conventions]
 **Why.** (Bill, 2026-07-07, resolving plan §6 Q3): the harness lives on GitHub; keeping a second normative copy in Notion recreates the exact mirror-rot this revision was fixing — the sync problem is best solved by not having two sources. Notion remains the estate for *work* (hubs, PRDs, roadmap, templates); it just no longer owns the *rules*.
 
 **Consequences.** The conventions-staleness sweep becomes a conventions-integrity sweep (canonicality headers, agents↔docs cross-references, superseded banners). The same treatment applies to `docs/evals/rubrics/` (distilled from the 📊 Evals page). Supersedes the mirror-provenance model in ADR-013 §(4) and the Phase-2 "middle path" in plan 2026-07-07-001 §3. One-time follow-up: banner the legacy Notion playbook pages.
+
+
+## ADR-018: Gemini access is Vertex-only in production; AI Studio key is never deployed (2026-07-16)
+
+**Decision.** uno-bot's Gemini lane always authenticates via the Vertex AI service-account pair (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `hcii-plus`, region `global`). The AI Studio `GEMINI_API_KEY` must never be set as a Worker secret — it exists only as a local-dev emergency fallback. Code enforces the precedence (SA wins whenever set, `src/gemini/client.ts`) and warns loudly when it ever resolves to the API-key path.
+
+**Why.** (Bill, 2026-07-16): during the 2026-07-16 outage (Vertex flash-model quota exhaustion, 429 RESOURCE_EXHAUSTED — not a credential problem), a Vertex-vs-AI-Studio key discussion caused config confusion, and the then-current code made it worse: the API key silently took precedence over the SA pair, so which auth/billing/data boundary served traffic depended on which secrets happened to exist. One canonical path makes credential debugging deterministic and keeps usage attributable to the hcii-plus project quota Cindy Tipper administers.
+
+**Consequences.** Precedence flipped SA-first in `geminiConfigured`; rule documented in `wrangler.toml`, `types.ts`, `.dev.vars.example`, `README.md`, `src/gemini/auth.ts`. A 429/RESOURCE_EXHAUSTED from Vertex means project quota — the fix is a quota bump or a temporary model switch (e.g. the 2026-07-16 fallback to `gemini-2.5-pro`), never a credential swap to AI Studio.
+
+
+## ADR-019: Share-out bundle — stage immediately, flag gaps loudly on the card (2026-07-16)
+
+**Decision.** uno-bot's feedback rail stages a `shareout_post` proposal the moment a summary is in hand — it never interrogates for missing bundle pieces before staging. The confirmation card carries a code-enforced bundle audit (`proposal-render.ts: shareoutBundleNote` — Loom walkthrough / live preview / Decisions DB link for prototype share-outs); ✅ on that card is informed consent to post partial, or the user drops links in-thread and the bot folds them in. The IDE publish flow (`skills/uno-publish`) keeps its hard gate — a partial bundle never posts from there.
+
+**Why.** (Bill, 2026-07-16, "stage, but flag gaps loudly"): the 2026-07-16 evals exposed a three-way spec contradiction — AGENT.md required "bundle complete" before staging, preflight.ts hard-REJECTED partial prototype share-outs, while the eval cases (R3/R6) expected immediate staging from a bare link. The primary model happened to satisfy the evals; the fallback model read the docs literally and asked-then-staged, which surfaced as an approval being stonewalled ("go ahead" had nothing to resolve). A renderer-level audit keeps the disclosure deterministic on any model lane while removing the ask-first round-trip.
+
+**Consequences.** preflight.ts bundle rejection removed (min-substance summary check stays); loud audit added to the proposal card; aligned surfaces: AGENT.md dispatch row, skills/uno-publish/bot.md + SKILL.md + references/method.md, docs/conventions/slack.md, tool-definitions.json (shareout_post description), regenerated harness. Evals R3/R6 unchanged — they now match the contract.
+
+
+## ADR-020: Requester-scoped Slack visibility — per-user tokens, own DMs readable in own bot DM (2026-07-16)
+
+**Decision.** Each user can connect their own Slack history at `/oauth/slack/start`; tokens are stored per Slack user id (`slack_oauth_token:user:{U…}`, identity taken from `authed_user.id` at consent). When a connected user asks uno-bot something **in their own DM with the bot**, `slack_search` runs on THEIR token and passes through their full personal visibility — their DMs, group DMs, private channels. Outside their bot DM, or for users who haven't connected, the legacy single-token + hard firewall behavior stands unchanged (public + allowlisted private only; DMs always dropped). The legacy workspace slot is bootstrapped by the first-ever consent and never overwritten by later ones.
+
+**Why.** (Bill, 2026-07-16, "full own-visibility"): the bot should be able to reason over conversations the requester participates in. Slack's token model enforces the participation requirement by physics — a user token can only see its owner's conversations — so per-requester tokens are the only mechanism that grants DM access without over-granting. The own-DM surface gate keeps DM-derived content out of shared spaces structurally; AGENT.md adds the matching discretion rule (requester-own results answer that requester in that DM only). Equivalent trust model to the requester pasting their own conversation; team should be told other participants' messages become bot-readable to their counterpart's requests.
+
+**Consequences.** mcp-oauth gains identity-keyed token slots (+ keyed refresh); oauth/slack extracts and shape-validates `authed_user.id`; `getSlackAccessTokenFor(env, userId)` prefers the requester's own token; slack_search takes SlackContext, gates own-visibility on the D-channel surface, reports `visibility` and a consent-link `note`; AGENT.md + tool description updated. Follow-up (todo 019): extend `slack_thread_read` to the requester's token for reading their own DM threads by permalink.

@@ -6,6 +6,7 @@
 
 import type { Env } from "../types";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
+import { collectStrings } from "../agent/preflight";
 
 // One shared confirmation footer on every card. Anyone in the thread may
 // confirm/cancel now (the requester lock was removed 2026-07-14), so it names no
@@ -33,8 +34,36 @@ export function formatProposal(
   }
   lines.push(`:warning: About to *${proposalVerb(toolName)}*:`);
   if (targetNote) lines.push(targetNote);
-  lines.push(body, CONFIRM_FOOTER);
+  lines.push(body);
+  if (toolName === "shareout_post") {
+    const audit = shareoutBundleNote(input);
+    if (audit) lines.push(audit);
+  }
+  lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
+}
+
+// "Stage, but flag gaps loudly" (Bill, 2026-07-16): a share-out stages
+// immediately with whatever is in hand, and the CARD carries the bundle audit —
+// so ✅ is informed consent to post without the missing pieces, and a weaker
+// model lane can't silently skip the disclosure (renderer-level, not
+// prompt-level). Bundle contract for prototype share-outs: Loom walkthrough +
+// live preview + Decisions DB link (skills/uno-publish/references/method.md).
+function shareoutBundleNote(input: Record<string, unknown>): string | null {
+  const summary = typeof input.summary === "string" ? input.summary : "";
+  if (!/prototype|prototypes|scaffold/i.test(summary)) return null;
+  const haystack = collectStrings(input).join("\n");
+  const missing: string[] = [];
+  if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) missing.push("Loom walkthrough");
+  if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev)/i.test(haystack)) missing.push("live preview");
+  if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
+    missing.push("Decisions DB link");
+  }
+  if (missing.length === 0) return null;
+  return (
+    `:rotating_light: *Bundle incomplete — missing: ${missing.join(" · ")}.*\n` +
+    `:white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
+  );
 }
 
 // notion_update gets its OWN conversational card (no ⚠️ preamble): a warm lead,

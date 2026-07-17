@@ -193,7 +193,7 @@
   },
   {
     "name": "slack_search",
-    "description": "Search Slack workspace messages. Results are PRE-CLEARED for sharing: public channels plus the team-designated private channels only — DMs and other private spaces are filtered out before you see them, so everything returned is safe to quote in your reply. The response includes withheld_private_matches (a count of hits that existed in non-shareable spaces); if it's >0 and relevant, you may say matches exist in private spaces you can't surface — never speculate about their content. Use for 'find the discussion about X', sign-off tallies across channels, locating past decisions. READ-ONLY, ungated.",
+    "description": "READ-ONLY. Search Slack messages. Results arrive PRE-CLEARED by a Worker-side visibility firewall — safe to quote as returned. Two modes (see result.visibility): 'workspace-filtered' (public + team-allowlisted private channels only; DMs never included) and 'requester-own' (active only when the requester has connected their Slack history AND is asking in their own DM with you — results then include their DMs, group DMs, and private channels, i.e. exactly what they can already see). Requester-own results answer that requester in that DM only — never repeat DM-derived content anywhere else. If the result carries a `note` with a connect link, offer it when the requester wanted DM coverage.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -204,41 +204,6 @@
         "query": {
           "type": "string",
           "description": "Slack search query. Supports operators like in:#channel, from:@user, before:/after: dates."
-        }
-      }
-    }
-  },
-  {
-    "name": "delegate",
-    "description": "Fan out up to 3 independent research subtasks to fast subagents that run IN PARALLEL — each one can search and read Notion, GitHub, Supabase, and Slack on its own. Use whenever grounding needs several separate lookups (fetch specific cards and report their status; find a person's roster page; pull a doc and extract fields) so you stay focused on reasoning and synthesis instead of doing every lookup serially yourself. Each task must be a SELF-CONTAINED goal with the names/links/IDs the subagent needs. Results come back as compact bullet facts with links. READ-ONLY; ungated; counts as one tool call.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "tasks"
-      ],
-      "properties": {
-        "tasks": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 3,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "goal"
-            ],
-            "properties": {
-              "goal": {
-                "type": "string",
-                "description": "Self-contained instruction, e.g. 'Fetch Notion card 2154 (Goal-Setting Feature) and report its Design Status, Product Pillar, and Contributors with the page link.'"
-              },
-              "context": {
-                "type": "string",
-                "description": "Optional extra context: links, constraints, disambiguation."
-              }
-            }
-          }
         }
       }
     }
@@ -435,7 +400,7 @@
   },
   {
     "name": "shareout_post",
-    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Draft the shareout text conversationally first; invoke once they approve.",
+    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Stage IMMEDIATELY with whatever links are in hand — do NOT interrogate for missing bundle pieces first; the confirmation card automatically flags anything missing (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

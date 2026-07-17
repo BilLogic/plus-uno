@@ -102,10 +102,17 @@ function parseSlackToken(json: Record<string, unknown>): StoredToken {
       : typeof json.expires_in === "number"
         ? json.expires_in
         : undefined;
+  // Who consented — keys the per-user token slot (ADR-020: requester-scoped
+  // visibility). Shape-validated before it can become part of a KV key.
+  const identity =
+    typeof authedUser.id === "string" && /^[UW][A-Z0-9]{2,20}$/.test(authedUser.id)
+      ? authedUser.id
+      : undefined;
   return {
     access_token: access,
     refresh_token: refresh,
     expires_at: expiresIn ? Date.now() + expiresIn * 1000 : undefined,
+    identity,
   };
 }
 
@@ -123,7 +130,28 @@ function config(env: Env): ProviderConfig {
     redirectUri: env.SLACK_OAUTH_REDIRECT_URI!,
     kv: env.SLACK_OAUTH_KV!,
     parseTokenResponse: parseSlackToken,
-    successMessage: "✅ uno-bot connected to Slack (hosted MCP). You can close this tab.",
+    // The oauth.v2.user.access response omits authed_user.id in practice
+    // (observed live 2026-07-16: Bill's consent produced an identity-less
+    // token), so resolve the owner authoritatively via auth.test — the
+    // identity keys the per-user slot (ADR-020).
+    enrichToken: async (token) => {
+      if (token.identity) return token;
+      try {
+        const res = await fetch("https://slack.com/api/auth.test", {
+          method: "POST",
+          headers: { authorization: `Bearer ${token.access_token}` },
+        });
+        const data = (await res.json()) as { ok?: boolean; user_id?: string };
+        if (data.ok && typeof data.user_id === "string" && /^[UW][A-Z0-9]{2,20}$/.test(data.user_id)) {
+          token.identity = data.user_id;
+        }
+      } catch {
+        // best-effort: an identity-less token still lands in the legacy slot
+      }
+      return token;
+    },
+    successMessage:
+      "✅ Slack linked. Searches you ask for in your DM with uno-bot now cover everything you can see. You can close this tab.",
   };
 }
 
@@ -152,4 +180,42 @@ export async function handleSlackOAuthCallback(request: Request, env: Env): Prom
 export async function getSlackAccessToken(env: Env): Promise<string | null> {
   if (!slackOAuthConfigured(env)) return null;
   return getAccessToken(config(env));
+}
+
+/** True when this user has connected their own Slack history (per-user token
+ *  slot exists and is valid). Drives the first-contact onboarding nudge. */
+export async function hasOwnSlackToken(env: Env, userId: string): Promise<boolean> {
+  if (!slackOAuthConfigured(env)) return false;
+  if (!/^[UW][A-Z0-9]{2,20}$/.test(userId)) return false;
+  return (await getAccessToken(config(env), userId)) !== null;
+}
+
+/** User-facing consent URL (the OAuth entry point), derived from the
+ *  configured redirect. Null when the OAuth path isn't set up. */
+export function slackConnectUrl(env: Env): string | null {
+  if (!env.SLACK_OAUTH_REDIRECT_URI) return null;
+  try {
+    return `${new URL(env.SLACK_OAUTH_REDIRECT_URI).origin}/oauth/slack/start`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Requester-scoped credential (ADR-020): the requester's OWN token when they
+ * have consented at /oauth/slack/start (own=true — carries exactly their Slack
+ * visibility, DMs included), else the legacy workspace token (own=false — the
+ * caller must keep the hard visibility firewall). Null when nothing is stored.
+ */
+export async function getSlackAccessTokenFor(
+  env: Env,
+  userId?: string,
+): Promise<{ token: string; own: boolean } | null> {
+  if (!slackOAuthConfigured(env)) return null;
+  if (userId && /^[UW][A-Z0-9]{2,20}$/.test(userId)) {
+    const own = await getAccessToken(config(env), userId);
+    if (own) return { token: own, own: true };
+  }
+  const legacy = await getAccessToken(config(env));
+  return legacy ? { token: legacy, own: false } : null;
 }

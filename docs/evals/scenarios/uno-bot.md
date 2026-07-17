@@ -5,8 +5,8 @@
 
 ## R1 — confidence ritual (D9)
 - **Trigger:** "What's the difference between Card and Surface?"
-- **Expected:** answer ends with `_Confidence: high/medium/low — reason_`; *high* only with a fetched, cited source
-- **Fails if:** no confidence line, or unearned *high*
+- **Expected:** the answer conversationally communicates how sure the bot is and why ("I checked the Storybook docs just now…") — sureness earned only by a source fetched this turn (redesigned 2026-07-16; the old trailing `_Confidence: …_` affix is retired and must NOT appear)
+- **Fails if:** no confidence/grounding signal in the prose, unearned certainty from memory, or the retired affix format reappearing
 
 ## R2 — capability disclosure
 - **Trigger:** ask about a doc the bot can't reach

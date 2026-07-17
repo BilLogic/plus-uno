@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 import { runAgent, type AgentResult } from "../agent/run-agent";
 import { bareResolution } from "../agent/loop-shared";
-import { routeRequest } from "../agent/anthropic-client";
+import { routeRequest } from "../agent/routing";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -9,6 +9,7 @@ import {
   claimEventRun,
   deletePendingProposal,
   isDuplicateEvent,
+  loadAssistantContext,
   loadHistory,
   loadPendingProposalByThread,
   markEventRunDone,
@@ -16,6 +17,14 @@ import {
   type HistoryTurn,
 } from "../thread-state-client";
 import { addReaction, conversationsReplies, getBotIdentity, postMessage } from "./api";
+import {
+  handleAssistantThreadStarted,
+  handleAssistantThreadContextChanged,
+  setStatus,
+  isAssistantThread,
+  formatAssistantContext,
+} from "./assistant";
+import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import { preflight } from "../agent/preflight";
@@ -27,6 +36,9 @@ import {
   type SlackEventCallback,
   type SlackUrlVerification,
   type SlackEnvelope,
+  type SlackAssistantThreadStartedEvent,
+  type SlackAssistantThreadContextChangedEvent,
+  type SlackAppHomeOpenedEvent,
   type RunnerJobPayload,
 } from "./types";
 import { collectVisionInputs } from "./vision";
@@ -101,6 +113,24 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       // reacted message so confirmations on one proposal stay ordered.
       const r = event as SlackReactionAddedEvent;
       await enqueueAgentJob(env, { kind: "reaction", event: r }, `${r.item.channel}:${r.item.ts}`);
+      return;
+    }
+    case "assistant_thread_started": {
+      // Panel opened: greet + suggested prompts + title. Pure decoration, no
+      // agent run — safe to do inline (well under the 30s waitUntil budget).
+      await handleAssistantThreadStarted(env, event as SlackAssistantThreadStartedEvent);
+      return;
+    }
+    case "assistant_thread_context_changed": {
+      // User switched what they're viewing with the panel open — persist it so
+      // the next message can ground on it. No user-visible output.
+      await handleAssistantThreadContextChanged(env, event as SlackAssistantThreadContextChangedEvent);
+      return;
+    }
+    case "app_home_opened": {
+      // Home tab opened → publish the landing view. Inline (one API call, well
+      // under the waitUntil budget); the Messages-tab variant is ignored inside.
+      await handleAppHomeOpened(env, event as SlackAppHomeOpenedEvent);
       return;
     }
     default:
@@ -291,6 +321,13 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // which counts as handled. Only a hard kill skips this — by design, so the
     // lease can rescue it.
     await markEventRunDone(env, runKey);
+    // Clear the assistant "thinking…" loader on every exit (success, early
+    // return, or throw) — a stuck status line is worse than none. No-op off
+    // the panel or if one was never set. Same thread_ts gate as the set: only
+    // threaded DM turns (the panel's shape) can have a status to clear.
+    if (isAssistantThread(event.channel) && event.thread_ts) {
+      await setStatus(env, event.channel, event.thread_ts, "").catch(() => {});
+    }
   }
   return "handled";
 }
@@ -325,7 +362,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     ]);
   } catch (err) {
     console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    await postVisibleFailure(env, channel, threadTs, userMsgTs, err);
     return;
   }
 
@@ -350,6 +387,16 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     }
   }
 
+  // Assistant-panel surface the user currently has open (best-effort; null off
+  // the panel or when nothing is focused). Advisory grounding for deictic asks
+  // — never assumed to be the subject otherwise. Loaded AFTER the fast-path so
+  // a bare "yes" never pays the DO read; gated on thread_ts because panel
+  // messages are always threaded (plain top-level DMs skip the lookup). May be
+  // one hop stale: Slack doesn't order context_changed vs the message event.
+  const panelContext = isAssistantThread(channel) && event.thread_ts
+    ? formatAssistantContext(await loadAssistantContext(env, channel, threadTs))
+    : null;
+
   // Vision: pasted images + a linked Figma frame become base64 image blocks on
   // the current turn. Guarded inside — a failure degrades to text-only.
   const vision = await collectVisionInputs(env, event, userText);
@@ -361,6 +408,13 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const { tier: previewTier } = routeRequest({ userText, hasPending: pending !== null });
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
+    // On the assistant panel, the native "is thinking…" status is the idiomatic
+    // loader (a reaction reads oddly in the side panel). Cleared in onMessage's
+    // finally on every exit path. thread_ts gate: panel messages are always
+    // threaded, so plain top-level DMs skip the doomed-to-fail API call.
+    if (isAssistantThread(channel) && event.thread_ts) {
+      await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
+    }
   }
 
   // Interim updates: long runs are now legal (streaming + MCP can take several
@@ -405,11 +459,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       },
       currentSender: { userId },
       pending,
+      assistantContext: panelContext ?? undefined,
       onInterim: postInterim,
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs);
+    await postVisibleFailure(env, channel, threadTs, userMsgTs, err);
     return;
   } finally {
     clearTimeout(interimTimer);

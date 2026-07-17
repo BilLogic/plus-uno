@@ -26,7 +26,7 @@ The unit of async sharing is a complete bundle, never a lone link:
 | Decision log (Notion Decisions DB) | the whys, so rounds compound | always |
 | Figma replica | a surface to mark up | when the artifact is a prototype (interactive or coded); static/low-fi shares may omit |
 
-Before posting, the replica gets a visual diff against the coded prototype — drift there defeats its feedback purpose (rubric dimension: replica-fidelity). **Completeness is a hard gate: a partial bundle never posts.** A missing piece gets produced, not waived — the only legitimate omission is the replica on a non-prototype artifact. The replica is a feedback surface, not a source of truth: the coded prototype stays the real artifact. Don't confuse it with the handoff rail's componentized Figma spec, which *is* contractual.
+Before posting, the replica gets a visual diff against the coded prototype — drift there defeats its feedback purpose (rubric dimension: replica-fidelity). **Completeness is loudly audited, not silently waived.** Producing every piece stays the default expectation, and the only always-legitimate omission is the replica on a non-prototype artifact. In the IDE publish flow a partial bundle still never posts; on uno-bot's quick feedback rail (revised 2026-07-16) the post stages immediately and the confirmation card lists every missing piece — an explicit ✅ on that card is informed consent to post partial. The replica is a feedback surface, not a source of truth: the coded prototype stays the real artifact. Don't confuse it with the handoff rail's componentized Figma spec, which *is* contractual.
 
 ### Sync — logistics only
 

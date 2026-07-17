@@ -140,16 +140,34 @@ nearest existing composition as the interim, (3) file a uno-maintain intake for
 the missing component. Zero hand-rolled lookalikes — a gap is a finding, not a
 license to invent.
 
-## 6. Exit — validate, manifest, hand off
+## 6. Exit — the validation loop, manifest, hand off
 
 Before the artifact leaves the skill:
 
-1. **DS-lens validation pass** — a conformance check at the artifact's own
+1. **Validation loop — hi-fi and coded artifacts only.** Run every machine
+   check the runtime provides (each face names its own set); if any fail, fix
+   the reported findings and run the **full set** again — a fix can break a
+   check that passed last time. Stop when:
+   - **all checks pass** → continue to step 2;
+   - **three attempts are spent**, or **an attempt fixes nothing** (the same
+     failures twice in a row) → stop looping, carry the remaining failures
+     into the manifest, and continue anyway. The cap exists because a loop
+     that isn't converging burns budget without adding quality — a human
+     judges it next.
+   A runtime with a goal-loop primitive may drive this with it (goal = all
+   checks pass; cap = 3 attempts); the loop as written here is the contract
+   for every other runtime. **Headless codegen faces** (the figma-implement
+   workflows) are single-pass by construction — no agent survives to iterate —
+   so their check set runs as a deterministic workflow post-step whose results
+   land in the draft PR under "Machine checks"; the PR review is their fix
+   loop, and a ❌ there blocks review sign-off, not PR creation.
+2. **DS-lens validation pass** — a conformance check at the artifact's own
    fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
    Major findings loop back to the fidelity decision (§2).
-2. **Artifact manifest** — one line: fidelity · tools used · PRD link. Review's
-   mandatory input; every path exit produces it.
-3. Hand to **uno-review** for the stage-lens review. Passing review and being
+3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
+   any unresolved check failures from step 1. Review's mandatory input; every
+   path exit produces it.
+4. Hand to **uno-review** for the stage-lens review. Passing review and being
    ready to share are separate gates — iteration by choice re-enters at §2.
 
 ## Quality bar

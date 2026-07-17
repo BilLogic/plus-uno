@@ -1,11 +1,16 @@
 // Minimal Gemini client for the provider adapter (phase 1, 2026-07-10).
 //
 // Supports BOTH access paths, auto-selected by which credential is present:
-//   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
-//                                 googleapis.com) — plain key header. The path
-//                                 Google recommends; simplest on Workers.
 //   • GEMINI_SA_* service acct  → Vertex AI (aiplatform.googleapis.com) with
-//                                 an OAuth token minted in ./auth.ts.
+//                                 an OAuth token minted in ./auth.ts. THE
+//                                 CANONICAL PATH — always wins when configured
+//                                 (rule set 2026-07-16 after the Vertex-vs-AI-
+//                                 Studio key mixup; docs/knowledge/decisions.md
+//                                 ADR-018).
+//   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
+//                                 googleapis.com) — plain key header. Emergency
+//                                 fallback only; do NOT set this secret on the
+//                                 deployed Worker.
 //
 // Phase 1 scope: non-streaming generateContent with a system prompt and plain
 // text — enough for the /debug/gemini smoke test and the delegate-subagent
@@ -38,8 +43,23 @@ interface GenerateContentResponse {
 }
 
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
-  if (env.GEMINI_API_KEY) return "api-key";
-  if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY) return "service-account";
+  // SA FIRST (flipped 2026-07-16, live incident; ADR-018): the service account
+  // carries the GCP project's real Vertex quota and matches the credential used
+  // everywhere else (Claude lane, embeddings, backfill). An AI-Studio
+  // GEMINI_API_KEY used to take precedence — free-tier keys have small daily
+  // caps, and when one is set on the Worker it starved EVERY turn with 429s
+  // (bot down in Slack + the whole eval run). API key remains the fallback for
+  // deployments without an SA — and only ever local-dev, never the Worker.
+  if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
+    return "service-account";
+  }
+  if (env.GEMINI_API_KEY) {
+    // Loud on purpose: the SA config going missing (rotation, rename, typo)
+    // silently shifting traffic to a different auth/billing boundary is the
+    // failure mode ADR-018 exists to catch.
+    console.warn("[gemini] Vertex SA not fully configured — falling back to the AI Studio key (emergency path)");
+    return "api-key";
+  }
   return null;
 }
 
@@ -107,7 +127,11 @@ export async function geminiGenerate(
       maxOutputTokens: opts.maxTokens ?? 2048,
       // thinking_level nests under thinkingConfig on the REST generateContent
       // surface (live 400 confirmed it's not a direct generationConfig field).
-      ...(opts.thinkingLevel ? { thinkingConfig: { thinkingLevel: opts.thinkingLevel } } : {}),
+      // Gemini 3.x only — 2.5-gen models reject it ("not supported by this
+      // model", probed 2026-07-16), so it's gated on the model generation.
+      ...(opts.thinkingLevel && /^gemini-3/.test(model)
+        ? { thinkingConfig: { thinkingLevel: opts.thinkingLevel } }
+        : {}),
     },
     ...(opts.system ? { systemInstruction: { parts: [{ text: opts.system }] } } : {}),
   };
