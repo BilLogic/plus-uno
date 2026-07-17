@@ -62,12 +62,12 @@ jobs:
             -d "{\"channel\": \"$CHANNEL\", \"name\": \"gear\", \"timestamp\": \"$MESSAGE_TS\"}" || true
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
 
@@ -107,16 +107,27 @@ jobs:
             echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Run machine checks (uno-prototype method §6, headless post-step)
+        if: steps.commit.outputs.changes == 'true'
+        id: checks
+        continue-on-error: true # findings go to the human PR review, they don't block the PR existing
+        env:
+          SLUG: ${{ steps.implement.outputs.slug }}
+        run: |
+          bash skills/uno-review/scripts/run-review-checks.sh "playground/$SLUG" \
+            | tee checks-output.txt
+
       - name: Create draft PR
         if: steps.commit.outputs.changes == 'true'
         id: create-pr
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           SLUG: ${{ steps.implement.outputs.slug }}
           BRANCH: ${{ steps.commit.outputs.branch }}
           FIGMA_URL: ${{ steps.payload.outputs.figma_url }}
           PRD_URL: ${{ steps.payload.outputs.notion_prd_url }}
           FILES_WRITTEN: ${{ steps.implement.outputs.files_written }}
+          CHECKS_OUTCOME: ${{ steps.checks.outcome }}
         with:
           script: |
             const slug = process.env.SLUG;
@@ -124,6 +135,12 @@ jobs:
             const figmaUrl = process.env.FIGMA_URL;
             const prdUrl = process.env.PRD_URL;
             const filesWritten = process.env.FILES_WRITTEN;
+
+            const fs = require('fs');
+            const checksRaw = fs.existsSync('checks-output.txt')
+              ? fs.readFileSync('checks-output.txt', 'utf8').slice(0, 3000)
+              : '(checks step produced no output)';
+            const checksBadge = process.env.CHECKS_OUTCOME === 'success' ? '✅ passed' : '❌ FAILED — fix before review sign-off';
 
             const body = [
               `## New Prototype: ${slug}`,
@@ -133,6 +150,17 @@ jobs:
               '',
               figmaUrl ? `**Figma:** ${figmaUrl}` : '',
               prdUrl ? `**Notion PRD:** ${prdUrl}` : '',
+              '',
+              '---',
+              `## Machine checks (${checksBadge})`,
+              '',
+              '<details><summary>run-review-checks.sh output</summary>',
+              '',
+              '```',
+              checksRaw,
+              '```',
+              '',
+              '</details>',
               '',
               '---',
               '## Prototype Review Checklist',

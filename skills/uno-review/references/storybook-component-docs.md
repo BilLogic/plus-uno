@@ -19,13 +19,13 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
 ### Sidebar patterns in the current repo
 
 1. **Single entry, MDX-first**
-   Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../design-system/src/components/Button/Button.mdx), [`Checkbox.mdx`](../../../design-system/src/forms/Checkbox.mdx).
+   Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../design-system/src/components/actions/Button/Button.mdx), [`Checkbox.mdx`](../../../design-system/src/components/forms-and-inputs/Checkbox.mdx).
 
 2. **Single entry, merged subcomponent stories**
-   Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Examples: [`Alert.mdx`](../../../design-system/src/components/Alert/Alert.mdx), [`NavPills.mdx`](../../../design-system/src/components/NavPills/NavPills.mdx).
+   Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Examples: [`Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx), [`NavPills.mdx`](../../../design-system/src/components/navigation/NavPills/NavPills.mdx).
 
 3. **Single entry, richer composed docs**
-   A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/Button/Button.mdx), which uses [`button-segmented-demos.jsx`](../../../design-system/src/components/Button/button-segmented-demos.jsx).
+   A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/actions/Button/Button.mdx), which uses [`button-segmented-demos.jsx`](../../../design-system/src/components/actions/Button/button-segmented-demos.jsx).
 
 4. **Stories-only outlier**
    Some forms still rely on a single story file and have no colocated MDX page yet. Current examples: `Forms/Rating`, `Forms/Input Group`, and `Forms/Scale`.
@@ -108,7 +108,7 @@ Use it when:
 - those parts matter to how designers review or compose it
 - a plain `Content` section would blur “what goes in it” with “what it is made of”
 
-Strong current example: [`Alert.mdx`](../../../design-system/src/components/Alert/Alert.mdx).
+Strong current example: [`Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx).
 
 #### `Behavior`
 
@@ -119,7 +119,7 @@ Use it when:
 - the component’s rules of operation are a major part of design review
 - `Interaction States` alone would only show screenshots, not explain the behavior model
 
-Strong current example: [`Accordion.mdx`](../../../design-system/src/components/Accordion/Accordion.mdx).
+Strong current example: [`Accordion.mdx`](../../../design-system/src/components/layout-and-structure/Accordion/Accordion.mdx).
 
 #### `Types` (rare)
 
@@ -130,7 +130,7 @@ Use it when:
 - the component exposes distinct conceptual modes
 - calling them `Variants` would hide meaningful product intent
 
-Current example: [`Modal.mdx`](../../../design-system/src/components/Modal/Modal.mdx).
+Current example: [`Modal.mdx`](../../../design-system/src/components/messaging/Modal/Modal.mdx).
 
 ### Headings that should usually be folded back into the default spine
 
@@ -341,6 +341,6 @@ Avoid making the page read like plugin or implementation documentation. The poin
 - [`storybook.md`](storybook.md)
 - [`design-system/src/storybook-docs/Introduction.mdx`](../../../design-system/src/storybook-docs/Introduction.mdx)
 - [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx)
-- [`design-system/src/components/Button/Button.mdx`](../../../design-system/src/components/Button/Button.mdx)
-- [`design-system/src/components/Alert/Alert.mdx`](../../../design-system/src/components/Alert/Alert.mdx)
-- [`design-system/src/components/NavPills/NavPills.mdx`](../../../design-system/src/components/NavPills/NavPills.mdx)
+- [`design-system/src/components/actions/Button/Button.mdx`](../../../design-system/src/components/actions/Button/Button.mdx)
+- [`design-system/src/components/messaging/Alert/Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx)
+- [`design-system/src/components/navigation/NavPills/NavPills.mdx`](../../../design-system/src/components/navigation/NavPills/NavPills.mdx)

@@ -109,10 +109,11 @@ Before the artifact leaves the skill:
      judges it next.
    A runtime with a goal-loop primitive may drive this with it (goal = all
    checks pass; cap = 3 attempts); the loop as written here is the contract
-   for every other runtime. **Known exemption:** the headless codegen faces
-   (`scripts/prompts/uno-implement*`, dispatched by the figma-implement
-   workflows) currently exit through draft-PR human review instead of this
-   loop — a deliberate gap tracked as a maintain intake, not an implied pass.
+   for every other runtime. **Headless codegen faces** (the figma-implement
+   workflows) are single-pass by construction — no agent survives to iterate —
+   so their check set runs as a deterministic workflow post-step whose results
+   land in the draft PR under "Machine checks"; the PR review is their fix
+   loop, and a ❌ there blocks review sign-off, not PR creation.
 2. **DS-lens validation pass** — a conformance check at the artifact's own
    fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
    Major findings loop back to the fidelity decision (§2).
