@@ -37,7 +37,10 @@ jobs:
           GH_TOKEN: ${{ github.token }} # read-only: `gh run list` for the missed-run window check
         with:
           prompt-file: scripts/prompts/uno-tier1-digest/SKILL.md
-          max-turns: "20"
+          # 20 was too tight on the first verified run ("Reached max turns") —
+          # reading the conventions + window check + compose + post + sentinel
+          # takes ~25-30 turns with a few allowlist denials along the way.
+          max-turns: "40"
           # Injection boundary: repo reads, payload composition, and ONLY the
           # Slack chat.postMessage endpoint — no arbitrary curl targets.
           allowed-tools: "Read,Grep,Glob,Write,Bash(jq:*),Bash(date:*),Bash(gh run list:*),Bash(curl -s -X POST https://slack.com/api/chat.postMessage:*)"
