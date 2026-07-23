@@ -21,7 +21,7 @@ Because the brain is bundled, **guidance changes reach the bot on `deploy`, not 
 
 | | `gemini` (**default / active**) | `vertex-claude` |
 |---|---|---|
-| Loop | `src/agent/gemini-agent.ts` — `GEMINI_MODEL` (`gemini-3.5-flash`) | `src/agent/claude-agent.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
+| Loop | `src/agent/gemini-agent.ts` — `GEMINI_MODEL` (`gemini-3.6-flash`) | `src/agent/claude-agent.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
 | Web grounding | `googleSearch` + `urlContext` (Google built-ins) | Claude `web_search` (needs the GCP org policy `constraints/vertexai.allowedPartnerModelFeatures`) |
 | Prompt caching | Gemini implicit caching | Anthropic prompt caching on the cached system prefix |
 | Auth / billing | Vertex service account (canonical — ADR-018; AI-Studio `GEMINI_API_KEY` is a local-dev fallback only) → GCP | **Same** Vertex service account → GCP (Claude via Model Garden) |

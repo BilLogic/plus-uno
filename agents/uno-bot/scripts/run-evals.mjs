@@ -15,7 +15,7 @@
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
 // Judge (optional — judge is skipped without it; deterministic checks still run):
 //   GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID (default hcii-plus)
-// Optional: JUDGE_MODEL (default gemini-3.5-flash), CASES_PATH
+// Optional: JUDGE_MODEL (default gemini-3.6-flash), CASES_PATH
 //
 // Run:  node agents/uno-bot/scripts/run-evals.mjs
 
@@ -28,7 +28,7 @@ const {
   GEMINI_SA_EMAIL,
   GEMINI_SA_PRIVATE_KEY,
   GEMINI_PROJECT_ID = "hcii-plus",
-  JUDGE_MODEL = "gemini-3.5-flash",
+  JUDGE_MODEL = "gemini-3.6-flash",
   CASES_PATH = "docs/evals/fixtures/uno-bot-cases.json",
 } = process.env;
 
