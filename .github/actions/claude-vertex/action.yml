@@ -13,13 +13,12 @@ inputs:
   model:
     description: "Vertex model id — route by difficulty (sonnet default / opus hard)"
     required: false
-    # hcii-plus Model Garden enablement (probed 2026-07-16 via CLI errors):
-    # sonnet tier has ONLY claude-sonnet-4-5@20250929; claude-sonnet-5 and
-    # claude-sonnet-4-6 are NOT enabled; claude-opus-4-8 IS. Bump when the
-    # admin enables newer sonnets — the Worker's routing.ts sonnet tier
-    # (claude-sonnet-5) will hit the same wall if its vertex-claude lane is
-    # switched on first.
-    default: "claude-sonnet-4-5@20250929"
+    # hcii-plus Model Garden: claude-sonnet-5 enabled 2026-07-17 (was bridged on
+    # claude-sonnet-4-5@20250929 while pending). Matches the Worker's routing.ts
+    # sonnet tier — one source of truth for "which sonnet". claude-opus-4-8 also
+    # enabled. A "not available on your vertex deployment" error = an
+    # enablement gap, not quota/creds (the CLI names the nearest enabled model).
+    default: "claude-sonnet-5"
   max-turns:
     description: "Hard agentic-turn cap (cost control — every loop needs a stop)"
     required: false

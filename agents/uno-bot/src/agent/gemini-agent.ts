@@ -155,7 +155,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       builtinSearchTools: isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [],
     };
   };
-  let model = env.GEMINI_MODEL ?? "gemini-3.5-flash";
+  let model = env.GEMINI_MODEL ?? "gemini-3.6-flash";
   let { thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model);
 
   // Backup-model failover (2026-07-16 quota incident — flash quota exhausted,
