@@ -4,9 +4,26 @@
 
 ## The contract
 
-- **uno-blueprint (Supabase) is the product source of truth.** Ground every product-fact claim in a blueprint read (`blueprint_search` / PostgREST) with layer/actor attribution; cite what you found. Notion pages may mirror or link blueprint content but are never the source.
+- **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`blueprint_search` / PostgREST) with layer/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
 - **Query at task time, never cache.** `docs/context/product/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
-- **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect; the auditor's drift sweep flags it.
+- **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect; the shipped watchdog's blueprint-drift check (`docs/conventions/automations.md`) flags it, and any human spot of blueprint-vs-reality drift files a `uno-maintain` intake.
+
+## Two sources, one time axis (ADR-021)
+
+Grounded in the UNO Blueprint Grounding Evaluation (Notion, 2026-07: six-arm context ladder; guided blueprint arms hit 100% vs 36% docs-only; the sharpest failures were source-conflict blends). Every agent answering journey/product questions — in-IDE or uno-bot — follows this routing:
+
+| Situation | Authority | Answer shape |
+|---|---|---|
+| "How does it work **today**?" | Blueprint | Cite `scenario → path → step` + `layer` actor. |
+| Conflicting card is **WIP / under review** and the change is **decided** (Decisions DB / card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both stated, attributed, never blended. |
+| Conflicting card is **WIP / review** but **exploratory** (no decision) | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — might change, not decided." Calibrate the verb to decision status. |
+| Conflicting card is **shipped** (`Dev Status: Deployed`) | **Blueprint still wins** — the paired write updates it at ship, so shipped-card docs may be the obsolete side | Answer from the blueprint. Evidence the blueprint itself is stale → say so and file/offer a `uno-maintain` intake; never silently prefer the doc. |
+| "What's **planned / coming / changing**?" | Roadmap cards + PRDs | Cite card + Design/Dev Status; use the blueprint as the today-baseline to explain the delta. |
+| Blueprint silent; a **current** doc covers it (Help Center, shipped PRD) | The doc | Cite + date it; note the blueprint doesn't cover this yet. |
+| Only **aspirational** docs (roadmap PRD, future spec) | Neither, as fact | Report as planned per {doc}; current behavior stays blueprint's (or "not in the source"). |
+| Neither source | Abstain | "Not in the source" + name who should fill the gap. |
+
+Hard rules across all rows: **never merge two sources into one unattributed answer** — a conflict is surfaced, not blended; a fabricated blueprint citation is the worst outcome; blueprint feeds PRD drafting too (`skills/uno-synthesize` queries it for the current-state and downstream-effects sections before writing).
 - Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 

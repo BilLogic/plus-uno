@@ -7,7 +7,7 @@ Keep the harness itself current. One pass per issue: **capture → route → dra
 
 ## 1 · Intake — normalize the observation
 
-Every intake is one of four **trigger types** — improvement (could be better) · inaccuracy (says something wrong) · inconsistency (two sources disagree) · bug (behaves wrongly) — routed to one of **11 targets across 3 estates**:
+Every intake is one of four **trigger types** — improvement (could be better) · inaccuracy (says something wrong) · inconsistency (two sources disagree) · bug (behaves wrongly) — routed to one of **12 targets across 4 estates**:
 
 | Estate | Target | Fix action |
 |---|---|---|
@@ -22,6 +22,7 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 | Notion | requirement / story changed | update PRD **+ blueprint together** — paired, never one alone |
 | Notion | behavior / spec wrong | correct the doc **+ flag its owner** — fixing the artifact alone isn't enough |
 | Notion | doc stale or missing | author / refresh the doc |
+| Supabase | blueprint stale vs operational reality (journey changed, no requirement doc involved) | update the blueprint via `writers/blueprint` — pair a PRD only when a requirement doc exists for that flow (`docs/conventions/supabase.md` § Two sources) |
 
 The taxonomy is the harness map — when a new component joins the harness, this table must grow.
 
@@ -67,10 +68,11 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
 - **Standing sweeps:** named in `docs/conventions/automations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
-- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness against built reality — routine, not exceptional. The check set, per shipped card:
+- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
   - `design-system/` stories/MDX reflect the shipped surface where they reference it;
   - harness docs (`docs/context/*`, conventions, skill references) don't describe pre-ship behavior as current;
-  - deployment/marketplace references (per uno-publish's references) still point at live URLs.
+  - deployment/marketplace references (per uno-publish's references) still point at live URLs;
+  - the **blueprint** reflects the shipped change (`docs/conventions/supabase.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
   The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
 
 ## 7 · Knowledge capture

@@ -2,8 +2,8 @@
 name: uno-maintain
 description: >
   Keeps the harness itself current. Captures a flagged issue — improvement,
-  inaccuracy, inconsistency, or bug — routes it across the three estates
-  (codebase, Figma, Notion) to one of eleven targets, drafts the fix, and runs the
+  inaccuracy, inconsistency, or bug — routes it across the four estates
+  (codebase, Figma, Notion, Supabase/blueprint) to one of twelve targets, drafts the fix, and runs the
   tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
   directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
@@ -30,14 +30,14 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 | Headless sweep queue | open GitHub issues labeled `harness-intake` (filed by the cron sweeps — method §1 headless surrogate). **Drain first on every maintain session**: `gh issue list --label harness-intake --state open`, triage each into the pipeline, close as incorporated |
 | DS gap from prototyping | `uno-prototype` hits a missing/broken component or token |
 | Legacy-source conflict | a legacy Notion/Figma page contradicts repo-canonical `docs/conventions/*` (method §6) |
-| Post-ship reconciliation | a handoff shipped; DS + harness reconcile against built reality |
+| Post-ship reconciliation | a handoff shipped; DS + harness **+ blueprint** reconcile against built reality (ship-time is when the blueprint must be updated — the paired-write contract, `docs/conventions/supabase.md`) |
 
 ## Workflow (execution over method.md)
 
 1. **Normalize** (method §1): classify trigger type → estate → target; record the Roadmap intake card via `writers/notion`; name evidence + suggested tier. Cross-estate disagreement → flag it, don't improvise.
 2. **Draft the fix** (method §2), fix-first judge-second:
    - Repo targets (context docs, skills, persona, DS source, bot) — edit files directly in a branch. DS-source and Figma↔DS reconcile targets: execution runbook [`references/ds-fix.md`](references/ds-fix.md) (who executes what · workflows · script inventory).
-   - Notion writes → `writers/notion` · Figma writes → `writers/figma` · requirement changes → `writers/blueprint` (paired PRD+blueprint, never one alone).
+   - Notion writes → `writers/notion` · Figma writes → `writers/figma` · requirement changes → `writers/blueprint` (paired PRD+blueprint, never one alone) · blueprint-stale-vs-reality (no requirement doc) → `writers/blueprint` solo, PRD only when one exists for the flow.
 3. **Human gate** (method §3): present the 3-line impact / effort / risk brief; the spotter answers. Never answer it yourself.
 4. **Tier and apply** (method §4–5):
    - **Tier 1** (whitelist absolute): apply, then add the one-line row for the weekly digest.
