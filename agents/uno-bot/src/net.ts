@@ -1,10 +1,14 @@
 // Request-scoped subrequest meter.
 //
-// Cloudflare's free plan caps ONE Worker invocation at 50 outbound subrequests.
+// Cloudflare's free plan caps ONE Worker invocation at 50 EXTERNAL subrequests.
 // Call 51 doesn't fail gracefully: the invocation dies, so the reply is never
 // posted — the 👀-then-silence mode (live 2026-07-10, 2026-07-13). The budget
 // gate can only avoid that if it knows the real number, so every outbound call
 // goes through countedFetch here. Why measure instead of estimate: ADR-022.
+//
+// Calls to Cloudflare services (Durable Objects, KV) are a SEPARATE bucket with
+// a 1,000 cap — see charge() below. They are tracked, not counted against the
+// 50, because mixing the two made the gate refuse lookups the turn could afford.
 //
 // The counter lives in AsyncLocalStorage, so it is per-invocation without every
 // integration having to thread a context object through its signature. Metered
@@ -15,9 +19,19 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
 interface Meter {
+  /** EXTERNAL subrequests — the ones capped at 50. */
   count: number;
   /** Per-host tallies for the `[budget]` telemetry line. */
   byHost: Record<string, number>;
+  /**
+   * INTERNAL subrequests — Durable Object hops, KV, and any other
+   * Cloudflare-service call. A separate bucket with a separate (1,000) cap, so
+   * these must NOT be added to `count`: doing so makes the lookup gate refuse
+   * work it could afford. Tracked anyway because unbounded internal fan-out is
+   * still a way to die, just a further-off one.
+   */
+  internal: number;
+  internalByLabel: Record<string, number>;
   /** When set, countedFetch refuses the call that would cross it. */
   limit?: number;
   /**
@@ -119,7 +133,7 @@ export async function withSubrequestLimit<T>(limit: number, fn: () => Promise<T>
  * @param fn - The invocation body
  */
 export function runMetered<T>(fn: () => Promise<T>): Promise<T> {
-  return meterStore.run({ count: 0, byHost: {}, trips: 0 }, fn);
+  return meterStore.run({ count: 0, byHost: {}, internal: 0, internalByLabel: {}, trips: 0 }, fn);
 }
 
 /** Subrequests spent so far in this invocation (0 outside a metered context). */
@@ -128,27 +142,43 @@ export function subrequestsUsed(): number {
 }
 
 /**
- * Record subrequests this module can't see. Durable Object stub calls are real
- * subrequests but don't go through fetch(); charge them explicitly.
+ * Record an INTERNAL subrequest — a Durable Object hop, a KV read, anything to
+ * a Cloudflare service. These don't go through fetch(), so the meter can't see
+ * them, and they belong to a different budget than the outbound calls.
+ *
+ * Cloudflare's free plan allows "50 external subrequests and 1,000 subrequests
+ * to Cloudflare services per invocation" (developers.cloudflare.com/workers/
+ * platform/limits/#subrequests, verified 2026-07-30). Two buckets, not one.
+ * These used to be added to the external count, which was safe but wrong: every
+ * DO hop silently cost the turn a lookup it could have afforded.
  *
  * @param n - How many
- * @param host - Label for the telemetry breakdown
+ * @param label - Label for the telemetry breakdown
  */
-export function charge(n: number, host: string): void {
+export function charge(n: number, label: string): void {
   const m = meterStore.getStore();
   if (!m) return;
-  m.count += n;
-  m.byHost[host] = (m.byHost[host] ?? 0) + n;
+  m.internal += n;
+  m.internalByLabel[label] = (m.internalByLabel[label] ?? 0) + n;
 }
 
-/** Compact per-host breakdown, e.g. `api.notion.com:7 slack.com:4`. */
+/** Internal (Cloudflare-service) subrequests spent so far this invocation. */
+export function internalSubrequestsUsed(): number {
+  return meterStore.getStore()?.internal ?? 0;
+}
+
+/** Compact breakdown, e.g. `api.notion.com:7 slack.com:4 | internal do:2 kv:1`. */
 export function meterBreakdown(): string {
   const m = meterStore.getStore();
   if (!m) return "unmetered";
-  return Object.entries(m.byHost)
-    .sort((a, b) => b[1] - a[1])
-    .map(([host, n]) => `${host}:${n}`)
-    .join(" ");
+  const fmt = (t: Record<string, number>): string =>
+    Object.entries(t)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, n]) => `${label}:${n}`)
+      .join(" ");
+  const external = fmt(m.byHost);
+  const internal = fmt(m.internalByLabel);
+  return internal ? `${external} | internal ${internal}` : external;
 }
 
 /**

@@ -82,12 +82,9 @@ export async function ensureHarnessCache(
     return { name: memo.name, reason: memo.name ? undefined : "negative-cached this hour" };
   }
 
-  // KV is the cross-isolate memo. Charged deliberately, not casually: KV calls
-  // don't go through fetch, so the meter cannot see them, and whether Cloudflare
-  // bills them against the 50-subrequest cap is the kind of thing that is
-  // cheaper to over-count than to be wrong about (net.ts, ADR-022). NOTE: the
-  // KV reads in figma-poll.ts and slack/delivery.ts are NOT charged — that
-  // inconsistency predates this file and is worth settling separately.
+  // KV is the cross-isolate memo. Charged so it shows up in telemetry: KV calls
+  // don't go through fetch, so the meter cannot see them. They land in the
+  // INTERNAL bucket (1,000 cap), not the 50 that gates lookups — net.ts charge().
   if (env.HARNESS_KV) {
     charge(1, "kv");
     const stored = await env.HARNESS_KV.get<{ name: string | null; expiresAt: number }>(key, "json").catch(() => null);

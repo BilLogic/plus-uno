@@ -99,8 +99,9 @@ export const READONLY_TOOL_BUDGET = 12;
 
 // ── Subrequest budget: enforced at the boundary ──────────────────────────────
 //
-// The free plan hard-caps each Worker invocation at 50 subrequests (Notion
-// reads, Slack calls, DO hops, model calls — everything outbound). Call 51 kills
+// The free plan hard-caps each Worker invocation at 50 EXTERNAL subrequests
+// (Notion reads, Slack calls, model calls — everything that leaves Cloudflare;
+// DO and KV hops are a separate 1,000 bucket). Call 51 kills
 // the invocation, and because POSTING the reply also costs a subrequest, it dies
 // silently: 👀 then nothing (live incidents 2026-07-10, 2026-07-13).
 //
@@ -128,9 +129,10 @@ export const READONLY_TOOL_BUDGET = 12;
 // stamps `markPartialLookup` on whatever came back. Swallowing the throw now
 // costs an unnecessary label, not a false absence.
 
-export const SUBREQUEST_CAP = 50; // Cloudflare free-plan hard cap per invocation.
-// Reserved for delivery — NEVER spent on lookups: final post + one retry + 2
-// history writes + the pre-send review-judge model call + margin.
+export const SUBREQUEST_CAP = 50; // Cloudflare free-plan EXTERNAL cap per invocation.
+// Reserved for delivery — NEVER spent on lookups: final post + one retry + the
+// pre-send review-judge model call + margin. (History writes are Durable Object
+// hops, which live in the separate 1,000 internal bucket — see net.ts charge.)
 export const DELIVERY_RESERVE = 12;
 // Lookups run under this limit; delivery runs unlimited against the real cap.
 export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;

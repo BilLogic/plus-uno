@@ -69,7 +69,7 @@ for (const rel of readdirSync(srcDir, { recursive: true })) {
       return;
     }
     if (STUB_FETCH.test(line) && !GLOBAL_FETCH.test(line) && !CHARGED_STUB_CALLS.has(unix)) {
-      offences.push(`${at}\n    -> looks like a Durable Object / service-binding call. Those are real\n       subrequests the meter can't see: charge(1, "<label>") next to it, then\n       add this file to CHARGED_STUB_CALLS.`);
+      offences.push(`${at}\n    -> looks like a Durable Object / service-binding call. Those are INTERNAL\n       subrequests (separate 1,000 cap) the meter can't see: charge(1, "<label>")\n       next to it, then add this file to CHARGED_STUB_CALLS.`);
     }
   });
 }

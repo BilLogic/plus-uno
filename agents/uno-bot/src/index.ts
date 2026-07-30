@@ -12,7 +12,7 @@ import { BUILD } from "./version";
 import { runFigmaPoll } from "./figma-poll";
 import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
-import { runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips } from "./net";
+import { runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -215,6 +215,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
     return Response.json({
       ok: true, build: BUILD, ms: Date.now() - startedAt,
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
+      internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),
       narration, gateAsk, result,
     });
@@ -225,6 +226,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       ms: Date.now() - startedAt,
       narration,
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
+      internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),
       error: err instanceof Error ? err.message : String(err),
     });
