@@ -17,7 +17,6 @@ export interface Env {
   SLACK_BOT_TOKEN: string;
   GITHUB_TOKEN: string;
   GITHUB_REPO: string;
-  SKILLS_BASE_URL: string;
   FIGMA_ACCESS_TOKEN: string;
   // Figma library poll (figma-poll.ts, cron-fired). Both optional — unset →
   // the poll logs a skip and does nothing. FIGMA_FILE_KEY is the DS file

@@ -2,7 +2,7 @@
 
 <!-- Tier: 1 — the single core doc. Every embodiment reads this first, loading-order.md second; everything else loads on demand. -->
 
-The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which fetches this file), and headless GitHub Actions runs.
+The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which bakes this file into its bundle at build time), and headless GitHub Actions runs.
 
 **The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
 Users remember six skills (or describe intent and get routed). Skills invoke agents; users never do. Agents point at the conventions they enforce and never restate them.
@@ -44,10 +44,11 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Conventions — what agents obey
 
-`docs/conventions/` is normative. In the uno-bot bundle, always in context: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `blueprint-navigation.md` · `writing-style.md` · `terminology.md` · `automations.md` (the standing-automation registry — every row names its agent). IDE-side, loaded on demand: `coding.md` · `tech-stack.md` · `integrations.md` (tool index) — the bot can reach these with `github_read` but does not carry them. Conventions are **canonical in this repo** (ADR-017; the Notion playbooks they were distilled from are superseded) — every header carries the ADR-017 canonical line + `distilled:` lineage; on conflict with a legacy page, the repo wins and the page gets a superseded banner via uno-maintain.
+`docs/conventions/` is normative. In the uno-bot bundle, always in context: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `blueprint-navigation.md` · `writing-style.md` · `terminology.md` · `automations.md` (the standing-automation registry — every row names its agent). IDE-side, loaded on demand: `coding.md` · `tech-stack.md` · `integrations.md` (tool index) · `article-writing-style.md` (essay-length recaps) — the bot can reach these with `github_read` but does not carry them. Conventions are **canonical in this repo** (ADR-017; the Notion playbooks they were distilled from are superseded) — every header carries the ADR-017 canonical line + `distilled:` lineage; on conflict with a legacy page, the repo wins and the page gets a superseded banner via uno-maintain.
 
 **Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← `docs/conventions/` (canonical here). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 
+<!-- ide-only -->
 ## Knowledge Architecture
 
 Design System knowledge lives in `design-system/docs/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/docs/discovery.md`; load only task-relevant docs. Workflow skills (`skills/uno-prototype`, `skills/uno-review`, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
@@ -66,9 +67,9 @@ Story-authoring conventions for agent-friendliness (storybook.js.org/docs/ai/bes
 
 `storybook.taxonomy.json` is the single source of truth for the Storybook sidebar; after editing it run `node scripts/sync-storybook-sort.mjs` (the sort literal in `.storybook/preview.jsx` is generated — never hand-edit it). The shared tree, spoken identically by Storybook titles, repo folders, and both Figma files (see `docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md`):
 
-- Top level: Getting started · Foundations (was Styles+Assets; source still lives in `src/styles/` + `src/assets/`) · Components · Data visualizations · Patterns · Specs · Deprecated.
-- Components groups (kebab-case folders under `src/components/`): `actions`, `forms-and-inputs`, `layout-and-structure`, `messaging`, `navigation`, `overlays`, `status-and-loading`; undocumented internal composites live in `_internal/` until they graduate.
-- Data viz lives in `src/dataviz/<purpose>/` (comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal).
+- Top level: Getting started · Foundations (was Styles+Assets; source still lives in `design-system/src/styles/` + `design-system/src/assets/`) · Components · Data visualizations · Patterns · Specs · Deprecated.
+- Components groups (kebab-case folders under `design-system/src/components/`): `actions`, `forms-and-inputs`, `layout-and-structure`, `messaging`, `navigation`, `overlays`, `status-and-loading`; undocumented internal composites live in `_internal/` until they graduate.
+- Data viz lives in `design-system/src/dataviz/<purpose>/` (comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal).
 - Specs grammar: `Specs/<Area>/(<Phase>/)<Type>/<Component>` with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages; Title Case phases/types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
 - Naming: sentence-case display names in titles ("Button group"); PascalCase code exports; specs never re-implement a core component — a local organism used in 2+ areas gets promoted.
 
@@ -79,27 +80,34 @@ Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `siz
 - **Two grids, both single mode-adaptive Figma styles** (values bound to `size / layout` variables — switch the frame's mode, never hand-edit or detach): `Grid/Viewport (adaptive)` (12 col, gutter 12/16/16, margin 16/32/32) for full-page frames without the shell; `Grid/Adaptive (12-col)` (12 col, **gutter 8px** = `--layout-grid-gap`, offset = `Surface/pad-x` 32) — the content grid, carried by `Pattern/Surface container`.
 - **Column spans** come from `Columns/col-1…12` (Figma) = `--col-*` (code); they assume the 8px content gutter. Main content width at breakpoint minimums: 672 / 748 / 1164 (= `1440 − 32 outer − 164 SideNav − 16 gap − 64 surface pad` at XL).
 - **Ownership layering**: the page frame owns width (bound to `Breakpoints/min width`) and the mode; `Pattern/Surface container` runs on auto mode and **fills** the width it's given (`--color-surface`, Surface-tier pad 32/24, gap 24, radius 16) and carries the grid + Content slot; SideNav is **164px** (`--layout-sidebar-width`) and its visibility binds to the `Display/*` booleans (collapses at MD).
-- **Docs-page shell (every MDX)**: `<Title/>` → intro paragraph → `<ResourcesBlock/>` → `<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">` → `sb-ds-doc-section` blocks with `###` headings. Markdown pipe-tables do NOT parse in this MDX setup — always use styled `<table>` JSX (see `src/styles/Spacing.stories.jsx` for the shared pattern).
+- **Docs-page shell (every MDX)**: `<Title/>` → intro paragraph → `<ResourcesBlock/>` → `<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">` → `sb-ds-doc-section` blocks with `###` headings. Markdown pipe-tables do NOT parse in this MDX setup — always use styled `<table>` JSX (see `design-system/src/styles/Spacing.stories.jsx` for the shared pattern).
+<!-- /ide-only -->
 
 ## Forbidden patterns
 
-1. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g., `var(--color-on-surface-state-08)`), not raw Figma literal names.
-2. **DS knowledge is law**: Start at `design-system/docs/discovery.md`, then load only required docs (e.g., `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). If a component is not listed, it does not exist.
-3. **Never hallucinate layouts**: When building a new page, read `design-system/docs/patterns/layout.md` and use official structural React formulas (e.g., `<PageLayout>`).
-4. **Never hallucinate props**: Always read component `.jsx` or `.stories.jsx` to verify exact prop names and types before implementing.
-5. Never skip reading component source + story + styles before using unfamiliar components.
-6. Use PLUS components first — only fall back to generic React-Bootstrap when no PLUS equivalent exists.
-7. When Figma design input exists, follow the full implement-design workflow (see `skills/uno-prototype/references/figma-mcp-guide.md`): **MANDATORY load** `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` first (see `skills/uno-prototype/references/figma-registry-mandatory-load.md`) → extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
-8. Never install new packages without explicit user approval.
-9. Never introduce non-Bootstrap UI frameworks (no Material UI, no Ant Design, no Tailwind).
-10. Never deep-import from `design-system/src/` — use barrel exports from `@` alias.
-11. Never create components that duplicate existing ones — check `docs/context/design-system/components/components-index.json` first.
-12. Never edit generated token files directly — run `npm run generate:tokens` after changes.
-13. Always validate in Storybook when component behavior is touched.
-14. Confirm implementation plan and touched files before large or risky edits.
-15. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only icon names (e.g., `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`, etc.) are included in FA Free.
-16. Notion writes follow `docs/conventions/notion.md` (convention surfaces + ✅-gated tools) — never invent select options, pillars, features, or OKRs; exact-match existing option names. Safety is the gate + schema match, not a hardcoded DB fence.
-17. **Figma registries are law for design-to-code**: Before mapping Figma nodes to imports or variables to tokens, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json`. Never hallucinate component imports or token names when Figma input is involved.
+Every embodiment, including Slack:
+
+1. **DS knowledge is law**: start at `design-system/docs/discovery.md`, then load only required docs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). **If a component is not listed, it does not exist** — never assert one from priors.
+2. **Never hallucinate props**: read the component `.jsx` or `.stories.jsx` to verify exact prop names and types before naming them.
+3. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only names (e.g. `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`) are in FA Free.
+4. Notion writes follow `docs/conventions/notion.md` (convention surfaces + ✅-gated tools) — never invent select options, pillars, features, or OKRs; exact-match existing option names. Safety is the gate + schema match, not a hardcoded DB fence.
+5. Use PLUS components first — only fall back to generic React-Bootstrap when no PLUS equivalent exists; never introduce a non-Bootstrap UI framework (no Material UI, Ant Design, or Tailwind).
+
+<!-- ide-only -->
+### Code authoring — IDE and Actions runners only
+
+6. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g. `var(--color-on-surface-state-08)`), not raw Figma literal names.
+7. **Never hallucinate layouts**: when building a new page, read `design-system/docs/patterns/layout.md` and use the official structural React formulas (e.g. `<PageLayout>`).
+8. Never skip reading component source + story + styles before using an unfamiliar component.
+9. When Figma design input exists, follow the full implement-design workflow (`skills/uno-prototype/references/figma-mcp-guide.md`): **MANDATORY load** `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` first (`skills/uno-prototype/references/figma-registry-mandatory-load.md`) → extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
+10. **Figma registries are law for design-to-code**: before mapping Figma nodes to imports or variables to tokens, read both registries above. Never hallucinate component imports or token names when Figma input is involved.
+11. Never install new packages without explicit user approval.
+12. Never deep-import from `design-system/src/` — use barrel exports from the `@` alias.
+13. Never create components that duplicate existing ones — check `design-system/agent-views/components/index.md` first (`components-index.json` is a path manifest, not a component list).
+14. Never edit generated token files directly — run `npm run generate:tokens` after changes.
+15. Always validate in Storybook when component behavior is touched.
+16. Confirm the implementation plan and touched files before large or risky edits.
+<!-- /ide-only -->
 
 ## Knowledge
 
@@ -139,10 +147,13 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Product context, users, or domain terms | `docs/context/product/*.md` (foundation) + uno-blueprint (live truth) |
-| Reading or reasoning over the blueprint (schema, layer semantics, query recipes, answering rules) | `docs/conventions/blueprint-navigation.md` — load BEFORE querying; un-guided blueprint reads fail on navigation and layer attribution |
+| Reading or reasoning over the blueprint (schema, layer semantics, query recipes, answering rules) | `docs/conventions/blueprint-navigation.md` — load BEFORE querying; un-guided blueprint reads fail on navigation and layer attribution (the Worker already carries it) |
 | New teammate orientation | `docs/context/onboarding.md` |
+
+<!-- Every `ide-only` region in this file is stripped from the uno-bot system
+     prompt when the harness is bundled (agents/uno-bot/scripts/bundle-harness.mjs,
+     stripIdeOnly), because the Worker has no filesystem, npm, or localhost, and
+     its prompt is fixed at build time. They stay here as the single source for
+     the IDE agent. The comment sits INSIDE the fence on purpose: a note about
+     removed sections is itself meaningless to the reader they were removed for. -->
 <!-- /ide-only -->
-<!-- The two sections above (Commands, Progressive loading) are IDE-agent-only —
-     stripped from the uno-bot system prompt at assembly (src/agent/skills.ts
-     stripIdeOnly), since the Worker has no filesystem or npm and its prompt is
-     fixed at load time. They stay here as the single source for the IDE agent. -->

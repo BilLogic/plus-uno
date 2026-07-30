@@ -42,6 +42,12 @@ export async function buildSystemBlocks(
   assistantContext?: string | null,
 ): Promise<SystemBlock[]> {
   const stable = getStableSystem(env);
+  // NB: only the Vertex-Claude lane honours this. gemini-agent.ts flattens these
+  // blocks into one `systemInstruction` string and the Gemini API has no
+  // cache_control, so on the PRODUCTION lane the harness rides uncached on every
+  // iteration unless Google's implicit caching picks up the stable prefix.
+  // gemini-agent.ts logs `cached_in=` so that is measured, not assumed.
+  //
   // 1h cache TTL on the stable block: design-team traffic gaps blow the 5-min
   // cache TTL; 1h costs 2× on write, pays back on the first reuse within the
   // hour. (ttl is post-SDK-0.32 — SystemBlock carries it; the API accepts it.)

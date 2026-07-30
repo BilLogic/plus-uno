@@ -13,7 +13,7 @@ Review / critique a design, prototype, spec, or frame from Slack. Method rules a
 - **Inspect before judging.** First `source_read` (read-only, no gate) the linked Figma frame AND any linked PRD/spec, then diagnose from the fetched content. Never critique from priors or speculatively.
 - **Fidelity wall — qualitative yes, quantitative/spec IDE-only** (the capability boundary lives in `agents/uno-bot/AGENT.md § My lane`). Qualitative visual review from the screenshot: layout, hierarchy, alignment, spacing *feel*, glaring contrast — plus flow logic, structure, terminology, copy, PRD conformance. IDE-only: exact WCAG ratios, token fidelity, 44×44 target measurement, focus order, responsive behavior — computed values, not pictures (`skills/uno-review` + Figma MCP + `run-review-checks.sh`). Say the boundary plainly, mark depth-limited findings *as partial*, and offer an intake or a ready-to-paste IDE prompt with the frame + PRD links pre-filled. No image attached or renderable → text-layer review only, labeled as such.
 - Manifest missing → ask once in-thread for the one-liner (fidelity / tools / PRD link). Still missing, or the target is unfetchable (no link, `source_read` fails) → say so plainly, **record the intake**, route to a human. No generic DIY instructions, no from-memory review.
-- Design QA runs arrive via the RTT trigger with the Roadmap card — resolve RM-ID → `[spec]` file per method.md before walking the build.
+- Design QA runs arrive when someone brings the Roadmap card at RTT (no auto-trigger exists) — resolve RM-ID → `[spec]` file per method.md before walking the build.
 
 ## Output — threaded Slack mrkdwn
 
@@ -31,7 +31,7 @@ Omit empty severity sections; short critiques stay short:
 • {Specific strength + which doc/principle it matches}
 ```
 
-No actionable findings → be honest: "I don't see anything that violates Plus conventions — what were you specifically worried about?" Over ~1500 chars → 3-bullet summary inline + offer to append the full critique to the Notion card (`notion_update`, ✅) — the bot cannot create Gists. Confidence follows the persona's conversational rule (one woven clause max, no trailing confidence line; sureness earned only by sources fetched this turn).
+No actionable findings → be honest: "I don't see anything that violates Plus conventions — what were you specifically worried about?" Past the summary threshold (`docs/conventions/slack.md` § Writing style) → 3-bullet summary inline + offer to append the full critique to the Notion card (`notion_update`, ✅) — the bot cannot create Gists. Confidence follows the persona's conversational rule (one woven clause max, no trailing confidence line; sureness earned only by sources fetched this turn).
 
 ## Hand-offs
 

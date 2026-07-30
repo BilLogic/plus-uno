@@ -32,7 +32,7 @@ Both lanes are **local tools only** (no hosted MCP), and share the same tool ros
 
 **Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`blueprint_search`), DS/component/repo facts (`github_read`), Slack search + thread reads, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
 
-**Can, behind the ✅ gate (proposal card, 60-min expiry, requester-only confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
+**Can, behind the ✅ gate (proposal card, 60-min expiry, anyone in the thread may confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
 
 **Autonomous (no ask, no gate — cron):** the **Figma library poll** (`src/figma-poll.ts`, `[triggers]` in `wrangler.toml`) checks the DS Figma file every 15 min during work hours, and on a publish files a PRD on the Roadmap board and posts the "🎨 Figma Design System Updated" card to `#uno-bot` — reply `implement <component>` in that thread to kick off the gated implement flow. (This is the v1 `figma-library-poll.yml` automation, re-homed in the Worker 2026-07-16.)
 
@@ -42,7 +42,7 @@ Both lanes are **local tools only** (no hosted MCP), and share the same tool ros
 
 **Can't:** edit repo files, run shell/`npm`/`git`, or spawn IDE subagents — it's a Worker, not an IDE agent. It routes that work to Claude Code/Cursor via ready-to-paste handoff prompts. Blueprint and marketplace-catalog writes are deliberately not bot tools (they run in-IDE via `writers/blueprint` / `writers/notion`).
 
-The full behavioral contract (voice, grounding rules, gate protocol, Slack etiquette) is [`AGENT.md`](AGENT.md) — fetched into the system prompt at runtime.
+The full behavioral contract (voice, grounding rules, gate protocol, Slack etiquette) is [`AGENT.md`](AGENT.md) — baked into the system prompt at build time (see § Brain above).
 
 ## Layout
 
@@ -89,9 +89,9 @@ curl http://localhost:8787/health
 
 ## Config
 
-**Plain vars** (`wrangler.toml` `[vars]` — commented inline there): `GITHUB_REPO` + `SKILLS_BASE_URL` (both must point at the harness repo, `BilLogic/plus-uno`) · `MODEL_PROVIDER` + `GEMINI_PROJECT_ID` / `GEMINI_REGION` / `GEMINI_MODEL` / `CLAUDE_MODEL` · Notion DB ids · `SUPABASE_URL` · Slack channel ids (`UNO_BOT_CHANNEL_ID`, `PLUS_DESIGN_CHANNEL_ID`, `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`) · `FIGMA_FILE_KEY` (the DS file the library poll watches) · `SLACK_SEARCH_PRIVATE_ALLOWLIST` (the privacy firewall) · `SLACK_MCP_CLIENT_ID` + `SLACK_OAUTH_REDIRECT_URI` (the slack_search login).
+**Plain vars** (`wrangler.toml` `[vars]` — commented inline there): `GITHUB_REPO` (must point at the harness repo, `BilLogic/plus-uno` — the Worker dispatches `repository_dispatch` against it) · `MODEL_PROVIDER` + `GEMINI_PROJECT_ID` / `GEMINI_REGION` / `GEMINI_MODEL` / `CLAUDE_MODEL` · Notion DB ids · `SUPABASE_URL` · Slack channel ids (`UNO_BOT_CHANNEL_ID`, `PLUS_DESIGN_CHANNEL_ID`, `PLUS_DESIGN_FEEDBACK_CHANNEL_ID`) · `FIGMA_FILE_KEY` (the DS file the library poll watches) · `SLACK_SEARCH_PRIVATE_ALLOWLIST` (the privacy firewall) · `SLACK_MCP_CLIENT_ID` + `SLACK_OAUTH_REDIRECT_URI` (the slack_search login).
 
-**Bindings:** Durable Objects `THREAD_STATE` + `AGENT_RUNNER`; KV `HARNESS_KV` (harness fallback/alert), `SLACK_OAUTH_KV` (slack_search user token).
+**Bindings:** Durable Objects `THREAD_STATE` + `AGENT_RUNNER`; KV `HARNESS_KV` (general-purpose Worker KV — the Figma-poll snapshot and delivery alert state; NOT a harness fallback, the harness is a compiled constant), `SLACK_OAUTH_KV` (slack_search user token).
 
 **Secrets** (`wrangler secret put <NAME>`, persist across redeploys):
 
@@ -126,7 +126,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider health (both auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) and `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run this before flipping `MODEL_PROVIDER="vertex-claude"`).
 - **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
-- **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/test-prototype/` + a root `dev:test-prototype` script; `npm install && npm run dev:test-prototype` boots it.
+- **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/<slug>/` + a root `dev:<slug>` script; `npm install && npm run dev:test-prototype` boots it.
 
 ## Gotchas
 

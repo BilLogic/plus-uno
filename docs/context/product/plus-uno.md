@@ -5,7 +5,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 
 ## What This Is
 
-- **Design System** (`design-system/src/`) — 44 components, 20 form components, 42 DataViz charts, 7 spec areas, generated token SCSS. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
+- **Design System** (`design-system/src/`) — 35 UI components (forms grouped under `components/forms-and-inputs/`), 42 DataViz charts, 7 spec areas, generated token SCSS. Counts come from `design-system/agent-views/` — regenerate with `npm run generate:agent` rather than trusting the numbers below. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
 - **Prototypes** (`prototypes/`) — on `main`: live app + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `home-redesign/` (+ content modules). Branch experiments catalogued in Notion.
 - **Storybook** (`.storybook/`) — Interactive component documentation. Site landing at `/storybook/`.
 - **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
@@ -61,14 +61,13 @@ plus-vibe-coding-starting-kit/
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Components | 44 | `design-system/src/components/` (39 top-level + layout + 4 training) |
-| Forms | 20 | `design-system/src/forms/` (exported form components) |
-| DataViz | 42 charts (25 exported wrappers) | `design-system/src/DataViz/` — 6 categories |
+| UI components | 35 | `design-system/src/components/` — seven groups: actions, forms-and-inputs, layout-and-structure, messaging, navigation, overlays, status-and-loading (plus `_internal/`) |
+| DataViz | 42 charts (25 exported wrappers) | `design-system/src/dataviz/` — 6 categories |
 | Specs | 7 product areas | `design-system/src/specs/` (Home, Universal, Training, Admin, Profile, Toolkit, Login) |
 | Tokens | 6 SCSS files + `source/` | `design-system/src/tokens/` (generated — never hand-edit) |
 | Styles | 14 files | `design-system/src/styles/` |
 
-<!-- Counts audited 2026-07-10 — regenerate by `ls` on the dirs above; keep README.md § Design System in sync. -->
+<!-- Counts are a SNAPSHOT, not a source of truth. `design-system/agent-views/` is generated (`npm run generate:agent`) and AGENTS.md § Forbidden patterns makes it authoritative — "if a component is not listed, it does not exist". Re-read the agent-views before quoting a number to anyone; keep README.md § Design System in sync. Last checked 2026-07-30. -->
 
 ## Deployment
 

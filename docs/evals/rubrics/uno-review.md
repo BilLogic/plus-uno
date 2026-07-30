@@ -1,7 +1,7 @@
 ---
 artifact: review report (stage-lens review or Design QA)
-source: https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c
-synced: 2026-07-07
+status: canonical
+distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: recall/precision measured on the golden defect set; other dimensions 1-5; hard gates pass/fail
 dimensions:

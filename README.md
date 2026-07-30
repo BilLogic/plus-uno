@@ -27,7 +27,7 @@ Open [localhost:4200](http://localhost:4200) for Storybook, [localhost:4100/home
 | **uno-bot** | `@uno-bot` in Slack | Grounded Q&A + gated actions (file PRDs, trigger builds) — see [`agents/uno-bot/README.md`](agents/uno-bot/README.md) |
 | **Headless runs** | GitHub Actions (`Implement Design`, `Implement Figma Changes`) | Figma-to-code builds that open draft PRs |
 
-All three read the same brain: [`AGENTS.md`](AGENTS.md) (the constitution — identity, skill roster, forbidden patterns) plus [`loading-order.md`](loading-order.md) (what loads when). Push a doc change to `main` and every embodiment picks it up — no code deploy needed for guidance changes.
+All three read the same brain: [`AGENTS.md`](AGENTS.md) (the constitution — identity, skill roster, forbidden patterns) plus [`loading-order.md`](loading-order.md) (what loads when). The in-IDE agent and headless runs read those files from the checkout, so a push to `main` reaches them immediately. The Worker does NOT: its harness is baked into the bundle at build time, so a guidance edit reaches uno-bot only on `npm run deploy` (`agents/uno-bot/scripts/bundle-harness.mjs`).
 
 **The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
 
@@ -108,7 +108,7 @@ Do **not** merge one-off experiments onto `main`. Captures go on the Notion row 
 
 ## Design System
 
-The component library lives in `design-system/src/`: **44 components, 20 form components, 42 DataViz charts (6 categories), and page specs for 7 product areas** — full inventory in [`docs/context/product/plus-uno.md`](docs/context/product/plus-uno.md). Browse it at [localhost:4200](http://localhost:4200) (Storybook) or [live](https://plus-uno.netlify.app/storybook/).
+The component library lives in `design-system/src/`: **35 UI components, 42 DataViz charts across 6 categories, and page specs for 7 product areas** (form elements are grouped under `components/forms-and-inputs/`) — generated inventory in `design-system/agent-views/`, narrative in [`docs/context/product/plus-uno.md`](docs/context/product/plus-uno.md). Browse it at [localhost:4200](http://localhost:4200) (Storybook) or [live](https://plus-uno.netlify.app/storybook/).
 
 **Key rules for agents and contributors:**
 - Use PLUS components first — only fall back to React-Bootstrap when no PLUS equivalent exists

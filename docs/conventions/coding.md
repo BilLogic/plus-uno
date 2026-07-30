@@ -1,6 +1,6 @@
 # Coding Conventions
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · applied by every agent writing code in this repo. -->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent writing code in this repo. -->
 
 ## File naming
 
@@ -19,14 +19,14 @@
 
 ```js
 import { Button, Alert, Modal } from '@/components';
-import { Input, Select, Checkbox } from '@/forms';
+import { Input, Select, Checkbox } from '@/components'; // forms-and-inputs re-exports through the components barrel
 import '@/styles/globals.scss';
 ```
 
 **Explicit entry points:**
 - `design-system/src/index.js`
 - `design-system/src/components/index.js`
-- `design-system/src/forms/index.js`
+- `design-system/src/components/forms-and-inputs/index.js` (also re-exported from the components barrel)
 
 **Prohibited:**
 - Deep imports: `import Button from 'design-system/src/components/Button/Button'` — use barrel
@@ -56,7 +56,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 - Each prototype lives at `prototypes/{project-name}/` (flat, no creator grouping)
 - Each has its own `vite.config.js` with `@` alias pointing to `../../design-system/src`
 - Creator info is metadata in the prototype's README or marketplace data, not the directory name
-- Register new prototypes in `src/pages/PrototypeMarket/prototypes-data.js`
+- `src/pages/PrototypeMarket/prototypes-data.js` is a LEGACY routing registry for the live-app shell — do not add new experiment IDs for `main` (`skills/uno-publish/SKILL.md`); new prototypes register in the Notion marketplace DB
 
 ## Token workflow
 
@@ -82,7 +82,7 @@ docs/knowledge/ideations.md → docs/plans/ → implementation → docs/knowledg
 
 - **Ideation**: `YYYY-MM-DD-topic-ideation.md` — exploratory docs with ranked ideas
 - **Plans**: `YYYY-MM-DD-NNN-type-slug-plan.md` — actionable implementation plans
-- **Lessons**: `docs/knowledge/lessons/{domain}.md` — compound loop learnings (atomic entries with YAML frontmatter)
+- **Lessons**: two shapes, both live. `docs/knowledge/lessons/{domain}.md` — the compounding files (atomic entries with YAML frontmatter), one per domain. `docs/knowledge/lessons/YYYY-MM-DD-slug.md` — a single incident or sweep worth its own file (template: `skills/uno-maintain/examples/lesson-template.md`). Default to the domain file; give an incident its own only when it will be cited as an event.
 
 ## Known gotchas
 

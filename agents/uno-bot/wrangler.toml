@@ -43,7 +43,6 @@ crons = ["*/15 13-23 * * 1-5"]
 # dispatches repository_dispatch events against GITHUB_REPO.
 [vars]
 GITHUB_REPO = "BilLogic/plus-uno"
-SKILLS_BASE_URL = "https://raw.githubusercontent.com/BilLogic/plus-uno/main"
 # Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
 NOTION_ROADMAP_DB_ID = "2fc01241-1bb5-4770-af51-d5a050bddb75"

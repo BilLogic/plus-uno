@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# validate-prototype.sh — Quick sanity check for a prototypes prototype.
+# validate-prototype.sh — Quick sanity check for a prototype.
 #
 # Usage:
 #   bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/my-project

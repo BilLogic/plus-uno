@@ -4,7 +4,7 @@
 // list is now the source of truth; the output must stay byte-identical to what
 // the old runtime assembleSystem() produced (same order, dividers, ide-only
 // stripping). Run: npm run bundle:harness
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -55,6 +55,40 @@ for (const sentinel of ["AGENTS.md", "docs/conventions/notion.md"]) {
     console.error(`[bundle-harness] repo root check failed: ${sentinel} not found under ${repoRoot}`);
     process.exit(1);
   }
+}
+
+// Files the Worker deliberately does NOT carry. Every skill face and every
+// convention must appear here or in SKILL_PATHS — see the coverage guard below.
+const NOT_BUNDLED = new Set([
+  "docs/conventions/coding.md", // repo code authoring; the Worker writes no code
+  "docs/conventions/tech-stack.md", // dependency/version table; IDE-side
+  "docs/conventions/integrations.md", // MCP server names — the Worker has no MCP
+  "docs/conventions/article-writing-style.md", // 39k chars for essay-length recaps
+]);
+
+// Coverage guard: a MISSING listed file already fails below, but the reverse —
+// a new skill face or convention that nobody adds to SKILL_PATHS — was silent,
+// and silence here means the bot never learns a rule that exists. Every such
+// file must be bundled or explicitly excluded; adding one and forgetting both
+// fails the build.
+const mustBeAccountedFor = [
+  ...readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .flatMap((d) => [`skills/${d.name}/bot.md`, `skills/${d.name}/references/method.md`]),
+  ...readdirSync(path.join(repoRoot, "docs/conventions"))
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => `docs/conventions/${f}`),
+].filter((p) => existsSync(path.join(repoRoot, p)));
+
+const listed = new Set(SKILL_PATHS);
+const unaccounted = mustBeAccountedFor.filter((p) => !listed.has(p) && !NOT_BUNDLED.has(p));
+if (unaccounted.length) {
+  console.error(
+    `[bundle-harness] ${unaccounted.length} file(s) are neither bundled nor explicitly excluded:\n` +
+      unaccounted.map((p) => `  ${p}`).join("\n") +
+      "\n  -> add to SKILL_PATHS (the bot needs it) or to NOT_BUNDLED (with the reason).",
+  );
+  process.exit(1);
 }
 
 // Read every listed file from the LOCAL repo. Any missing file is a FAILURE —

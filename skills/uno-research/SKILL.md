@@ -45,7 +45,7 @@ writers/notion.
 ## Workflow — method.md spine, IDE execution
 
 1. **Inventory first** (method.md gate 1). Read `docs/knowledge/INDEX.md`; check
-   the Research & notes DB for prior studies via `mcp__notion-plus__*`. Context
+   the project hub Research subpages for prior studies via `mcp__notion-plus__*`. Context
    already exists → route to `uno-synthesize` and stop.
 2. **Repo/DS questions** → Task `researchers/explorer`. It owns the heavy reads
    and returns `path:line`-cited findings, never file dumps.

@@ -66,6 +66,8 @@ interface GeminiResponseData {
     promptTokenCount?: number;
     candidatesTokenCount?: number;
     thoughtsTokenCount?: number;
+    /** Prefix served from Gemini implicit caching, when it applies. */
+    cachedContentTokenCount?: number;
   };
   error?: { code?: number; message?: string };
 }
@@ -175,6 +177,13 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   let inputTokens = 0;
   let outputTokens = 0;
   let thinkingTokens = 0;
+  // Gemini has no cache_control: buildSystemBlocks sets a 1h cache directive that
+  // only the Anthropic lane honours, and this lane flattens the blocks to a
+  // string. The ~40k-token harness therefore rides on every iteration of every
+  // turn. Google MAY discount it via implicit caching (the harness is the stable
+  // leading prefix), so measure rather than assume: this counter is what says
+  // whether an explicit cachedContent is worth building.
+  let cachedTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
   const toolNamesUsed: string[] = [];
@@ -190,6 +199,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
         `fallback=${fellBack ? "yes" : "no"} ` +
         `iterations=${iterations} tokens_in=${inputTokens} tokens_out=${outputTokens} thinking=${thinkingTokens} ` +
+        `cached_in=${cachedTokens} ` +
         `ms=${Date.now() - startedAt} tools=[${toolNamesUsed.join(",")}] mcp=off outcome=${result.kind}`,
     );
     return result;
@@ -249,6 +259,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     inputTokens += parsed.usageMetadata?.promptTokenCount ?? 0;
     outputTokens += parsed.usageMetadata?.candidatesTokenCount ?? 0;
     thinkingTokens += parsed.usageMetadata?.thoughtsTokenCount ?? 0;
+    cachedTokens += parsed.usageMetadata?.cachedContentTokenCount ?? 0;
     return parsed.candidates?.[0]?.content?.parts ?? [];
   };
 

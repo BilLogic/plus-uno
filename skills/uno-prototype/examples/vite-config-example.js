@@ -1,5 +1,5 @@
 /**
- * Canonical Vite config for a prototypes prototype.
+ * Canonical Vite config for a prototype.
  *
  * Copy this file to prototypes/{your-project}/vite.config.js and update:
  *   1. The server.port — pick an unused port (check other prototypes configs)
@@ -54,7 +54,7 @@ export default defineConfig({
     },
 
     server: {
-        /** Pick a unique port — avoid collisions with other prototypes prototypes */
+        /** Pick a unique port — avoid collisions with other prototypes */
         port: 3020,
         /** host: true makes the server accessible on the local network */
         host: true,

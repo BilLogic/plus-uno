@@ -1,6 +1,6 @@
 # uno-blueprint — Navigation Guide
 
-<!-- canonical per ADR-017. Distilled 2026-07-29 — vendored from the Notion "UNO Blueprint Navigation Guide" (the guided-arm context block of the UNO Blueprint Grounding Evaluation). The Notion page is the mirror; this file is the source the harness loads, and it DIFFERS from the mirror on two rules (see § Answering rules 5–6) — the Notion page needs a superseded banner per staleness-sweep.md. Companion: supabase.md (access, contract, source routing). -->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand; bundled into the uno-bot prompt) · distilled 2026-07-29 — vendored from the Notion "UNO Blueprint Navigation Guide" (the guided-arm context block of the UNO Blueprint Grounding Evaluation). The Notion page is the mirror; this file is the source the harness loads, and it DIFFERS from the mirror on two rules (see § Answering rules 5–6) — the Notion page needs a superseded banner per staleness-sweep.md. Companion: supabase.md (access, contract, source routing). -->
 
 The eval that produced this guide: guided blueprint arms scored 100% vs 36% docs-only, and the top failure tag across un-guided arms was `nav-failure` (32), then `shallow-coverage` (23). This file is the fix for both — load it whenever answering a journey question or drafting from journey context.
 
@@ -19,7 +19,7 @@ Row counts are a **2026-07-18 snapshot**, kept only to convey rough scale — th
 | `service_lifecycles` | 1 | the whole journey ("PLUS Application") | — |
 | `phases` | 5 | ordered phases: Application → Onboarding → Pre-session → In-session → Post-session | `service_lifecycle_id` |
 | `service_scenarios` | 17 | scenarios within a phase (e.g. Goal Setting) | `phase_id` |
-| `paths` | 23 | scenario variants: `happy` / `unhappy` / `exception` / `alternative` | `service_scenario_id` |
+| `paths` | 23 | scenario variants — read `paths.name`, not `path_type`; the declared enum is not what the board uses (§4) | `service_scenario_id` |
 | `steps` | 140 | the columns, scoped to a scenario | `service_scenario_id` |
 | `path_steps` | 148 | which steps appear on a path + `column_position` | `path_id`, `step_id` |
 | `layers` | 186 | the rows (actors), scoped to a path, ordered by `row_position` | `path_id` |
@@ -132,7 +132,7 @@ Coverage is **very uneven**: Goal Setting is multi-path and far deeper than anyt
 
 The rule this exists for: **a thin result is more often a content gap than a retrieval failure.** A query that returns two or three cells in a shallow scenario means the blueprint doesn't cover it yet — say so and route a `uno-maintain` intake, rather than synthesizing an answer out of adjacent scenarios.
 
-**Judge depth from the rows you just read, not from a remembered ranking.** Row counts change on every blueprint write and this file only changes on deploy, so a leaderboard baked in here goes wrong quietly — the last one had a scenario's path count wrong and two scenarios in the opposite order, teaching the bot to call a well-covered scenario thin. In-IDE, count it:
+**Judge depth from the rows you just read, not from a remembered ranking.** Row counts change on every blueprint write and this file only changes on deploy, so a leaderboard baked in here goes wrong quietly — the last one had a scenario's path count wrong and two scenarios in the opposite order, teaching the bot to call a well-covered scenario thin. In-IDE, count it with the query below.
 
 <!-- ide-only -->
 ```sql

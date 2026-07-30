@@ -1,6 +1,6 @@
 # Tech Stack
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · applied by every agent adding a dependency, command, or path alias. -->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent adding a dependency, command, or path alias. Versions mirror `package.json` as of 2026-07-30 — read package.json, not this table, before asserting an installed version. -->
 
 ## Core
 
@@ -16,7 +16,7 @@
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| Storybook | 10.2.7 | Component docs + visual testing |
+| Storybook | ^10.5.0 | Component docs + visual testing |
 | Vitest | 4.0.15 | Unit testing |
 | Playwright | 1.58.2 | Browser testing |
 
@@ -24,15 +24,15 @@
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| Highcharts | 12.5.0 | Charts and graphs |
+| Highcharts | ^12.4.0 | Charts and graphs |
 | highcharts-react-official | 3.2.3 | React bindings |
 
 ## UI enhancement
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| Framer Motion | 12.33.0 | Animations |
-| React Router DOM | 7.13.0 | Client-side routing |
+| Framer Motion | ^12.38.0 | Animations |
+| React Router DOM | ^7.13.1 | Client-side routing |
 | @assistant-ui/react | 0.12.3 | AI chat interface |
 
 ## Key commands

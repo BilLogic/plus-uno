@@ -1,7 +1,7 @@
 ---
 artifact: findings doc + PRD (+ paired blueprint write)
-source: https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c
-synced: 2026-07-07
+status: canonical
+distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:

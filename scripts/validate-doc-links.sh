@@ -44,6 +44,50 @@ while IFS= read -r file; do
   done < <(link_grep "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
 done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*'; echo AGENTS.md; echo loading-order.md; } | sort)
 
+echo "[check] validating backticked repo paths resolve"
+
+# The harness writes almost every path as inline code (`docs/conventions/x.md`),
+# not as a markdown link — so the check above sees ~none of them, and a broken
+# path passed green for weeks. Only tokens rooted at a known top-level directory
+# are checked: anything else is prose, a URL fragment, or another repo's path.
+path_grep() {
+  if command -v rg >/dev/null 2>&1; then rg -o '`[^`]+`' "$1"; else grep -oE '`[^`]+`' "$1"; fi
+}
+
+while IFS= read -r file; do
+  while IFS= read -r tok; do
+    tok="${tok//\`/}"
+    [[ -z "$tok" ]] && continue
+
+    # Only tokens rooted at a real top-level dir of this repo.
+    [[ "$tok" =~ ^(AGENTS\.md|loading-order\.md|docs/|skills/|agents/|scripts/|design-system/|prototypes/|\.github/) ]] || continue
+
+    # Placeholders, globs, ranges, prose fragments, command lines.
+    [[ "$tok" == *"*"* || "$tok" == *"{"* || "$tok" == *"<"* || "$tok" == *" "* ]] && continue
+    [[ "$tok" == *"\$"* || "$tok" == *"|"* ]] && continue
+    # Template placeholders: `…/YYYY-MM-DD-slug.md`, `design-system/src/specs/…`
+    [[ "$tok" == *"…"* || "$tok" == *"YYYY"* || "$tok" == *"<name>"* ]] && continue
+
+    # Paths named in order to FORBID them. The doc is correct precisely because
+    # the path does not exist; asserting otherwise would invert the rule.
+    case "$tok" in
+      docs/solutions/*|docs/solutions) continue ;;
+    esac
+
+    # Trailing line/anchor references: src/net.ts:42, file.md#section
+    tok="${tok%%#*}"
+    tok="${tok%%:*}"
+    # Trailing punctuation that belongs to the sentence, not the path.
+    tok="${tok%,}"; tok="${tok%.}"; tok="${tok%)}"
+
+    [[ -z "$tok" ]] && continue
+    if [[ ! -e "$tok" ]]; then
+      echo "[missing] $file -> \`$tok\`"
+      status=1
+    fi
+  done < <(path_grep "$file")
+done < <({ find skills agents docs/conventions -type f -name '*.md' -not -path '*/node_modules/*'; echo AGENTS.md; echo loading-order.md; } | sort)
+
 echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 
 # NB: process substitution, not a pipeline — status=1 must survive (a `| while`
@@ -99,7 +143,7 @@ for pattern in "${old_patterns[@]}"; do
   # design-system/docs/foundations/ is a VALID current path — only the old
   # repo-root docs/foundations/ counts as stale.
   count=$({ grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" . 2>/dev/null || true; } \
-    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|storybook-static/\|design-system/docs/foundations/\|design-system/docs/knowledge-audit.json" || true; } \
+    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|todos/\|storybook-static/\|design-system/docs/foundations/\|design-system/docs/knowledge-audit.json" || true; } \
     | wc -l | tr -d ' ')
   if [[ "$count" -gt 0 ]]; then
     echo "[stale] $count references to old path pattern: $pattern"

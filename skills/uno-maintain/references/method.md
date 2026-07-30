@@ -79,7 +79,7 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 After significant work — a non-trivial fix, a gotcha, a decision worth preserving:
 
-1. File a lesson at `docs/knowledge/lessons/YYYY-MM-DD-slug.md` — frontmatter (`title` · `date` · `tags` · `rule_candidate`) + problem / root cause / fix / prevention.
+1. File a lesson per `docs/conventions/coding.md` § Docs pipeline — the domain file by default, `docs/knowledge/lessons/YYYY-MM-DD-slug.md` for an event worth its own record — frontmatter (`title` · `date` · `tags` · `rule_candidate`) + problem / root cause / fix / prevention.
 2. Update `docs/knowledge/INDEX.md`.
 3. If a standing rule changes: one line in `docs/knowledge/changelog.md`. Proposing the AGENTS.md / persona edit itself is Tier 2 — the gate in §5 applies.
 

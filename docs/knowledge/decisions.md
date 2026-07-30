@@ -9,7 +9,7 @@ tags: [architecture, conventions]
 
 ## ADR-001: AGENTS.md as single cross-agent entry point
 - **Date**: 2026-03-21
-- **Status**: Active
+- **Status**: Superseded by ADR-013 (2026-07-07)
 - **Context**: Platform files (CLAUDE.md, .windsurfrules, cursorrules.md) each contained their own instructions, creating inconsistency. Non-DS tasks had no agent guidance at all.
 - **Decision**: Create AGENTS.md at repo root as THE single entry point. All platform files point to it. Contains voice, forbidden patterns, skills table, progressive loading, commands.
 - **Source**: docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan.md
@@ -19,25 +19,25 @@ tags: [architecture, conventions]
 - **Status**: Active
 - **Context**: Considered migrating to Next.js for auth, API routes, SSR. plus-uno does not need any of these -- it is a prototype builder, not the production platform.
 - **Decision**: Stay on Vite. Upgrade to Vite 8 (Rolldown). If a production PLUS platform is built, it becomes a separate Next.js app consuming the shared design system.
-- **Source**: _archive/solutions/agent-infrastructure/vite-8-upgrade-and-framework-decision.md
+- **Source**: (pre-consolidation solution doc, no longer in the repo) _archive/solutions/agent-infrastructure/vite-8-upgrade-and-framework-decision.md
 
 ## ADR-003: Iframe embedding over proxy for Storybook
 - **Date**: 2026-03-22
 - **Status**: Active
 - **Context**: Storybook's assets load at root paths (`/sb-manager/`, `/sb-addons/`) which bypass subpath proxy rewrites. Direct port links lose navigation context.
 - **Decision**: Embed Storybook via full-screen iframe at `/storybook` route. Use `concurrently` to run both Vite (port 4100) and Storybook (port 4200) in parallel.
-- **Source**: _archive/solutions/agent-infrastructure/marketplace-storybook-navigation-architecture.md
+- **Source**: (pre-consolidation solution doc, no longer in the repo) _archive/solutions/agent-infrastructure/marketplace-storybook-navigation-architecture.md
 
 ## ADR-004: 4-digit numeric IDs over slugs for prototype listings
 - **Date**: 2026-03-22
 - **Status**: Active
 - **Context**: String slugs caused naming collisions and awkward URL paths. Creator-based directory grouping did not scale.
 - **Decision**: Use 4-digit numeric IDs (1001+) for all prototype listings. Flat project-oriented prototypes structure with creator info as metadata.
-- **Source**: _archive/solutions/agent-infrastructure/marketplace-storybook-navigation-architecture.md
+- **Source**: (pre-consolidation solution doc, no longer in the repo) _archive/solutions/agent-infrastructure/marketplace-storybook-navigation-architecture.md
 
 ## ADR-005: All docs consolidated under docs/
 - **Date**: 2026-03-21
-- **Status**: Active
+- **Status**: Active for the docs/ consolidation; the `.agent/` half is obsolete — that directory no longer exists (skills live in `skills/`, agents in `agents/`, per ADR-013)
 - **Context**: DS docs were split across three locations: `.agent/references/` (16 files), `packages/plus-ds/guidelines/` (16 files), and `docs/`. Confusion about where things live.
 - **Decision**: Single `docs/` tree for all documentation. `.agent/` is only for skills and assets. No separate `guidelines/`, `references/`, or scattered doc directories.
 - **Source**: docs/plans/2026-03-21-004-feat-agent-infrastructure-consolidated-plan.md
@@ -46,12 +46,12 @@ tags: [architecture, conventions]
 - **Date**: 2026-03-21
 - **Status**: Active
 - **Context**: `packages/plus-ds/` was configured as a publishable npm package but will never be published. Publishing config (`files`, `exports`, `prepublishOnly`) was misleading.
-- **Decision**: Set `private: true`, strip all publishing fields. Keep the package where it is to avoid breaking relative path aliases in prototypes prototypes. Later flattened to `design-system/`.
+- **Decision**: Set `private: true`, strip all publishing fields. Keep the package where it is to avoid breaking relative path aliases in prototypes. Later flattened to `design-system/`.
 - **Source**: docs/plans/2026-03-21-006-refactor-strip-npm-publishing-simplify-package-plan.md
 
 ## ADR-007: Agent-agnostic skills under .agent/skills/
 - **Date**: 2026-03-21
-- **Status**: Amended (2026-04-11)
+- **Status**: Superseded by ADR-013 (2026-07-07); amended 2026-04-11 before that
 - **Context**: Skills in `.claude/commands/` only work in Claude Code. Cursor and Windsurf agents cannot invoke them. Platform-specific frontmatter limits portability.
 - **Decision**: All skills under `.agent/skills/` with platform-agnostic SKILL.md files. Each skill has SKILL.md + references/ + examples/ + scripts/.
 - **Amendment (2026-04-11)**: Skill frontmatter MAY include `allowed-tools`, `context`, `agent`, and `disable-model-invocation` fields. These are treated as hints — Claude Code enforces them natively; other platforms ignore unknown frontmatter gracefully. This is preferred over maintaining separate platform-specific wrappers.
@@ -59,7 +59,7 @@ tags: [architecture, conventions]
 
 ## ADR-008: Compound loop for cross-session learning
 - **Date**: 2026-03-21
-- **Status**: Active
+- **Status**: Superseded by ADR-013 (2026-07-07)
 - **Context**: Learnings from bugs and gotchas were lost between sessions. Same mistakes repeated.
 - **Decision**: After significant work, document in `docs/knowledge/lessons/` with YAML frontmatter. Periodically extract patterns into AGENTS.md forbidden patterns and conventions.md. The uno-compound skill codifies this.
 - **Source**: docs/plans/2026-03-21-001-feat-agents-md-compound-loop-agent-skills-plan.md
@@ -69,11 +69,11 @@ tags: [architecture, conventions]
 - **Status**: Active
 - **Context**: The PLUS design system is built on React-Bootstrap / Bootstrap 5.3. Introducing Material UI, Ant Design, or Tailwind would fragment the component library and token system.
 - **Decision**: Use PLUS DS components first, fall back to React-Bootstrap when no PLUS equivalent exists. Never introduce non-Bootstrap UI frameworks. FA Free only (no Pro icons).
-- **Source**: _archive/solutions/agent-infrastructure/repo-restructure-agents-md-docs-consolidation.md
+- **Source**: (pre-consolidation solution doc, no longer in the repo) _archive/solutions/agent-infrastructure/repo-restructure-agents-md-docs-consolidation.md
 
 ## ADR-010: Three-tier context loading architecture
 - **Date**: 2026-04-11
-- **Status**: Active
+- **Status**: Superseded by `loading-order.md` (the tier contract) — Tier 1 is now exactly AGENTS.md + loading-order.md, docs/context/* is Tier 2, and Tier 3 means "retrieved live, never cached" rather than ephemeral handoffs; `.agent/handoffs/` no longer exists
 - **Context**: Agent context windows are finite. The flat docs/ structure mixed always-loaded context with on-demand references. No way to distinguish essential product truth from supplementary guides.
 - **Decision**: Implement three tiers: (1) Always-loaded -- identity, conventions, principles, knowledge index via AGENTS.md "See" references to `docs/context/`. (2) On-demand -- skills, detailed context, knowledge entries triggered by skill invocation. (3) Ephemeral -- tool outputs, exploration, handoffs in `.agent/handoffs/` (gitignored).
 - **Source**: docs/plans/2026-04-11-001-refactor-three-tier-context-architecture-plan.md
@@ -83,7 +83,8 @@ tags: [architecture, conventions]
 - **Status**: Active
 - **Context**: Monolithic docs (400+ lines) wasted 60-70% of context budget per agent interaction. Docs were written for human top-to-bottom reading, not agent load-what-you-need consumption.
 - **Decision**: Each monolith becomes a lightweight index file (<20 lines) linking to focused modules. Each module gets a `<!-- Load when: ... -->` header. New docs >150 lines must be split by task context from the start. Skill SKILL.md files stay under 80 lines.
-- **Source**: _archive/solutions/agent-infrastructure/2026-03-23-doc-splitting-dynamic-context-loading.md
+- **Amendment (2026-07-30)**: the 80-line SKILL.md cap is retired — it was a proxy for context cost, and SKILL.md files are IDE-side and never enter the Worker bundle, so their real cost is human attention. The budgets that bind are in `loading-order.md` § Tier 1 and § Runtime notes, stated in characters, because these files have paragraph-length lines. `uno-prototype` (129), `uno-research` (101), `uno-synthesize` (97), and `uno-publish` (90) exceeded the retired cap.
+- **Source**: (pre-consolidation solution doc, no longer in the repo) _archive/solutions/agent-infrastructure/2026-03-23-doc-splitting-dynamic-context-loading.md
 
 ## ADR-012: Declarative route manifest over parallel maps
 - **Date**: 2026-03-17
@@ -100,7 +101,7 @@ tags: [architecture, conventions]
 
 **Supersedes.** ADR-001 (AGENTS.md entry point — strengthened: now the *only* one), ADR-007 (skills agent-agnostic under .agent/ — now top-level skills/ with per-runtime faces), ADR-008 (compound loop via uno-compound — now uno-maintain), the .agent/SKILL.md mode/pipeline router.
 
-**Pending.** ADR for the Pipedream→Cloudflare cutover outcome (Bill to confirm the Slack app's Event Subscriptions URL); skill-body rewrites (plan Phase 1) land separately with evals-first scenarios.
+**Pending, closed.** The Pipedream→Cloudflare cutover outcome is recorded in ADR-014 (Status CONFIRMED live, 2026-07-08). Skill-body rewrites (plan Phase 1) landed with evals-first scenarios.
 
 ## ADR-014: uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history)
 
@@ -110,13 +111,15 @@ tags: [architecture, conventions]
 
 **Why.** Rationale not recorded in-repo; inferred from the archived Pipedream docs (`docs/knowledge/archive/`) and eval commits: Pipedream limited control over tool orchestration, state, and observability; the Worker gives one TypeScript codebase, telemetry (`c48e1c30` build tags — round-2 evals unknowingly tested a stale deployment), and subrequest-budget control.
 
+**Amendment (2026-07-30).** Three details above are no longer true and were corrected here rather than left to mislead a reader of the log. (1) **Skills no longer raw-fetch at runtime** — the harness is baked into the Worker bundle at build time by `agents/uno-bot/scripts/bundle-harness.mjs` (it cost ~20 subrequests against a 50-cap invocation). The consequence reverses: deploys are now *coupled* to guidance edits, and the deploy workflow is `workflow_dispatch`-only, so a doc edit reaches the bot only when someone deploys. `SKILLS_BASE_URL` is deleted. (2) The gate tool is `proposal_resolve`, not `resolve_pending_proposal`. (3) **Anyone in the thread may confirm**, not only the requester — the lock was removed 2026-07-14 (`src/slack/gate.ts`). Model tiering is `pickModelTier()`.
+
 **Status.** CONFIRMED live (closed 2026-07-08 by evidence): eval rounds 1–3 ran through Slack against the Worker — round 2 diagnosed a stale *Worker* deployment serving Slack traffic and added /health build tags in response (`c48e1c30`), which is only possible with Event Subscriptions already pointed at workers.dev. Follow-up for a Slack-app admin: retire the v1 Pipedream workflow (out of the serving path either way).
 
 ## ADR-015: uno-blueprint on Supabase as the product source of truth (backfilled 2026-07-07 from git history)
 
 **Original date:** ≤2026-07-01 (`d892346f` D8 grounding: read-only `blueprint_search` over "the uno-blueprint Supabase"; hardened 2026-07-02 `0864cb54` with a `search_blueprint()` RPC and layer/step/scenario cell attribution).
 
-**Decision.** Product truth (actors, stages, steps, scenarios, requirements) lives in a Supabase-hosted blueprint, queried at task time — never cached into repo docs. All agent answers about product behavior cite blueprint cells; gaps are stated, not filled ("blueprint gap honesty", scenario R11). On any requirement change, PRD and blueprint update **together** — the paired-writes contract now codified in `docs/conventions/supabase.md` and enforced by `agents/writers/blueprint.md`.
+**Decision.** Product truth (actors, phases, steps, scenarios, requirements) lives in a Supabase-hosted blueprint, queried at task time — never cached into repo docs. All agent answers about product behavior cite blueprint cells; gaps are stated, not filled ("blueprint gap honesty", scenario R11). On any requirement change, PRD and blueprint update **together** — the paired-writes contract now codified in `docs/conventions/supabase.md` and enforced by `agents/writers/blueprint.md`.
 
 **Why.** Rationale not recorded; inferred: Notion docs drifted from reality and are slow to query programmatically; a structured store makes grounding citable (row-level) and machine-checkable, and gives prototypes a dummy-backend candidate.
 

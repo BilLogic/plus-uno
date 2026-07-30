@@ -37,3 +37,7 @@ Unverified mitigation: Gemini implicit context caching may discount a byte-stabl
 ## Work Log
 
 - 2026-07-30: Found by ce:review bundle audit; `gemini-agent.ts:206,216` and `wrangler.toml:140` verified directly.
+
+## Work Log (continued)
+
+- 2026-07-30: **Measurement instrumented, decision deferred to data.** `gemini-agent.ts` now reads `usageMetadata.cachedContentTokenCount` and reports it as `cached_in=` on the `[uno-bot]` telemetry line; `skills.ts` states which lane honours `cache_control` so the next reader doesn't assume both do. Nothing else changed: whether to build an explicit `cachedContent` depends on what `cached_in=` shows after a few live turns, and guessing would be the same mistake the subrequest budget already taught. Status moved pending → ready; the remaining work is reading the logs post-deploy.

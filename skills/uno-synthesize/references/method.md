@@ -69,7 +69,13 @@ yes is a scenario failure.
 
 ## 4 · PRD
 
-Draft from the documented findings — reuse, don't re-derive: findings → summary /
+**Query `uno-blueprint` first (ADR-021).** The current-state section and every
+downstream-effects claim cite blueprint rows, not memory — a PRD that describes
+today's journey from priors is the failure ADR-021 exists to prevent. Routing
+when a card and the blueprint disagree: `docs/conventions/supabase.md` § Two
+sources, one time axis.
+
+Then draft from the documented findings — reuse, don't re-derive: findings → summary /
 problem / goals; user flows + screen list → requirements & scope; action items →
 acceptance criteria; open questions carry over. Every key PRD claim traces to a
 documented finding (target: 100%).

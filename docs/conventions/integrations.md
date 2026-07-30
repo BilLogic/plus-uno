@@ -1,6 +1,6 @@
 # Integrations Index
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand, ~150 tokens) · load when deciding which tool or integration path to use. -->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand, ~150 tokens) · distilled 2026-07-07 · load when deciding which tool or integration path to use. -->
 
 One row per connected tool: where its conventions live, what touches it. Concrete scripts/env vars: `skills/uno-prototype/references/integrations-index.json`.
 

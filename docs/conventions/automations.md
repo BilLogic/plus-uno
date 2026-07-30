@@ -13,9 +13,11 @@ THE standing-automation registry. An automation absent from the table below is u
 
 **Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
 
+<!-- ide-only -->
 **Operate:** spot-run any workflow with `gh workflow run <file>`; outcomes land in the Actions job summary (`gh run list` / `gh run view <id>`). Cron triggers fire only from `main` — a workflow is inert until merged.
 
 **Supply chain:** third-party actions are pinned to commit SHAs (`uses: owner/repo@<sha> # vN`), the Claude Code CLI to an exact npm version (claude-vertex action). To bump: resolve the new tag (`gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`), update the SHA + comment everywhere it appears, then one green dispatch run before trusting crons.
+<!-- /ide-only -->
 
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
 |---|---|---|---|---|---|---|---|

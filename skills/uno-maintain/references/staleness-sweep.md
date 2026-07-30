@@ -6,7 +6,7 @@ One intake per finding (evidence + suggested tier), through the normal pipeline 
 
 ## A. Canonicality headers (conventions are repo-canonical — ADR-017)
 
-- [ ] Every `docs/conventions/*.md` header declares `status: canonical` with a `distilled:` lineage date.
+- [ ] Every `docs/conventions/*.md` opens with the ADR-017 header comment: `<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier N · <lineage> · applied by <who>. -->`. Prose headers, `<!-- Tier: N -->`-only headers, and missing lineage all fail.
 - [ ] No conventions file still carries a "prefer Notion on conflict" rule line.
 - [ ] Legacy Notion playbook pages duplicating a conventions file carry a superseded banner pointing at the repo — missing banner → intake for writers/notion.
 
@@ -26,5 +26,5 @@ One intake per finding (evidence + suggested tier), through the normal pipeline 
 ## D. Token & DS integrity
 
 - [ ] Token docs align with `design-system/src/tokens/*.scss`; no guidance conflicts with generated sources.
-- [ ] Export barrels (`design-system/src/index.js`, `components/index.js`, `forms/index.js`) match the components docs reference.
+- [ ] Export barrels (`design-system/src/index.js`, `components/index.js`, `components/forms-and-inputs/index.js`) match the components docs reference.
 - [ ] Storybook story paths referenced in docs still resolve under `.storybook/main.js` config.
