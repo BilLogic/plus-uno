@@ -55,13 +55,14 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-/** Empty student reflection — rating required. */
+/** Empty student reflection — chip questions unanswered. */
 export const Empty = {
     render: () => (
         <Shell
             formProps={{
                 studentName: 'Baxter Ellington',
-                initialData: { rating: 0 },
+                initialData: {},
+                simulateAi: false,
                 aiState: 'idle',
             }}
         />
@@ -75,11 +76,12 @@ export const InProgressAi = {
         <Shell
             formProps={{
                 studentName: 'Baxter Ellington',
+                simulateAi: false,
                 aiState: 'generating',
                 initialData: {
-                    rating: 4,
-                    whatWorked: ['good-pacing', 'strong-rapport'],
-                    whatImprove: [],
+                    goalProgress: ['steady'],
+                    effort: ['consistent'],
+                    engagement: ['responsive'],
                 },
             }}
         />
@@ -92,11 +94,15 @@ export const Filled = {
         <Shell
             formProps={{
                 studentName: 'Baxter Ellington',
+                simulateAi: false,
                 aiState: 'ready',
                 initialData: {
-                    rating: 4,
-                    whatWorked: ['good-pacing', 'strong-rapport'],
-                    whatImprove: ['pacing'],
+                    goalProgress: ['steady'],
+                    effort: ['consistent'],
+                    engagement: ['responsive'],
+                    followUp: ['no'],
+                    aiPrompt: 'What’s one moment from this session you’d want the next tutor to know?',
+                    aiAnswer: 'He solved the last two problems without prompts.',
                 },
             }}
         />
@@ -110,12 +116,17 @@ export const WorstCase = {
         <Shell
             formProps={{
                 studentName: 'Baxter Ellington',
+                simulateAi: false,
                 aiState: 'ready',
                 initialData: {
-                    rating: 2,
-                    whatWorked: ['other'],
-                    whatImprove: ['other'],
-                    otherImprove: 'Camera off for most of the block.',
+                    goalProgress: ['other'],
+                    effort: ['other'],
+                    engagement: ['other'],
+                    otherGoal: 'Worked ahead on a custom packet.',
+                    otherEffort: 'Needed frequent nudges after break.',
+                    otherEngagement: 'Camera off for most of the block.',
+                    followUp: ['behavioral'],
+                    followUpDescription: 'Repeatedly redirected peers off-task.',
                 },
             }}
         />

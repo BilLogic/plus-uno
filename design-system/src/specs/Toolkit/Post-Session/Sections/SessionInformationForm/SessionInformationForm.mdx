@@ -7,12 +7,17 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/st
 
 <Title />
 
-Session Info page composition (Figma Pages · Session Info).
+**Single-step page spec** for Session Information (Figma Pages · Session Info).
 Composes Session date, Session selection, Students Dropdown, and Upload Files.
+States (empty · filled · cancellation) are story variants — not separate docs pages.
+
+For the clickable multi-step walkthrough (nav between all steps), use **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)**.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-300236"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Sections/SessionInformationForm"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Session Info', nodeId: '563:300236' }]}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -21,7 +26,9 @@ Composes Session date, Session selection, Students Dropdown, and Upload Files.
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Default</code> story).</>}>
+Filled happy path — date + session selected; students and upload visible.
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Default</code> / filled).</>}>
     <Canvas of={SessionInformationFormStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -29,9 +36,29 @@ Composes Session date, Session selection, Students Dropdown, and Upload Files.
 
 <div className="sb-ds-doc-section">
 
+### States
+
+| Story | What it shows |
+| --- | --- |
+| Default | Date + session filled; students + recording |
+| Empty | Date/session required before roster/upload |
+| Cancellation | “Session did not happen” — reasons + description |
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
-<DocsInteractivePlayground of={SessionInformationFormStories.Default} />
+<DocsInteractivePlayground
+    of={SessionInformationFormStories.Default}
+    description={
+        <>
+            Preview stays <strong className="text-foreground">inline</strong> while you scroll.
+            Switch stories in the sidebar for empty / cancellation.
+        </>
+    }
+/>
 
 </div>
 

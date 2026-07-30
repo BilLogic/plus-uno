@@ -57,6 +57,8 @@ Empty in Figma — no Storybook leaves.
 
 ## Pages (`1721:118451`)
 
+One Storybook docs leaf per Figma page. Empty / filled / AI states are **story variants or Controls args**, not nested Unfilled/Filled docs.
+
 | Figma | Node | Storybook |
 |---|---|---|
 | Full Page / Reflections | `1751:114672` | Pre-Session Pages / Reflection (shared entry) |
@@ -65,7 +67,14 @@ Empty in Figma — no Storybook leaves.
 | Session Reflection | `10662:18089` | Pages / Session Reflection |
 | Self Reflection | `5179:79703` | Pages / Self Reflection |
 | Form Feedback | `5176:24528` | Pages / Form Feedback |
-| — (orchestrator) | — | Pages / Reflection Flow |
+
+### Reflection Flow (orchestrator — not a Figma page)
+
+| | Storybook |
+|---|---|
+| End-to-end clickable prototype (hi-fi app mounts this) | Pages / Reflection Flow |
+
+Use **page docs** for single-step visual QA against Figma masters. Use **Reflection Flow** to walk Session Info → Students → Session → Self → Form Feedback with nav, cadence, cancellation, and modals.
 
 ## Obsolete (removed from Storybook catalog)
 

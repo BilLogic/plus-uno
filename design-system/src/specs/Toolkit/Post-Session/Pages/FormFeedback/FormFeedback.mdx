@@ -1,0 +1,63 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as FormFeedbackStories from './FormFeedback.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FormFeedbackStories} name="Toolkit Docs — Form Feedback" />
+
+<Title />
+
+**Single-step page spec** for Form Feedback (Figma Pages · Form Feedback).
+States (empty · filled) are story variants / Controls args — not separate docs pages.
+
+For the clickable multi-step walkthrough (nav between all steps), use **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)**.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5176-24528"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Pages/FormFeedback"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Form Feedback', nodeId: '5176:24528' }]}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+Empty state — form rating unanswered. Use Controls → **Form state** to switch filled on the Overview story.
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Empty</code>).</>}>
+    <Canvas of={FormFeedbackStories.Empty} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+| Story | What it shows |
+| --- | --- |
+| Empty | Intuitiveness scale only |
+| Filled | Scale + experience caption + comments with privacy warning |
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={FormFeedbackStories.Overview}
+    description={
+        <>
+            Change <strong className="text-foreground">Form state</strong> in the controls table.
+            Preview stays inline while you scroll.
+        </>
+    }
+/>
+
+</div>
+
+</div>

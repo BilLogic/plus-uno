@@ -1,17 +1,22 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as Part1Stories from './Part1.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={Part1Stories} name="Toolkit Docs — Part1" />
+<Meta of={Part1Stories} name="Toolkit Docs — Student Reflection" />
 
 <Title />
 
-Student Reflection page states — unfilled · AI generating · filled · worst case. Visual specs live in **Figma**; tokens and behavior notes are in the **GitHub** source below.
+**Single-step page spec** for Student Reflection (Figma Pages · Student Reflection).
+States (empty · AI generating · filled · worst case) are story variants — not separate docs pages.
+
+For the clickable multi-step walkthrough (nav between all steps), use **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)**.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10662-18965"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Student Reflection', nodeId: '10662:18965' }]}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -20,9 +25,24 @@ Student Reflection page states — unfilled · AI generating · filled · worst 
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Empty</code> story).</>}>
+Empty state — chip questions unanswered for the active student.
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Empty</code>).</>}>
     <Canvas of={Part1Stories.Empty} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+| Story | What it shows |
+| --- | --- |
+| Empty | Notes + unanswered chip banks |
+| In progress (AI generating) | Chips complete; AI loading |
+| Filled | AI follow-up ready |
+| Worst case (Other everywhere) | Other text + escalation path |
 
 </div>
 
@@ -34,8 +54,8 @@ Student Reflection page states — unfilled · AI generating · filled · worst 
     of={Part1Stories.Empty}
     description={
         <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+            Preview stays <strong className="text-foreground">inline</strong> while you scroll.
+            Switch stories in the sidebar for other states.
         </>
     }
 />

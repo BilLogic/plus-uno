@@ -122,7 +122,7 @@ See `STRUCTURE.md` for the full node map. Do not invent organisms that are not i
             </td>
         </tr>
         <tr>
-            <td><strong>Pages</strong></td>
+            <td><strong>Pages</strong> (single-step specs)</td>
             <td>
                 <a href="?path=/docs/specs-toolkit-pre-session-pages-reflection--docs">Full Page / Reflections</a>
                 {' · '}
@@ -132,13 +132,23 @@ See `STRUCTURE.md` for the full node map. Do not invent organisms that are not i
                 {' · '}
                 <a href="?path=/docs/specs-toolkit-post-session-pages-session-reflection--docs">Session Reflection</a>
                 {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-pages-self-reflection-unfilled--docs">Self Reflection</a>
+                <a href="?path=/docs/specs-toolkit-post-session-pages-self-reflection--docs">Self Reflection</a>
                 {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-pages-form-feedback-unfilled--docs">Form Feedback</a>
-                {' · '}
+                <a href="?path=/docs/specs-toolkit-post-session-pages-form-feedback--docs">Form Feedback</a>
+            </td>
+            <td>
+                One docs leaf per Figma page. Empty / filled / AI states are story variants or Controls args — not subpages.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Reflection Flow</strong></td>
+            <td>
                 <a href="?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs">Reflection Flow</a>
             </td>
-            <td>Session Info is a page composition of Elements — not an Element itself.</td>
+            <td>
+                End-to-end interactive prototype (click through all steps). Not a Figma page frame.
+                The hi-fi app mounts this same orchestrator.
+            </td>
         </tr>
         <tr>
             <td>Cards</td>
@@ -152,14 +162,18 @@ See `STRUCTURE.md` for the full node map. Do not invent organisms that are not i
 
 <div className="sb-ds-doc-section">
 
-### Reflection flow
+### Reflection Flow vs page docs
 
-In-memory walkthrough (no backend). Entry list: Pre-Session Reflections.
-Flow: Session Info → Student → Session → Self → Form Feedback → Confirmation Pop-up (reflection submitted).
+| Use… | When… |
+| --- | --- |
+| **Page docs** (Session Info, Student, Session, Self, Form Feedback) | Checking one Figma page master — layout, copy, empty/filled states |
+| **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)** | Clicking through the full journey, cadence flags, cancellation, Save & Exit / submit modals |
+
+Flow order: Session Info → Student(s) → Session → Self (optional) → Form Feedback (optional) → confirmation.
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>Orchestrator composing Figma page states and local organisms.</>}
+    description={<>Interactive prototype — start here to walk the whole form.</>}
 >
     <Canvas of={ReflectionFlowStories.Default} />
 </DocsCanvasShell>

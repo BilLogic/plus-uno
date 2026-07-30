@@ -54,3 +54,23 @@ export const Empty = {
         </div>
     ),
 };
+
+/**
+ * Cancellation branch — session did not happen (reasons + description).
+ */
+export const Cancellation = {
+    name: 'Cancellation',
+    render: () => (
+        <div style={{ maxWidth: 720, width: '100%' }}>
+            <SessionInformationForm
+                initialData={{
+                    date: '2025-07-29',
+                    sessionOption: 'session-1',
+                    didNotHappen: true,
+                }}
+                availableStudents={SAMPLE_STUDENTS}
+                selectedStudentIds={[]}
+            />
+        </div>
+    ),
+};
