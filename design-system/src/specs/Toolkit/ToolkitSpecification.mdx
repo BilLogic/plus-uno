@@ -4,8 +4,10 @@ import * as DaysDropdownStories from './Pre-Session/Elements/DaysDropdown.storie
 import * as MySessionsStories from './Pre-Session/Pages/MySessions.stories.jsx';
 import * as StudentListStories from './In-Session/Tables/StudentList.stories.jsx';
 import * as MATHiaGoalStatusBannerStories from './In-Session/Elements/MATHiaGoalStatusBanner.stories.jsx';
-import * as SessionReflectionPart1Stories from './Post-Session/Pages/SessionReflection/Part1.stories.jsx';
-import * as SelfReflectionUnfilledStories from './Post-Session/Pages/SelfReflection/Unfilled.stories.jsx';
+import * as ReflectionFlowStories from './Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx';
+import * as SessionReflectionStories from './Post-Session/Pages/SessionReflection/SessionReflection.stories.jsx';
+import * as SelfReflectionStories from './Post-Session/Pages/SelfReflection/SelfReflection.stories.jsx';
+
 
 import { DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -70,17 +72,17 @@ Representative inline playgrounds below; open any leaf under **Toolkit** in the 
 
 ### Post-session
 
-#### Reflection flow (end-to-end)
+#### Reflection flow (end-to-end prototype)
 
-<DocsInteractivePlayground of={SessionReflectionPart1Stories.Filled} />
+<DocsInteractivePlayground of={ReflectionFlowStories.Default} />
 
 #### Session reflection — AI generating
 
-<DocsInteractivePlayground of={SessionReflectionPart1Stories.InProgressAi} />
+<DocsInteractivePlayground of={SessionReflectionStories.InProgressAi} />
 
-#### Self reflection (unfilled)
+#### Self reflection (empty)
 
-<DocsInteractivePlayground of={SelfReflectionUnfilledStories.Unfilled} />
+<DocsInteractivePlayground of={SelfReflectionStories.Empty} />
 
 </div>
 

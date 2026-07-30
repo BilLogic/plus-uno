@@ -2,6 +2,7 @@ import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as TutorHomePageStories from './Pages/TutorHomePageSkillsOverview/TutorHomePageSkillsOverview.stories.jsx';
 import {
     DocsCanvasShell,
+    DocsTable,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -33,7 +34,7 @@ Tutor home local organisms from the Web App Specs file. Organized the same way a
 
 ### Catalog
 
-<table className="sb-ds-doc-table">
+<DocsTable>
     <thead>
         <tr>
             <th>Figma section</th>
@@ -68,7 +69,7 @@ Tutor home local organisms from the Web App Specs file. Organized the same way a
                 {' · '}
                 <a href="?path=/docs/specs-home-cards-resource-card--docs">Resource Card</a>
                 {' · '}
-                                <a href="?path=/docs/specs-home-cards-overview-card-training-progress--docs">Overview Card / Training Progress</a>
+                <a href="?path=/docs/specs-home-cards-overview-card-training-progress--docs">Overview Card / Training Progress</a>
             </td>
             <td>Skills charts · Sessions/Lessons metrics · Lessons carousel · Resources · Training progress</td>
         </tr>
@@ -86,7 +87,7 @@ Tutor home local organisms from the Web App Specs file. Organized the same way a
             <td>
                 <a href="?path=/docs/specs-home-sections-homepage-jumbotron--docs">Homepage Jumbotron</a>
                 {' · '}
-                                <a href="?path=/docs/specs-home-sections-students-overview--docs">Students Overview</a>
+                <a href="?path=/docs/specs-home-sections-students-overview--docs">Students Overview</a>
             </td>
             <td>Sign-up / session / reflection · Bottom students overview</td>
         </tr>
@@ -105,7 +106,7 @@ Tutor home local organisms from the Web App Specs file. Organized the same way a
             <td>Empty in Figma — no Storybook docs yet</td>
         </tr>
     </tbody>
-</table>
+</DocsTable>
 
 </div>
 

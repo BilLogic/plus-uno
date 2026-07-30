@@ -1,0 +1,35 @@
+/**
+ * Post-Session Linear Scale shell around Foundations Scale.
+ * Figma Sections · Linear Scale `10819:11602` — primary-state-08, 12px radius, 445px.
+ */
+
+.post-session-linear-scale.plus-scale-wrapper {
+    width: 445px;
+    max-width: 100%;
+}
+
+.post-session-linear-scale .plus-scale-container {
+    align-items: flex-start;
+    gap: var(--size-section-gap-md);
+    padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
+    background-color: var(--color-primary-state-08);
+    border-radius: var(--size-section-radius-md, 12px);
+}
+
+.post-session-linear-scale .plus-scale-end-label {
+    flex: 1 0 0;
+    min-width: 0;
+    white-space: normal;
+    line-height: 1.571;
+}
+
+.post-session-linear-scale .plus-scale-options {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: var(--size-section-gap-md);
+}
+
+.post-session-linear-scale .plus-scale-option {
+    flex: 0 0 29px;
+    width: 29px;
+}

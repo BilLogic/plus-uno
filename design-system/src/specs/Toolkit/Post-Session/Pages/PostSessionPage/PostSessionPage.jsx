@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
-import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/SessionInformationForm/SessionInformationForm';
+import SessionInfo from '@/specs/Toolkit/Post-Session/Pages/SessionInfo/SessionInfo';
 
 const PostSessionPage = ({
     initialSessionData,
@@ -29,7 +29,7 @@ const PostSessionPage = ({
             />
             <div style={{ flex: 1 }}>
                 {activeTab === 'session-information' ? (
-                    <SessionInformationForm
+                    <SessionInfo
                         initialData={sessionData}
                         availableStudents={initialStudents}
                         selectedStudentIds={selectedStudentIds}

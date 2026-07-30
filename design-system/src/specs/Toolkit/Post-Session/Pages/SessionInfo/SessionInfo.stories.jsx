@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SessionInformationForm from './SessionInformationForm';
+import SessionInfo from './SessionInfo';
 
 const SAMPLE_STUDENTS = [
     { id: 'kiera', name: 'Kiera Wintervale' },
@@ -9,7 +9,7 @@ const SAMPLE_STUDENTS = [
 
 export default {
     title: 'Specs/Toolkit/Post-Session/Pages/Session Info',
-    component: SessionInformationForm,
+    component: SessionInfo,
     parameters: {
         layout: 'padded',
     },
@@ -26,7 +26,7 @@ export const Default = {
         );
         return (
             <div style={{ maxWidth: 720, width: '100%' }}>
-                <SessionInformationForm
+                <SessionInfo
                     initialData={{
                         date: '2025-07-29',
                         sessionOption: 'session-1',
@@ -46,7 +46,7 @@ export const Default = {
 export const Empty = {
     render: () => (
         <div style={{ maxWidth: 720, width: '100%' }}>
-            <SessionInformationForm
+            <SessionInfo
                 initialData={{}}
                 availableStudents={SAMPLE_STUDENTS}
                 selectedStudentIds={[]}
@@ -62,7 +62,7 @@ export const Cancellation = {
     name: 'Cancellation',
     render: () => (
         <div style={{ maxWidth: 720, width: '100%' }}>
-            <SessionInformationForm
+            <SessionInfo
                 initialData={{
                     date: '2025-07-29',
                     sessionOption: 'session-1',

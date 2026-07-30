@@ -16,7 +16,7 @@ import { CANCELLATION_REASON_OPTIONS } from '@/specs/Toolkit/Post-Session/reflec
  *
  * @param {object} props
  */
-const SessionInformationForm = ({
+const SessionInfo = ({
     initialData,
     availableStudents = [],
     selectedStudentIds = [],
@@ -214,7 +214,7 @@ const SessionInformationForm = ({
     );
 };
 
-SessionInformationForm.propTypes = {
+SessionInfo.propTypes = {
     initialData: PropTypes.object,
     availableStudents: PropTypes.array,
     selectedStudentIds: PropTypes.array,
@@ -225,7 +225,7 @@ SessionInformationForm.propTypes = {
     lastUpdated: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };
 
-SessionInformationForm.defaultProps = {
+SessionInfo.defaultProps = {
     initialData: {},
     availableStudents: [],
     selectedStudentIds: [],
@@ -233,4 +233,4 @@ SessionInformationForm.defaultProps = {
     onSave: () => {},
 };
 
-export default SessionInformationForm;
+export default SessionInfo;

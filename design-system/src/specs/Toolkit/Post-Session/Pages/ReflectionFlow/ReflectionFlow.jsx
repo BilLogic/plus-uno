@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
-import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/SessionInformationForm/SessionInformationForm';
+import SessionInfo from '@/specs/Toolkit/Post-Session/Pages/SessionInfo/SessionInfo';
 import SessionReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionFormV2';
 import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
 import SelfReflectionForm from '@/specs/Toolkit/Post-Session/Sections/SelfReflectionForm/SelfReflectionForm';
@@ -215,7 +215,7 @@ const ReflectionFlow = ({
     const renderStep = () => {
         if (activeTab === 'session-information') {
             return (
-                <SessionInformationForm
+                <SessionInfo
                     initialData={sessionInfo}
                     availableStudents={studentsProp}
                     selectedStudentIds={sessionInfo.selectedStudentIds || students.map((s) => s.id || s.name)}

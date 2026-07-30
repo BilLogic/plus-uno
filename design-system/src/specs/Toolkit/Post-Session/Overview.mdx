@@ -2,6 +2,7 @@ import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as ReflectionFlowStories from './Pages/ReflectionFlow/ReflectionFlow.stories.jsx';
 import {
     DocsCanvasShell,
+    DocsTable,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -36,7 +37,7 @@ See `STRUCTURE.md` for the full node map. Do not invent organisms that are not i
 
 ### Catalog
 
-<table className="sb-ds-doc-table">
+<DocsTable>
     <thead>
         <tr>
             <th>Figma</th>
@@ -156,7 +157,7 @@ See `STRUCTURE.md` for the full node map. Do not invent organisms that are not i
             <td>Empty in Figma.</td>
         </tr>
     </tbody>
-</table>
+</DocsTable>
 
 </div>
 
@@ -164,10 +165,30 @@ See `STRUCTURE.md` for the full node map. Do not invent organisms that are not i
 
 ### Reflection Flow vs page docs
 
-| Use… | When… |
-| --- | --- |
-| **Page docs** (Session Info, Student, Session, Self, Form Feedback) | Checking one Figma page master — layout, copy, empty/filled states |
-| **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)** | Clicking through the full journey, cadence flags, cancellation, Save & Exit / submit modals |
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Use…</th>
+            <th>When…</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <strong>Page docs</strong> (Session Info, Student, Session, Self, Form Feedback)
+            </td>
+            <td>Checking one Figma page master — layout, copy, empty/filled states</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs">Reflection Flow</a>
+            </td>
+            <td>
+                Clicking through the full journey, cadence flags, cancellation, Save &amp; Exit / submit modals
+            </td>
+        </tr>
+    </tbody>
+</DocsTable>
 
 Flow order: Session Info → Student(s) → Session → Self (optional) → Form Feedback (optional) → confirmation.
 

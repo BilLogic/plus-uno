@@ -1,7 +1,12 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ReflectionFlowStories from './ReflectionFlow.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ReflectionFlowStories} name="Toolkit Docs — Reflection Flow" />
 
@@ -41,13 +46,36 @@ Starts on Session Information with side nav. Walk the form with Next / side-nav 
 
 ### Stories
 
-| Story | What it shows |
-| --- | --- |
-| Default | Full flow from Session Info |
-| Start at Session Reflection | Jump into mid-flow |
-| Save & Exit | Confirmation modal on mount |
-| Without Self + Form Feedback | Cadence flags off |
-| Cancellation branch | Session did not happen path |
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Default</td>
+            <td>Full flow from Session Info</td>
+        </tr>
+        <tr>
+            <td>Start at Session Reflection</td>
+            <td>Jump into mid-flow</td>
+        </tr>
+        <tr>
+            <td>Save &amp; Exit</td>
+            <td>Confirmation modal on mount</td>
+        </tr>
+        <tr>
+            <td>Without Self + Form Feedback</td>
+            <td>Cadence flags off</td>
+        </tr>
+        <tr>
+            <td>Cancellation branch</td>
+            <td>Session did not happen path</td>
+        </tr>
+    </tbody>
+</DocsTable>
 
 </div>
 

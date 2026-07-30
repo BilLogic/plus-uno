@@ -1,7 +1,12 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelfReflectionStories from './SelfReflection.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SelfReflectionStories} name="Toolkit Docs — Self Reflection" />
 
@@ -37,11 +42,28 @@ Empty state — scale unanswered. Use Controls → **Form state** to switch fill
 
 ### States
 
-| Story | What it shows |
-| --- | --- |
-| Empty | Scale only; Next disabled |
-| Filled | Rating, chip banks, AI answer, support + escalate |
-| In progress (AI generating) | Loading card after gated selections |
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Empty</td>
+            <td>Scale only; Next disabled</td>
+        </tr>
+        <tr>
+            <td>Filled</td>
+            <td>Rating, chip banks, AI answer, support + escalate</td>
+        </tr>
+        <tr>
+            <td>In progress (AI generating)</td>
+            <td>Loading card after gated selections</td>
+        </tr>
+    </tbody>
+</DocsTable>
 
 </div>
 

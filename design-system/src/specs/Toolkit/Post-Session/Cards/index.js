@@ -1,1 +1,1 @@
-export * from './Cards.stories.jsx';
+// Cards strip is empty in Figma — no Storybook leaves.

@@ -1,10 +1,11 @@
 /**
  * Post-Session page story barrels.
- * Prefer ReflectionFlow for the multi-step prototype; single-step leaves for Figma page specs.
+ * Single-step leaves share Section forms + pageShell; ReflectionFlow is the multi-step prototype.
  */
 
 export * from './ReflectionFlow/ReflectionFlow.stories.jsx';
-export * from './SessionReflection/Part1.stories.jsx';
-export * from './StudentReflection/Part1.stories.jsx';
+export * from './SessionInfo/SessionInfo.stories.jsx';
+export * from './SessionReflection/SessionReflection.stories.jsx';
+export * from './StudentReflection/StudentReflection.stories.jsx';
 export * from './SelfReflection/SelfReflection.stories.jsx';
 export * from './FormFeedback/FormFeedback.stories.jsx';

@@ -1,0 +1,86 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SessionReflectionStories from './SessionReflection.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionReflectionStories} name="Toolkit Docs — Session Reflection" />
+
+<Title />
+
+**Single-step page spec** for Session Reflection (Figma Pages · Session Reflection).
+States are story variants — not separate docs pages. Shell + form share the same Section components as Reflection Flow.
+
+For the clickable multi-step walkthrough, use **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)**.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10662-18089"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Pages/SessionReflection"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Session Reflection', nodeId: '10662:18089' }]}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+Empty state — overall session rating unanswered.
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Empty</code>).</>}>
+    <Canvas of={SessionReflectionStories.Empty} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Empty</td>
+            <td>Rating only</td>
+        </tr>
+        <tr>
+            <td>In progress (AI generating)</td>
+            <td>Chips answered; AI loading</td>
+        </tr>
+        <tr>
+            <td>Filled</td>
+            <td>Happy path with AI follow-up</td>
+        </tr>
+        <tr>
+            <td>Worst case (Other everywhere)</td>
+            <td>Other + escalation describe</td>
+        </tr>
+        <tr>
+            <td>Save &amp; Exit confirmation</td>
+            <td>Modal over filled form</td>
+        </tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground of={SessionReflectionStories.Empty} />
+
+</div>
+
+</div>

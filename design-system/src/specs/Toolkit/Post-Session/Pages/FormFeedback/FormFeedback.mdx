@@ -1,7 +1,12 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FormFeedbackStories from './FormFeedback.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FormFeedbackStories} name="Toolkit Docs — Form Feedback" />
 
@@ -37,10 +42,24 @@ Empty state — form rating unanswered. Use Controls → **Form state** to switc
 
 ### States
 
-| Story | What it shows |
-| --- | --- |
-| Empty | Intuitiveness scale only |
-| Filled | Scale + experience caption + comments with privacy warning |
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Empty</td>
+            <td>Intuitiveness scale only</td>
+        </tr>
+        <tr>
+            <td>Filled</td>
+            <td>Scale + experience caption + comments with privacy warning</td>
+        </tr>
+    </tbody>
+</DocsTable>
 
 </div>
 

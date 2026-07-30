@@ -62,11 +62,13 @@ One Storybook docs leaf per Figma page. Empty / filled / AI states are **story v
 | Figma | Node | Storybook |
 |---|---|---|
 | Full Page / Reflections | `1751:114672` | Pre-Session Pages / Reflection (shared entry) |
-| Session Info | `563:300236` | Pages / Session Info |
+| Session Info | `563:300236` | Pages / Session Info (`Pages/SessionInfo/`) |
 | Student Reflection | `10662:18965` | Pages / Student Reflection |
 | Session Reflection | `10662:18089` | Pages / Session Reflection |
 | Self Reflection | `5179:79703` | Pages / Self Reflection |
 | Form Feedback | `5176:24528` | Pages / Form Feedback |
+
+Page stories share `pageShell` + Section form organisms with **Reflection Flow** (no divergent Unfilled/Filled bodies).
 
 ### Reflection Flow (orchestrator — not a Figma page)
 
@@ -75,6 +77,13 @@ One Storybook docs leaf per Figma page. Empty / filled / AI states are **story v
 | End-to-end clickable prototype (hi-fi app mounts this) | Pages / Reflection Flow |
 
 Use **page docs** for single-step visual QA against Figma masters. Use **Reflection Flow** to walk Session Info → Students → Session → Self → Form Feedback with nav, cadence, cancellation, and modals.
+
+### Docs IA notes (047)
+
+- Session Info lives under `Pages/SessionInfo/` (title matches folder).
+- Free Response Question = `Sections/FreeResponseQuestion/` (legacy `FormReflection` archived).
+- `Tables/index.js` → `Reflections.stories.jsx`; Cards barrel is empty (Figma Cards strip empty).
+- Linear Scale composes Foundations `Scale` with Post-Session shell SCSS.
 
 ## Obsolete (removed from Storybook catalog)
 
