@@ -1,17 +1,33 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
-
 import * as OptionChipStories from './OptionChip.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+    fileKey: 'W0qzhXWxFsMwSJzkdV2yal',
+    sets: [
+        {
+            id: 'option-chip',
+            name: 'Option Chip',
+            componentSetNodeId: '10661:10292',
+            url: 'https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10661-10292',
+        },
+    ],
+};
 
 <Meta of={OptionChipStories} name="Toolkit Docs — OptionChip" />
 
 <Title />
 
-This entry is part of **Toolkit** specs (Storybook title `Specs/Toolkit/Post-Session/Elements/Option Chip`). Visual specs live in **Figma**; tokens, layout, and behavior notes are in the **GitHub** source below.
+Multi-select chip for reflection question banks (What worked / What could be improved /
+Supervisor follow-up). Figma styles: **tonal** (unselected) · **filled** (selected).
+
+Local organism — Elements (Toolkit / Sessions / Post-Session).
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs"
-    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.stories.jsx"
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10661-10292"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip"
+    figmaFileKey={figmaMeta.fileKey}
+    sets={figmaMeta.sets}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -20,7 +36,7 @@ This entry is part of **Toolkit** specs (Storybook title `Specs/Toolkit/Post-Ses
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Overview</code> story).</>}>
+<DocsCanvasShell attachSourceBelow description={<>Tonal vs filled chip states.</>}>
     <Canvas of={OptionChipStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -34,8 +50,8 @@ This entry is part of **Toolkit** specs (Storybook title `Specs/Toolkit/Post-Ses
     of={OptionChipStories.Interactive}
     description={
         <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+            Toggle chips in a multi-select bank. The preview stays{' '}
+            <strong className="text-foreground">inline</strong> while you scroll.
         </>
     }
 />

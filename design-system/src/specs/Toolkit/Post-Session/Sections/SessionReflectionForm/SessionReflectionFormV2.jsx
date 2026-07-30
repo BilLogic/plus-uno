@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
 import Rating from '@/components/forms-and-inputs/Rating';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 import { OptionChipGroup } from '@/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip';
-import AiGeneratingPlaceholder from '@/specs/Toolkit/Post-Session/Elements/AiGeneratingPlaceholder/AiGeneratingPlaceholder';
+import AiPromptedQuestionBox from '@/specs/Toolkit/Post-Session/Sections/AiPromptedQuestionBox/AiPromptedQuestionBox';
+import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
+import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
 import {
     SESSION_RATING_COMMENTS,
     WHAT_WORKED_OPTIONS,
     WHAT_COULD_IMPROVE_OPTIONS,
     SUPERVISOR_FOLLOWUP_OPTIONS,
-    formatLastUpdated,
 } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 /**
@@ -105,9 +105,7 @@ const SessionReflectionFormV2 = ({
                 <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
                     Session Reflection
                 </h4>
-                <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    {lastUpdated || formatLastUpdated()}
-                </p>
+                <LastUpdated text={typeof lastUpdated === 'string' ? lastUpdated : undefined} value={lastUpdated instanceof Date ? lastUpdated : undefined} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
@@ -175,20 +173,15 @@ const SessionReflectionFormV2 = ({
                             )}
                         </div>
 
-                        {aiState === 'generating' && <AiGeneratingPlaceholder />}
+                        {aiState === 'generating' && <AiPromptedQuestionBox state="loading" />}
                         {aiState === 'ready' && aiPrompt && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                                <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                                    {aiPrompt}
-                                </p>
-                                <Textarea
-                                    id="session-ai-followup"
-                                    value={aiAnswer}
-                                    onChange={(event) => setAiAnswer(event.target.value)}
-                                    placeholder="Optional — share a short note"
-                                    rows={3}
-                                />
-                            </div>
+                            <AiPromptedQuestionBox
+                                state="default"
+                                question={aiPrompt}
+                                helper="Optional — share a short note"
+                                value={aiAnswer}
+                                onChange={(event) => setAiAnswer(event.target.value)}
+                            />
                         )}
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
@@ -209,23 +202,13 @@ const SessionReflectionFormV2 = ({
                 )}
             </div>
 
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', marginTop: 'auto' }}>
-                <Button text="Cancel" style="default" fill="tonal" onClick={onCancel} />
-                <Button
-                    text="Save & Exit"
-                    style="primary"
-                    fill="tonal"
-                    disabled={!canSave}
-                    onClick={() => onSaveAndExit?.(snapshot())}
-                />
-                <Button
-                    text="Next"
-                    style="primary"
-                    fill="filled"
-                    disabled={!canNext}
-                    onClick={() => onNext?.(snapshot())}
-                />
-            </div>
+            <NavigationButtons
+                canSave={canSave}
+                canNext={canNext}
+                onCancel={onCancel}
+                onSaveAndExit={() => onSaveAndExit?.(snapshot())}
+                onNext={() => onNext?.(snapshot())}
+            />
         </div>
     );
 };
