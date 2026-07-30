@@ -14,20 +14,24 @@
 
 ## Two sources, one time axis (ADR-021)
 
-Grounded in the UNO Blueprint Grounding Evaluation (Notion, 2026-07: six-arm context ladder; guided blueprint arms hit 100% vs 36% docs-only; the sharpest failures were source-conflict blends). Every agent answering journey/product questions — in-IDE or uno-bot — follows this routing:
+**Authority is routed per claim, not per source.** The blueprint owns how the service works *today*; cards and PRDs own what's *planned*. Every agent answering a journey or product question — in-IDE or uno-bot — routes by this table.
 
 | Situation | Authority | Answer shape |
 |---|---|---|
-| "How does it work **today**?" | Blueprint | Cite `scenario → path → step` + `layer` actor. |
-| Conflicting card is **WIP / under review** and the change is **decided** (Decisions DB / card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both stated, attributed, never blended. |
-| Conflicting card is **WIP / review** but **exploratory** (no decision) | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — might change, not decided." Calibrate the verb to decision status. |
-| Conflicting card is **shipped** (`Dev Status: Deployed`) | **Blueprint still wins** — the paired write updates it at ship, so shipped-card docs may be the obsolete side | Answer from the blueprint. Evidence the blueprint itself is stale → say so and file/offer a `uno-maintain` intake; never silently prefer the doc. |
-| "What's **planned / coming / changing**?" | Roadmap cards + PRDs | Cite card + Design/Dev Status; use the blueprint as the today-baseline to explain the delta. |
-| Blueprint silent; a **current** doc covers it (Help Center, shipped PRD) | The doc | Cite + date it; note the blueprint doesn't cover this yet. |
-| Only **aspirational** docs (roadmap PRD, future spec) | Neither, as fact | Report as planned per {doc}; current behavior stays blueprint's (or "not in the source"). |
+| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path › layer › step`. |
+| Conflicting card is **WIP / under review**, change **decided** (Decisions DB or card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both attributed, never blended. |
+| Conflicting card is **WIP / under review**, still **exploratory** | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — not decided." Match the verb to decision status. |
+| Conflicting card is **shipped** (`Dev Status: Deployed`) | Blueprint (still) | Answer from the blueprint — the paired write updates it at ship, so a shipped doc that disagrees is the likely obsolete side. Evidence the blueprint itself is stale → say so and offer a `uno-maintain` intake. Never silently prefer the doc. |
+| "What's **planned / coming / changing**?" | Roadmap cards + PRDs | Cite card + Design/Dev Status. Use the blueprint as the today-baseline to explain the delta. |
+| Blueprint silent; a **current** doc covers it (Help Center, shipped PRD) | The doc | Cite it and date it. Note the blueprint doesn't cover this yet. |
+| Only **aspirational** docs (roadmap PRD, future spec) | Neither, as fact | Report as planned per {doc}. Current behavior stays the blueprint's — or "not in the source". |
 | Neither source | Abstain | "Not in the source" + name who should fill the gap. |
 
-Hard rules across all rows: **never merge two sources into one unattributed answer** — a conflict is surfaced, not blended; a fabricated blueprint citation is the worst outcome; blueprint feeds PRD drafting too (`skills/uno-synthesize` queries it for the current-state and downstream-effects sections before writing).
+Two hard rules, every row: **never merge two sources into one unattributed answer** — surface the conflict instead of blending it — and **never fabricate a blueprint citation**, the worst outcome available here.
+
+Drafting follows the same routing, not just answering: `skills/uno-synthesize` queries the blueprint for the current-state and downstream-effects sections before writing a PRD.
+
+*Evidence: UNO Blueprint Grounding Evaluation (Notion, 2026-07) — six-arm context ladder; guided blueprint arms scored 100% vs 36% docs-only, and the sharpest failures were source-conflict blends.*
 
 ## Access & keys
 
