@@ -29,7 +29,6 @@ export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTex
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
 export { default as Scrollspy } from '@/components/navigation/Scrollspy';
 
-export { default as Section } from '@/components/_internal/Section';
 export { default as Sidebar } from './_internal/Sidebar/Sidebar';
 export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 // export { default as PageLayout } from './_internal/PageLayout/PageLayout';

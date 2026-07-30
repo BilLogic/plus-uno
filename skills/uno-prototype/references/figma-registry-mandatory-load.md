@@ -12,6 +12,8 @@ Agents **MUST** read both files below before:
 
 **Do not guess** component imports or token names. If a node is not in the registry, flag it as a gap — do not invent a substitute.
 
+**Write-back gate:** when the user asks to write back to Figma, `.cursor/hooks/briefings/active-writeback-gate.json` is the live checklist — follow `design-system/figma/component-alignment.md` § Cursor → Figma.
+
 ## Mandatory files (load in this order)
 
 | Order | File | Purpose |

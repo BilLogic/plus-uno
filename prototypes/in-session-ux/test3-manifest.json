@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-07-11",
+  "playground": "playground/test-3",
+  "localPreview": "npm run dev:test-3",
+  "description": "Component variant lab — Alert, Card, Button, Badge, Progress, and form controls.",
+  "figmaTestFile": {
+    "fileKey": "mg1o1ybNMZOq4Kz7vn4r2M",
+    "url": "https://www.figma.com/design/mg1o1ybNMZOq4Kz7vn4r2M/Test-Roundtrip",
+    "page": "Page 1"
+  },
+  "figmaLibraryFile": {
+    "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+    "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
+  },
+  "writeBackFrame": {
+    "name": "Test 3",
+    "nodeId": "52:3327",
+    "url": "https://www.figma.com/design/mg1o1ybNMZOq4Kz7vn4r2M/Test-Roundtrip?node-id=52-3327"
+  },
+  "components": [
+    { "codeImport": "@/components/Badge", "codeProps": { "style": "primary", "size": "b3", "children": "Variant lab" }, "registrySetId": "static-badges", "componentSetNodeId": "25:568", "libraryKey": "4cccef7ac820218a928e05b36796e403ffa00fa1", "figmaInstanceNodeId": "52:3331" },
+    { "codeImport": "@/components/Badge", "codeProps": { "style": "success", "size": "b3", "children": "Roundtrip" }, "registrySetId": "static-badges", "componentSetNodeId": "25:568", "libraryKey": "4cccef7ac820218a928e05b36796e403ffa00fa1", "figmaInstanceNodeId": "52:3341" },
+    { "codeImport": "@/components/Badge", "codeProps": { "style": "warning", "size": "b3", "counter": 3 }, "registrySetId": "counter-badges", "componentSetNodeId": "3998:68735", "libraryKey": "4cccef7ac820218a928e05b36796e403ffa00fa1", "figmaInstanceNodeId": "52:3351" },
+    { "codeImport": "@/components/Badge", "codeProps": { "style": "info", "size": "b3", "dismissible": true, "children": "Dismissible" }, "registrySetId": "dismissible-badges", "componentSetNodeId": "1056:32356", "libraryKey": "4cccef7ac820218a928e05b36796e403ffa00fa1", "figmaInstanceNodeId": "52:3361" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "filled", "style": "primary", "text": "Primary action" }, "registrySetId": "filled-buttons", "componentSetNodeId": "33:2470", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "52:3374" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "tonal", "style": "secondary", "text": "Tonal" }, "registrySetId": "tonal-buttons", "componentSetNodeId": "979:20977", "libraryKey": "b00c9ab707a5f2774940bc17599c370a514dbcae", "figmaInstanceNodeId": "52:3381" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "outline", "style": "success", "text": "Outline" }, "registrySetId": "outlined-buttons", "componentSetNodeId": "968:18597", "libraryKey": "c486535e5e6140a60b619f22967fa2445f585cda", "figmaInstanceNodeId": "52:3388" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "text", "style": "danger", "text": "Text danger" }, "registrySetId": "text-buttons", "componentSetNodeId": "979:19814", "libraryKey": "1e64b7d6a9135790fb8230718400faba0dbbf214", "figmaInstanceNodeId": "52:3395" },
+    { "codeImport": "@/components/Alert", "codeProps": { "style": "success", "title": "Success" }, "registrySetId": "alert", "componentSetNodeId": "11:324", "libraryKey": "f11ba4c5d7dc477077f7e37c663e40d43301cdf7", "figmaInstanceNodeId": "52:3403" },
+    { "codeImport": "@/components/Alert", "codeProps": { "style": "warning", "title": "Warning" }, "registrySetId": "alert", "componentSetNodeId": "11:324", "libraryKey": "f11ba4c5d7dc477077f7e37c663e40d43301cdf7", "figmaInstanceNodeId": "52:3421" },
+    { "codeImport": "@/components/Alert", "codeProps": { "style": "danger", "title": "Action required" }, "registrySetId": "alert", "componentSetNodeId": "11:324", "libraryKey": "f11ba4c5d7dc477077f7e37c663e40d43301cdf7", "figmaInstanceNodeId": "52:3412" },
+    { "codeImport": "@/components/Alert", "codeProps": { "style": "info", "title": "Tip" }, "registrySetId": "alert", "componentSetNodeId": "11:324", "libraryKey": "f11ba4c5d7dc477077f7e37c663e40d43301cdf7", "figmaInstanceNodeId": "52:3437" },
+    { "codeImport": "@/components/Card", "codeProps": { "title": "Active tutors", "subtitle": "12 this week", "paddingSize": "sm" }, "registrySetId": "card", "componentSetNodeId": "4241:27817", "libraryKey": "8f398812b980ce87c669a6427a35eba840a63896", "figmaInstanceNodeId": "57:1230" },
+    { "codeImport": "@/components/Card", "codeProps": { "title": "Sessions logged", "subtitle": "48 completed", "paddingSize": "md", "showBorder": false }, "registrySetId": "card", "componentSetNodeId": "4241:27817", "libraryKey": "8f398812b980ce87c669a6427a35eba840a63896", "figmaInstanceNodeId": "57:1271" },
+    { "codeImport": "@/components/Card", "codeProps": { "title": "Avg. rating", "subtitle": "4.7 / 5.0", "header": "Performance", "footer": "Updated hourly" }, "registrySetId": "card", "componentSetNodeId": "4241:27817", "libraryKey": "8f398812b980ce87c669a6427a35eba840a63896", "figmaInstanceNodeId": "57:1312" },
+    { "codeImport": "@/forms/Input", "codeProps": { "label": "Student name", "placeholder": "Alex Morgan" }, "registrySetId": "input", "componentSetNodeId": "39:4802", "libraryKey": "1effcb43356ff2de1a06cfa6ccba425f8583713f", "figmaInstanceNodeId": "57:1397" },
+    { "codeImport": "@/forms/Select", "codeProps": { "label": "Cohort", "placeholder": "Select a cohort" }, "registrySetId": "select", "componentSetNodeId": "39:4802", "libraryKey": "1effcb43356ff2de1a06cfa6ccba425f8583713f", "figmaInstanceNodeId": "57:1415", "notes": "Select maps to Input set in registry pilot." },
+    { "codeImport": "@/forms/Textarea", "codeProps": { "label": "Session notes", "variant": "short", "rows": 3 }, "registrySetId": "form-short-textarea", "componentSetNodeId": "13543:5904", "libraryKey": "3c25c07664d6c19faeb64baf450ba18b81325293", "figmaInstanceNodeId": "57:1435" },
+    { "codeImport": "@/forms/Switch", "codeProps": { "label": "Send email notification" }, "registrySetId": "form-switch", "componentSetNodeId": "13543:5904", "libraryKey": "3c25c07664d6c19faeb64baf450ba18b81325293", "figmaInstanceNodeId": "57:1441", "notes": "Instance name Form Switch Button in Figma." },
+    { "codeImport": "@/forms/Checkbox", "codeProps": { "label": "I confirm this information is accurate" }, "registrySetId": "form-checkbox", "componentSetNodeId": "13543:5904", "libraryKey": "3c25c07664d6c19faeb64baf450ba18b81325293", "figmaInstanceNodeId": "57:1446" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "filled", "style": "primary", "text": "Submit" }, "registrySetId": "filled-buttons", "componentSetNodeId": "33:2470", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "57:1452" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "outline", "style": "secondary", "text": "Save draft" }, "registrySetId": "outlined-buttons", "componentSetNodeId": "968:18597", "libraryKey": "c486535e5e6140a60b619f22967fa2445f585cda", "figmaInstanceNodeId": "57:1459" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "text", "style": "tertiary", "text": "Cancel" }, "registrySetId": "text-buttons", "componentSetNodeId": "979:19814", "libraryKey": "1e64b7d6a9135790fb8230718400faba0dbbf214", "figmaInstanceNodeId": "57:1466" },
+    { "codeImport": "@/components/Card", "codeProps": { "title": "Task queue", "subtitle": "List items inside card body.", "items": [] }, "registrySetId": "card", "componentSetNodeId": "4241:27817", "libraryKey": "8f398812b980ce87c669a6427a35eba840a63896", "figmaInstanceNodeId": "57:1475" },
+    { "codeImport": "@/components/Progress", "codeProps": { "style": "primary", "value": 72, "label": "Primary", "showLabel": true }, "registrySetId": "progress-bar", "componentSetNodeId": "49:6872", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "57:1518" },
+    { "codeImport": "@/components/Progress", "codeProps": { "style": "success", "value": 100, "label": "Success", "showLabel": true, "striped": true, "animated": true }, "registrySetId": "progress-bar", "componentSetNodeId": "49:6872", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "57:1522" },
+    { "codeImport": "@/components/Progress", "codeProps": { "style": "warning", "value": 45, "label": "Warning", "showLabel": true, "size": "small" }, "registrySetId": "progress-bar", "componentSetNodeId": "49:6872", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "57:1723" },
+    { "codeImport": "@/components/Progress", "codeProps": { "style": "danger", "value": 18, "label": "Danger", "showLabel": true, "size": "large" }, "registrySetId": "progress-bar", "componentSetNodeId": "49:6872", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "57:1727" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "filled", "style": "success", "text": "Approve roster" }, "registrySetId": "filled-buttons", "componentSetNodeId": "33:2470", "libraryKey": "998e00aea10fa9d0e44ac53e2b1d446515387c67", "figmaInstanceNodeId": "52:4264" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "tonal", "style": "warning", "text": "Request review" }, "registrySetId": "tonal-buttons", "componentSetNodeId": "979:20977", "libraryKey": "b00c9ab707a5f2774940bc17599c370a514dbcae", "figmaInstanceNodeId": "52:4276" },
+    { "codeImport": "@/components/Button", "codeProps": { "fill": "outline", "style": "danger", "text": "Archive term" }, "registrySetId": "outlined-buttons", "componentSetNodeId": "968:18597", "libraryKey": "c486535e5e6140a60b619f22967fa2445f585cda", "figmaInstanceNodeId": "52:4288" }
+  ],
+  "tokenBindings": [
+    { "codeToken": "var(--color-surface)", "figmaVariableName": "Neutral Colors/surface", "key": "0fa65f9e6b100853fd8e72466c9017e750b32590", "appliedTo": "Test 3 frame fill" },
+    { "codeToken": "var(--color-on-surface)", "figmaVariableName": "Neutral Colors/on-surface", "key": "276bd82733cce667bb6b1a9ed355dda43404ed60", "appliedTo": "Title text fill" },
+    { "codeToken": "var(--color-on-surface-variant)", "figmaVariableName": "Neutral Colors/on-surface-variant", "key": "5798cab1bf150b4370eb3eab8c0b5478535ee1b8", "appliedTo": "Subtitle text fill" },
+    { "codeToken": "var(--size-surface-pad-x)", "figmaVariableName": "Surface/pad-x", "key": "afd52d7b0bf5852773c860d471f799185d1633b9", "appliedTo": "Test 3 frame paddingLeft/Right" },
+    { "codeToken": "var(--size-surface-pad-y)", "figmaVariableName": "Surface/pad-y", "key": "1c115eedcae8828a31d6bf72be222e9afbfbe0b2", "appliedTo": "Test 3 frame paddingTop/Bottom" },
+    { "codeToken": "var(--size-surface-gap-md)", "figmaVariableName": "Surface/gap-md", "key": "1c2c8e8bfdbcf45bcff6c8e67771ab78af899acd", "appliedTo": "Test 3 frame itemSpacing" },
+    { "codeToken": "h3", "figmaTextStyleName": "Headline/H3", "key": "c5a9b4e2a1ae1075ed582a7c3c0d51e8128f9757", "appliedTo": "Title" },
+    { "codeToken": "body2-txt", "figmaTextStyleName": "Body/B2/Regular", "key": "74d2f8680d204055ae945e338ec665c74677f078", "appliedTo": "Subtitle" }
+  ],
+  "notes": [
+    "Registry-mapped instances verified on Test-Roundtrip frame 52:3327.",
+    "PageLayout shell omitted — content frame only, matching test-1/test-2 write-back scope."
+  ]
+}

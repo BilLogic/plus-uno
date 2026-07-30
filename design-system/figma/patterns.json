@@ -1,0 +1,58 @@
+{
+  "note": "HAND-AUTHORED source for the `patterns` section of component-registry.json. Patterns are the layout/composition layer: Figma component sets that govern how a container is laid out, each bound to one `size / semantics` token family. They deliberately do NOT map to a code component — there is no `PatternCard` export — which is why they cannot come from MDX figmaMeta like components do. Edit here, then run `npm run generate:component-registry`.",
+  "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "patterns": {
+    "Pattern/Card": {
+      "componentSetNodeId": "17169:137",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-137",
+      "isComponentSet": true,
+      "variantProps": { "size": ["sm", "md", "lg"] },
+      "tokenFamily": "Card",
+      "tokenPrefix": "--size-card-",
+      "source": "designer-supplied",
+      "status": "verified"
+    },
+    "Pattern/Section": {
+      "componentSetNodeId": "17169:43292",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-43292",
+      "isComponentSet": true,
+      "variantProps": { "size": ["sm", "md", "lg"] },
+      "tokenFamily": "Section",
+      "tokenPrefix": "--size-section-",
+      "source": "designer-supplied",
+      "status": "verified"
+    },
+    "Pattern/Modal": {
+      "componentSetNodeId": "17169:43279",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-43279",
+      "isComponentSet": true,
+      "variantProps": { "size": ["sm", "md", "lg"] },
+      "tokenFamily": "Modal",
+      "tokenPrefix": "--size-modal-",
+      "source": "designer-supplied",
+      "status": "verified"
+    },
+    "Pattern/Surface container": {
+      "componentSetNodeId": "17160:127",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17160-127",
+      "isComponentSet": false,
+      "slots": ["Content"],
+      "tokenFamily": "Surface Container",
+      "tokenPrefix": "--size-surface-container-",
+      "source": "designer-supplied",
+      "status": "verified",
+      "notes": "Content is a real native SLOT (verified via the Plugin API: type === 'SLOT'). The '◇ Content — convert this frame to a slot' line still sitting inside it is stale instructional copy, not an unconverted frame — cosmetic cleanup only, it does not block write-back."
+    },
+    "Pattern/Table": {
+      "componentSetNodeId": "17161:132",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17161-132",
+      "isComponentSet": false,
+      "slots": ["Toolbar", "Table", "Pagination"],
+      "tokenFamily": "Table",
+      "tokenPrefix": "--size-table-",
+      "source": "designer-supplied",
+      "status": "verified",
+      "notes": "All three are real native SLOTs (verified via the Plugin API: type === 'SLOT'). The '◇ … — convert this frame to a slot' lines inside them are stale instructional copy, not unconverted frames — cosmetic cleanup only, they do not block write-back."
+    }
+  }
+}

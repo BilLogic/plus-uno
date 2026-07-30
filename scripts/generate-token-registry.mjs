@@ -19,6 +19,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const MD_SOURCE = path.join(REPO_ROOT, 'design-system/docs/foundations/token-mapping.md');
+const VARIABLES_SNAPSHOT = path.join(REPO_ROOT, 'scripts/figma-variables-snapshot.json');
 const TOKENS_DIR = path.join(REPO_ROOT, 'design-system/src/tokens');
 const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 
@@ -91,6 +92,119 @@ function parseTables(md) {
   return tables;
 }
 
+/** `_Mastering-Content/On Mastering-Content Container` -> `on-mastering-content-container` */
+function slug(text) {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[()]/g, '')
+    .replace(/[\s_/]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/**
+ * Candidate CSS tokens for one Figma variable path, most-specific first.
+ *
+ * The hand-authored .md covers the semantics a human wants to reason about; it
+ * cannot realistically enumerate every variable (it reached 51 of 460). Naming
+ * on both sides is systematic, so the bulk mapping is derived instead — the
+ * collection decides the token family, then the path tail becomes the suffix.
+ * @param {string} collection
+ * @param {string} name full Figma variable path, e.g. "Card/pad-x-md"
+ * @returns {string[]}
+ */
+function deriveCandidates(collection, name) {
+  const parts = name.split('/').map((p) => p.trim());
+  const leaf = parts[parts.length - 1];
+  const head = parts[0].replace(/^_/, '');
+  const out = [];
+
+  if (collection.startsWith('colors')) {
+    // State layers land as `--color-<base>-state-<NN>` in code. Figma spells the
+    // same thing two ways: accent puts the tint in the leaf ("Advocacy 08"),
+    // neutral puts it in the parent ("…/on surface/opacity-0_08").
+    const accentTint = leaf.match(/\s(\d{2})$/);
+    const neutralTint = leaf.match(/opacity-0[_.]?(\d{2})$/);
+    if (accentTint) {
+      const base = slug(leaf.replace(/\s*\d{2}$/, ''));
+      out.push(`--color-${base}-state-${accentTint[1]}`);
+    }
+    if (neutralTint) {
+      const base = slug(parts[parts.length - 2] || head);
+      out.push(`--color-${base}-state-${neutralTint[1]}`);
+    }
+    if (/\(text\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(text\)/i, ''))}-text`);
+    out.push(`--color-${slug(leaf)}`);
+    out.push(`--color-${slug(head)}-${slug(leaf)}`);
+    return out;
+  }
+
+  if (collection.includes('semantics')) {
+    out.push(`--size-${slug(head)}-${slug(leaf)}`);
+    // Some families are coarser in code than in Figma (Figma has
+    // `Surface Container/pad-x-md`, code only `--size-surface-container-pad-x`).
+    // Fall back to the size-suffix-free form so those still bind.
+    const stripped = slug(leaf).replace(/-(xs|sm|md|lg|xl|full)$/, '');
+    if (stripped !== slug(leaf)) out.push(`--size-${slug(head)}-${stripped}`);
+    return out;
+  }
+
+  if (collection.includes('primitive')) {
+    // Code keeps the full Figma path: "Border/Radius/radius-100" ->
+    // --size-border-radius-radius-100 ; "Spacing/Small/space-100" ->
+    // --size-spacing-small-space-100.
+    out.push(`--size-${slug(name)}`);
+    out.push(`--size-${slug(leaf)}`);
+    out.push(`--${slug(leaf)}`);
+    return out;
+  }
+
+  if (collection.includes('layout')) {
+    // Grid columns are bare in code (`--col-1`).
+    out.push(`--${slug(leaf)}`);
+    out.push(`--size-${slug(head)}-${slug(leaf)}`);
+    out.push(`--size-${slug(leaf)}`);
+    return out;
+  }
+
+  out.push(`--${slug(leaf)}`);
+  return out;
+}
+
+/**
+ * Derive the exact-path Figma-variable -> CSS-token mapping from the snapshot.
+ * Keyed by the exact variable path because that is what `get_variable_defs`
+ * returns — an agent doing a round-trip looks up what Figma actually reports,
+ * not a prose label. Anything that does not resolve to a real SCSS token is
+ * reported as unresolved rather than written, so a bad rule can never
+ * masquerade as a mapping.
+ * @param {Set<string>} scssTokens
+ */
+function buildFigmaVariableMappings(scssTokens) {
+  if (!fs.existsSync(VARIABLES_SNAPSHOT)) {
+    return { resolved: {}, unresolved: [], total: 0, snapshotMissing: true };
+  }
+  const snapshot = JSON.parse(fs.readFileSync(VARIABLES_SNAPSHOT, 'utf8'));
+  /** @type {Record<string, Record<string, string>>} */
+  const resolved = {};
+  /** @type {Array<{ collection: string; figmaVariable: string; tried: string[] }>} */
+  const unresolved = [];
+  let total = 0;
+
+  for (const [collection, data] of Object.entries(snapshot.collections)) {
+    resolved[collection] = {};
+    for (const name of data.variables) {
+      total += 1;
+      const candidates = deriveCandidates(collection, name);
+      const hit = candidates.find((c) => scssTokens.has(c));
+      if (hit) resolved[collection][name] = `var(${hit})`;
+      else unresolved.push({ collection, figmaVariable: name, tried: candidates });
+    }
+  }
+  return { resolved, unresolved, total, snapshotMissing: false };
+}
+
 function build() {
   const md = fs.readFileSync(MD_SOURCE, 'utf8');
   const scssTokens = collectScssTokens();
@@ -134,30 +248,48 @@ function build() {
     }
   }
 
+  const figma = buildFigmaVariableMappings(scssTokens);
+  const figmaResolvedCount = Object.values(figma.resolved).reduce(
+    (n, group) => n + Object.keys(group).length,
+    0,
+  );
+
   const registry = {
-    version: '1.0.0',
+    version: '1.1.0',
     generated: true,
     generatedBy: 'scripts/generate-token-registry.mjs',
-    note: 'DO NOT EDIT BY HAND. Source of truth is design-system/docs/foundations/token-mapping.md; every token is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
+    note: 'DO NOT EDIT BY HAND. Two inputs: design-system/docs/foundations/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). Every token in both is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
     ...STATIC,
+    variablesSnapshot: 'scripts/figma-variables-snapshot.json',
     mappings: { colors, typography, spacing, elevation },
+    // Exact Figma variable path -> CSS token. This is the lookup an agent needs
+    // for round-trip work, because `get_variable_defs` reports these paths.
+    figmaVariableMappings: figma.resolved,
     validation: {
       scssTokenCount: scssTokens.size,
       unknownTokens: [...unknown].sort(),
+      figmaVariableCoverage: {
+        total: figma.total,
+        resolved: figmaResolvedCount,
+        percent: figma.total ? Math.round((figmaResolvedCount / figma.total) * 100) : 0,
+        unresolved: figma.unresolved,
+      },
     },
     notes: [
       'Spacing is contextual: pick the layer-appropriate token family; there is no single Spacing/N token.',
       'unknownTokens MUST be empty. A non-empty list means the .md references a token absent from SCSS.',
+      'figmaVariableCoverage.unresolved is the human to-do list: either the Figma variable has no code counterpart (a real gap) or deriveCandidates() needs widening. It never blocks the build.',
     ],
   };
 
-  return { registry, unknown };
+  return { registry, unknown, figma };
 }
 
 function main() {
   const check = process.argv.includes('--check');
-  const { registry, unknown } = build();
+  const { registry, unknown, figma } = build();
   const serialized = `${JSON.stringify(registry, null, 2)}\n`;
+  const cov = registry.validation.figmaVariableCoverage;
 
   if (check) {
     let failed = false;
@@ -178,6 +310,14 @@ function main() {
 
   fs.writeFileSync(OUT, serialized);
   console.log(`Wrote token-registry.json (${Object.keys(registry.mappings.colors).length} colors, ${Object.keys(registry.mappings.spacing).length} spacing contexts).`);
+  if (figma.snapshotMissing) {
+    console.warn('\n⚠ scripts/figma-variables-snapshot.json not found — Figma variable mappings skipped.');
+  } else {
+    console.log(`Figma variables: ${cov.resolved}/${cov.total} resolved (${cov.percent}%), ${cov.unresolved.length} unresolved.`);
+    const byCollection = {};
+    for (const u of cov.unresolved) byCollection[u.collection] = (byCollection[u.collection] || 0) + 1;
+    for (const [c, n] of Object.entries(byCollection)) console.log(`   unresolved in ${c}: ${n}`);
+  }
   if (unknown.size) {
     console.warn(`\n⚠ ${unknown.size} referenced token(s) missing from SCSS:`);
     [...unknown].sort().forEach((t) => console.warn(`   - ${t}`));

@@ -1,5 +1,6 @@
 import React from 'react';
-import { PageLayout, Section, Card, Table, Button, Badge } from '@/components';
+import { PageLayout, Card, Table, Button, Badge } from '@/components';
+import PatternSection from '@/patterns/PatternSection';
 import { Select } from '@/components/forms-and-inputs';
 
 export const OnboardingSpec = () => {
@@ -52,7 +53,7 @@ export const OnboardingSpec = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-surface-gap-md, 16px)' }}>
 
                 {/* Featured Modules */}
-                <Section title="Featured Modules">
+                <PatternSection title="Featured Modules">
                     <div className="d-flex justify-content-end mb-2">
                         <div className="d-flex gap-2">
                             <Button btnStyle="default" btnFill="outline" icon="arrow-left" btnSize="small" disabled />
@@ -71,10 +72,10 @@ export const OnboardingSpec = () => {
                             </Card>
                         ))}
                     </div>
-                </Section>
+                </PatternSection>
 
                 {/* All Modules */}
-                <Section title="All Modules">
+                <PatternSection title="All Modules">
                     <div className="d-flex justify-content-end mb-3">
                         <div style={{ width: '200px' }}>
                             <Select options={[{ value: 'default', label: 'Sort by...' }]} />
@@ -85,7 +86,7 @@ export const OnboardingSpec = () => {
                         data={allModules}
                         hover
                     />
-                </Section>
+                </PatternSection>
 
             </div>
         </PageLayout>

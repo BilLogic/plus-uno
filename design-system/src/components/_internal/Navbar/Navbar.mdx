@@ -1,0 +1,92 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as NavbarStories from './Navbar.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "backgroundColor": { "type": "enum", "values": ["light", "dark", "primary"] }
+  },
+  "sets": [
+    {
+      "id": "navbar",
+      "name": "Navbar",
+      "componentSetNodeId": "72:16462",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16462",
+      "variantProps": { "background color": "backgroundColor" },
+      "variantValueMap": { "background color": { "light": "light", "dark": "dark", "primary": "primary" } },
+      "source": "designer-supplied",
+      "status": "verified",
+      "notes": "The Figma variant group is `background color` WITH A SPACE; the code prop is `backgroundColor`. Values match one-to-one."
+    }
+  ]
+};
+
+<Meta of={NavbarStories} />
+
+<Title />
+
+Horizontal navigation bar with a brand slot and a list of links.
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Navbar"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Light bar with an active link and a disabled link.</>}
+>
+
+<Canvas of={NavbarStories.Overview} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Backgrounds
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Dark and primary treatments.</>}
+>
+
+<Canvas of={NavbarStories.Dark} />
+
+<Canvas of={NavbarStories.Primary} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Usage notes
+
+- For the authenticated PLUS app shell, use the **Top Bar** spec (`Specs/Universal/Sections/Top Bar`) — it carries breadcrumbs, the user avatar, and the sidebar toggle. `Navbar` is the generic standalone bar.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground of={NavbarStories.Overview} />
+
+</div>
+
+</div>

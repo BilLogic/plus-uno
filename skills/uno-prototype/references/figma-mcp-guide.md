@@ -82,7 +82,7 @@ Use `create_new_file` only when:
 For iterating a prototype between the repo and Figma (build here → designer tweaks on canvas → re-import). Never offer it unprompted as a mandatory step; it starts only when the user asks to push work to Figma, and every canvas write goes through **`writers/figma`** (placement, naming, and annotations per `docs/conventions/figma-workspace.md`).
 
 1. **Implement in the repo** — the normal hi-fi path (implement-design 7 steps if the source was Figma).
-2. **Write-back (gated)** — user opts in and names the target file/page. Load the official `figma-use` skill before ANY canvas write; place registry component **instances**, never redrawn frames (see Component alignment above). Capture the returned file URL + node ids in the thread.
+2. **Write-back (gated)** — user opts in and names the target file/page. The **DS write-back hook** activates (`active-writeback-gate.json`). Load `figma-use` before ANY canvas write; place registry component **instances**, never redrawn frames. **`generate_figma_design` is forbidden as the final deliverable** (reference layer only, delete after). Run `validate:figma-writeback` + `audit:figma-writeback` before `writeback:audit-passed`.
 3. **Designer tweaks in Figma** — human work; the agent stays out.
 4. **Re-import** — treat the updated frame link as a fresh design handoff: run the full implement-design 7 steps again (registries first). No shortcuts because "it came from our own write-back".
 5. Repeat 2–4 until the user stops.
