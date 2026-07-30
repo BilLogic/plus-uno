@@ -85,6 +85,22 @@ function capText(text: string): string {
   return `${cut}\n_…truncated — ask me for the rest._`;
 }
 
+// The retired confidence affix, killed deterministically instead of by prompt.
+// The persona has banned it since 2026-07-16 and the ban was re-worded twice
+// (r19, r21 — including removing the literal pattern from its own prohibition,
+// since printing the format taught it). It still resurfaced on rich multi-source
+// answers while the R1 eval stayed green, so wording is not a reliable control
+// here. Same precedent as the share-out bundle audit (ADR-019): when a surface
+// rule must hold on every model lane, enforce it in the renderer.
+//
+// Only a TRAILING standalone label is stripped — confidence woven into prose is
+// the desired behavior and is left completely alone.
+const TRAILING_CONFIDENCE = /\n+\s*[_*]{0,2}\s*confidence\s*[:—–-][^\n]*?[_*]{0,2}\s*$/i;
+
+export function stripTrailingConfidence(text: string): string {
+  return text.replace(TRAILING_CONFIDENCE, "").trimEnd();
+}
+
 /**
  * Post a text reply and report whether Slack actually accepted it. Guards the
  * R2 "✅ + empty body" defect: empty text gets an honest placeholder, oversized
@@ -97,8 +113,10 @@ export async function postTextVerified(
   threadTs: string,
   text: string,
 ): Promise<{ ok: boolean; text: string }> {
-  const body = text.trim()
-    ? capText(text)
+  const cleaned = stripTrailingConfidence(text);
+  if (cleaned !== text.trimEnd()) console.log("[slack] stripped trailing confidence affix");
+  const body = cleaned.trim()
+    ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
   let posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
   if (!posted.ok) {
