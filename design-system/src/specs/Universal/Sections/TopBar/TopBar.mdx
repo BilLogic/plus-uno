@@ -7,6 +7,36 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+  "sets": [
+    {
+      "id": "top-bar",
+      "name": "Top Bar",
+      "componentSetNodeId": "111:227859",
+      "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227859",
+      "source": "designer-supplied",
+      "status": "verified",
+      "variantProps": {
+        "expand?": "mode"
+      },
+      "variantValues": {
+        "expand?": [
+          "true",
+          "false"
+        ]
+      },
+      "variantValueMap": {
+        "expand?": {
+          "true": "expanded",
+          "false": "collapsed"
+        }
+      },
+      "notes": "Names diverge across the boundary: Figma spells this `expand?` with boolean values, code spells it `mode` with 'expanded' | 'collapsed'. Verified against the TopBar props table in Storybook."
+    }
+  ]
+};
+
 <Meta of={TopBarStories} />
 
 <Title />
@@ -16,6 +46,8 @@ Universal top navigation bar — sidebar control button, breadcrumb, and user av
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227860"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/TopBar"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">

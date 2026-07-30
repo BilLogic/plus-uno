@@ -1,0 +1,156 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TableStories from './Table.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "density": { "type": "enum", "values": ["sm", "md", "lg"] },
+    "striped": { "type": "boolean" },
+    "hover": { "type": "boolean" },
+    "bordered": { "type": "boolean" }
+  },
+  "modelNote": "Figma models table CELLS (variant `size`/`type` = body vs head); code models the WHOLE table via `headers` + `rows`. A set therefore maps to the cells this component renders, not to a single instance — pick the set from `density` + `bordered`, then the cell variant from whether it is a header or body cell.",
+  "sets": [
+    {
+      "id": "normal-borderless",
+      "name": "Table/Normal Borderless",
+      "componentSetNodeId": "10:473",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-473",
+      "codeDefaults": { "density": "md", "bordered": false },
+      "variantProps": { "size": "cellRole", "style": "cellStyle", "icon": "trailingIcon" },
+      "variantValueMap": { "size": { "head": "header cell", "body": "body cell" } },
+      "source": "designer-supplied",
+      "status": "verified"
+    },
+    {
+      "id": "small-borderless",
+      "name": "Table/Small Borderless",
+      "componentSetNodeId": "10:507",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-507",
+      "codeDefaults": { "density": "sm", "bordered": false },
+      "variantProps": { "size": "cellRole", "style": "cellStyle", "icon": "trailingIcon" },
+      "variantValueMap": { "size": { "head": "header cell", "body": "body cell" } },
+      "source": "designer-supplied",
+      "status": "verified"
+    },
+    {
+      "id": "normal-border",
+      "name": "Table/Normal Border",
+      "componentSetNodeId": "10:502",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-502",
+      "codeDefaults": { "density": "md", "bordered": true },
+      "variantProps": { "type": "cellRole", "style": "cellStyle", "icon": "trailingIcon" },
+      "variantValueMap": { "type": { "head": "header cell", "body": "body cell" } },
+      "source": "designer-supplied",
+      "status": "verified",
+      "notes": "Note the variant group is named `type` here, not `size` as in the borderless sets."
+    },
+    {
+      "id": "contextual-color",
+      "name": "Table/Contextual Color",
+      "componentSetNodeId": "10:721",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-721",
+      "variantProps": { "state": null, "style": null },
+      "source": "designer-supplied",
+      "status": "no-code-equivalent",
+      "notes": "Row state (disabled/focused/hovered/pressed) x semantic style (error/info/primary/success/warning). Code has no prop for this — apply it per cell via the cell object's `className`."
+    },
+    {
+      "id": "background-color",
+      "name": "Table/Background Color",
+      "componentSetNodeId": "10:722",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-722",
+      "variantProps": { "color": null },
+      "source": "designer-supplied",
+      "status": "no-code-equivalent",
+      "notes": "11 tinted row backgrounds including the SMART competency colors. Code has no prop — apply per cell via `className`."
+    }
+  ]
+};
+
+<Meta of={TableStories} />
+
+<Title />
+
+Data table for tabular content. Cells accept any node, so a row can carry Badges, formatted currency, or a Button used as a sort trigger.
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Table"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Default table with hover enabled and medium density.</>}
+>
+
+<Canvas of={TableStories.Overview} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Striped rows and bordered cells are independent switches.</>}
+>
+
+<Canvas of={TableStories.Striped} />
+
+<Canvas of={TableStories.Bordered} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Empty state
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>With no rows the header still renders — pair it with an empty-state message.</>}
+>
+
+<Canvas of={TableStories.Empty} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Usage notes
+
+- **Sorting is not built in.** The consuming page owns sort state and passes already-ordered `rows`. To make a header sortable, put a text-fill `Button` in that header's `text`.
+- **Per-cell control** — pass `{ content, align, colSpan, className }` instead of a bare value when a cell needs alignment or spanning.
+- **Density** maps to the `--size-table-cell-*` token family, matching `Pattern/Table` in Figma.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground of={TableStories.Overview} />
+
+</div>
+
+</div>

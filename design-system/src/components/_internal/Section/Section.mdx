@@ -1,0 +1,78 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SectionStories from './Section.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": []
+};
+
+<Meta of={SectionStories} />
+
+<Title />
+
+Page-level content band — a titled group of content with token-bound padding and an optional surface background.
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Section"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Titled section on a surface background with medium padding.</>}
+>
+
+<Canvas of={SectionStories.Overview} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Background and padding vary independently; the title is optional.</>}
+>
+
+<Canvas of={SectionStories.Transparent} />
+
+<Canvas of={SectionStories.Untitled} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Usage notes
+
+- `padding` maps to the `--size-section-pad-*` token family — the same scale `Pattern/Section` uses in Figma (`sm` / `md` / `lg`).
+- Use `Section` for page bands; use `Card` for bounded, elevated content.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground of={SectionStories.Overview} />
+
+</div>
+
+</div>

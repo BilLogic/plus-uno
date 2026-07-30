@@ -85,26 +85,7 @@ export function clearSession(conversationId) {
 }
 
 /**
- * @param {string} conversationId
- * @param {string} markdown
- */
-export function writeBriefing(conversationId, markdown) {
-  ensureDirs();
-  fs.writeFileSync(briefingPath(conversationId), markdown);
-  fs.writeFileSync(path.join(BRIEFING_DIR, 'active-prototype-briefing.md'), markdown);
-}
-
-/**
- * @param {string} conversationId
- * @returns {string | null}
- */
-export function readBriefing(conversationId) {
-  const file = briefingPath(conversationId);
-  if (!fs.existsSync(file)) return null;
-  return fs.readFileSync(file, 'utf8');
-}
-
-/**
+ * Defensive cleanup of any stale briefing left by an older workflow version.
  * @param {string} conversationId
  */
 export function clearBriefing(conversationId) {

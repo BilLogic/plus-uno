@@ -1,5 +1,28 @@
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as LogoStories from './Logo.stories.jsx';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "style": { "type": "enum", "values": ["colored", "filled", "outlined"] },
+    "size": { "type": "enum", "values": ["XS", "S", "M", "L", "XL"] },
+    "text": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "logo",
+      "name": "Logo",
+      "componentSetNodeId": "1133:12915",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1133-12915",
+      "variantProps": { "style": "style", "size": "size", "text?": "text" },
+      "variantValueMap": { "text?": { "true": true, "false": false } },
+      "source": "designer-supplied",
+      "status": "verified",
+      "notes": "style and size map one-to-one by name. The Figma variant group is `text?` (with the question mark) and its values are the STRINGS \"true\"/\"false\", while the code prop `text` is a real boolean — convert, do not pass the string through."
+    }
+  ]
+};
 
 <Meta of={LogoStories} />
 
@@ -8,6 +31,12 @@ import * as LogoStories from './Logo.stories.jsx';
 <Description>
 The application Logo. Supports colored, filled, and outlined variations.
 </Description>
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/assets/Logo"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 

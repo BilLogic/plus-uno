@@ -49,30 +49,6 @@ export function isBypassRequest(prompt) {
 }
 
 /**
- * @param {string} prompt
- * @returns {boolean}
- */
-export function isExecuteRequest(prompt) {
-  return /uno-prototype:execute/i.test(prompt.trim());
-}
-
-/**
- * User wants to re-run intake at a different fidelity without re-uploading PRD.
- * @param {string} prompt
- * @returns {boolean}
- */
-export function hasFidelitySwitchIntent(prompt) {
-  const lower = prompt.toLowerCase();
-  return (
-    /\b(switch|change|pick|choose|try|use)\b[^.]{0,40}\b(another|different|new)\b[^.]{0,30}\bfidelit/.test(
-      lower,
-    ) ||
-    /\b(switch|change)\b[^.]{0,20}\bfidelit/.test(lower) ||
-    /\b(different|another)\s+fidelit/.test(lower)
-  );
-}
-
-/**
  * User wants to replace the PRD cached for this conversation.
  * @param {string} prompt
  * @returns {boolean}

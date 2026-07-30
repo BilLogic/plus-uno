@@ -21,29 +21,30 @@ export function isNoPrdAnswer(value) {
 }
 
 /**
+ * True when a message is the PRD itself rather than a Yes/No answer.
+ *
+ * The designer very often answers "Do you have a PRD?" by simply pasting the
+ * PRD. Without this, `parseChoice` rejects it as an invalid choice and the gate
+ * re-asks the same question forever — the input that should satisfy the gate is
+ * the input that fails it. Deliberately conservative: a real answer ("yes",
+ * "no", "sure") is short and single-line, so it can never reach here.
  * @param {string} value
  * @returns {boolean}
  */
-export function isHttpLink(value) {
-  return /^https?:\/\/\S+/i.test(value.trim());
-}
+export function looksLikePrdContent(value) {
+  if (typeof value !== 'string') return false;
+  const text = value.trim();
+  if (text.length < 40) return false;
+  if (isNoPrdAnswer(text)) return false;
 
-/**
- * @param {string} value
- * @returns {boolean}
- */
-export function isFigJamLink(value) {
-  const v = value.trim();
-  return isHttpLink(v) && /figma\.com\/(board|figjam)/i.test(v);
-}
+  const hasPrdMarker =
+    /\b(prd|user flows?|acceptance criteria|requirements?|deliverables?|user stor(y|ies)|success metrics?)\b/i.test(
+      text,
+    );
+  const hasDocReference = /https?:\/\/\S+/.test(text) || /\.(md|txt|docx?)\b/i.test(text);
+  const isMultiLine = text.split('\n').filter((line) => line.trim()).length >= 2;
 
-/**
- * @param {string} value
- * @returns {boolean}
- */
-export function isFigmaDesignLink(value) {
-  const v = value.trim();
-  return isHttpLink(v) && /figma\.com\/(design|file)/i.test(v);
+  return hasPrdMarker || hasDocReference || isMultiLine;
 }
 
 /**

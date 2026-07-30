@@ -1,15 +1,11 @@
-import { GLOBAL_COMMANDS, EXECUTE_PHRASE, STRICT_GATE_STATE_IDS } from './constants.mjs';
+import { GLOBAL_COMMANDS, STRICT_GATE_STATE_IDS } from './constants.mjs';
 import {
   hasPrototypeIntent,
-  hasFidelitySwitchIntent,
   hasNewPrdIntent,
   isBypassRequest,
-  isExecuteRequest,
 } from './intents.mjs';
 import { extractPrdHints } from './prd-hints.mjs';
 import {
-  buildInvokeBriefing,
-  formatQuestionMessage,
   getState,
   resolveOptions,
   resolveType,
@@ -27,13 +23,11 @@ import {
   isPrdGateEnabled,
   loadPrdCache,
   loadSession,
-  readBriefing,
   resolveRepoRoot,
   savePrdCache,
   saveSession,
-  writeBriefing,
 } from './storage.mjs';
-import { parseChoice } from './validators.mjs';
+import { isNoPrdAnswer, looksLikePrdContent, parseChoice } from './validators.mjs';
 
 /**
  * @typedef {object} HookInput
@@ -81,9 +75,12 @@ function releaseSession(conversationId) {
  */
 function createSession(cachedPrd = null) {
   if (cachedPrd?.prd) {
+    // PRD already captured this conversation — the PRD gate is satisfied, so
+    // re-enter the reflection at its first question (Step 2 re-runs on a fresh
+    // prototype request; a failed review legitimately changes the strategy).
     return {
-      stateId: 'fidelity_select',
-      history: ['fidelity_select'],
+      stateId: 'reflect_learn',
+      history: ['reflect_learn'],
       context: {
         prd: cachedPrd.prd,
         prdHints: cachedPrd.prdHints || extractPrdHints(/** @type {string} */ (cachedPrd.prd)),
@@ -135,28 +132,32 @@ function goBack(session) {
 }
 
 /**
- * @param {string} conversationId
- * @param {import('./storage.mjs').SessionState} session
- */
-function prepareInvoke(conversationId, session) {
-  const briefing = buildInvokeBriefing(session.context);
-  writeBriefing(conversationId, briefing);
-  session.status = 'awaiting_execute';
-  session.stateId = 'invoke_ready';
-  saveSession(conversationId, session);
-}
-
-/**
- * @param {import('./states.mjs').ConversationState} state
- * @param {Record<string, unknown>} context
+ * Handoff emitted the moment the brief card is confirmed. The hook releases
+ * the session and the agent takes over Step 3 (Plan) → Step 4 (Generate) —
+ * never jumping straight to a build. The confirmed reflection answers ride
+ * along as the contract: the build's validation loop checks the artifact
+ * against them, and prompt-specs embed them as the external tool's self-check.
+ * @param {Record<string, unknown>} [context]
  * @returns {string}
  */
-function terminalAgentMessage(state, context) {
+function buildHandoffMessage(context = {}) {
+  const reflection = /** @type {Record<string, string> | undefined} */ (context.reflection);
+  const contractLines = reflection
+    ? [
+        'The confirmed prototype brief (the contract for everything that follows):',
+        reflection.reflect_learn ? `- Goal: ${reflection.reflect_learn}` : '',
+        reflection.reflect_artifact ? `- Artifact: ${reflection.reflect_artifact}` : '',
+        reflection.reflect_fidelity ? `- Fidelity: ${reflection.reflect_fidelity}` : '',
+        reflection.reflect_exclude ? `- Won't include: ${reflection.reflect_exclude}` : '',
+      ].filter(Boolean)
+    : [];
+
   return [
-    formatQuestionMessage(state, context),
-    '',
-    'Workflow complete. Continue the conversation normally — the hook will no longer intercept.',
-  ].join('\n');
+    'Step 2 (Prototype Reflection) is complete — the brief is confirmed and the uno-prototype hook will no longer intercept.',
+    ...contractLines,
+    'Restate this brief at the top of the Step 3 plan, then lay out pages/frames, flows, interactions, and components; confirm the plan and touched files before any large edit.',
+    'Then Step 4 (Generate) — we build WITH the designer against this brief. For a high-fi build, first ask the "do you already have a Figma file?" question, then scaffold from prototypes/starter on the Plus Design System. The validation loop\'s objective is this brief: the artifact serves the goal, matches the fidelity dials, and contains nothing from the won\'t-include list — never expand scope just because the PRD lists more.',
+  ].join(' ');
 }
 
 /**
@@ -190,43 +191,18 @@ export function handleSubmit(input) {
   }
 
   const cachedPrd = loadPrdCache(conversationId);
-  const wantsReentry =
-    hasFidelitySwitchIntent(prompt) || (hasPrototypeIntent(prompt) && Boolean(cachedPrd));
-
   const session = loadSession(conversationId);
 
-  if (isExecuteRequest(prompt)) {
-    if (readBriefing(conversationId)) {
-      clearSession(conversationId);
-      clearIntakeQuestion();
-      return result(true);
-    }
-    return result(
-      true,
-      undefined,
-      [
-        'No completed uno-prototype workflow is waiting for execution.',
-        'Start a prototype workflow first, or say "terminate this process" to exit.',
-      ].join('\n'),
-    );
-  }
-
-  if (session?.status === 'awaiting_execute') {
-    return result(true);
-  }
-
-  if (session?.status === 'active' || session?.status === 'awaiting_execute') {
+  if (session?.status === 'active') {
     return handleActiveSession(conversationId, session, prompt, attachments);
   }
 
-  if (wantsReentry && cachedPrd) {
+  // Re-entry: a fresh prototype request when a PRD is already cached skips the
+  // PRD gate and hands off to the agent to re-run the reflection workflow.
+  if (hasPrototypeIntent(prompt) && cachedPrd) {
     const resumed = createSession(cachedPrd);
     saveSession(conversationId, resumed);
     return presentState(conversationId, resumed);
-  }
-
-  if (hasFidelitySwitchIntent(prompt) && !cachedPrd) {
-    return result(true);
   }
 
   if (!hasPrototypeIntent(prompt)) return result(true);
@@ -237,28 +213,39 @@ export function handleSubmit(input) {
 }
 
 /**
+ * Advance the gate with an answer that arrived as a TOOL RESULT rather than a
+ * user prompt.
+ *
+ * The FSM was written for Cursor, where every gate answer is a `beforeSubmitPrompt`
+ * submission. In Claude Code the agent is instructed to ask via AskQuestion, and
+ * those answers come back as tool results that never fire `UserPromptSubmit` —
+ * so the gate could not advance at all, and the user's *next* unrelated message
+ * got consumed as the answer instead. This is the entry point the PostToolUse
+ * adapter uses to close that gap.
+ * @param {{ conversation_id?: string; answer?: string; workspace_roots?: string[] }} input
+ * @returns {{ continue: boolean; agent_message?: string }}
+ */
+export function handleGateAnswer(input) {
+  const answer = (input.answer || '').trim();
+  const conversationId = input.conversation_id || 'default';
+  const repoRoot = resolveRepoRoot(input.workspace_roots);
+
+  if (!answer) return result(true);
+  if (!isPrdGateEnabled(repoRoot)) return result(true);
+
+  const session = loadSession(conversationId);
+  if (session?.status !== 'active') return result(true);
+
+  return handleActiveSession(conversationId, session, answer, []);
+}
+
+/**
  * @param {string} conversationId
  * @param {import('./storage.mjs').SessionState} session
  * @param {string} prompt
  * @param {Array<{ type?: string; file_path?: string }>} attachments
  */
 function handleActiveSession(conversationId, session, prompt, attachments) {
-  if (hasFidelitySwitchIntent(prompt)) {
-    const atFidelityStep =
-      session.stateId === 'fidelity_select' || session.stateId === 'fidelity_level_pick';
-    if (!atFidelityStep) {
-      const cached = loadPrdCache(conversationId) || (session.context?.prd ? {
-        prd: session.context.prd,
-        prdHints: session.context.prdHints,
-      } : null);
-      if (cached) {
-        const resumed = createSession(cached);
-        saveSession(conversationId, resumed);
-        return presentState(conversationId, resumed);
-      }
-    }
-  }
-
   if (GLOBAL_COMMANDS.restart.test(prompt)) {
     const cached = loadPrdCache(conversationId);
     const restarted = createSession(cached);
@@ -297,19 +284,42 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
   if (effectiveType === 'choice' && options) {
     const choice = parseChoice(prompt, options);
     if (!choice) {
-      if (!strict) {
-        releaseSession(conversationId);
-        return result(true);
+      // Fast path: the designer answered "Do you have a PRD?" by pasting the PRD
+      // itself. That input satisfies BOTH gate steps, so consume it as the
+      // answer and the document in one move rather than rejecting it as an
+      // invalid choice — otherwise the gate re-asks forever (the paste can never
+      // parse as Yes/No). Covers the common case where the PRD arrives before
+      // the question is formally answered.
+      if (state.id === 'prd_check' && looksLikePrdContent(prompt)) {
+        storePrdContext(session.context, prompt, conversationId);
+        transitionSession(session, 'prd_paste');
+        transitionSession(session, 'reflect_learn');
+        saveSession(conversationId, session);
+        return presentState(conversationId, session);
       }
-      writeIntakeQuestion(conversationId, session, state);
-      saveSession(conversationId, session);
-      return result(
-        true,
-        undefined,
-        `Invalid choice for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
-      );
+      // Mirror of the fast path on the "No" branch: natural phrasings like
+      // "nope" or "not yet" are unmistakably a no, but `parseChoice` only
+      // accepts the literal option label, so they used to be rejected and
+      // re-asked forever. `isNoPrdAnswer` was written for exactly this and was
+      // never wired in — route it to the guided uno-synthesize exit.
+      if (state.id === 'prd_check' && isNoPrdAnswer(prompt)) {
+        answer = 'No';
+      } else {
+        if (!strict) {
+          releaseSession(conversationId);
+          return result(true);
+        }
+        writeIntakeQuestion(conversationId, session, state);
+        saveSession(conversationId, session);
+        return result(
+          true,
+          undefined,
+          `Invalid choice for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
+        );
+      }
+    } else {
+      answer = choice;
     }
-    answer = choice;
   }
 
   if (state.validate && !state.validate(answer, session.context, attachments)) {
@@ -324,14 +334,6 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
       undefined,
       `Input validation failed for the current uno-prototype intake step. ${buildAgentIntakeInstruction(state)}`,
     );
-  }
-
-  if (state.id === 'challenge_other') {
-    session.context.challengeOtherNote = answer.trim();
-    session.context.challengeTool = 'custom';
-    session.context.branch = 'challenge';
-    releaseSession(conversationId);
-    return result(true);
   }
 
   if (state.id === 'prd_paste') {
@@ -366,25 +368,9 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
     return result(true, undefined, nextState.question);
   }
 
-  if (nextStateId === 'invoke_ready') {
-    prepareInvoke(conversationId, session);
-    clearSession(conversationId);
-    clearIntakeQuestion();
-    return result(
-      true,
-      undefined,
-      [
-        'Prototype briefing confirmed.',
-        `Send \`${EXECUTE_PHRASE}\` when you are ready to start the build, or continue in chat.`,
-        'The hook will not intercept further messages until you start a new prototype workflow.',
-      ].join(' '),
-    );
-  }
-
-  if (nextState.terminal && (nextStateId === 'challenge_deliver' || nextStateId === 'flow_variety_deliver')) {
-    const agentMessage = terminalAgentMessage(nextState, session.context);
+  if (nextStateId === 'build_handoff') {
     releaseSession(conversationId);
-    return result(true, undefined, agentMessage);
+    return result(true, undefined, buildHandoffMessage(session.context));
   }
 
   saveSession(conversationId, session);
@@ -405,10 +391,14 @@ function presentState(conversationId, session) {
 
   saveSession(conversationId, session);
 
-  if (state.terminal) {
-    const agentMessage = terminalAgentMessage(state, session.context);
+  if (state.id === 'build_handoff') {
     releaseSession(conversationId);
-    return result(true, undefined, agentMessage);
+    return result(true, undefined, buildHandoffMessage(session.context));
+  }
+
+  if (state.terminal) {
+    releaseSession(conversationId);
+    return result(true);
   }
 
   writeIntakeQuestion(conversationId, session, state);
