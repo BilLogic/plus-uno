@@ -1525,18 +1525,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516"
       }
     },
-    "Section": {
-      "code": {
-        "import": "@/components",
-        "export": "default",
-        "mdxPath": "design-system/src/components/_internal/Section/Section.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Section"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
-      }
-    },
     "Select": {
       "code": {
         "import": "@/components/forms-and-inputs",
