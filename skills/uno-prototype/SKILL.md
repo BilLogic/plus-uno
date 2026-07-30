@@ -74,8 +74,14 @@ the Step 2 reflection gates `reflect_learn`, `reflect_artifact_open`,
 - **Hook-gated** (Cursor · Claude Code · Codex — adapters in `.cursor/hooks.json`,
   `.claude/settings.json`, `.codex/hooks.json`; one FSM backs all three):
   `.cursor/hooks/briefings/active-intake-question.json` exists and owns the
-  state. Render the **current** step (the file's `stateId` / `type` tell you
-  which), per the numbered rules below.
+  state. Sanity-check it first: a `conversationId` that doesn't match the
+  current session, or an `updatedAt` older than a day, means a dead session
+  left it behind — ignore the file and take the manual path. Otherwise render
+  the **current** step (the file's `stateId` / `type` tell you which), per the
+  numbered rules below.
+- **Gate disabled?** Check `.cursor/settings.json` first: `"uno": { "prdGate": false }`
+  means the operator turned intake OFF — do not re-impose it manually; proceed
+  straight to Step 1 with the PRD gate as an ordinary skill rule.
 - **Manual** (any runtime without a wired adapter — Antigravity and Windsurf
   until theirs land, headless runs, or a hook that failed to fire): no JSON
   appears. Run the SAME eight steps yourself, in order, one question per

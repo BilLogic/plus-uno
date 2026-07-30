@@ -47,4 +47,4 @@ Agents **MUST** read both files below before:
 | uno-research | When auditing Figma ↔ code alignment or component discovery |
 | uno-review | When reviewing Figma-derived prototypes or registry drift |
 
-Entry: `AGENTS.md` § Progressive loading + forbidden pattern #17 route here.
+Entry: `AGENTS.md` § Progressive loading + the Figma-registries-are-law forbidden pattern routes here.

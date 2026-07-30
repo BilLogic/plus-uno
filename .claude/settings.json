@@ -22,6 +22,17 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/session-end.mjs\"",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }

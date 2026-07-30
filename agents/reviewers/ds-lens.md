@@ -22,5 +22,5 @@ Judges an artifact against the design system: components sourced from BS4/uno-st
 
 ## Conventions it obeys
 
-- `AGENTS.md` forbidden patterns 1–6, 9–11, 15 (the DS rules it enforces — defined there, not here)
+- `AGENTS.md` forbidden patterns — the DS rules by name: tokens-over-literals, DS-knowledge-is-law, no-hallucinated-layouts/props, read-source-first, PLUS-components-first, no-deep-imports, no-duplicate-components, generated-tokens, Storybook-validation, FA-Free-only
 - Scored by: `docs/evals/rubrics/uno-review.md` (recall/precision on the golden defect set)

@@ -47,8 +47,25 @@ export interface HarnessCacheResult {
   tokens?: number;
 }
 
-function cacheKey(model: string, region: string): string {
-  return `gemini:cache:${region}:${model}:${BUILD}`;
+/**
+ * FNV-1a over the harness text. The key must change whenever the CONTENT
+ * changes, and BUILD is a hand-bumped convention — a prompt-only hotfix that
+ * forgets the bump would serve the old harness from cache for up to 50 minutes.
+ * Hashing the text makes the staleness guarantee structural (the same lesson
+ * the subrequest meter already encodes: conventions drift, boundaries hold).
+ * BUILD stays in the key too, purely as a human-readable label.
+ */
+function fnv1a(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, "0");
+}
+
+function cacheKey(model: string, region: string, systemText: string): string {
+  return `gemini:cache:${region}:${model}:${BUILD}:${fnv1a(systemText)}`;
 }
 
 /**
@@ -76,7 +93,7 @@ export async function ensureHarnessCache(
     return { name: null, reason: "GEMINI_REGION is `global`; cachedContents is a regional resource" };
   }
 
-  const key = cacheKey(model, base.region);
+  const key = cacheKey(model, base.region, systemText);
   const now = Date.now();
   if (memo && memo.key === key && memo.expiresAt > now) {
     return { name: memo.name, reason: memo.name ? undefined : "negative-cached this hour" };

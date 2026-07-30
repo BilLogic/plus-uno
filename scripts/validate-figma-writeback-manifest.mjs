@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Validate a Figma write-back manifest (structure + forbidden capture methods).
- * Run: npm run validate:figma-writeback -- playground/test-roundtrip/roundtrip-manifest.json
+ * Run: npm run validate:figma-writeback -- prototypes/test-roundtrip/roundtrip-manifest.json
  */
 import fs from 'node:fs';
 import path from 'node:path';

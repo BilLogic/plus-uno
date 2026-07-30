@@ -5,7 +5,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 
 ## What This Is
 
-- **Design System** (`design-system/src/`) — 57 UI components (forms grouped under `components/forms-and-inputs/`), 42 DataViz charts, 7 spec areas, generated token SCSS. Counts come from `design-system/agent-views/` — regenerate with `npm run generate:agent` rather than trusting the numbers below. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
+- **Design System** (`design-system/src/`) — 56 UI components (forms grouped under `components/forms-and-inputs/`), 42 DataViz charts, 7 spec areas, generated token SCSS. Counts come from `design-system/agent-views/` — regenerate with `npm run generate:agent` rather than trusting the numbers below. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
 - **Prototypes** (`prototypes/`) — on `main`: live app + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `home-redesign/` (+ content modules). Branch experiments catalogued in Notion.
 - **Storybook** (`.storybook/`) — Interactive component documentation. Site landing at `/storybook/`.
 - **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
@@ -63,7 +63,7 @@ plus-vibe-coding-starting-kit/
 
 | Category | Count | Location |
 |----------|-------|----------|
-| UI components | 57 | `design-system/src/components/` — seven groups: actions, forms-and-inputs, layout-and-structure, messaging, navigation, overlays, status-and-loading (plus `_internal/`) |
+| UI components | 56 | `design-system/src/components/` — seven groups: actions, forms-and-inputs, layout-and-structure, messaging, navigation, overlays, status-and-loading (plus `_internal/`) |
 | DataViz | 42 charts (25 exported wrappers) | `design-system/src/dataviz/` — 6 categories |
 | Specs | 7 product areas | `design-system/src/specs/` (Home, Universal, Training, Admin, Profile, Toolkit, Login) |
 | Tokens | 6 SCSS files + `source/` | `design-system/src/tokens/` (generated — never hand-edit) |

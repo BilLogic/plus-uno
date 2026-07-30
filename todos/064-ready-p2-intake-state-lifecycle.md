@@ -1,5 +1,5 @@
 ---
-status: pending
+status: ready
 priority: p2
 issue_id: 064
 tags: [code-review, hooks, fsm, architecture]
@@ -17,3 +17,6 @@ Four interlocking defects (architecture review, file:line verified):
 
 ## Proposed Solutions
 1. Key the question file by conversationId (already in the payload) + SKILL.md treats conversationId mismatch or stale updatedAt as the manual path + loadSession ignores sessions older than 24h + SessionEnd hook in .claude/settings.json + answer dedup. Medium, all in the FSM's own files. Coordinate with Cynthia — her subsystem.
+
+## Work Log (2026-07-30, partial fix)
+Done: SESSION_TTL_MS=24h in loadSession (stale sessions cleared, not resumed); SessionEnd hook added to .claude/settings.json; SKILL.md tells agents to ignore a stale/mismatched active-intake-question.json and take the manual path. Remaining for Cynthia: conversationId-keyed question file (the singleton clobber), answer dedup for the typed-vs-tapped double-advance.
