@@ -11,73 +11,120 @@ Tracks agent-facing docs and whether a designer has verified them.
 npm run generate:agent
 ```
 
-Generated: 2026-07-12
+Generated: 2026-07-30
 
 ## Components (agent-views)
 
 | Component | Agent view | On disk | Verified | Verified at | Verified by | Notes | File updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Accordion | `design-system/agent-views/components/Accordion/Accordion.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Alert | `design-system/agent-views/components/Alert/Alert.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Badge | `design-system/agent-views/components/Badge/Badge.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Breadcrumb | `design-system/agent-views/components/Breadcrumb/Breadcrumb.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Button | `design-system/agent-views/components/Button/Button.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-12 |
-| ButtonGroup | `design-system/agent-views/components/ButtonGroup/ButtonGroup.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Card | `design-system/agent-views/components/Card/Card.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-12 |
-| Carousel | `design-system/agent-views/components/Carousel/Carousel.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| Accordion | `design-system/agent-views/components/Accordion/Accordion.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Alert | `design-system/agent-views/components/Alert/Alert.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| AreaChart | `design-system/agent-views/components/AreaChart/AreaChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Badge | `design-system/agent-views/components/Badge/Badge.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| BarChart | `design-system/agent-views/components/BarChart/BarChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| BoxPlotChart | `design-system/agent-views/components/BoxPlotChart/BoxPlotChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Breadcrumb | `design-system/agent-views/components/Breadcrumb/Breadcrumb.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| BubbleChart | `design-system/agent-views/components/BubbleChart/BubbleChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| BulletChart | `design-system/agent-views/components/BulletChart/BulletChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Button | `design-system/agent-views/components/Button/Button.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-30 |
+| ButtonGroup | `design-system/agent-views/components/ButtonGroup/ButtonGroup.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Card | `design-system/agent-views/components/Card/Card.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-30 |
+| Carousel | `design-system/agent-views/components/Carousel/Carousel.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Cascader | `design-system/agent-views/components/Cascader/Cascader.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Cascader | `design-system/agent-views/forms/Cascader.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| Checkbox | `design-system/agent-views/components/Checkbox/Checkbox.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Checkbox | `design-system/agent-views/forms/Checkbox.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| ChoiceGrid | `design-system/agent-views/components/ChoiceGrid/ChoiceGrid.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | ChoiceGrid | `design-system/agent-views/forms/ChoiceGrid.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Collapse | `design-system/agent-views/components/Collapse/Collapse.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| Collapse | `design-system/agent-views/components/Collapse/Collapse.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| ComboChart | `design-system/agent-views/components/ComboChart/ComboChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| DateAndTimePicker | `design-system/agent-views/components/DateAndTimePicker/DateAndTimePicker.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | DateAndTimePicker | `design-system/agent-views/forms/DateAndTimePicker.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| DatePicker | `design-system/agent-views/components/DatePicker/DatePicker.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | DatePicker | `design-system/agent-views/forms/DatePicker/DatePicker.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Divider | `design-system/agent-views/components/Divider/Divider.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Dropdown | `design-system/agent-views/components/Dropdown/Dropdown.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| DependencyWheel | `design-system/agent-views/components/DependencyWheel/DependencyWheel.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Divider | `design-system/agent-views/components/Divider/Divider.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| DonutChart | `design-system/agent-views/components/DonutChart/DonutChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Dropdown | `design-system/agent-views/components/Dropdown/Dropdown.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| FileUpload | `design-system/agent-views/components/FileUpload/FileUpload.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | FileUpload | `design-system/agent-views/forms/FileUpload.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Footer | `design-system/agent-views/components/Footer/Footer.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| Footer | `design-system/agent-views/components/Footer/Footer.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| FunnelChart | `design-system/agent-views/components/FunnelChart/FunnelChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| GaugeChart | `design-system/agent-views/components/GaugeChart/GaugeChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| HeatmapChart | `design-system/agent-views/components/HeatmapChart/HeatmapChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| HistogramChart | `design-system/agent-views/components/HistogramChart/HistogramChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Input | `design-system/agent-views/components/Input/Input.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-30 |
 | Input | `design-system/agent-views/forms/Input.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-10 |
+| InputGroup | `design-system/agent-views/components/InputGroup/InputGroup.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | InputGroup | `design-system/agent-views/forms/InputGroup/InputGroup.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Jumbotron | `design-system/agent-views/components/Jumbotron/Jumbotron.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| ListGroup | `design-system/agent-views/components/ListGroup/ListGroup.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Logo | `design-system/agent-views/components/Logo/Logo.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| MediaObject | `design-system/agent-views/components/MediaObject/MediaObject.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Modal | `design-system/agent-views/components/Modal/Modal.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-12 |
+| Jumbotron | `design-system/agent-views/components/Jumbotron/Jumbotron.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| LineChart | `design-system/agent-views/components/LineChart/LineChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| ListGroup | `design-system/agent-views/components/ListGroup/ListGroup.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Logo | `design-system/agent-views/components/Logo/Logo.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| LollipopChart | `design-system/agent-views/components/LollipopChart/LollipopChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| MediaObject | `design-system/agent-views/components/MediaObject/MediaObject.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Modal | `design-system/agent-views/components/Modal/Modal.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-30 |
+| MultipleChoice | `design-system/agent-views/components/MultipleChoice/MultipleChoice.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | MultipleChoice | `design-system/agent-views/forms/MultipleChoice.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Navbar | `design-system/agent-views/components/Navbar/Navbar.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| NavPills | `design-system/agent-views/components/NavPills/NavPills.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| NavTabs | `design-system/agent-views/components/NavTabs/NavTabs.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| Navbar | `design-system/agent-views/components/Navbar/Navbar.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| NavPills | `design-system/agent-views/components/NavPills/NavPills.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| NavTabs | `design-system/agent-views/components/NavTabs/NavTabs.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| NetworkGraph | `design-system/agent-views/components/NetworkGraph/NetworkGraph.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| NumberInput | `design-system/agent-views/components/NumberInput/NumberInput.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | NumberInput | `design-system/agent-views/forms/NumberInput.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| OptionList | `design-system/agent-views/components/OptionList/OptionList.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | OptionList | `design-system/agent-views/forms/OptionList.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| PageLayout | `design-system/agent-views/components/PageLayout/PageLayout.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Pagination | `design-system/agent-views/components/Pagination/Pagination.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Popover | `design-system/agent-views/components/Popover/Popover.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Progress | `design-system/agent-views/components/Progress/Progress.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| PageLayout | `design-system/agent-views/components/PageLayout/PageLayout.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Pagination | `design-system/agent-views/components/Pagination/Pagination.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| PieChart | `design-system/agent-views/components/PieChart/PieChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Popover | `design-system/agent-views/components/Popover/Popover.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Progress | `design-system/agent-views/components/Progress/Progress.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| RadarChart | `design-system/agent-views/components/RadarChart/RadarChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Radio | `design-system/agent-views/components/Radio/Radio.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Radio | `design-system/agent-views/forms/Radio.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| Range | `design-system/agent-views/components/Range/Range.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Range | `design-system/agent-views/forms/Range.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| Rating | `design-system/agent-views/components/Rating/Rating.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Rating | `design-system/agent-views/forms/Rating.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| RichTextEditor | `design-system/agent-views/components/RichTextEditor/RichTextEditor.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| RichTextEditor | `design-system/agent-views/components/RichTextEditor/RichTextEditor.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| SankeyDiagram | `design-system/agent-views/components/SankeyDiagram/SankeyDiagram.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Scale | `design-system/agent-views/components/Scale/Scale.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Scale | `design-system/agent-views/forms/Scale.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Scrollspy | `design-system/agent-views/components/Scrollspy/Scrollspy.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Section | `design-system/agent-views/components/Section/Section.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| ScatterChart | `design-system/agent-views/components/ScatterChart/ScatterChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| ScrollBar | `design-system/agent-views/components/ScrollBar/ScrollBar.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Scrollspy | `design-system/agent-views/components/Scrollspy/Scrollspy.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Section | `design-system/agent-views/components/Section/Section.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Select | `design-system/agent-views/components/Select/Select.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Select | `design-system/agent-views/forms/Select.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| SelectMultiple | `design-system/agent-views/components/SelectMultiple/SelectMultiple.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | SelectMultiple | `design-system/agent-views/forms/SelectMultiple.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Sidebar | `design-system/agent-views/components/Sidebar/Sidebar.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| SidebarTab | `design-system/agent-views/components/SidebarTab/SidebarTab.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Spinner | `design-system/agent-views/components/Spinner/Spinner.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| StaticBadgeSmart | `design-system/agent-views/components/StaticBadgeSmart/StaticBadgeSmart.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| Sidebar | `design-system/agent-views/components/Sidebar/Sidebar.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| SidebarTab | `design-system/agent-views/components/SidebarTab/SidebarTab.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| SmartBarChart | `design-system/agent-views/components/SmartBarChart/SmartBarChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Spinner | `design-system/agent-views/components/Spinner/Spinner.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| StackedBarChart | `design-system/agent-views/components/StackedBarChart/StackedBarChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| StaticBadgeSmart | `design-system/agent-views/components/StaticBadgeSmart/StaticBadgeSmart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| SunburstChart | `design-system/agent-views/components/SunburstChart/SunburstChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Switch | `design-system/agent-views/components/Switch/Switch.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Switch | `design-system/agent-views/forms/Switch.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Table | `design-system/agent-views/components/Table/Table.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-12 |
+| Table | `design-system/agent-views/components/Table/Table.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-07-30 |
+| TagInput | `design-system/agent-views/components/TagInput/TagInput.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | TagInput | `design-system/agent-views/forms/TagInput.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
+| Textarea | `design-system/agent-views/components/Textarea/Textarea.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Textarea | `design-system/agent-views/forms/Textarea.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
-| Toast | `design-system/agent-views/components/Toast/Toast.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| Tooltip | `design-system/agent-views/components/Tooltip/Tooltip.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
-| UserAvatar | `design-system/agent-views/components/UserAvatar/UserAvatar.md` | yes | ⏳ No | — | — | — | 2026-07-12 |
+| Toast | `design-system/agent-views/components/Toast/Toast.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| Tooltip | `design-system/agent-views/components/Tooltip/Tooltip.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| TreemapChart | `design-system/agent-views/components/TreemapChart/TreemapChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| TreeSelect | `design-system/agent-views/components/TreeSelect/TreeSelect.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| UserAvatar | `design-system/agent-views/components/UserAvatar/UserAvatar.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| WaterfallChart | `design-system/agent-views/components/WaterfallChart/WaterfallChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
+| WordCloud | `design-system/agent-views/components/WordCloud/WordCloud.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 
 ## Tokens & mapping
 
 | Doc | Path | On disk | Verified | Verified at | Verified by | Notes | File updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss | 2026-07-12 |
+| agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss | 2026-07-30 |
 | docs/foundations/token-mapping.md | `design-system/docs/foundations/token-mapping.md` | yes | ⏳ No | — | — | Hand-authored Figma ↔ CSS mapping | 2026-07-10 |
 
 ## Patterns (hand-authored)

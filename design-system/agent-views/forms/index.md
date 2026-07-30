@@ -2,14 +2,6 @@
 <!-- Load when: building forms | Route: design-system/docs/discovery.md -->
 # PLUS DS — Forms
 
-> **CRITICAL**: Only use form components listed here.
+> Form components moved into `design-system/src/components/forms-and-inputs/` (2026-07 IA reorg) and are listed in **[components/index.md](../components/index.md)**. Import them from `@/components` like any other component.
 
-Mirrors `design-system/src/forms/`. Import via `@/forms/`.
-
-## Form elements (0)
-
-
-
-```
-
-```
+`design-system/src/forms/` no longer exists. This file is a redirect, not an empty inventory — an absence here means nothing.
