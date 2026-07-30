@@ -12,7 +12,7 @@ description: >
   itself (uno-synthesize).
 user-invocable: true
 argument-hint: [prd-required] [fidelity]
-allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__notion-plus__*
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__figma-plus__*, mcp__figma-parsnip__*, mcp__notion-plus__*
 ---
 
 # Prototype
@@ -64,14 +64,26 @@ procedures (grounding §1, prompt-spec modes §3, hard gates §5, validation loo
 §6) are unchanged — they are folded into these four steps. Always optimize for
 **learning, not completeness** (see Guiding Principle at the end).
 
-### Intake mode — the hook enforces the PRD gate AND Step 2 reflection
+### Intake mode — the PRD gate AND Step 2 reflection
 
-When `.cursor/hooks/briefings/active-intake-question.json` exists, you are in
-**hook-gated intake**. The FSM owns eight steps in order — `prd_check`,
-`prd_paste`, then the Step 2 reflection gates `reflect_learn`,
-`reflect_artifact_open`, `reflect_artifact`, `reflect_fidelity`,
-`reflect_exclude`, `reflect_confirm`. Render the **current** one (the file's
-`stateId` / `type` tell you which):
+The intake sequence is eight steps in order — `prd_check`, `prd_paste`, then
+the Step 2 reflection gates `reflect_learn`, `reflect_artifact_open`,
+`reflect_artifact`, `reflect_fidelity`, `reflect_exclude`, `reflect_confirm`.
+**The sequence is the contract; the hook is an accelerator.** Two ways to run it:
+
+- **Hook-gated** (Cursor, Claude Code): `.cursor/hooks/briefings/active-intake-question.json`
+  exists and owns the state. Render the **current** step (the file's
+  `stateId` / `type` tell you which), per the numbered rules below.
+- **Manual** (any other runtime — Codex, Windsurf, Antigravity, headless): no
+  JSON appears. Run the SAME eight steps yourself, in order, one question per
+  message, tracking your own position. Every numbered rule below still applies —
+  read "the JSON's field" as "the step you are on". Do not refuse to proceed
+  because the hook is absent; the hook automates this procedure, it does not
+  own it.
+
+Throughout, "AskQuestion" means your runtime's ask-the-user tool —
+`AskUserQuestion` in Claude Code, `AskQuestion` in Cursor; a runtime without
+such a tool asks the same single question in plain text.
 
 1. Read `active-intake-question.json` first — the only source of truth for what
    to ask this turn (`oneQuestionOnly` and `neverSkipStep` are always true).
@@ -109,8 +121,9 @@ caches it. A follow-up prototype request for the same project skips PRD check +
 paste and **re-enters the reflection at `reflect_learn`** (a revision may change
 the strategy). Say **upload a new PRD** to clear the cache and start fresh.
 
-If intake JSON is absent, do **not** improvise or batch-ask — tell the user to
-invoke `uno-prototype` / say `prototype this` so the hook can run the PRD gate.
+If intake JSON is absent and your runtime has no hook, that is the **manual**
+path above — run the eight steps yourself. What stays forbidden either way:
+improvising a different sequence, batching steps, or skipping the PRD gate.
 
 ---
 
@@ -306,23 +319,22 @@ gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
 ## Constraints
 
-- **Hook = PRD gate + Step 2 reflection, then handoff** — when `prdGate` is on,
-  `.cursor/hooks/uno-prototype/` runs `prd_check` → `prd_paste` →
-  `reflect_learn` → `reflect_artifact_open` → `reflect_artifact` →
-  `reflect_fidelity` → `reflect_exclude` → `reflect_confirm`,
-  one step per message, writing `active-intake-question.json` each turn. Render
-  **one** step per message: **AskQuestion** with `questions.length === 1` — for
-  `reflection` steps you compose the PRD-specific options from the `guidance`
-  field (the `openEnded` beat takes free text, no menu; the `confirm` beat
-  assembles the brief card from the JSON's `reflection` answers). Only after the
-  brief is confirmed does the hook emit its **build-handoff** message — carrying
-  the contract — and stop intercepting; **you** then run Step 3 (Plan) → Step 4
-  (Generate). The hook does not run a separate fidelity-picker
-  step (fidelity is `reflect_fidelity`); the "do you have a Figma file?" question
-  is asked by the agent in Step 4's high-fi branch, right before generation. The
-  same FSM backs both IDEs: Cursor via `beforeSubmitPrompt` (`run.mjs`) and
-  Claude Code via `UserPromptSubmit` (`claude-code-run.mjs` +
-  `.claude/settings.json`).
+- **Intake = PRD gate + Step 2 reflection, then handoff** — the eight-step
+  sequence (`prd_check` → `prd_paste` → `reflect_learn` →
+  `reflect_artifact_open` → `reflect_artifact` → `reflect_fidelity` →
+  `reflect_exclude` → `reflect_confirm`), one step per message, one AskQuestion
+  with `questions.length === 1` per step — for `reflection` steps you compose
+  the PRD-specific options from the guidance (the `openEnded` beat takes free
+  text, no menu; the `confirm` beat assembles the brief card from the answers).
+  Only after the brief is confirmed do **you** run Step 3 (Plan) → Step 4
+  (Generate). There is no separate fidelity-picker step (fidelity is
+  `reflect_fidelity`); the "do you have a Figma file?" question is asked by the
+  agent in Step 4's high-fi branch, right before generation. Hook runtimes
+  automate the sequence — Cursor via `beforeSubmitPrompt` (`run.mjs`), Claude
+  Code via `UserPromptSubmit` (`claude-code-run.mjs` + `.claude/settings.json`)
+  — writing `active-intake-question.json` each turn and emitting the
+  **build-handoff** message at confirm; every other runtime runs the same
+  sequence manually (see Intake mode above).
 - **One question at a time everywhere** — the PRD-gate steps *and* the Step 2
   reflection beats are each their own hook-gated AskQuestion
   (`questions.length === 1`). The hook enforces this; never batch reflection

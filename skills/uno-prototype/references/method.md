@@ -23,40 +23,40 @@ routing alike; there are no exceptions and no "idea-only" bypass.
    (user flows, acceptance criteria, scope, or equivalent)
 
 **When PRD is missing:** stop immediately. Do not ground, scaffold, write a
-prompt-spec, or touch `playground/`. Invite the designer to run
+prompt-spec, or touch `prototypes/`. Invite the designer to run
 `skills/uno-synthesize` first (`notion_create` flow) and return with the PRD
 link or approved inline draft. Never invent requirements to fill the gap.
 
-The IDE enforces this at prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`
-(a data-driven conversation FSM in `.cursor/hooks/uno-prototype/` — stateless per message,
-scoped by `conversation_id`); the skill body enforces it again on load.
-
-**IDE hook behavior:** when prototype intent is detected, the hook runs a finite-state
-workflow — PRD check → PRD upload/verify → the Step 2 reflection (goal →
+**The intake procedure — portable by construction.** Before any routing or
+building: PRD check → PRD upload/verify → the Step 2 reflection (goal →
 artifact, asked open-ended first then as a recommendation → fidelity →
-exclusions) → **brief-card confirmation** — and re-prompts each step until it is
-satisfied. **No step may be skipped** — a PRD or strategy stated in an earlier
+exclusions) → **brief-card confirmation**. One question per message, never
+batched; **no step may be skipped** — a PRD or strategy stated in an earlier
 message only rephrases the current step as verification. The confirmed brief
 card (goal · artifact · fidelity · won't-include) is the **contract** carried
 into planning, generation, and the validation loop. Plus Design System is
-always applied and is never asked.
+always applied and is never asked. This written sequence is the contract; any
+runtime that can ask a question can run it. IDE hook runtimes automate it
+(details below, IDE-only); a runtime without the hook runs the same steps
+itself, in order, and skips nothing.
 
-**Agent rendering contract (intake):** the coding agent displays hook content
-**one question per message** — never batches PRD, reflection, Figma, or later
-steps into a single AskQuestion call or reply. When
-`.cursor/hooks/briefings/active-intake-question.json` exists, the agent renders
-only that file's current step (`stateId`/`type`/`guidance`), shows its
-`progressLabel`, opens the first step with the one-line flow map, and surfaces
-that saying `back` revises an earlier answer. Skipping a step because the user
-already answered in an earlier message, attached a PRD, or named fidelity/Figma
-in the same turn is forbidden — the FSM still asks that step for explicit
-verification.
+<!-- ide-only -->
+**Hook automation (Cursor + Claude Code).** Cursor enforces the sequence at
+prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`; Claude Code via
+`.claude/settings.json` → `.cursor/hooks/uno-prototype/claude-code-run.mjs`
+(one data-driven FSM in `.cursor/hooks/uno-prototype/` backs both — stateless
+per message, scoped by `conversation_id`). The hook re-prompts each step until
+satisfied and writes `.cursor/hooks/briefings/active-intake-question.json` each
+turn; the agent renders only that file's current step (`stateId`/`type`/
+`guidance`), shows its `progressLabel`, opens the first step with the one-line
+flow map, and surfaces that saying `back` revises an earlier answer.
 
-To exit without invoking uno-prototype, say
-`skip PRD upload` or `terminate this process`. That releases the workflow but does not grant a PRD bypass
-inside the skill. After the brief is confirmed, the hook stops intercepting and
-hands off to the agent's Plan → Generate steps. Disable the gate for local testing:
-`"uno": { "prdGate": false }` in `.cursor/settings.json`.
+To exit without invoking uno-prototype, say `skip PRD upload` or
+`terminate this process`. That releases the workflow but does not grant a PRD
+bypass inside the skill. After the brief is confirmed, the hook stops
+intercepting and hands off to the agent's Plan → Generate steps. Disable the
+gate for local testing: `"uno": { "prdGate": false }` in `.cursor/settings.json`.
+<!-- /ide-only -->
 
 ## 1. Ground the brief — unconditional, scoped
 
