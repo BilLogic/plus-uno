@@ -20,7 +20,7 @@
 import type { Env } from "./types";
 import { postMessage } from "./slack/api";
 import { notionCreate, type CreatedPrd } from "./integrations/notion";
-import { countedFetch } from "./net";
+import { countedFetch, charge } from "./net";
 
 const FIGMA_API = "https://api.figma.com";
 const FETCH_TIMEOUT_MS = 15000;
@@ -434,11 +434,13 @@ async function createPollPrd(
 
 async function loadSnapshot(env: Env): Promise<Snapshot | null> {
   if (!env.HARNESS_KV) return null;
+  charge(1, "kv"); // internal bucket — see net.ts
   return env.HARNESS_KV.get<Snapshot>(SNAPSHOT_KV_KEY, "json");
 }
 
 async function saveSnapshot(env: Env, snapshot: Snapshot): Promise<void> {
   if (!env.HARNESS_KV) return;
+  charge(1, "kv"); // internal bucket — see net.ts
   await env.HARNESS_KV.put(SNAPSHOT_KV_KEY, JSON.stringify(snapshot));
 }
 
