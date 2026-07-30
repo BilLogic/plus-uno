@@ -1,9 +1,9 @@
 ---
 status: pending
 priority: p2
-issue_id: 056
+issue_id: 066
 tags: [code-review, hooks, portability]
-dependencies: [054]
+dependencies: [064]
 ---
 
 # The Figma write-back gate only exists in Cursor
