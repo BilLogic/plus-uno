@@ -1,14 +1,17 @@
 import { Title, Meta, Canvas } from '@storybook/addon-docs/blocks';
-import * as PostSessionPageStories from './Pages/PostSessionPage/PostSessionPage.stories.jsx';
+import * as ReflectionFlowStories from './Pages/ReflectionFlow/ReflectionFlow.stories.jsx';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta title="Specs/Toolkit/Post-Session/Overview" />
 
 <Title>Toolkit · Post-Session</Title>
 
-Reflection and feedback after a session ends: session reflection, self and
-student ratings, and the feedback forms. Organized
-Elements → Cards → Tables → Modals → Sections → Pages.
+Reflection after a session ends: entry from the Reflections list, then Session
+Information → Student Reflection → Session Reflection → Self Reflection → Form
+Feedback. New states include AI-generating prompts, chip multi-selects, and
+Save & Exit confirmation.
+
+Organized Elements → Cards → Tables → Modals → Sections → Pages.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=3400-286833"
@@ -17,8 +20,16 @@ Elements → Cards → Tables → Modals → Sections → Pages.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Featured page — Post-Session
+### Featured — Reflection flow
 
-<Canvas of={PostSessionPageStories.Default} />
+Clickable in-memory walkthrough of the full post-session form (no backend).
+
+<Canvas of={ReflectionFlowStories.Default} />
+
+### Key states to review in the sidebar
+
+- **Session Reflection** — Empty · In progress (AI generating) · Filled · Worst case · Save & Exit confirmation
+- **Modals / Save And Exit** — leave confirmation scrim
+- **Elements / Option Chip** · **AI Generating Placeholder**
 
 </div>

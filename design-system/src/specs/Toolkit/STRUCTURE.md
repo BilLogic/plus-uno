@@ -14,6 +14,15 @@ design-system/src/specs/Toolkit/
 ├── Pre-Session/   (elements, cards, tables, modals, sections, pages — each with *.stories.jsx + *.mdx)
 ├── In-Session/
 ├── Post-Session/
+│   ├── Overview.mdx
+│   ├── reflectionCopy.js          # shared rating copy + chip option banks
+│   ├── Elements/                  # Session/Student/Self/Form Rating, SessionInfo,
+│   │                              # OptionChip, AiGeneratingPlaceholder
+│   ├── Modals/SaveAndExitModal/   # Save & Exit confirmation scrim
+│   ├── Sections/                  # SideNavBar, SessionInformationForm,
+│   │                              # SessionReflectionForm(V2), StudentReflectionForm(V2), …
+│   └── Pages/                     # ReflectionFlow (orchestrator), SessionReflection states,
+│                                  # StudentReflection, SelfReflection, FormFeedback, PostSessionPage
 │
 ├── Elements/   (legacy conceptual grouping — see phase folders for actual specs)
 │   ├── SessionControlButtons/
@@ -148,8 +157,10 @@ design-system/src/specs/Toolkit/
 - **MySessionsPage** (`Full page / my sessions`): Full page for my sessions (pop-up?: off/on, has alert?: no, user: both)
 - **SessionSignUpPage** (`Session Sign up`): Session sign-up page
 - **StudentsDashboard** (`Students Dashboard`): Students dashboard (view: Default/loading/toast)
-- **SessionReflection** (`Session Reflection`): Session reflection pages (part=1-4)
-- **StudentReflection** (`Student Reflection`): Student reflection pages (part=1-3)
+- **SessionReflection** (`Session Reflection`): Empty · In progress (AI generating) · Filled · Worst case · Save & Exit confirmation
+- **ReflectionFlow** (`Reflection Flow`): End-to-end in-memory orchestrator (Entry → Submit)
+- **StudentReflection** (`Student Reflection`): Student reflection pages (part=1-3; AI states in V2 form)
+- **OptionChip / AiGeneratingPlaceholder / SaveAndExitModal**: new Post-Session organisms aligned to Figma 3400:286833
 
 ## Storybook organization
 

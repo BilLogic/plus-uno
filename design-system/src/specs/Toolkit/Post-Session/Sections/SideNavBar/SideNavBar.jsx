@@ -2,6 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button';
 
+/**
+ * Single side-nav tab row for the reflection flow.
+ *
+ * @param {object} props
+ * @param {string} props.text - Tab label
+ * @param {'enabled'|'selected'|'disabled'} [props.state='enabled'] - Visual state
+ * @param {React.ReactNode} [props.trailingIcon] - Optional trailing icon
+ * @param {() => void} [props.onClick] - Click handler
+ */
 const SideBarTab = ({
     text = 'Tab Title',
     state = 'enabled',
@@ -13,6 +22,8 @@ const SideBarTab = ({
 
     return (
         <div
+            role="button"
+            tabIndex={isDisabled ? -1 : 0}
             style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -24,6 +35,13 @@ const SideBarTab = ({
                 backgroundColor: isSelected ? 'var(--color-primary-state-16)' : undefined,
             }}
             onClick={!isDisabled ? onClick : undefined}
+            onKeyDown={(event) => {
+                if (isDisabled) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onClick?.();
+                }
+            }}
         >
             <span
                 className={isSelected ? 'body2-txt font-weight-semibold' : 'body2-txt'}
@@ -58,11 +76,42 @@ const SideBarTab = ({
     );
 };
 
+SideBarTab.propTypes = {
+    text: PropTypes.string,
+    state: PropTypes.oneOf(['enabled', 'selected', 'disabled']),
+    trailingIcon: PropTypes.node,
+    onClick: PropTypes.func,
+};
+
+/**
+ * @param {boolean} complete
+ * @returns {React.ReactNode|null}
+ */
+const completeIcon = (complete) =>
+    complete ? (
+        <i className="fa-solid fa-check" style={{ color: 'var(--color-success)' }} aria-hidden="true" />
+    ) : null;
+
+/**
+ * Reflection flow side navigation (Session Information → Student → Session → Self → Form Feedback).
+ *
+ * @param {object} props
+ * @param {'default'|'collapsed'} [props.state='default'] - Collapsed shows only the expand control
+ * @param {{ name: string, status?: string }[]} [props.students=[]] - Students under Student Reflection
+ * @param {string} props.activeTab - Active tab id
+ * @param {(tabId: string) => void} [props.onTabClick] - Tab selection handler
+ * @param {Record<string, boolean>} [props.completedSections={}] - Section completion map
+ * @param {boolean} [props.canSubmit=false] - Enables the Submit button
+ * @param {() => void} [props.onSubmit] - Submit handler
+ */
 const SideNavBar = ({
     state = 'default',
     students = [],
     activeTab,
     onTabClick,
+    completedSections = {},
+    canSubmit = false,
+    onSubmit,
 }) => {
     const isCollapsed = state === 'collapsed';
 
@@ -93,6 +142,7 @@ const SideNavBar = ({
                 <SideBarTab
                     text="Session Information"
                     state={activeTab === 'session-information' ? 'selected' : 'enabled'}
+                    trailingIcon={completeIcon(completedSections['session-information'])}
                     onClick={() => onTabClick?.('session-information')}
                 />
 
@@ -100,15 +150,16 @@ const SideNavBar = ({
                     <SideBarTab
                         text="Student Reflection"
                         state={activeTab === 'student-reflection' ? 'selected' : 'enabled'}
+                        trailingIcon={completeIcon(completedSections['student-reflection'])}
                         onClick={() => onTabClick?.('student-reflection')}
                     />
 
                     {students.map((student, index) => (
-                        <div key={index} style={{ paddingLeft: '16px' }}>
+                        <div key={student.id || student.name || index} style={{ paddingLeft: '16px' }}>
                             <SideBarTab
                                 text={student.name}
                                 state={activeTab === `student-${index}` ? 'selected' : 'enabled'}
-                                trailingIcon={student.status === 'complete' ? <i className="fa-solid fa-check" style={{ color: 'var(--color-success)' }}></i> : null}
+                                trailingIcon={completeIcon(student.status === 'complete')}
                                 onClick={() => onTabClick?.(`student-${index}`)}
                             />
                         </div>
@@ -118,29 +169,31 @@ const SideNavBar = ({
                 <SideBarTab
                     text="Session Reflection"
                     state={activeTab === 'session-reflection' ? 'selected' : 'enabled'}
+                    trailingIcon={completeIcon(completedSections['session-reflection'])}
                     onClick={() => onTabClick?.('session-reflection')}
                 />
                 <SideBarTab
                     text="Self Reflection"
                     state={activeTab === 'self-reflection' ? 'selected' : 'enabled'}
+                    trailingIcon={completeIcon(completedSections['self-reflection'])}
                     onClick={() => onTabClick?.('self-reflection')}
                 />
                 <SideBarTab
                     text="Form Feedback"
                     state={activeTab === 'form-feedback' ? 'selected' : 'enabled'}
+                    trailingIcon={completeIcon(completedSections['form-feedback'])}
                     onClick={() => onTabClick?.('form-feedback')}
                 />
             </div>
-            {/* Submit Button with correct Figma opacity (38%) */}
-            <div style={{ opacity: activeTab !== 'submission' ? 0.38 : 1, width: '100%' }}>
+            <div style={{ opacity: canSubmit ? 1 : 0.38, width: '100%' }}>
                 <Button
                     text="Submit"
                     style="default"
                     fill="filled"
                     size="medium"
-                    disabled={activeTab !== 'submission'}
+                    disabled={!canSubmit}
                     block={true}
-                    onClick={() => onTabClick?.('submission')}
+                    onClick={() => onSubmit?.()}
                 />
             </div>
         </div>
@@ -152,6 +205,9 @@ SideNavBar.propTypes = {
     students: PropTypes.array,
     activeTab: PropTypes.string,
     onTabClick: PropTypes.func,
+    completedSections: PropTypes.object,
+    canSubmit: PropTypes.bool,
+    onSubmit: PropTypes.func,
 };
 
 export default SideNavBar;

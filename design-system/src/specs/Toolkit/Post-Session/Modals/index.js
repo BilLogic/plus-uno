@@ -1,1 +1,1 @@
-export * from './Modals.stories.jsx';
+export { default } from './SaveAndExitModal/SaveAndExitModal';

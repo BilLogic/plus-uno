@@ -1,69 +1,130 @@
 import React, { useState } from 'react';
-import StudentReflectionPart1 from './Part1';
-import StudentReflectionPart2 from './Part2';
-import StudentReflectionPart3 from './Part3';
+import PropTypes from 'prop-types';
+import { PageLayout } from '@/specs/Universal/Pages';
+import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
+import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
 
-const BreakpointPreview = ({ Component, args }) => (
-    // Width/breakpoint + height come from the global Breakpoint toolbar (ResponsiveFrame decorator).
-    <div style={{ height: '100%', width: '100%', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
-        <Component {...args} />
-    </div>
-);
+const defaultStudents = [
+    { name: 'Kiera Wintervale', status: 'complete' },
+    { name: 'Baxter Ellington', status: 'incomplete' },
+    { name: 'Milo Thorne', status: 'incomplete' },
+];
+
+/**
+ * @param {object} props
+ */
+const Shell = ({ formProps = {}, students = defaultStudents, activeStudentTab = 'student-1' }) => {
+    const [activeTab, setActiveTab] = useState(activeStudentTab);
+    return (
+        <div style={{ width: '100%', height: '100%' }}>
+            <PageLayout
+                topBarConfig={{
+                    breadcrumbs: [
+                        { text: 'Toolkit', href: '#' },
+                        { text: 'Sessions', href: '#' },
+                        { text: 'Reflection Form' },
+                    ],
+                    user: { name: 'John Doe', type: 'lead tutor' },
+                }}
+                sidebarConfig={{ user: 'tutor', activeTab: 'sessions' }}
+                id="student-reflection-story"
+            >
+                <div style={{ display: 'flex', gap: 'var(--size-surface-gap-md)', width: '100%', minHeight: '100%' }}>
+                    <SideNavBar
+                        students={students}
+                        activeTab={activeTab}
+                        completedSections={{ 'session-information': true }}
+                        onTabClick={setActiveTab}
+                    />
+                    <StudentReflectionFormV2 {...formProps} />
+                </div>
+            </PageLayout>
+        </div>
+    );
+};
+
+Shell.propTypes = {
+    formProps: PropTypes.object,
+    students: PropTypes.array,
+    activeStudentTab: PropTypes.string,
+};
 
 export default {
     title: 'Specs/Toolkit/Post-Session/Pages/Student Reflection',
-    component: StudentReflectionPart1,
-    parameters: {
-        layout: 'padded',
-    },
+    parameters: { layout: 'padded' },
     tags: ['!dev', '!autodocs'],
 };
 
-export const Part1 = {
-    render: (args) => <BreakpointPreview Component={StudentReflectionPart1} args={args} />,
-    argTypes: {
-        studentName: {
-            control: 'select',
-            options: ['Kiera Wintervale', 'Baxter Ellington', 'Milo Thorne'],
-            name: 'Student',
-            table: { category: 'Content' },
-        },
-    },
-    args: {
-        studentName: 'Kiera Wintervale',
-        students: [
-            { name: 'Kiera Wintervale', status: 'incomplete' },
-            { name: 'Baxter Ellington', status: 'incomplete' },
-            { name: 'Milo Thorne', status: 'incomplete' },
-        ],
-        activeTab: 'student-0',
-    },
+/** Empty student reflection — rating required. */
+export const Empty = {
+    render: () => (
+        <Shell
+            formProps={{
+                studentName: 'Baxter Ellington',
+                initialData: { rating: 0 },
+                aiState: 'idle',
+            }}
+        />
+    ),
 };
 
-export const Part2 = {
-    render: (args) => <BreakpointPreview Component={StudentReflectionPart2} args={args} />,
-    args: {
-        studentName: 'Kiera Wintervale',
-        students: [
-            { name: 'Kiera Wintervale', status: 'incomplete' },
-            { name: 'Baxter Ellington', status: 'incomplete' },
-            { name: 'Milo Thorne', status: 'incomplete' },
-        ],
-        activeTab: 'student-0',
-        initialRating: 4,
-    },
+/** AI generating follow-up after chips. */
+export const InProgressAi = {
+    name: 'In progress (AI generating)',
+    render: () => (
+        <Shell
+            formProps={{
+                studentName: 'Baxter Ellington',
+                aiState: 'generating',
+                initialData: {
+                    rating: 4,
+                    whatWorked: ['good-pacing', 'strong-rapport'],
+                    whatImprove: [],
+                },
+            }}
+        />
+    ),
 };
 
-export const Part3 = {
-    render: (args) => <BreakpointPreview Component={StudentReflectionPart3} args={args} />,
-    args: {
-        studentName: 'Milo Thorne',
-        students: [
-            { name: 'Kiera Wintervale', status: 'complete' },
-            { name: 'Baxter Ellington', status: 'complete' },
-            { name: 'Milo Thorne', status: 'incomplete' },
-        ],
-        activeTab: 'student-2',
-        initialRating: 3,
-    },
+/** Filled student reflection with AI prompt ready. */
+export const Filled = {
+    render: () => (
+        <Shell
+            formProps={{
+                studentName: 'Baxter Ellington',
+                aiState: 'ready',
+                initialData: {
+                    rating: 4,
+                    whatWorked: ['good-pacing', 'strong-rapport'],
+                    whatImprove: ['pacing'],
+                },
+            }}
+        />
+    ),
 };
+
+/** Worst case — Other selected. */
+export const WorstCase = {
+    name: 'Worst case (Other everywhere)',
+    render: () => (
+        <Shell
+            formProps={{
+                studentName: 'Baxter Ellington',
+                aiState: 'ready',
+                initialData: {
+                    rating: 2,
+                    whatWorked: ['other'],
+                    whatImprove: ['other'],
+                    otherImprove: 'Camera off for most of the block.',
+                },
+            }}
+        />
+    ),
+};
+
+/** @deprecated Prefer Empty. */
+export const Part1 = Empty;
+/** @deprecated Prefer InProgressAi. */
+export const Part2 = InProgressAi;
+/** @deprecated Prefer Filled. */
+export const Part3 = Filled;
