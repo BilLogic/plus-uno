@@ -11,6 +11,14 @@
 // wire types. Each loop keeps its own transport and calls into these helpers.
 
 import type { Env } from "../types";
+import {
+  APPS_MAX_PAGES,
+  CATALOG_MAX_PAGES,
+  PAGE_TITLE_CAP,
+  READ_BLOCK_PAGES,
+  ROADMAP_MAX_PAGES,
+} from "../integrations/notion";
+import { BLUEPRINT_TABLE_FANOUT } from "../integrations/blueprint";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
 import { addReaction } from "../slack/api";
@@ -112,25 +120,28 @@ export const READONLY_TOOL_BUDGET = 12;
 //
 // One estimate remains and can't be removed: a tool's cost isn't knowable until
 // it has run. So the gate is measured-past + bounded-future — real spend so far,
-// plus the WORST CASE for the one call about to be made. Those bounds are
-// derived from each tool's page caps and fan-out, not guessed, and the
-// `[budget]` line logs actual-vs-bound per tool so drift is now visible.
+// plus the WORST CASE for the one call about to be made. The `[budget]` line
+// logs actual-vs-bound per tool so that remaining estimate can't drift unseen.
 //
 // Direction matters: an over-estimated bound costs one skipped lookup, an
 // under-estimated one costs the whole reply. When unsure, round up.
 
-// Worst-case subrequests ONE call of a tool can spend. Derived:
-//   source_read      1 page fetch + READ_BLOCK_PAGES (3) = 4, +1 slack/figma variant
-//   blueprint_search 2 embed (token + vector) + 1 rpc + 4 table fan-out = 7
-//   notion_search    apps: 2 directory pages + 4 power-user title lookups = 6
-//                    catalog: CATALOG_MAX_PAGES (5)
-//   roadmap_query    ROADMAP_MAX_PAGES (5) + a full unfiltered drift rescan (5)
+// Worst-case subrequests ONE call of a tool can spend. DERIVED from the page
+// caps and fan-outs themselves, not copied next to a comment claiming they
+// match — a hand-copied bound is the same class of drift ADR-022 retires, just
+// moved from "estimate vs reality" to "bound vs page cap". Raising
+// CATALOG_MAX_PAGES now updates this automatically.
 const MAX_SUBREQUESTS_PER_TOOL: Record<string, number> = {
-  source_read: 5,
-  blueprint_search: 8,
+  // 1 page fetch + block pagination, +1 for the figma/github variants.
+  source_read: 1 + READ_BLOCK_PAGES + 1,
+  // SA token on a cold isolate + embed + semantic RPC + keyword RPC + fan-out.
+  blueprint_search: 4 + BLUEPRINT_TABLE_FANOUT,
   delegate: 6,
-  notion_search: 6,
-  roadmap_query: 10,
+  // apps: directory pages + power-user title lookups. catalog: its page cap.
+  notion_search: Math.max(APPS_MAX_PAGES + PAGE_TITLE_CAP, CATALOG_MAX_PAGES),
+  // A filtered read, plus a full unfiltered rescan when a renamed property
+  // makes Notion 400 the filter.
+  roadmap_query: ROADMAP_MAX_PAGES * 2,
   github_read: 4,
   slack_search: 3,
   slack_thread_read: 3,
@@ -157,35 +168,33 @@ export const DELIVERY_RESERVE = 12;
 export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;
 
 /**
- * Collects what each tool call ACTUALLY spent so the `[budget]` line can be read
- * against the bounds above. This is the feedback loop the old estimate table
- * never had: a bound that is chronically 3x the real spend is wasting research
- * headroom, and one a real call ever exceeds is a latent silent death. Both are
- * now visible in the logs instead of being invisible until an incident.
+ * True when another loop iteration can't be afforded. Refusing a LOOKUP is not
+ * enough on its own: once lookups are exhausted the model can keep asking for
+ * tools, and while each refusal is free, the model round-trip that carries it is
+ * not — MAX_ITERATIONS of those walk straight through DELIVERY_RESERVE and kill
+ * the post. Both loops check this before calling the model and fall through to
+ * their tools-disabled synthesis pass instead.
  *
- * Per-invocation (not module state) so concurrent requests can't blend tallies.
+ * `+ 1` because the synthesis pass itself still has to be paid for.
  */
-export function makeSpendRecorder(): {
-  record: (tool: string, spent: number) => void;
-  report: () => string;
-} {
-  const actual: Record<string, number[]> = {};
-  return {
-    record(tool, spent) {
-      (actual[tool] ??= []).push(spent);
-      const bound = maxToolSubrequests(tool);
-      if (spent > bound) {
-        // The bound is what the gate trusts. If reality exceeds it, the gate can
-        // wave a call through that pushes the invocation past 50 — raise it.
-        console.warn(`[budget] BOUND EXCEEDED ${tool}: spent ${spent} > bound ${bound} — raise MAX_SUBREQUESTS_PER_TOOL`);
-      }
-    },
-    report() {
-      return Object.entries(actual)
-        .map(([tool, runs]) => `${tool}=${runs.join("+")}/${maxToolSubrequests(tool)}`)
-        .join(" ");
-    },
-  };
+export function outOfIterationBudget(used: number): boolean {
+  return used + 1 >= LOOKUP_CEILING;
+}
+
+/**
+ * Record what a tool call ACTUALLY spent, for the `[budget]` line. This is the
+ * feedback loop the old estimate table never had: a bound reality exceeds is a
+ * latent silent death, and one chronically far above reality is wasted research
+ * headroom. Both now show up in the logs rather than in an incident.
+ *
+ * @param log - Per-invocation accumulator, joined into the telemetry line
+ */
+export function noteSpend(log: string[], tool: string, spent: number): void {
+  const bound = maxToolSubrequests(tool);
+  if (spent > bound) {
+    console.warn(`[budget] BOUND EXCEEDED ${tool}: spent ${spent} > bound ${bound} — raise the derivation in MAX_SUBREQUESTS_PER_TOOL`);
+  }
+  log.push(`${tool}=${spent}/${bound}${spent > bound ? "!" : ""}`);
 }
 
 // ── Shared prompt strings (must read identically in both lanes) ───────────────

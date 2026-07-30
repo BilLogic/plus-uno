@@ -8,9 +8,9 @@
 // Runs inline in the agent loop (no side effect, no gate).
 
 import type { Env } from "../types";
-import { fetchWithTimeout } from "../http";
 import { parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
+import { countedFetch } from "../net";
 
 const GENERIC_TIMEOUT_MS = 8000;
 const GENERIC_TEXT_CAP = 8000;
@@ -112,7 +112,7 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
     const raw = toGithubRaw(parsed);
     const fetchUrl = raw ?? url;
     {
-      const res = await fetchWithTimeout(fetchUrl, { headers: { "user-agent": "uno-bot" } }, GENERIC_TIMEOUT_MS);
+      const res = await countedFetch(fetchUrl, { headers: { "user-agent": "uno-bot" } }, GENERIC_TIMEOUT_MS);
       if (!res.ok) {
         return JSON.stringify({ ok: false, error: `fetch ${res.status} for ${fetchUrl}`, note: "Couldn't open the link — tell the user you couldn't read it; don't answer from priors." });
       }

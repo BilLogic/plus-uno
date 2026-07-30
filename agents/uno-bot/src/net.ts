@@ -2,25 +2,22 @@
 //
 // Cloudflare's free plan caps ONE Worker invocation at 50 outbound subrequests.
 // Call 51 doesn't fail gracefully: the invocation dies, so the reply is never
-// posted — the 👀-then-silence mode (live 2026-07-10, 2026-07-13).
-//
-// The budget gate used to run on a GUESS: a hand-typed per-tool cost table plus
-// a flat PRE_GROUNDING_OVERHEAD, none of it ever compared against reality. The
-// guesses drifted (notion_search was priced 4 while scope 'apps' really spent 6)
-// and nothing could notice, because nothing counted. This module counts.
+// posted — the 👀-then-silence mode (live 2026-07-10, 2026-07-13). The budget
+// gate can only avoid that if it knows the real number, so every outbound call
+// goes through countedFetch here. Why measure instead of estimate: ADR-022.
 //
 // The counter lives in AsyncLocalStorage, so it is per-invocation without every
-// integration having to thread a context object through its signature. Outside a
-// metered context (cron, OAuth callbacks, health checks) countedFetch is a plain
-// fetch and the counters stay at zero — those paths have no budget to protect.
+// integration having to thread a context object through its signature. Metered
+// entry points are the Worker fetch handler (index.ts, which covers the Slack
+// webhook and its ctx.waitUntil work), the AgentRunner DO alarm that runs the
+// agent turn, and the cron. Outside one — a direct integration call from a test
+// — countedFetch is a plain fetch and the counters stay at zero.
 import { AsyncLocalStorage } from "node:async_hooks";
 
 interface Meter {
   count: number;
   /** Per-host tallies for the `[budget]` telemetry line. */
   byHost: Record<string, number>;
-  /** Marks set by markToolStart, used to attribute spend to a tool call. */
-  mark: number;
 }
 
 const meterStore = new AsyncLocalStorage<Meter>();
@@ -32,7 +29,7 @@ const meterStore = new AsyncLocalStorage<Meter>();
  * @param fn - The invocation body
  */
 export function runMetered<T>(fn: () => Promise<T>): Promise<T> {
-  return meterStore.run({ count: 0, byHost: {}, mark: 0 }, fn);
+  return meterStore.run({ count: 0, byHost: {} }, fn);
 }
 
 /** Subrequests spent so far in this invocation (0 outside a metered context). */
@@ -47,23 +44,11 @@ export function subrequestsUsed(): number {
  * @param n - How many
  * @param host - Label for the telemetry breakdown
  */
-export function charge(n: number, host = "durable-object"): void {
+export function charge(n: number, host: string): void {
   const m = meterStore.getStore();
   if (!m) return;
   m.count += n;
   m.byHost[host] = (m.byHost[host] ?? 0) + n;
-}
-
-/** Snapshot the counter so the next markToolEnd can attribute a tool's spend. */
-export function markToolStart(): void {
-  const m = meterStore.getStore();
-  if (m) m.mark = m.count;
-}
-
-/** Subrequests spent since the last markToolStart. */
-export function spentSinceMark(): number {
-  const m = meterStore.getStore();
-  return m ? m.count - m.mark : 0;
 }
 
 /** Compact per-host breakdown, e.g. `api.notion.com:7 slack.com:4`. */
@@ -77,22 +62,27 @@ export function meterBreakdown(): string {
 }
 
 /**
- * The ONE outbound fetch for this Worker. Counts the call, then applies the
- * timeout guard (Workers have no per-fetch timeout — without it a slow upstream
- * pins the invocation).
+ * The ONE outbound fetch for this Worker: counts the call, and applies a timeout
+ * when the caller asks for one (Workers have no per-fetch timeout, so without it
+ * a slow upstream pins the invocation).
  *
- * Every network call in src/ goes through here; `scripts/check-fetch.mjs`
- * fails the build on a bare `fetch(` anywhere else, because an uncounted call
- * site is exactly the drift this module exists to end.
+ * `timeoutMs` is deliberately OPTIONAL and has no default. Counting applies to
+ * every call; a timeout is a per-call-site policy. The model calls
+ * (vertex/claude.ts, gemini/client.ts) are non-streaming generations that can
+ * legitimately run for minutes, and a default would have silently capped them.
+ *
+ * Every network call in src/ goes through here; `scripts/check-fetch.mjs` fails
+ * the build on a bare `fetch(` anywhere else, because an uncounted call site is
+ * exactly the drift this module exists to end.
  *
  * @param input - URL
  * @param init - Standard fetch init; a caller-supplied `signal` still applies
- * @param timeoutMs - Abort after this long
+ * @param timeoutMs - Abort after this long; omit for no timeout
  */
-export async function countedFetch(
+export function countedFetch(
   input: string,
   init: RequestInit = {},
-  timeoutMs = 15_000,
+  timeoutMs?: number,
 ): Promise<Response> {
   const m = meterStore.getStore();
   if (m) {
@@ -101,18 +91,18 @@ export async function countedFetch(
     try {
       host = new URL(input).host;
     } catch {
-      // Non-absolute URL (DO stub targets) — keep the count, skip the label.
+      // Non-absolute URL — keep the count, skip the label.
     }
     m.byHost[host] = (m.byHost[host] ?? 0) + 1;
   }
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  // Count BEFORE the call and keep the count if it throws: Cloudflare charges
+  // the attempt, and over-counting costs a lookup while under-counting costs
+  // the whole reply.
+  const deadline = timeoutMs == null ? undefined : AbortSignal.timeout(timeoutMs);
   // A caller that already has its own signal (a shared per-operation abort)
-  // keeps it: abort either way. Workers support AbortSignal.any.
-  const signal = init.signal ? AbortSignal.any([init.signal, controller.signal]) : controller.signal;
-  try {
-    return await fetch(input, { ...init, signal });
-  } finally {
-    clearTimeout(timer);
-  }
+  // keeps it: abort either way, rather than the old code's silent clobber.
+  const signal = deadline && init.signal
+    ? AbortSignal.any([init.signal, deadline])
+    : (deadline ?? init.signal);
+  return fetch(input, { ...init, ...(signal ? { signal } : {}) });
 }

@@ -23,7 +23,7 @@ import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
 import { BUILD } from "../version";
-import { subrequestsUsed, markToolStart, spentSinceMark, meterBreakdown } from "../net";
+import { subrequestsUsed, meterBreakdown } from "../net";
 import {
   MAX_ITERATIONS,
   MAX_TOKENS,
@@ -31,7 +31,8 @@ import {
   LOOKUP_CEILING,
   SUBREQUEST_CAP,
   maxToolSubrequests,
-  makeSpendRecorder,
+  noteSpend,
+  outOfIterationBudget,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
@@ -179,7 +180,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   let toolCallsUsed = 0;
   // Actual-vs-bound spend per tool, for the [budget] line. The gate itself
   // reads the live meter (src/net.ts), not a running estimate.
-  const spend = makeSpendRecorder();
+  const spendLog: string[] = [];
   const toolNamesUsed: string[] = [];
 
   const finish = (result: AgentResult): AgentResult => {
@@ -187,7 +188,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     // in the logs instead of surfacing later as a silent mid-turn death.
     console.log(
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools | ${spend.report()} | ${meterBreakdown()}`,
+        `${toolCallsUsed} tools | ${spendLog.join(" ")} | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
@@ -256,6 +257,11 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   };
 
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+    // The model round-trip is the one subrequest EVERY iteration spends, and it
+    // used to be the only one nothing gated: refusing lookups still let the loop
+    // spin, burning the delivery reserve until the post itself failed. Break to
+    // the tools-disabled synthesis pass below instead.
+    if (outOfIterationBudget(subrequestsUsed())) break;
     const parts = await callGemini(false);
     const functionCalls = parts.filter((p) => p.functionCall?.name);
 
@@ -339,9 +345,12 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         });
       } else {
         toolCallsUsed++;
-        markToolStart();
-        resultText = await executeReadOnlyTool(env, name, args, slack);
-        spend.record(name, spentSinceMark());
+        const before = subrequestsUsed();
+        try {
+          resultText = await executeReadOnlyTool(env, name, args, slack);
+        } finally {
+          noteSpend(spendLog, name, subrequestsUsed() - before);
+        }
       }
       responseParts.push({ functionResponse: { name, response: { result: resultText } } });
     }

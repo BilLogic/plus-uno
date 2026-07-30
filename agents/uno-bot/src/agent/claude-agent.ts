@@ -29,7 +29,8 @@ import {
   LOOKUP_CEILING,
   SUBREQUEST_CAP,
   maxToolSubrequests,
-  makeSpendRecorder,
+  noteSpend,
+  outOfIterationBudget,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
@@ -40,7 +41,7 @@ import {
   type AgentResult,
   type AgentImage,
 } from "./loop-shared";
-import { subrequestsUsed, markToolStart, spentSinceMark, meterBreakdown } from "../net";
+import { subrequestsUsed, meterBreakdown } from "../net";
 import type { HistoryTurn } from "../thread-state-client";
 
 // ── Anthropic Messages wire types (the subset we touch) ──────────────────────
@@ -106,7 +107,7 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   let cacheWriteTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
-  const spend = makeSpendRecorder();
+  const spendLog: string[] = [];
   const toolNamesUsed: string[] = [];
 
   const addUsage = (u: ClaudeMessage["usage"]): void => {
@@ -125,7 +126,7 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const finish = (result: AgentResult): AgentResult => {
     console.log(
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools | ${spend.report()} | ${meterBreakdown()}`,
+        `${toolCallsUsed} tools | ${spendLog.join(" ")} | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=vertex-claude tier=${tier} route=${routeReason} model=${model} ` +
@@ -163,6 +164,11 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   };
 
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+    // The model round-trip is the one subrequest EVERY iteration spends, and it
+    // used to be the only one nothing gated: refusing lookups still let the loop
+    // spin, burning the delivery reserve until the post itself failed. Break to
+    // the tools-disabled synthesis pass below instead.
+    if (outOfIterationBudget(subrequestsUsed())) break;
     const response = await callClaude(false);
     iterations++;
     addUsage(response.usage);
@@ -247,9 +253,13 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
           continue;
         }
         toolCallsUsed++;
-        markToolStart();
-        const resultText = await executeReadOnlyTool(env, tu.name, tu.input, slack);
-        spend.record(tu.name, spentSinceMark());
+        const before = subrequestsUsed();
+        let resultText: string;
+        try {
+          resultText = await executeReadOnlyTool(env, tu.name, tu.input, slack);
+        } finally {
+          noteSpend(spendLog, tu.name, subrequestsUsed() - before);
+        }
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }
       messages.push({ role: "user", content: toolResults });

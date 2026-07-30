@@ -8,8 +8,8 @@
 import type { Env } from "../types";
 import type { AgentImage } from "../agent/loop-shared";
 import type { SlackMessageEvent } from "./types";
-import { fetchWithTimeout } from "../http";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
+import { countedFetch } from "../net";
 
 const MAX_IMAGE_ATTACHMENTS = 3;
 const MAX_IMAGE_BYTES = Math.floor(3.5 * 1024 * 1024); // Anthropic per-image limit is ~5MB; stay well under
@@ -116,7 +116,7 @@ async function fetchBytes(
   headers?: Record<string, string>,
 ): Promise<ArrayBuffer | null> {
   try {
-    const res = await fetchWithTimeout(url, { headers }, IMAGE_FETCH_TIMEOUT_MS);
+    const res = await countedFetch(url, { headers }, IMAGE_FETCH_TIMEOUT_MS);
     if (!res.ok) return null;
     const contentType = res.headers.get("content-type") ?? "";
     if (contentType.includes("text/html")) return null;

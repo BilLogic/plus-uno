@@ -19,6 +19,11 @@ const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
 const TEAM_QUERY_PAGE_SIZE = 100;
 const TEAM_MAX = 200;
+/** Hard page cap. TEAM_MAX alone doesn't bound the loop: rows without a Name
+ *  title are skipped without incrementing members.length, so a DB with many
+ *  untitled rows paginated unbounded — the one paginated reader that predates
+ *  queryDatabaseRows and so never got a maxPages. */
+export const TEAM_MAX_PAGES = 3;
 const DESIGN_STATUS_NEED_PRD = "Need PRD / Under Playground";
 const REQUEST_TIMEOUT_MS = 10000;
 const MAX_RICH_TEXT = 1900; // Notion caps a single rich_text content at 2000
@@ -180,15 +185,20 @@ const plain = (rt?: NotionRichText): string =>
 
 /**
  * Read the Team Member Database roster (name, group, role, bio, links). The bot
- * matches a topic against the bios itself; this just returns the people. Paginates
- * up to TEAM_MAX. Throws on failure (caller surfaces it).
+ * matches a topic against the bios itself; this just returns the people.
+ * Paginates up to TEAM_MAX rows / TEAM_MAX_PAGES pages, reporting `truncated`
+ * so the caller never presents a partial roster as the whole team. Throws on
+ * failure (caller surfaces it).
  */
-export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
+export async function findTeamMembers(
+  env: Env,
+): Promise<{ members: TeamMember[]; truncated: boolean }> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   if (!env.NOTION_TEAM_DB_ID) throw new Error("NOTION_TEAM_DB_ID not configured");
 
   const headers = notionHeaders(env, { write: true });
   const members: TeamMember[] = [];
+  let pages = 0;
   let cursor: string | undefined;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -221,9 +231,10 @@ export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
           slackUserId: normalizeSlackId(plain(p["Slack ID"]?.rich_text)) ?? undefined,
         });
       }
+      pages++;
       cursor = data.has_more ? data.next_cursor : undefined;
-    } while (cursor && members.length < TEAM_MAX);
-    return members;
+    } while (cursor && members.length < TEAM_MAX && pages < TEAM_MAX_PAGES);
+    return { members, truncated: cursor != null };
   } finally {
     clearTimeout(timer);
   }
@@ -256,7 +267,7 @@ export interface ThirdPartyApp {
 }
 
 const APPS_PAGE_SIZE = 100;
-const APPS_MAX_PAGES = 2;
+export const APPS_MAX_PAGES = 2;
 
 /**
  * Read the Third Party Applications directory (name, admins, power-user page
@@ -356,14 +367,12 @@ export async function queryThirdPartyApps(
 // known DBs. Query databases/{id} directly (1–2 subrequests) and match in-Worker.
 
 const CATALOG_PAGE_SIZE = 100;
-// 5, matching ROADMAP_MAX_PAGES. At 2 this was a 200-row window that the tool
-// then described as a "complete scan" — the same defect that made a real card
-// come back as "not on the board" (2026-07-29). No catalog exceeds 200 rows
-// today (largest: Design Running Notes at 105), so this is headroom, not a fix
-// for a live miss; the truncated flag below is what makes the claim honest
-// either way. Coupled to loop-shared's notion_search bound of 6: 5 catalog
-// pages, or the apps path's 2 directory pages + 4 power-user lookups.
-const CATALOG_MAX_PAGES = 5;
+// 3, not 2 — one doubling of headroom over the largest catalog today (Design
+// Running Notes, 105 rows). Not higher: the honest thing here is the truncated
+// flag below, which makes a partial read say so at ANY page cap, and every
+// extra page is real worst-case spend on the tool whose budget already sits
+// closest to the edge. loop-shared derives notion_search's bound from this.
+export const CATALOG_MAX_PAGES = 3;
 /** Cap how many select/status/url/rich_text fields we surface per row. */
 const CATALOG_META_CAP = 6;
 
@@ -451,7 +460,7 @@ export async function queryCatalogDatabase(
  * Power User(s)). Capped — each id is one subrequest. Unresolvable ids are
  * skipped, never fabricated.
  */
-export async function fetchPageTitles(env: Env, pageIds: string[], cap = 4): Promise<string[]> {
+export async function fetchPageTitles(env: Env, pageIds: string[], cap = PAGE_TITLE_CAP): Promise<string[]> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   const headers = notionHeaders(env);
   const titles: string[] = [];
@@ -493,7 +502,9 @@ export interface ArchivedCard {
 // Returns the page title, its properties rendered to strings (so the model can
 // read an Owner/Assignee/Status field), and the page's block text. Read-only.
 
-const READ_BLOCK_PAGES = 3; // cap pagination so a huge page can't blow the budget
+/** Max relation page-ids resolved to titles per call — each is one subrequest. */
+export const PAGE_TITLE_CAP = 4;
+export const READ_BLOCK_PAGES = 3; // cap pagination so a huge page can't blow the budget
 const READ_TEXT_CAP = 8000;
 
 // In-memory read cache: a back-and-forth thread re-reads the SAME page every
@@ -1290,7 +1301,7 @@ const ROADMAP_PAGE_SIZE = 100;
 // 300) got reported as "not on the board" on 2026-07-29. Title and card-number
 // lookups now filter SERVER-side (below) so position stops mattering; this cap
 // only bounds unfiltered enumeration, and truncation is reported, never hidden.
-const ROADMAP_MAX_PAGES = 5;
+export const ROADMAP_MAX_PAGES = 5;
 const ROADMAP_TITLE_PROP = "Name";
 const ROADMAP_ID_PROP = "ID";
 

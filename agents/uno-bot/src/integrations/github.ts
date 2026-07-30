@@ -5,7 +5,7 @@
 // which fails-open because it's a preflight guard, not a user-facing read.
 
 import type { Env } from "../types";
-import { fetchWithTimeout } from "../http";
+import { countedFetch } from "../net";
 
 const GH_TIMEOUT_MS = 8000;
 const GH_TEXT_CAP = 12000; // keep a big file from blowing the model's budget
@@ -38,7 +38,7 @@ export async function githubReadPath(
   const url = `https://api.github.com/repos/${env.GITHUB_REPO}/contents/${clean}${qs}`;
 
   {
-    const res = await fetchWithTimeout(url, {
+    const res = await countedFetch(url, {
       headers: {
         authorization: `Bearer ${env.GITHUB_TOKEN}`,
         accept: "application/vnd.github+json",
@@ -88,7 +88,7 @@ export async function githubSearchCode(env: Env, query: string): Promise<GithubC
   }
   const q = `${query} repo:${env.GITHUB_REPO}`;
   const url = `https://api.github.com/search/code?q=${encodeURIComponent(q)}&per_page=10`;
-  const res = await fetchWithTimeout(url, {
+  const res = await countedFetch(url, {
     headers: {
       authorization: `Bearer ${env.GITHUB_TOKEN}`,
       accept: "application/vnd.github+json",

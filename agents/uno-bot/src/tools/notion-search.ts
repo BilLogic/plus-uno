@@ -96,16 +96,19 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
 
   try {
     if (scope === "team") {
-      const members = await findTeamMembers(env);
+      const { members, truncated } = await findTeamMembers(env);
       const anySlackIds = members.some((m) => m.slackUserId);
       return JSON.stringify({
         ok: true,
         scope: "team",
         count: members.length,
         members,
-        note: anySlackIds
-          ? "Match these people to the query using role + bio; present the best 2-4 with role + a one-line reason + LinkedIn. When a person has a slackUserId, @-mention as <@slackUserId>; otherwise name them."
-          : "Match these people to the query using role + bio; present the best 2-4 with role + reason + LinkedIn. No Slack handles — name who to contact, don't @-mention.",
+        complete: !truncated,
+        note:
+          (anySlackIds
+            ? "Match these people to the query using role + bio; present the best 2-4 with role + a one-line reason + LinkedIn. When a person has a slackUserId, @-mention as <@slackUserId>; otherwise name them."
+            : "Match these people to the query using role + bio; present the best 2-4 with role + reason + LinkedIn. No Slack handles — name who to contact, don't @-mention.") +
+          (truncated ? " This is the first page of the roster, not everyone — if nobody here fits, say you checked part of the roster rather than that nobody works on it." : ""),
       });
     }
 
@@ -126,12 +129,26 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
       count: hits.length,
       results: hits,
       note: hits.length
-        ? "Title-matched candidates from workspace search (pages + databases). Prefer a catalog scope (marketplace, help_tutors, decisions, …) when you know the surface — those are complete DB scans. To answer about one hit, source_read its url. Cite the page you used."
+        ? "Title-matched candidates from workspace search (pages + databases). Prefer a catalog scope (marketplace, help_tutors, decisions, …) when you know the surface — those read the database directly and report whether the read was complete. To answer about one hit, source_read its url. Cite the page you used."
         : "No pages matched workspace search. Try a catalog scope if you know the surface (marketplace / help_tutors / help_teachers / decisions / running_notes / news / …), or the page may not be shared with the bot's Notion integration (Connections). Say so; don't answer from memory.",
     });
   } catch (err) {
     return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
   }
+}
+
+/**
+ * The one sentence that states how much was actually read. Every scope says it
+ * the same way, because the failure this prevents is a partial read described as
+ * a complete one.
+ *
+ * @param rows - How many rows came back
+ * @param truncated - Whether the page budget ran out with rows still unread
+ */
+function scanClaim(rows: number, truncated: boolean): string {
+  return truncated
+    ? `Read the first ${rows} rows — there are more than could be read, so this is NOT the full set.`
+    : `Complete read of all ${rows} rows (not a keyword sample).`;
 }
 
 // ─── Catalog scopes — direct DB query + fuzzy title match ────────────────────
@@ -232,7 +249,6 @@ async function searchCatalogScope(
     label: cfg.label,
     count: results.length,
     scanned: rows.length,
-    complete: !truncated,
     results: results.map((r) => ({
       title: r.title,
       url: r.url,
@@ -242,11 +258,15 @@ async function searchCatalogScope(
     // A miss on a TRUNCATED read is not an absence — the row may sit past the
     // page budget. Saying "complete scan" there is how a real card came back as
     // "doesn't exist" on the Roadmap (2026-07-29); same sentence, same trap.
-    note: results.length
-      ? `${cfg.note} ${truncated ? `Read the first ${rows.length} rows — the DB has more than could be read, so this is not the whole catalog.` : `Complete scan of ${rows.length} rows (not a keyword sample).`} source_read a hit for full content; cite the page you used.`
-      : truncated
-        ? `No ${cfg.label} row matched '${query}' among the first ${rows.length} rows, BUT the DB was too large to read fully — do NOT say it doesn't exist. Say you couldn't find it and ask for the link or a distinctive word from its title. ${cfg.note}`
-        : `No ${cfg.label} row matched '${query}' (complete scan of ${rows.length} rows). Say so plainly — don't invent entries. ${cfg.note}`,
+    note: `${scanClaim(rows.length, truncated)} ${
+      results.length
+        ? "source_read a hit for full content; cite the page you used."
+        : `Nothing matched '${query}' — ${
+            truncated
+              ? "do NOT say it doesn't exist; say you couldn't find it and ask for the link or a distinctive word from its title."
+              : "say so plainly; don't invent entries."
+          }`
+    } ${cfg.note}`,
   });
 }
 
@@ -292,10 +312,11 @@ async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
       scope: "apps",
       count: 0,
       all_applications: apps.map((a) => a.name),
-      complete: !truncated,
-      note: truncated
-        ? `No application matched '${query}' among the first ${apps.length} rows, and the directory was too large to read fully — say you couldn't find it there rather than that it isn't in the directory. ${ROUTING_NOTE}`
-        : `No application matched '${query}'. The directory's names are listed — offer the closest ones, or say the tool isn't in the directory. ${ROUTING_NOTE}`,
+      note: `${scanClaim(apps.length, truncated)} Nothing matched '${query}' — ${
+        truncated
+          ? "say you couldn't find it in what you read, NOT that it isn't in the directory."
+          : "the names read are listed; offer the closest ones, or say the tool isn't in the directory."
+      } ${ROUTING_NOTE}`,
     });
   }
 
@@ -319,6 +340,8 @@ async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
       license_types: top.licenseTypes,
     },
     other_matches: matches.slice(1, 5).map((a) => ({ name: a.name, url: a.url, admins: a.admins })),
-    note: ROUTING_NOTE,
+    // Also caveat the HIT branch: "here's the directory" over a partial read is
+    // the same false-completeness claim as a miss over one.
+    note: `${scanClaim(apps.length, truncated)} ${ROUTING_NOTE}`,
   });
 }

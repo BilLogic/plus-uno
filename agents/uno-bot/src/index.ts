@@ -18,8 +18,10 @@ export default {
   // #uno-bot. Scheduled invocations get their own subrequest budget and a
   // 15-minute wall clock, so the poll runs here, not in a DO alarm.
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    // Metered like every other invocation: the poll fans out over Figma files
+    // under the same 50-subrequest cap, and would die the same silent way.
     ctx.waitUntil(
-      runFigmaPoll(env)
+      runMetered(() => runFigmaPoll(env))
         .then((r) => console.log(`[figma-poll] ${r.summary}`))
         .catch((err) => console.error(`[figma-poll] failed: ${err instanceof Error ? err.message : String(err)}`)),
     );
@@ -36,90 +38,90 @@ export default {
 };
 
 async function handleRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    const url = new URL(request.url);
+  const url = new URL(request.url);
 
-    if (request.method === "GET" && url.pathname === "/health") {
-      return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
-    }
+  if (request.method === "GET" && url.pathname === "/health") {
+    return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
+  }
 
-    // Gemini credential + reachability smoke test (dual-provider phase 1).
-    // Returns model, latency, auth mode, and a one-line sample — never secrets.
-    // Auth-gated: it triggers a live (billable) model call, so it must not be public.
-    if (request.method === "GET" && url.pathname === "/debug/gemini") {
-      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-      const mode = geminiConfigured(env);
-      if (!mode) {
-        return Response.json({ ok: false, error: "no Gemini credential configured (GEMINI_API_KEY or GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY)" });
-      }
-      const result = await geminiGenerate(env, {
-        prompt: "Reply with exactly: uno-bot gemini link ok",
-        maxTokens: 100,
-        thinkingLevel: "minimal",
-      });
-      return Response.json({ auth: mode, ...result, text: result.text?.slice(0, 100) });
+  // Gemini credential + reachability smoke test (dual-provider phase 1).
+  // Returns model, latency, auth mode, and a one-line sample — never secrets.
+  // Auth-gated: it triggers a live (billable) model call, so it must not be public.
+  if (request.method === "GET" && url.pathname === "/debug/gemini") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const mode = geminiConfigured(env);
+    if (!mode) {
+      return Response.json({ ok: false, error: "no Gemini credential configured (GEMINI_API_KEY or GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY)" });
     }
+    const result = await geminiGenerate(env, {
+      prompt: "Reply with exactly: uno-bot gemini link ok",
+      maxTokens: 100,
+      thinkingLevel: "minimal",
+    });
+    return Response.json({ auth: mode, ...result, text: result.text?.slice(0, 100) });
+  }
 
-    // Claude-on-Vertex credential + reachability smoke test. Confirms the
-    // service-account token reaches the Anthropic partner models before flipping
-    // MODEL_PROVIDER="vertex-claude". Auth-gated: it triggers a live (billable)
-    // model call, so it must not be public.
-    if (request.method === "GET" && url.pathname === "/debug/vertex-claude") {
-      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-      if (!claudeVertexConfigured(env)) {
-        return Response.json({ ok: false, error: "no Vertex-Claude credential (need GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID)" });
-      }
-      const model = env.CLAUDE_MODEL ?? MODELS.sonnet;
-      const result = await claudeVertexGenerate(env, {
-        model,
-        prompt: "Reply with exactly: uno-bot vertex-claude link ok",
-        maxTokens: 100,
-      });
-      return Response.json({ ...result, text: result.text?.slice(0, 100) });
+  // Claude-on-Vertex credential + reachability smoke test. Confirms the
+  // service-account token reaches the Anthropic partner models before flipping
+  // MODEL_PROVIDER="vertex-claude". Auth-gated: it triggers a live (billable)
+  // model call, so it must not be public.
+  if (request.method === "GET" && url.pathname === "/debug/vertex-claude") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    if (!claudeVertexConfigured(env)) {
+      return Response.json({ ok: false, error: "no Vertex-Claude credential (need GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID)" });
     }
+    const model = env.CLAUDE_MODEL ?? MODELS.sonnet;
+    const result = await claudeVertexGenerate(env, {
+      model,
+      prompt: "Reply with exactly: uno-bot vertex-claude link ok",
+      maxTokens: 100,
+    });
+    return Response.json({ ...result, text: result.text?.slice(0, 100) });
+  }
 
-    // One HEADLESS agent turn for evals + reasoning investigation. Runs the
-    // exact runAgent the Slack pipeline uses, but with a synthetic context and
-    // NO delivery: replies come back as JSON, proposals come back as data
-    // (nothing is staged or posted — staging/posting live a layer up in
-    // events.ts), and the preflight clarify-gate verdict is included so eval
-    // assertions see the same gating production applies. Multi-turn flows are
-    // driven by the CALLER passing history/pending back in (the DO is never
-    // touched). Auth-gated: every call is a live billable model run.
-    // Driven by scripts/run-evals.mjs; scenarios in docs/evals/.
-    if (request.method === "POST" && url.pathname === "/debug/eval") {
-      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-      return handleEvalTurn(request, env);
-    }
+  // One HEADLESS agent turn for evals + reasoning investigation. Runs the
+  // exact runAgent the Slack pipeline uses, but with a synthetic context and
+  // NO delivery: replies come back as JSON, proposals come back as data
+  // (nothing is staged or posted — staging/posting live a layer up in
+  // events.ts), and the preflight clarify-gate verdict is included so eval
+  // assertions see the same gating production applies. Multi-turn flows are
+  // driven by the CALLER passing history/pending back in (the DO is never
+  // touched). Auth-gated: every call is a live billable model run.
+  // Driven by scripts/run-evals.mjs; scenarios in docs/evals/.
+  if (request.method === "POST" && url.pathname === "/debug/eval") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    return handleEvalTurn(request, env);
+  }
 
-    // Manual firing of the Figma library poll (same code path as the cron).
-    // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
-    // Auth-gated: a live run posts to Slack and files a PRD.
-    if (request.method === "GET" && url.pathname === "/debug/figma-poll") {
-      if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-      const dryRun = url.searchParams.get("dry_run") === "1";
-      try {
-        const result = await runFigmaPoll(env, { dryRun });
-        return Response.json({ ok: true, build: BUILD, dryRun, ...result });
-      } catch (err) {
-        return Response.json({ ok: false, build: BUILD, dryRun, error: err instanceof Error ? err.message : String(err) });
-      }
+  // Manual firing of the Figma library poll (same code path as the cron).
+  // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
+  // Auth-gated: a live run posts to Slack and files a PRD.
+  if (request.method === "GET" && url.pathname === "/debug/figma-poll") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const dryRun = url.searchParams.get("dry_run") === "1";
+    try {
+      const result = await runFigmaPoll(env, { dryRun });
+      return Response.json({ ok: true, build: BUILD, dryRun, ...result });
+    } catch (err) {
+      return Response.json({ ok: false, build: BUILD, dryRun, error: err instanceof Error ? err.message : String(err) });
     }
+  }
 
-    if (request.method === "POST" && url.pathname === "/slack/events") {
-      return handleSlackEventsRequest(request, env, ctx);
-    }
+  if (request.method === "POST" && url.pathname === "/slack/events") {
+    return handleSlackEventsRequest(request, env, ctx);
+  }
 
-    // One-time Slack OAuth — issues the user token that slack_search needs
-    // (Slack's search Web API rejects bot tokens). Reads only; writes post as
-    // uno-bot via the bot token.
-    if (request.method === "GET" && url.pathname === "/oauth/slack/start") {
-      return startSlackOAuth(env);
-    }
-    if (request.method === "GET" && url.pathname === "/oauth/slack/callback") {
-      return handleSlackOAuthCallback(request, env);
-    }
+  // One-time Slack OAuth — issues the user token that slack_search needs
+  // (Slack's search Web API rejects bot tokens). Reads only; writes post as
+  // uno-bot via the bot token.
+  if (request.method === "GET" && url.pathname === "/oauth/slack/start") {
+    return startSlackOAuth(env);
+  }
+  if (request.method === "GET" && url.pathname === "/oauth/slack/callback") {
+    return handleSlackOAuthCallback(request, env);
+  }
 
-    return new Response("not found", { status: 404 });
+  return new Response("not found", { status: 404 });
 }
 
 // /debug/eval body: one turn of a (possibly multi-turn) eval conversation.

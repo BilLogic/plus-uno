@@ -7,7 +7,7 @@
 // not a wall, so a GitHub hiccup must not block legitimate implements.
 
 import type { Env } from "../types";
-import { fetchWithTimeout } from "../http";
+import { countedFetch } from "../net";
 
 const CACHE_TTL_MS = 10 * 60_000;
 const FETCH_TIMEOUT_MS = 8000;
@@ -21,7 +21,7 @@ export async function listDsComponents(env: Env): Promise<string[] | null> {
 
   const url = `https://api.github.com/repos/${env.GITHUB_REPO}/contents/design-system/src/components`;
   try {
-    const res = await fetchWithTimeout(url, {
+    const res = await countedFetch(url, {
       headers: {
         authorization: `Bearer ${env.GITHUB_TOKEN}`,
         accept: "application/vnd.github+json",

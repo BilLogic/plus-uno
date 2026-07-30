@@ -18,9 +18,9 @@
 //   missing hashes → store current hashes now, diff on the NEXT publish.
 
 import type { Env } from "./types";
-import { fetchWithTimeout } from "./http";
 import { postMessage } from "./slack/api";
 import { notionCreate, type CreatedPrd } from "./integrations/notion";
+import { countedFetch } from "./net";
 
 const FIGMA_API = "https://api.figma.com";
 const FETCH_TIMEOUT_MS = 15000;
@@ -85,7 +85,7 @@ async function figmaGet<T>(env: Env, endpoint: string): Promise<T> {
   for (let attempt = 0; attempt <= RETRIES; attempt++) {
     if (attempt > 0) await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
     try {
-      const res = await fetchWithTimeout(`${FIGMA_API}/v1${endpoint}`, {
+      const res = await countedFetch(`${FIGMA_API}/v1${endpoint}`, {
         headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
       }, FETCH_TIMEOUT_MS);
       if (res.ok) return (await res.json()) as T;

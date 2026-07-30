@@ -128,11 +128,11 @@ No structured fields for verbatim scripts, durations, counts, targets, or dates 
 
 ## 8 · Content depth (what's answerable today)
 
-Coverage is **very uneven**. Goal Setting is far deeper than everything else (6 paths, ~275 cells with evidence — roughly four times the next scenario); Warm-Up is a distant second; most scenarios are single-path and under 30 cells; several are under 10.
+Coverage is **very uneven**: Goal Setting is multi-path and far deeper than anything else, Warm-Up is a distant second, and most scenarios are single-path and thin.
 
-The rule this exists for: **a thin result is more often a content gap than a retrieval failure.** When a query returns two or three cells and the scenario is one of the shallow ones, say the blueprint doesn't cover it yet and route a `uno-maintain` intake — don't strain to synthesize an answer out of adjacent scenarios.
+The rule this exists for: **a thin result is more often a content gap than a retrieval failure.** A query that returns two or three cells in a shallow scenario means the blueprint doesn't cover it yet — say so and route a `uno-maintain` intake, rather than synthesizing an answer out of adjacent scenarios.
 
-**Judge depth from the rows you just read, not from a remembered ranking.** An earlier version of this section carried a baked per-scenario leaderboard; by the time anyone checked, it had the wrong path count for Warm-Up and had Discovery and Tech Setup in the opposite order — so it was teaching the bot to call a well-covered scenario thin. Row counts change on every blueprint write and this file only changes on deploy; anything numeric here is stale by construction. In-IDE, count it:
+**Judge depth from the rows you just read, not from a remembered ranking.** Row counts change on every blueprint write and this file only changes on deploy, so a leaderboard baked in here goes wrong quietly — the last one had a scenario's path count wrong and two scenarios in the opposite order, teaching the bot to call a well-covered scenario thin. In-IDE, count it:
 
 <!-- ide-only -->
 ```sql

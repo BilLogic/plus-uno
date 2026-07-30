@@ -205,6 +205,13 @@ const SOURCES: Source[] = [
   },
 ];
 
+/**
+ * Tables the keyword fallback fans out over — one subrequest each. Derived from
+ * SOURCES, not copied, so adding a table updates blueprint_search's worst-case
+ * bound in loop-shared automatically instead of silently exceeding it.
+ */
+export const BLUEPRINT_TABLE_FANOUT = SOURCES.length;
+
 async function searchViaTables(
   base: string,
   key: string,

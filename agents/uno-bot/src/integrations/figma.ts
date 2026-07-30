@@ -6,7 +6,7 @@
 // for the Slack proposal preview.
 
 import type { Env } from "../types";
-import { fetchWithTimeout } from "../http";
+import { countedFetch } from "../net";
 
 const FIGMA_API = "https://api.figma.com";
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
@@ -49,7 +49,7 @@ export async function fetchFigmaNode(
   if (!env.FIGMA_ACCESS_TOKEN) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
 
   const url = `${FIGMA_API}/v1/files/${fileKey}/nodes?ids=${encodeURIComponent(nodeId)}`;
-  const res = await fetchWithTimeout(url, {
+  const res = await countedFetch(url, {
     headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
   }, NODE_FETCH_TIMEOUT_MS);
   const data = (await res.json().catch(() => ({}))) as {
@@ -132,7 +132,7 @@ export async function fetchFigmaImagePngUrl(
   const url = `${FIGMA_API}/v1/images/${fileKey}?${params.toString()}`;
 
   try {
-    const res = await fetchWithTimeout(url, {
+    const res = await countedFetch(url, {
       headers: { "X-Figma-Token": env.FIGMA_ACCESS_TOKEN },
     }, IMAGE_FETCH_TIMEOUT_MS);
     if (!res.ok) {
