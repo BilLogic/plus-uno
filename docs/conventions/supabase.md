@@ -6,7 +6,9 @@
 
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`blueprint_search` / PostgREST) with layer/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
 - **Query at task time, never cache.** `docs/context/product/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
-- **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect; the shipped watchdog's blueprint-drift check (`docs/conventions/automations.md`) flags it, and any human spot of blueprint-vs-reality drift files a `uno-maintain` intake.
+- **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Detection is human today** — no automation reads Supabase, so nothing verifies the pair. The weekly shipped watchdog files a *verify-blueprint* intake per shipped journey card (`skills/uno-maintain/references/method.md` §6) but cannot confirm drift itself; any human spot files a `uno-maintain` intake.
+- Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
+- Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
 **Navigating it:** schema, layer semantics, path semantics, query recipes, and the scored answering rules live in `docs/conventions/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
 
@@ -26,8 +28,6 @@ Grounded in the UNO Blueprint Grounding Evaluation (Notion, 2026-07: six-arm con
 | Neither source | Abstain | "Not in the source" + name who should fill the gap. |
 
 Hard rules across all rows: **never merge two sources into one unattributed answer** — a conflict is surfaced, not blended; a fabricated blueprint citation is the worst outcome; blueprint feeds PRD drafting too (`skills/uno-synthesize` queries it for the current-state and downstream-effects sections before writing).
-- Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
-- Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
 ## Access & keys
 

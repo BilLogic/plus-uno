@@ -62,7 +62,7 @@ Two estates describe the product in **different languages**, and the words are N
 | | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
-| Its words | **phase** (Application · Onboarding · Pre-session · In-session · Post-session) · **service scenario** (Goal Setting, Call-off Request, Fill-in Request, Warm-Up, Wrap-Up, Session Sign Up, …) · **path** (Happy / Sad / Alternate / edge case) · **step** · **layer** = the actor row (Regular Tutor, Lead Tutor, Partner Action: Teacher, Front/Back Stage Actions, Front/Back Stage Tech, Support Actions, Visual) · **cell** = one activity at layer × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| Its words | **phase** (Application · Onboarding · Pre-session · In-session · Post-session) · **service scenario** (Goal Setting, Call-off Request, Fill-in Request, Warm-Up, Wrap-Up, Session Sign Up, …) · **path** (identified by NAME — `Happy Path`, `Set Goals`, `Update Goals Edge Case`, …; the `path_type` column carries only `happy` / `named` / `alternative` in practice, so it barely discriminates — see `blueprint-navigation.md` § Path semantics) · **step** · **layer** = the actor row (Regular Tutor, Lead Tutor, Partner Action: Teacher, Front/Back Stage Actions, Front/Back Stage Tech, Support Actions, Visual) · **cell** = one activity at layer × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
 | NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "layer", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
@@ -76,7 +76,7 @@ Two estates describe the product in **different languages**, and the words are N
 
 When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English:
 
-- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `layer` · `cell`, the path types `happy` / `alternative` / `unhappy` / `edge case`, and the layer (actor-row) names — `Regular Tutor`, `Lead Tutor`, `Partner Action: Teacher`, `Front Stage Actions`, `Back Stage Actions`, `Front Stage Tech`, `Back Stage Tech`, `Support Actions`, `Visual`.
+- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `layer` · `cell`, the path types `happy` / `named` / `alternative` (the values the board actually uses), and the layer (actor-row) names — `Regular Tutor`, `Lead Tutor`, `Partner Action: Teacher`, `Front Stage Actions`, `Back Stage Actions`, `Front Stage Tech`, `Back Stage Tech`, `Support Actions`, `Visual`.
 - **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
 
 Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `layer`"), not in ordinary prose ("a tutor joins the call").

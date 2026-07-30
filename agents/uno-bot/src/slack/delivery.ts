@@ -86,19 +86,33 @@ function capText(text: string): string {
 }
 
 // The retired confidence affix, killed deterministically instead of by prompt.
-// The persona has banned it since 2026-07-16 and the ban was re-worded twice
-// (r19, r21 — including removing the literal pattern from its own prohibition,
-// since printing the format taught it). It still resurfaced on rich multi-source
-// answers while the R1 eval stayed green, so wording is not a reliable control
-// here. Same precedent as the share-out bundle audit (ADR-019): when a surface
-// rule must hold on every model lane, enforce it in the renderer.
+// Banned in the persona since 2026-07-16 and re-worded twice (r19, r21) — it
+// still resurfaced while the R1 eval stayed green, so wording is not a reliable
+// control here (ADR-021). Precedent ADR-019: a surface rule that must hold on
+// every model lane belongs in the renderer.
 //
-// Only a TRAILING standalone label is stripped — confidence woven into prose is
-// the desired behavior and is left completely alone.
-const TRAILING_CONFIDENCE = /\n+\s*[_*]{0,2}\s*confidence\s*[:—–-][^\n]*?[_*]{0,2}\s*$/i;
+// Two deliberate narrowings, both learned in review:
+//  • Only a HIGH rating is stripped. The affix is the model's fallback when it
+//    did NOT weave a clause inline, so a trailing "low/medium — from memory,
+//    verify" is often the reply's ONLY calibration signal; deleting it would
+//    make the answer read more certain than the model was.
+//  • Horizontal-whitespace classes and a single leading \n — the first version
+//    nested \n+ with two \s* (which also match \n), giving ~O(n^4) backtracking
+//    on a run of trailing blank lines: 100 blank lines blew the 10ms Worker CPU
+//    limit, which posts nothing at all. Model output is shaped by fetched
+//    content, so that was reachable from a read.
+const TRAILING_CONFIDENCE =
+  /\n[^\S\n]*(?:[-•*][^\S\n]+)?[_*]{0,2}[^\S\n]*confidence[^\S\n]*[_*]{0,2}[^\S\n]*[:—–-][^\S\n]*[_*]{0,2}[^\S\n]*(?:very )?high(?![a-z])[^\n]*$/i;
 
-export function stripTrailingConfidence(text: string): string {
-  return text.replace(TRAILING_CONFIDENCE, "").trimEnd();
+function stripTrailingConfidence(text: string): string {
+  const trimmed = text.trimEnd();
+  const cleaned = trimmed.replace(TRAILING_CONFIDENCE, "").trimEnd();
+  // Log what was removed, so "stripped a decoration" stays distinguishable from
+  // "ate a line that mattered" when someone reads the tail.
+  if (cleaned !== trimmed) {
+    console.log(`[slack] stripped trailing confidence affix: ${trimmed.slice(cleaned.length).trim().slice(0, 120)}`);
+  }
+  return cleaned;
 }
 
 /**
@@ -114,7 +128,6 @@ export async function postTextVerified(
   text: string,
 ): Promise<{ ok: boolean; text: string }> {
   const cleaned = stripTrailingConfidence(text);
-  if (cleaned !== text.trimEnd()) console.log("[slack] stripped trailing confidence affix");
   const body = cleaned.trim()
     ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";

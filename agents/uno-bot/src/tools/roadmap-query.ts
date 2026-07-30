@@ -2,14 +2,23 @@
 // questions (status / owner / title lookups), replacing chains of weak
 // /v1/search calls that miss existing cards (live failures 2026-07-10) and
 // burn the free-tier subrequest budget. Queries the Roadmap database directly
-// (1-2 subrequests, complete result set) and does fuzzy title matching in the
-// Worker so vague descriptions come back as ranked "did you mean" candidates.
+// (server-side filtered for title / card-number asks, so a match is found
+// wherever it sits on the board) and ranks fuzzy title matches in the Worker so
+// vague descriptions come back as "did you mean" candidates. A partial read is
+// reported as partial — never as a complete scan.
 
 import type { Env } from "../types";
 import { queryRoadmapCards, type RoadmapCard } from "../integrations/notion";
 
 const MAX_ENUMERATION_ROWS = 30;
 const MAX_TITLE_CANDIDATES = 6;
+
+// Notion rejects an unknown filter property with a 400 validation_error; that —
+// not an empty result — is what a property rename looks like.
+function isFilterDriftError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /validation_error|Could not find property/i.test(msg);
+}
 
 function tokens(text: string): string[] {
   return Array.from(
@@ -48,19 +57,24 @@ export async function executeRoadmapQuery(
   try {
     // Title + card-number narrowing happens SERVER-side so a match is found
     // wherever it sits on the board (the tail used to be invisible — 2026-07-29).
-    // A filtered query that comes back empty is retried unfiltered, so a property
-    // rename degrades to the old scan instead of a false "no such card".
     const titleTokens = title ? tokens(title) : [];
-    let { rows: cards, truncated } = await queryRoadmapCards(env, {
-      ...(designStatus ? { designStatus } : {}),
-      ...(titleTokens.length ? { titleTokens } : {}),
-      ...(cardNumber !== null ? { cardNumber } : {}),
-    });
-    if (!cards.length && (titleTokens.length || cardNumber !== null)) {
-      ({ rows: cards, truncated } = await queryRoadmapCards(
-        env,
-        designStatus ? { designStatus } : {},
-      ));
+    let cards: RoadmapCard[];
+    let truncated: boolean;
+    try {
+      ({ rows: cards, truncated } = await queryRoadmapCards(env, {
+        designStatus,
+        titleTokens,
+        cardNumber,
+      }));
+    } catch (err) {
+      // A renamed property fails CLOSED — Notion 400s the filter, it does not
+      // return zero rows. So the drift fallback has to hang off the error, not
+      // off an empty result (an empty filtered result is a true absence: the
+      // server's case-insensitive `contains` is a superset of what scoreTitle
+      // could rank above zero, so a rescan would only re-find the same nothing).
+      if (!isFilterDriftError(err)) throw err;
+      console.warn("[roadmap] filter rejected — property names may have drifted; unfiltered rescan");
+      ({ rows: cards, truncated } = await queryRoadmapCards(env, { designStatus }));
       if (cardNumber !== null) cards = cards.filter((c) => c.card_number === cardNumber);
     }
 
@@ -74,10 +88,11 @@ export async function executeRoadmapQuery(
     let results: (RoadmapCard & { match_score?: number })[];
     let note: string;
     if (title) {
-      const qToks = tokens(title);
       results = cards
-        .map((c) => ({ ...c, match_score: Number(scoreTitle(qToks, title, c.title).toFixed(2)) }))
-        .filter((c) => (c.match_score ?? 0) > 0)
+        .map((c) => ({ ...c, match_score: Number(scoreTitle(titleTokens, title, c.title).toFixed(2)) }))
+        // An exact card-number hit is authoritative — don't drop it because the
+        // user's remembered title shares no word with the real one.
+        .filter((c) => (c.match_score ?? 0) > 0 || c.card_number === cardNumber)
         .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
         .slice(0, MAX_TITLE_CANDIDATES);
       note = results.length

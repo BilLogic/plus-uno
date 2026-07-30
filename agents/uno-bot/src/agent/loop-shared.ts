@@ -118,7 +118,11 @@ const READONLY_TOOL_COST: Record<string, number> = {
   blueprint_search: 6,
   delegate: 6,
   notion_search: 4,
-  roadmap_query: 4,
+  // 6, not 4: the Roadmap board outgrew a 2-page read, so a query now pages up
+  // to ROADMAP_MAX_PAGES (5) — plus the drift-fallback rescan in the rare error
+  // case. Under-pricing the one tool whose cost grew is how a turn sails past
+  // the gate and then dies mid-flight with no reply (the 👀-then-silence mode).
+  roadmap_query: 6,
   github_read: 4,
   slack_search: 3,
   slack_thread_read: 3,

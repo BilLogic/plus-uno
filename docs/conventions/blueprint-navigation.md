@@ -1,6 +1,6 @@
 # uno-blueprint — Navigation Guide
 
-<!-- canonical per ADR-017; vendored 2026-07-29 from the Notion "UNO Blueprint Navigation Guide" (the guided-arm context block of the UNO Blueprint Grounding Evaluation). The Notion page is the mirror; this file is the source the harness loads. Two rules were ADAPTED on vendoring — see § Answering rules. Companion: supabase.md (access, contract, source routing). -->
+<!-- canonical per ADR-017. Distilled 2026-07-29 — vendored from the Notion "UNO Blueprint Navigation Guide" (the guided-arm context block of the UNO Blueprint Grounding Evaluation). The Notion page is the mirror; this file is the source the harness loads, and it DIFFERS from the mirror on two rules (see § Answering rules 5–6) — the Notion page needs a superseded banner per staleness-sweep.md. Companion: supabase.md (access, contract, source routing). -->
 
 The eval that produced this guide: guided blueprint arms scored 100% vs 36% docs-only, and the top failure tag across un-guided arms was `nav-failure` (32), then `shallow-coverage` (23). This file is the fix for both — load it whenever answering a journey question or drafting from journey context.
 
@@ -44,11 +44,13 @@ Mis-attribution is the most common error (`schema-misread`). In the built-out sc
 
 ## 4 · Path semantics
 
-`path_type` ∈ `happy` / `unhappy` / `exception` / `alternative`. A scenario usually has a Happy Path plus alternatives for variants and edge cases — e.g. Goal Setting encodes the **Set → Check → Update** goal cycle as three paths, plus two edge cases where the dashboard state mismatches the cycle. **Establish which path a question is about before answering**; never merge happy + edge into one answer.
+**Don't trust the schema's enum — read the values.** `path_type` is declared `happy` / `unhappy` / `exception` / `alternative`, but the live board actually uses only three: `happy` (17 paths), `named` (5) and `alternative` (1) — `named` isn't in the declared set at all, and `unhappy`/`exception` are unused. So **read `paths.name`, not `path_type`**, to tell variants apart; the type column is close to non-discriminating.
+
+Goal Setting carries 6 paths: `Happy Path` plus the **Set → Check → Update** goal cycle (`Set Goals`, `Check Goals`, `Update Goals`) and two edge cases (`Set Goals Edge Case`, `Update Goals Edge Case`) where the dashboard state mismatches the cycle. **Establish which path a question is about before answering**; never merge a happy path and an edge case into one answer.
 
 ## 5 · Retrieval
 
-uno-bot has no SQL: it calls `blueprint_search` (semantic + keyword over these same rows), which returns `layer` / `step` / `scenario` per row — phrase the query in journey words (actor, scenario, step) rather than product-management words, and re-query per actor when a question spans layers. In-IDE, query Supabase directly with the recipes below.
+uno-bot has no SQL: it calls `blueprint_search` (semantic + keyword over these same rows), which returns `layer` / `step` / `scenario` per row — phrase the query in journey words (actor, scenario, step) rather than product-management words, and re-query per actor when a question spans layers. In-IDE, query Supabase directly — the repo copy of this file carries the query recipes.
 
 <!-- ide-only -->
 ### Query recipes (Supabase MCP / SQL)

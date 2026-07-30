@@ -275,11 +275,6 @@ interface DbQueryRow {
   }>;
 }
 
-// Callers that don't (yet) surface partial-scan state just take the rows.
-async function unwrapRows<T>(p: Promise<{ rows: T[]; truncated: boolean }>): Promise<T[]> {
-  return (await p).rows;
-}
-
 // Shared paginated database read: the API-key guard, AbortController/timer,
 // fixed-page loop, POST databases/{id}/query, error + has_more handling that
 // every catalog reader (apps / catalog scopes / roadmap) had copied verbatim.
@@ -294,7 +289,6 @@ async function queryDatabaseRows<T>(
   if (!databaseId) throw new Error("database id is empty");
   const out: T[] = [];
   let cursor: string | undefined;
-  let truncated = false;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
@@ -317,14 +311,14 @@ async function queryDatabaseRows<T>(
         const mapped = mapRow(r);
         if (mapped != null) out.push(mapped);
       }
-      if (!data.has_more || !data.next_cursor) break;
+      if (!data.has_more || !data.next_cursor) return { rows: out, truncated: false };
       cursor = data.next_cursor;
-      // Ran out of page budget with rows still unread: the caller MUST be told,
-      // or it will report a partial window as a complete scan (live miss
-      // 2026-07-29 — a card past row 200 was reported as "not on the board").
-      if (page === opts.maxPages - 1) truncated = true;
     }
-    return { rows: out, truncated };
+    // Fell out of the loop = page budget exhausted with rows still unread. The
+    // caller MUST be told, or it reports a partial window as a complete scan
+    // (live miss 2026-07-29 — a card past row 200 came back as "not on the
+    // board"). Structural, so a future edit can't drift an index comparison.
+    return { rows: out, truncated: true };
   } finally {
     clearTimeout(timer);
   }
@@ -332,7 +326,7 @@ async function queryDatabaseRows<T>(
 
 export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
   if (!env.NOTION_APPS_DB_ID) throw new Error("NOTION_APPS_DB_ID not configured");
-  return unwrapRows(queryDatabaseRows(
+  const { rows } = await queryDatabaseRows(
     env,
     env.NOTION_APPS_DB_ID,
     { maxPages: APPS_MAX_PAGES, pageSize: APPS_PAGE_SIZE, errorLabel: "third-party apps query failed" },
@@ -350,7 +344,8 @@ export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
         licenseTypes: (p["License Type"]?.multi_select ?? []).map((o) => o.name ?? "").filter(Boolean),
       };
     },
-  ));
+  );
+  return rows;
 }
 
 // ─── Generic catalog DB query (notion_search scoped catalogs) ────────────────
@@ -417,7 +412,7 @@ export async function queryCatalogDatabase(
   databaseId: string,
   opts: { skipTitleNames?: string[] } = {},
 ): Promise<CatalogRow[]> {
-  return unwrapRows(queryDatabaseRows(
+  const { rows } = await queryDatabaseRows(
     env,
     databaseId,
     { maxPages: CATALOG_MAX_PAGES, pageSize: CATALOG_PAGE_SIZE, errorLabel: "catalog query failed" },
@@ -433,7 +428,8 @@ export async function queryCatalogDatabase(
         meta: catalogMeta(props),
       };
     },
-  ));
+  );
+  return rows;
 }
 
 /**
@@ -1257,8 +1253,10 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
 // by its literal title. Status/title/person questions about the Roadmap need
 // EXACT and COMPLETE answers, so this queries the Roadmap database directly
 // (classic databases/{id}/query, version 2022-06-28) and matches in the Worker.
-// One page of 100 cards ≈ one subrequest (two max) — far cheaper than a chain
-// of search calls on the free-tier 50-subrequest budget.
+// One page of 100 cards ≈ one subrequest, up to ROADMAP_MAX_PAGES — still far
+// cheaper than a chain of search calls on the free-tier 50-subrequest budget.
+// Title / card-number asks filter server-side, so they cost 1 page, not 5;
+// keep READONLY_TOOL_COST.roadmap_query in loop-shared.ts in step with this.
 
 export interface RoadmapCard {
   title: string;
@@ -1297,9 +1295,16 @@ function roadmapFilter(opts: {
     clauses.push({ property: "Design Status", status: { equals: opts.designStatus } });
   }
   if (opts.cardNumber != null) {
+    // A card number is a unique key — ANDing a half-remembered title against it
+    // can only subtract, so it wins alone and scoreTitle ranks locally.
     clauses.push({ property: ROADMAP_ID_PROP, unique_id: { equals: opts.cardNumber } });
+    return clauses.length === 1 ? clauses[0] : { and: clauses };
   }
-  const toks = (opts.titleTokens ?? []).slice(0, 6);
+  // Longest-first, NOT first-six: tokens() keeps every word ≥3 chars in the
+  // user's word order, so slicing by position spends the budget on "the / one /
+  // about" and drops the proper noun that actually discriminates — which left
+  // the named card invisible while adjacent ones matched.
+  const toks = [...(opts.titleTokens ?? [])].sort((a, b) => b.length - a.length).slice(0, 6);
   if (toks.length) {
     clauses.push({
       or: toks.map((t) => ({ property: ROADMAP_TITLE_PROP, title: { contains: t } })),

@@ -75,6 +75,17 @@ const assembled = parts
   })
   .join("");
 
+// stripIdeOnly needs a MATCHED pair — an unbalanced or misspelled marker simply
+// doesn't match, and the IDE-only block ships into the system prompt silently.
+// Fail the build instead: a surviving marker proves something didn't strip.
+if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
+  console.error(
+    "[bundle-harness] an <!-- ide-only --> marker survived assembly — unbalanced or misspelled pair. " +
+      "IDE-only content would ship in the bot prompt. Fix the markers and re-run.",
+  );
+  process.exit(1);
+}
+
 const outDir = path.join(here, "..", "src", "generated");
 mkdirSync(outDir, { recursive: true });
 const outFile = path.join(outDir, "harness.ts");
