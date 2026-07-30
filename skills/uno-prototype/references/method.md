@@ -31,8 +31,9 @@ link or approved inline draft. Never invent requirements to fill the gap.
 building: PRD check → PRD upload/verify → the Step 2 reflection (goal →
 artifact, asked open-ended first then as a recommendation → fidelity →
 exclusions) → **brief-card confirmation**. One question per message, never
-batched; **no step may be skipped** — a PRD or strategy stated in an earlier
-message only rephrases the current step as verification. The confirmed brief
+batched; **no step may be skipped** — but a step the conversation has already
+answered is rendered as a one-tap confirm of that answer (cite where it came
+from), never re-asked cold. Verification, not re-interview. The confirmed brief
 card (goal · artifact · fidelity · won't-include) is the **contract** carried
 into planning, generation, and the validation loop. Plus Design System is
 always applied and is never asked. This written sequence is the contract; any
@@ -41,10 +42,12 @@ runtime that can ask a question can run it. IDE hook runtimes automate it
 itself, in order, and skips nothing.
 
 <!-- ide-only -->
-**Hook automation (Cursor + Claude Code).** Cursor enforces the sequence at
-prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`; Claude Code via
-`.claude/settings.json` → `.cursor/hooks/uno-prototype/claude-code-run.mjs`
-(one data-driven FSM in `.cursor/hooks/uno-prototype/` backs both — stateless
+**Hook automation (Cursor · Claude Code · Codex).** Cursor enforces the sequence
+at prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`; Claude Code
+via `.claude/settings.json` and Codex via `.codex/hooks.json` (Codex shares
+Claude Code's hook events and stdin shape), both running
+`.cursor/hooks/uno-prototype/claude-code-run.mjs`
+(one data-driven FSM in `.cursor/hooks/uno-prototype/` backs all three — stateless
 per message, scoped by `conversation_id`). The hook re-prompts each step until
 satisfied and writes `.cursor/hooks/briefings/active-intake-question.json` each
 turn; the agent renders only that file's current step (`stateId`/`type`/

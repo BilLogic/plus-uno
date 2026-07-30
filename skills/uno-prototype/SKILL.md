@@ -71,15 +71,19 @@ the Step 2 reflection gates `reflect_learn`, `reflect_artifact_open`,
 `reflect_artifact`, `reflect_fidelity`, `reflect_exclude`, `reflect_confirm`.
 **The sequence is the contract; the hook is an accelerator.** Two ways to run it:
 
-- **Hook-gated** (Cursor, Claude Code): `.cursor/hooks/briefings/active-intake-question.json`
-  exists and owns the state. Render the **current** step (the file's
-  `stateId` / `type` tell you which), per the numbered rules below.
-- **Manual** (any other runtime — Codex, Windsurf, Antigravity, headless): no
-  JSON appears. Run the SAME eight steps yourself, in order, one question per
+- **Hook-gated** (Cursor · Claude Code · Codex — adapters in `.cursor/hooks.json`,
+  `.claude/settings.json`, `.codex/hooks.json`; one FSM backs all three):
+  `.cursor/hooks/briefings/active-intake-question.json` exists and owns the
+  state. Render the **current** step (the file's `stateId` / `type` tell you
+  which), per the numbered rules below.
+- **Manual** (any runtime without a wired adapter — Antigravity and Windsurf
+  until theirs land, headless runs, or a hook that failed to fire): no JSON
+  appears. Run the SAME eight steps yourself, in order, one question per
   message, tracking your own position. Every numbered rule below still applies —
   read "the JSON's field" as "the step you are on". Do not refuse to proceed
   because the hook is absent; the hook automates this procedure, it does not
-  own it.
+  own it. Either path delivers the same intake — same steps, same order, same
+  brief-card contract.
 
 Throughout, "AskQuestion" means your runtime's ask-the-user tool —
 `AskUserQuestion` in Claude Code, `AskQuestion` in Cursor; a runtime without
@@ -101,9 +105,14 @@ such a tool asks the same single question in plain text.
    with the question, and mention once that saying **back** revises an earlier
    answer — this is prototyping *with* the designer; nothing locks until the
    brief is confirmed.
-4. **Never skip a step.** Even when the user's message already contains a PRD or
-   an obvious strategy, still ask the current gate step. Do not auto-advance and
-   do not batch the reflection questions.
+4. **Never skip a step — but never re-interview either.** When the conversation
+   already answers the current step (a pasted PRD names the goal, the ask names
+   the artifact, an earlier message sets fidelity), **render that answer as the
+   recommended option and ask to confirm** — quote where it came from ("your PRD's
+   Goals section says X — confirm?"). The step still fires, the designer still
+   rules on it, but a pre-answered step costs one tap, not a fresh question.
+   Reason from the whole context window; only ask cold when the context is
+   genuinely silent. Do not auto-advance past the confirm and do not batch steps.
 5. **Forbidden during intake:** batching steps into one AskQuestion; loading
    `method.md`; building; or previewing later steps beyond the flow map.
    (Grounding + the Step 1 Understand summary are expected *before* answering
