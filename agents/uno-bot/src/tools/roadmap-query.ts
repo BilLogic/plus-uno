@@ -46,11 +46,24 @@ export async function executeRoadmapQuery(
   }
 
   try {
-    let cards = await queryRoadmapCards(env, designStatus ? { designStatus } : {});
-
-    if (cardNumber !== null) {
-      cards = cards.filter((c) => c.card_number === cardNumber);
+    // Title + card-number narrowing happens SERVER-side so a match is found
+    // wherever it sits on the board (the tail used to be invisible — 2026-07-29).
+    // A filtered query that comes back empty is retried unfiltered, so a property
+    // rename degrades to the old scan instead of a false "no such card".
+    const titleTokens = title ? tokens(title) : [];
+    let { rows: cards, truncated } = await queryRoadmapCards(env, {
+      ...(designStatus ? { designStatus } : {}),
+      ...(titleTokens.length ? { titleTokens } : {}),
+      ...(cardNumber !== null ? { cardNumber } : {}),
+    });
+    if (!cards.length && (titleTokens.length || cardNumber !== null)) {
+      ({ rows: cards, truncated } = await queryRoadmapCards(
+        env,
+        designStatus ? { designStatus } : {},
+      ));
+      if (cardNumber !== null) cards = cards.filter((c) => c.card_number === cardNumber);
     }
+
     if (person) {
       const p = person.toLowerCase();
       cards = cards.filter((c) =>
@@ -68,12 +81,17 @@ export async function executeRoadmapQuery(
         .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
         .slice(0, MAX_TITLE_CANDIDATES);
       note = results.length
-        ? "Ranked title candidates from the live Roadmap board (complete scan, not a keyword sample). If the top hit clearly matches, answer from it and cite its link; if it's ambiguous, offer the top few as 'did you mean' WITH their links — never dead-end asking for a link without suggesting candidates."
-        : "No Roadmap card resembles that title (this was a complete scan of the board, not a search miss). Say so plainly, and offer the closest-status alternatives only if helpful.";
+        ? "Ranked title candidates from the live Roadmap board (the whole board was searched for these words, not a keyword sample). If the top hit clearly matches, answer from it and cite its link; if it's ambiguous, offer the top few as 'did you mean' WITH their links — never dead-end asking for a link without suggesting candidates."
+        : truncated
+          ? "No match among the cards read, BUT the board was too large to read fully — do NOT say the card doesn't exist. Say you couldn't find it and ask for the link or a distinctive word from its title."
+          : "No Roadmap card resembles that title (the whole board was searched for those words, so this is a real absence, not a search miss). Say so plainly — and if the thing they named might be a doc rather than a card, check the docs before concluding.";
     } else {
       results = cards.slice(0, MAX_ENUMERATION_ROWS);
       note =
-        "Complete result set from the live Roadmap board — safe to enumerate as the full answer. Cite the board and link cards you name." +
+        (truncated
+          ? "PARTIAL result set — the board has more rows than could be read. Say the list is partial; never present it as the whole board."
+          : "Complete result set from the live Roadmap board — safe to enumerate as the full answer.") +
+        " Cite the board and link cards you name." +
         (cards.length > MAX_ENUMERATION_ROWS ? ` (${cards.length - MAX_ENUMERATION_ROWS} more rows truncated — say the list is the first ${MAX_ENUMERATION_ROWS}.)` : "");
     }
 
