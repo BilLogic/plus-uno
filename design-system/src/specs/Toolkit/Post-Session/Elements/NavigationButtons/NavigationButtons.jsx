@@ -43,7 +43,7 @@ const NavigationButtons = ({
         />
         {showSubmit ? (
             <Button
-                text="Submit reflection"
+                text="Submit"
                 style="primary"
                 fill="filled"
                 size="medium"

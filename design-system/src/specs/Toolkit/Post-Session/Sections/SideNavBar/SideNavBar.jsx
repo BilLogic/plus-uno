@@ -164,7 +164,11 @@ const SideNavBar = ({
                 <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                     <SideBarTab
                         text="Student Reflection"
-                        state={sectionState(onStudentStep, !sessionInfoDone && state === 'pre-student-add')}
+                        state={sectionState(
+                            /* Selected pill only when there is no student list yet */
+                            activeTab === 'student-reflection' && students.length === 0,
+                            !sessionInfoDone && state === 'pre-student-add',
+                        )}
                         trailingIcon={completeIcon(studentDone && !onStudentStep)}
                         onClick={() => onTabClick?.(students.length ? 'student-0' : 'student-reflection')}
                     />
@@ -178,6 +182,7 @@ const SideNavBar = ({
                             >
                                 <SideBarTab
                                     text={student.name}
+                                    /* Figma: active student = primary text only — never a selected pill */
                                     state={isActive ? 'active-text' : 'enabled'}
                                     trailingIcon={completeIcon(student.status === 'complete')}
                                     onClick={() => onTabClick?.(`student-${index}`)}

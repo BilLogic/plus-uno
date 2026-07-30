@@ -74,13 +74,11 @@ import Table from '@plus-ds/components/Table';
 import Badge from '@plus-ds/components/Badge';
 
 export default function MyContentBlock() {
-    const tableColumns = [
-        { key: 'name', label: 'Student Name' },
-        { key: 'status', label: 'Status' }
-    ];
-    
-    const tableData = [
-        { id: 1, name: 'John Doe', status: <Badge style="success" text="Active" /> }
+    // Table takes ARRAYS OF ARRAYS — `headers` / `rows`, not `columns` / `data`.
+    const tableHeaders = ['Student Name', 'Status'];
+
+    const tableRows = [
+        ['John Doe', <Badge style="success" text="Active" />]
     ];
 
     return (
@@ -89,9 +87,9 @@ export default function MyContentBlock() {
             actions={<button className="plus-btn plus-btn-primary">Add Row</button>}
         >
             {/* Use the PLUS Table component, do not write raw <table> tags */}
-            <Table 
-                columns={tableColumns} 
-                data={tableData} 
+            <Table
+                headers={tableHeaders}
+                rows={tableRows}
                 onRowClick={(row) => console.log('Clicked', row)}
             />
         </Card>

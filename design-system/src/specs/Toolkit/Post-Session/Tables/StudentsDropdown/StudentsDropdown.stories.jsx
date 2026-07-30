@@ -14,7 +14,6 @@ export default {
     title: 'Specs/Toolkit/Post-Session/Tables/Students Dropdown',
     component: StudentsDropdown,
     parameters: { layout: 'padded' },
-    tags: ['!dev', '!autodocs'],
 };
 
 /** Empty field. */

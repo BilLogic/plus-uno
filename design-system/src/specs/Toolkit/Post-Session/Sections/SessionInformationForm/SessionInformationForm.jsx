@@ -112,17 +112,6 @@ const SessionInformationForm = ({
     };
 
     /**
-     * @param {string} studentId
-     */
-    const handleStudentToggle = (studentId) => {
-        if (!onStudentSelectionChange) return;
-        const next = selectedStudentIds.includes(studentId)
-            ? selectedStudentIds.filter((id) => id !== studentId)
-            : [...selectedStudentIds, studentId];
-        onStudentSelectionChange(next);
-    };
-
-    /**
      * Prototype file pick — appends a sample Zoom file.
      */
     const handleChooseFile = () => {

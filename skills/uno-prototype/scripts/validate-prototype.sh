@@ -20,9 +20,13 @@ PASS=0
 WARN=0
 FAIL=0
 
-pass() { echo "  PASS  $1"; ((PASS++)); }
-warn() { echo "  WARN  $1"; ((WARN++)); }
-fail() { echo "  FAIL  $1"; ((FAIL++)); }
+# NB: `$((PASS+1))`, not `((PASS++))`. Post-increment evaluates to the OLD
+# value, so the first call returns 0 — which bash reads as a failed command, and
+# `set -e` above kills the script. Every prototype validation used to stop after
+# its first passing check and report success (flagged in PR #83).
+pass() { echo "  PASS  $1"; PASS=$((PASS + 1)); }
+warn() { echo "  WARN  $1"; WARN=$((WARN + 1)); }
+fail() { echo "  FAIL  $1"; FAIL=$((FAIL + 1)); }
 
 echo "Validating prototype: $PROJECT_DIR"
 echo "---"

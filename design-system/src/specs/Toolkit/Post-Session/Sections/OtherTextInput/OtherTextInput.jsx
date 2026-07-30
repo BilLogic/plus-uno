@@ -1,0 +1,64 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import Textarea from '@/components/forms-and-inputs/Textarea';
+
+/**
+ * Free-text follow-up when an "Other" option chip is selected
+ * (Figma Sections · Other Text Input `10807:115523`).
+ *
+ * @param {object} props
+ * @param {string} [props.label='Other (please specify)']
+ * @param {string} [props.placeholder='Tell us more…']
+ * @param {string} [props.value]
+ * @param {(event: React.ChangeEvent) => void} [props.onChange]
+ * @param {boolean} [props.required=true]
+ * @param {string} [props.id='other-text-input']
+ */
+const OtherTextInput = ({
+    label = 'Other (please specify)',
+    placeholder = 'Tell us more…',
+    value = '',
+    onChange,
+    required = true,
+    id = 'other-text-input',
+}) => (
+    <div
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-element-gap-xs)',
+            width: '100%',
+            maxWidth: '380px',
+        }}
+    >
+        <label
+            htmlFor={id}
+            className="body3-txt font-weight-semibold m-0"
+            style={{ color: 'var(--color-on-surface)' }}
+        >
+            {label}
+            {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
+        </label>
+        <Textarea
+            id={id}
+            name={id}
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder}
+            rows={1}
+            variant="short"
+            size="medium"
+        />
+    </div>
+);
+
+OtherTextInput.propTypes = {
+    label: PropTypes.string,
+    placeholder: PropTypes.string,
+    value: PropTypes.string,
+    onChange: PropTypes.func,
+    required: PropTypes.bool,
+    id: PropTypes.string,
+};
+
+export default OtherTextInput;

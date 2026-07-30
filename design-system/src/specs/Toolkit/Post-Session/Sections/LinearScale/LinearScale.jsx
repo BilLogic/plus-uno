@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Radio from '@/components/forms-and-inputs/Radio';
 
 /**
  * Five-point linear scale (Figma Sections · Linear Scale `10819:11602`).
- * Anchors sit beside a non-shrinking 1–5 radio row — labels wrap as phrases, not one letter per line.
+ * Fixed 445px shell: equal flex label columns + non-shrinking 1–5 radio row.
  *
  * @param {object} props
  * @param {number} [props.value=0]
@@ -23,79 +22,126 @@ const LinearScale = ({
     <div
         style={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             gap: 'var(--size-section-gap-md)',
             padding: 'var(--size-section-pad-y-sm) var(--size-section-pad-x-sm)',
             backgroundColor: 'var(--color-primary-state-08)',
             borderRadius: 'var(--size-section-radius-md, 12px)',
-            width: '100%',
-            maxWidth: '445px',
+            width: '445px',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
         }}
     >
-        <p
-            className="body2-txt m-0"
-            style={{
-                flex: '1 1 120px',
-                minWidth: '100px',
-                maxWidth: '160px',
-                color: 'var(--color-on-surface)',
-                lineHeight: 1.571,
-            }}
-        >
-            {lowLabel}
-        </p>
-
         <div
             style={{
                 display: 'flex',
-                gap: 'var(--size-section-gap-md)',
+                flex: '1 0 0',
                 alignItems: 'center',
-                flexShrink: 0,
+                justifyContent: 'center',
+                gap: 'var(--size-section-gap-lg, 24px)',
+                minWidth: 0,
             }}
-            role="radiogroup"
-            aria-label="Self reflection scale"
         >
-            {[1, 2, 3, 4, 5].map((option) => (
-                <div
-                    key={option}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 'var(--size-element-gap-sm)',
-                        width: '29px',
-                    }}
-                >
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                        {option}
-                    </span>
-                    <Radio
-                        id={`${name}-${option}`}
-                        name={name}
-                        value={String(option)}
-                        checked={value === option}
-                        onChange={() => onChange?.(option)}
-                        aria-label={String(option)}
-                        label=""
-                        size="small"
-                    />
-                </div>
-            ))}
-        </div>
+            <p
+                className="body2-txt m-0"
+                style={{
+                    flex: '1 0 0',
+                    minWidth: 0,
+                    color: 'var(--color-on-surface)',
+                    lineHeight: 1.571,
+                }}
+            >
+                {lowLabel}
+            </p>
 
-        <p
-            className="body2-txt m-0"
-            style={{
-                flex: '1 1 72px',
-                minWidth: '72px',
-                maxWidth: '120px',
-                color: 'var(--color-on-surface)',
-                lineHeight: 1.571,
-                textAlign: 'right',
-            }}
-        >
-            {highLabel}
-        </p>
+            <div
+                style={{
+                    display: 'flex',
+                    gap: 'var(--size-section-gap-md)',
+                    alignItems: 'center',
+                    flexShrink: 0,
+                }}
+                role="radiogroup"
+                aria-label="Self reflection scale"
+            >
+                {[1, 2, 3, 4, 5].map((option) => {
+                    const checked = value === option;
+                    return (
+                        <label
+                            key={option}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 'var(--size-element-gap-sm)',
+                                width: '29px',
+                                cursor: 'pointer',
+                                margin: 0,
+                            }}
+                        >
+                            <span className="body2-txt" style={{ color: 'var(--color-on-surface)', textAlign: 'center' }}>
+                                {option}
+                            </span>
+                            <span
+                                style={{
+                                    position: 'relative',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '12px',
+                                    height: '12px',
+                                    borderRadius: '999px',
+                                    border: '1px solid var(--color-primary)',
+                                    backgroundColor: checked
+                                        ? 'var(--color-surface)'
+                                        : 'var(--color-on-primary, #fff)',
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <input
+                                    type="radio"
+                                    name={name}
+                                    value={option}
+                                    checked={checked}
+                                    onChange={() => onChange?.(option)}
+                                    aria-label={String(option)}
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        opacity: 0,
+                                        margin: 0,
+                                        cursor: 'pointer',
+                                    }}
+                                />
+                                {checked && (
+                                    <span
+                                        aria-hidden="true"
+                                        style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            borderRadius: '999px',
+                                            backgroundColor: 'var(--color-primary)',
+                                        }}
+                                    />
+                                )}
+                            </span>
+                        </label>
+                    );
+                })}
+            </div>
+
+            <p
+                className="body2-txt m-0"
+                style={{
+                    flex: '1 0 0',
+                    minWidth: 0,
+                    color: 'var(--color-on-surface)',
+                    lineHeight: 1.571,
+                }}
+            >
+                {highLabel}
+            </p>
+        </div>
     </div>
 );
 

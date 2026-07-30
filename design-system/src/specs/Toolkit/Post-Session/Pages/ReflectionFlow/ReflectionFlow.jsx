@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
 import Rating from '@/components/forms-and-inputs/Rating';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 import { PageLayout } from '@/specs/Universal/Pages';
@@ -9,7 +8,7 @@ import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/Sessio
 import SessionReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionFormV2';
 import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
 import LinearScale from '@/specs/Toolkit/Post-Session/Sections/LinearScale/LinearScale';
-import SaveAndExitModal from '@/specs/Toolkit/Post-Session/Modals/SaveAndExitModal/SaveAndExitModal';
+import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
 import {
     FORM_RATING_COMMENTS,
@@ -55,12 +54,15 @@ function SelfReflectionStep({ data, onChange, onCancel, onSaveAndExit, onNext, o
                     rows={4}
                 />
             )}
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', marginTop: 'auto' }}>
-                <Button text="Previous" style="default" fill="tonal" onClick={onPrevious} />
-                <Button text="Cancel" style="default" fill="tonal" onClick={onCancel} />
-                <Button text="Save & Exit" style="primary" fill="tonal" disabled={rating < 1} onClick={onSaveAndExit} />
-                <Button text="Next" style="primary" fill="filled" disabled={rating < 1} onClick={onNext} />
-            </div>
+            <NavigationButtons
+                showPrevious
+                canSave={rating >= 1}
+                canNext={rating >= 1}
+                onPrevious={onPrevious}
+                onCancel={onCancel}
+                onSaveAndExit={onSaveAndExit}
+                onNext={onNext}
+            />
         </div>
     );
 }
@@ -109,12 +111,16 @@ function FormFeedbackStep({ data, onChange, onCancel, onSaveAndExit, onPrevious,
                 onChange={(event) => onChange({ ...data, notes: event.target.value })}
                 rows={4}
             />
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', marginTop: 'auto' }}>
-                <Button text="Previous" style="default" fill="tonal" onClick={onPrevious} />
-                <Button text="Cancel" style="default" fill="tonal" onClick={onCancel} />
-                <Button text="Save & Exit" style="primary" fill="tonal" disabled={rating < 1} onClick={onSaveAndExit} />
-                <Button text="Submit reflection" style="primary" fill="filled" disabled={rating < 1} onClick={onSubmit} />
-            </div>
+            <NavigationButtons
+                showPrevious
+                showSubmit
+                canSave={rating >= 1}
+                canNext={rating >= 1}
+                onPrevious={onPrevious}
+                onCancel={onCancel}
+                onSaveAndExit={onSaveAndExit}
+                onSubmit={onSubmit}
+            />
         </div>
     );
 }
@@ -387,14 +393,15 @@ const ReflectionFlow = ({
                 </div>
             </PageLayout>
 
-            <SaveAndExitModal
+            <ConfirmationPopUp
                 show={showSaveExit}
+                type="exit-without-saving"
                 onClose={() => setShowSaveExit(false)}
-                onExitWithoutSaving={() => {
+                onPrimary={() => {
                     setShowSaveExit(false);
                     onExit?.();
                 }}
-                onSaveAndExit={() => {
+                onSecondary={() => {
                     setShowSaveExit(false);
                     onExit?.();
                 }}

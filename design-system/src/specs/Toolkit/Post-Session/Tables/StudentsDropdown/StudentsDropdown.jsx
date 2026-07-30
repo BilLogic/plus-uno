@@ -132,13 +132,10 @@ const StudentsDropdown = ({
                                 <Badge
                                     key={id}
                                     text={student.name}
-                                    style="default"
+                                    style="secondary"
                                     size="b3"
                                     dismissible
-                                    onDismiss={(event) => {
-                                        event?.stopPropagation?.();
-                                        removeId(id);
-                                    }}
+                                    onDismiss={() => removeId(id)}
                                 />
                             );
                         })

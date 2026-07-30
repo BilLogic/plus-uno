@@ -1,0 +1,38 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as OtherTextInputStories from './OtherTextInput.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={OtherTextInputStories} name="Toolkit Docs — OtherTextInput" />
+
+<Title />
+
+Free-text follow-up shown when the **Other** option chip is selected in a Multi-Select Question
+(Figma: Other Text Input). Hidden by default; toggle on when Other is active.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10807-115523"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Sections/OtherTextInput"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Overview</code> story).</>}>
+    <Canvas of={OtherTextInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground of={OtherTextInputStories.Overview} />
+
+</div>
+
+</div>

@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button/Button';
-import Rating from '@/components/forms-and-inputs/Rating';
 import { PageLayout } from '@/specs/Universal/Pages';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
+import LinearScale from '@/specs/Toolkit/Post-Session/Sections/LinearScale/LinearScale';
+import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
+import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
 
-const selfRatingCommentsByValue = {
-    1: 'I have a lot to improve on.',
-    2: 'Not so well, there are things I should adjust.',
-    3: "Okay, I could've done better.",
-    4: 'Good, with some room for improvement.',
-    5: 'Excellent performance!',
-};
-
+/**
+ * Self Reflection page — unfilled (Linear Scale, not star rating).
+ *
+ * @param {object} props
+ * @param {{ name: string, status?: string }[]} [props.students]
+ * @param {string} [props.activeTab]
+ */
 const SelfReflectionUnfilled = ({
     students = [],
-    activeTab: initialActiveTab,
+    activeTab: initialActiveTab = 'self-reflection',
 }) => {
     const [activeTab, setActiveTab] = useState(initialActiveTab);
-    const [selfRating, setSelfRating] = useState(0);
+    const [rating, setRating] = useState(0);
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
@@ -47,7 +47,7 @@ const SelfReflectionUnfilled = ({
                     }}
                 >
                     <SideNavBar
-                        state="default"
+                        state="in-progress"
                         students={students}
                         activeTab={activeTab}
                         onTabClick={setActiveTab}
@@ -57,59 +57,36 @@ const SelfReflectionUnfilled = ({
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 'var(--size-section-gap-lg)',
+                            gap: 'var(--size-section-gap-md)',
                             flex: '1 0 0',
                             minHeight: 0,
+                            minWidth: 0,
                         }}
                     >
-                        <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
-                            Self Reflection: How do you think you did?
-                        </h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
+                            <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
+                                Self Reflection
+                            </h4>
+                            <LastUpdated />
+                        </div>
 
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 'var(--size-element-gap-lg)',
-                            }}
-                        >
-                            <p className="h6 m-0" style={{ color: 'var(--color-on-surface)' }}>
-                                How was your own performance during the session?
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                            <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
+                                How do you feel about your performance this session?
                                 <span style={{ color: 'var(--color-danger)' }}> *</span>
                             </p>
-
-                            <Rating
-                                id="self-reflection-rating"
-                                value={selfRating}
-                                onChange={setSelfRating}
-                                variant="comments"
-                                showCommentsLabel={Boolean(selfRatingCommentsByValue[selfRating])}
-                                commentsLabel={selfRatingCommentsByValue[selfRating] || null}
+                            <LinearScale
+                                name="self-reflection-rating"
+                                value={rating}
+                                onChange={setRating}
                             />
                         </div>
 
-                        {/* Navigation Buttons */}
-                        <div
-                            style={{
-                                display: 'flex',
-                                gap: 'var(--size-element-gap-lg)',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Button 
-                                text="Previous" 
-                                style="primary" 
-                                fill="tonal" 
-                                size="medium" 
-                            />
-                            <Button 
-                                text="Next" 
-                                style="primary" 
-                                fill="filled" 
-                                size="medium" 
-                                disabled
-                            />
-                        </div>
+                        <NavigationButtons
+                            showPrevious
+                            canSave={rating >= 1}
+                            canNext={rating >= 1}
+                        />
                     </div>
                 </div>
             </PageLayout>
@@ -118,23 +95,8 @@ const SelfReflectionUnfilled = ({
 };
 
 SelfReflectionUnfilled.propTypes = {
-    students: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            status: PropTypes.string,
-        })
-    ),
+    students: PropTypes.array,
     activeTab: PropTypes.string,
 };
 
-SelfReflectionUnfilled.defaultProps = {
-    students: [
-        { name: 'Kiera Wintervale', status: 'complete' },
-        { name: 'Baxter Ellington', status: 'complete' },
-        { name: 'Milo Thorne', status: 'complete' },
-    ],
-    activeTab: 'self-reflection',
-};
-
 export default SelfReflectionUnfilled;
-

@@ -28,7 +28,7 @@ Storybook sidebar order matches Figma: **Overview → Elements → Cards → Tab
 | Figma | Node | Storybook |
 |---|---|---|
 | Table / Reflections | `1751:176973` | Tables / Reflections |
-| Students Dropdown | `20:24325` | Session Information Form (multi-select) |
+| Students Dropdown | `20:24325` | Tables / Students Dropdown |
 
 ## Modals (`1721:118454`)
 
