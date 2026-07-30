@@ -8,7 +8,7 @@ const SAMPLE_STUDENTS = [
 ];
 
 export default {
-    title: 'Specs/Toolkit/Post-Session/Sections/Session Information Form',
+    title: 'Specs/Toolkit/Post-Session/Pages/Session Info',
     component: SessionInformationForm,
     parameters: {
         layout: 'padded',

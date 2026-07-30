@@ -1,0 +1,30 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as UploadFilesStories from './UploadFiles.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={UploadFilesStories} name="Toolkit Docs — UploadFiles" />
+
+<Title />
+
+Upload session recording — **empty** · **filled** · **no recording**.
+Primary: Upload Folder (filled small). Secondary: Choose a file (tonal small).
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=7486-93070"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Elements/UploadFiles"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>All three states on one page.</>}>
+    <Canvas of={UploadFilesStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

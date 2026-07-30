@@ -1,138 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import Rating from '@/components/forms-and-inputs/Rating';
-import Textarea from '@/components/forms-and-inputs/Textarea';
 import { PageLayout } from '@/specs/Universal/Pages';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
 import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/SessionInformationForm/SessionInformationForm';
 import SessionReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionFormV2';
 import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
-import LinearScale from '@/specs/Toolkit/Post-Session/Sections/LinearScale/LinearScale';
-import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
+import SelfReflectionForm from '@/specs/Toolkit/Post-Session/Sections/SelfReflectionForm/SelfReflectionForm';
+import FormFeedbackForm from '@/specs/Toolkit/Post-Session/Sections/FormFeedbackForm/FormFeedbackForm';
 import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
-import {
-    FORM_RATING_COMMENTS,
-    formatLastUpdated,
-} from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 const DEFAULT_STUDENTS = [
     { id: 'kiera', name: 'Kiera Wintervale', status: 'incomplete' },
     { id: 'baxter', name: 'Baxter Ellington', status: 'incomplete' },
     { id: 'milo', name: 'Milo Thorne', status: 'incomplete' },
 ];
-
-/**
- * Self reflection step body.
- *
- * @param {object} props
- */
-function SelfReflectionStep({ data, onChange, onCancel, onSaveAndExit, onNext, onPrevious }) {
-    const rating = data.rating || 0;
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Self Reflection</h4>
-                <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{formatLastUpdated()}</p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    How do you feel about your performance this session?
-                    <span style={{ color: 'var(--color-danger)' }}> *</span>
-                </p>
-                <LinearScale
-                    name="self-reflection-rating"
-                    value={rating}
-                    onChange={(value) => onChange({ ...data, rating: value })}
-                />
-            </div>
-            {rating > 0 && (
-                <Textarea
-                    id="self-reflection-notes"
-                    label="Anything else you’d like to note?"
-                    value={data.notes || ''}
-                    onChange={(event) => onChange({ ...data, notes: event.target.value })}
-                    rows={4}
-                />
-            )}
-            <NavigationButtons
-                showPrevious
-                canSave={rating >= 1}
-                canNext={rating >= 1}
-                onPrevious={onPrevious}
-                onCancel={onCancel}
-                onSaveAndExit={onSaveAndExit}
-                onNext={onNext}
-            />
-        </div>
-    );
-}
-
-SelfReflectionStep.propTypes = {
-    data: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    onSaveAndExit: PropTypes.func,
-    onNext: PropTypes.func,
-    onPrevious: PropTypes.func,
-};
-
-/**
- * Form feedback step body.
- *
- * @param {object} props
- */
-function FormFeedbackStep({ data, onChange, onCancel, onSaveAndExit, onPrevious, onSubmit }) {
-    const rating = data.rating || 0;
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Form Feedback</h4>
-                <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{formatLastUpdated()}</p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    How was this reflection form?
-                    <span style={{ color: 'var(--color-danger)' }}> *</span>
-                </p>
-                <Rating
-                    id="form-feedback-rating"
-                    value={rating}
-                    onChange={(value) => onChange({ ...data, rating: value })}
-                    icon="thumbs-up"
-                    variant="comments"
-                    showCommentsLabel={rating > 0}
-                    commentsLabel={FORM_RATING_COMMENTS[rating]}
-                />
-            </div>
-            <Textarea
-                id="form-feedback-notes"
-                label="Any feedback on the reflection experience?"
-                value={data.notes || ''}
-                onChange={(event) => onChange({ ...data, notes: event.target.value })}
-                rows={4}
-            />
-            <NavigationButtons
-                showPrevious
-                showSubmit
-                canSave={rating >= 1}
-                canNext={rating >= 1}
-                onPrevious={onPrevious}
-                onCancel={onCancel}
-                onSaveAndExit={onSaveAndExit}
-                onSubmit={onSubmit}
-            />
-        </div>
-    );
-}
-
-FormFeedbackStep.propTypes = {
-    data: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    onSaveAndExit: PropTypes.func,
-    onPrevious: PropTypes.func,
-    onSubmit: PropTypes.func,
-};
 
 /**
  * Full post-session reflection flow orchestrator (PageLayout + side nav + step content).
@@ -144,7 +25,9 @@ FormFeedbackStep.propTypes = {
  * @param {object} [props.initialSessionInfo]
  * @param {() => void} [props.onExit]
  * @param {() => void} [props.onSubmitted]
- * @param {boolean} [props.showSaveAndExitOnMount=false] - Story helper for Save & Exit modal state
+ * @param {boolean} [props.showSaveAndExitOnMount=false]
+ * @param {boolean} [props.showSelfReflection=true] - Cadence flag (session_count % 10 == 5)
+ * @param {boolean} [props.showFormFeedback=true] - Cadence flag (≤ once / 3 weeks)
  */
 const ReflectionFlow = ({
     students: studentsProp = DEFAULT_STUDENTS,
@@ -153,6 +36,8 @@ const ReflectionFlow = ({
     onExit,
     onSubmitted,
     showSaveAndExitOnMount = false,
+    showSelfReflection = true,
+    showFormFeedback = true,
 }) => {
     const [students, setStudents] = useState(studentsProp);
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -162,25 +47,29 @@ const ReflectionFlow = ({
     const [selfReflection, setSelfReflection] = useState({});
     const [formFeedback, setFormFeedback] = useState({});
     const [completedSections, setCompletedSections] = useState({});
+    const [draftSnapshot, setDraftSnapshot] = useState(null);
     const [showSaveExit, setShowSaveExit] = useState(showSaveAndExitOnMount);
     const [submitted, setSubmitted] = useState(false);
+    const [cancelled, setCancelled] = useState(Boolean(initialSessionInfo.didNotHappen));
 
     const selectedStudentIndex = activeTab.startsWith('student-')
         ? Number(activeTab.replace('student-', ''))
         : 0;
 
     const completedStudents = useMemo(
-        () => students.every((student) => student.status === 'complete'),
+        () => students.length > 0 && students.every((student) => student.status === 'complete'),
         [students],
     );
 
-    const canSubmit = Boolean(
-        completedSections['session-information']
-        && completedStudents
-        && completedSections['session-reflection']
-        && completedSections['self-reflection']
-        && completedSections['form-feedback'],
-    );
+    const canSubmit = cancelled
+        ? Boolean(completedSections.cancellation)
+        : Boolean(
+            completedSections['session-information']
+            && completedStudents
+            && completedSections['session-reflection']
+            && (!showSelfReflection || completedSections['self-reflection'])
+            && (!showFormFeedback || completedSections['form-feedback']),
+        );
 
     /**
      * @param {string} section
@@ -199,16 +88,61 @@ const ReflectionFlow = ({
     };
 
     /**
-     * Opens Save & Exit confirmation.
+     * Opens Save & Exit confirmation, optionally capturing a draft snapshot.
+     *
+     * @param {object} [data]
      */
-    const openSaveExit = () => setShowSaveExit(true);
+    const openSaveExit = (data) => {
+        if (data) setDraftSnapshot(data);
+        setShowSaveExit(true);
+    };
 
     /**
-     * Advances after Session Information.
+     * Persists in-memory draft then exits (Save & Exit path).
+     */
+    const handleSaveAndExitConfirm = () => {
+        if (draftSnapshot) {
+            if (activeTab === 'session-information') setSessionInfo(draftSnapshot);
+            else if (activeTab.startsWith('student-')) {
+                const student = students[selectedStudentIndex];
+                if (student) {
+                    setStudentReflections((prev) => ({
+                        ...prev,
+                        [student.id || student.name]: draftSnapshot,
+                    }));
+                }
+            } else if (activeTab === 'session-reflection') setSessionReflection(draftSnapshot);
+            else if (activeTab === 'self-reflection') setSelfReflection(draftSnapshot);
+            else if (activeTab === 'form-feedback') setFormFeedback(draftSnapshot);
+        }
+        setShowSaveExit(false);
+        setDraftSnapshot(null);
+        onExit?.({ saved: true, draft: draftSnapshot });
+    };
+
+    /**
+     * Discards unsaved changes and exits.
+     */
+    const handleExitWithoutSaving = () => {
+        setShowSaveExit(false);
+        setDraftSnapshot(null);
+        onExit?.({ saved: false });
+    };
+
+    /**
      * @param {object} data
      */
     const handleSessionInfoNext = (data) => {
         setSessionInfo(data);
+        if (data.didNotHappen) {
+            setCancelled(true);
+            markComplete('cancellation');
+            markComplete('session-information');
+            setSubmitted(true);
+            onSubmitted?.({ cancelled: true, data });
+            return;
+        }
+        setCancelled(false);
         markComplete('session-information');
         setActiveTab(students.length ? 'student-0' : 'session-reflection');
     };
@@ -235,28 +169,47 @@ const ReflectionFlow = ({
     const handleSessionReflectionNext = (data) => {
         setSessionReflection(data);
         markComplete('session-reflection');
-        setActiveTab('self-reflection');
+        if (showSelfReflection) {
+            setActiveTab('self-reflection');
+        } else if (showFormFeedback) {
+            setActiveTab('form-feedback');
+        } else {
+            setSubmitted(true);
+            onSubmitted?.({ data: { sessionReflection: data } });
+        }
     };
 
     /**
-     * Completes self reflection and moves to form feedback.
+     * @param {object} data
      */
-    const handleSelfNext = () => {
+    const handleSelfNext = (data) => {
+        setSelfReflection(data);
         markComplete('self-reflection');
-        setActiveTab('form-feedback');
+        if (showFormFeedback) {
+            setActiveTab('form-feedback');
+        } else {
+            setSubmitted(true);
+            onSubmitted?.({ data: { selfReflection: data } });
+        }
     };
 
     /**
-     * Final submit of the in-memory reflection.
+     * @param {object} data
      */
-    const handleSubmit = () => {
+    const handleSubmit = (data) => {
+        if (data) setFormFeedback(data);
         markComplete('form-feedback');
         setSubmitted(true);
-        onSubmitted?.();
+        onSubmitted?.({
+            sessionInfo,
+            studentReflections,
+            sessionReflection,
+            selfReflection,
+            formFeedback: data || formFeedback,
+        });
     };
 
     /**
-     * Renders the active step panel.
      * @returns {React.ReactNode}
      */
     const renderStep = () => {
@@ -273,11 +226,8 @@ const ReflectionFlow = ({
                         );
                     }}
                     onSave={handleSessionInfoNext}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={(data) => {
-                        setSessionInfo(data);
-                        openSaveExit();
-                    }}
+                    onCancel={() => openSaveExit()}
+                    onSaveAndExit={(data) => openSaveExit(data)}
                 />
             );
         }
@@ -294,12 +244,8 @@ const ReflectionFlow = ({
                     key={studentKey}
                     studentName={student.name}
                     initialData={studentReflections[studentKey] || {}}
-                    aiState={studentReflections[studentKey]?.goalProgress?.length ? 'ready' : 'idle'}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={(data) => {
-                        setStudentReflections((prev) => ({ ...prev, [studentKey]: data }));
-                        openSaveExit();
-                    }}
+                    onCancel={() => openSaveExit()}
+                    onSaveAndExit={(data) => openSaveExit(data)}
                     onNext={handleStudentNext}
                 />
             );
@@ -309,37 +255,32 @@ const ReflectionFlow = ({
             return (
                 <SessionReflectionFormV2
                     initialData={sessionReflection}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={(data) => {
-                        setSessionReflection(data);
-                        openSaveExit();
-                    }}
+                    onCancel={() => openSaveExit()}
+                    onSaveAndExit={(data) => openSaveExit(data)}
                     onNext={handleSessionReflectionNext}
                 />
             );
         }
 
-        if (activeTab === 'self-reflection') {
+        if (activeTab === 'self-reflection' && showSelfReflection) {
             return (
-                <SelfReflectionStep
-                    data={selfReflection}
-                    onChange={setSelfReflection}
+                <SelfReflectionForm
+                    initialData={selfReflection}
                     onPrevious={() => setActiveTab('session-reflection')}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={openSaveExit}
+                    onCancel={() => openSaveExit()}
+                    onSaveAndExit={(data) => openSaveExit(data)}
                     onNext={handleSelfNext}
                 />
             );
         }
 
-        if (activeTab === 'form-feedback') {
+        if (activeTab === 'form-feedback' && showFormFeedback) {
             return (
-                <FormFeedbackStep
-                    data={formFeedback}
-                    onChange={setFormFeedback}
-                    onPrevious={() => setActiveTab('self-reflection')}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={openSaveExit}
+                <FormFeedbackForm
+                    initialData={formFeedback}
+                    onPrevious={() => setActiveTab(showSelfReflection ? 'self-reflection' : 'session-reflection')}
+                    onCancel={() => openSaveExit()}
+                    onSaveAndExit={(data) => openSaveExit(data)}
                     onSubmit={handleSubmit}
                 />
             );
@@ -384,8 +325,10 @@ const ReflectionFlow = ({
                             'student-reflection': completedStudents || completedSections['student-reflection'],
                         }}
                         canSubmit={canSubmit}
+                        showSelfReflection={showSelfReflection}
+                        showFormFeedback={showFormFeedback}
                         onTabClick={setActiveTab}
-                        onSubmit={handleSubmit}
+                        onSubmit={() => handleSubmit()}
                     />
                     <div style={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}>
                         {renderStep()}
@@ -396,15 +339,12 @@ const ReflectionFlow = ({
             <ConfirmationPopUp
                 show={showSaveExit}
                 type="exit-without-saving"
-                onClose={() => setShowSaveExit(false)}
-                onPrimary={() => {
+                onClose={() => {
                     setShowSaveExit(false);
-                    onExit?.();
+                    setDraftSnapshot(null);
                 }}
-                onSecondary={() => {
-                    setShowSaveExit(false);
-                    onExit?.();
-                }}
+                onPrimary={handleExitWithoutSaving}
+                onSecondary={handleSaveAndExitConfirm}
             />
             <ConfirmationPopUp
                 show={submitted}
@@ -424,6 +364,8 @@ ReflectionFlow.propTypes = {
     onExit: PropTypes.func,
     onSubmitted: PropTypes.func,
     showSaveAndExitOnMount: PropTypes.bool,
+    showSelfReflection: PropTypes.bool,
+    showFormFeedback: PropTypes.bool,
 };
 
 export default ReflectionFlow;

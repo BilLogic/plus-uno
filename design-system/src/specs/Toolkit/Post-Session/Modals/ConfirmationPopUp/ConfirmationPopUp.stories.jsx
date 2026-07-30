@@ -1,60 +1,38 @@
-import React, { useState } from 'react';
-import Button from '@/components/actions/Button';
+import React from 'react';
 import ConfirmationPopUp from './ConfirmationPopUp';
 
 export default {
+    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Post-Session/Modals/Confirmation Pop-up',
     parameters: {
         layout: 'padded',
-        docs: {
-            description: {
-                component:
-                    'Local organism — Confirmation Pop-up. type: exit | exit without saving | reflection submitted.',
-            },
-        },
     },
 };
 
 /**
- * @param {'exit-without-saving'|'exit'|'reflection-submitted'} type
+ * All three Figma types on one canvas — no separate subpages.
  */
-function ModalDemo({ type }) {
-    const [show, setShow] = useState(true);
-    return (
-        <div style={{ minHeight: '280px' }}>
-            {!show && (
-                <Button
-                    text={`Open ${type}`}
-                    style="primary"
-                    fill="filled"
-                    onClick={() => setShow(true)}
+export const Overview = {
+    render: () => (
+        <div
+            style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '24px',
+                alignItems: 'flex-start',
+            }}
+        >
+            {['exit-without-saving', 'exit', 'reflection-submitted'].map((type) => (
+                <ConfirmationPopUp
+                    key={type}
+                    show
+                    type={type}
+                    renderAs="inline"
+                    onClose={() => {}}
+                    onPrimary={() => {}}
+                    onSecondary={() => {}}
                 />
-            )}
-            <ConfirmationPopUp
-                show={show}
-                type={type}
-                onClose={() => setShow(false)}
-                onPrimary={() => setShow(false)}
-                onSecondary={() => setShow(false)}
-            />
+            ))}
         </div>
-    );
-}
-
-/** Triggered by Cancel when there are unsaved changes. */
-export const ExitWithoutSaving = {
-    name: 'Exit without saving',
-    render: () => <ModalDemo type="exit-without-saving" />,
-};
-
-/** Triggered after Save & Exit succeeds. */
-export const ExitSaved = {
-    name: 'Exit (saved)',
-    render: () => <ModalDemo type="exit" />,
-};
-
-/** Triggered after successful reflection submit. */
-export const ReflectionSubmitted = {
-    name: 'Reflection submitted',
-    render: () => <ModalDemo type="reflection-submitted" />,
+    ),
 };

@@ -60,3 +60,29 @@ export const SaveAndExit = {
         </BreakpointPreview>
     ),
 };
+
+/** Cadence off — no Self Reflection / Form Feedback tabs (PRD §6–7). */
+export const WithoutCadenceSections = {
+    name: 'Without Self + Form Feedback',
+    render: () => (
+        <BreakpointPreview>
+            <ReflectionFlow showSelfReflection={false} showFormFeedback={false} />
+        </BreakpointPreview>
+    ),
+};
+
+/** Cancellation branch from Session Information. */
+export const CancellationBranch = {
+    name: 'Cancellation branch',
+    render: () => (
+        <BreakpointPreview>
+            <ReflectionFlow
+                initialSessionInfo={{
+                    date: '2026-07-15',
+                    sessionOption: 'session-1',
+                    didNotHappen: true,
+                }}
+            />
+        </BreakpointPreview>
+    ),
+};

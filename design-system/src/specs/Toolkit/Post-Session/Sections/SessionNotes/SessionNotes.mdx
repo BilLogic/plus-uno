@@ -1,5 +1,5 @@
 import { Meta, Canvas, Title } from '@storybook/addon-docs/blocks';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import * as SessionNotesStories from './SessionNotes.stories.jsx';
 
 <Meta of={SessionNotesStories} name="Toolkit Docs — Session Notes" />
@@ -13,7 +13,16 @@ Read-only display of the tutor’s in-session notes for a student (Figma Section
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Sections/SessionNotes"
 />
 
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
 ### Overview
 
-<Canvas of={SessionNotesStories.Empty} />
-<Canvas of={SessionNotesStories.Filled} />
+<DocsCanvasShell attachSourceBelow description={<>Empty · Filled</>}>
+    <Canvas of={SessionNotesStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

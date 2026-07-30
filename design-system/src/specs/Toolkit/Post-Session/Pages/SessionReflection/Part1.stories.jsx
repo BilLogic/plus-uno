@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
 import SessionReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionFormV2';
-import SaveAndExitModal from '@/specs/Toolkit/Post-Session/Modals/SaveAndExitModal/SaveAndExitModal';
+import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
 import { WHAT_WORKED_OPTIONS, WHAT_COULD_IMPROVE_OPTIONS, SUPERVISOR_FOLLOWUP_OPTIONS } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 const defaultStudents = [
@@ -64,11 +64,12 @@ const SessionReflectionShell = ({
                     />
                 </div>
             </PageLayout>
-            <SaveAndExitModal
+            <ConfirmationPopUp
                 show={saveExitOpen}
+                type="exit-without-saving"
                 onClose={() => setSaveExitOpen(false)}
-                onExitWithoutSaving={() => setSaveExitOpen(false)}
-                onSaveAndExit={() => setSaveExitOpen(false)}
+                onPrimary={() => setSaveExitOpen(false)}
+                onSecondary={() => setSaveExitOpen(false)}
             />
         </div>
     );

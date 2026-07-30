@@ -5,6 +5,11 @@ import PropTypes from 'prop-types';
  * Five-point linear scale (Figma Sections · Linear Scale `10819:11602`).
  * Fixed 445px shell: equal flex label columns + non-shrinking 1–5 radio row.
  *
+ * Not composed from DS Scale (`forms-and-inputs/RadioButtonGroup`): Post-Session spec
+ * uses section-tier shell (primary-state-08, 12px radius, 445px), wrap-capable end labels,
+ * fixed 29px option columns, and dot-in-circle checked radios; Scale uses
+ * surface-container-low, nowrap end labels, flex-distributed options, and filled Form.Check radios.
+ *
  * @param {object} props
  * @param {number} [props.value=0]
  * @param {(value: number) => void} [props.onChange]

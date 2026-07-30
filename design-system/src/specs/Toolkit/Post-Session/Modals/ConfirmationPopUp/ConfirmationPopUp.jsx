@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from '@/components/messaging/Modal';
+import './ConfirmationPopUp.scss';
 
 const COPY = {
     'exit-without-saving': {
@@ -24,17 +25,10 @@ const COPY = {
 };
 
 /**
- * Confirmation pop-up for the reflection form
- * (Figma: Confirmation Pop-up — exit | exit without saving | reflection submitted).
- *
- * Uses DS Modal with small primary/tonal secondary buttons and surface-container-high shell.
+ * Confirmation pop-up (Figma Modals · Confirmation Pop-up).
+ * Types: exit | exit without saving | reflection submitted.
  *
  * @param {object} props
- * @param {boolean} props.show
- * @param {'exit-without-saving'|'exit'|'reflection-submitted'} [props.type='exit-without-saving']
- * @param {() => void} props.onClose
- * @param {() => void} [props.onPrimary]
- * @param {() => void} [props.onSecondary]
  */
 const ConfirmationPopUp = ({
     show,
@@ -42,6 +36,7 @@ const ConfirmationPopUp = ({
     onClose,
     onPrimary,
     onSecondary,
+    renderAs = 'modal',
 }) => {
     const copy = COPY[type] || COPY['exit-without-saving'];
     return (
@@ -49,10 +44,13 @@ const ConfirmationPopUp = ({
             show={show}
             onClose={onClose}
             title={copy.title}
-            body={copy.body}
+            body={<p className="body1-txt m-0" style={{ color: 'var(--color-on-surface)' }}>{copy.body}</p>}
             width={340}
-            className="plus-modal--surface-container-high"
-            style={{ backgroundColor: 'var(--color-surface-container-high, var(--color-surface))' }}
+            paddingSize="sm"
+            gapSize="sm"
+            radiusSize="sm"
+            renderAs={renderAs}
+            className="plus-modal--confirmation-popup"
             primaryButton={{
                 text: copy.primary,
                 style: 'primary',
@@ -77,6 +75,7 @@ ConfirmationPopUp.propTypes = {
     onClose: PropTypes.func.isRequired,
     onPrimary: PropTypes.func,
     onSecondary: PropTypes.func,
+    renderAs: PropTypes.oneOf(['modal', 'inline']),
 };
 
 export default ConfirmationPopUp;

@@ -14,6 +14,18 @@
     max-height: calc(100vh - 40px);
 }
 
+.plus-modal.plus-modal-radius-sm {
+    border-radius: var(--size-modal-radius-sm, 6px);
+}
+
+.plus-modal.plus-modal-radius-md {
+    border-radius: var(--size-modal-radius-md, 16px);
+}
+
+.plus-modal.plus-modal-radius-lg {
+    border-radius: var(--size-modal-radius-lg, 24px);
+}
+
 .plus-modal.plus-modal-body-only {
     background-color: transparent;
     box-shadow: none;

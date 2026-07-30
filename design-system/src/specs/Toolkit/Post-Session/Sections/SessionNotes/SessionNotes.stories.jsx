@@ -9,20 +9,16 @@ export default {
 };
 
 /**
- * Figma Session Notes — State=Empty.
+ * Empty + Filled on one canvas — no subpages.
  */
-export const Empty = {
-    render: () => <SessionNotes state="empty" />,
-};
-
-/**
- * Figma Session Notes — State=Filled.
- */
-export const Filled = {
+export const Overview = {
     render: () => (
-        <SessionNotes
-            state="filled"
-            notes="Hasn’t been spending much time on math lately and progress has slowed. Gets distracted/puts it off, needs regular check-ins and encouragement to get started."
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <SessionNotes state="empty" />
+            <SessionNotes
+                state="filled"
+                notes="Hasn’t been spending much time on math lately and progress has slowed. Gets distracted/puts it off, needs regular check-ins and encouragement to get started."
+            />
+        </div>
     ),
 };

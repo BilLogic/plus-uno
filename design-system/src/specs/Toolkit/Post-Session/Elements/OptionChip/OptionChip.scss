@@ -1,0 +1,5 @@
+/* Pill radius for post-session option chips composing DS Button. */
+.plus-btn.post-session-option-chip {
+    border-radius: var(--size-card-radius-full, 999px);
+    min-width: 36px;
+}

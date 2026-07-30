@@ -6,12 +6,13 @@ import OtherTextInput from '@/specs/Toolkit/Post-Session/Sections/OtherTextInput
 /**
  * Multi-select question block
  * (Figma Sections · Multi-Select Question `10791:8694`).
- * Selected chips = filled · unselected = tonal. Pair with Other Text Input when Other is selected.
+ * Selected chips = filled · unselected = tonal. Tooltips on hover ≥2s via OptionChip.
+ * Pair with Other Text Input when Other is selected.
  *
  * @param {object} props
  * @param {string} [props.question='{Question}']
  * @param {string} [props.caption='Select all that apply.']
- * @param {{ id: string, label: string }[]} [props.options]
+ * @param {{ id: string, label: string, tooltip?: string }[]} [props.options]
  * @param {string[]} [props.selectedIds]
  * @param {(id: string) => void} [props.onToggle]
  * @param {string} [props.otherId='other']
@@ -25,7 +26,7 @@ const MultiSelectQuestion = ({
     options = [
         { id: 'option-1', label: 'Option 1' },
         { id: 'option-2', label: 'Option 2' },
-        { id: 'other', label: 'Other' },
+        { id: 'other', label: 'Other', tooltip: 'Anything not covered by the options — a short text field asks for details.' },
     ],
     selectedIds = [],
     onToggle,
@@ -73,6 +74,7 @@ MultiSelectQuestion.propTypes = {
     options: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
+        tooltip: PropTypes.string,
     })),
     selectedIds: PropTypes.arrayOf(PropTypes.string),
     onToggle: PropTypes.func,

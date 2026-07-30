@@ -1,83 +1,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
-import Dropdown from '@/components/forms-and-inputs/Dropdown';
-import Switch from '@/components/forms-and-inputs/Switch';
-import DatePicker from '@/components/forms-and-inputs/DatePicker';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
-import StudentsDropdown from '@/specs/Toolkit/Post-Session/Tables/StudentsDropdown/StudentsDropdown';
-
-const NO_RECORDING_REASONS = [
-    'Forgot to record',
-    'Recording failed / tech issue',
-    'Other',
-];
-
-/**
- * Field label with optional required asterisk (Figma Session Information).
- *
- * @param {object} props
- * @param {string} [props.htmlFor]
- * @param {React.ReactNode} props.children
- * @param {boolean} [props.required]
- */
-function FieldLabel({ htmlFor, children, required = false }) {
-    return (
-        <label
-            htmlFor={htmlFor}
-            className="body2-txt font-weight-semibold m-0"
-            style={{ color: 'var(--color-on-surface)' }}
-        >
-            {children}
-            {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-        </label>
-    );
-}
-
-FieldLabel.propTypes = {
-    htmlFor: PropTypes.string,
-    children: PropTypes.node.isRequired,
-    required: PropTypes.bool,
-};
-
-/**
- * Full-width wrapper so DS Dropdown toggles stretch to the form column.
- *
- * @param {object} props
- * @param {React.ReactNode} props.children
- */
-function FullWidthDropdown({ children }) {
-    return (
-        <div className="session-info-full-width-dropdown" style={{ width: '100%' }}>
-            <style>
-                {`
-                  .session-info-full-width-dropdown .pdropdown {
-                    display: flex;
-                    width: 100%;
-                  }
-                  .session-info-full-width-dropdown .pdropdown-default-toggle {
-                    width: 100%;
-                    justify-content: space-between;
-                  }
-                  .session-info-full-width-dropdown .dropdown-menu {
-                    width: 100%;
-                    max-width: none;
-                  }
-                `}
-            </style>
-            {children}
-        </div>
-    );
-}
-
-FullWidthDropdown.propTypes = {
-    children: PropTypes.node.isRequired,
-};
+import SessionDate from '@/specs/Toolkit/Post-Session/Elements/SessionDate/SessionDate';
+import SessionSelection from '@/specs/Toolkit/Post-Session/Elements/SessionSelection/SessionSelection';
+import UploadFiles from '@/specs/Toolkit/Post-Session/Elements/UploadFiles/UploadFiles';
+import StudentsDropdown from '@/specs/Toolkit/Post-Session/Elements/StudentsDropdown/StudentsDropdown';
+import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion/FreeResponseQuestion';
+import { CANCELLATION_REASON_OPTIONS } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 /**
  * Session Information — page composition from Figma Session Info (`563:300236`).
- * Composes Elements: Session date, Session selection, Students Dropdown, Upload Files.
+ * Supports the cancellation branch when “Session did not happen” is on.
  *
  * @param {object} props
  */
@@ -97,6 +32,8 @@ const SessionInformationForm = ({
         didNotHappen: initialData?.didNotHappen || false,
         noRecording: initialData?.noRecording || false,
         noRecordingReason: initialData?.noRecordingReason || '',
+        cancellationReasons: initialData?.cancellationReasons || [],
+        cancellationDescription: initialData?.cancellationDescription || '',
         files: initialData?.files || [
             { name: 'zoom_0.mp4', size: '160 mb' },
             { name: 'audio_only.m4a', size: '18 mb' },
@@ -125,10 +62,15 @@ const SessionInformationForm = ({
     };
 
     /**
-     * @param {string} fileName
+     * @param {string} id
      */
-    const handleRemoveFile = (fileName) => {
-        patchForm({ files: formData.files.filter((file) => file.name !== fileName) });
+    const toggleCancellationReason = (id) => {
+        const selected = formData.cancellationReasons.includes(id);
+        patchForm({
+            cancellationReasons: selected
+                ? formData.cancellationReasons.filter((value) => value !== id)
+                : [...formData.cancellationReasons, id],
+        });
     };
 
     /**
@@ -139,35 +81,23 @@ const SessionInformationForm = ({
         selectedStudentIds,
     });
 
-    const sessionItems = [
-        {
-            text: 'Life STEAM Academy · 16:00',
-            value: 'session-1',
-            selected: formData.sessionOption === 'session-1',
-            onClick: () => patchForm({ sessionOption: 'session-1' }),
-        },
-        {
-            text: 'Lincoln High · 10:00 AM',
-            value: 'session-2',
-            selected: formData.sessionOption === 'session-2',
-            onClick: () => patchForm({ sessionOption: 'session-2' }),
-        },
-        {
-            text: 'Math Tutoring · 2:00 PM',
-            value: 'math_tutoring',
-            selected: formData.sessionOption === 'math_tutoring',
-            onClick: () => patchForm({ sessionOption: 'math_tutoring' }),
-        },
+    const sessionOptions = [
+        { value: 'session-el-capitan', label: 'El Capitan (Thompson) · 12:25–13:25' },
+        { value: 'session-1', label: 'Life STEAM Academy · 16:00' },
+        { value: 'session-life-steam-am', label: 'Life STEAM (Thompson) · 10:00' },
     ];
-
-    const sessionLabel =
-        sessionItems.find((item) => item.value === formData.sessionOption)?.text || 'Select a session';
 
     const hasDateAndSession = Boolean(formData.date && formData.sessionOption);
     const recordingOk = formData.noRecording
         ? Boolean(formData.noRecordingReason)
         : formData.files.length > 0;
-    const canNext = hasDateAndSession && selectedStudentIds.length > 0 && recordingOk;
+
+    const cancellationOk = formData.cancellationReasons.length > 0
+        && Boolean(String(formData.cancellationDescription).trim());
+
+    const canNext = formData.didNotHappen
+        ? hasDateAndSession && cancellationOk
+        : hasDateAndSession && selectedStudentIds.length > 0 && recordingOk;
     const canSave = hasDateAndSession;
 
     return (
@@ -194,49 +124,58 @@ const SessionInformationForm = ({
             <div
                 style={{
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                    alignItems: 'flex-start',
                     gap: 'var(--size-section-gap-md)',
                 }}
             >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <FieldLabel htmlFor="session-date" required>
-                        Select Date
-                    </FieldLabel>
-                    <DatePicker
-                        id="session-date"
-                        name="date"
-                        placeholder="Select date"
-                        value={formData.date}
-                        onChange={(value) => patchForm({ date: value })}
-                        style={{ width: '100%' }}
-                        className="w-100"
-                    />
-                </div>
+                <SessionDate
+                    value={formData.date}
+                    onChange={(value) => patchForm({ date: value })}
+                />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <FieldLabel htmlFor="session-select-dropdown" required>
-                        Select Session
-                    </FieldLabel>
-                    <FullWidthDropdown>
-                        <Dropdown
-                            id="session-select-dropdown"
-                            buttonText={sessionLabel}
-                            items={sessionItems}
-                            style="default"
-                            fill="outline"
-                        />
-                    </FullWidthDropdown>
-                </div>
-
-                <Switch
-                    id="did-not-happen-switch"
-                    label="Session did not happen"
-                    checked={formData.didNotHappen}
-                    onChange={(event) => patchForm({ didNotHappen: event.target.checked })}
+                <SessionSelection
+                    value={formData.sessionOption}
+                    onChange={(sessionOption) => patchForm({ sessionOption })}
+                    options={sessionOptions}
+                    didNotHappen={formData.didNotHappen}
+                    onDidNotHappenChange={(checked) => patchForm({ didNotHappen: checked })}
                 />
             </div>
 
-            {hasDateAndSession && (
+            {hasDateAndSession && formData.didNotHappen && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: '445px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                        <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
+                            Select one or more reasons why the session did not happen.
+                            <span style={{ color: 'var(--color-danger)' }}> *</span>
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                            {CANCELLATION_REASON_OPTIONS.map((reason) => (
+                                <Checkbox
+                                    key={reason.id}
+                                    id={`cancel-reason-${reason.id}`}
+                                    label={reason.example
+                                        ? `${reason.label} (${reason.example})`
+                                        : reason.label}
+                                    checked={formData.cancellationReasons.includes(reason.id)}
+                                    onChange={() => toggleCancellationReason(reason.id)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <FreeResponseQuestion
+                        id="cancellation-description"
+                        label="Please briefly describe the situation."
+                        required
+                        value={formData.cancellationDescription}
+                        onChange={(event) => patchForm({ cancellationDescription: event.target.value })}
+                    />
+                </div>
+            )}
+
+            {hasDateAndSession && !formData.didNotHappen && (
                 <>
                     <StudentsDropdown
                         students={availableStudents}
@@ -244,114 +183,32 @@ const SessionInformationForm = ({
                         onChange={(ids) => onStudentSelectionChange?.(ids)}
                     />
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '480px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                            <FieldLabel required>Upload session recording</FieldLabel>
-                            <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                                Upload this session’s Zoom recording folder — video, audio, and student chat come in together. Single files and .zip work too.
-                            </p>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
-                            <Button
-                                text="Upload Folder"
-                                style="primary"
-                                fill="filled"
-                                size="small"
-                                onClick={handleChooseFile}
-                            />
-                            <Button
-                                text="Choose a file"
-                                style="primary"
-                                fill="tonal"
-                                size="small"
-                                onClick={handleChooseFile}
-                            />
-                        </div>
-
-                        {!formData.noRecording && formData.files.length > 0 && (
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                {formData.files.map((file) => (
-                                    <div
-                                        key={file.name}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 'var(--size-element-gap-md)',
-                                            padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
-                                        }}
-                                    >
-                                        <i
-                                            className="fa-solid fa-file-circle-check"
-                                            style={{ color: 'var(--color-on-surface-variant)', fontSize: '12px' }}
-                                            aria-hidden="true"
-                                        />
-                                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                                            {file.name}
-                                        </span>
-                                        <span className="body2-txt" style={{ color: 'var(--color-outline-variant)' }}>
-                                            {file.size}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            aria-label={`Remove ${file.name}`}
-                                            onClick={() => handleRemoveFile(file.name)}
-                                            style={{
-                                                border: 'none',
-                                                background: 'transparent',
-                                                cursor: 'pointer',
-                                                color: 'var(--color-on-surface-variant)',
-                                                padding: 0,
-                                                marginLeft: 'auto',
-                                            }}
-                                        >
-                                            <i className="fa-solid fa-xmark" aria-hidden="true" />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        <Switch
-                            id="no-recording-switch"
-                            label="I don’t have a session recording"
-                            checked={formData.noRecording}
-                            onChange={(event) => patchForm({
-                                noRecording: event.target.checked,
-                                files: event.target.checked ? [] : formData.files,
-                            })}
-                        />
-
-                        {formData.noRecording && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                                <FieldLabel htmlFor="no-recording-reason" required>
-                                    Why is there no recording?
-                                </FieldLabel>
-                                <FullWidthDropdown>
-                                    <Dropdown
-                                        id="no-recording-reason"
-                                        buttonText={formData.noRecordingReason || 'Select a reason'}
-                                        items={NO_RECORDING_REASONS.map((text) => ({
-                                            text,
-                                            selected: formData.noRecordingReason === text,
-                                            onClick: () => patchForm({ noRecordingReason: text }),
-                                        }))}
-                                        style="default"
-                                        fill="outline"
-                                    />
-                                </FullWidthDropdown>
-                            </div>
-                        )}
-                    </div>
+                    <UploadFiles
+                        files={formData.files}
+                        noRecording={formData.noRecording}
+                        noRecordingReason={formData.noRecordingReason}
+                        onUploadFolder={handleChooseFile}
+                        onChooseFile={handleChooseFile}
+                        onRemoveFile={(fileName) => {
+                            patchForm({ files: formData.files.filter((file) => file.name !== fileName) });
+                        }}
+                        onNoRecordingChange={(checked) => patchForm({
+                            noRecording: checked,
+                            files: checked ? [] : formData.files,
+                        })}
+                        onNoRecordingReasonChange={(reason) => patchForm({ noRecordingReason: reason })}
+                    />
                 </>
             )}
 
             <NavigationButtons
                 canSave={canSave}
                 canNext={canNext}
+                showSubmit={formData.didNotHappen}
                 onCancel={onCancel}
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onSave?.(snapshot())}
+                onSubmit={() => onSave?.(snapshot())}
             />
         </div>
     );

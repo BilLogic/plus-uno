@@ -34,7 +34,7 @@ const SideBarTab = ({
                 padding: '10px 16px',
                 width: '100%',
                 cursor: isDisabled ? 'default' : 'pointer',
-                borderRadius: isSelected ? 'var(--size-legacy-radius-3, 6px)' : undefined,
+                borderRadius: isSelected ? 'var(--size-element-radius-md, 6px)' : undefined,
                 backgroundColor: isSelected ? 'var(--color-primary-state-16)' : undefined,
             }}
             onClick={!isDisabled ? onClick : undefined}
@@ -115,6 +115,8 @@ const SideNavBar = ({
     completedSections = {},
     canSubmit = false,
     onSubmit,
+    showSelfReflection = true,
+    showFormFeedback = true,
 }) => {
     const onStudentStep = activeTab === 'student-reflection' || Boolean(activeTab?.startsWith('student-'));
     const sessionInfoDone = Boolean(completedSections['session-information']) || state !== 'pre-student-add';
@@ -165,8 +167,8 @@ const SideNavBar = ({
                     <SideBarTab
                         text="Student Reflection"
                         state={sectionState(
-                            /* Selected pill only when there is no student list yet */
-                            activeTab === 'student-reflection' && students.length === 0,
+                            /* Parent stays selected while any student is active */
+                            onStudentStep || activeTab === 'student-reflection',
                             !sessionInfoDone && state === 'pre-student-add',
                         )}
                         trailingIcon={completeIcon(studentDone && !onStudentStep)}
@@ -198,18 +200,22 @@ const SideNavBar = ({
                     trailingIcon={completeIcon(Boolean(completedSections['session-reflection']))}
                     onClick={() => onTabClick?.('session-reflection')}
                 />
-                <SideBarTab
-                    text="Self Reflection"
-                    state={sectionState(activeTab === 'self-reflection')}
-                    trailingIcon={completeIcon(Boolean(completedSections['self-reflection']))}
-                    onClick={() => onTabClick?.('self-reflection')}
-                />
-                <SideBarTab
-                    text="Form Feedback"
-                    state={sectionState(activeTab === 'form-feedback')}
-                    trailingIcon={completeIcon(Boolean(completedSections['form-feedback']))}
-                    onClick={() => onTabClick?.('form-feedback')}
-                />
+                {showSelfReflection && (
+                    <SideBarTab
+                        text="Self Reflection"
+                        state={sectionState(activeTab === 'self-reflection')}
+                        trailingIcon={completeIcon(Boolean(completedSections['self-reflection']))}
+                        onClick={() => onTabClick?.('self-reflection')}
+                    />
+                )}
+                {showFormFeedback && (
+                    <SideBarTab
+                        text="Form Feedback"
+                        state={sectionState(activeTab === 'form-feedback')}
+                        trailingIcon={completeIcon(Boolean(completedSections['form-feedback']))}
+                        onClick={() => onTabClick?.('form-feedback')}
+                    />
+                )}
             </div>
 
             <div style={{ opacity: canSubmit ? 1 : 0.38, width: '100%' }}>
@@ -235,6 +241,8 @@ SideNavBar.propTypes = {
     completedSections: PropTypes.object,
     canSubmit: PropTypes.bool,
     onSubmit: PropTypes.func,
+    showSelfReflection: PropTypes.bool,
+    showFormFeedback: PropTypes.bool,
 };
 
 export default SideNavBar;

@@ -1,0 +1,58 @@
+/**
+ * Post-Session Confirmation Pop-up chrome (Figma `6327:241452`).
+ * Spec-local overrides for surface-container-high + sm modal pads.
+ * radiusSize="sm" on Modal supplies border-radius via --size-modal-radius-sm.
+ */
+
+.plus-modal.plus-modal--confirmation-popup {
+    background-color: var(--color-surface-container-high, #e7e8eb);
+    gap: 0;
+
+    .plus-modal-header,
+    .plus-modal-footer {
+        padding: var(--size-modal-pad-y-sm, 8px) var(--size-modal-pad-x-sm, 10px);
+    }
+
+    .plus-modal-header {
+        gap: var(--size-modal-gap-md, 12px);
+    }
+
+    .plus-modal-title {
+        font-size: var(--font-size-h5, 20px);
+        line-height: var(--font-line-height-h5, 1.4);
+    }
+
+    .plus-modal-close-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .plus-modal-close-btn-h5,
+    .plus-modal-close-btn-h3 {
+        font-size: 24px;
+    }
+
+    .plus-modal-content {
+        padding: 0 var(--size-modal-pad-x-sm, 10px);
+        min-height: 64px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .plus-modal-footer {
+        justify-content: flex-end;
+    }
+
+    .plus-modal-button-row {
+        gap: var(--size-modal-gap-sm, 8px);
+        justify-content: flex-end;
+    }
+
+    .plus-modal-divider {
+        opacity: 0.1;
+        background-color: var(--color-outline, #6f797a);
+        margin: 0;
+    }
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import FormReflection from './FormReflection';
 
 export default {
-    title: 'Specs/Toolkit/Post-Session/Sections/Form Reflection',
+    title: 'Specs/Toolkit/Post-Session/Sections/Free Response Question',
     component: FormReflection,
     parameters: {
         layout: 'padded',
