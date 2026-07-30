@@ -31,7 +31,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 |---|---|---|
 | `skills/uno-research` | gather context: user studies, Slack threads, analytics, codebase — instrument-first | researchers/* · writers/notion (study guide) |
 | `skills/uno-synthesize` | findings → takeaways → PRD; blueprint updates | writers/notion · writers/blueprint |
-| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / hand-craft) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
+| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / hand-craft); **PRD required at entry** — no PRD → `skills/uno-synthesize` first (IDE: `.cursor/hooks/require-prd-for-prototype.sh`) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
 | `skills/uno-publish` | share-out bundle · handoff rail + Handoff Spec · marketplace entry | writers/notion · writers/figma |
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* |
 | `skills/uno-maintain` | intake · Tier 1/2 fixes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
@@ -107,6 +107,8 @@ Every embodiment, including Slack:
 14. Never edit generated token files directly — run `npm run generate:tokens` after changes.
 15. Always validate in Storybook when component behavior is touched.
 16. Confirm the implementation plan and touched files before large or risky edits.
+17. **uno-prototype intake is one step per message**: when `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly one hook step — AskQuestion with `questions.length === 1`, or one plain question. Never batch PRD/fidelity/Figma into one turn; never skip a step because context already answers it.
+18. **Figma write-back uses the DS gate — never screenshot import as the final frame**: when `.cursor/hooks/briefings/active-writeback-gate.json` exists, follow it. Place library component instances per `design-system/figma/component-alignment.md` using `component-registry.json` + `token-registry.json`. **Forbidden:** `generate_figma_design` / html-to-design capture as the `[replica]` deliverable (reference-only if used at all). Complete `npm run validate:figma-writeback` + `npm run audit:figma-writeback` before `writeback:audit-passed`.
 <!-- /ide-only -->
 
 ## Knowledge
@@ -141,7 +143,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
 | Implementation setup (aliases, prototypes, Vite) | `design-system/docs/setup.md` |
 | Design philosophy / agent role | `design-system/docs/guidelines.md` |
-| Figma link, implement-design, or design-to-code mapping | `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` (MANDATORY — load first); then `skills/uno-prototype/references/figma-registry-mandatory-load.md` + `figma-mcp-guide.md` |
+| Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/conventions/*.md` |
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |

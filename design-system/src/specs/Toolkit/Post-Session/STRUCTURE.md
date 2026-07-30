@@ -17,9 +17,11 @@ Storybook sidebar order matches Figma: **Overview → Elements → Cards → Tab
 | Navigation Button + Button Group | `6327:243019` / `6327:243100` | Elements / Navigation Buttons |
 | Last Updated | `10750:475179` | Elements / Last Updated |
 | Filter / Completion | `221:171321` | Pre-Session Elements / Completion Filter (shared) |
-| Upload Files / Session date / No Recording Reason / Session selection | various | Session Information Form section |
-
-Student / Self ratings are Post-Session companions to Session / Form Rating (same Rating primitive).
+| Upload Files | `7486:93070` | Session Info page composition |
+| Session date | `10882:170725` | Session Info page composition |
+| No Recording Reason | `10925:11334` | Session Info page composition |
+| Session selection | `20:24370` | Session Info page composition |
+| File List Item | `10750:475180` | Session Info page composition |
 
 ## Tables (`1721:118449`)
 
@@ -32,7 +34,7 @@ Student / Self ratings are Post-Session companions to Session / Form Rating (sam
 
 | Figma | Node | Storybook |
 |---|---|---|
-| Confirmation Pop-up | `6327:241454` | Modals / Confirmation Pop-up |
+| Confirmation Pop-up (`exit` · `exit without saving` · `reflection submitted`) | `6327:241454` | Modals / Confirmation Pop-up |
 
 ## Sections (`1721:118456`)
 
@@ -42,13 +44,15 @@ Student / Self ratings are Post-Session companions to Session / Form Rating (sam
 | Dynamic AI Prompted Question Box | `10779:8455` | Sections / AI Prompted Question Box |
 | Free Response Question | `791:137860` | Sections / Form Reflection |
 | Multi-Select Question | `10791:8694` | Elements / Option Chip (+ group) |
+| Session Notes | `10808:478232` | Sections / Session Notes |
+| Linear Scale | `10819:11602` | Sections / Linear Scale |
 
 ## Pages (`1721:118451`)
 
 | Figma | Node | Storybook |
 |---|---|---|
 | Full Page / Reflections | `1751:114672` | Pre-Session Pages / Reflection (entry) |
-| Session Info | `563:300236` | PostSessionPage + Session Information Form |
+| Session Info | `563:300236` | Session Information page composition |
 | Student Reflection | `10662:18965` | Pages / Student Reflection |
 | Session Reflection | `10662:18089` | Pages / Session Reflection |
 | Self Reflection | `5179:79703` | Pages / Self Reflection |

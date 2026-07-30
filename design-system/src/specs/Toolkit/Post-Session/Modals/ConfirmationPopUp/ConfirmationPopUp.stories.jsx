@@ -3,21 +3,20 @@ import Button from '@/components/actions/Button';
 import ConfirmationPopUp from './ConfirmationPopUp';
 
 export default {
-    tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Post-Session/Modals/Confirmation Pop-up',
     parameters: {
         layout: 'padded',
         docs: {
             description: {
                 component:
-                    'Local organism — Confirmation Pop-up. type: exit (after Save & Exit) | exit without saving (Cancel with dirty form).',
+                    'Local organism — Confirmation Pop-up. type: exit | exit without saving | reflection submitted.',
             },
         },
     },
 };
 
 /**
- * @param {'exit-without-saving'|'exit'} type
+ * @param {'exit-without-saving'|'exit'|'reflection-submitted'} type
  */
 function ModalDemo({ type }) {
     const [show, setShow] = useState(true);
@@ -52,4 +51,10 @@ export const ExitWithoutSaving = {
 export const ExitSaved = {
     name: 'Exit (saved)',
     render: () => <ModalDemo type="exit" />,
+};
+
+/** Triggered after successful reflection submit. */
+export const ReflectionSubmitted = {
+    name: 'Reflection submitted',
+    render: () => <ModalDemo type="reflection-submitted" />,
 };

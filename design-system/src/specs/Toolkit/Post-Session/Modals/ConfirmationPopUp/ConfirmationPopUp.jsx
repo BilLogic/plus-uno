@@ -15,15 +15,23 @@ const COPY = {
         secondary: 'Continue Editing',
         primary: 'Exit',
     },
+    'reflection-submitted': {
+        title: 'Reflection submitted',
+        body: 'Your reflection was submitted successfully.',
+        secondary: 'Edit reflection',
+        primary: 'Back to sessions',
+    },
 };
 
 /**
- * Confirmation pop-up for leaving the reflection form
- * (Figma: Confirmation Pop-up — type: exit | exit without saving).
+ * Confirmation pop-up for the reflection form
+ * (Figma: Confirmation Pop-up — exit | exit without saving | reflection submitted).
+ *
+ * Uses DS Modal with small primary/tonal secondary buttons and surface-container-high shell.
  *
  * @param {object} props
  * @param {boolean} props.show
- * @param {'exit-without-saving'|'exit'} [props.type='exit-without-saving']
+ * @param {'exit-without-saving'|'exit'|'reflection-submitted'} [props.type='exit-without-saving']
  * @param {() => void} props.onClose
  * @param {() => void} [props.onPrimary]
  * @param {() => void} [props.onSecondary]
@@ -43,12 +51,20 @@ const ConfirmationPopUp = ({
             title={copy.title}
             body={copy.body}
             width={340}
+            className="plus-modal--surface-container-high"
+            style={{ backgroundColor: 'var(--color-surface-container-high, var(--color-surface))' }}
             primaryButton={{
                 text: copy.primary,
+                style: 'primary',
+                fill: 'filled',
+                size: 'small',
                 onClick: onPrimary || onClose,
             }}
             secondaryButton={{
                 text: copy.secondary,
+                style: 'primary',
+                fill: 'tonal',
+                size: 'small',
                 onClick: onSecondary || onClose,
             }}
         />
@@ -57,7 +73,7 @@ const ConfirmationPopUp = ({
 
 ConfirmationPopUp.propTypes = {
     show: PropTypes.bool.isRequired,
-    type: PropTypes.oneOf(['exit-without-saving', 'exit']),
+    type: PropTypes.oneOf(['exit-without-saving', 'exit', 'reflection-submitted']),
     onClose: PropTypes.func.isRequired,
     onPrimary: PropTypes.func,
     onSecondary: PropTypes.func,

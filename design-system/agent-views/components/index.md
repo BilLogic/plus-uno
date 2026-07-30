@@ -6,7 +6,7 @@
 
 Mirrors `design-system/src/components/`. Import via `@/components/`.
 
-## UI components (57)
+## UI components (56)
 
 - [Accordion](components/Accordion/Accordion.md)
 - [Alert](components/Alert/Alert.md)
@@ -50,7 +50,6 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 - [Scale](components/Scale/Scale.md)
 - [ScrollBar](components/ScrollBar/ScrollBar.md)
 - [Scrollspy](components/Scrollspy/Scrollspy.md)
-- [Section](components/Section/Section.md)
 - [Select](components/Select/Select.md)
 - [SelectMultiple](components/SelectMultiple/SelectMultiple.md)
 - [Sidebar](components/Sidebar/Sidebar.md)

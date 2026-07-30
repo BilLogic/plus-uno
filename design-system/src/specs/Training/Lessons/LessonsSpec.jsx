@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageLayout, Section, Card, Table, Button, Badge, Select, Input } from '@/components';
+import { PageLayout, Card, Table, Button, Badge, Select, Input } from '@/components';
 
 export const LessonsSpec = () => {
     const [view, setView] = useState('list');

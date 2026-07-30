@@ -19,8 +19,9 @@ export default function ReflectionFormPage() {
         <ReflectionFlow
             students={reflection.students}
             initialSessionInfo={{
-                date: reflection.date,
+                date: reflection.dateIso || '',
                 sessionOption: 'session-1',
+                selectedStudentIds: (reflection.students || []).map((student) => student.id || student.name),
             }}
             onExit={() => navigate('/')}
             onSubmitted={() => navigate('/')}

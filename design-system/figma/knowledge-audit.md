@@ -93,7 +93,6 @@ Generated: 2026-07-30
 | ScatterChart | `design-system/agent-views/components/ScatterChart/ScatterChart.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | ScrollBar | `design-system/agent-views/components/ScrollBar/ScrollBar.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Scrollspy | `design-system/agent-views/components/Scrollspy/Scrollspy.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
-| Section | `design-system/agent-views/components/Section/Section.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Select | `design-system/agent-views/components/Select/Select.md` | yes | ⏳ No | — | — | — | 2026-07-30 |
 | Select | `design-system/agent-views/forms/Select.md` | yes | ⏳ No | — | — | — | 2026-07-10 |
 | SelectMultiple | `design-system/agent-views/components/SelectMultiple/SelectMultiple.md` | yes | ⏳ No | — | — | — | 2026-07-30 |

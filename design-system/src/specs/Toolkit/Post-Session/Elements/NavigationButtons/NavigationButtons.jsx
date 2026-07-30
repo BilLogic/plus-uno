@@ -28,23 +28,25 @@ const NavigationButtons = ({
     onNext,
     onSubmit,
 }) => (
-    <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
         {showPrevious && (
-            <Button text="Previous" style="default" fill="tonal" onClick={onPrevious} />
+            <Button text="Previous" style="default" fill="tonal" size="medium" onClick={onPrevious} />
         )}
-        <Button text="Cancel" style="default" fill="tonal" onClick={onCancel} />
+        <Button text="Cancel" style="default" fill="tonal" size="medium" onClick={onCancel} />
         <Button
             text="Save & Exit"
             style="primary"
             fill="tonal"
+            size="medium"
             disabled={!canSave}
             onClick={onSaveAndExit}
         />
         {showSubmit ? (
             <Button
-                text="Submit"
+                text="Submit reflection"
                 style="primary"
                 fill="filled"
+                size="medium"
                 disabled={!canNext}
                 onClick={onSubmit}
             />
@@ -53,6 +55,7 @@ const NavigationButtons = ({
                 text="Next"
                 style="primary"
                 fill="filled"
+                size="medium"
                 disabled={!canNext}
                 onClick={onNext}
             />

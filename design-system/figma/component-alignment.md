@@ -69,9 +69,12 @@ Only after user opts in and supplies a Figma URL.
    - **Hit** → place **component instance** with variant props; apply `codeDefaults` (e.g. `fill`)
    - **Miss** → stop and report; do not draw a substitute shape
 3. Layout/spacing → bind Figma variables, never raw hex/px
-4. Record returned `node-id`s for the next import pass
+4. Record returned `node-id`s in `playground/<name>/<name>-manifest.json`
+5. Run `npm run validate:figma-writeback` then `npm run audit:figma-writeback` (gate clears on pass)
 
-Requires: `figma-use` skill before canvas writes; prefer `figma-generate-design` for full pages.
+**IDE gate:** saying "write back to Figma" activates `.cursor/hooks/briefings/active-writeback-gate.json`. **`generate_figma_design` / screenshot capture is forbidden as the final frame** — reference-only at most.
+
+Requires: `figma-use` skill before canvas writes; summon `writers/figma` for placement.
 
 ## Adding a new mapped component
 

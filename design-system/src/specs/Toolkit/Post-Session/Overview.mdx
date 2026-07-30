@@ -5,36 +5,28 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
-{/* Figma Post-Session canvas + Components (Local organisms): node 3400:286833 / 1721:118446 */}
+{/* Figma: Toolkit / Post-Session `3400:286833` · Components (Local organisms) `1721:118446` */}
 <Meta title="Specs/Toolkit/Post-Session/Overview" />
 
 <Title>Toolkit · Post-Session</Title>
 
-Reflection after a session ends — local organisms from the Web App Specs file,
-organized the same way as Figma: **Elements → Cards → Tables → Modals → Sections → Pages**.
+Local organisms and page states for the post-session reflection form.
+Source of truth is Figma **Components (Local organisms)** — Storybook groups match that strip:
+**Elements → Cards → Tables → Modals → Sections → Pages**.
 
-Flow frames (01–06) sit beside the Components strip; Storybook docs map 1:1 to that strip.
-See `STRUCTURE.md` in this folder for the full Figma ↔ Storybook node map.
+See `STRUCTURE.md` for the node map. Do not invent organisms that are not in that strip.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=3400-286833"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session"
     figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
     sets={[
-        { name: 'Toolkit / Post-Session (flows)', nodeId: '3400:286833' },
         { name: 'Components (Local organisms)', nodeId: '1721:118446' },
         { name: 'Elements', nodeId: '1721:118447' },
-        { name: 'Cards', nodeId: '1721:118453' },
         { name: 'Tables', nodeId: '1721:118449' },
         { name: 'Modals', nodeId: '1721:118454' },
         { name: 'Sections', nodeId: '1721:118456' },
         { name: 'Pages', nodeId: '1721:118451' },
-        { name: '01 · Entry Point', nodeId: '20:5809' },
-        { name: '02 · Session Info', nodeId: '20:5872' },
-        { name: '03 · Student Reflection', nodeId: '20:6210' },
-        { name: '04 · Session Reflection', nodeId: '20:6006' },
-        { name: '05 · Self Reflection', nodeId: '20:6125' },
-        { name: '06 · Form Feedback', nodeId: '10788:8281' },
     ]}
 />
 
@@ -47,9 +39,9 @@ See `STRUCTURE.md` in this folder for the full Figma ↔ Storybook node map.
 <table className="sb-ds-doc-table">
     <thead>
         <tr>
-            <th>Figma section</th>
-            <th>Storybook docs</th>
-            <th>Contents</th>
+            <th>Figma</th>
+            <th>Storybook</th>
+            <th>Notes</th>
         </tr>
     </thead>
     <tbody>
@@ -57,10 +49,6 @@ See `STRUCTURE.md` in this folder for the full Figma ↔ Storybook node map.
             <td><strong>Elements</strong></td>
             <td>
                 <a href="?path=/docs/specs-toolkit-post-session-elements-session-rating--docs">Session Rating</a>
-                {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-elements-student-rating--docs">Student Rating</a>
-                {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-elements-self-rating--docs">Self Rating</a>
                 {' · '}
                 <a href="?path=/docs/specs-toolkit-post-session-elements-form-rating--docs">Form Rating</a>
                 {' · '}
@@ -74,58 +62,69 @@ See `STRUCTURE.md` in this folder for the full Figma ↔ Storybook node map.
                 {' · '}
                 <a href="?path=/docs/specs-toolkit-post-session-elements-last-updated--docs">Last Updated</a>
             </td>
-            <td>Ratings · chips · status badges · table actions · footer CTA group · timestamps</td>
+            <td>
+                Also in Figma Elements (composed on Session Info page): Session date, Session selection,
+                Upload Files, File List Item, No Recording Reason. Filter / Completion is shared with Pre-Session.
+            </td>
         </tr>
         <tr>
             <td><strong>Tables</strong></td>
             <td>
-                <a href="?path=/docs/specs-toolkit-post-session-tables-reflections--docs">Reflections</a>
-                {' · '}
-                <a href="?path=/docs/specs-toolkit-pre-session-pages-reflection--docs">Full Page / Reflections (entry)</a>
+                <a href="?path=/docs/specs-toolkit-post-session-tables-reflections--docs">Table / Reflections</a>
             </td>
-            <td>Table / Reflections rows + entry list (shared with Pre-Session Sessions tab)</td>
+            <td>Students Dropdown is composed inside Session Info.</td>
         </tr>
         <tr>
             <td><strong>Modals</strong></td>
             <td>
                 <a href="?path=/docs/specs-toolkit-post-session-modals-confirmation-pop-up--docs">Confirmation Pop-up</a>
-                {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-modals-save-and-exit--docs">Save And Exit</a>
             </td>
-            <td>exit · exit without saving (Cancel dirty / Save &amp; Exit)</td>
+            <td>
+                Variants: exit · exit without saving · reflection submitted.
+                Save &amp; Exit is the exit-without-saving type — not a separate modal.
+            </td>
         </tr>
         <tr>
             <td><strong>Sections</strong></td>
             <td>
                 <a href="?path=/docs/specs-toolkit-post-session-sections-side-nav-bar-reflection--docs">Side Nav Bar</a>
                 {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-sections-ai-prompted-question-box--docs">AI Prompted Question Box</a>
+                <a href="?path=/docs/specs-toolkit-post-session-sections-ai-prompted-question-box--docs">Dynamic AI Prompted Question Box</a>
                 {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-sections-session-information-form--docs">Session Information Form</a>
+                <a href="?path=/docs/specs-toolkit-post-session-sections-session-notes--docs">Session Notes</a>
                 {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-sections-form-reflection--docs">Form Reflection</a>
+                <a href="?path=/docs/specs-toolkit-post-session-sections-linear-scale--docs">Linear Scale</a>
+                {' · '}
+                <a href="?path=/docs/specs-toolkit-post-session-sections-form-reflection--docs">Free Response Question</a>
             </td>
-            <td>Side nav states · AI question card · session info · free-response prompts</td>
+            <td>
+                AI loading is a state of the AI question box — not a separate Element.
+                Self Reflection uses Linear Scale (not a Self Rating Element).
+            </td>
         </tr>
         <tr>
             <td><strong>Pages</strong></td>
             <td>
-                <a href="?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs">Reflection Flow</a>
+                <a href="?path=/docs/specs-toolkit-pre-session-pages-reflection--docs">Full Page / Reflections</a>
                 {' · '}
-                <a href="?path=/docs/specs-toolkit-post-session-pages-session-reflection--docs">Session Reflection</a>
+                <a href="?path=/docs/specs-toolkit-post-session-sections-session-information-form--docs">Session Info</a>
                 {' · '}
                 <a href="?path=/docs/specs-toolkit-post-session-pages-student-reflection--docs">Student Reflection</a>
+                {' · '}
+                <a href="?path=/docs/specs-toolkit-post-session-pages-session-reflection--docs">Session Reflection</a>
                 {' · '}
                 <a href="?path=/docs/specs-toolkit-post-session-pages-self-reflection-unfilled--docs">Self Reflection</a>
                 {' · '}
                 <a href="?path=/docs/specs-toolkit-post-session-pages-form-feedback-unfilled--docs">Form Feedback</a>
+                {' · '}
+                <a href="?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs">Reflection Flow</a>
             </td>
-            <td>Orchestrator + page states (unfilled / filled / AI / worst case / Save &amp; Exit)</td>
+            <td>Session Info is a page composition of Elements — not an Element itself.</td>
         </tr>
         <tr>
             <td>Cards</td>
             <td>—</td>
-            <td>Empty in Figma — no Storybook docs yet</td>
+            <td>Empty in Figma.</td>
         </tr>
     </tbody>
 </table>
@@ -134,14 +133,14 @@ See `STRUCTURE.md` in this folder for the full Figma ↔ Storybook node map.
 
 <div className="sb-ds-doc-section">
 
-### Featured — Reflection flow
+### Reflection flow
 
-Clickable in-memory walkthrough (no backend): Entry list lives under Pre-Session Reflections;
-this flow starts at Session Information and walks Student → Session → Self → Form Feedback.
+In-memory walkthrough (no backend). Entry list: Pre-Session Reflections.
+Flow: Session Info → Student → Session → Self → Form Feedback → Confirmation Pop-up (reflection submitted).
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>End-to-end Post-Session orchestrator (Figma flows 02–06 + local organisms).</>}
+    description={<>Orchestrator composing Figma page states and local organisms.</>}
 >
     <Canvas of={ReflectionFlowStories.Default} />
 </DocsCanvasShell>

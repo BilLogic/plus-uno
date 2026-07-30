@@ -1,0 +1,30 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tutor-earnings-center",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:tutor-earnings-center"],
+      "port": 3030
+    },
+    {
+      "name": "tutor-payout-history",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:tutor-payout-history"],
+      "port": 3040
+    },
+    {
+      "name": "student-progress",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:student-progress"],
+      "port": 3050
+    },
+    {
+      "name": "storybook",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "storybook:preview"],
+      "port": 4200,
+      "autoPort": true
+    }
+  ]
+}

@@ -8,6 +8,9 @@ import './Rating.scss';
  * Rating component with 5 stars, supporting two variants:
  * 1. With "Comments" label below
  * 2. With numeric labels (1-5) above each star
+ *
+ * @param {object} props
+ * @param {'star'|'thumbs-up'} [props.icon='star'] Icon used for each rating choice.
  */
 const Rating = ({
     id,
@@ -22,6 +25,7 @@ const Rating = ({
     onChange,
     className = '',
     style,
+    icon = 'star',
     ...props
 }) => {
     const handleStarClick = (starValue) => {
@@ -56,6 +60,7 @@ const Rating = ({
                                 value={starValue}
                                 selected={isSelected}
                                 variant={variant}
+                                icon={icon}
                                 disabled={disabled}
                                 onClick={() => handleStarClick(starValue)}
                             />
@@ -84,17 +89,19 @@ Rating.propTypes = {
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    icon: PropTypes.oneOf(['star', 'thumbs-up'])
 };
 
 /**
  * Sub-component: RatingItem
- * Individual star item with circular background and star icon
+ * Individual rating item with circular background and an icon.
  */
 const RatingItem = ({
     value,
     selected = false,
     variant = 'comments',
+    icon = 'star',
     disabled = false,
     onClick,
     className = '',
@@ -119,7 +126,7 @@ const RatingItem = ({
                 onClick={!disabled ? onClick : undefined}
                 role={!disabled ? 'button' : undefined}
                 tabIndex={!disabled ? 0 : undefined}
-                aria-label={!disabled ? `Rate ${value} star${value === 1 ? '' : 's'}` : undefined}
+                aria-label={!disabled ? `Rate ${value}` : undefined}
                 onKeyDown={!disabled && onClick ? (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -129,7 +136,7 @@ const RatingItem = ({
                 {...props}
             >
                 <i 
-                    className={selected ? 'fas fa-star' : 'far fa-star'} 
+                    className={selected ? `fas fa-${icon}` : `far fa-${icon}`}
                     aria-hidden="true"
                 />
             </div>
@@ -141,6 +148,7 @@ RatingItem.propTypes = {
     value: PropTypes.number.isRequired,
     selected: PropTypes.bool,
     variant: PropTypes.oneOf(['comments', 'numeric']),
+    icon: PropTypes.oneOf(['star', 'thumbs-up']),
     disabled: PropTypes.bool,
     onClick: PropTypes.func,
     className: PropTypes.string

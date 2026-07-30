@@ -1,0 +1,14 @@
+{
+  "plugins": {
+    "figma": {
+      "enabled": true
+    },
+    "notion-workspace": {
+      "enabled": true
+    }
+  },
+  "uno": {
+    "prdGate": true,
+    "writebackGate": true
+  }
+}

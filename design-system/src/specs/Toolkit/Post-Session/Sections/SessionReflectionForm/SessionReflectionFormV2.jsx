@@ -118,6 +118,7 @@ const SessionReflectionFormV2 = ({
                         id="session-reflection-rating"
                         value={rating}
                         onChange={setRating}
+                        icon="thumbs-up"
                         variant="comments"
                         showCommentsLabel={rating > 0}
                         commentsLabel={SESSION_RATING_COMMENTS[rating]}

@@ -5,39 +5,42 @@
 
 /** @type {Record<number, string>} */
 export const SESSION_RATING_COMMENTS = {
-    1: 'Lots of room for improvement.',
-    2: 'Not so well, adjustments are needed.',
-    3: "Okay, could've gone better.",
+    1: 'Rough — very little went to plan.',
+    2: 'Tough, and a lot needs adjusting.',
+    3: 'Okay — it could have gone better.',
     4: 'Good, with a few things to tighten.',
-    5: 'Excellent session!',
-};
-
-/** @type {Record<number, string>} */
-export const STUDENT_RATING_COMMENTS = {
-    1: 'Lots of room for improvement.',
-    2: 'Not so well, adjustments are needed.',
-    3: "Okay, could've gone better.",
-    4: 'Good, with some room for improvement.',
-    5: 'Wonderful interactions!',
-};
-
-/** @type {Record<number, string>} */
-export const SELF_RATING_COMMENTS = {
-    1: 'Lots of room for improvement.',
-    2: 'Not so well, adjustments are needed.',
-    3: "Okay, could've gone better.",
-    4: 'Good, with some room for improvement.',
-    5: 'I did great!',
+    5: 'Great — it all came together.',
 };
 
 /** @type {Record<number, string>} */
 export const FORM_RATING_COMMENTS = {
-    1: 'Lots of room for improvement.',
-    2: 'Not so well, adjustments are needed.',
-    3: "Okay, could've gone better.",
-    4: 'Good, with some room for improvement.',
-    5: 'Excellent form!',
+    1: 'Confusing — I struggled to get through it.',
+    2: 'Workable, but not straightforward.',
+    3: 'Mostly clear, a few parts less so.',
+    4: 'Easy, with a couple of unclear bits.',
+    5: 'Clear and easy from start to finish.',
 };
+
+export const GOAL_PROGRESS_OPTIONS = [
+    { id: 'ahead', label: 'Ahead of Goal' },
+    { id: 'steady', label: 'Steady / On Track' },
+    { id: 'needs-support', label: 'Needs Support' },
+    { id: 'other', label: 'Other' },
+];
+
+export const EFFORT_OPTIONS = [
+    { id: 'above', label: 'Went Above and Beyond' },
+    { id: 'consistent', label: 'Consistent' },
+    { id: 'gave-up', label: 'Gave Up Quickly' },
+    { id: 'other', label: 'Other' },
+];
+
+export const ENGAGEMENT_OPTIONS = [
+    { id: 'enthusiastic', label: 'Enthusiastic / Curious' },
+    { id: 'responsive', label: 'Responsive' },
+    { id: 'distracted', label: 'Distracted' },
+    { id: 'other', label: 'Other' },
+];
 
 export const WHAT_WORKED_OPTIONS = [
     { id: 'good-pacing', label: 'Good Pacing' },

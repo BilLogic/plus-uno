@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/actions/Button';
+import SideNavBar from './SideNavBar/SideNavBar';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -141,7 +142,7 @@ const SideBarTab = ({
  * - Container radius: 16px (--size-border-radius-4-5)
  * - Min width: 162px, Max width: ~219px
  */
-const SideNavBar = ({
+const SideNavBarLegacy = ({
     state = 'default',
     students = [],
     activeTab = 'student-reflection',
@@ -309,8 +310,7 @@ const inProgressStudents = [
 
 /**
  * Overview
- * Shows all four states of the Side Nav Bar side by side:
- * Default, In Progress, Pre-student Add, and Collapsed
+ * Shows the three Figma Side Nav Bar variants side by side.
  */
 export const Overview = () => (
     <div
@@ -326,7 +326,7 @@ export const Overview = () => (
         <div>
             <h5 className="text-muted mb-2">Side Nav Bar — Reflection</h5>
             <p className="text-muted small mb-0">
-                Vertical side navigation for the post-session reflection flow. Shows all four states.
+                Vertical side navigation for the post-session reflection flow. Shows the three Figma states.
             </p>
         </div>
 
@@ -338,23 +338,22 @@ export const Overview = () => (
                 alignItems: 'flex-start',
             }}
         >
-            {/* Default State */}
+            {/* Students confirmed */}
             <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
-                <span className="small text-muted">Default</span>
+                <span className="small text-muted">Students confirmed</span>
                 <SideNavBar
-                    state="default"
+                    state="students-confirmed"
                     students={defaultStudents}
                 />
             </div>
 
-            {/* In Progress State */}
-            <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
+            {false && <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
                 <span className="small text-muted">In Progress</span>
                 <SideNavBar
                     state="in-progress"
                     students={inProgressStudents}
                 />
-            </div>
+            </div>}
 
             {/* Pre-student Add State */}
             <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
@@ -365,10 +364,10 @@ export const Overview = () => (
                 />
             </div>
 
-            {/* Collapsed State */}
+            {/* In progress state */}
             <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
-                <span className="small text-muted">Collapsed</span>
-                <SideNavBar state="collapsed" />
+                <span className="small text-muted">In progress</span>
+                <SideNavBar state="in-progress" />
             </div>
         </div>
 

@@ -190,10 +190,30 @@ const Dropdown = ({
                             }}
                         >
                             <div className="dropdown-item-inner">
+                                {item.multiSelectCheckbox ? (
+                                    <i
+                                        className={
+                                            item.multiSelectChecked
+                                                ? 'fa-solid fa-square-check'
+                                                : 'fa-regular fa-square'
+                                        }
+                                        style={{
+                                            color: item.multiSelectChecked
+                                                ? 'var(--color-primary)'
+                                                : 'var(--color-on-surface-variant)',
+                                            flexShrink: 0,
+                                        }}
+                                        aria-hidden="true"
+                                    />
+                                ) : (
+                                    <i
+                                        className="fas fa-check selected-icon"
+                                        style={{ opacity: item.selected ? 1 : 0 }}
+                                        aria-hidden="true"
+                                    />
+                                )}
 
-                                <i className="fas fa-check selected-icon" style={{ opacity: item.selected ? 1 : 0 }}></i>
-
-                                {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`}></i>}
+                                {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
 
                                 <span className="pdropdown-item-text" style={{ flexGrow: 1, minWidth: 0 }}>
                                     {item.text || item.label}

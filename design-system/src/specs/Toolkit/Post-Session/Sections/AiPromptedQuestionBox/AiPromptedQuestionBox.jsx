@@ -56,7 +56,7 @@ const AiPromptedQuestionBox = ({
     if (state === 'empty') {
         return (
             <div className={className} style={shellStyle}>
-                <i className="fa-solid fa-wand-magic-sparkles" style={{ color: 'var(--color-mastering-content-text, #5b3d7a)', marginTop: '2px' }} aria-hidden="true" />
+                <i className="fa-solid fa-sparkles" style={{ color: 'var(--color-mastering-content-text)', fontSize: '24px', marginTop: '2px' }} aria-hidden="true" />
                 <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)', flex: 1 }}>
                     No more questions for now — you’ve got it covered. Let’s move on to the next section!
                 </p>
@@ -66,7 +66,7 @@ const AiPromptedQuestionBox = ({
 
     return (
         <div className={className} style={shellStyle}>
-            <i className="fa-solid fa-wand-magic-sparkles" style={{ color: 'var(--color-mastering-content-text, #5b3d7a)', marginTop: '2px' }} aria-hidden="true" />
+            <i className="fa-solid fa-sparkles" style={{ color: 'var(--color-mastering-content-text)', fontSize: '24px', marginTop: '2px' }} aria-hidden="true" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-sm, 10px)', flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
                     <p className="h6 m-0" style={{ color: 'var(--color-on-surface)' }}>{question}</p>
@@ -97,6 +97,8 @@ export default AiPromptedQuestionBox;
 
 /**
  * Interactive playground wrapper with local answer state.
+ *
+ * @param {object} props
  */
 export function AiPromptedQuestionBoxInteractive(props) {
     const [value, setValue] = useState('');

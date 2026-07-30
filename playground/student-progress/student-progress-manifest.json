@@ -1,0 +1,220 @@
+{
+  "playground": "playground/student-progress",
+  "sourcePrototype": "prototypes/student-progress",
+  "generatedAt": "2026-07-27",
+  "scope": "Full-interface replica of the Student Progress screen (expanded state: Arjun Mehta open). Every UI element with a verified registry mapping is a published library component instance — 49 in total. Container frames (page section, roster card, table rows) are auto-layout frames with design-system variables bound for colour, spacing, radius and stroke; no raw hex or px values. Nothing was drawn to imitate a component that the library lacks.",
+  "figmaTestFile": {
+    "fileKey": "mg1o1ybNMZOq4Kz7vn4r2M",
+    "name": "Test-Roundtrip",
+    "page": "Page 2 (99:1249)"
+  },
+  "writeBackFrame": {
+    "nodeId": "122:1109",
+    "name": "[replica] Student Progress",
+    "size": "1440 x 900"
+  },
+  "componentLibraries": [
+    {
+      "name": "Design System - BS4 Foundation (Component LIbrary)",
+      "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+      "role": "Table, Static Badges, Buttons"
+    },
+    {
+      "name": "Design System - Web App Specs",
+      "libraryKey": "lk-03c19a275e0d9044b320f34688b3e6df4cd9c3df68e3b954437a6b0cd83980a50e7b47457cfab947e0901b4ceeb4c14f837d4e0edd87991288a16ecb58f447cf",
+      "role": "Sidebar, Top Bar (Universal Organisms — the shell)"
+    }
+  ],
+  "components": [
+    {
+      "codeImport": "@/specs/Universal/Sections/Sidebar/Sidebar",
+      "componentSetNodeId": "111:227891",
+      "figmaInstanceNodeId": "122:1110",
+      "libraryComponentKey": "b8992160c30244c2871f83b0a97da6f46e3a0a9a",
+      "variantProps": { "user": "tutor" },
+      "role": "App shell — left navigation (sidebarConfig.user='tutor')"
+    },
+    {
+      "codeImport": "@/specs/Universal/Sections/TopBar/TopBar",
+      "componentSetNodeId": "111:227859",
+      "figmaInstanceNodeId": "122:1112",
+      "libraryComponentKey": "2ebcf766671d3b245697aaf7174d23fca7366227",
+      "variantProps": { "expand?": "true" },
+      "role": "App shell — top bar; breadcrumb overridden to Toolkit / Progress, user to Sam Rivera. Figma spells this prop `expand?`, code spells it `mode: expanded | collapsed`."
+    },
+    {
+      "codeImport": "@/components/Button",
+      "componentSetNodeId": "968:18597",
+      "figmaInstanceNodeId": "124:280",
+      "libraryComponentKey": "c486535e5e6140a60b619f22967fa2445f585cda",
+      "variantProps": { "size": "small", "style": "secondary", "state": "rest (default)", "fill": "outline" },
+      "role": "\"Needs attention (3)\" filter toggle in its off state; leadingVisual icon-name=filter, trailingVisual disabled"
+    },
+    {
+      "codeImport": "@/components/Table",
+      "componentSetNodeId": "10:473",
+      "figmaInstanceNodeId": "126:345",
+      "libraryComponentKey": "56600529d872a997f3ebaeecee7215454c6a01c7",
+      "variantProps": { "size": "head", "style": "default", "icon": "none" },
+      "role": "Roster header cell — \"Student\" (4 head cells at 126:345, 126:349, 126:352, 126:355)"
+    },
+    {
+      "codeImport": "@/components/Table",
+      "componentSetNodeId": "10:473",
+      "figmaInstanceNodeId": "127:296",
+      "libraryComponentKey": "56600529d872a997f3ebaeecee7215454c6a01c7",
+      "variantProps": { "size": "body", "style": "default", "icon": "none" },
+      "role": "Roster body cell — student name + grade (6 rows x 2 text cells)"
+    },
+    {
+      "codeImport": "@/components/Table",
+      "componentSetNodeId": "10:473",
+      "figmaInstanceNodeId": "127:317",
+      "libraryComponentKey": "56600529d872a997f3ebaeecee7215454c6a01c7",
+      "variantProps": { "size": "body", "style": "default", "icon": "right" },
+      "role": "Roster expand-affordance cell — chevron-up on the open row, chevron-down on the rest"
+    },
+    {
+      "codeImport": "@/components/Table",
+      "componentSetNodeId": "10:507",
+      "figmaInstanceNodeId": "129:435",
+      "libraryComponentKey": "47de9d29fad612bfcbfbe8d92ad5c24c039f129e",
+      "variantProps": { "size": "head", "style": "default", "icon": "none" },
+      "role": "Session-history header cell (density='sm' in code -> Table/Small Borderless); Date / Topic / Outcome"
+    },
+    {
+      "codeImport": "@/components/Table",
+      "componentSetNodeId": "10:507",
+      "figmaInstanceNodeId": "129:446",
+      "libraryComponentKey": "47de9d29fad612bfcbfbe8d92ad5c24c039f129e",
+      "variantProps": { "size": "body", "style": "default", "icon": "none" },
+      "role": "Session-history body cell — 5 sessions x date + topic"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "127:304",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b2", "style": "danger" },
+      "role": "Progress state — At risk (leadingVisual icon-name=triangle-exclamation)"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "127:334",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b2", "style": "warning" },
+      "role": "Progress state — Needs attention (icon-name=circle-exclamation); also 127:359"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "128:359",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b2", "style": "success" },
+      "role": "Progress state — On track (icon-name=circle-check); also 128:384, 128:404"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "129:454",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b3", "style": "danger" },
+      "role": "Session outcome — Missed; also 129:472"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "129:486",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b3", "style": "warning" },
+      "role": "Session outcome — Struggled; also 129:500"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "129:514",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b3", "style": "primary" },
+      "role": "Session outcome — Steady. Code uses Badge style='info'; the Static Badges set has no info variant, mapped to primary (see variantGaps)"
+    }
+  ],
+  "tokenBindings": [
+    { "codeToken": "var(--color-surface)", "figmaVariableName": "Neutral Colors/surface", "usedBy": "Page background" },
+    { "codeToken": "var(--color-surface-container-lowest)", "figmaVariableName": "Neutral Colors/Surface container/surface-container-lowest", "usedBy": "Roster card fill" },
+    { "codeToken": "var(--color-surface-container-high)", "figmaVariableName": "Neutral Colors/Surface container/surface-container-high", "usedBy": "Open row tint + expanded session-history block (.sp__cell--open, .sp__detail-cell)" },
+    { "codeToken": "var(--color-outline-variant)", "figmaVariableName": "Neutral Colors/outline-variant", "usedBy": "Roster card border" },
+    { "codeToken": "var(--color-on-surface)", "figmaVariableName": "Neutral Colors/on-surface", "usedBy": "Page title, roster heading" },
+    { "codeToken": "var(--color-on-surface-variant)", "figmaVariableName": "Neutral Colors/on-surface-variant", "usedBy": "Subtitle, Showing 6 of 6, student grade line, history label" },
+    { "codeToken": "var(--color-primary)", "figmaVariableName": "_Primary/Primary", "usedBy": "Left accent on the expanded detail block" },
+    { "codeToken": "var(--size-section-pad-x-lg)", "figmaVariableName": "Section/pad-x-lg", "usedBy": "Content section horizontal padding" },
+    { "codeToken": "var(--size-section-pad-y-lg)", "figmaVariableName": "Section/pad-y-lg", "usedBy": "Content section vertical padding" },
+    { "codeToken": "var(--size-section-gap-md)", "figmaVariableName": "Section/gap-md", "usedBy": "Gap between page header and roster card (.sp gap)" },
+    { "codeToken": "var(--size-card-pad-x-lg)", "figmaVariableName": "Card/pad-x-lg", "usedBy": "Roster card horizontal padding (paddingSize='lg')" },
+    { "codeToken": "var(--size-card-pad-y-lg)", "figmaVariableName": "Card/pad-y-lg", "usedBy": "Roster card vertical padding" },
+    { "codeToken": "var(--size-card-radius-md)", "figmaVariableName": "Card/radius-md", "usedBy": "Roster card corner radius" },
+    { "codeToken": "var(--size-card-border-sm)", "figmaVariableName": "Card/border-sm", "usedBy": "Roster card stroke weight" },
+    { "codeToken": "var(--size-card-pad-x-md)", "figmaVariableName": "Card/pad-x-md", "usedBy": "Expanded detail block horizontal padding (.sp__history)" },
+    { "codeToken": "var(--size-card-pad-y-md)", "figmaVariableName": "Card/pad-y-md", "usedBy": "Expanded detail block vertical padding" },
+    { "codeToken": "var(--size-element-gap-md)", "figmaVariableName": "Element/gap-md", "usedBy": "Toolbar-to-table gap inside the card" },
+    { "codeToken": "var(--size-element-gap-sm)", "figmaVariableName": "Element/gap-sm", "usedBy": "History label to sub-table gap" },
+    { "codeToken": "var(--size-element-gap-xs)", "figmaVariableName": "Element/gap-xs", "usedBy": "Title/subtitle gap, roster heading/count gap" },
+    { "codeToken": "var(--size-element-stroke-lg)", "figmaVariableName": "Element/stroke-lg", "usedBy": "Left accent weight on the expanded detail block" },
+    { "codeToken": "var(--size-table-cell-x)", "figmaVariableName": "Table/cell-x", "usedBy": "Progress and Outcome cell horizontal padding (badge-bearing cells)" },
+    { "codeToken": "var(--size-table-cell-y)", "figmaVariableName": "Table/cell-y", "usedBy": "Progress and Outcome cell vertical padding" },
+    { "codeToken": "h3-txt", "figmaTextStyleName": "Headline/H3", "usedBy": "\"Student progress\" page title" },
+    { "codeToken": "body2-txt", "figmaTextStyleName": "Body/B2/Regular", "usedBy": "Page subtitle" },
+    { "codeToken": "body1-txt font-weight-semibold", "figmaTextStyleName": "Body/B1/Bold", "usedBy": "\"Your students\" roster heading" },
+    { "codeToken": "body3-txt", "figmaTextStyleName": "Body/B3/Regular", "usedBy": "\"Showing 6 of 6\", \"LAST 5 SESSIONS · ARJUN MEHTA\"" }
+  ],
+  "variantGaps": [
+    {
+      "codeValue": "Badge style=\"info\"",
+      "figmaSet": "Static Badges (25:568)",
+      "reason": "The Figma set exposes primary | secondary | tertiary | danger | success | warning | socio-emotional | mastering content | advocacy | relationships | technology tools — there is no `info` variant, though the code Badge has one.",
+      "action": "Session outcome \"Steady\" placed as style=primary. Same substitution as the tutor-payout-history write-back; needs a real `info` variant in the Figma set."
+    }
+  ],
+  "gaps": [
+    {
+      "codeImport": "@/specs/Universal/Pages/PageLayout/PageLayout",
+      "reason": "The published Page Layout component (key 4d02ef5dbb2961127c21f11cb05384d17482841f) contains Top Bar + Main Container + a Content SLOT but NO Sidebar, so an instance of it cannot reproduce the rendered shell. The registry's node-id for PageLayout (111:241933) also does not resolve in the file the registry names (zAecJNRdvJzAUOcjV32tRX) — the specs live in the separate 'Design System - Web App Specs' library.",
+      "action": "Shell composed from its registry-mapped parts instead — Sidebar (122:1110) + Top Bar (122:1112), both real library instances. Registry entry for PageLayout needs its fileKey/node-id corrected and the published component needs its Sidebar restored."
+    },
+    {
+      "codeImport": "@/components/Card",
+      "reason": "The DS Card component (4241:27817) has a fixed internal structure (image / title / subtitle / content / list / link / button) and exposes no content SLOT, so a Table cannot be nested inside a Card instance.",
+      "action": "Roster container built as an auto-layout frame with Card/pad-x-lg, Card/pad-y-lg, Card/radius-md, Card/border-sm and surface-container-lowest / outline-variant bound — the Card's own tokens, no invented values. A slot-bearing Card variant would close this."
+    },
+    {
+      "codeImport": "expandable table row",
+      "reason": "No design-system component expresses a table row that expands in place; the code composes it from Table + an injected colSpan row.",
+      "action": "Reproduced as a sibling frame directly beneath the open row, tinted surface-container-high with an Element/stroke-lg primary left accent — matching the code's .sp__detail-cell / .sp__history styling."
+    }
+  ],
+  "notPlaced": [
+    {
+      "element": "Demo state switch (Assigned students / No students)",
+      "reason": "Prototype-only scaffolding, marked 'not a shipped control' in prototypes/student-progress/student-progress-manifest.json. Excluded so the frame reads as the product interface."
+    },
+    {
+      "element": "Empty state (no assigned students)",
+      "reason": "A separate screen state; this frame replicates the populated + expanded state. Would need its own [replica] frame."
+    }
+  ],
+  "divergences": [
+    {
+      "what": "Sidebar Toolkit item",
+      "detail": "The published Figma Sidebar ships 'Slack' as its second Toolkit item; the code Sidebar renders 'Reviews'. Overridden to 'Reviews' in the instance to match the rendered interface — the underlying component still differs."
+    },
+    {
+      "what": "Table cell text alignment",
+      "detail": "DS body cells centre their text; the rendered app left-aligns. Applied as an instance-level textAlignHorizontal override on 30 cell text nodes."
+    }
+  ],
+  "verification": {
+    "instancesPlaced": 49,
+    "method": "All placed via importComponentSetByKeyAsync/importComponentByKeyAsync + createInstance — published library instances only. No capture-based authoring tool was used at any point in producing this frame.",
+    "visualCheck": "Frame screenshot compared against the running prototype at localhost:3050 (expanded state, Arjun Mehta open); no placeholder text remains (audited for 'Table Head', 'Table Body', 'Badge', 'Button', 'John Doe', 'Strategies', 'Page Now')."
+  }
+}

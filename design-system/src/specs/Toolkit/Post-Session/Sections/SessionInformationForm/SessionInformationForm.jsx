@@ -1,342 +1,370 @@
-
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Card from '@/components/layout-and-structure/Card';
 import Button from '@/components/actions/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown';
 import Switch from '@/components/forms-and-inputs/Switch';
-import Input from '@/components/forms-and-inputs/Input';
-import Checkbox from '@/components/forms-and-inputs/Checkbox';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import DatePicker from '@/components/forms-and-inputs/DatePicker';
+import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
+import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
+import StudentsDropdown from '@/specs/Toolkit/Post-Session/Tables/StudentsDropdown/StudentsDropdown';
+
+const NO_RECORDING_REASONS = [
+    'Forgot to record',
+    'Recording failed / tech issue',
+    'Other',
+];
 
 /**
- * SessionInformationForm
+ * Field label with optional required asterisk (Figma Session Information).
  *
- * Form to capture or edit session details.
- * Includes fields for Date, Time, Duration, and Topic/Notes.
+ * @param {object} props
+ * @param {string} [props.htmlFor]
+ * @param {React.ReactNode} props.children
+ * @param {boolean} [props.required]
+ */
+function FieldLabel({ htmlFor, children, required = false }) {
+    return (
+        <label
+            htmlFor={htmlFor}
+            className="body2-txt font-weight-semibold m-0"
+            style={{ color: 'var(--color-on-surface)' }}
+        >
+            {children}
+            {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
+        </label>
+    );
+}
+
+FieldLabel.propTypes = {
+    htmlFor: PropTypes.string,
+    children: PropTypes.node.isRequired,
+    required: PropTypes.bool,
+};
+
+/**
+ * Full-width wrapper so DS Dropdown toggles stretch to the form column.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.children
+ */
+function FullWidthDropdown({ children }) {
+    return (
+        <div className="session-info-full-width-dropdown" style={{ width: '100%' }}>
+            <style>
+                {`
+                  .session-info-full-width-dropdown .pdropdown {
+                    display: flex;
+                    width: 100%;
+                  }
+                  .session-info-full-width-dropdown .pdropdown-default-toggle {
+                    width: 100%;
+                    justify-content: space-between;
+                  }
+                  .session-info-full-width-dropdown .dropdown-menu {
+                    width: 100%;
+                    max-width: none;
+                  }
+                `}
+            </style>
+            {children}
+        </div>
+    );
+}
+
+FullWidthDropdown.propTypes = {
+    children: PropTypes.node.isRequired,
+};
+
+/**
+ * Session Information — page composition from Figma Session Info (`563:300236`).
+ * Composes Elements: Session date, Session selection, Students Dropdown, Upload Files.
+ *
+ * @param {object} props
  */
 const SessionInformationForm = ({
     initialData,
     availableStudents = [],
     selectedStudentIds = [],
     onStudentSelectionChange,
-    onSave
+    onSave,
+    onCancel,
+    onSaveAndExit,
+    lastUpdated,
 }) => {
     const [formData, setFormData] = useState({
         date: initialData?.date || '',
         sessionOption: initialData?.sessionOption || '',
         didNotHappen: initialData?.didNotHappen || false,
-        cancellationReasons: initialData?.cancellationReasons || [],
-        otherReason: initialData?.otherReason || '',
-        reason: initialData?.reason || '',
+        noRecording: initialData?.noRecording || false,
+        noRecordingReason: initialData?.noRecordingReason || '',
         files: initialData?.files || [
-            { name: 'math_worksheet_completed.pdf', size: '2.4 MB' }
+            { name: 'zoom_0.mp4', size: '160 mb' },
+            { name: 'audio_only.m4a', size: '18 mb' },
+            { name: 'chat.txt', size: '1 mb' },
         ],
     });
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+    /**
+     * @param {Partial<typeof formData>} patch
+     */
+    const patchForm = (patch) => {
+        setFormData((prev) => ({ ...prev, ...patch }));
     };
 
-    const handleDidNotHappenChange = (checked) => {
-        setFormData(prev => ({
-            ...prev,
-            didNotHappen: checked,
-            // Optionally reset cancellation reasons if untoggled
-            // cancellationReasons: checked ? prev.cancellationReasons : [],
-            // otherReason: checked ? prev.otherReason : '',
-            // reason: checked ? prev.reason : '',
-        }));
-    };
-
-    const handleRemoveFile = (fileName) => {
-        setFormData(prev => ({
-            ...prev,
-            files: prev.files.filter(f => f.name !== fileName)
-        }));
-    };
-
+    /**
+     * @param {string} studentId
+     */
     const handleStudentToggle = (studentId) => {
         if (!onStudentSelectionChange) return;
-
-        const newSelection = selectedStudentIds.includes(studentId)
-            ? selectedStudentIds.filter(id => id !== studentId)
+        const next = selectedStudentIds.includes(studentId)
+            ? selectedStudentIds.filter((id) => id !== studentId)
             : [...selectedStudentIds, studentId];
-
-        onStudentSelectionChange(newSelection);
+        onStudentSelectionChange(next);
     };
 
-    const handleReasonCheckboxChange = (reason) => {
-        setFormData(prev => {
-            const currentReasons = prev.cancellationReasons || [];
-            const newReasons = currentReasons.includes(reason)
-                ? currentReasons.filter(r => r !== reason)
-                : [...currentReasons, reason];
-            return { ...prev, cancellationReasons: newReasons };
+    /**
+     * Prototype file pick — appends a sample Zoom file.
+     */
+    const handleChooseFile = () => {
+        patchForm({
+            files: [
+                ...formData.files,
+                { name: `recording_${formData.files.length + 1}.mp4`, size: '12 mb' },
+            ],
+            noRecording: false,
         });
     };
 
-    const handleSessionSelect = (value) => {
-        setFormData(prev => ({ ...prev, sessionOption: value }));
+    /**
+     * @param {string} fileName
+     */
+    const handleRemoveFile = (fileName) => {
+        patchForm({ files: formData.files.filter((file) => file.name !== fileName) });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave?.({
-            ...formData,
-            selectedStudentIds
-        });
-    };
+    /**
+     * @returns {object}
+     */
+    const snapshot = () => ({
+        ...formData,
+        selectedStudentIds,
+    });
 
-    const cancellationOptions = [
-        "Unforeseen circumstances",
-        "Technical difficulties",
-        "Participant absence",
-        "Schedule conflict",
-        "Communication error",
-        "Other"
-    ];
-
-    // Prepare dropdown items for students
-    const studentDropdownItems = availableStudents.map(student => ({
-        text: student.name,
-        multiSelectCheckbox: true,
-        multiSelectChecked: selectedStudentIds.includes(student.id || student.name),
-        keepOpen: true,
-        onClick: () => handleStudentToggle(student.id || student.name)
-    }));
-
-    // Prepare dropdown items for sessions
     const sessionItems = [
-        { text: 'Lincoln High - 10:00 AM', value: 'session-1', onClick: () => handleSessionSelect('session-1'), selected: formData.sessionOption === 'session-1' },
-        { text: 'Lincoln High - 11:00 AM', value: 'session-2', onClick: () => handleSessionSelect('session-2'), selected: formData.sessionOption === 'session-2' },
-        { text: 'Math Tutoring - 2:00 PM', value: 'math_tutoring', onClick: () => handleSessionSelect('math_tutoring'), selected: formData.sessionOption === 'math_tutoring' }
+        {
+            text: 'Life STEAM Academy · 16:00',
+            value: 'session-1',
+            selected: formData.sessionOption === 'session-1',
+            onClick: () => patchForm({ sessionOption: 'session-1' }),
+        },
+        {
+            text: 'Lincoln High · 10:00 AM',
+            value: 'session-2',
+            selected: formData.sessionOption === 'session-2',
+            onClick: () => patchForm({ sessionOption: 'session-2' }),
+        },
+        {
+            text: 'Math Tutoring · 2:00 PM',
+            value: 'math_tutoring',
+            selected: formData.sessionOption === 'math_tutoring',
+            onClick: () => patchForm({ sessionOption: 'math_tutoring' }),
+        },
     ];
 
-    const getSessionLabel = () => {
-        const selected = sessionItems.find(i => i.value === formData.sessionOption);
-        return selected ? selected.text : 'Select a session';
-    };
+    const sessionLabel =
+        sessionItems.find((item) => item.value === formData.sessionOption)?.text || 'Select a session';
+
+    const hasDateAndSession = Boolean(formData.date && formData.sessionOption);
+    const recordingOk = formData.noRecording
+        ? Boolean(formData.noRecordingReason)
+        : formData.files.length > 0;
+    const canNext = hasDateAndSession && selectedStudentIds.length > 0 && recordingOk;
+    const canSave = hasDateAndSession;
 
     return (
-        <Card className="border-0 shadow-none" style={{ backgroundColor: 'transparent' }}>
-            <div className="mb-4">
-                <h2 className="h4-txt mb-2">Session Information</h2>
-                <p className="body2-txt text-muted">Please verify the details of this session.</p>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-section-gap-md)',
+                flex: '1 0 0',
+                minWidth: 0,
+                width: '100%',
+            }}
+        >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
+                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
+                    Session Information
+                </h4>
+                <LastUpdated
+                    text={typeof lastUpdated === 'string' ? lastUpdated : undefined}
+                    value={lastUpdated instanceof Date ? lastUpdated : undefined}
+                />
             </div>
 
-            <Form onSubmit={handleSubmit}>
-                <div className="d-flex flex-column gap-4">
-                    <div className="d-flex flex-column gap-3">
-                        {/* Session Date */}
-                        <Input
-                            id="date"
-                            name="date"
-                            type="date"
-                            label="Session Date"
-                            required
-                            value={formData.date}
-                            onChange={handleChange}
-                            leadingVisual="fa-regular fa-calendar"
-                            className="body2-txt"
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--size-section-gap-md)',
+                }}
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                    <FieldLabel htmlFor="session-date" required>
+                        Select Date
+                    </FieldLabel>
+                    <DatePicker
+                        id="session-date"
+                        name="date"
+                        placeholder="Select date"
+                        value={formData.date}
+                        onChange={(value) => patchForm({ date: value })}
+                        style={{ width: '100%' }}
+                        className="w-100"
+                    />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                    <FieldLabel htmlFor="session-select-dropdown" required>
+                        Select Session
+                    </FieldLabel>
+                    <FullWidthDropdown>
+                        <Dropdown
+                            id="session-select-dropdown"
+                            buttonText={sessionLabel}
+                            items={sessionItems}
+                            style="default"
+                            fill="outline"
                         />
+                    </FullWidthDropdown>
+                </div>
 
-                        {/* Select Session */}
-                        <Form.Group controlId="sessionOption">
-                            <Form.Label className="body2-txt font-weight-bold">
-                                Select Session <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Dropdown
-                                id="session-select-dropdown"
-                                buttonText={getSessionLabel()}
-                                items={sessionItems}
-                                style="default"
-                                fill="outline"
-                                className="w-100"
-                            />
-                            {/* Hidden input for HTML5 validation if needed, or rely on state check */}
-                            <input
-                                type="hidden"
-                                name="sessionOption"
-                                value={formData.sessionOption}
-                                required
-                            />
-                        </Form.Group>
+                <Switch
+                    id="did-not-happen-switch"
+                    label="Session did not happen"
+                    checked={formData.didNotHappen}
+                    onChange={(event) => patchForm({ didNotHappen: event.target.checked })}
+                />
+            </div>
 
-                        {/* Did not happen switch */}
-                        <div className="d-flex align-items-center mb-4">
-                            <Switch
-                                id="did-not-happen-switch"
-                                label="Session did not happen"
-                                checked={formData.didNotHappen}
-                                onChange={(e) => handleDidNotHappenChange(e.target.checked)}
-                                className="d-flex align-items-center gap-2"
+            {hasDateAndSession && (
+                <>
+                    <StudentsDropdown
+                        students={availableStudents}
+                        selectedIds={selectedStudentIds}
+                        onChange={(ids) => onStudentSelectionChange?.(ids)}
+                    />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '480px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
+                            <FieldLabel required>Upload session recording</FieldLabel>
+                            <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                Upload this session’s Zoom recording folder — video, audio, and student chat come in together. Single files and .zip work too.
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
+                            <Button
+                                text="Upload Folder"
+                                style="primary"
+                                fill="filled"
+                                size="small"
+                                onClick={handleChooseFile}
+                            />
+                            <Button
+                                text="Choose a file"
+                                style="primary"
+                                fill="tonal"
+                                size="small"
+                                onClick={handleChooseFile}
                             />
                         </div>
-                    </div>
 
-                    <hr className="m-0" style={{ borderTop: '1px solid var(--color-border)' }} />
-
-
-                    {/* LOGIC: 
-                        If Session/Date NOT selected: Show nothing.
-                        If Session/Date SELECTED:
-                            If DidNotHappen is TRUE: Show Reason field.
-                            If DidNotHappen is FALSE: Show Uploads and Students.
-                    */}
-
-                    {formData.date && formData.sessionOption && (
-                        <>
-                            {formData.didNotHappen ? (
-                                /* Did Not Happen Logic - Show Reason */
-                                <div className="d-flex flex-column gap-4">
-                                    {/* Reason Checkboxes */}
-                                    <Form.Group>
-                                        <Form.Label className="body2-txt font-weight-bold mb-2">
-                                            Select one or more reasons why the session did not happen <span className="text-danger">*</span>
-                                        </Form.Label>
-                                        <div className="d-flex flex-column gap-2">
-                                            {cancellationOptions.map((option) => (
-                                                <div key={option} className="d-flex align-items-center gap-2">
-                                                    <Checkbox
-                                                        id={`reason-${option}`}
-                                                        label={option}
-                                                        checked={(formData.cancellationReasons || []).includes(option)}
-                                                        onChange={() => handleReasonCheckboxChange(option)}
-                                                        className="body2-txt"
-                                                    />
-                                                    {option === "Other" && (formData.cancellationReasons || []).includes("Other") && (
-                                                        <Input
-                                                            type="text"
-                                                            name="otherReason"
-                                                            value={formData.otherReason}
-                                                            onChange={handleChange}
-                                                            placeholder="Please specify"
-                                                            size="small"
-                                                            className="body2-txt ms-2"
-                                                            style={{ maxWidth: '200px' }}
-                                                        />
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Form.Group>
-
-                                    {/* Additional Notes */}
-                                    <div className="d-flex flex-column gap-1">
-                                        <h3 className="h6-txt mb-1">Reason for Cancellation</h3>
-                                        <p className="body2-txt text-muted mb-0">
-                                            Please briefly describe the situation.
-                                        </p>
-                                        <Textarea
-                                            rows={3}
-                                            name="reason"
-                                            value={formData.reason}
-                                            onChange={handleChange}
-                                            placeholder="e.g., Student absent, technical issues, etc."
-                                            className="body2-txt"
+                        {!formData.noRecording && formData.files.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                {formData.files.map((file) => (
+                                    <div
+                                        key={file.name}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 'var(--size-element-gap-md)',
+                                            padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                                        }}
+                                    >
+                                        <i
+                                            className="fa-solid fa-file-circle-check"
+                                            style={{ color: 'var(--color-on-surface-variant)', fontSize: '12px' }}
+                                            aria-hidden="true"
                                         />
+                                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                            {file.name}
+                                        </span>
+                                        <span className="body2-txt" style={{ color: 'var(--color-outline-variant)' }}>
+                                            {file.size}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            aria-label={`Remove ${file.name}`}
+                                            onClick={() => handleRemoveFile(file.name)}
+                                            style={{
+                                                border: 'none',
+                                                background: 'transparent',
+                                                cursor: 'pointer',
+                                                color: 'var(--color-on-surface-variant)',
+                                                padding: 0,
+                                                marginLeft: 'auto',
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-xmark" aria-hidden="true" />
+                                        </button>
                                     </div>
-                                </div>
-                            ) : (
-                                /* Normal Flow - Show Uploads and Students */
-                                <>
-                                    {/* Upload files */}
-                                    <div className="d-flex flex-column gap-3">
-                                        <div>
-                                            <h3 className="h6-txt mb-1">Upload files</h3>
-                                            <p className="body2-txt text-muted mb-0">
-                                                Upload any materials used or completed during the session.
-                                            </p>
-                                        </div>
-
-                                        <div className="d-flex flex-column gap-2">
-                                            {/* Upload Button */}
-                                            <div>
-                                                <Button
-                                                    text="Choose a file"
-                                                    style="default"
-                                                    fill="outline"
-                                                    leadingVisual="upload"
-                                                    size="small"
-                                                    onClick={() => { }}
-                                                />
-                                            </div>
-
-                                            {/* File List */}
-                                            <div className="d-flex flex-column gap-2">
-                                                {formData.files.map((file, index) => (
-                                                    <div key={index} className="d-flex align-items-center justify-content-between p-2 border rounded" style={{ backgroundColor: 'var(--color-surface)' }}>
-                                                        <div className="d-flex align-items-center gap-2">
-                                                            <i className="fa-regular fa-file-pdf text-danger"></i>
-                                                            <span className="body2-txt">{file.name}</span>
-                                                            <span className="caption-txt text-muted">({file.size})</span>
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveFile(file.name)}
-                                                            className="btn btn-link p-0 text-muted"
-                                                            title="Remove file"
-                                                        >
-                                                            <i className="fa-solid fa-xmark"></i>
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr className="m-0" style={{ borderTop: '1px solid var(--color-border)' }} />
-
-                                    {/* Students */}
-                                    <div className="d-flex flex-column gap-3">
-                                        <div>
-                                            <h3 className="h6-txt mb-1">Students</h3>
-                                            <p className="body2-txt text-muted mb-0">
-                                                Select the students who attended this session.
-                                            </p>
-                                        </div>
-
-                                        <div className="d-flex flex-column gap-2">
-                                            <Dropdown
-                                                id="student-select-dropdown"
-                                                buttonText={`${selectedStudentIds.length} Student${selectedStudentIds.length !== 1 ? 's' : ''} Selected`}
-                                                items={studentDropdownItems}
-                                                style="default"
-                                                fill="outline"
-                                                className="w-100"
-                                            />
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="d-flex justify-content-start mt-2">
-                                <Button
-                                    text={formData.didNotHappen ? "Submit" : "Next"}
-                                    style="primary"
-                                    fill="filled"
-                                    type="submit"
-                                    disabled={
-                                        formData.didNotHappen
-                                            ? !((formData.cancellationReasons || []).length > 0 && formData.reason && formData.reason.trim().length > 0 && (!formData.cancellationReasons.includes("Other") || (formData.otherReason && formData.otherReason.trim().length > 0)))
-                                            : selectedStudentIds.length === 0
-                                    }
-                                />
+                                ))}
                             </div>
-                        </>
-                    )}
-                </div>
-            </Form>
-        </Card>
+                        )}
+
+                        <Switch
+                            id="no-recording-switch"
+                            label="I don’t have a session recording"
+                            checked={formData.noRecording}
+                            onChange={(event) => patchForm({
+                                noRecording: event.target.checked,
+                                files: event.target.checked ? [] : formData.files,
+                            })}
+                        />
+
+                        {formData.noRecording && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
+                                <FieldLabel htmlFor="no-recording-reason" required>
+                                    Why is there no recording?
+                                </FieldLabel>
+                                <FullWidthDropdown>
+                                    <Dropdown
+                                        id="no-recording-reason"
+                                        buttonText={formData.noRecordingReason || 'Select a reason'}
+                                        items={NO_RECORDING_REASONS.map((text) => ({
+                                            text,
+                                            selected: formData.noRecordingReason === text,
+                                            onClick: () => patchForm({ noRecordingReason: text }),
+                                        }))}
+                                        style="default"
+                                        fill="outline"
+                                    />
+                                </FullWidthDropdown>
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
+
+            <NavigationButtons
+                canSave={canSave}
+                canNext={canNext}
+                onCancel={onCancel}
+                onSaveAndExit={() => onSaveAndExit?.(snapshot())}
+                onNext={() => onSave?.(snapshot())}
+            />
+        </div>
     );
 };
 
@@ -346,16 +374,17 @@ SessionInformationForm.propTypes = {
     selectedStudentIds: PropTypes.array,
     onStudentSelectionChange: PropTypes.func,
     onSave: PropTypes.func,
-    className: PropTypes.string,
+    onCancel: PropTypes.func,
+    onSaveAndExit: PropTypes.func,
+    lastUpdated: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };
 
 SessionInformationForm.defaultProps = {
     initialData: {},
     availableStudents: [],
     selectedStudentIds: [],
-    onStudentSelectionChange: () => { },
-    onSave: () => { },
-    className: '',
+    onStudentSelectionChange: () => {},
+    onSave: () => {},
 };
 
 export default SessionInformationForm;

@@ -7,7 +7,8 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 <Title />
 
-Confirmation Pop-up — type: exit | exit without saving. Visual specs live in **Figma**; tokens and behavior notes are in the **GitHub** source below.
+Confirmation Pop-up — types: **exit without saving** · **exit** · **reflection submitted**.
+Visual specs live in **Figma**; tokens and behavior notes are in the **GitHub** source below.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=6327-241454"
@@ -20,8 +21,16 @@ Confirmation Pop-up — type: exit | exit without saving. Visual specs live in *
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>ExitWithoutSaving</code> story).</>}>
+<DocsCanvasShell attachSourceBelow description={<>Exit without saving</>}>
     <Canvas of={ConfirmationPopUpStories.ExitWithoutSaving} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell attachSourceBelow description={<>Exit (saved)</>}>
+    <Canvas of={ConfirmationPopUpStories.ExitSaved} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell attachSourceBelow description={<>Reflection submitted</>}>
+    <Canvas of={ConfirmationPopUpStories.ReflectionSubmitted} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>

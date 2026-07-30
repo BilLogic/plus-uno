@@ -1,0 +1,117 @@
+{
+  "playground": "playground/tutor-payout-history",
+  "sourcePrototype": "prototypes/tutor-payout-history",
+  "generatedAt": "2026-07-26",
+  "scope": "Scoped write-back: only components with a verified registry mapping were placed as library instances. Table and PageLayout are registry gaps (see gaps[]) and were intentionally omitted rather than substituted with drawn shapes, per component-alignment.md.",
+  "figmaTestFile": {
+    "fileKey": "mg1o1ybNMZOq4Kz7vn4r2M",
+    "name": "Test-Roundtrip",
+    "page": "Page 2 (99:1249)"
+  },
+  "writeBackFrame": {
+    "nodeId": "105:2",
+    "name": "[replica] Tutor Payout History"
+  },
+  "componentLibrary": {
+    "name": "Design System - BS4 Foundation (Component LIbrary)",
+    "fileKey": "zAecJNRdvJzAUOcjV32tRX"
+  },
+  "components": [
+    {
+      "codeImport": "@/components/Accordion",
+      "componentSetNodeId": "13667:6004",
+      "figmaInstanceNodeId": "105:142",
+      "libraryComponentKey": "1c23add2206ebf90d1ad168c8a523f2e770ca93d",
+      "role": "Month group (June 2026)"
+    },
+    {
+      "codeImport": "@/components/Card",
+      "componentSetNodeId": "4241:27817",
+      "figmaInstanceNodeId": "105:431",
+      "libraryComponentKey": "8f398812b980ce87c669a6427a35eba840a63896",
+      "role": "Container reference"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "106:444",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b3", "style": "success" },
+      "role": "Payout status — Paid"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "106:454",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b3", "style": "primary" },
+      "role": "Payout status — Processing (code uses style=info; Figma set has no info, mapped to primary)"
+    },
+    {
+      "codeImport": "@/components/Badge",
+      "componentSetNodeId": "25:568",
+      "figmaInstanceNodeId": "106:460",
+      "libraryComponentKey": "4cccef7ac820218a928e05b36796e403ffa00fa1",
+      "variantProps": { "type": "b3", "style": "warning" },
+      "role": "Payout status — Scheduled"
+    },
+    {
+      "codeImport": "@/components/Button",
+      "componentSetNodeId": "968:18597",
+      "figmaInstanceNodeId": "106:813",
+      "libraryComponentKey": "c486535e5e6140a60b619f22967fa2445f585cda",
+      "variantProps": { "fill": "outline", "style": "secondary", "size": "medium (default)" },
+      "role": "Download statement (PDF)"
+    },
+    {
+      "codeImport": "@/components/Button",
+      "componentSetNodeId": "979:20977",
+      "figmaInstanceNodeId": "106:827",
+      "libraryComponentKey": "b00c9ab707a5f2774940bc17599c370a514dbcae",
+      "variantProps": { "fill": "tonal", "style": "primary", "size": "medium (default)" },
+      "role": "Demo dataset switch (prototype-only control)"
+    },
+    {
+      "codeImport": "@/components/Toast",
+      "componentSetNodeId": "44:4803",
+      "figmaInstanceNodeId": "106:1597",
+      "libraryComponentKey": "0ab11442d762d545d41e3258154b3d1e7762b2d1",
+      "variantProps": { "style": "success" },
+      "role": "Simulated download confirmation"
+    }
+  ],
+  "tokenBindings": [
+    {
+      "codeToken": "var(--color-success)",
+      "figmaVariableName": "Success",
+      "usedBy": "Badge Paid, Toast"
+    },
+    {
+      "codeToken": "var(--color-warning)",
+      "figmaVariableName": "Warning",
+      "usedBy": "Badge Scheduled"
+    },
+    {
+      "codeToken": "var(--color-primary)",
+      "figmaVariableName": "Primary / Primary 500",
+      "usedBy": "Badge Processing, Tonal button"
+    },
+    {
+      "codeToken": "var(--color-on-surface)",
+      "figmaVariableName": "On Surface",
+      "usedBy": "Accordion header, Card, button labels"
+    }
+  ],
+  "gaps": [
+    {
+      "codeImport": "@/components/Table",
+      "reason": "Not present in design-system/figma/component-registry.json — no mapped Figma component set.",
+      "action": "Omitted from the frame; needs a uno-maintain mapping (add figmaMeta + component-set node-id) before it can be placed as a library instance."
+    },
+    {
+      "codeImport": "@/specs/Universal/Pages · PageLayout",
+      "reason": "Not present in the registry — the tutor app shell has no mapped Figma component.",
+      "action": "Omitted; file a uno-maintain mapping for the shell before a full-page replica is possible."
+    }
+  ]
+}

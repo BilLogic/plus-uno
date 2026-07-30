@@ -2,7 +2,7 @@ import React from 'react';
 import Rating from '@/components/forms-and-inputs/Rating';
 
 export default {
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', '!manifest'],
     title: 'Specs/Toolkit/Post-Session/Elements/Self Rating',
     parameters: {
         layout: 'padded',

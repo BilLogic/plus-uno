@@ -8,9 +8,10 @@ import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNav
 import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/SessionInformationForm/SessionInformationForm';
 import SessionReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionFormV2';
 import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
+import LinearScale from '@/specs/Toolkit/Post-Session/Sections/LinearScale/LinearScale';
 import SaveAndExitModal from '@/specs/Toolkit/Post-Session/Modals/SaveAndExitModal/SaveAndExitModal';
+import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
 import {
-    SELF_RATING_COMMENTS,
     FORM_RATING_COMMENTS,
     formatLastUpdated,
 } from '@/specs/Toolkit/Post-Session/reflectionCopy';
@@ -39,13 +40,10 @@ function SelfReflectionStep({ data, onChange, onCancel, onSaveAndExit, onNext, o
                     How do you feel about your performance this session?
                     <span style={{ color: 'var(--color-danger)' }}> *</span>
                 </p>
-                <Rating
-                    id="self-reflection-rating"
+                <LinearScale
+                    name="self-reflection-rating"
                     value={rating}
                     onChange={(value) => onChange({ ...data, rating: value })}
-                    variant="comments"
-                    showCommentsLabel={rating > 0}
-                    commentsLabel={SELF_RATING_COMMENTS[rating]}
                 />
             </div>
             {rating > 0 && (
@@ -98,6 +96,7 @@ function FormFeedbackStep({ data, onChange, onCancel, onSaveAndExit, onPrevious,
                     id="form-feedback-rating"
                     value={rating}
                     onChange={(value) => onChange({ ...data, rating: value })}
+                    icon="thumbs-up"
                     variant="comments"
                     showCommentsLabel={rating > 0}
                     commentsLabel={FORM_RATING_COMMENTS[rating]}
@@ -255,26 +254,24 @@ const ReflectionFlow = ({
      * @returns {React.ReactNode}
      */
     const renderStep = () => {
-        if (submitted) {
-            return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', padding: 'var(--size-section-pad-y-lg)' }}>
-                    <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Reflection submitted</h4>
-                    <p className="body1-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        Thanks — your draft was kept in memory for this prototype (no backend).
-                    </p>
-                    <Button text="Return to reflections" style="primary" fill="filled" onClick={onExit} />
-                </div>
-            );
-        }
-
         if (activeTab === 'session-information') {
             return (
                 <SessionInformationForm
                     initialData={sessionInfo}
-                    availableStudents={students}
+                    availableStudents={studentsProp}
                     selectedStudentIds={sessionInfo.selectedStudentIds || students.map((s) => s.id || s.name)}
-                    onStudentSelectionChange={(ids) => setSessionInfo((prev) => ({ ...prev, selectedStudentIds: ids }))}
+                    onStudentSelectionChange={(ids) => {
+                        setSessionInfo((prev) => ({ ...prev, selectedStudentIds: ids }));
+                        setStudents(
+                            studentsProp.filter((student) => ids.includes(student.id || student.name)),
+                        );
+                    }}
                     onSave={handleSessionInfoNext}
+                    onCancel={openSaveExit}
+                    onSaveAndExit={(data) => {
+                        setSessionInfo(data);
+                        openSaveExit();
+                    }}
                 />
             );
         }
@@ -285,15 +282,18 @@ const ReflectionFlow = ({
             if (!student) {
                 return <p className="body1-txt">Add students in Session Information to continue.</p>;
             }
+            const studentKey = student.id || student.name;
             return (
                 <StudentReflectionFormV2
+                    key={studentKey}
                     studentName={student.name}
-                    initialData={studentReflections[student.id || student.name] || {}}
-                    aiState={studentReflections[student.id || student.name]?.rating ? 'ready' : 'idle'}
-                    isLastStudent={index === students.length - 1}
-                    onPrevious={index > 0 ? () => setActiveTab(`student-${index - 1}`) : () => setActiveTab('session-information')}
+                    initialData={studentReflections[studentKey] || {}}
+                    aiState={studentReflections[studentKey]?.goalProgress?.length ? 'ready' : 'idle'}
                     onCancel={openSaveExit}
-                    onSaveAndExit={openSaveExit}
+                    onSaveAndExit={(data) => {
+                        setStudentReflections((prev) => ({ ...prev, [studentKey]: data }));
+                        openSaveExit();
+                    }}
                     onNext={handleStudentNext}
                 />
             );
@@ -351,13 +351,14 @@ const ReflectionFlow = ({
                         { text: 'Sessions', href: '#' },
                         { text: 'Reflection Form' },
                     ],
-                    user: { name: 'John Doe', type: 'lead tutor' },
+                    user: { name: 'John Doe', role: 'Lead' },
                 }}
                 sidebarConfig={{
                     user: 'tutor',
                     activeTab: 'sessions',
                 }}
                 id="post-session-reflection-flow"
+                style={{ width: '100%', height: '100%' }}
             >
                 <div
                     style={{
@@ -365,12 +366,13 @@ const ReflectionFlow = ({
                         gap: 'var(--size-surface-gap-md)',
                         width: '100%',
                         minHeight: '100%',
+                        alignItems: 'stretch',
                     }}
                 >
                     <SideNavBar
-                        state="default"
+                        state={activeTab === 'session-information' ? 'pre-student-add' : activeTab.startsWith('student-') ? 'students-confirmed' : 'in-progress'}
                         students={students}
-                        activeTab={activeTab.startsWith('student-') ? activeTab : activeTab}
+                        activeTab={activeTab}
                         completedSections={{
                             ...completedSections,
                             'student-reflection': completedStudents || completedSections['student-reflection'],
@@ -379,7 +381,9 @@ const ReflectionFlow = ({
                         onTabClick={setActiveTab}
                         onSubmit={handleSubmit}
                     />
-                    {renderStep()}
+                    <div style={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}>
+                        {renderStep()}
+                    </div>
                 </div>
             </PageLayout>
 
@@ -394,6 +398,13 @@ const ReflectionFlow = ({
                     setShowSaveExit(false);
                     onExit?.();
                 }}
+            />
+            <ConfirmationPopUp
+                show={submitted}
+                type="reflection-submitted"
+                onClose={() => setSubmitted(false)}
+                onSecondary={() => setSubmitted(false)}
+                onPrimary={onExit}
             />
         </div>
     );

@@ -7,6 +7,41 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+  "sets": [
+    {
+      "id": "overview-card",
+      "name": "Overview Card",
+      "componentSetNodeId": "83:125838",
+      "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838",
+      "source": "designer-supplied",
+      "status": "verified",
+      "variantProps": {
+        "type": "type"
+      },
+      "variantValues": {
+        "type": [
+          "relationships",
+          "undefined",
+          "socio-emotional",
+          "mastering",
+          "advocacy",
+          "technology",
+          "status",
+          "completion",
+          "accuracy",
+          "avg-accuracy",
+          "avg-completion",
+          "time-spent",
+          "effort",
+          "progress"
+        ]
+      }
+    }
+  ]
+};
+
 <Meta of={OverviewCardStories} />
 
 <Title />
@@ -16,6 +51,8 @@ Overview cards for SMART competency snapshots and training-progress metrics. SMA
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Cards/OverviewCard"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">

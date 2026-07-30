@@ -6,6 +6,7 @@ export const REFLECTIONS = [
     {
         id: 'ref-001',
         date: 'Tue, Jul 29',
+        dateIso: '2025-07-29',
         timeRange: '12:30 PM - 1:30 PM',
         school: 'Hogwarts',
         teacher: 'Mr. Snape',
@@ -19,6 +20,7 @@ export const REFLECTIONS = [
     {
         id: 'ref-002',
         date: 'Mon, Jul 28',
+        dateIso: '2025-07-28',
         timeRange: '10:00 AM - 11:00 AM',
         school: 'Lincoln High',
         teacher: 'Ms. Rivera',
@@ -31,6 +33,7 @@ export const REFLECTIONS = [
     {
         id: 'ref-003',
         date: 'Fri, Jul 25',
+        dateIso: '2025-07-25',
         timeRange: '2:00 PM - 3:00 PM',
         school: 'Hogwarts',
         teacher: 'Mr. Snape',
