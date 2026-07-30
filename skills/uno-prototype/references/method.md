@@ -10,54 +10,6 @@ tools generate from UNO's briefs. Only at hi-fi does UNO build directly, against
 uno-publish. The hand-craft path bypasses this skill by design — but nothing
 bypasses the stage-lens review.
 
-## 0. PRD required — entry gate, all fidelities
-
-No PRD → do not enter this skill. Applies to low, mid, high, and hand-craft
-routing alike; there are no exceptions and no "idea-only" bypass.
-
-**Acceptable PRD forms (any one):**
-
-1. **Notion PRD URL** — the document of record from `skills/uno-synthesize`
-2. **Local PRD file** — a `.md` path in the repo (e.g. eval fixtures)
-3. **Inline PRD body** — pasted in the same turn, with structured sections
-   (user flows, acceptance criteria, scope, or equivalent)
-
-**When PRD is missing:** stop immediately. Do not ground, scaffold, write a
-prompt-spec, or touch `playground/`. Invite the designer to run
-`skills/uno-synthesize` first (`notion_create` flow) and return with the PRD
-link or approved inline draft. Never invent requirements to fill the gap.
-
-The IDE enforces this at prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`
-(a data-driven conversation FSM in `.cursor/hooks/uno-prototype/` — stateless per message,
-scoped by `conversation_id`); the skill body enforces it again on load.
-
-**IDE hook behavior:** when prototype intent is detected, the hook runs a finite-state
-workflow — PRD check → PRD upload/verify → the Step 2 reflection (goal →
-artifact, asked open-ended first then as a recommendation → fidelity →
-exclusions) → **brief-card confirmation** — and re-prompts each step until it is
-satisfied. **No step may be skipped** — a PRD or strategy stated in an earlier
-message only rephrases the current step as verification. The confirmed brief
-card (goal · artifact · fidelity · won't-include) is the **contract** carried
-into planning, generation, and the validation loop. Plus Design System is
-always applied and is never asked.
-
-**Agent rendering contract (intake):** the coding agent displays hook content
-**one question per message** — never batches PRD, reflection, Figma, or later
-steps into a single AskQuestion call or reply. When
-`.cursor/hooks/briefings/active-intake-question.json` exists, the agent renders
-only that file's current step (`stateId`/`type`/`guidance`), shows its
-`progressLabel`, opens the first step with the one-line flow map, and surfaces
-that saying `back` revises an earlier answer. Skipping a step because the user
-already answered in an earlier message, attached a PRD, or named fidelity/Figma
-in the same turn is forbidden — the FSM still asks that step for explicit
-verification.
-
-To exit without invoking uno-prototype, say
-`skip PRD upload` or `terminate this process`. That releases the workflow but does not grant a PRD bypass
-inside the skill. After the brief is confirmed, the hook stops intercepting and
-hands off to the agent's Plan → Generate steps. Disable the gate for local testing:
-`"uno": { "prdGate": false }` in `.cursor/settings.json`.
-
 ## 1. Ground the brief — unconditional, scoped
 
 No path from PRD to prototyping skips grounding, at any fidelity.
@@ -112,15 +64,6 @@ working-UI proofs. Everything above, plus the asset spec the tool needs: real
 copy, sample data, screen states (incl. empty/error), and the specific
 behavior under test. Name what's out of scope so the tool doesn't invent it.
 
-**Both modes end with an embedded self-check block** — the confirmed brief
-restated as concrete pass/fail checks (serves the goal · right artifact shape ·
-at the agreed fidelity · nothing from the won't-include list, plus the spec's
-own named states/constraints). The block instructs the generating tool to
-verify its output against these checks and regenerate once if any fail. The
-loop travels inside the spec, so it runs on any platform — no UNO-side runtime
-needed. Where UNO can see the result (the designer pastes it back), UNO
-re-checks against the same block.
-
 Either mode ends with a prompt-spec the designer carries to the external tool —
 usable with at most one regeneration. UNO does not run the generation.
 
@@ -154,13 +97,10 @@ license to invent.
 
 Before the artifact leaves the skill:
 
-1. **Validation loop — hi-fi and coded artifacts only.** The loop's objective
-   is twofold: every machine check the runtime provides passes (each face names
-   its own set), **and the artifact honors the confirmed brief** — serves the
-   goal, sits at the agreed fidelity, contains nothing from the won't-include
-   list. An artifact that passes all scripts but violates the brief has not
-   converged. If anything fails, fix the reported findings and run the **full
-   set** again — a fix can break a check that passed last time. Stop when:
+1. **Validation loop — hi-fi and coded artifacts only.** Run every machine
+   check the runtime provides (each face names its own set); if any fail, fix
+   the reported findings and run the **full set** again — a fix can break a
+   check that passed last time. Stop when:
    - **all checks pass** → continue to step 2;
    - **three attempts are spent**, or **an attempt fixes nothing** (the same
      failures twice in a row) → stop looping, carry the remaining failures
@@ -168,8 +108,8 @@ Before the artifact leaves the skill:
      that isn't converging burns budget without adding quality — a human
      judges it next.
    A runtime with a goal-loop primitive may drive this with it (goal = all
-   checks pass AND the brief is honored; cap = 3 attempts); the loop as
-   written here is the contract for every other runtime. **Headless codegen faces** (the figma-implement
+   checks pass; cap = 3 attempts); the loop as written here is the contract
+   for every other runtime. **Headless codegen faces** (the figma-implement
    workflows) are single-pass by construction — no agent survives to iterate —
    so their check set runs as a deterministic workflow post-step whose results
    land in the draft PR under "Machine checks"; the PR review is their fix

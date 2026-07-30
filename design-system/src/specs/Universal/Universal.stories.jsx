@@ -45,6 +45,7 @@ export const Overview = () => (
                 <h3 className="h4 mb-2">Elements</h3>
                 <p className="body2-txt mb-2">Reusable building blocks for universal UI patterns:</p>
                 <ul className="body2-txt mb-0 ps-4">
+                    <li><strong>SidebarTab</strong> - Navigation tab with icon, text, and state</li>
                     <li><strong>UserAvatar</strong> - User display with initial, name, and counter</li>
                     <li><strong>StaticBadgeSmart</strong> - SMART competency area badges</li>
                 </ul>

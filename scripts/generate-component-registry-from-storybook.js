@@ -1,17 +1,10 @@
 /**
- * Generate component-registry.json from per-component MDX `figmaMeta` exports,
- * plus the hand-authored pattern layer.
+ * Generate component-registry.json from per-component MDX `figmaMeta` exports.
  *
- * Source of truth (components): each component's MDX file declares
+ * Source of truth: each component's MDX file declares
  *   export const figmaMeta = { fileKey, props?, sets: [...] };
  *
- * Source of truth (patterns): design-system/figma/patterns.json. Patterns are
- * the layout/composition layer — Figma component sets bound to a `size /
- * semantics` token family — and have no code component to hang an MDX off, so
- * they cannot come from figmaMeta. They live in their own registry section
- * rather than masquerading as components.
- *
- * This script scans both and emits a single generated artifact:
+ * This script scans those exports and emits a single generated artifact:
  *   design-system/figma/component-registry.json   (DO NOT EDIT BY HAND)
  *
  * Usage:
@@ -27,7 +20,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const DS_ROOT = path.join(REPO_ROOT, 'design-system', 'src');
 const OUT_REGISTRY = path.join(REPO_ROOT, 'design-system', 'figma', 'component-registry.json');
-const PATTERNS_SOURCE = path.join(REPO_ROOT, 'design-system', 'figma', 'patterns.json');
 
 const CANONICAL_FILE = {
   fileKey: 'zAecJNRdvJzAUOcjV32tRX',
@@ -43,11 +35,6 @@ function deriveImportPath(mdxAbsPath) {
   const withoutMdx = rel.replace(/\.mdx$/, '');
   const parts = withoutMdx.split('/');
 
-  // `_internal` is a source-layout folder, not an import surface — components in
-  // it are re-exported from the public barrel. Reporting `@/components/_internal`
-  // would hand agents a private path that reads as off-limits; point at the
-  // barrel they are actually meant to import from.
-  if (parts[0] === 'components' && parts[1] === '_internal') return '@/components';
   if (parts[0] === 'components' && parts.length >= 2) return `@/components/${parts[1]}`;
   if (parts[0] === 'forms') {
     if (parts[1] === 'DatePicker') return '@/forms/DatePicker';
@@ -142,27 +129,16 @@ function extractFromMdx(mdxPath) {
   };
 }
 
-/** Hand-authored pattern layer, or an empty section when the source is absent. */
-function loadPatterns() {
-  if (!fs.existsSync(PATTERNS_SOURCE)) return {};
-  const parsed = JSON.parse(fs.readFileSync(PATTERNS_SOURCE, 'utf8'));
-  return parsed.patterns || {};
-}
-
-function buildRegistry(entries, patterns) {
+function buildRegistry(entries) {
   const components = {};
   for (const { name, entry } of entries) components[name] = entry;
   return {
-    version: '1.1.0',
+    version: '1.0.0',
     generated: true,
     generatedBy: 'scripts/generate-component-registry-from-storybook.js',
-    note: 'DO NOT EDIT BY HAND. Components come from each component MDX `export const figmaMeta`; patterns come from design-system/figma/patterns.json. Run `npm run generate:component-registry` to regenerate.',
+    note: 'DO NOT EDIT BY HAND. Source of truth is each component MDX `export const figmaMeta`. Run `npm run generate:component-registry` to regenerate.',
     figmaFile: CANONICAL_FILE,
     components,
-    // Layout/composition layer. Separate from `components` on purpose: these
-    // have no code counterpart, so listing them as components would imply an
-    // import that does not exist.
-    patterns,
   };
 }
 
@@ -174,11 +150,8 @@ function main() {
     .filter(Boolean)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const patterns = loadPatterns();
-  const registry = buildRegistry(entries, patterns);
+  const registry = buildRegistry(entries);
   const serialized = `${JSON.stringify(registry, null, 2)}\n`;
-  const patternCount = Object.keys(patterns).length;
-  const blocked = Object.entries(patterns).filter(([, p]) => p.status === 'blocked-slots-unconverted');
 
   if (check) {
     const current = fs.existsSync(OUT_REGISTRY) ? fs.readFileSync(OUT_REGISTRY, 'utf8') : '';
@@ -186,16 +159,13 @@ function main() {
       console.error('✗ component-registry.json is stale. Run `npm run generate:component-registry`.');
       process.exit(1);
     }
-    console.log(`✓ component-registry.json up to date (${entries.length} components, ${patternCount} patterns).`);
+    console.log(`✓ component-registry.json up to date (${entries.length} components).`);
     return;
   }
 
   fs.mkdirSync(path.dirname(OUT_REGISTRY), { recursive: true });
   fs.writeFileSync(OUT_REGISTRY, serialized);
-  console.log(`Wrote ${entries.length} components + ${patternCount} patterns → ${path.relative(REPO_ROOT, OUT_REGISTRY)}`);
-  for (const [name, p] of blocked) {
-    console.warn(`⚠ ${name}: ${p.blockedReason}`);
-  }
+  console.log(`Wrote ${entries.length} components → ${path.relative(REPO_ROOT, OUT_REGISTRY)}`);
 }
 
 main();
