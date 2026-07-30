@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-07-27",
+  "prototype": "prototypes/student-progress",
+  "localPreview": "npm run dev:student-progress (http://localhost:3050/)",
+  "fidelity": "high visual · low-mid interaction · 1 screen · fixed data",
+  "tools": "Plus Design System (built directly, no Figma source)",
+  "prd": "Inline PRD — Student Progress Dashboard (desktop web, tutor reviews assigned students across sessions)",
+  "description": "Desktop Progress screen for a PLUS tutor: a roster of assigned students sorted worst-first, each with name, sessions completed, and a three-state progress badge. Clicking a student expands their last 5 sessions (date, topic, outcome) in place; a single 'Needs attention' toggle narrows the roster to students not on track. Includes the no-assigned-students empty state.",
+  "learningGoals": ["validate usability", "reduce engineering ambiguity"],
+  "components": [
+    { "import": "@/specs/Universal/Pages · PageLayout", "role": "Tutor app shell (top bar + sidebar) — rendered, entirely non-functional" },
+    { "import": "@/components/Card", "role": "Roster container and empty state" },
+    { "import": "@/components/Table", "role": "Roster and nested session history" },
+    { "import": "@/components/Badge", "role": "Progress state (success/warning/danger) and session outcome" },
+    { "import": "@/components/Button", "role": "Filter toggle and the prototype-only demo state switch" }
+  ],
+  "interactions": [
+    "Click a student row → expands their last 5 sessions in place; single-open (opening another closes the first)",
+    "'Needs attention' toggle → shows only students not on track (needs-attention + at-risk), with a live 'Showing N of M' count",
+    "Toggling the filter collapses an open student the filter is about to hide",
+    "Demo state switch: Assigned students / No students (prototype-only, not a shipped control)"
+  ],
+  "outOfScope": [
+    "Toolkit shell behavior — the shell renders for context but no navigation, tab switching, or routing is wired",
+    "Student detail page behind the expanded row",
+    "Tutor switching / multiple rosters",
+    "Sorting, search, pagination, clickable session rows",
+    "Auth, assigning or removing students, session editing, at-risk notifications",
+    "Loading and error states",
+    "Responsive / mobile layout (desktop web only)",
+    "Real data or persistence — the roster is a fixed module"
+  ],
+  "decisions": [
+    "The 'needs attention' filter shows BOTH needs-attention and at-risk students, matching the PRD's 'only students not on track'. No per-state filter chips.",
+    "Roster is sorted worst-first (at risk → needs attention → on track) so triage does not depend on scanning. Sorting is not user-controllable.",
+    "'Outcome' is modelled as a closed set — Strong / Steady / Struggled / Missed — because the PRD leaves it undefined. This is an assumption under test.",
+    "PageLayout is used because design-system/docs/patterns/layout.md requires it for full pages; the 'no toolkit shell' exclusion is honored by wiring nothing inside it."
+  ],
+  "dsGaps": [
+    "No expandable-table-row component exists in the DS. Composed from Table + an injected colSpan row rather than hand-rolling a lookalike; nearest existing alternative (Accordion) loses column alignment. Consequence: Table applies onRowClick to every row, so the injected detail row carries role=\"button\" — suppressed visually (cursor) but not removed from the a11y tree. Worth a uno-maintain intake."
+  ],
+  "openQuestions": [
+    "Is 'outcome' a status, a score, or free text? Prototype assumes a closed 4-value status set.",
+    "Should 'at risk' be reachable separately from 'needs attention', or is one toggle enough?",
+    "Roster rows are role=\"button\" without an accessible name — needs a real pattern before build."
+  ],
+  "openChecks": [
+    "validate-prototype.sh reports only its first check: the script aborts under set -e because ((PASS++)) returns 0. Pre-existing, affects every prototype. The remaining checks (default export, vite.config.js, no deep imports) were run manually and pass. Filed as a follow-up task.",
+    "Storybook run-story-tests not run — this prototype adds no stories."
+  ]
+}
