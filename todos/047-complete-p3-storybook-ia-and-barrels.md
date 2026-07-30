@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 priority: p3
 issue_id: "047"
 tags: [code-review, quality, post-session]
@@ -43,9 +43,9 @@ Session InformationForm lives under Sections but stories title as Pages; FormRef
 
 ## Acceptance Criteria
 
-- [ ] Storybook titles match folder IA or STRUCTURE documents intentional exceptions
-- [ ] No broken barrel re-exports
-- [ ] Overview links resolve
+- [x] Storybook titles match folder IA or STRUCTURE documents intentional exceptions
+- [x] No broken barrel re-exports
+- [x] Overview links resolve
 
 ## Work Log
 

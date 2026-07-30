@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 priority: p1
 issue_id: "039"
 tags: [code-review, architecture, post-session]
@@ -56,10 +56,10 @@ Storybook ships two product UIs for Self / Form Feedback (and parallel shells fo
 
 ## Acceptance Criteria
 
-- [ ] No divergent Self/Form Feedback implementations in Storybook
-- [ ] Session/Student page stories do not reimplement SideNav shell logic
-- [ ] Prototype and Storybook share the same step components
-- [ ] Overview catalog links point at the surviving leaves
+- [x] No divergent Self/Form Feedback implementations in Storybook
+- [x] Session/Student page stories do not reimplement SideNav shell logic
+- [x] Prototype and Storybook share the same step components
+- [x] Overview catalog links point at the surviving leaves
 
 ## Work Log
 
