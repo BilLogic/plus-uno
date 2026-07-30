@@ -23,15 +23,13 @@ import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
 import { BUILD } from "../version";
-import { subrequestsUsed, meterBreakdown } from "../net";
+import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError } from "../net";
 import {
   MAX_ITERATIONS,
   MAX_TOKENS,
   READONLY_TOOL_BUDGET,
   LOOKUP_CEILING,
   SUBREQUEST_CAP,
-  maxToolSubrequests,
-  noteSpend,
   outOfIterationBudget,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
@@ -180,7 +178,6 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   let toolCallsUsed = 0;
   // Actual-vs-bound spend per tool, for the [budget] line. The gate itself
   // reads the live meter (src/net.ts), not a running estimate.
-  const spendLog: string[] = [];
   const toolNamesUsed: string[] = [];
 
   const finish = (result: AgentResult): AgentResult => {
@@ -188,7 +185,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     // in the logs instead of surfacing later as a silent mid-turn death.
     console.log(
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools | ${spendLog.join(" ")} | ${meterBreakdown()}`,
+        `${toolCallsUsed} tools | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
@@ -336,7 +333,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       // allowed even when the lookup budget is spent.
       if (
         toolCallsUsed >= READONLY_TOOL_BUDGET ||
-        subrequestsUsed() + maxToolSubrequests(name) > LOOKUP_CEILING
+        subrequestsUsed() >= LOOKUP_CEILING
       ) {
         resultText = JSON.stringify({
           ok: false,
@@ -345,11 +342,13 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         });
       } else {
         toolCallsUsed++;
-        const before = subrequestsUsed();
+        // Enforced, not forecast — see the claude lane for the full note.
         try {
-          resultText = await executeReadOnlyTool(env, name, args, slack);
-        } finally {
-          noteSpend(spendLog, name, subrequestsUsed() - before);
+          resultText = await withSubrequestLimit(LOOKUP_CEILING, () =>
+            executeReadOnlyTool(env, name, args, slack));
+        } catch (err) {
+          if (!isSubrequestBudgetError(err)) throw err;
+          resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
         }
       }
       responseParts.push({ functionResponse: { name, response: { result: resultText } } });

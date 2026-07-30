@@ -28,8 +28,6 @@ import {
   READONLY_TOOL_BUDGET,
   LOOKUP_CEILING,
   SUBREQUEST_CAP,
-  maxToolSubrequests,
-  noteSpend,
   outOfIterationBudget,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
@@ -41,7 +39,7 @@ import {
   type AgentResult,
   type AgentImage,
 } from "./loop-shared";
-import { subrequestsUsed, meterBreakdown } from "../net";
+import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError } from "../net";
 import type { HistoryTurn } from "../thread-state-client";
 
 // ── Anthropic Messages wire types (the subset we touch) ──────────────────────
@@ -107,7 +105,6 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   let cacheWriteTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
-  const spendLog: string[] = [];
   const toolNamesUsed: string[] = [];
 
   const addUsage = (u: ClaudeMessage["usage"]): void => {
@@ -126,7 +123,7 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const finish = (result: AgentResult): AgentResult => {
     console.log(
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools | ${spendLog.join(" ")} | ${meterBreakdown()}`,
+        `${toolCallsUsed} tools | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=vertex-claude tier=${tier} route=${routeReason} model=${model} ` +
@@ -243,7 +240,7 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
       for (const tu of toolUses) {
         if (
           toolCallsUsed >= READONLY_TOOL_BUDGET ||
-          subrequestsUsed() + maxToolSubrequests(tu.name) > LOOKUP_CEILING
+          subrequestsUsed() >= LOOKUP_CEILING
         ) {
           toolResults.push({
             type: "tool_result",
@@ -253,12 +250,18 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
           continue;
         }
         toolCallsUsed++;
-        const before = subrequestsUsed();
+        // Enforced, not forecast: countedFetch refuses the call that would cross
+        // the ceiling, so a tool can start with any amount of headroom left and
+        // simply return less. Paging loops turn the stop into truncated:true; a
+        // tool that can't do anything useful with what's left surfaces as the
+        // budget note, same as a pre-emptive refusal used to.
         let resultText: string;
         try {
-          resultText = await executeReadOnlyTool(env, tu.name, tu.input, slack);
-        } finally {
-          noteSpend(spendLog, tu.name, subrequestsUsed() - before);
+          resultText = await withSubrequestLimit(LOOKUP_CEILING, () =>
+            executeReadOnlyTool(env, tu.name, tu.input, slack));
+        } catch (err) {
+          if (!isSubrequestBudgetError(err)) throw err;
+          resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
         }
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }

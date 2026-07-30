@@ -11,6 +11,7 @@
 //   any — workspace /v1/search (pages + databases; last resort)
 
 import type { Env } from "../types";
+import { rethrowIfBudget } from "../net";
 import {
   notionSearch,
   findTeamMembers,
@@ -323,7 +324,8 @@ async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
   // Resolve power-user names for the top match only (each is a subrequest).
   const top = matches[0]!;
   const powerUsers = top.powerUserPageIds.length
-    ? await fetchPageTitles(env, top.powerUserPageIds, 4).catch(() => [] as string[])
+    ? await fetchPageTitles(env, top.powerUserPageIds, 4)
+        .catch((e) => { rethrowIfBudget(e); return [] as string[]; })
     : [];
 
   return JSON.stringify({

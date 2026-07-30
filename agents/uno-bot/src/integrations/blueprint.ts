@@ -18,7 +18,7 @@
 
 import type { Env } from "../types";
 import { embedText, embeddingsConfigured } from "../vertex/embed";
-import { countedFetch } from "../net";
+import { countedFetch, rethrowIfBudget } from "../net";
 
 const REQUEST_TIMEOUT_MS = 10000;
 const RPC_NAME = "search_blueprint";
@@ -98,7 +98,8 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
   try {
     // Primary: semantic (vector) search. Any miss/failure → keyword paths below.
     if (env.SEMANTIC_SEARCH !== "off" && embeddingsConfigured(env)) {
-      const sem = await trySemantic(env, base, key, q, controller.signal).catch(() => null);
+      const sem = await trySemantic(env, base, key, q, controller.signal)
+        .catch((e) => { rethrowIfBudget(e); return null; });
       if (sem && sem.length) {
         console.log(`[blueprint] semantic hit (${sem.length})`);
         searchCache.set(cacheKey, { at: Date.now(), rows: sem });
@@ -230,7 +231,11 @@ async function searchViaTables(
         if (!res.ok) return [] as BlueprintRow[];
         const rows = (await res.json()) as Record<string, unknown>[];
         return rows.map((r) => normalize(src, r)).filter((r): r is BlueprintRow => r !== null);
-      } catch {
+      } catch (e) {
+        // An empty table is a fine answer to a failed query, but a LIE about a
+        // budget stop — that would report "not in the blueprint" for a scenario
+        // we simply ran out of budget to read.
+        rethrowIfBudget(e);
         return [] as BlueprintRow[];
       }
     }),

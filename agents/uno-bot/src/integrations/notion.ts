@@ -13,7 +13,7 @@
 // implement_design flows' fetchNotionPRD can read it.
 
 import type { Env } from "../types";
-import { countedFetch } from "../net";
+import { countedFetch, subrequestBudgetSpent, rethrowIfBudget } from "../net";
 
 const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
@@ -305,6 +305,9 @@ async function queryDatabaseRows<T>(
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     for (let page = 0; page < opts.maxPages; page++) {
+      // A budget stop here is not a failure and not an absence: it's a partial
+      // read, which is precisely what `truncated` exists to say.
+      if (subrequestBudgetSpent()) return { rows: out, truncated: true };
       const res = await countedFetch(`${NOTION_API}/databases/${databaseId}/query`, {
         method: "POST",
         headers: notionHeaders(env, { write: true }),
@@ -476,7 +479,8 @@ export async function fetchPageTitles(env: Env, pageIds: string[], cap = PAGE_TI
           break;
         }
       }
-    } catch {
+    } catch (e) {
+      rethrowIfBudget(e);
       // skip — the caller reports who it could resolve
     }
   }
@@ -617,6 +621,7 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     const lines: string[] = [];
     let cursor: string | undefined;
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
+      if (subrequestBudgetSpent()) break; // keep the blocks already read
       const qs = new URLSearchParams({ page_size: "100" });
       if (cursor) qs.set("start_cursor", cursor);
       const bRes = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
@@ -1137,7 +1142,9 @@ export async function describeNotionTarget(
         let value = renderProperty(prop);
         if (prop.type === "relation" && prop.relation?.length) {
           const ids = prop.relation.map((r) => r.id).filter((x): x is string => !!x);
-          const titles = ids.length ? await fetchPageTitles(env, ids).catch(() => []) : [];
+          const titles = ids.length
+            ? await fetchPageTitles(env, ids).catch((e) => { rethrowIfBudget(e); return [] as string[]; })
+            : [];
           if (titles.length) value = titles.join(", ");
         }
         current[key] = { label: name, value };
@@ -1154,7 +1161,8 @@ export async function describeNotionTarget(
     if (!dbRes.ok) return { title, parent: "a database", url, current };
     const db = (await dbRes.json()) as { title?: NotionRichText };
     return { title, parent: plain(db.title) || "a database", url, current };
-  } catch {
+  } catch (e) {
+    rethrowIfBudget(e);
     return null;
   } finally {
     clearTimeout(timer);

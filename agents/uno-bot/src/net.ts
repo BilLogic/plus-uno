@@ -18,9 +18,75 @@ interface Meter {
   count: number;
   /** Per-host tallies for the `[budget]` telemetry line. */
   byHost: Record<string, number>;
+  /** When set, countedFetch refuses the call that would cross it. */
+  limit?: number;
 }
 
 const meterStore = new AsyncLocalStorage<Meter>();
+
+/**
+ * Thrown by countedFetch when the next call would cross the active limit.
+ *
+ * This is what lets the budget be ENFORCED rather than forecast. The gate used
+ * to need a per-tool worst-case estimate because it decided before the call and
+ * a tool's cost isn't knowable until it runs; enforcing at the boundary makes
+ * the ceiling unbreachable no matter what a tool costs, so the estimate — and
+ * the drift it could hide — goes away entirely.
+ *
+ * Handlers must distinguish it from a normal failure: swallowing it turns "I ran
+ * out of budget" into "there is nothing there", which is the false-absence bug
+ * this codebase keeps having to fix.
+ */
+export class SubrequestBudgetError extends Error {
+  constructor(limit: number) {
+    super(`subrequest budget exhausted (limit ${limit})`);
+    this.name = "SubrequestBudgetError";
+  }
+}
+
+/**
+ * True when the active limit is already reached, so the NEXT countedFetch would
+ * throw. Lets a paging loop stop cleanly and report a partial read instead of
+ * unwinding through an exception it would only have to convert back.
+ */
+export function subrequestBudgetSpent(): boolean {
+  const m = meterStore.getStore();
+  return m?.limit != null && m.count >= m.limit;
+}
+
+/** True when `err` is the budget stop rather than an upstream failure. */
+export function isSubrequestBudgetError(err: unknown): boolean {
+  return err instanceof SubrequestBudgetError;
+}
+
+/**
+ * Re-throw a budget stop, swallow anything else. For the best-effort catch sites
+ * (optional enrichment, per-item fan-out) where an empty result is a fine answer
+ * to a failure but a LIE about a budget stop.
+ */
+export function rethrowIfBudget(err: unknown): void {
+  if (isSubrequestBudgetError(err)) throw err;
+}
+
+/**
+ * Run `fn` with outbound calls capped at `limit` total subrequests for this
+ * invocation. Wrap the phases that must not eat the delivery reserve — i.e.
+ * grounding lookups. Delivery itself runs unlimited, against the real 50.
+ *
+ * @param limit - Total invocation subrequests allowed while `fn` runs
+ */
+export async function withSubrequestLimit<T>(limit: number, fn: () => Promise<T>): Promise<T> {
+  const m = meterStore.getStore();
+  if (!m) return fn();
+  const previous = m.limit;
+  m.limit = limit;
+  try {
+    return await fn();
+  } finally {
+    m.limit = previous;
+  }
+}
+
 
 /**
  * Run `fn` with a fresh subrequest counter. Wrap whatever the 50-subrequest cap
@@ -78,14 +144,16 @@ export function meterBreakdown(): string {
  * @param input - URL
  * @param init - Standard fetch init; a caller-supplied `signal` still applies
  * @param timeoutMs - Abort after this long; omit for no timeout
+ * @throws SubrequestBudgetError when a limit is active and already reached
  */
-export function countedFetch(
+export async function countedFetch(
   input: string,
   init: RequestInit = {},
   timeoutMs?: number,
 ): Promise<Response> {
   const m = meterStore.getStore();
   if (m) {
+    if (m.limit != null && m.count >= m.limit) throw new SubrequestBudgetError(m.limit);
     m.count += 1;
     let host = "unknown";
     try {

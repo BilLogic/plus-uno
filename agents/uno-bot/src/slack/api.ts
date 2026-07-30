@@ -3,7 +3,7 @@
 
 import type { Env } from "../types";
 import { toSlackMrkdwn } from "./mrkdwn";
-import { countedFetch } from "../net";
+import { countedFetch, rethrowIfBudget } from "../net";
 
 interface SlackOk {
   ok: true;
@@ -54,6 +54,9 @@ export async function slackCall<T extends SlackResponse>(
       body: JSON.stringify(payload),
     });
   } catch (err) {
+    // A budget stop is not a network error — let the loop report it as one and
+    // say what's missing, rather than the reply claiming Slack was unreachable.
+    rethrowIfBudget(err);
     console.warn(`[slack] ${method} fetch failed: ${err instanceof Error ? err.message : String(err)}`);
     return { ok: false, error: "network_error" } as unknown as T;
   }
@@ -74,6 +77,9 @@ async function slackGet<T extends SlackResponse>(
       headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
     });
   } catch (err) {
+    // A budget stop is not a network error — let the loop report it as one and
+    // say what's missing, rather than the reply claiming Slack was unreachable.
+    rethrowIfBudget(err);
     console.warn(`[slack] ${method} fetch failed: ${err instanceof Error ? err.message : String(err)}`);
     return { ok: false, error: "network_error" } as unknown as T;
   }

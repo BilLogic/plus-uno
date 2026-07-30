@@ -11,14 +11,6 @@
 // wire types. Each loop keeps its own transport and calls into these helpers.
 
 import type { Env } from "../types";
-import {
-  APPS_MAX_PAGES,
-  CATALOG_MAX_PAGES,
-  PAGE_TITLE_CAP,
-  READ_BLOCK_PAGES,
-  ROADMAP_MAX_PAGES,
-} from "../integrations/notion";
-import { BLUEPRINT_TABLE_FANOUT } from "../integrations/blueprint";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
 import { addReaction } from "../slack/api";
@@ -105,96 +97,50 @@ export const MAX_TOKENS = 16384;
 // Kept as a secondary hard COUNT backstop behind the weighted budget below.
 export const READONLY_TOOL_BUDGET = 12;
 
-// ── Subrequest budget: measured spend + a bounded forecast ────────────────────
+// ── Subrequest budget: enforced at the boundary ──────────────────────────────
 //
 // The free plan hard-caps each Worker invocation at 50 subrequests (Notion
 // reads, Slack calls, DO hops, model calls — everything outbound). Call 51 kills
 // the invocation, and because POSTING the reply also costs a subrequest, it dies
 // silently: 👀 then nothing (live incidents 2026-07-10, 2026-07-13).
 //
-// This used to run entirely on estimates: a hand-typed per-tool cost table plus
-// a flat PRE_GROUNDING_OVERHEAD, with nothing comparing either to reality. They
-// drifted — notion_search was priced 4 while scope 'apps' really spent 6 — and
-// nothing could notice, because nothing counted. `src/net.ts` now counts every
-// outbound call, so the gate reads what was ACTUALLY spent.
+// This ran on estimates twice over. First a hand-typed per-tool cost table with
+// nothing comparing it to reality — it drifted (notion_search priced 4 while
+// scope 'apps' really spent 6) and nothing could notice, because nothing
+// counted. Then a measured counter plus a per-tool WORST-CASE bound, because a
+// gate that decides before a call can't know what the call will cost. That was
+// honest but still a hand-maintained table, and still had to be conservative:
+// a tool bounded at 10 was refused with 9 units left even when it would have
+// spent 2.
 //
-// One estimate remains and can't be removed: a tool's cost isn't knowable until
-// it has run. So the gate is measured-past + bounded-future — real spend so far,
-// plus the WORST CASE for the one call about to be made. The `[budget]` line
-// logs actual-vs-bound per tool so that remaining estimate can't drift unseen.
+// Now `countedFetch` refuses the call that would cross the ceiling and throws
+// (net.ts). Nothing has to predict anything: the ceiling is unbreachable
+// whatever a tool costs, paging loops turn the stop into a partial read with
+// `truncated: true`, and there is no table left to drift.
 //
-// Direction matters: an over-estimated bound costs one skipped lookup, an
-// under-estimated one costs the whole reply. When unsure, round up.
-
-// Worst-case subrequests ONE call of a tool can spend. DERIVED from the page
-// caps and fan-outs themselves, not copied next to a comment claiming they
-// match — a hand-copied bound is the same class of drift ADR-022 retires, just
-// moved from "estimate vs reality" to "bound vs page cap". Raising
-// CATALOG_MAX_PAGES now updates this automatically.
-const MAX_SUBREQUESTS_PER_TOOL: Record<string, number> = {
-  // 1 page fetch + block pagination, +1 for the figma/github variants.
-  source_read: 1 + READ_BLOCK_PAGES + 1,
-  // SA token on a cold isolate + embed + semantic RPC + keyword RPC + fan-out.
-  blueprint_search: 4 + BLUEPRINT_TABLE_FANOUT,
-  delegate: 6,
-  // apps: directory pages + power-user title lookups. catalog: its page cap.
-  notion_search: Math.max(APPS_MAX_PAGES + PAGE_TITLE_CAP, CATALOG_MAX_PAGES),
-  // A filtered read, plus a full unfiltered rescan when a renamed property
-  // makes Notion 400 the filter.
-  roadmap_query: ROADMAP_MAX_PAGES * 2,
-  github_read: 4,
-  slack_search: 3,
-  slack_thread_read: 3,
-  slack_user_profile: 3,
-  slack_channel_members: 3,
-  slack_react: 2,
-};
-// Default bound for any unlisted read-only tool.
-const MAX_SUBREQUESTS_DEFAULT = 5;
-
-/** Worst-case subrequests one call of this tool can spend. */
-export function maxToolSubrequests(name: string): number {
-  return MAX_SUBREQUESTS_PER_TOOL[name] ?? MAX_SUBREQUESTS_DEFAULT;
-}
+// The one rule handlers must respect: a budget stop is NOT an empty result.
+// Swallowing it reports "there is nothing there" — the false-absence bug this
+// codebase keeps having to fix. Use `rethrowIfBudget` at best-effort catches.
 
 export const SUBREQUEST_CAP = 50; // Cloudflare free-plan hard cap per invocation.
 // Reserved for delivery — NEVER spent on lookups: final post + one retry + 2
 // history writes + the pre-send review-judge model call + margin.
 export const DELIVERY_RESERVE = 12;
-// Measured spend may reach this before a lookup is refused (= 38). Higher than
-// the old GROUNDING_BUDGET of 28 because the 10 units that used to be set aside
-// as PRE_GROUNDING_OVERHEAD are no longer a guess — startup cost is now counted
-// as it happens, so it doesn't need reserving twice.
+// Lookups run under this limit; delivery runs unlimited against the real cap.
 export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;
 
 /**
- * True when another loop iteration can't be afforded. Refusing a LOOKUP is not
- * enough on its own: once lookups are exhausted the model can keep asking for
- * tools, and while each refusal is free, the model round-trip that carries it is
- * not — MAX_ITERATIONS of those walk straight through DELIVERY_RESERVE and kill
- * the post. Both loops check this before calling the model and fall through to
- * their tools-disabled synthesis pass instead.
+ * True when another loop iteration can't be afforded.
  *
- * `+ 1` because the synthesis pass itself still has to be paid for.
+ * The model round-trip is the one subrequest every iteration spends, and it is
+ * deliberately NOT under the enforced limit — a budget stop there means no reply
+ * at all, which is the outcome we're avoiding. So it stays a pre-check: refusing
+ * lookups alone left the model free to keep requesting tools, and while each
+ * refusal is free, the round-trip carrying it is not. `+ 1` because the
+ * tools-disabled synthesis pass still has to be paid for.
  */
 export function outOfIterationBudget(used: number): boolean {
   return used + 1 >= LOOKUP_CEILING;
-}
-
-/**
- * Record what a tool call ACTUALLY spent, for the `[budget]` line. This is the
- * feedback loop the old estimate table never had: a bound reality exceeds is a
- * latent silent death, and one chronically far above reality is wasted research
- * headroom. Both now show up in the logs rather than in an incident.
- *
- * @param log - Per-invocation accumulator, joined into the telemetry line
- */
-export function noteSpend(log: string[], tool: string, spent: number): void {
-  const bound = maxToolSubrequests(tool);
-  if (spent > bound) {
-    console.warn(`[budget] BOUND EXCEEDED ${tool}: spent ${spent} > bound ${bound} — raise the derivation in MAX_SUBREQUESTS_PER_TOOL`);
-  }
-  log.push(`${tool}=${spent}/${bound}${spent > bound ? "!" : ""}`);
 }
 
 // ── Shared prompt strings (must read identically in both lanes) ───────────────
