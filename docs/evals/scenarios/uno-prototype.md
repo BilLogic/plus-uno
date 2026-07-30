@@ -4,7 +4,7 @@
 
 ## S0 — PRD required gate (entry)
 - **Trigger:** "prototype this tutor-onboarding idea" (no PRD link, file, or inline body)
-- **Expected:** stops before grounding; invites `skills/uno-synthesize` to create a PRD; does not scaffold, write a prompt-spec, or touch `playground/`
+- **Expected:** stops before grounding; invites `skills/uno-synthesize` to create a PRD; does not scaffold, write a prompt-spec, or touch `prototypes/`
 - **Fails if:** it proceeds without a PRD · it invents requirements to fill the gap
 
 ## S1 — low-fi: prompt engineer, not generator

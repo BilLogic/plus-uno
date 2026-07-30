@@ -130,7 +130,7 @@ export function writeGateBriefing(conversationId, triggerPrompt) {
     ],
     requiredSteps: [
       'Place Figma library component instances (never screenshot import as the final frame).',
-      'Write playground/<name>/<name>-manifest.json with components[] and tokenBindings[].',
+      'Write prototypes/<name>/<name>-manifest.json with components[] and tokenBindings[].',
       'Run: npm run validate:figma-writeback -- <manifest.json>',
       'Run: npm run audit:figma-writeback -- --conversation-id <conversationId> <manifest.json>',
       'Say writeback:audit-passed after audit exits 0, or terminate writeback to cancel.',

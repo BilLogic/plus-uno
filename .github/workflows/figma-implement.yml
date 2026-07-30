@@ -133,7 +133,7 @@ jobs:
           # Scope checks to the directories this change actually touched —
           # a whole-tree run would drown the diff's findings in pre-existing noise.
           git fetch origin main --depth=1
-          DIRS=$(git diff --name-only origin/main...HEAD -- 'design-system/src/' 'playground/' \
+          DIRS=$(git diff --name-only origin/main...HEAD -- 'design-system/src/' 'prototypes/' \
             | xargs -n1 dirname 2>/dev/null | sort -u)
           if [ -z "$DIRS" ]; then
             echo "no checkable dirs in diff" | tee checks-output.txt
