@@ -284,7 +284,7 @@ async function queryDatabaseRows<T>(
   databaseId: string,
   opts: { maxPages: number; pageSize?: number; filter?: unknown; errorLabel: string },
   mapRow: (row: DbQueryRow) => T | null,
-): Promise<T[]> {
+): Promise<{ rows: T[]; truncated: boolean }> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
   if (!databaseId) throw new Error("database id is empty");
   const out: T[] = [];
@@ -311,10 +311,14 @@ async function queryDatabaseRows<T>(
         const mapped = mapRow(r);
         if (mapped != null) out.push(mapped);
       }
-      if (!data.has_more || !data.next_cursor) break;
+      if (!data.has_more || !data.next_cursor) return { rows: out, truncated: false };
       cursor = data.next_cursor;
     }
-    return out;
+    // Fell out of the loop = page budget exhausted with rows still unread. The
+    // caller MUST be told, or it reports a partial window as a complete scan
+    // (live miss 2026-07-29 — a card past row 200 came back as "not on the
+    // board"). Structural, so a future edit can't drift an index comparison.
+    return { rows: out, truncated: true };
   } finally {
     clearTimeout(timer);
   }
@@ -322,7 +326,7 @@ async function queryDatabaseRows<T>(
 
 export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
   if (!env.NOTION_APPS_DB_ID) throw new Error("NOTION_APPS_DB_ID not configured");
-  return queryDatabaseRows(
+  const { rows } = await queryDatabaseRows(
     env,
     env.NOTION_APPS_DB_ID,
     { maxPages: APPS_MAX_PAGES, pageSize: APPS_PAGE_SIZE, errorLabel: "third-party apps query failed" },
@@ -341,6 +345,7 @@ export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
       };
     },
   );
+  return rows;
 }
 
 // ─── Generic catalog DB query (notion_search scoped catalogs) ────────────────
@@ -407,7 +412,7 @@ export async function queryCatalogDatabase(
   databaseId: string,
   opts: { skipTitleNames?: string[] } = {},
 ): Promise<CatalogRow[]> {
-  return queryDatabaseRows(
+  const { rows } = await queryDatabaseRows(
     env,
     databaseId,
     { maxPages: CATALOG_MAX_PAGES, pageSize: CATALOG_PAGE_SIZE, errorLabel: "catalog query failed" },
@@ -424,6 +429,7 @@ export async function queryCatalogDatabase(
       };
     },
   );
+  return rows;
 }
 
 /**
@@ -1247,8 +1253,10 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
 // by its literal title. Status/title/person questions about the Roadmap need
 // EXACT and COMPLETE answers, so this queries the Roadmap database directly
 // (classic databases/{id}/query, version 2022-06-28) and matches in the Worker.
-// One page of 100 cards ≈ one subrequest (two max) — far cheaper than a chain
-// of search calls on the free-tier 50-subrequest budget.
+// One page of 100 cards ≈ one subrequest, up to ROADMAP_MAX_PAGES — still far
+// cheaper than a chain of search calls on the free-tier 50-subrequest budget.
+// Title / card-number asks filter server-side, so they cost 1 page, not 5;
+// keep READONLY_TOOL_COST.roadmap_query in loop-shared.ts in step with this.
 
 export interface RoadmapCard {
   title: string;
@@ -1263,12 +1271,53 @@ export interface RoadmapCard {
 }
 
 const ROADMAP_PAGE_SIZE = 100;
-const ROADMAP_MAX_PAGES = 2;
+// The board is >300 cards and grows. A blind window silently hides the tail —
+// which is exactly how a real card ("TACT - Tutor Compliance Monitor", past row
+// 300) got reported as "not on the board" on 2026-07-29. Title and card-number
+// lookups now filter SERVER-side (below) so position stops mattering; this cap
+// only bounds unfiltered enumeration, and truncation is reported, never hidden.
+const ROADMAP_MAX_PAGES = 5;
+const ROADMAP_TITLE_PROP = "Name";
+const ROADMAP_ID_PROP = "ID";
+
+/**
+ * Server-side prefilter. Notion can't fuzzy-rank, but it CAN find every row whose
+ * title contains a token — so we hand it the tokens and rank what comes back in
+ * the Worker. Falls back to an unfiltered scan if the property names ever drift.
+ */
+function roadmapFilter(opts: {
+  designStatus?: string;
+  titleTokens?: string[];
+  cardNumber?: number | null;
+}): unknown {
+  const clauses: unknown[] = [];
+  if (opts.designStatus) {
+    clauses.push({ property: "Design Status", status: { equals: opts.designStatus } });
+  }
+  if (opts.cardNumber != null) {
+    // A card number is a unique key — ANDing a half-remembered title against it
+    // can only subtract, so it wins alone and scoreTitle ranks locally.
+    clauses.push({ property: ROADMAP_ID_PROP, unique_id: { equals: opts.cardNumber } });
+    return clauses.length === 1 ? clauses[0] : { and: clauses };
+  }
+  // Longest-first, NOT first-six: tokens() keeps every word ≥3 chars in the
+  // user's word order, so slicing by position spends the budget on "the / one /
+  // about" and drops the proper noun that actually discriminates — which left
+  // the named card invisible while adjacent ones matched.
+  const toks = [...(opts.titleTokens ?? [])].sort((a, b) => b.length - a.length).slice(0, 6);
+  if (toks.length) {
+    clauses.push({
+      or: toks.map((t) => ({ property: ROADMAP_TITLE_PROP, title: { contains: t } })),
+    });
+  }
+  if (!clauses.length) return undefined;
+  return clauses.length === 1 ? clauses[0] : { and: clauses };
+}
 
 export async function queryRoadmapCards(
   env: Env,
-  opts: { designStatus?: string } = {},
-): Promise<RoadmapCard[]> {
+  opts: { designStatus?: string; titleTokens?: string[]; cardNumber?: number | null } = {},
+): Promise<{ rows: RoadmapCard[]; truncated: boolean }> {
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
   return queryDatabaseRows(
     env,
@@ -1277,9 +1326,7 @@ export async function queryRoadmapCards(
       maxPages: ROADMAP_MAX_PAGES,
       pageSize: ROADMAP_PAGE_SIZE,
       errorLabel: "roadmap query failed",
-      filter: opts.designStatus
-        ? { property: "Design Status", status: { equals: opts.designStatus } }
-        : undefined,
+      filter: roadmapFilter(opts),
     },
     (r): RoadmapCard | null => {
       if (!r.id || r.archived) return null;

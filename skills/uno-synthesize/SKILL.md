@@ -53,7 +53,7 @@ or an exported file/query result. Say so — never claim a connection that isn't
 | 1 · Ingest | `Read`/`Grep`/`Glob` local material; pull referenced Notion pages via `mcp__notion-plus__*` |
 | 2 · Findings doc | summon **writers/notion** → Findings & Takeaways in the Research & notes DB |
 | 3 · STOP | present findings + recommendation; ask "enough context?" then "worth pursuing?"; wait for the designer |
-| 4 · PRD | draft inline for refinement; on approval, summon **writers/notion** → instantiate from the PRD template |
+| 4 · PRD | **query uno-blueprint first** (Supabase MCP read, `docs/conventions/supabase.md`) for the scenarios/paths/steps the PRD touches — the current-state section and downstream-effects reasoning cite blueprint rows, not memory; then draft inline for refinement; on approval, summon **writers/notion** → instantiate from the PRD template |
 | 5 · Paired write | on acceptance, summon **writers/blueprint** → stories/flows/screens to uno-blueprint **in the same action** as the PRD write; Roadmap card → `Design Status: Ready for Design` |
 
 No-go and not-sure outcomes at step 3 are deliverables too — see method § 3.
@@ -71,7 +71,7 @@ enforces convention surfaces and exact-match selects.
 |---|---|
 | always | `references/method.md` |
 | any Notion write | `docs/conventions/notion.md` |
-| any blueprint write | `docs/conventions/supabase.md` |
+| any blueprint read or write | `docs/conventions/supabase.md` + `docs/conventions/blueprint-navigation.md` |
 | human-facing prose | `docs/conventions/writing-style.md` |
 
 ## Quality bar

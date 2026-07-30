@@ -33,8 +33,8 @@ export async function executeBlueprintSearch(
       rows,
       note:
         rows.length > 0
-          ? "Ground your answer ONLY in these rows and cite the blueprint. For 'cell' rows, attribute each activity to its `layer` (the actor/stage — e.g. 'Regular Tutor', 'Lead Tutor', 'Partner Action: Teacher', 'Back Stage Actions') and order by `step`; do NOT attribute one actor's activities to another. Do not add facts that aren't here."
-          : "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing; you may fall back to cited docs.",
+          ? "Ground your answer ONLY in these rows and cite the blueprint. For 'cell' rows, attribute each activity to its `layer` (the actor/stage — e.g. 'Regular Tutor', 'Lead Tutor', 'Partner Action: Teacher', 'Back Stage Actions') and order by `step`; do NOT attribute one actor's activities to another. If the question spans multiple actors, paths, or layers, cover ALL the relevant ones here — a one-layer answer to a multi-actor question is incomplete. These rows are the CURRENT journey; if a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two. Do not add facts that aren't here."
+          : "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing. A CURRENT doc (Help Center, shipped PRD) may answer instead — cite and date it. If nothing covers it, say 'not in the source' and name who likely can fill the gap (the workflow's owner or lead from the roster).",
     });
   } catch (err) {
     return JSON.stringify({

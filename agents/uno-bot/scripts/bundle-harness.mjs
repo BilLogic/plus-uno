@@ -34,6 +34,7 @@ const SKILL_PATHS = [
   "docs/conventions/figma-workspace.md",
   "docs/conventions/slack.md",
   "docs/conventions/supabase.md",
+  "docs/conventions/blueprint-navigation.md",
   "docs/conventions/writing-style.md",
 ];
 
@@ -73,6 +74,17 @@ const assembled = parts
     return i === 0 ? text : `\n\n---\n\n<!-- ${SKILL_PATHS[i]} -->\n\n${text}`;
   })
   .join("");
+
+// stripIdeOnly needs a MATCHED pair — an unbalanced or misspelled marker simply
+// doesn't match, and the IDE-only block ships into the system prompt silently.
+// Fail the build instead: a surviving marker proves something didn't strip.
+if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
+  console.error(
+    "[bundle-harness] an <!-- ide-only --> marker survived assembly — unbalanced or misspelled pair. " +
+      "IDE-only content would ship in the bot prompt. Fix the markers and re-run.",
+  );
+  process.exit(1);
+}
 
 const outDir = path.join(here, "..", "src", "generated");
 mkdirSync(outDir, { recursive: true });

@@ -85,6 +85,36 @@ function capText(text: string): string {
   return `${cut}\n_…truncated — ask me for the rest._`;
 }
 
+// The retired confidence affix, killed deterministically instead of by prompt.
+// Banned in the persona since 2026-07-16 and re-worded twice (r19, r21) — it
+// still resurfaced while the R1 eval stayed green, so wording is not a reliable
+// control here (ADR-021). Precedent ADR-019: a surface rule that must hold on
+// every model lane belongs in the renderer.
+//
+// Two deliberate narrowings, both learned in review:
+//  • Only a HIGH rating is stripped. The affix is the model's fallback when it
+//    did NOT weave a clause inline, so a trailing "low/medium — from memory,
+//    verify" is often the reply's ONLY calibration signal; deleting it would
+//    make the answer read more certain than the model was.
+//  • Horizontal-whitespace classes and a single leading \n — the first version
+//    nested \n+ with two \s* (which also match \n), giving ~O(n^4) backtracking
+//    on a run of trailing blank lines: 100 blank lines blew the 10ms Worker CPU
+//    limit, which posts nothing at all. Model output is shaped by fetched
+//    content, so that was reachable from a read.
+const TRAILING_CONFIDENCE =
+  /\n[^\S\n]*(?:[-•*][^\S\n]+)?[_*]{0,2}[^\S\n]*confidence[^\S\n]*[_*]{0,2}[^\S\n]*[:—–-][^\S\n]*[_*]{0,2}[^\S\n]*(?:very )?high(?![a-z])[^\n]*$/i;
+
+function stripTrailingConfidence(text: string): string {
+  const trimmed = text.trimEnd();
+  const cleaned = trimmed.replace(TRAILING_CONFIDENCE, "").trimEnd();
+  // Log what was removed, so "stripped a decoration" stays distinguishable from
+  // "ate a line that mattered" when someone reads the tail.
+  if (cleaned !== trimmed) {
+    console.log(`[slack] stripped trailing confidence affix: ${trimmed.slice(cleaned.length).trim().slice(0, 120)}`);
+  }
+  return cleaned;
+}
+
 /**
  * Post a text reply and report whether Slack actually accepted it. Guards the
  * R2 "✅ + empty body" defect: empty text gets an honest placeholder, oversized
@@ -97,8 +127,9 @@ export async function postTextVerified(
   threadTs: string,
   text: string,
 ): Promise<{ ok: boolean; text: string }> {
-  const body = text.trim()
-    ? capText(text)
+  const cleaned = stripTrailingConfidence(text);
+  const body = cleaned.trim()
+    ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
   let posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
   if (!posted.ok) {

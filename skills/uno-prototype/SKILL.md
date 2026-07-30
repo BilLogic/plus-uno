@@ -297,7 +297,7 @@ answer their current design question.** Whenever possible, help the designer
 | Building UI, using components or tokens | `design-system/agent-views/components/{Name}/{Name}.md` if it exists, else `design-system/agent-views/components/index.md` + `design-system/agent-views/tokens/tokens.md` |
 | Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
 | Figma link / implement-design workflow | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first; gate: [`references/figma-registry-mandatory-load.md`](references/figma-registry-mandatory-load.md)), then [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) |
-| Grounding read / any blueprint touch | `docs/conventions/supabase.md` |
+| Grounding read / any blueprint touch | `docs/conventions/supabase.md` + `docs/conventions/blueprint-navigation.md` |
 | Writing frames/annotations to Figma | `docs/conventions/figma-workspace.md` |
 | Exhaustive lookup: prior-art roots · token sources · tool wiring | [`references/examples-index.json`](references/examples-index.json) · [`references/tokens-index.json`](references/tokens-index.json) · [`references/integrations-index.json`](references/integrations-index.json) |
 
