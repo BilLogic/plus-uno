@@ -12,6 +12,8 @@ import {
   CreateNewSessionPage,
   ConfirmSessionAvailabilityPage,
   StudentDashboardPage,
+  ReflectionFlowPage,
+  SessionInfoPage,
   SessionReflectionPage,
   StudentReflectionPage,
   FormFeedbackPage,
@@ -39,9 +41,6 @@ const OnboardingOverviewPage = React.lazy(() =>
 );
 const OnboardingInnerPage = React.lazy(() =>
   import('@/specs/Training/Onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage'),
-);
-const PostSessionPage = React.lazy(() =>
-  import('@/specs/Toolkit/Post-Session/Pages/PostSessionPage/PostSessionPage'),
 );
 const TutorTrainingProgressPage = React.lazy(() =>
   import('@/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage'),
@@ -119,7 +118,8 @@ function LiveAppRouteElements() {
       <Route path="/toolkit/create-session" element={<CreateNewSessionPage />} />
       <Route path="/toolkit/confirm-availability" element={<ConfirmSessionAvailabilityPage />} />
       <Route path="/toolkit/in-session" element={<StudentDashboardPage />} />
-      <Route path="/toolkit/post-session" element={<PostSessionPage />} />
+      <Route path="/toolkit/post-session" element={<ReflectionFlowPage />} />
+      <Route path="/toolkit/session-info" element={<SessionInfoPage />} />
       <Route path="/toolkit/session-reflection" element={<SessionReflectionPage />} />
       <Route path="/toolkit/student-reflection" element={<StudentReflectionPage />} />
       <Route path="/toolkit/form-feedback" element={<FormFeedbackPage />} />

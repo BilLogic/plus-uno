@@ -1,6 +1,7 @@
 /**
  * Post-Session page story barrels.
  * Single-step leaves share Section forms + pageShell; ReflectionFlow is the multi-step prototype.
+ * Components: import SessionInfo / ReflectionFlow directly — do not treat this barrel as a component API.
  */
 
 export * from './ReflectionFlow/ReflectionFlow.stories.jsx';

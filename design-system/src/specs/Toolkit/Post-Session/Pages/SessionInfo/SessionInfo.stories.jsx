@@ -1,11 +1,38 @@
 import React, { useState } from 'react';
 import SessionInfo from './SessionInfo';
+import {
+    BreakpointPreview,
+    ReflectionPageShell,
+} from '@/specs/Toolkit/Post-Session/Pages/pageShell';
 
 const SAMPLE_STUDENTS = [
     { id: 'kiera', name: 'Kiera Wintervale' },
     { id: 'baxter', name: 'Baxter Ellington' },
     { id: 'milo', name: 'Milo Thorne' },
 ];
+
+/**
+ * @param {object} formProps
+ */
+function renderShell(formProps) {
+    return (
+        <BreakpointPreview>
+            <ReflectionPageShell
+                activeTab="session-information"
+                completedSections={{}}
+                id="session-info-page-story"
+            >
+                {({ openSaveExit }) => (
+                    <SessionInfo
+                        {...formProps}
+                        onCancel={openSaveExit}
+                        onSaveAndExit={openSaveExit}
+                    />
+                )}
+            </ReflectionPageShell>
+        </BreakpointPreview>
+    );
+}
 
 export default {
     title: 'Specs/Toolkit/Post-Session/Pages/Session Info',
@@ -24,19 +51,15 @@ export const Default = {
         const [selectedStudentIds, setSelectedStudentIds] = useState(
             SAMPLE_STUDENTS.map((student) => student.id),
         );
-        return (
-            <div style={{ maxWidth: 720, width: '100%' }}>
-                <SessionInfo
-                    initialData={{
-                        date: '2025-07-29',
-                        sessionOption: 'session-1',
-                    }}
-                    availableStudents={SAMPLE_STUDENTS}
-                    selectedStudentIds={selectedStudentIds}
-                    onStudentSelectionChange={setSelectedStudentIds}
-                />
-            </div>
-        );
+        return renderShell({
+            initialData: {
+                date: '2025-07-29',
+                sessionOption: 'session-1',
+            },
+            availableStudents: SAMPLE_STUDENTS,
+            selectedStudentIds,
+            onStudentSelectionChange: setSelectedStudentIds,
+        });
     },
 };
 
@@ -44,15 +67,11 @@ export const Default = {
  * Empty Session Information — date/session required before uploads/students.
  */
 export const Empty = {
-    render: () => (
-        <div style={{ maxWidth: 720, width: '100%' }}>
-            <SessionInfo
-                initialData={{}}
-                availableStudents={SAMPLE_STUDENTS}
-                selectedStudentIds={[]}
-            />
-        </div>
-    ),
+    render: () => renderShell({
+        initialData: {},
+        availableStudents: SAMPLE_STUDENTS,
+        selectedStudentIds: [],
+    }),
 };
 
 /**
@@ -60,17 +79,13 @@ export const Empty = {
  */
 export const Cancellation = {
     name: 'Cancellation',
-    render: () => (
-        <div style={{ maxWidth: 720, width: '100%' }}>
-            <SessionInfo
-                initialData={{
-                    date: '2025-07-29',
-                    sessionOption: 'session-1',
-                    didNotHappen: true,
-                }}
-                availableStudents={SAMPLE_STUDENTS}
-                selectedStudentIds={[]}
-            />
-        </div>
-    ),
+    render: () => renderShell({
+        initialData: {
+            date: '2025-07-29',
+            sessionOption: 'session-1',
+            didNotHappen: true,
+        },
+        availableStudents: SAMPLE_STUDENTS,
+        selectedStudentIds: [],
+    }),
 };

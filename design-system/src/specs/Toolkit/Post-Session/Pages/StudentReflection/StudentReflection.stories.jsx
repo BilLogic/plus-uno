@@ -100,10 +100,3 @@ export const WorstCase = {
         },
     }),
 };
-
-/** @deprecated Prefer Empty. */
-export const Part1 = Empty;
-/** @deprecated Prefer InProgressAi. */
-export const Part2 = InProgressAi;
-/** @deprecated Prefer Filled. */
-export const Part3 = Filled;

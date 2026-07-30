@@ -87,7 +87,7 @@ Use **page docs** for single-step visual QA against Figma masters. Use **Reflect
 
 ## Obsolete (removed from Storybook catalog)
 
-These are **not** in the current Figma Components strip. Source may remain as `.archive` / wrapper for back-compat:
+These are **not** in the current Figma Components strip and must not ship as live modules:
 
 | Was | Reason |
 |---|---|
@@ -95,8 +95,10 @@ These are **not** in the current Figma Components strip. Source may remain as `.
 | AI Generating Placeholder | Loading is a state of Dynamic AI Prompted Question Box |
 | Session Info (Element) | Session Info is a **Page** |
 | Save And Exit (separate modal) | Confirmation Pop-up `type=exit without saving` |
-| Sections / Form Feedback | Form Feedback is a **Page** |
+| Sections / Form Feedback (success card) | Form Feedback is a **Page** (`FormFeedbackForm`) |
 | Post Session Page shell | Superseded by Reflection Flow + page states |
+| `*.archive` soft-deletes | Deleted — use git history |
+| V1 `*ReflectionForm.jsx` (non-V2) | Use `*FormV2` / `SelfReflectionForm` / `FormFeedbackForm` |
 
 ## Docs conventions
 

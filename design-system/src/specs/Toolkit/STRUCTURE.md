@@ -16,13 +16,12 @@ design-system/src/specs/Toolkit/
 ├── Post-Session/
 │   ├── Overview.mdx
 │   ├── reflectionCopy.js          # shared rating copy + chip option banks
-│   ├── Elements/                  # Session/Student/Self/Form Rating, SessionInfo,
-│   │                              # OptionChip, AiGeneratingPlaceholder
-│   ├── Modals/SaveAndExitModal/   # Save & Exit confirmation scrim
-│   ├── Sections/                  # SideNavBar, SessionInformationForm,
-│   │                              # SessionReflectionForm(V2), StudentReflectionForm(V2), …
-│   └── Pages/                     # ReflectionFlow (orchestrator), SessionReflection states,
-│                                  # StudentReflection, SelfReflection, FormFeedback, PostSessionPage
+│   ├── Elements/                  # Ratings, OptionChip, Session date/selection, Upload, …
+│   ├── Modals/ConfirmationPopUp/  # exit · exit without saving · reflection submitted
+│   ├── Sections/                  # SideNavBar, FreeResponse, MultiSelect, AI box, LinearScale,
+│   │                              # *Form / *FormV2 (composition helpers, not Figma strip leaves)
+│   └── Pages/                     # SessionInfo, Student/Session/Self/Form Feedback,
+│                                  # ReflectionFlow (orchestrator — not a Figma page)
 │
 ├── Elements/   (legacy conceptual grouping — see phase folders for actual specs)
 │   ├── SessionControlButtons/
@@ -160,7 +159,7 @@ design-system/src/specs/Toolkit/
 - **SessionReflection** (`Session Reflection`): Empty · In progress (AI generating) · Filled · Worst case · Save & Exit confirmation
 - **ReflectionFlow** (`Reflection Flow`): End-to-end in-memory orchestrator (Entry → Submit)
 - **StudentReflection** (`Student Reflection`): Student reflection pages (part=1-3; AI states in V2 form)
-- **OptionChip / AiGeneratingPlaceholder / SaveAndExitModal**: new Post-Session organisms aligned to Figma 3400:286833
+- **OptionChip / Dynamic AI Prompted Question Box / Confirmation Pop-up**: Post-Session organisms aligned to Figma `3400:286833` / `1721:118446`
 
 ## Storybook organization
 

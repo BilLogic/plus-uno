@@ -4,7 +4,7 @@
  */
 
 .post-session-linear-scale.plus-scale-wrapper {
-    width: 445px;
+    width: var(--col-8, 445px);
     max-width: 100%;
 }
 

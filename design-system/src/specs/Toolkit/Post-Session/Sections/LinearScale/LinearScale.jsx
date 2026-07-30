@@ -38,7 +38,7 @@ const LinearScale = ({
         options={SCALE_OPTIONS}
         value={value > 0 ? value : null}
         onChange={(next) => onChange?.(Number(next))}
-        aria-label="Self reflection scale"
+        aria-label={`${lowLabel} to ${highLabel}`}
     />
 );
 
