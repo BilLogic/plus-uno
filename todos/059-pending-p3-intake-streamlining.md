@@ -1,9 +1,9 @@
 ---
 status: pending
 priority: p3
-issue_id: 047
+issue_id: 059
 tags: [code-review, simplification, fsm]
-dependencies: [042]
+dependencies: [054]
 ---
 
 # Streamline the intake ecosystem (~1,850 lines for an 8-question interview)

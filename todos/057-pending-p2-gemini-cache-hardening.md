@@ -1,7 +1,7 @@
 ---
 status: pending
 priority: p2
-issue_id: 045
+issue_id: 057
 tags: [code-review, worker, cache]
 dependencies: []
 ---

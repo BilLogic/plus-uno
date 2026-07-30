@@ -1,7 +1,7 @@
 ---
 status: pending
 priority: p2
-issue_id: 042
+issue_id: 054
 tags: [code-review, hooks, fsm, architecture]
 dependencies: []
 ---
