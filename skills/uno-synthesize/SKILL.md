@@ -71,7 +71,7 @@ enforces convention surfaces and exact-match selects.
 |---|---|
 | always | `references/method.md` |
 | any Notion write | `docs/conventions/notion.md` |
-| any blueprint write | `docs/conventions/supabase.md` |
+| any blueprint read or write | `docs/conventions/supabase.md` + `docs/conventions/blueprint-navigation.md` |
 | human-facing prose | `docs/conventions/writing-style.md` |
 
 ## Quality bar

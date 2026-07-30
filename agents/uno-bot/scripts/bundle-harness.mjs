@@ -34,6 +34,7 @@ const SKILL_PATHS = [
   "docs/conventions/figma-workspace.md",
   "docs/conventions/slack.md",
   "docs/conventions/supabase.md",
+  "docs/conventions/blueprint-navigation.md",
   "docs/conventions/writing-style.md",
 ];
 

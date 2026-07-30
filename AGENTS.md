@@ -139,6 +139,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Product context, users, or domain terms | `docs/context/product/*.md` (foundation) + uno-blueprint (live truth) |
+| Reading or reasoning over the blueprint (schema, layer semantics, query recipes, answering rules) | `docs/conventions/blueprint-navigation.md` — load BEFORE querying; un-guided blueprint reads fail on navigation and layer attribution |
 | New teammate orientation | `docs/context/onboarding.md` |
 <!-- /ide-only -->
 <!-- The two sections above (Commands, Progressive loading) are IDE-agent-only —

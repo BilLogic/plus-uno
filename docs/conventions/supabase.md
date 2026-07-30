@@ -8,6 +8,8 @@
 - **Query at task time, never cache.** `docs/context/product/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
 - **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect; the shipped watchdog's blueprint-drift check (`docs/conventions/automations.md`) flags it, and any human spot of blueprint-vs-reality drift files a `uno-maintain` intake.
 
+**Navigating it:** schema, layer semantics, path semantics, query recipes, and the scored answering rules live in `docs/conventions/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
+
 ## Two sources, one time axis (ADR-021)
 
 Grounded in the UNO Blueprint Grounding Evaluation (Notion, 2026-07: six-arm context ladder; guided blueprint arms hit 100% vs 36% docs-only; the sharpest failures were source-conflict blends). Every agent answering journey/product questions — in-IDE or uno-bot — follows this routing:
