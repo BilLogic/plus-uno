@@ -3,6 +3,7 @@
 // the response body for diagnostics.
 
 import type { Env } from "../types";
+import { countedFetch } from "../net";
 
 export interface DispatchResult {
   ok: boolean;
@@ -16,7 +17,7 @@ export async function repositoryDispatch(
   clientPayload: Record<string, unknown>,
 ): Promise<DispatchResult> {
   const url = `https://api.github.com/repos/${env.GITHUB_REPO}/dispatches`;
-  const res = await fetch(url, {
+  const res = await countedFetch(url, {
     method: "POST",
     headers: {
       accept: "application/vnd.github+json",

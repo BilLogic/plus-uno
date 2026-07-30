@@ -13,6 +13,7 @@
 // implement_design flows' fetchNotionPRD can read it.
 
 import type { Env } from "../types";
+import { countedFetch } from "../net";
 
 const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
@@ -195,7 +196,7 @@ export async function findTeamMembers(env: Env): Promise<TeamMember[]> {
     do {
       const body: Record<string, unknown> = { page_size: TEAM_QUERY_PAGE_SIZE };
       if (cursor) body.start_cursor = cursor;
-      const res = await fetch(`${NOTION_API}/databases/${env.NOTION_TEAM_DB_ID}/query`, {
+      const res = await countedFetch(`${NOTION_API}/databases/${env.NOTION_TEAM_DB_ID}/query`, {
         method: "POST", headers, body: JSON.stringify(body), signal: controller.signal,
       });
       const data = (await res.json()) as {
@@ -293,7 +294,7 @@ async function queryDatabaseRows<T>(
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     for (let page = 0; page < opts.maxPages; page++) {
-      const res = await fetch(`${NOTION_API}/databases/${databaseId}/query`, {
+      const res = await countedFetch(`${NOTION_API}/databases/${databaseId}/query`, {
         method: "POST",
         headers: notionHeaders(env, { write: true }),
         body: JSON.stringify({
@@ -324,9 +325,11 @@ async function queryDatabaseRows<T>(
   }
 }
 
-export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
+export async function queryThirdPartyApps(
+  env: Env,
+): Promise<{ apps: ThirdPartyApp[]; truncated: boolean }> {
   if (!env.NOTION_APPS_DB_ID) throw new Error("NOTION_APPS_DB_ID not configured");
-  const { rows } = await queryDatabaseRows(
+  const { rows, truncated } = await queryDatabaseRows(
     env,
     env.NOTION_APPS_DB_ID,
     { maxPages: APPS_MAX_PAGES, pageSize: APPS_PAGE_SIZE, errorLabel: "third-party apps query failed" },
@@ -345,7 +348,7 @@ export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
       };
     },
   );
-  return rows;
+  return { apps: rows, truncated };
 }
 
 // ─── Generic catalog DB query (notion_search scoped catalogs) ────────────────
@@ -353,7 +356,14 @@ export async function queryThirdPartyApps(env: Env): Promise<ThirdPartyApp[]> {
 // known DBs. Query databases/{id} directly (1–2 subrequests) and match in-Worker.
 
 const CATALOG_PAGE_SIZE = 100;
-const CATALOG_MAX_PAGES = 2;
+// 5, matching ROADMAP_MAX_PAGES. At 2 this was a 200-row window that the tool
+// then described as a "complete scan" — the same defect that made a real card
+// come back as "not on the board" (2026-07-29). No catalog exceeds 200 rows
+// today (largest: Design Running Notes at 105), so this is headroom, not a fix
+// for a live miss; the truncated flag below is what makes the claim honest
+// either way. Coupled to loop-shared's notion_search bound of 6: 5 catalog
+// pages, or the apps path's 2 directory pages + 4 power-user lookups.
+const CATALOG_MAX_PAGES = 5;
 /** Cap how many select/status/url/rich_text fields we surface per row. */
 const CATALOG_META_CAP = 6;
 
@@ -404,6 +414,11 @@ function catalogMeta(props: Record<string, NotionProperty>): Record<string, stri
  * Read rows from any Notion database the integration can see. Generic title +
  * meta extraction — used by notion_search catalog scopes. Throws on failure.
  *
+ * Returns `truncated` alongside the rows: the page budget can run out with rows
+ * still unread, and a caller that doesn't know cannot tell "no such row" from
+ * "didn't get that far". Discarding it here is what let notion_search advertise
+ * a partial window as a "complete scan".
+ *
  * @param databaseId - Notion DATABASE id (not data-source id)
  * @param opts.skipTitleNames - title property names to ignore (multi-source DBs)
  */
@@ -411,8 +426,8 @@ export async function queryCatalogDatabase(
   env: Env,
   databaseId: string,
   opts: { skipTitleNames?: string[] } = {},
-): Promise<CatalogRow[]> {
-  const { rows } = await queryDatabaseRows(
+): Promise<{ rows: CatalogRow[]; truncated: boolean }> {
+  return queryDatabaseRows(
     env,
     databaseId,
     { maxPages: CATALOG_MAX_PAGES, pageSize: CATALOG_PAGE_SIZE, errorLabel: "catalog query failed" },
@@ -429,7 +444,6 @@ export async function queryCatalogDatabase(
       };
     },
   );
-  return rows;
 }
 
 /**
@@ -443,7 +457,7 @@ export async function fetchPageTitles(env: Env, pageIds: string[], cap = 4): Pro
   const titles: string[] = [];
   for (const id of pageIds.slice(0, cap)) {
     try {
-      const res = await fetch(`${NOTION_API}/pages/${id}`, { headers });
+      const res = await countedFetch(`${NOTION_API}/pages/${id}`, { headers });
       if (!res.ok) continue;
       const page = (await res.json()) as { properties?: Record<string, NotionProperty> };
       for (const prop of Object.values(page.properties ?? {})) {
@@ -567,7 +581,7 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const pageRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
+    const pageRes = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
     const page = (await pageRes.json()) as {
       id?: string; message?: string; code?: string;
       properties?: Record<string, NotionProperty>;
@@ -594,7 +608,7 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
       const qs = new URLSearchParams({ page_size: "100" });
       if (cursor) qs.set("start_cursor", cursor);
-      const bRes = await fetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
+      const bRes = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?${qs.toString()}`, { headers, signal: controller.signal });
       if (!bRes.ok) break;
       const bData = (await bRes.json()) as {
         results?: Record<string, unknown>[]; has_more?: boolean; next_cursor?: string;
@@ -643,7 +657,7 @@ export async function notionSearch(
     // No object filter — Notion only allows page OR database per call; omitting
     // the filter returns both. Prefer a scoped catalog query when the surface
     // is known (help_tutors / marketplace / decisions / …).
-    const res = await fetch(`${NOTION_API}/search`, {
+    const res = await countedFetch(`${NOTION_API}/search`, {
       method: "POST",
       headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
@@ -821,7 +835,7 @@ export async function notionCreate(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(`${NOTION_API}/pages`, {
+    const res = await countedFetch(`${NOTION_API}/pages`, {
       method: "POST",
       headers: notionHeaders(env, { write: true }),
       body: JSON.stringify({
@@ -993,7 +1007,7 @@ async function fetchPageTitle(
   headers: Record<string, string>,
   signal: AbortSignal,
 ): Promise<string> {
-  const res = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
+  const res = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
   const page = (await res.json()) as {
     id?: string; message?: string; code?: string; properties?: Record<string, NotionProperty>;
   };
@@ -1010,7 +1024,7 @@ async function fetchPageSchema(
   headers: Record<string, string>,
   signal: AbortSignal,
 ): Promise<PageSchema> {
-  const getRes = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
+  const getRes = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers, signal });
   const page = (await getRes.json()) as {
     id?: string; message?: string; code?: string;
     parent?: { type?: string; database_id?: string };
@@ -1028,7 +1042,7 @@ async function fetchPageSchema(
   if (!dbId) {
     return { title, inDatabase: false, schema };
   }
-  const dbRes = await fetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal });
+  const dbRes = await countedFetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal });
   const db = (await dbRes.json()) as {
     message?: string; code?: string;
     properties?: Record<string, {
@@ -1088,7 +1102,7 @@ export async function describeNotionTarget(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
+    const res = await countedFetch(`${NOTION_API}/pages/${pageId}`, { headers, signal: controller.signal });
     const page = (await res.json()) as {
       id?: string;
       url?: string;
@@ -1125,7 +1139,7 @@ export async function describeNotionTarget(
       const parent = page.parent?.type === "page_id" ? "a sub-page" : "a standalone page";
       return { title, parent, url, current };
     }
-    const dbRes = await fetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal: controller.signal });
+    const dbRes = await countedFetch(`${NOTION_API}/databases/${dbId.replace(/-/g, "")}`, { headers, signal: controller.signal });
     if (!dbRes.ok) return { title, parent: "a database", url, current };
     const db = (await dbRes.json()) as { title?: NotionRichText };
     return { title, parent: plain(db.title) || "a database", url, current };
@@ -1173,7 +1187,7 @@ export async function notionUpdate(
         updated.push(fmt.note ? `${match.name} (${fmt.note})` : match.name);
       }
       if (Object.keys(props).length) {
-        const res = await fetch(`${NOTION_API}/pages/${pageId}`, {
+        const res = await countedFetch(`${NOTION_API}/pages/${pageId}`, {
           method: "PATCH",
           headers,
           body: JSON.stringify({ properties: props }),
@@ -1195,7 +1209,7 @@ export async function notionUpdate(
     }
     if (input.append?.text?.trim()) children.push(...bodyToParagraphs(input.append.text));
     if (children.length) {
-      const res = await fetch(`${NOTION_API}/blocks/${pageId}/children`, {
+      const res = await countedFetch(`${NOTION_API}/blocks/${pageId}/children`, {
         method: "PATCH",
         headers,
         body: JSON.stringify({ children }),
@@ -1228,7 +1242,7 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
   try {
     const title = await fetchPageTitle(env, pageId, headers, controller.signal);
 
-    const patchRes = await fetch(`${NOTION_API}/pages/${pageId}`, {
+    const patchRes = await countedFetch(`${NOTION_API}/pages/${pageId}`, {
       method: "PATCH",
       headers,
       body: JSON.stringify({ archived: true }),

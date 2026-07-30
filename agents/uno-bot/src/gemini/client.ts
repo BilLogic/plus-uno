@@ -19,6 +19,7 @@
 
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "./auth";
+import { countedFetch } from "../net";
 
 export interface GeminiResult {
   ok: boolean;
@@ -100,7 +101,7 @@ export async function geminiGenerateRaw(
   body: Record<string, unknown>,
 ): Promise<{ status: number; data: unknown }> {
   const { url, headers } = await geminiEndpoint(env, model);
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  const res = await countedFetch(url, { method: "POST", headers, body: JSON.stringify(body) });
   const data = (await res.json().catch(() => ({}))) as unknown;
   return { status: res.status, data };
 }
@@ -150,7 +151,7 @@ export async function geminiGenerate(
   }
 
   try {
-    const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+    const res = await countedFetch(url, { method: "POST", headers, body: JSON.stringify(body) });
     const data = (await res.json()) as GenerateContentResponse;
     if (!res.ok) {
       return {

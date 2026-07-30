@@ -9,6 +9,7 @@
 //   GEMINI_API_KEY only       → Developer API, plain key header, this file unused.
 
 import type { Env } from "../types";
+import { countedFetch } from "../net";
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const SCOPE = "https://www.googleapis.com/auth/cloud-platform";
@@ -69,7 +70,7 @@ export async function getGoogleAccessToken(env: Env): Promise<string> {
   );
   const jwt = `${signingInput}.${base64url(new Uint8Array(sig))}`;
 
-  const res = await fetch(TOKEN_URL, {
+  const res = await countedFetch(TOKEN_URL, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({

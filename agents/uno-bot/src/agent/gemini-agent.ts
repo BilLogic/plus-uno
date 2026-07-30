@@ -23,12 +23,15 @@ import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
 import { BUILD } from "../version";
+import { subrequestsUsed, markToolStart, spentSinceMark, meterBreakdown } from "../net";
 import {
   MAX_ITERATIONS,
   MAX_TOKENS,
   READONLY_TOOL_BUDGET,
-  GROUNDING_BUDGET,
-  readOnlyToolCost,
+  LOOKUP_CEILING,
+  SUBREQUEST_CAP,
+  maxToolSubrequests,
+  makeSpendRecorder,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
@@ -174,16 +177,17 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   let thinkingTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
-  // Weighted grounding cost (estimated subrequests spent on lookups this turn).
-  // The real guard behind the READONLY_TOOL_BUDGET count backstop — see
-  // GROUNDING_BUDGET (free-tier 50-subrequest cap; live incident 2026-07-13).
-  let groundingCostUsed = 0;
+  // Actual-vs-bound spend per tool, for the [budget] line. The gate itself
+  // reads the live meter (src/net.ts), not a running estimate.
+  const spend = makeSpendRecorder();
   const toolNamesUsed: string[] = [];
 
   const finish = (result: AgentResult): AgentResult => {
-    // Weighted-budget telemetry for later calibration of the estimates/reserve.
+    // Measured spend + per-tool actual-vs-bound, so a drifting bound is visible
+    // in the logs instead of surfacing later as a silent mid-turn death.
     console.log(
-      `[budget] grounding est: ${groundingCostUsed}/${GROUNDING_BUDGET} subrequests, ${toolCallsUsed} tools`,
+      `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
+        `${toolCallsUsed} tools | ${spend.report()} | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
@@ -320,13 +324,13 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       const name = fc.functionCall!.name!;
       const args = (fc.functionCall!.args ?? {}) as Record<string, unknown>;
       let resultText: string;
-      // Fire when EITHER the weighted subrequest budget (checked BEFORE the
-      // call, using its projected cost) or the count backstop is hit. Gate
-      // applies to LOOKUPS only — side-effect tools were already peeled off
-      // above and stay allowed even when the lookup budget is spent.
+      // Fire when EITHER measured spend plus this call's worst case would cross
+      // the lookup ceiling, or the count backstop is hit. Gate applies to
+      // LOOKUPS only — side-effect tools were already peeled off above and stay
+      // allowed even when the lookup budget is spent.
       if (
         toolCallsUsed >= READONLY_TOOL_BUDGET ||
-        groundingCostUsed + readOnlyToolCost(name) > GROUNDING_BUDGET
+        subrequestsUsed() + maxToolSubrequests(name) > LOOKUP_CEILING
       ) {
         resultText = JSON.stringify({
           ok: false,
@@ -335,8 +339,9 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         });
       } else {
         toolCallsUsed++;
-        groundingCostUsed += readOnlyToolCost(name);
+        markToolStart();
         resultText = await executeReadOnlyTool(env, name, args, slack);
+        spend.record(name, spentSinceMark());
       }
       responseParts.push({ functionResponse: { name, response: { result: resultText } } });
     }

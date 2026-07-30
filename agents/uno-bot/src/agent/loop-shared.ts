@@ -97,32 +97,40 @@ export const MAX_TOKENS = 16384;
 // Kept as a secondary hard COUNT backstop behind the weighted budget below.
 export const READONLY_TOOL_BUDGET = 12;
 
-// ── Weighted subrequest budget (the real guard) ───────────────────────────────
+// ── Subrequest budget: measured spend + a bounded forecast ────────────────────
 //
-// Why weighted, not a flat count: the free plan hard-caps each Worker
-// invocation at 50 subrequests (Notion reads, Slack calls, DO hops, model call
-// — every fetch). A COUNT budget waves through 12 source_reads (~4 subrequests
-// each = ~48) and the request dies mid-flight — and because posting the error
-// ALSO costs a subrequest, it dies SILENTLY ("👀 then nothing"; live incident
-// 2026-07-13, Handoff thread). We estimate per-tool subrequest cost and reserve
-// a delivery budget that lookups can never spend. Conservative/high estimates +
-// a generous reserve keep us safely under 50; we log the estimate to calibrate.
+// The free plan hard-caps each Worker invocation at 50 subrequests (Notion
+// reads, Slack calls, DO hops, model calls — everything outbound). Call 51 kills
+// the invocation, and because POSTING the reply also costs a subrequest, it dies
+// silently: 👀 then nothing (live incidents 2026-07-10, 2026-07-13).
 //
-// NOT real fetch-counting (design decision): this touches only the loop files,
-// so there's no "missed a fetch path" failure mode.
+// This used to run entirely on estimates: a hand-typed per-tool cost table plus
+// a flat PRE_GROUNDING_OVERHEAD, with nothing comparing either to reality. They
+// drifted — notion_search was priced 4 while scope 'apps' really spent 6 — and
+// nothing could notice, because nothing counted. `src/net.ts` now counts every
+// outbound call, so the gate reads what was ACTUALLY spent.
+//
+// One estimate remains and can't be removed: a tool's cost isn't knowable until
+// it has run. So the gate is measured-past + bounded-future — real spend so far,
+// plus the WORST CASE for the one call about to be made. Those bounds are
+// derived from each tool's page caps and fan-out, not guessed, and the
+// `[budget]` line logs actual-vs-bound per tool so drift is now visible.
+//
+// Direction matters: an over-estimated bound costs one skipped lookup, an
+// under-estimated one costs the whole reply. When unsure, round up.
 
-// Estimated subrequests per read-only tool INCLUDING the model round-trip its
-// result triggers. Conservative (high) — better to synthesize early than die.
-const READONLY_TOOL_COST: Record<string, number> = {
-  source_read: 6,
-  blueprint_search: 6,
+// Worst-case subrequests ONE call of a tool can spend. Derived:
+//   source_read      1 page fetch + READ_BLOCK_PAGES (3) = 4, +1 slack/figma variant
+//   blueprint_search 2 embed (token + vector) + 1 rpc + 4 table fan-out = 7
+//   notion_search    apps: 2 directory pages + 4 power-user title lookups = 6
+//                    catalog: CATALOG_MAX_PAGES (5)
+//   roadmap_query    ROADMAP_MAX_PAGES (5) + a full unfiltered drift rescan (5)
+const MAX_SUBREQUESTS_PER_TOOL: Record<string, number> = {
+  source_read: 5,
+  blueprint_search: 8,
   delegate: 6,
-  notion_search: 4,
-  // 6, not 4: the Roadmap board outgrew a 2-page read, so a query now pages up
-  // to ROADMAP_MAX_PAGES (5) — plus the drift-fallback rescan in the rare error
-  // case. Under-pricing the one tool whose cost grew is how a turn sails past
-  // the gate and then dies mid-flight with no reply (the 👀-then-silence mode).
-  roadmap_query: 6,
+  notion_search: 6,
+  roadmap_query: 10,
   github_read: 4,
   slack_search: 3,
   slack_thread_read: 3,
@@ -130,24 +138,55 @@ const READONLY_TOOL_COST: Record<string, number> = {
   slack_channel_members: 3,
   slack_react: 2,
 };
-// Default for any unlisted read-only tool.
-const READONLY_TOOL_COST_DEFAULT = 4;
+// Default bound for any unlisted read-only tool.
+const MAX_SUBREQUESTS_DEFAULT = 5;
 
-/** Estimated subrequest cost of one read-only tool call (map value or default). */
-export function readOnlyToolCost(name: string): number {
-  return READONLY_TOOL_COST[name] ?? READONLY_TOOL_COST_DEFAULT;
+/** Worst-case subrequests one call of this tool can spend. */
+export function maxToolSubrequests(name: string): number {
+  return MAX_SUBREQUESTS_PER_TOOL[name] ?? MAX_SUBREQUESTS_DEFAULT;
 }
 
-// Tunable dials — recalibrate from the `[budget]` telemetry line.
 export const SUBREQUEST_CAP = 50; // Cloudflare free-plan hard cap per invocation.
 // Reserved for delivery — NEVER spent on lookups: final post + one retry + 2
 // history writes + the pre-send review-judge model call + margin.
 export const DELIVERY_RESERVE = 12;
-// Spent before grounding starts: Slack context load + initial model call + DO
-// reads before the first tool round.
-export const PRE_GROUNDING_OVERHEAD = 10;
-// What's actually left for grounding lookups (= 28).
-export const GROUNDING_BUDGET = SUBREQUEST_CAP - DELIVERY_RESERVE - PRE_GROUNDING_OVERHEAD;
+// Measured spend may reach this before a lookup is refused (= 38). Higher than
+// the old GROUNDING_BUDGET of 28 because the 10 units that used to be set aside
+// as PRE_GROUNDING_OVERHEAD are no longer a guess — startup cost is now counted
+// as it happens, so it doesn't need reserving twice.
+export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;
+
+/**
+ * Collects what each tool call ACTUALLY spent so the `[budget]` line can be read
+ * against the bounds above. This is the feedback loop the old estimate table
+ * never had: a bound that is chronically 3x the real spend is wasting research
+ * headroom, and one a real call ever exceeds is a latent silent death. Both are
+ * now visible in the logs instead of being invisible until an incident.
+ *
+ * Per-invocation (not module state) so concurrent requests can't blend tallies.
+ */
+export function makeSpendRecorder(): {
+  record: (tool: string, spent: number) => void;
+  report: () => string;
+} {
+  const actual: Record<string, number[]> = {};
+  return {
+    record(tool, spent) {
+      (actual[tool] ??= []).push(spent);
+      const bound = maxToolSubrequests(tool);
+      if (spent > bound) {
+        // The bound is what the gate trusts. If reality exceeds it, the gate can
+        // wave a call through that pushes the invocation past 50 — raise it.
+        console.warn(`[budget] BOUND EXCEEDED ${tool}: spent ${spent} > bound ${bound} — raise MAX_SUBREQUESTS_PER_TOOL`);
+      }
+    },
+    report() {
+      return Object.entries(actual)
+        .map(([tool, runs]) => `${tool}=${runs.join("+")}/${maxToolSubrequests(tool)}`)
+        .join(" ");
+    },
+  };
+}
 
 // ── Shared prompt strings (must read identically in both lanes) ───────────────
 

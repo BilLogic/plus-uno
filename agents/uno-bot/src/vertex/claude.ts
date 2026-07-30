@@ -17,6 +17,7 @@
 
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "../gemini/auth";
+import { countedFetch } from "../net";
 
 export const ANTHROPIC_VERTEX_VERSION = "vertex-2023-10-16";
 
@@ -48,7 +49,7 @@ export async function claudeVertexRaw(
   body: Record<string, unknown>,
 ): Promise<{ status: number; data: unknown }> {
   const token = await getGoogleAccessToken(env);
-  const res = await fetch(endpoint(env, model), {
+  const res = await countedFetch(endpoint(env, model), {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
     body: JSON.stringify({ anthropic_version: ANTHROPIC_VERTEX_VERSION, ...body }),

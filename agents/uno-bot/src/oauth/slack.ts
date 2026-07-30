@@ -29,6 +29,7 @@ import {
   handleOAuthCallback,
   getAccessToken,
 } from "./mcp-oauth";
+import { countedFetch } from "../net";
 
 // Space-joined user scopes requested at consent (read + the intentional writes).
 const SLACK_SCOPES = [
@@ -137,7 +138,7 @@ function config(env: Env): ProviderConfig {
     enrichToken: async (token) => {
       if (token.identity) return token;
       try {
-        const res = await fetch("https://slack.com/api/auth.test", {
+        const res = await countedFetch("https://slack.com/api/auth.test", {
           method: "POST",
           headers: { authorization: `Bearer ${token.access_token}` },
         });

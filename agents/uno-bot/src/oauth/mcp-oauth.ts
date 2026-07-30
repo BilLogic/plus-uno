@@ -18,6 +18,8 @@
 // resulting tokens live in the provider's KV namespace and the Worker refreshes
 // silently thereafter — the standard "headless via one-time consent" pattern.
 
+import { countedFetch } from "../net";
+
 export interface StoredToken {
   access_token: string;
   refresh_token?: string;
@@ -124,7 +126,7 @@ async function getClient(cfg: ProviderConfig): Promise<StoredClient> {
     response_types: ["code"],
   };
   if (cfg.scope) body.scope = cfg.scope;
-  const res = await fetch(cfg.registerUrl, {
+  const res = await countedFetch(cfg.registerUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -207,7 +209,7 @@ async function tokenRequest(
       break;
   }
 
-  const res = await fetch(cfg.tokenUrl, { method: "POST", headers, body: body.toString() });
+  const res = await countedFetch(cfg.tokenUrl, { method: "POST", headers, body: body.toString() });
   const json = (await res.json()) as Record<string, unknown>;
   // Non-standard responses (Slack) are handled by the provider's hook, which does
   // its own success/error detection (Slack returns HTTP 200 even on errors).

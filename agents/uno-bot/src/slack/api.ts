@@ -3,6 +3,7 @@
 
 import type { Env } from "../types";
 import { toSlackMrkdwn } from "./mrkdwn";
+import { countedFetch } from "../net";
 
 interface SlackOk {
   ok: true;
@@ -44,7 +45,7 @@ export async function slackCall<T extends SlackResponse>(
 ): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`https://slack.com/api/${method}`, {
+    res = await countedFetch(`https://slack.com/api/${method}`, {
       method: "POST",
       headers: {
         "content-type": "application/json; charset=utf-8",
@@ -69,7 +70,7 @@ async function slackGet<T extends SlackResponse>(
   const qs = new URLSearchParams(params).toString();
   let res: Response;
   try {
-    res = await fetch(`https://slack.com/api/${method}?${qs}`, {
+    res = await countedFetch(`https://slack.com/api/${method}?${qs}`, {
       headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
     });
   } catch (err) {

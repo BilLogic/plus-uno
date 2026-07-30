@@ -201,7 +201,7 @@ async function searchCatalogScope(
     });
   }
 
-  const rows = await queryCatalogDatabase(env, databaseId.trim(), {
+  const { rows, truncated } = await queryCatalogDatabase(env, databaseId.trim(), {
     skipTitleNames: cfg.skipTitleNames,
   });
 
@@ -232,15 +232,21 @@ async function searchCatalogScope(
     label: cfg.label,
     count: results.length,
     scanned: rows.length,
+    complete: !truncated,
     results: results.map((r) => ({
       title: r.title,
       url: r.url,
       meta: r.meta,
       ...(r.match_score != null ? { match_score: r.match_score } : {}),
     })),
+    // A miss on a TRUNCATED read is not an absence — the row may sit past the
+    // page budget. Saying "complete scan" there is how a real card came back as
+    // "doesn't exist" on the Roadmap (2026-07-29); same sentence, same trap.
     note: results.length
-      ? `${cfg.note} Complete scan of ${rows.length} rows (not a keyword sample). source_read a hit for full content; cite the page you used.`
-      : `No ${cfg.label} row matched '${query}' (complete scan of ${rows.length} rows). Say so plainly — don't invent entries. ${cfg.note}`,
+      ? `${cfg.note} ${truncated ? `Read the first ${rows.length} rows — the DB has more than could be read, so this is not the whole catalog.` : `Complete scan of ${rows.length} rows (not a keyword sample).`} source_read a hit for full content; cite the page you used.`
+      : truncated
+        ? `No ${cfg.label} row matched '${query}' among the first ${rows.length} rows, BUT the DB was too large to read fully — do NOT say it doesn't exist. Say you couldn't find it and ask for the link or a distinctive word from its title. ${cfg.note}`
+        : `No ${cfg.label} row matched '${query}' (complete scan of ${rows.length} rows). Say so plainly — don't invent entries. ${cfg.note}`,
   });
 }
 
@@ -261,7 +267,7 @@ const ROUTING_NOTE =
  * @param query - Tool/service name (blank → full directory)
  */
 async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
-  const apps = await queryThirdPartyApps(env);
+  const { apps, truncated } = await queryThirdPartyApps(env);
   if (apps.length === 0) {
     return JSON.stringify({
       ok: false,
@@ -286,7 +292,10 @@ async function searchThirdPartyApps(env: Env, query: string): Promise<string> {
       scope: "apps",
       count: 0,
       all_applications: apps.map((a) => a.name),
-      note: `No application matched '${query}'. The directory's names are listed — offer the closest ones, or say the tool isn't in the directory. ${ROUTING_NOTE}`,
+      complete: !truncated,
+      note: truncated
+        ? `No application matched '${query}' among the first ${apps.length} rows, and the directory was too large to read fully — say you couldn't find it there rather than that it isn't in the directory. ${ROUTING_NOTE}`
+        : `No application matched '${query}'. The directory's names are listed — offer the closest ones, or say the tool isn't in the directory. ${ROUTING_NOTE}`,
     });
   }
 

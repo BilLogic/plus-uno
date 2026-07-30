@@ -21,6 +21,7 @@
 
 import type { Env, SlackContext } from "../types";
 import { getSlackAccessTokenFor } from "../oauth/slack";
+import { countedFetch } from "../net";
 
 interface SearchMatch {
   channel?: {
@@ -66,7 +67,7 @@ export async function executeSlackSearch(
 
   try {
     const params = new URLSearchParams({ query, count: "20", highlight: "false" });
-    const res = await fetch(`https://slack.com/api/search.messages?${params}`, {
+    const res = await countedFetch(`https://slack.com/api/search.messages?${params}`, {
       headers: { authorization: `Bearer ${token}` },
     });
     const data = (await res.json()) as {

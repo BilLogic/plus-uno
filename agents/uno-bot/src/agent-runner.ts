@@ -20,6 +20,7 @@
 // visible-failure posts remain the user-facing error path.
 
 import type { Env } from "./types";
+import { runMetered } from "./net";
 import {
   onRunnerJob,
   type RunnerJobPayload,
@@ -63,7 +64,14 @@ export class AgentRunner {
     return new Response("not found", { status: 404 });
   }
 
-  async alarm(): Promise<void> {
+  alarm(): Promise<void> {
+    // The agent turn runs here, so THIS is the invocation the 50-subrequest cap
+    // applies to — open the meter around the whole firing. The budget gate in
+    // the agent loop reads the counter this establishes.
+    return runMetered(() => this.runOneJob());
+  }
+
+  private async runOneJob(): Promise<void> {
     // ONE job per alarm invocation — free-tier Workers cap subrequests at 50
     // per invocation, and a single agent turn spends most of that budget
     // (Slack + DO hops + grounding tool calls + model API). Processing a second

@@ -18,6 +18,7 @@
 
 import type { Env } from "../types";
 import { embedText, embeddingsConfigured } from "../vertex/embed";
+import { countedFetch } from "../net";
 
 const REQUEST_TIMEOUT_MS = 10000;
 const RPC_NAME = "search_blueprint";
@@ -129,7 +130,7 @@ async function trySemantic(
 ): Promise<BlueprintRow[] | null> {
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
   if (!embedding) return null;
-  const res = await fetch(`${base}/rest/v1/rpc/${SEMANTIC_RPC}`, {
+  const res = await countedFetch(`${base}/rest/v1/rpc/${SEMANTIC_RPC}`, {
     method: "POST",
     headers: {
       ...headers(key),
@@ -171,7 +172,7 @@ async function tryRpc(
   q: string,
   signal: AbortSignal,
 ): Promise<BlueprintRow[] | null> {
-  const res = await fetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
+  const res = await countedFetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
     body: JSON.stringify({ q }),
@@ -218,7 +219,7 @@ async function searchViaTables(
       const clauses = words.flatMap((t) => src.columns.map((c) => `${c}.ilike.*${t}*`));
       const url = `${base}/rest/v1/${src.table}?or=(${clauses.join(",")})&select=${src.select}&limit=${PER_TABLE_LIMIT}`;
       try {
-        const res = await fetch(url, { headers: headers(key), signal });
+        const res = await countedFetch(url, { headers: headers(key), signal });
         if (!res.ok) return [] as BlueprintRow[];
         const rows = (await res.json()) as Record<string, unknown>[];
         return rows.map((r) => normalize(src, r)).filter((r): r is BlueprintRow => r !== null);

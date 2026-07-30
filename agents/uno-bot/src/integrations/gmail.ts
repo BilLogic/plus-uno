@@ -10,6 +10,7 @@
 //   GMAIL_REFRESH_TOKEN  refresh token with https://www.googleapis.com/auth/gmail.send
 
 import type { Env } from "../types";
+import { countedFetch } from "../net";
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const SEND_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send";
@@ -37,7 +38,7 @@ function assertConfigured(env: Env): void {
 }
 
 async function getAccessToken(env: Env, signal: AbortSignal): Promise<string> {
-  const res = await fetch(TOKEN_URL, {
+  const res = await countedFetch(TOKEN_URL, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -95,7 +96,7 @@ export async function sendGmailMessage(env: Env, input: EmailInput): Promise<Sen
   try {
     const accessToken = await getAccessToken(env, controller.signal);
     const raw = base64UrlEncode(buildMime(env.GMAIL_SENDER!, input));
-    const res = await fetch(SEND_URL, {
+    const res = await countedFetch(SEND_URL, {
       method: "POST",
       headers: {
         authorization: `Bearer ${accessToken}`,

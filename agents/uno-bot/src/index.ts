@@ -10,6 +10,7 @@ import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
 import { runFigmaPoll } from "./figma-poll";
+import { runMetered, subrequestsUsed, meterBreakdown } from "./net";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -24,7 +25,17 @@ export default {
     );
   },
 
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  // runMetered opens a fresh subrequest counter for this invocation. Cloudflare
+  // caps a free-plan invocation at 50 outbound subrequests and kills it on 51,
+  // so the agent's budget gate reads this counter rather than the guess table it
+  // used to trust. ctx.waitUntil work continues inside the same async context,
+  // so the Slack-event path is metered too.
+  fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    return runMetered(() => handleRequest(request, env, ctx));
+  },
+};
+
+async function handleRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (request.method === "GET" && url.pathname === "/health") {
@@ -109,8 +120,7 @@ export default {
     }
 
     return new Response("not found", { status: 404 });
-  },
-};
+}
 
 // /debug/eval body: one turn of a (possibly multi-turn) eval conversation.
 interface EvalTurnBody {
@@ -172,13 +182,21 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       }).catch(() => null);
       gateAsk = gate?.ask ?? null;
     }
-    return Response.json({ ok: true, build: BUILD, ms: Date.now() - startedAt, narration, gateAsk, result });
+    // subrequests: the measured spend for this invocation. Surfaced so an eval
+    // run can see how close a turn came to the 50-call cap instead of finding
+    // out by way of a silent death in production.
+    return Response.json({
+      ok: true, build: BUILD, ms: Date.now() - startedAt,
+      subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
+      narration, gateAsk, result,
+    });
   } catch (err) {
     return Response.json({
       ok: false,
       build: BUILD,
       ms: Date.now() - startedAt,
       narration,
+      subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
       error: err instanceof Error ? err.message : String(err),
     });
   }

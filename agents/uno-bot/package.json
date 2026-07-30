@@ -7,12 +7,14 @@
   "scripts": {
     "dev": "wrangler dev",
     "bundle:harness": "node scripts/bundle-harness.mjs",
-    "deploy": "npm run bundle:harness && wrangler deploy",
+    "check:fetch": "node scripts/check-fetch.mjs",
+    "deploy": "npm run check:fetch && npm run bundle:harness && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "tail": "wrangler tail"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250101.0",
+    "@types/node": "^22.20.1",
     "typescript": "^5.6.0",
     "wrangler": "^4.97.0"
   }

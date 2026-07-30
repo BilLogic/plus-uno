@@ -10,6 +10,7 @@
 
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "../gemini/auth";
+import { countedFetch } from "../net";
 
 const EMBED_DIM = 768;
 const EMBED_REGION = "us-central1";
@@ -47,7 +48,7 @@ export async function embedText(
       const url =
         `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${env.GEMINI_PROJECT_ID}` +
         `/locations/${EMBED_REGION}/publishers/google/models/${VERTEX_MODEL}:predict`;
-      const res = await fetch(url, {
+      const res = await countedFetch(url, {
         method: "POST",
         headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
         body: JSON.stringify({
@@ -64,7 +65,7 @@ export async function embedText(
     }
     if (env.GEMINI_API_KEY) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${AISTUDIO_MODEL}:embedContent?key=${env.GEMINI_API_KEY}`;
-      const res = await fetch(url, {
+      const res = await countedFetch(url, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

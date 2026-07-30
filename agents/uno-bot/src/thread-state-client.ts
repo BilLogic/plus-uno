@@ -2,6 +2,7 @@
 // uses these helpers — it never builds DO URLs by hand.
 
 import type { Env } from "./types";
+import { charge } from "./net";
 import type { HistoryTurn } from "./thread-state";
 import type { AssistantContext } from "./slack/types";
 
@@ -34,6 +35,10 @@ function stub(env: Env): DurableObjectStub {
 }
 
 async function call(env: Env, path: string, init?: RequestInit): Promise<Response> {
+  // A DO stub call is a real subrequest against the 50-per-invocation cap, but
+  // it never goes through fetch(), so the meter can't see it — charge it here.
+  // Every ThreadState read/write funnels through this one function.
+  charge(1, "thread-state");
   return stub(env).fetch(`https://do${path}`, init);
 }
 

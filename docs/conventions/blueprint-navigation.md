@@ -12,6 +12,8 @@ Query the **database**, never the Netlify front end — that's the human viewer;
 
 ## 2 · The data model
 
+Row counts are a **2026-07-18 snapshot**, kept only to convey rough scale — the shape (which tables, which joins) is what's durable. Never quote a count from this file to a reader as the current number; count it at task time.
+
 | Table | Rows | What it is | Joins on |
 |---|---|---|---|
 | `service_lifecycles` | 1 | the whole journey ("PLUS Application") | — |
@@ -126,4 +128,20 @@ No structured fields for verbatim scripts, durations, counts, targets, or dates 
 
 ## 8 · Content depth (what's answerable today)
 
-Goal Setting is the deepest scenario (6 paths · 60 steps · 276 non-empty cells · 9 layers). Then Warm-Up (85 cells, 3 paths) → Discovery (40) → Before Students Join (31) → Help Request (28) → Tech Setup (20). Thin: Reporting an Issue (8), Reporting Hours (6), Standard Scheduling (6). A question landing in a thin scenario is likelier a **content gap than a retrieval failure** — say the blueprint doesn't cover it yet and route a `uno-maintain` intake, rather than straining to synthesize an answer from adjacent scenarios.
+Coverage is **very uneven**. Goal Setting is far deeper than everything else (6 paths, ~275 cells with evidence — roughly four times the next scenario); Warm-Up is a distant second; most scenarios are single-path and under 30 cells; several are under 10.
+
+The rule this exists for: **a thin result is more often a content gap than a retrieval failure.** When a query returns two or three cells and the scenario is one of the shallow ones, say the blueprint doesn't cover it yet and route a `uno-maintain` intake — don't strain to synthesize an answer out of adjacent scenarios.
+
+**Judge depth from the rows you just read, not from a remembered ranking.** An earlier version of this section carried a baked per-scenario leaderboard; by the time anyone checked, it had the wrong path count for Warm-Up and had Discovery and Tech Setup in the opposite order — so it was teaching the bot to call a well-covered scenario thin. Row counts change on every blueprint write and this file only changes on deploy; anything numeric here is stale by construction. In-IDE, count it:
+
+<!-- ide-only -->
+```sql
+select ss.name as scenario, count(distinct pa.id) as paths,
+       count(c.id) filter (where coalesce(c.content,'') <> '' or coalesce(c.description,'') <> ''
+                              or c.picture is not null or c.links::text <> '[]') as cells_with_evidence
+from service_scenarios ss
+left join paths pa on pa.service_scenario_id = ss.id
+left join cells c on c.path_id = pa.id
+group by ss.name order by cells_with_evidence desc;
+```
+<!-- /ide-only -->

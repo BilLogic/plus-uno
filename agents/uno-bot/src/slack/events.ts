@@ -1,4 +1,5 @@
 import type { Env } from "../types";
+import { charge } from "../net";
 import { runAgent, type AgentResult } from "../agent/run-agent";
 import { bareResolution } from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
@@ -146,6 +147,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
 // Keyed per thread so runs within a thread stay ordered.
 async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
   const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
+  charge(1, "agent-runner"); // DO stub call — a subrequest the meter can't see.
   const res = await stub.fetch("https://do/enqueue", {
     method: "POST",
     headers: { "content-type": "application/json" },
