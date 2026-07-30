@@ -1,16 +1,21 @@
 # Automations Registry
 
-<!--
-THE standing-automation registry — canonical (ADR-017; distilled 2026-07-07 from 📓 playbook §6, now superseded).
-Rule: every automation names its agent — an automation without an agent is unowned by definition.
-Rule: an automation invokes a skill's method; it never embeds its own copy of the logic. Migrate opportunistically as each is next touched.
-Rule (2026-07-16): every automation is a loop and declares its loop mechanics — stop condition and issue caps in its prompt adapter (scripts/prompts/<name>/SKILL.md); trigger cadence and the hard turn cap in its workflow file — keeping the procedure itself in the skill's method. Portable by construction: any model can execute the written loop; harness loop primitives are optional accelerators. (Pre-rule adapters — uno-implement, uno-implement-design — migrate opportunistically as each is next touched.)
-Rule (2026-07-16): every automation names where it runs and who pays. Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (.github/actions/claude-vertex) → Claude-on-Vertex, billed to the hcii-plus GCP project via the uno-bot service account (ADR-018; the GEMINI_SA_* secret names are that same account — rotating "the Gemini secrets" also rotates every Claude cron) — never to a personal Anthropic seat. Model routed by difficulty per the bot's tier table (sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia).
-Sweep intake transport (labels, dedupe, caps, injection rule): scripts/prompts/references/headless-intake.md — one copy, adapters point at it.
-Operate: spot-run any workflow with `gh workflow run <file>`; run outcomes land in the Actions job summary (`gh run list` / `gh run view <id>`). Cron triggers only fire from `main` — a workflow is inert until merged.
-Supply chain: third-party actions are pinned to commit SHAs (`uses: owner/repo@<sha> # vN`) and the Claude Code CLI to an exact npm version (claude-vertex action). To bump: resolve the new tag (`gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`), update the SHA + comment everywhere it appears, one green dispatch run before trusting crons.
-An automation absent from this table is undocumented by definition.
--->
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
+
+THE standing-automation registry. An automation absent from the table below is undocumented by definition.
+
+## Rules
+
+- **Every automation names its agent.** An automation without one is unowned by definition.
+- **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
+- **Every automation is a loop, and declares its loop mechanics.** Stop condition and issue caps go in its prompt adapter (`scripts/prompts/<name>/SKILL.md`); trigger cadence and the hard turn cap go in its workflow file. The procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop, and harness loop primitives are optional accelerators. Pre-rule adapters (uno-implement, uno-implement-design) migrate as each is next touched. *(rule added 2026-07-16)*
+- **Every automation names where it runs and who pays.** Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (`.github/actions/claude-vertex`) → Claude-on-Vertex, billed to the `hcii-plus` GCP project via the uno-bot service account (ADR-018 — the `GEMINI_SA_*` secret names are that same account, so rotating "the Gemini secrets" rotates every Claude cron too). Never a personal Anthropic seat. Model routed by difficulty per the bot's tier table: sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia. *(rule added 2026-07-16)*
+
+**Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
+
+**Operate:** spot-run any workflow with `gh workflow run <file>`; outcomes land in the Actions job summary (`gh run list` / `gh run view <id>`). Cron triggers fire only from `main` — a workflow is inert until merged.
+
+**Supply chain:** third-party actions are pinned to commit SHAs (`uses: owner/repo@<sha> # vN`), the Claude Code CLI to an exact npm version (claude-vertex action). To bump: resolve the new tag (`gh api repos/<owner>/<repo>/commits/<tag> --jq .sha`), update the SHA + comment everywhere it appears, then one green dispatch run before trusting crons.
 
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
 |---|---|---|---|---|---|---|---|

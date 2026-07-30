@@ -1,5 +1,6 @@
-<!-- Tier: 2 -->
 # Tech Stack
+
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · applied by every agent adding a dependency, command, or path alias. -->
 
 ## Core
 
@@ -11,7 +12,7 @@
 | Vite | ^8.0.1 | Build tool + dev server (Rolldown-powered) |
 | SASS | 1.77.8 | CSS preprocessing |
 
-## Documentation & Testing
+## Documentation & testing
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
@@ -19,14 +20,14 @@
 | Vitest | 4.0.15 | Unit testing |
 | Playwright | 1.58.2 | Browser testing |
 
-## Data Visualization
+## Data visualization
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
 | Highcharts | 12.5.0 | Charts and graphs |
 | highcharts-react-official | 3.2.3 | React bindings |
 
-## UI Enhancement
+## UI enhancement
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
@@ -34,7 +35,7 @@
 | React Router DOM | 7.13.0 | Client-side routing |
 | @assistant-ui/react | 0.12.3 | AI chat interface |
 
-## Key Commands
+## Key commands
 
 | Command | What it does |
 |---------|-------------|
@@ -49,7 +50,7 @@
 | `npm run dev:home-redesign` | Home redesign prototype server |
 | `npm run dev:monthly-report` | Monthly report prototype server |
 
-## Path Aliases
+## Path aliases
 
 | Alias | Resolves To |
 |-------|-------------|
@@ -57,7 +58,7 @@
 | `@plus-ds` | `design-system/src` |
 | `~` | `node_modules` |
 
-## Infrastructure (added 2026-07-08, plan Phase 2)
+## Infrastructure
 
 | Technology | Purpose |
 |---|---|

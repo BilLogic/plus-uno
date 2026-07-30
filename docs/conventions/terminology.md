@@ -1,11 +1,12 @@
-<!-- Tier: 1 -->
 # PLUS Terminology
+
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · applied by every agent naming a product, org, design-system, or harness term. -->
 
 Use these terms consistently across all design system work, prototypes, and documentation. Do not substitute generic web terms.
 
-## Product Terms
+## Product terms
 
-| PLUS Term | Meaning | Do NOT Use |
+| PLUS Term | Meaning | Do NOT use |
 |-----------|---------|------------|
 | **Session** | A scheduled tutoring slot (Zoom or Pencil) | "class", "meeting", "appointment" |
 | **Reflection** | Post-session tutor self-report | "survey", "feedback form", "review" |
@@ -20,7 +21,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Student Card** | UI component showing student info during session | "student profile", "student row" |
 | **Student Insight** | AI-generated student engagement summary | "student report", "analytics" |
 
-## Organizational Terms
+## Organizational terms
 
 | Term | Meaning |
 |------|---------|
@@ -30,7 +31,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **SMART** | PLUS training system |
 | **Breakout Room** | Zoom sub-room for one-on-one tutoring |
 
-## Design System Terms
+## Design-system terms
 
 | Term | Meaning |
 |------|---------|
@@ -39,7 +40,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Token** | Design value: color, spacing, typography, elevation, radius |
 | **Foundation** | Fundamental design primitive (color palette, type scale, grid) |
 
-## Harness & workflow terms (added 2026-07-08, plan Phase 2)
+## Harness & workflow terms
 
 | Term | Meaning | Do NOT use |
 |---|---|---|
@@ -55,7 +56,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Tier 1 / Tier 2** (loading) | always-loaded docs vs on-demand loads (`loading-order.md`) | — |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
 
-## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management (added 2026-07-10)
+## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
 Two estates describe the product in **different languages**, and the words are NOT interchangeable. Mixing them is a defect: never describe results from one estate in the other's vocabulary, and never search one estate for the other's concepts.
 
@@ -72,9 +73,9 @@ Two estates describe the product in **different languages**, and the words are N
 
 **Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows. Blueprint scenarios, steps, or research notes must never be presented as things found "on the Roadmap", and Roadmap cards must never be called scenarios, steps, or cells.
 
-## Codify the frame words in chat (added 2026-07-12, Bill)
+## Codify the frame words in chat
 
-When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English:
+When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
 
 - **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `layer` · `cell`, the path types `happy` / `named` / `alternative` (the values the board actually uses), and the layer (actor-row) names — `Regular Tutor`, `Lead Tutor`, `Partner Action: Teacher`, `Front Stage Actions`, `Back Stage Actions`, `Front Stage Tech`, `Back Stage Tech`, `Support Actions`, `Visual`.
 - **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.

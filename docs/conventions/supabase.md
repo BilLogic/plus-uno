@@ -18,7 +18,7 @@
 
 | Situation | Authority | Answer shape |
 |---|---|---|
-| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path › layer › step`. |
+| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path — layer × step`. The chain is containment; the pair after the dash is the cell's coordinate (actor row × journey column). |
 | Conflicting card is **WIP / under review**, change **decided** (Decisions DB or card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both attributed, never blended. |
 | Conflicting card is **WIP / under review**, still **exploratory** | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — not decided." Match the verb to decision status. |
 | Conflicting card is **shipped** (`Dev Status: Deployed`) | Blueprint (still) | Answer from the blueprint — the paired write updates it at ship, so a shipped doc that disagrees is the likely obsolete side. Evidence the blueprint itself is stale → say so and offer a `uno-maintain` intake. Never silently prefer the doc. |

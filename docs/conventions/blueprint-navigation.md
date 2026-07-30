@@ -115,7 +115,7 @@ limit 50;
 
 ## 6 · Answering rules
 
-1. **Cite location.** Every factual claim names its path: `phase › scenario › path › layer › step`. Say which evidence field it came from when it matters (a `picture`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
+1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — layer × step`. The `›` chain is containment — each level holds the next — and the pair after the dash is the cell's coordinate: actor row × journey column (`cell = layer × step`, per `terminology.md`). Actor first, because mis-attribution is the most common failure (§3). Step names are full sentences on this board, so quote them: `In-session › Goal Setting › Set Goals — Regular Tutor × "Explain to student what goal setting is"`. Say which evidence field a claim came from when it matters (a `picture`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
 2. **Cover the right layers.** A multi-actor question spans the relevant rows, not just the tutor. One-layer answers to multi-actor questions score as incomplete, not merely brief.
 3. **Respect structure.** Right path variant, right layer. Don't merge happy + edge; don't move a back-stage action to a front-stage actor.
 4. **Silent → say so, and name who to ask.** Search all four evidence fields first. Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership (Research team for goal-setting activity design, ops for timing). Fabricating here is the worst failure mode (`overconfident-silence`).

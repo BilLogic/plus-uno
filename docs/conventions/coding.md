@@ -1,8 +1,8 @@
-<!-- Tier: 1 -->
-
 # Coding Conventions
 
-## File Naming
+<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · applied by every agent writing code in this repo. -->
+
+## File naming
 
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `Alert/Alert.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
@@ -32,7 +32,7 @@ import '@/styles/globals.scss';
 - Deep imports: `import Button from 'design-system/src/components/Button/Button'` — use barrel
 - Ad hoc legacy paths — prefer existing index exports over deep relative traversals
 
-## Token Usage
+## Token usage
 
 Use design tokens everywhere — never hardcode colors, spacing, typography, or elevation.
 
@@ -58,7 +58,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 - Creator info is metadata in the prototype's README or marketplace data, not the directory name
 - Register new prototypes in `src/pages/PrototypeMarket/prototypes-data.js`
 
-## Token Workflow
+## Token workflow
 
 ```
 Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
@@ -74,7 +74,7 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 - **Imperative mood**: "Add button component" not "Added button component"
 - **Branch naming**: `feat/description`, `fix/description`, `refactor/description`
 
-## Docs Pipeline
+## Docs pipeline
 
 ```
 docs/knowledge/ideations.md → docs/plans/ → implementation → docs/knowledge/lessons/
@@ -84,7 +84,7 @@ docs/knowledge/ideations.md → docs/plans/ → implementation → docs/knowledg
 - **Plans**: `YYYY-MM-DD-NNN-type-slug-plan.md` — actionable implementation plans
 - **Lessons**: `docs/knowledge/lessons/{domain}.md` — compound loop learnings (atomic entries with YAML frontmatter)
 
-## Known Gotchas
+## Known gotchas
 
 | Gotcha | What Happens | Fix |
 |--------|-------------|-----|

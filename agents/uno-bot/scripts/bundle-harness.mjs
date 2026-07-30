@@ -36,6 +36,9 @@ const SKILL_PATHS = [
   "docs/conventions/supabase.md",
   "docs/conventions/blueprint-navigation.md",
   "docs/conventions/writing-style.md",
+  // The standing-automation registry: "what runs on a schedule / who owns it"
+  // is a live Slack question, and the table is the only answer to it.
+  "docs/conventions/automations.md",
 ];
 
 // Drop `<!-- ide-only -->…<!-- /ide-only -->` regions — replicated EXACTLY from

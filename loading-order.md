@@ -19,6 +19,7 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 | skill references | `skills/<name>/references/*.md` — one level deep, linked from SKILL.md | as linked |
 | any agent, on summon | its `agents/<kind>/<name>.md` + the conventions it names | always for that agent |
 | any estate write | the matching `docs/conventions/{notion,figma-workspace,slack,supabase}.md` | before writing |
+| any blueprint read | `docs/conventions/blueprint-navigation.md` | before querying — un-guided reads fail on navigation and layer attribution |
 | any human-facing text | `docs/conventions/writing-style.md` | before writing |
 | UI building | DS agent-views per AGENTS.md § Progressive loading | mandatory triggers |
 | orientation / product framing | `docs/context/*` | as needed |
@@ -33,5 +34,5 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 
 ## Runtime notes
 
-- **Worker (uno-bot):** no on-demand loading — `agents/uno-bot/src/agent/skills.ts` `SKILL_PATHS` concats AGENTS.md + AGENT.md + all `skills/*/bot.md` + methods + conventions into one prompt-cached block. Keep bot.md files ≤60 lines for this reason.
+- **Worker (uno-bot):** no on-demand loading. `agents/uno-bot/scripts/bundle-harness.mjs` `SKILL_PATHS` concatenates AGENTS.md + AGENT.md + every `skills/*/bot.md` + methods + the conventions it lists into `src/generated/harness.ts` at build time; `src/agent/skills.ts` serves that constant as one prompt-cached block. Everything in the bundle is always in context — the bot never "loads on demand", so Tier 2 is an IDE concept only. It carries 7 of the 11 conventions; `coding.md`, `tech-stack.md`, `integrations.md` are IDE-side and reachable via `github_read` if ever needed. Keep bot.md files ≤60 lines for this reason.
 - **GitHub Actions:** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline — fine, because conventions are repo-canonical (ADR-017) and load as plain files.
