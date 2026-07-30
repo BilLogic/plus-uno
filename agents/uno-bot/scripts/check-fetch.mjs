@@ -4,9 +4,11 @@
 // can't see makes the gate say "plenty of headroom" while the invocation is
 // already past Cloudflare's 50 — the 👀-then-silence failure.
 //
-// Not airtight — `const f = fetch; f(url)` is undetectable by regex. It catches
-// the accidents (a new integration, a copy-pasted call, a new DO binding), not
-// a determined bypass.
+// This is the SECOND line of defence, not the only one: net.ts also meters
+// globalThis.fetch, so a call that slips these regexes is still counted. The
+// guard's job is to keep call sites on countedFetch (which is also where the
+// timeout policy lives) and to catch the one case the runtime patch can't — an
+// alias captured at module scope in a file that evaluates before net.ts.
 //
 // Run: npm run check:fetch (also runs as part of deploy)
 import { readFileSync, readdirSync } from "node:fs";
@@ -40,6 +42,11 @@ const STUB_FETCH = /\.\s*fetch\s*\(/;
 // Without the `\w+\s*:` a fire-and-forget statement — `fetch(url).catch(…)`,
 // which this codebase does write — would exempt itself by sitting at line start.
 const HANDLER_DEF = /^\s*(?:async\s+)?fetch\s*\(\s*\w+\s*:/;
+// `const f = fetch` / `wrap(fetch)` / `[fetch]` — a reference, not a call. Only
+// these shapes, not any bare word `fetch`, so prose and "fetch failed" strings
+// stay quiet. A module-scope alias is the one hole the runtime patch can't
+// close (net.ts may evaluate after the file that captured it).
+const ALIAS_FETCH = /=\s*fetch\s*(?![(\w])|[([,]\s*fetch\s*[,)\]]/;
 
 const offences = [];
 for (const rel of readdirSync(srcDir, { recursive: true })) {
@@ -55,6 +62,10 @@ for (const rel of readdirSync(srcDir, { recursive: true })) {
     }
     if (BARE_FETCH.test(line) && !HANDLER_DEF.test(line) && !ALLOWED_BARE_FETCH.has(unix)) {
       offences.push(`${at}\n    -> bare fetch(); import countedFetch from net.ts.`);
+      return;
+    }
+    if (ALIAS_FETCH.test(line) && !ALLOWED_BARE_FETCH.has(unix)) {
+      offences.push(`${at}\n    -> aliases the global fetch. A module-scope alias can be captured before\n       net.ts patches the global, escaping the meter; use countedFetch.`);
       return;
     }
     if (STUB_FETCH.test(line) && !GLOBAL_FETCH.test(line) && !CHARGED_STUB_CALLS.has(unix)) {

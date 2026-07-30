@@ -23,7 +23,7 @@ import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
 import { BUILD } from "../version";
-import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError } from "../net";
+import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
 import {
   MAX_ITERATIONS,
   MAX_TOKENS,
@@ -32,6 +32,7 @@ import {
   SUBREQUEST_CAP,
   outOfIterationBudget,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
+  markPartialLookup,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
   makeInterimFilter,
@@ -176,16 +177,14 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   let thinkingTokens = 0;
   let iterations = 0;
   let toolCallsUsed = 0;
-  // Actual-vs-bound spend per tool, for the [budget] line. The gate itself
-  // reads the live meter (src/net.ts), not a running estimate.
   const toolNamesUsed: string[] = [];
 
   const finish = (result: AgentResult): AgentResult => {
-    // Measured spend + per-tool actual-vs-bound, so a drifting bound is visible
-    // in the logs instead of surfacing later as a silent mid-turn death.
+    // Measured spend, per host — how close the turn came to the cap, instead of
+    // finding out by way of a silent mid-turn death.
     console.log(
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools | ${meterBreakdown()}`,
+        `${toolCallsUsed} tools, ${subrequestBudgetTrips()} budget stops | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
@@ -327,10 +326,10 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       const name = fc.functionCall!.name!;
       const args = (fc.functionCall!.args ?? {}) as Record<string, unknown>;
       let resultText: string;
-      // Fire when EITHER measured spend plus this call's worst case would cross
-      // the lookup ceiling, or the count backstop is hit. Gate applies to
-      // LOOKUPS only — side-effect tools were already peeled off above and stay
-      // allowed even when the lookup budget is spent.
+      // Fire when the lookup ceiling is already reached, or the tool-count
+      // backstop is hit. Gate applies to LOOKUPS only — side-effect tools were
+      // already peeled off above and stay allowed even when the lookup budget
+      // is spent.
       if (
         toolCallsUsed >= READONLY_TOOL_BUDGET ||
         subrequestsUsed() >= LOOKUP_CEILING
@@ -343,9 +342,13 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       } else {
         toolCallsUsed++;
         // Enforced, not forecast — see the claude lane for the full note.
+        const tripsBefore = subrequestBudgetTrips();
         try {
           resultText = await withSubrequestLimit(LOOKUP_CEILING, () =>
             executeReadOnlyTool(env, name, args, slack));
+          // Cut short but returned normally (clean paging stop, or a catch that
+          // ate the throw) — the counter sees it either way.
+          if (subrequestBudgetTrips() > tripsBefore) resultText = markPartialLookup(resultText);
         } catch (err) {
           if (!isSubrequestBudgetError(err)) throw err;
           resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });

@@ -20,6 +20,12 @@ interface Meter {
   byHost: Record<string, number>;
   /** When set, countedFetch refuses the call that would cross it. */
   limit?: number;
+  /**
+   * How many times the limit has stopped a read this invocation — thrown OR
+   * checked by a paging loop. Monotonic, never reset: callers compare a before
+   * and after reading, so nested regions can't clobber each other.
+   */
+  trips: number;
 }
 
 const meterStore = new AsyncLocalStorage<Meter>();
@@ -51,7 +57,25 @@ export class SubrequestBudgetError extends Error {
  */
 export function subrequestBudgetSpent(): boolean {
   const m = meterStore.getStore();
-  return m?.limit != null && m.count >= m.limit;
+  if (m?.limit == null || m.count < m.limit) return false;
+  // Records a trip: the caller is about to return LESS than it was asked for.
+  // A partial read reported as if it were whole is the same lie as a swallowed
+  // throw, so the boundary has to hear about both.
+  m.trips += 1;
+  return true;
+}
+
+/**
+ * Budget stops so far this invocation. Read once before a lookup and again
+ * after: a rise means the result is short whatever the lookup itself reported.
+ *
+ * This is what makes the false-absence guarantee an INVARIANT rather than a
+ * convention. `rethrowIfBudget` at every best-effort catch is a rule a future
+ * `catch {}` can quietly break; a counter the boundary reads can't be broken by
+ * code that never mentions it.
+ */
+export function subrequestBudgetTrips(): number {
+  return meterStore.getStore()?.trips ?? 0;
 }
 
 /** True when `err` is the budget stop rather than an upstream failure. */
@@ -95,7 +119,7 @@ export async function withSubrequestLimit<T>(limit: number, fn: () => Promise<T>
  * @param fn - The invocation body
  */
 export function runMetered<T>(fn: () => Promise<T>): Promise<T> {
-  return meterStore.run({ count: 0, byHost: {} }, fn);
+  return meterStore.run({ count: 0, byHost: {}, trips: 0 }, fn);
 }
 
 /** Subrequests spent so far in this invocation (0 outside a metered context). */
@@ -128,6 +152,50 @@ export function meterBreakdown(): string {
 }
 
 /**
+ * Charge one subrequest for `url`, or refuse it. The single place the count and
+ * the limit are applied — shared by countedFetch and the patched global below.
+ *
+ * Counts BEFORE the call and keeps the count if it throws: Cloudflare charges
+ * the attempt, and over-counting costs a lookup while under-counting costs the
+ * whole reply.
+ *
+ * @throws SubrequestBudgetError when a limit is active and already reached
+ */
+function meterCall(url: string): void {
+  const m = meterStore.getStore();
+  if (!m) return;
+  if (m.limit != null && m.count >= m.limit) {
+    m.trips += 1;
+    throw new SubrequestBudgetError(m.limit);
+  }
+  m.count += 1;
+  let host = "unknown";
+  try {
+    host = new URL(url).host;
+  } catch {
+    // Non-absolute URL — keep the count, skip the label.
+  }
+  m.byHost[host] = (m.byHost[host] ?? 0) + 1;
+}
+
+// The real fetch, captured before the patch below so countedFetch doesn't
+// double-count by going through it.
+const nativeFetch = globalThis.fetch.bind(globalThis);
+
+// Meter the GLOBAL too, not just this module's export. check-fetch.mjs is a
+// regex and cannot see `const f = fetch; f(url)`, so a build guard alone leaves
+// the counter a convention; patching the global makes an aliased or dynamically
+// resolved call cost exactly what countedFetch costs. (globalThis.fetch is
+// writable in workerd — verified, not assumed.) The guard still runs: it catches
+// the one case this can't, an alias captured at module scope in a file that
+// evaluates before net.ts.
+globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+  const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  meterCall(url);
+  return nativeFetch(input, init);
+}) as typeof fetch;
+
+/**
  * The ONE outbound fetch for this Worker: counts the call, and applies a timeout
  * when the caller asks for one (Workers have no per-fetch timeout, so without it
  * a slow upstream pins the invocation).
@@ -139,7 +207,8 @@ export function meterBreakdown(): string {
  *
  * Every network call in src/ goes through here; `scripts/check-fetch.mjs` fails
  * the build on a bare `fetch(` anywhere else, because an uncounted call site is
- * exactly the drift this module exists to end.
+ * exactly the drift this module exists to end. A call that slips the guard is
+ * still counted — the global is metered too (above) — it just loses the timeout.
  *
  * @param input - URL
  * @param init - Standard fetch init; a caller-supplied `signal` still applies
@@ -151,26 +220,12 @@ export async function countedFetch(
   init: RequestInit = {},
   timeoutMs?: number,
 ): Promise<Response> {
-  const m = meterStore.getStore();
-  if (m) {
-    if (m.limit != null && m.count >= m.limit) throw new SubrequestBudgetError(m.limit);
-    m.count += 1;
-    let host = "unknown";
-    try {
-      host = new URL(input).host;
-    } catch {
-      // Non-absolute URL — keep the count, skip the label.
-    }
-    m.byHost[host] = (m.byHost[host] ?? 0) + 1;
-  }
-  // Count BEFORE the call and keep the count if it throws: Cloudflare charges
-  // the attempt, and over-counting costs a lookup while under-counting costs
-  // the whole reply.
+  meterCall(input);
   const deadline = timeoutMs == null ? undefined : AbortSignal.timeout(timeoutMs);
   // A caller that already has its own signal (a shared per-operation abort)
   // keeps it: abort either way, rather than the old code's silent clobber.
   const signal = deadline && init.signal
     ? AbortSignal.any([init.signal, deadline])
     : (deadline ?? init.signal);
-  return fetch(input, { ...init, ...(signal ? { signal } : {}) });
+  return nativeFetch(input, { ...init, ...(signal ? { signal } : {}) });
 }

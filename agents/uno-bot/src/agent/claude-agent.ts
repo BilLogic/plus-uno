@@ -30,6 +30,7 @@ import {
   SUBREQUEST_CAP,
   outOfIterationBudget,
   BUDGET_EXHAUSTED_LOOKUP_NOTE,
+  markPartialLookup,
   BUDGET_EXHAUSTED_SYNTHESIS,
   CLARIFY_FALLBACK,
   makeInterimFilter,
@@ -39,7 +40,7 @@ import {
   type AgentResult,
   type AgentImage,
 } from "./loop-shared";
-import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError } from "../net";
+import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
 import type { HistoryTurn } from "../thread-state-client";
 
 // ── Anthropic Messages wire types (the subset we touch) ──────────────────────
@@ -123,7 +124,7 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const finish = (result: AgentResult): AgentResult => {
     console.log(
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools | ${meterBreakdown()}`,
+        `${toolCallsUsed} tools, ${subrequestBudgetTrips()} budget stops | ${meterBreakdown()}`,
     );
     console.log(
       `[uno-bot] request done build=${BUILD} provider=vertex-claude tier=${tier} route=${routeReason} model=${model} ` +
@@ -256,9 +257,14 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
         // tool that can't do anything useful with what's left surfaces as the
         // budget note, same as a pre-emptive refusal used to.
         let resultText: string;
+        const tripsBefore = subrequestBudgetTrips();
         try {
           resultText = await withSubrequestLimit(LOOKUP_CEILING, () =>
             executeReadOnlyTool(env, tu.name, tu.input, slack));
+          // A tool that returned normally may still have been cut short — by a
+          // paging loop stopping cleanly, or by a catch that ate the throw.
+          // The counter sees both, so a short read can't pass as a whole one.
+          if (subrequestBudgetTrips() > tripsBefore) resultText = markPartialLookup(resultText);
         } catch (err) {
           if (!isSubrequestBudgetError(err)) throw err;
           resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });

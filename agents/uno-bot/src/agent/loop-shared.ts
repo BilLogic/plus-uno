@@ -121,6 +121,12 @@ export const READONLY_TOOL_BUDGET = 12;
 // The one rule handlers must respect: a budget stop is NOT an empty result.
 // Swallowing it reports "there is nothing there" — the false-absence bug this
 // codebase keeps having to fix. Use `rethrowIfBudget` at best-effort catches.
+//
+// That rule is a convention, and a future `catch {}` can break it without ever
+// mentioning the budget. So the tool boundary doesn't rely on it: net.ts counts
+// every stop, the loop compares the count either side of a lookup, and a rise
+// stamps `markPartialLookup` on whatever came back. Swallowing the throw now
+// costs an unnecessary label, not a false absence.
 
 export const SUBREQUEST_CAP = 50; // Cloudflare free-plan hard cap per invocation.
 // Reserved for delivery — NEVER spent on lookups: final post + one retry + 2
@@ -148,6 +154,16 @@ export function outOfIterationBudget(used: number): boolean {
 /** Fed back as a tool_result when the read-only budget is spent. */
 export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
   "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
+
+/**
+ * Stamp a tool result the budget cut short. Appended rather than merged into the
+ * JSON: the result may be any shape, and the model reads the text either way.
+ *
+ * @param resultText - Whatever the tool returned
+ */
+export function markPartialLookup(resultText: string): string {
+  return `${resultText}\n\n(system: this lookup was cut short — the turn ran out of lookup capacity mid-read, so the result above is INCOMPLETE. Nothing found here does NOT mean nothing exists; treat it as unread, not empty, and say which part you couldn't check rather than reporting it as absent.)`;
+}
 
 /** Injected as a final user turn to force a tools-disabled synthesis pass. */
 export const BUDGET_EXHAUSTED_SYNTHESIS =
