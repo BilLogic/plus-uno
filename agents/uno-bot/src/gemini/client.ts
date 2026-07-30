@@ -64,6 +64,35 @@ export function geminiConfigured(env: Env): "api-key" | "service-account" | null
   return null;
 }
 
+/**
+ * Vertex project/region/host + auth headers, or null when this deployment is on
+ * the AI-Studio key path (which has no cachedContents surface).
+ *
+ * Shared with ./cache.ts so the cache and the generateContent call can never
+ * drift onto different projects or regions — a cachedContents resource is
+ * scoped to both, and a mismatch is a 400 at request time, not a warning.
+ */
+export async function vertexBase(env: Env): Promise<{
+  host: string;
+  project: string;
+  region: string;
+  headers: Record<string, string>;
+} | null> {
+  if (geminiConfigured(env) !== "service-account") return null;
+  const project = env.GEMINI_PROJECT_ID ?? "";
+  const region = env.GEMINI_REGION ?? "global";
+  const host = region === "global" ? "aiplatform.googleapis.com" : `${region}-aiplatform.googleapis.com`;
+  return {
+    host,
+    project,
+    region,
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${await getGoogleAccessToken(env)}`,
+    },
+  };
+}
+
 // Resolve endpoint + auth headers for a generateContent call on either access
 // path (Developer API key, or Vertex with a service-account OAuth token).
 async function geminiEndpoint(

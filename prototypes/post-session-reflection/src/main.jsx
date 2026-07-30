@@ -4,6 +4,7 @@ import { ThemeProvider } from 'react-bootstrap';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/main.scss';
+import { PageLayoutShellProvider } from '@/specs/Universal/Pages/PageLayout/PageLayoutShellContext';
 import App from './App';
 import './index.css';
 
@@ -15,9 +16,11 @@ if (!rootEl) {
         ReactDOM.createRoot(rootEl).render(
             <React.StrictMode>
                 <ThemeProvider>
-                    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
-                        <App />
-                    </BrowserRouter>
+                    <PageLayoutShellProvider value={{ fullscreen: true }}>
+                        <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
+                            <App />
+                        </BrowserRouter>
+                    </PageLayoutShellProvider>
                 </ThemeProvider>
             </React.StrictMode>
         );

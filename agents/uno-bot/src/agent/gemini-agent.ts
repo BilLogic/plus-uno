@@ -22,6 +22,7 @@ import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
+import { ensureHarnessCache } from "../gemini/cache";
 import { BUILD } from "../version";
 import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
 import {
@@ -212,18 +213,46 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   const pendingForSystem = pending
     ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
     : null;
-  const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
-  const systemText = (systemBlocks as Array<{ text?: string }>)
+  const systemBlocks = (await buildSystemBlocks(
+    env,
+    pendingForSystem,
+    currentSender,
+    assistantContext,
+  )) as Array<{ text?: string }>;
+  // Block 0 is the harness — identical for every request on this build, which is
+  // exactly what a cache wants. Blocks 1+ are per-request (who sent this, what
+  // proposal is pending) and change every turn, so they must stay OUT of the
+  // cached bytes or nothing would ever hit.
+  const stableSystem = systemBlocks[0]?.text ?? "";
+  const perRequestSystem = systemBlocks
+    .slice(1)
     .map((b) => b.text ?? "")
+    .filter(Boolean)
     .join("\n\n");
+
+  // Vertex serves the harness from a cachedContents resource when the
+  // deployment is on a regional endpoint; otherwise this is null and the prompt
+  // goes inline exactly as before (see gemini/cache.ts for every fallback).
+  const harnessCache = await ensureHarnessCache(env, model, stableSystem);
+  if (harnessCache.name === null && harnessCache.reason) {
+    console.log(`[gemini-cache] inline system prompt — ${harnessCache.reason}`);
+  }
 
   const functionDeclarations = geminiFunctionDeclarations();
   const contents = buildContents(history, userText, images);
+  // A request that references cachedContent may NOT also set systemInstruction —
+  // Vertex rejects the pair. The per-request context therefore rides as a
+  // leading user turn instead; it is the same text, one role over.
+  if (harnessCache.name && perRequestSystem) {
+    contents.unshift({ role: "user", parts: [{ text: perRequestSystem }] });
+  }
 
   const callGemini = async (disableTools: boolean): Promise<GeminiPart[]> => {
     const body: Record<string, unknown> = {
       contents,
-      systemInstruction: { parts: [{ text: systemText }] },
+      ...(harnessCache.name
+        ? { cachedContent: harnessCache.name }
+        : { systemInstruction: { parts: [{ text: [stableSystem, perRequestSystem].filter(Boolean).join("\n\n") }] } }),
       // Built-in tools (googleSearch web grounding + urlContext server-side URL
       // fetch) run on Google's infra at zero Worker subrequests and mix with
       // function declarations ONLY on Gemini 3 — see builtinSearchTools above;
@@ -251,6 +280,15 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         );
         model = fallbackModel;
         ({ thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model));
+        // A cachedContents resource is bound to the model that created it, so
+        // the backup model cannot reference it — carrying the name over would
+        // turn a recoverable capacity failure into a hard 400. Inline for the
+        // rest of the turn; the next turn re-caches under the model in use.
+        if (harnessCache.name) {
+          console.log(`[gemini-cache] dropped for the fallback model — inlining the system prompt`);
+          if (perRequestSystem) contents.shift();
+          harnessCache.name = null;
+        }
         return callGemini(disableTools);
       }
       throw new Error(`Gemini ${status}: ${parsed.error?.message ?? "generateContent failed"}`.slice(0, 400));

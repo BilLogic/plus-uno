@@ -10,6 +10,8 @@ import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
 import { runFigmaPoll } from "./figma-poll";
+import { buildSystemBlocks } from "./agent/skills";
+import { ensureHarnessCache } from "./gemini/cache";
 import { runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips } from "./net";
 
 export default {
@@ -77,6 +79,29 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       maxTokens: 100,
     });
     return Response.json({ ...result, text: result.text?.slice(0, 100) });
+  }
+
+  // Is the Gemini lane's system prompt actually being cached? Reports the
+  // cachedContents resource (or the exact reason there isn't one) plus the size
+  // of the harness it would hold. Cheap: no model call, and the create is
+  // memoised for the hour either way. Auth-gated like every /debug route.
+  if (request.method === "GET" && url.pathname === "/debug/gemini-cache") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const model = env.GEMINI_MODEL ?? "gemini-3.6-flash";
+    const blocks = await buildSystemBlocks(env, null, null);
+    const stable = (blocks as Array<{ text?: string }>)[0]?.text ?? "";
+    const result = await ensureHarnessCache(env, model, stable);
+    return Response.json({
+      ok: true,
+      build: BUILD,
+      model,
+      region: env.GEMINI_REGION ?? "global",
+      harness_chars: stable.length,
+      cached: result.name !== null,
+      cache_name: result.name,
+      cache_tokens: result.tokens,
+      reason: result.reason,
+    });
   }
 
   // One HEADLESS agent turn for evals + reasoning investigation. Runs the

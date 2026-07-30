@@ -1,7 +1,38 @@
 /**
- * Bryan's Starter Prototype – index styles.
+ * Post-session reflection prototype — global layout.
+ * Fills the viewport; PageLayout owns surface padding via tokens.
  */
-:root {
-  --demo-frame-width: 1280px;
-  --demo-frame-height: 850px;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface, #191c1e);
+  background-color: var(--color-surface-container, #edeef0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+#root > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
 }

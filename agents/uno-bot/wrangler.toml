@@ -141,6 +141,17 @@ MODEL_PROVIDER = "gemini"
 # Shared by BOTH the Gemini-Vertex and the Vertex-Claude lanes.
 GEMINI_PROJECT_ID = "hcii-plus"
 GEMINI_REGION = "global"
+# ⚠️ One consequence of "global": Vertex context caching (`cachedContents`) is a
+# REGIONAL resource, so on the global endpoint the Gemini lane cannot cache its
+# system prompt and re-sends the ~40k-token harness on every loop iteration
+# (src/gemini/cache.ts explains the mechanism; GET /debug/gemini-cache reports
+# which side of this the deployment is on, and the `cached_in=` field on the
+# [uno-bot] log line shows whether Google's implicit caching is covering it
+# anyway). Setting a region — e.g. "us-central1" — turns explicit caching on for
+# free. It is NOT a free switch: this var is shared with the Vertex-CLAUDE lane
+# (src/vertex/claude.ts), and regional endpoints carry different model
+# availability, so smoke-test BOTH /debug/gemini and /debug/vertex-claude after
+# changing it. Decision left to Bill; the code handles either value.
 # Active Gemini model. A/B trial verdict (2026-07-10): gemini-3.1-flash-lite
 # fabricated grounding on multi-source answers — disqualifying for a
 # grounding-first bot. gemini-3.6-flash is the intended default (succeeded

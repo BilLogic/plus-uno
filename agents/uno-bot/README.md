@@ -124,7 +124,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 ## Smoke test
 
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
-- **Provider health (both auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) and `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run this before flipping `MODEL_PROVIDER="vertex-claude"`).
+- **Provider health (all auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) · `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run before flipping `MODEL_PROVIDER="vertex-claude"`) · `GET /debug/gemini-cache` (no model call: reports whether the Gemini lane's system prompt is served from a Vertex `cachedContents` resource, and the exact reason when it isn't — on `GEMINI_REGION = "global"` it never can be, see wrangler.toml).
 - **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/<slug>/` + a root `dev:<slug>` script; `npm install && npm run dev:test-prototype` boots it.
 
