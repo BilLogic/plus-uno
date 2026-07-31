@@ -6,24 +6,26 @@ tags: [harness, portability, hooks]
 dependencies: []
 ---
 
-# Wire the uno-prototype intake FSM for Antigravity
+# Antigravity intake adapter — possible, but needs a different mount point
 
-Windsurf dropped per Bill (2026-07-31). Antigravity is still wanted.
+Windsurf dropped per Bill (2026-07-31). Scope is Cursor · Claude Code · Codex, with Antigravity as the open question.
 
-## Problem Statement
+## What was verified (2026-07-31, antigravity.google/docs/hooks)
 
-The intake FSM has adapters for Cursor, Claude Code, and Codex (`.codex/hooks.json`, added 2026-07-30, unverified live). Antigravity 2.0 shipped a hooks system at Google I/O 2026 (nine lifecycle points, JSON config, PreToolUse/PostInvocation/Stop named in the launch blog) — an adapter is feasible, but its config format and whether it has a UserPromptSubmit-equivalent were not verifiable enough to ship without testing. Windsurf's hook story is unconfirmed. Until adapters land, both run the skill's manual intake path — same steps, no automation.
+Antigravity **does** have hooks — five events: `PreToolUse`, `PostToolUse`, `PreInvocation`, `PostInvocation`, `Stop`. Config is `hooks.json` in `.agents/` (workspace) or `~/.gemini/config/` (user). Hooks read JSON on stdin, return JSON on stdout with a `decision` of `allow`/`deny`.
 
-## Proposed Solutions
+**There is no `UserPromptSubmit` equivalent.** That is why the existing adapters cannot be copied: `.claude/settings.json` and `.codex/hooks.json` both mount on prompt submission, which Antigravity does not expose.
 
-1. Someone with Antigravity installed reads its hooks docs (antigravity.google/docs), maps UserPromptSubmit + PostToolUse:AskUserQuestion equivalents onto `claude-code-run.mjs` / `claude-code-answer.mjs`, adds the config file, live-tests `prototype this`. Small if the events map; the scripts are runtime-neutral.
-2. Same investigation for Windsurf.
+## The likely path
 
-## Acceptance Criteria
+`PreInvocation` fires before the model is called and is documented for injecting system instructions — functionally the closest mount point. But the input shape differs: Antigravity passes `conversationId`, `workspacePaths`, `transcriptPath`, `artifactDirectoryPath` — a transcript FILE, not the prompt string that `claude-code-run.mjs` expects. An adapter would need to read the latest user message out of the transcript before handing it to the FSM.
 
-- [ ] Antigravity session running `prototype this` gets `prd_check` from the hook
-- [ ] Or: a dated note recording why its hook surface cannot drive the FSM
+So: buildable, roughly one new adapter script (not a config copy), and it needs someone with Antigravity installed to verify the transcript format and that `PreInvocation` fires early enough to gate.
+
+## Until then
+
+Antigravity runs the manual intake path (`skills/uno-prototype/SKILL.md` § Intake mode) — same eight steps, same order, same brief card, no automation.
 
 ## Work Log
-
-- 2026-07-30: Created after verifying Codex hook compat (same events/stdin as Claude Code — wired) and Antigravity hooks existence (config format unverified).
+- 2026-07-30: Created; hooks existence known, config format unverified.
+- 2026-07-31: Verified against Antigravity's own docs. Corrected the earlier "couldn't verify" to a specific finding: hooks exist, no prompt-submit event, `PreInvocation` is the candidate, adapter needs a transcript reader.
