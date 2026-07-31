@@ -48,7 +48,7 @@ work — the designer's manual path carries no skill; it re-joins at review.
 3. **Deliver** — the confirmed artifact selects ONE deliverable doc (table
    below); plan, produce, validate per that doc.
 4. **Exit** — ds-lens pass · one-line manifest · hand to `skills/uno-review`
-   (method §6). Iteration or a failed review re-enters at the reflection, not
+   (method §5). Iteration or a failed review re-enters at the reflection, not
    at "fix the artifact".
 
 Always optimize for **learning, not completeness**: the successful prototype is

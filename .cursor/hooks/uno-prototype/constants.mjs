@@ -98,7 +98,7 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · Q2 of 4 (suggestion)',
     question: 'Step 2 · Q2 — Here is the artifact I would suggest — does it fit?',
     guidance:
-      'Building on what the designer just described in their own words, acknowledge their framing first, THEN offer ONE recommended artifact + ONE alternative + Other (not the full list), each tied to their description and the PRD. Vocabulary: user flow · journey map · wireframe · static mockup · interactive prototype · functional prototype. One line of tradeoff each; never imply only one correct answer — this is prototyping *with* them.',
+      'Building on what the designer just described in their own words, acknowledge their framing first, THEN offer ONE recommended artifact + ONE alternative + Other (not the full list), each tied to their description and the PRD. Vocabulary: user flow · journey map · wireframe (incl. quick ASCII sketch in-chat) · static mockup · concept image · storyboard · interactive prototype · functional prototype. One line of tradeoff each; never imply only one correct answer — this is prototyping *with* them.',
   },
   reflect_fidelity: {
     stepIndex: 3,

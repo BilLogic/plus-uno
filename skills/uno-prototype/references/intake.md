@@ -67,7 +67,7 @@ constraints · remaining uncertainties. **Recommend nothing yet.**
 
 Reflect *with* the designer, never decide for them. Every recommendation cites
 concrete PRD evidence; confirm labels RESTATE the content (never a bare "looks
-good"). Carry the missing-context gate (method §5) through — a missing screen
+good"). Carry the missing-context gate (method §4) through — a missing screen
 state or ambiguous interaction surfaces here, not as invented behavior later.
 The lists below are vocabulary to pick from, not menus to show.
 

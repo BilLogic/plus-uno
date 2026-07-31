@@ -20,7 +20,7 @@ or the coded build).
 - Iterate live; small revisions in-message. Style reference:
   `examples/ascii-wireframe.md`.
 - Still checked against the brief card before it exits anywhere; if it exits,
-  it produces the manifest line like every other artifact (method §6).
+  it produces the manifest line like every other artifact (method §5).
 
 ## Route B — Figma wireframe (MCP-direct)
 
@@ -33,13 +33,15 @@ Building wireframes *from DS components* triggers the registry gate:
 ## Route C — external tool spec (spec-handoff)
 
 **Target tools:** Stitch (PRD → wireframe generation) · Figma Make (mid visual
-polish). Write an interactive/functional-shaped prompt-spec (normative shape:
-method §3): everything a diagram spec names, plus the asset spec — real copy,
+polish). Write an interactive/functional-shaped prompt-spec — everything a diagram spec names, plus the asset spec — real copy,
 sample data, screen states **including empty/error**, and what is out of scope
 so the tool doesn't invent it. End with the embedded self-check block (brief
-card + dial settings as pass/fail checks). Offer the paste-back re-check.
+card + dial settings as pass/fail checks). Golden example:
+`examples/wireframe-spec.md`; check with
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Offer the
+paste-back re-check.
 
 ## Exit
 
-All routes: method §6 — DS-lens pass at the artifact's own rigor · one-line
+All routes: method §5 — DS-lens pass at the artifact's own rigor · one-line
 manifest (fidelity · tools · PRD link) · hand to uno-review.

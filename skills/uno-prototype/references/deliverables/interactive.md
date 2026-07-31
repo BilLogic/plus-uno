@@ -3,7 +3,7 @@
 # Deliverable — interactive / functional prototype (external tool)
 
 **Execution mode: spec-handoff.** UNO writes an interactive/functional-shaped
-prompt-spec (normative shape: method §3); the designer runs it. UNO does not
+prompt-spec ; the designer runs it. UNO does not
 run the generation. (A functional prototype built *on the design system in
 this repo* is `coded-build.md`, not this.)
 
@@ -17,7 +17,7 @@ this repo* is `coded-build.md`, not this.)
   - **real copy** — never lorem;
   - **sample data** — realistic values, enough rows to exercise the layout;
   - **screen states including empty and error** — a missing state here becomes
-    invented behavior there (missing-context gate, method §5: if grounding
+    invented behavior there (missing-context gate, method §4: if grounding
     lacks a state, ask, don't invent);
   - **the specific behavior under test** — which interaction must actually
     work, at which fidelity dial setting.
@@ -29,6 +29,7 @@ this repo* is `coded-build.md`, not this.)
 
 ## Handoff
 
-Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
-Offer the paste-back re-check against the same block. Exit per method §6:
+Golden example: `examples/interactive-spec.md`. Before handing off, run
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
+Offer the paste-back re-check against the same block. Exit per method §5:
 DS-lens at the artifact's rigor · manifest line · uno-review.

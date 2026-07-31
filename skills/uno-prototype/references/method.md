@@ -3,17 +3,21 @@
 
 # uno-prototype — method
 
-Turn a written requirement into a design artifact at a chosen fidelity. At low
-and mid fidelity UNO is the **prompt engineer, not the generator** — external
-tools generate from UNO's briefs. Only at hi-fi does UNO build directly, against
-`uno-storybook`. Critique belongs to uno-review; sharing and handoff to
-uno-publish. The hand-craft path bypasses this skill by design — but nothing
-bypasses the stage-lens review.
+Turn a written requirement into a design artifact. UNO's role depends on the
+deliverable's execution mode: for external-tool routes UNO is the **prompt
+engineer, not the generator** — the spec is the output, the external tool
+generates. Where UNO itself holds the medium (an in-chat text sketch, a
+connected design tool driven through its gated writer), producing directly is
+legitimate — the rule's target is hand-faking what a tool must render, never
+delegated production through sanctioned channels. Hi-fi builds UNO makes
+directly, against `uno-storybook`. Critique belongs to uno-review; sharing and
+handoff to uno-publish. The hand-craft path bypasses this skill by design —
+but nothing bypasses the stage-lens review.
 
 ## 0. PRD required — entry gate, all fidelities
 
-No PRD → do not enter this skill. Applies to low, mid, high, and hand-craft
-routing alike; there are no exceptions and no "idea-only" bypass.
+No PRD → do not enter this skill. Applies to every route including hand-craft;
+there are no exceptions and no "idea-only" bypass.
 
 **Acceptable PRD forms (any one):**
 
@@ -27,39 +31,15 @@ prompt-spec, or touch `prototypes/`. Invite the designer to run
 `skills/uno-synthesize` first (`notion_create` flow) and return with the PRD
 link or approved inline draft. Never invent requirements to fill the gap.
 
-**The intake procedure — portable by construction.** Before any routing or
-building: PRD check → PRD upload/verify → the Step 2 reflection (goal →
-artifact, asked open-ended first then as a recommendation → fidelity →
-exclusions) → **brief-card confirmation**. One question per message, never
-batched; **no step may be skipped** — but a step the conversation has already
-answered is rendered as a one-tap confirm of that answer (cite where it came
-from), never re-asked cold. Verification, not re-interview. The confirmed brief
-card (goal · artifact · fidelity · won't-include) is the **contract** carried
-into planning, generation, and the validation loop. Plus Design System is
-always applied and is never asked. This written sequence is the contract; any
-runtime that can ask a question can run it. IDE hook runtimes automate it
-(details below, IDE-only); a runtime without the hook runs the same steps
-itself, in order, and skips nothing.
-
-<!-- ide-only -->
-**Hook automation (Cursor · Claude Code · Codex).** Cursor enforces the sequence
-at prompt submit via `.cursor/hooks/require-prd-for-prototype.sh`; Claude Code
-via `.claude/settings.json` and Codex via `.codex/hooks.json` (Codex shares
-Claude Code's hook events and stdin shape), both running
-`.cursor/hooks/uno-prototype/claude-code-run.mjs`
-(one data-driven FSM in `.cursor/hooks/uno-prototype/` backs all three — stateless
-per message, scoped by `conversation_id`). The hook re-prompts each step until
-satisfied and writes `.cursor/hooks/briefings/active-intake-question.json` each
-turn; the agent renders only that file's current step (`stateId`/`type`/
-`guidance`), shows its `progressLabel`, opens the first step with the one-line
-flow map, and surfaces that saying `back` revises an earlier answer.
-
-To exit without invoking uno-prototype, say `skip PRD upload` or
-`terminate this process`. That releases the workflow but does not grant a PRD
-bypass inside the skill. After the brief is confirmed, the hook stops
-intercepting and hands off to the agent's Plan → Generate steps. Disable the
-gate for local testing: `"uno": { "prdGate": false }` in `.cursor/settings.json`.
-<!-- /ide-only -->
+**The intake contract.** Before any routing or building, an interview settles —
+one question per message, no step skipped, a step the conversation already
+answered rendered as a one-tap confirm (cite the source), never re-asked cold —
+and ends in a confirmed **brief card**: goal · artifact · fidelity (as explicit
+per-dimension dial settings) · won't-include. The card is the **contract**
+carried into planning, generation, and validation. Plus Design System is always
+applied and is never asked. Any runtime that can ask a question can run the
+interview; runtimes with an intake hook automate it, others run it manually —
+same steps, same order, same card.
 
 ## 1. Ground the brief — unconditional, scoped
 
@@ -71,76 +51,47 @@ No path from PRD to prototyping skips grounding, at any fidelity.
 - Sweep for prior art: existing components, specs, and prototypes
   touching the same surface.
 - **Figma grounding when a frame is in play — the runtimes are NOT symmetric:**
-  the **IDE** connects to Figma directly (`get_design_context`, `get_screenshot`,
-  `get_variable_defs`, write-back via `create_new_file`, ✅-gated; see
-  `figma-mcp-guide.md`). **uno-bot** gets a rendered screenshot of a pasted frame
-  link (with `node-id`) plus text-layer reads — qualitative grounding only;
-  variables, tokens, and computed values are IDE-only (the bot's full capability
-  statement lives in `agents/uno-bot/AGENT.md § My lane`). The bot grounds the
-  rest from the Notion doc/PRD that references the frame and runs its wall-ritual
-  for spec-level work.
+  the **IDE** connects to Figma directly (design context, screenshots, variable
+  reads, gated write-back; see `design-system/figma/mcp-guide.md`). **uno-bot**
+  gets a rendered screenshot of a pasted frame link (with `node-id`) plus
+  text-layer reads — qualitative grounding only; variables, tokens, and
+  computed values are IDE-only (the bot's full capability statement lives in
+  `agents/uno-bot/AGENT.md § My lane`). The bot grounds the rest from the
+  Notion doc/PRD that references the frame and runs its wall-ritual for
+  spec-level work.
 - Keep a grounding snapshot (what was read, when). Re-entry depends on it.
 
-**Re-grounding rule:** on every re-entry at the fidelity decision — review
-returned issues, or the designer iterates by choice — diff the PRD/blueprint
-against the grounding snapshot. Changed → re-ground the delta. Unchanged → fix
-against the existing grounding; never re-run the full ritual out of habit.
+**Re-grounding rule:** on every re-entry — review returned issues, or the
+designer iterates by choice — diff the PRD/blueprint against the grounding
+snapshot. Changed → re-ground the delta. Unchanged → fix against the existing
+grounding; never re-run the full ritual out of habit.
 
-## 2. Choose fidelity
+## 2. Choose the route
 
-The designer chooses; UNO routes — and never gold-plates past the ask.
-
-| Branch | The question it asks | UNO's role → output |
-|---|---|---|
-| **Low** | what are you working through? | prompt engineer → diagram-shaped prompt-spec |
-| **Mid** | what's the challenge (what needs proving)? | prompt engineer → interactive/functional prompt-spec |
-| **High** | none — direction is settled | builder → DS-compliant build on `uno-storybook` |
-| **Hand-craft** | any fidelity, fully manual | none — skill steps aside; review still applies |
+The designer chooses; UNO routes — and never gold-plates past the ask. The
+confirmed artifact selects the deliverable: a **flow map**, **wireframe or
+static mockup**, **concept image**, **storyboard**, or **interactive proof**
+exits as a prompt-spec (or, where sanctioned, a directly-produced WIP
+artifact); a **hi-fi build** is executed directly on the design system. Each
+deliverable's procedure lives in its own reference; every deliverable honors
+the same contract and exit ritual below.
 
 A revision re-enters *here*, not at "fix the artifact" — a failed review may
-legitimately change fidelity or tool, not just content.
+legitimately change the deliverable or tool, not just content.
 
-## 3. Low / mid — the two prompt-engineering modes
+## 3. The self-check block — every spec carries the contract
 
-Generation quality is a briefing problem: UNO's job is upstream of the tool.
-The two modes differ in kind — never merge them into one template.
-
-**Diagram-shaped (low).** For user-flow & supporting-system maps, data-flow
-maps, or flow-variety ideation. The spec names: the flow's trigger → steps →
-outcome, actors and systems touched, the constraint list from grounding, and
-what feedback the sketch is meant to provoke.
-
-**Interactive/functional-shaped (mid).** For layout/interaction validation or
-working-UI proofs. Everything above, plus the asset spec the tool needs: real
-copy, sample data, screen states (incl. empty/error), and the specific
-behavior under test. Name what's out of scope so the tool doesn't invent it.
-
-**Both modes end with an embedded self-check block** — the confirmed brief
+Every prompt-spec ends with an embedded self-check: the confirmed brief
 restated as concrete pass/fail checks (serves the goal · right artifact shape ·
-at the agreed fidelity · nothing from the won't-include list, plus the spec's
-own named states/constraints). The block instructs the generating tool to
-verify its output against these checks and regenerate once if any fail. The
+at the agreed fidelity dials · nothing from the won't-include list, plus the
+spec's own named states/constraints). The block instructs the generating tool
+to verify its output against these checks and regenerate once if any fail. The
 loop travels inside the spec, so it runs on any platform — no UNO-side runtime
 needed. Where UNO can see the result (the designer pastes it back), UNO
-re-checks against the same block.
+re-checks against the same block. A spec is done when it is usable with at
+most one regeneration.
 
-Either mode ends with a prompt-spec the designer carries to the external tool —
-usable with at most one regeneration. UNO does not run the generation.
-
-## 4. High — build on the design system
-
-Direction is settled; the work is execution on the system. DS compliance is
-enforced by construction, not by review catching it later:
-
-- **DS knowledge first, always**: components and tokens come from the DS
-  agent-views before any UI code. Not in the agent-views → it does not exist.
-- Tokens over literals, official layout formulas, PLUS components before
-  generic primitives — the constitution's forbidden patterns apply in full.
-- **Plan before large edits**: confirm the implementation plan and the list of
-  touched files with the designer before any large or risky edit — scaffold
-  layout, component choices, data shape. Small iterations don't need the gate.
-
-## 5. Hard gates — at any fidelity
+## 4. Hard gates — at any fidelity
 
 **Missing context → ask, never invent.** If the grounded brief lacks what the
 artifact needs — screen states (empty/error/loading), an ambiguous interaction,
@@ -153,36 +104,23 @@ nearest existing composition as the interim, (3) file a uno-maintain intake for
 the missing component. Zero hand-rolled lookalikes — a gap is a finding, not a
 license to invent.
 
-## 6. Exit — the validation loop, manifest, hand off
+## 5. Exit — validation, manifest, hand off
 
-Before the artifact leaves the skill:
+Before any artifact leaves the skill:
 
-1. **Validation loop — hi-fi and coded artifacts only.** The loop's objective
-   is twofold: every machine check the runtime provides passes (each face names
-   its own set), **and the artifact honors the confirmed brief** — serves the
-   goal, sits at the agreed fidelity, contains nothing from the won't-include
-   list. An artifact that passes all scripts but violates the brief has not
-   converged. If anything fails, fix the reported findings and run the **full
-   set** again — a fix can break a check that passed last time. Stop when:
-   - **all checks pass** → continue to step 2;
-   - **three attempts are spent**, or **an attempt fixes nothing** (the same
-     failures twice in a row) → stop looping, carry the remaining failures
-     into the manifest, and continue anyway. The cap exists because a loop
-     that isn't converging burns budget without adding quality — a human
-     judges it next.
-   A runtime with a goal-loop primitive may drive this with it (goal = all
-   checks pass AND the brief is honored; cap = 3 attempts); the loop as
-   written here is the contract for every other runtime. **Headless codegen faces** (the figma-implement
-   workflows) are single-pass by construction — no agent survives to iterate —
-   so their check set runs as a deterministic workflow post-step whose results
-   land in the draft PR under "Machine checks"; the PR review is their fix
-   loop, and a ❌ there blocks review sign-off, not PR creation.
+1. **Validation.** Coded artifacts run the validation loop their deliverable
+   reference defines (objective: every available machine check passes AND the
+   brief card is honored; capped attempts). Headless codegen faces run the
+   check set as a deterministic post-step whose results land in the draft PR
+   under "Machine checks" — the PR review is their fix loop, and a ❌ there
+   blocks review sign-off, not PR creation. Spec deliverables carry their
+   validation inside the spec (§3).
 2. **DS-lens validation pass** — a conformance check at the artifact's own
    fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
-   Major findings loop back to the fidelity decision (§2).
+   Major findings loop back to the route decision (§2).
 3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
-   any unresolved check failures from step 1. Review's mandatory input; every
-   path exit produces it.
+   any unresolved check failures. Review's mandatory input; **every path exit
+   produces it**.
 4. Hand to **uno-review** for the stage-lens review. Passing review and being
    ready to share are separate gates — iteration by choice re-enters at §2.
 

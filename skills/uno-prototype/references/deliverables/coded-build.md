@@ -4,7 +4,7 @@
 
 **Execution mode: UNO builds directly** in `prototypes/`, against
 uno-storybook. Direction is settled; the work is execution on the system
-(method §4) — DS compliance by construction, not by review catching it later.
+(method §2) — DS compliance by construction, not by review catching it later.
 
 ## Plan first (Step 3)
 
@@ -12,7 +12,7 @@ Generate the prototype plan — **open by restating the confirmed brief card**
 (goal · artifact · fidelity dials · won't include), then: pages or frames ·
 user flows · interactions · component requirements · variants (if useful) ·
 prototype outputs. **Confirm the plan + touched files with the designer before
-any large or risky edit** (method §4). Small iterations don't need the gate.
+any large or risky edit**. Small iterations don't need the gate.
 
 ## Build (Step 4)
 
@@ -24,13 +24,15 @@ a. **Ask for a Figma file first — one AskQuestion, before any build:** *"Do yo
      first per `design-system/figma/registry-load-gate.md` (MANDATORY);
      variables translate to tokens via `design-system/figma/token-registry.json`.
    - **No** → build from the confirmed plan on the design system directly.
-b. Scaffold from `prototypes/starter/` per `design-system/docs/setup.md`
-   (vite config: `examples/vite-config-example.js` — copy, set a free port).
+b. Scaffold: `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`
+   — copies `prototypes/starter/`, patches the name, picks the next free port
+   (details: `design-system/docs/setup.md`; config shape:
+   `examples/vite-config-example.js`).
 c. **Load the DS agent-views before any component or token use** (AGENTS.md
    § Progressive loading: `design-system/agent-views/components/{Name}/{Name}.md`
    if it exists, else `components/index.md` + `tokens/tokens.md`); verify props
    against source + stories.
-d. **Gate — DS gap (method §5):** needed component not in
+d. **Gate — DS gap (method §4):** needed component not in
    `design-system/agent-views/components/index.md` → name the gap, propose the
    nearest existing composition, file a uno-maintain intake. Never hand-roll a
    lookalike.
@@ -42,7 +44,7 @@ official layout formulas · PLUS components before generic primitives · no deep
 imports from `design-system/src/` · FA Free icons only. Build only what the
 plan names — never add screens or interactions just because the PRD lists more.
 
-## Validate & exit (the loop — method §6)
+## Validate & exit (the loop — method §5)
 
 Iterate until clean, **max 3 attempts** (stop early if an attempt fixes
 nothing — same failures twice in a row → carry remaining failures into the
