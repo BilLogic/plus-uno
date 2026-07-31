@@ -49,6 +49,17 @@
   to = "/prototypes/post-session-reflection/index.html"
   status = 200
 
+# Branch experiment: Student Progress prototype (proto/student-progress)
+[[redirects]]
+  from = "/prototypes/student-progress"
+  to = "/prototypes/student-progress/"
+  status = 302
+
+[[redirects]]
+  from = "/prototypes/student-progress/*"
+  to = "/prototypes/student-progress/index.html"
+  status = 200
+
 # SPA catch-all for live-app routes (must come AFTER Storybook + demo redirects).
 [[redirects]]
   from = "/*"
