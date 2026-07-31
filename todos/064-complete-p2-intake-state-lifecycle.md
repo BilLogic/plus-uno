@@ -1,5 +1,5 @@
 ---
-status: ready
+status: complete
 priority: p2
 issue_id: 064
 tags: [code-review, hooks, fsm, architecture]
@@ -20,3 +20,9 @@ Four interlocking defects (architecture review, file:line verified):
 
 ## Work Log (2026-07-30, partial fix)
 Done: SESSION_TTL_MS=24h in loadSession (stale sessions cleared, not resumed); SessionEnd hook added to .claude/settings.json; SKILL.md tells agents to ignore a stale/mismatched active-intake-question.json and take the manual path. Remaining for Cynthia: conversationId-keyed question file (the singleton clobber), answer dedup for the typed-vs-tapped double-advance.
+
+## Work Log (2026-07-31 — closed)
+Both remaining items fixed and probed, per Bill's "we definitely want them working for all agents":
+- clearIntakeQuestion(conversationId) reads the payload's owner and refuses to delete another conversation's live question. Fixes the two-tabs / Cursor+Claude-Code clobber.
+- Answer dedup in handleActiveSession, matched on text + 5s recency (NOT step id — by the time the duplicate lands the step has advanced, which is why the first attempt failed the probe). Verified: duplicate ignored, new answer still advances.
+Status → complete.

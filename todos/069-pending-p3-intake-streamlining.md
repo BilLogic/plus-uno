@@ -17,3 +17,8 @@ Simplicity review verdict: keep the FSM core (it fixed observed failures; enforc
 5. Wire `check:component-registry` + `check:token-registry` into the monthly integrity sweep (~5 yml lines) — currently guards only by prose.
 6. Kill-switch conflict: manual path overrides `uno.prdGate: false` — SKILL.md needs "check .cursor/settings.json prdGate before manual intake".
 7. PLAUSIBLE: engine's paste-PRD fast path (`engine.mjs:287-299`) skips two steps with no confirm tap, contradicting SKILL.md rule 4's one-tap-confirm promise — align doc or code.
+
+## Work Log (2026-07-31 — item 1 done, adapter decision made)
+- Prose duplication cut: Intake mode owns the sequence + presentation rules; Step 2 keeps only its unique content; Constraints points instead of restating. SKILL.md -39/+16.
+- Adapter matrix (item 3): Bill's ruling — Windsurf dropped, Antigravity still wanted, Codex kept. Not a freeze; todo 037 stays open for Antigravity.
+- Item 6 (prdGate kill switch) done. Items 2 (dead FSM code), 4 (test-fsm in CI), 5 (registry checks — DONE, wired into the monthly sweep) tracked here.
