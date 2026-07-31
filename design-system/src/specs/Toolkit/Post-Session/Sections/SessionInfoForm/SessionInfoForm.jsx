@@ -143,12 +143,14 @@ const SessionInfoForm = ({
                 />
             </div>
 
+            {/* Figma Session Info Questions: stacked column (Date → Session), not a side-by-side row */}
             <div
                 style={{
                     display: 'flex',
-                    flexWrap: 'wrap',
+                    flexDirection: 'column',
                     alignItems: 'flex-start',
                     gap: 'var(--size-section-gap-md)',
+                    width: '100%',
                 }}
             >
                 <SessionDate
