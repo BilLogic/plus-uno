@@ -3,7 +3,7 @@
 # Deliverable — interactive / functional prototype (external tool)
 
 **Execution mode: spec-handoff.** UNO writes an interactive/functional-shaped
-prompt-spec ; the designer runs it. UNO does not
+prompt-spec (normative shape: method §2); the designer runs it. UNO does not
 run the generation. (A functional prototype built *on the design system in
 this repo* is `coded-build.md`, not this.)
 

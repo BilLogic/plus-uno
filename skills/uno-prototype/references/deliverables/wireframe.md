@@ -33,7 +33,8 @@ Building wireframes *from DS components* triggers the registry gate:
 ## Route C — external tool spec (spec-handoff)
 
 **Target tools:** Stitch (PRD → wireframe generation) · Figma Make (mid visual
-polish). Write an interactive/functional-shaped prompt-spec — everything a diagram spec names, plus the asset spec — real copy,
+polish). Write an interactive/functional-shaped prompt-spec (normative shape:
+method §2) — everything a diagram spec names, plus the asset spec — real copy,
 sample data, screen states **including empty/error**, and what is out of scope
 so the tool doesn't invent it. End with the embedded self-check block (brief
 card + dial settings as pass/fail checks). Golden example:

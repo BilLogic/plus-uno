@@ -3,7 +3,7 @@
 # Deliverable — flow map (user flow · journey map · data-flow)
 
 **Execution mode: spec-handoff.** UNO writes a diagram-shaped prompt-spec
-; the designer runs it in the external tool. UNO
+(normative shape: method §2); the designer runs it in the external tool. UNO
 does not run the generation.
 
 **Target tools:** FigJam (diagram generation) · Stitch (PRD → flow visuals).
