@@ -2,4 +2,4 @@
 // round. Surfaced at GET /health and in the per-request telemetry line so an
 // eval run (or anyone) can verify WHICH code is actually live — round 2 of the
 // MVP eval accidentally tested a stale deployment because nothing exposed this.
-export const BUILD = "r29-2026-07-30";
+export const BUILD = "r30-2026-07-31";
