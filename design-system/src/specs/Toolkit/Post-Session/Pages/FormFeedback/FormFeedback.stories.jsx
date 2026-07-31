@@ -22,14 +22,14 @@ function renderShell(formProps, showSaveExit = false) {
             <ReflectionPageShell
                 activeTab="form-feedback"
                 completedSections={completedThroughSelf}
-                showSaveExit={showSaveExit}
+                initialExitModal={showSaveExit ? 'saved' : null}
                 id="form-feedback-page-story"
             >
-                {({ openSaveExit }) => (
+                {({ openDiscard, openSaved }) => (
                     <FormFeedbackForm
                         {...formProps}
-                        onCancel={openSaveExit}
-                        onSaveAndExit={openSaveExit}
+                        onCancel={openDiscard}
+                        onSaveAndExit={openSaved}
                         onPrevious={() => {}}
                         onSubmit={() => {}}
                     />

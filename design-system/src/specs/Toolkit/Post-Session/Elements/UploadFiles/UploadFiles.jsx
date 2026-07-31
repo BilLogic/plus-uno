@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button';
 import Switch from '@/components/forms-and-inputs/Switch';
@@ -21,7 +21,13 @@ const UploadFiles = ({
     onNoRecordingChange,
     noRecordingReason = '',
     onNoRecordingReasonChange,
+    noRecordingOtherDetail = '',
+    onNoRecordingOtherDetailChange,
+    id: idProp,
 }) => {
+    const reactId = useId();
+    const switchId = idProp ? `${idProp}-no-recording` : `no-recording-switch-${reactId}`;
+    const reasonId = idProp ? `${idProp}-reason` : `no-recording-reason-${reactId}`;
     const effectiveState = noRecording ? 'no-recording' : (files.length ? 'filled' : state);
     const showFiles = effectiveState === 'filled' && files.length > 0;
     const showReason = noRecording || effectiveState === 'no-recording';
@@ -31,9 +37,9 @@ const UploadFiles = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '4px',
+                gap: 'var(--size-element-gap-xs)',
                 width: '100%',
-                maxWidth: '480px',
+                maxWidth: 'var(--col-9)',
             }}
         >
             <label className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
@@ -77,12 +83,8 @@ const UploadFiles = ({
 
             {!showFiles && (
                 <Switch
-                    id="no-recording-switch"
-                    label={(
-                        <span style={{ opacity: showReason ? 1 : 0.38 }}>
-                            I don’t have a session recording
-                        </span>
-                    )}
+                    id={switchId}
+                    label="I don’t have a session recording"
                     checked={showReason}
                     onChange={(event) => onNoRecordingChange?.(event.target.checked)}
                 />
@@ -91,8 +93,11 @@ const UploadFiles = ({
             {showReason && (
                 <div style={{ width: '100%', paddingTop: 'var(--size-element-pad-y-lg, 8px)' }}>
                     <NoRecordingReason
+                        id={reasonId}
                         value={noRecordingReason}
                         onChange={onNoRecordingReasonChange}
+                        otherDetail={noRecordingOtherDetail}
+                        onOtherDetailChange={onNoRecordingOtherDetailChange}
                     />
                 </div>
             )}
@@ -110,6 +115,9 @@ UploadFiles.propTypes = {
     onNoRecordingChange: PropTypes.func,
     noRecordingReason: PropTypes.string,
     onNoRecordingReasonChange: PropTypes.func,
+    noRecordingOtherDetail: PropTypes.string,
+    onNoRecordingOtherDetailChange: PropTypes.func,
+    id: PropTypes.string,
 };
 
 export default UploadFiles;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import AiPromptedQuestionBox from '@/specs/Toolkit/Post-Session/Sections/AiPromptedQuestionBox/AiPromptedQuestionBox';
 import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion/FreeResponseQuestion';
@@ -11,6 +11,7 @@ import {
     SELF_IMPROVE_OPTIONS,
     multiSelectComplete,
     ratingGatedRequiredness,
+    isReflectionDraftDirty,
 } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 /**
@@ -51,7 +52,7 @@ const SelfReflectionForm = ({
 
     useEffect(() => {
         if (!simulateAi || aiStateProp) return undefined;
-        if (!gatedComplete || aiState === 'ready' || aiState === 'empty') return undefined;
+        if (!gatedComplete || aiState === 'ready' || aiState === 'empty' || aiState === 'failed') return undefined;
 
         setAiState('generating');
         const timer = setTimeout(() => {
@@ -88,6 +89,21 @@ const SelfReflectionForm = ({
         aiHelper,
         aiAnswer,
     });
+
+    const cancelBaseline = useMemo(() => ({
+        rating: initialData.rating || 0,
+        effective: initialData.effective || [],
+        improve: initialData.improve || [],
+        otherEffective: initialData.otherEffective || '',
+        otherImprove: initialData.otherImprove || '',
+        support: initialData.support || '',
+        escalateSupport: initialData.escalateSupport || false,
+        aiState: initialData.aiState || 'idle',
+        aiPrompt: initialData.aiPrompt || '',
+        aiHelper: initialData.aiHelper || '',
+        aiAnswer: initialData.aiAnswer || '',
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- mount baseline for dirty Cancel
+    }), []);
 
     return (
         <div
@@ -169,7 +185,10 @@ const SelfReflectionForm = ({
                 canSave={rating >= 1}
                 canNext={gatedComplete}
                 onPrevious={onPrevious}
-                onCancel={onCancel}
+                onCancel={() => {
+                    const data = snapshot();
+                    onCancel?.(data, isReflectionDraftDirty(data, cancelBaseline));
+                }}
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onNext?.(snapshot())}
             />
@@ -179,7 +198,7 @@ const SelfReflectionForm = ({
 
 SelfReflectionForm.propTypes = {
     initialData: PropTypes.object,
-    aiState: PropTypes.oneOf(['idle', 'generating', 'ready', 'empty']),
+    aiState: PropTypes.oneOf(['idle', 'generating', 'ready', 'empty', 'failed']),
     simulateAi: PropTypes.bool,
     onCancel: PropTypes.func,
     onSaveAndExit: PropTypes.func,

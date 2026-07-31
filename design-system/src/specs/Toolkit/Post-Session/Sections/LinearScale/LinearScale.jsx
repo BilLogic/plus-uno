@@ -3,17 +3,12 @@ import PropTypes from 'prop-types';
 import { Scale } from '@/components/forms-and-inputs';
 import './LinearScale.scss';
 
-const SCALE_OPTIONS = [
-    { value: 1, label: '1' },
-    { value: 2, label: '2' },
-    { value: 3, label: '3' },
-    { value: 4, label: '4' },
-    { value: 5, label: '5' },
-];
+const SCALE_VALUES = [1, 2, 3, 4, 5];
 
 /**
  * Five-point linear scale (Figma Sections · Linear Scale `10819:11602`).
- * Thin Post-Session organism over Foundations Scale — shell/token overrides in SCSS.
+ * Post-Session shell + Foundations `Scale.Button` radios — not the Foundations Scale organism
+ * (that shell uses different padding, gap, and non-wrapping end labels).
  *
  * @param {object} props
  * @param {number} [props.value=0]
@@ -29,17 +24,41 @@ const LinearScale = ({
     lowLabel = 'I struggled to find my footing.',
     highLabel = 'I nailed it!',
 }) => (
-    <Scale
-        id={name}
-        name={name}
+    <div
         className="post-session-linear-scale"
-        lowestLabel={lowLabel}
-        highestLabel={highLabel}
-        options={SCALE_OPTIONS}
-        value={value > 0 ? value : null}
-        onChange={(next) => onChange?.(Number(next))}
+        role="radiogroup"
         aria-label={`${lowLabel} to ${highLabel}`}
-    />
+    >
+        <div className="post-session-linear-scale__row">
+            <div className="post-session-linear-scale__label body2-txt">
+                {lowLabel}
+            </div>
+            <div className="post-session-linear-scale__options">
+                {SCALE_VALUES.map((optionValue) => {
+                    const optionId = `${name}-option-${optionValue}`;
+                    const labelId = `${optionId}-label`;
+                    return (
+                        <div key={optionValue} className="post-session-linear-scale__option">
+                            <div id={labelId} className="post-session-linear-scale__option-label body2-txt">
+                                {optionValue}
+                            </div>
+                            <Scale.Button
+                                id={optionId}
+                                name={name}
+                                value={optionValue}
+                                checked={value === optionValue}
+                                onChange={() => onChange?.(optionValue)}
+                                aria-labelledby={labelId}
+                            />
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="post-session-linear-scale__label body2-txt">
+                {highLabel}
+            </div>
+        </div>
+    </div>
 );
 
 LinearScale.propTypes = {

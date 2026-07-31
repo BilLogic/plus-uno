@@ -1,9 +1,9 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as SideNavBarReflectionStories from './SideNavBarReflection.stories.jsx';
+import * as SideNavBarStories from './SideNavBar.stories.jsx';
 import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={SideNavBarReflectionStories} name="Toolkit Docs — Side Nav Bar" />
+<Meta of={SideNavBarStories} name="Toolkit Docs — Side Nav Bar" />
 
 <Title />
 
@@ -23,7 +23,7 @@ While a student is active, **Student Reflection** stays selected; student name r
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Primary canvas</>}>
-    <Canvas of={SideNavBarReflectionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={SideNavBarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>

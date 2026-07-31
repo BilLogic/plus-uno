@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import AiPromptedQuestionBox from '@/specs/Toolkit/Post-Session/Sections/AiPromptedQuestionBox/AiPromptedQuestionBox';
 import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion/FreeResponseQuestion';
@@ -12,6 +12,7 @@ import {
     GOAL_PROGRESS_OPTIONS,
     STUDENT_FOLLOWUP_OPTIONS,
     escalationNeedsDescription,
+    isReflectionDraftDirty,
     multiSelectComplete,
     toggleExclusiveNo,
 } from '@/specs/Toolkit/Post-Session/reflectionCopy';
@@ -21,7 +22,7 @@ import {
  *
  * @param {object} props
  */
-const StudentReflectionFormV2 = ({
+const StudentReflectionForm = ({
     studentName = 'Student',
     initialData = {},
     aiState: aiStateProp,
@@ -39,10 +40,29 @@ const StudentReflectionFormV2 = ({
     const [otherEngagement, setOtherEngagement] = useState(initialData.otherEngagement || '');
     const [followUp, setFollowUp] = useState(initialData.followUp?.length ? initialData.followUp : ['no']);
     const [followUpDescription, setFollowUpDescription] = useState(initialData.followUpDescription || '');
+    const [escalate, setEscalate] = useState(Boolean(initialData.escalate));
     const [aiState, setAiState] = useState(aiStateProp || initialData.aiState || 'idle');
     const [aiPrompt, setAiPrompt] = useState(initialData.aiPrompt || '');
     const [aiHelper, setAiHelper] = useState(initialData.aiHelper || '');
     const [aiAnswer, setAiAnswer] = useState(initialData.aiAnswer || '');
+
+    const cancelBaseline = useMemo(() => ({
+        goalProgress: initialData.goalProgress || [],
+        effort: initialData.effort || [],
+        engagement: initialData.engagement || [],
+        otherGoal: initialData.otherGoal || '',
+        otherEffort: initialData.otherEffort || '',
+        otherEngagement: initialData.otherEngagement || '',
+        followUp: initialData.followUp?.length ? initialData.followUp : ['no'],
+        followUpDescription: initialData.followUpDescription || '',
+        escalate: Boolean(initialData.escalate),
+        aiState: initialData.aiState || 'idle',
+        aiPrompt: initialData.aiPrompt || '',
+        aiHelper: initialData.aiHelper || '',
+        aiAnswer: initialData.aiAnswer || '',
+        notes: initialData.notes,
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- mount baseline for dirty Cancel
+    }), []);
 
     const chipsComplete = multiSelectComplete(goalProgress, otherGoal)
         && multiSelectComplete(effort, otherEffort)
@@ -54,11 +74,11 @@ const StudentReflectionFormV2 = ({
 
     useEffect(() => {
         if (!simulateAi || aiStateProp) return undefined;
-        if (!chipsComplete || aiState === 'ready' || aiState === 'empty') return undefined;
+        if (!chipsComplete || aiState === 'ready' || aiState === 'empty' || aiState === 'failed') return undefined;
 
         setAiState('generating');
         const timer = setTimeout(() => {
-            // Prototype: occasionally return Empty (null question) for contract demo
+            // Prototype: Empty = null question success (distinct from failure)
             if (initialData.forceAiEmpty) {
                 setAiState('empty');
                 return;
@@ -88,6 +108,7 @@ const StudentReflectionFormV2 = ({
         otherEngagement,
         followUp,
         followUpDescription,
+        escalate,
         aiState,
         aiPrompt,
         aiHelper,
@@ -171,6 +192,7 @@ const StudentReflectionFormV2 = ({
                     question="Does anything about this student need supervisor follow-up?"
                     options={STUDENT_FOLLOWUP_OPTIONS}
                     selectedIds={followUp}
+                    otherId=""
                     onToggle={(id) => {
                         setFollowUp((prev) => {
                             const next = toggleExclusiveNo(prev, id);
@@ -186,6 +208,9 @@ const StudentReflectionFormV2 = ({
                         required
                         value={followUpDescription}
                         onChange={(event) => setFollowUpDescription(event.target.value)}
+                        showEscalate
+                        escalate={escalate}
+                        onEscalateChange={setEscalate}
                     />
                 )}
             </div>
@@ -193,7 +218,10 @@ const StudentReflectionFormV2 = ({
             <NavigationButtons
                 canSave={canSave}
                 canNext={canNext}
-                onCancel={onCancel}
+                onCancel={() => {
+                    const data = snapshot();
+                    onCancel?.(data, isReflectionDraftDirty(data, cancelBaseline));
+                }}
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onNext?.(snapshot())}
             />
@@ -201,10 +229,10 @@ const StudentReflectionFormV2 = ({
     );
 };
 
-StudentReflectionFormV2.propTypes = {
+StudentReflectionForm.propTypes = {
     studentName: PropTypes.string,
     initialData: PropTypes.object,
-    aiState: PropTypes.oneOf(['idle', 'generating', 'ready', 'empty']),
+    aiState: PropTypes.oneOf(['idle', 'generating', 'ready', 'empty', 'failed']),
     simulateAi: PropTypes.bool,
     onCancel: PropTypes.func,
     onSaveAndExit: PropTypes.func,
@@ -212,4 +240,4 @@ StudentReflectionFormV2.propTypes = {
     lastUpdated: PropTypes.string,
 };
 
-export default StudentReflectionFormV2;
+export default StudentReflectionForm;

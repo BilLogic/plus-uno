@@ -71,7 +71,7 @@ const SessionSelection = ({
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-sm)',
                 width: '100%',
-                maxWidth: '331px',
+                maxWidth: 'var(--col-6)',
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)', width: '100%' }}>
@@ -94,11 +94,7 @@ const SessionSelection = ({
             {showDidNotHappen && (
                 <Switch
                     id={`${id}-did-not-happen`}
-                    label={(
-                        <span style={{ opacity: didNotHappen ? 1 : 0.38 }}>
-                            Session did not happen
-                        </span>
-                    )}
+                    label="Session did not happen"
                     checked={didNotHappen}
                     onChange={(event) => onDidNotHappenChange?.(event.target.checked)}
                 />

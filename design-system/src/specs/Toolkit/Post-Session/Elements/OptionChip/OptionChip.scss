@@ -1,5 +1,12 @@
-/* Pill radius for post-session option chips composing DS Button. */
-.plus-btn.post-session-option-chip {
-    border-radius: var(--size-card-radius-full, 999px);
-    min-width: 36px;
+/**
+ * Pill radius for post-session option chips composing DS Button.
+ * Must beat `.plus-btn.plus-btn--{size}.btn` size radius rules (same 0,3,0 otherwise).
+ */
+.plus-btn.plus-btn--small.post-session-option-chip.btn,
+.plus-btn.plus-btn--medium.post-session-option-chip.btn,
+.plus-btn.plus-btn--large.post-session-option-chip.btn {
+    border-radius: var(--size-card-radius-full);
+    /* Figma Option Chip / _Button min-w 36 */
+    --post-session-option-chip-min: 36px;
+    min-width: var(--post-session-option-chip-min);
 }

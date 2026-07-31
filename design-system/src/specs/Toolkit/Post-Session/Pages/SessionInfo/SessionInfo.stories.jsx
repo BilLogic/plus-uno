@@ -22,11 +22,11 @@ function renderShell(formProps) {
                 completedSections={{}}
                 id="session-info-page-story"
             >
-                {({ openSaveExit }) => (
+                {({ openDiscard, openSaved }) => (
                     <SessionInfo
                         {...formProps}
-                        onCancel={openSaveExit}
-                        onSaveAndExit={openSaveExit}
+                        onCancel={openDiscard}
+                        onSaveAndExit={openSaved}
                     />
                 )}
             </ReflectionPageShell>

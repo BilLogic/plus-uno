@@ -9,3 +9,5 @@ export { default as LastUpdated } from './LastUpdated/LastUpdated';
 export { default as NavigationButtons } from './NavigationButtons/NavigationButtons';
 export { default as ReflectionFormActions } from './ReflectionFormActions/ReflectionFormActions';
 export { default as ReflectionStatusBadge } from './ReflectionStatusBadge/ReflectionStatusBadge';
+export { default as SessionRating } from './SessionRating/SessionRating';
+export { default as FormRating } from './FormRating/FormRating';

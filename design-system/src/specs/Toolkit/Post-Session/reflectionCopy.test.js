@@ -1,5 +1,6 @@
 import {
     escalationNeedsDescription,
+    isReflectionDraftDirty,
     multiSelectComplete,
     ratingGatedRequiredness,
     toggleExclusiveNo,
@@ -33,5 +34,18 @@ describe('reflectionCopy helpers', () => {
         expect(multiSelectComplete(['other'], '')).toBe(false);
         expect(multiSelectComplete(['other'], 'details')).toBe(true);
         expect(multiSelectComplete(['ahead'], '')).toBe(true);
+    });
+
+    test('isReflectionDraftDirty compares JSON snapshots', () => {
+        expect(isReflectionDraftDirty({ a: 1 }, { a: 1 })).toBe(false);
+        expect(isReflectionDraftDirty({ a: 1 }, { a: 2 })).toBe(true);
+        expect(isReflectionDraftDirty(null, null)).toBe(false);
+    });
+
+    test('isReflectionDraftDirty ignores AI timer fields', () => {
+        expect(isReflectionDraftDirty(
+            { a: 1, aiState: 'ready', aiPrompt: 'x' },
+            { a: 1, aiState: 'idle', aiPrompt: '' },
+        )).toBe(false);
     });
 });

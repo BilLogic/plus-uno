@@ -25,10 +25,17 @@ const COPY = {
 };
 
 /**
- * Confirmation pop-up (Figma Modals · Confirmation Pop-up).
- * Types: exit | exit without saving | reflection submitted.
+ * Confirmation pop-up (Figma Modals · Confirmation Pop-up `6327:241454`).
+ * Types: exit (Saved) · exit without saving · reflection submitted.
+ * Shell: 340px · surface-container-high · modal radius-md (6px) · small tonal/filled buttons.
  *
  * @param {object} props
+ * @param {boolean} props.show
+ * @param {'exit-without-saving'|'exit'|'reflection-submitted'} [props.type]
+ * @param {() => void} props.onClose
+ * @param {() => void} [props.onPrimary]
+ * @param {() => void} [props.onSecondary]
+ * @param {'modal'|'inline'} [props.renderAs]
  */
 const ConfirmationPopUp = ({
     show,
@@ -44,11 +51,11 @@ const ConfirmationPopUp = ({
             show={show}
             onClose={onClose}
             title={copy.title}
-            body={<p className="body1-txt m-0" style={{ color: 'var(--color-on-surface)' }}>{copy.body}</p>}
-            width={340}
-            paddingSize="sm"
-            gapSize="sm"
-            radiusSize="sm"
+            body={(
+                <p className="body1-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                    {copy.body}
+                </p>
+            )}
             renderAs={renderAs}
             className="plus-modal--confirmation-popup"
             primaryButton={{

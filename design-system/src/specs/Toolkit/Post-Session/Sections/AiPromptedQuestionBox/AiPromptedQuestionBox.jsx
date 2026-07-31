@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 import Spinner from '@/components/status-and-loading/Spinner';
@@ -12,10 +12,11 @@ import SparkleIcon from './SparkleIcon';
  * @param {object} props
  * @param {'default'|'loading'|'empty'} [props.state='default']
  * @param {string} [props.question]
- * @param {string} [props.helper] - E.g. helper from model `placeholder`
+ * @param {string} [props.helper] - E.g. caption (Body/B3) from model `placeholder`
  * @param {string} [props.value]
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
- * @param {boolean} [props.showPrivacyWarning=true]
+ * @param {boolean} [props.showPrivacyWarning=false]
+ * @param {string} [props.id]
  * @param {string} [props.className]
  */
 const AiPromptedQuestionBox = ({
@@ -24,28 +25,36 @@ const AiPromptedQuestionBox = ({
     helper = 'E.g. She solved the last two problems on her own and asked for a harder one.',
     value = '',
     onChange,
-    showPrivacyWarning = true,
+    showPrivacyWarning = false,
+    id: idProp,
     className = '',
 }) => {
+    const reactId = useId();
+    const fieldId = idProp || `ai-prompted-answer-${reactId}`;
     const shellStyle = {
         display: 'flex',
         gap: 'var(--size-section-gap-md)',
         alignItems: 'flex-start',
         padding: 'var(--size-section-pad-y-sm) var(--size-section-pad-x-sm)',
         borderRadius: 'var(--size-section-radius-md, 12px)',
-        backgroundColor: 'var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.16))',
+        backgroundColor: 'var(--color-mastering-content-state-16)',
         width: '100%',
-        maxWidth: '502px',
+        maxWidth: 'var(--col-9)',
     };
 
     if (state === 'loading') {
+        const skeletonBar = {
+            height: 'var(--font-size-body3)',
+            borderRadius: 'var(--size-element-radius-md)',
+            backgroundColor: 'var(--color-mastering-content-state-28, var(--color-mastering-content-state-16))',
+        };
         return (
             <div className={className} role="status" aria-live="polite" style={shellStyle}>
                 <Spinner size="sm" variant="border" />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', flex: 1, minWidth: 0 }}>
-                    <div style={{ height: '12px', width: '84%', borderRadius: '6px', backgroundColor: 'var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.28))' }} />
-                    <div style={{ height: '12px', width: '60%', borderRadius: '6px', backgroundColor: 'var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.28))' }} />
-                    <div style={{ height: '12px', width: '36%', borderRadius: '6px', backgroundColor: 'var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.28))' }} />
+                    <div style={{ ...skeletonBar, width: '84%' }} />
+                    <div style={{ ...skeletonBar, width: '60%' }} />
+                    <div style={{ ...skeletonBar, width: '36%' }} />
                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                         Preparing your question…
                     </span>
@@ -76,7 +85,7 @@ const AiPromptedQuestionBox = ({
                     ) : null}
                 </div>
                 <Textarea
-                    id="ai-prompted-answer"
+                    id={fieldId}
                     value={value}
                     onChange={onChange}
                     placeholder="Type your answer here…"
@@ -99,6 +108,7 @@ AiPromptedQuestionBox.propTypes = {
     value: PropTypes.string,
     onChange: PropTypes.func,
     showPrivacyWarning: PropTypes.bool,
+    id: PropTypes.string,
     className: PropTypes.string,
 };
 

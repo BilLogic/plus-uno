@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SideNavBar from './SideNavBar/SideNavBar';
+import SideNavBar from './SideNavBar';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -34,7 +34,7 @@ export const Overview = {
                     padding: 'var(--size-section-pad-y-sm)',
                 }}
             >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                         Students confirmed
                     </span>
@@ -47,7 +47,7 @@ export const Overview = {
                     />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                         Pre-student add
                     </span>
@@ -59,7 +59,7 @@ export const Overview = {
                     />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                         In progress
                     </span>

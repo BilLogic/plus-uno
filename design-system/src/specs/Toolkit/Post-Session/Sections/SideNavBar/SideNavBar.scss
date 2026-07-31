@@ -1,0 +1,91 @@
+/**
+ * Post-Session Side Nav Bar (Figma `20:24229`).
+ * Width maps to content-grid --col-4 (~219px at MD).
+ *
+ * Section tabs: py 10 / px 16 (Figma small/space-150 · medium/space-300).
+ * Student rows: pl 32 / pr 16 / py 10 (Figma surface/pad-x · element/pad-x-lg) — no selected pill.
+ */
+
+.post-session-side-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--size-section-gap-sm);
+    padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
+    background-color: var(--color-surface-container);
+    border-radius: var(--size-border-radius-4-5, 16px);
+    width: var(--col-4);
+    max-width: var(--col-4);
+    align-self: flex-start;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.post-session-side-nav__tabs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+}
+
+.post-session-side-nav__student-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    width: 100%;
+}
+
+.post-session-side-nav__submit {
+    width: 100%;
+}
+
+.post-session-side-nav-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+    /* Figma Side Bar Tab: py small/space-150 (10) · px medium/space-300 (16) */
+    padding: var(--size-element-gap-md) var(--size-element-pad-x-lg);
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+/* Figma student Side Bar Tab: pl surface/pad-x (32) · pr element/pad-x-lg (16) · py 10 */
+.post-session-side-nav-tab--student {
+    padding: var(--size-element-gap-md) var(--size-element-pad-x-lg) var(--size-element-gap-md) var(--size-surface-pad-x);
+}
+
+.post-session-side-nav-tab--selected {
+    border-radius: var(--size-element-radius-md, 6px);
+    background-color: var(--color-primary-state-16);
+}
+
+.post-session-side-nav-tab--disabled {
+    cursor: default;
+    opacity: var(--color-disabled-opacity, 0.38);
+}
+
+.post-session-side-nav-tab__label {
+    flex: 1 0 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-on-surface);
+}
+
+.post-session-side-nav-tab--selected .post-session-side-nav-tab__label,
+.post-session-side-nav-tab--active-text .post-session-side-nav-tab__label {
+    color: var(--color-primary-text);
+}
+
+.post-session-side-nav-tab__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-caption, var(--font-size-body3, 12px));
+    color: var(--color-success-text, var(--color-success));
+}

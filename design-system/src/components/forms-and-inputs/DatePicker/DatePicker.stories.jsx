@@ -60,7 +60,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
-        <DatePicker placeholder="Select a date" size="medium" />
+        <DatePicker placeholder="MM/DD/YYYY" size="medium" />
     </div>
 );
 Overview.parameters = {

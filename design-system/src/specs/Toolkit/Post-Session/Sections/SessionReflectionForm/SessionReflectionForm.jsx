@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import Rating from '@/components/forms-and-inputs/Rating';
+import SessionRating from '@/specs/Toolkit/Post-Session/Elements/SessionRating/SessionRating';
 import AiPromptedQuestionBox from '@/specs/Toolkit/Post-Session/Sections/AiPromptedQuestionBox/AiPromptedQuestionBox';
 import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion/FreeResponseQuestion';
 import MultiSelectQuestion from '@/specs/Toolkit/Post-Session/Sections/MultiSelectQuestion/MultiSelectQuestion';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
 import {
-    SESSION_RATING_COMMENTS,
     WHAT_WORKED_OPTIONS,
     WHAT_COULD_IMPROVE_OPTIONS,
     SUPERVISOR_FOLLOWUP_OPTIONS,
@@ -15,6 +14,7 @@ import {
     multiSelectComplete,
     ratingGatedRequiredness,
     toggleExclusiveNo,
+    isReflectionDraftDirty,
 } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 /**
@@ -22,7 +22,7 @@ import {
  *
  * @param {object} props
  */
-const SessionReflectionFormV2 = ({
+const SessionReflectionForm = ({
     initialData = {},
     aiState: aiStateProp,
     simulateAi = true,
@@ -43,6 +43,21 @@ const SessionReflectionFormV2 = ({
     const [aiHelper, setAiHelper] = useState(initialData.aiHelper || '');
     const [aiAnswer, setAiAnswer] = useState(initialData.aiAnswer || '');
 
+    const cancelBaseline = useMemo(() => ({
+        rating: initialData.rating || 0,
+        whatWorked: initialData.whatWorked || [],
+        whatImprove: initialData.whatImprove || [],
+        otherWorked: initialData.otherWorked || '',
+        otherImprove: initialData.otherImprove || '',
+        followUp: initialData.followUp?.length ? initialData.followUp : ['no'],
+        followUpDescription: initialData.followUpDescription || '',
+        aiState: initialData.aiState || 'idle',
+        aiPrompt: initialData.aiPrompt || '',
+        aiHelper: initialData.aiHelper || '',
+        aiAnswer: initialData.aiAnswer || '',
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- mount baseline for dirty Cancel
+    }), []);
+
     const { positiveRequired, improveRequired } = ratingGatedRequiredness(rating);
     const workedOk = !positiveRequired || multiSelectComplete(whatWorked, otherWorked);
     const improveOk = !improveRequired || multiSelectComplete(whatImprove, otherImprove);
@@ -54,7 +69,7 @@ const SessionReflectionFormV2 = ({
 
     useEffect(() => {
         if (!simulateAi || aiStateProp) return undefined;
-        if (!gatedComplete || aiState === 'ready' || aiState === 'empty') return undefined;
+        if (!gatedComplete || aiState === 'ready' || aiState === 'empty' || aiState === 'failed') return undefined;
 
         setAiState('generating');
         const timer = setTimeout(() => {
@@ -124,14 +139,10 @@ const SessionReflectionFormV2 = ({
                         How was the overall session?
                         <span style={{ color: 'var(--color-danger)' }}> *</span>
                     </p>
-                    <Rating
+                    <SessionRating
                         id="session-reflection-rating"
                         value={rating}
                         onChange={setRating}
-                        icon="thumbs-up"
-                        variant="comments"
-                        showCommentsLabel={rating > 0}
-                        commentsLabel={SESSION_RATING_COMMENTS[rating]}
                     />
                 </div>
 
@@ -175,6 +186,7 @@ const SessionReflectionFormV2 = ({
                     question="Does anything from this session need supervisor follow-up?"
                     options={SUPERVISOR_FOLLOWUP_OPTIONS}
                     selectedIds={followUp}
+                    otherId=""
                     onToggle={(id) => {
                         setFollowUp((prev) => {
                             const next = toggleExclusiveNo(prev, id);
@@ -197,7 +209,10 @@ const SessionReflectionFormV2 = ({
             <NavigationButtons
                 canSave={canSave}
                 canNext={canNext}
-                onCancel={onCancel}
+                onCancel={() => {
+                    const data = snapshot();
+                    onCancel?.(data, isReflectionDraftDirty(data, cancelBaseline));
+                }}
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onNext?.(snapshot())}
             />
@@ -205,9 +220,9 @@ const SessionReflectionFormV2 = ({
     );
 };
 
-SessionReflectionFormV2.propTypes = {
+SessionReflectionForm.propTypes = {
     initialData: PropTypes.object,
-    aiState: PropTypes.oneOf(['idle', 'generating', 'ready', 'empty']),
+    aiState: PropTypes.oneOf(['idle', 'generating', 'ready', 'empty', 'failed']),
     simulateAi: PropTypes.bool,
     onCancel: PropTypes.func,
     onSaveAndExit: PropTypes.func,
@@ -215,4 +230,4 @@ SessionReflectionFormV2.propTypes = {
     lastUpdated: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };
 
-export default SessionReflectionFormV2;
+export default SessionReflectionForm;

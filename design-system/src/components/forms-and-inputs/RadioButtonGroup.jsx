@@ -185,8 +185,8 @@ Scale.propTypes = {
             })
         ])
     ).isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.oneOf([null])]),
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.oneOf([null])]),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
     className: PropTypes.string,
