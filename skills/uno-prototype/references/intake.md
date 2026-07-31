@@ -28,10 +28,7 @@ and both forms are equally valid:
   `AskUserQuestion`, Cursor's question UI, anything equivalent): use it for a
   SINGLE question with the options.
 - **Runtime has no such tool** (some Cursor models, Codex, headless, plain
-  chat): post the JSON's **`render`** field verbatim for `choice` steps, or
-  follow its **`renderTemplate`** for reflection steps. Both are numbered lists
-  ending in the answer hint — the hook ships them so every runtime looks the
-  same instead of each model inventing a layout.
+  chat): ask in plain text with the options as a **numbered list**.
 
 The plain-text form is a first-class rendering, **not a degradation** — the
 contract is one question, options shown, recommendation marked, free-form
