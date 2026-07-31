@@ -63,6 +63,11 @@ refuse to proceed because a tool is missing.
 6. Intake ends only when the **brief card is confirmed** at `reflect_confirm`.
    Then load the deliverable doc (§ Handoff below) and proceed to plan →
    generate. There is no separate fidelity-picker step.
+   **Hard stop:** planning, spec-writing or building without having loaded that
+   doc is a defect, not a shortcut — each one carries rules that exist nowhere
+   else (the attempt cap, the machine-check set, the Figma question, the
+   scaffold script, the asset-spec contract). If you cannot name the deliverable
+   doc you loaded, you have not loaded it: stop and load it.
 
 **PRD reuse:** after a PRD is provided once, the hook caches it — a follow-up
 prototype request re-enters at `reflect_learn` (a revision may change the
@@ -94,8 +99,9 @@ The lists below are vocabulary to pick from, not menus to show.
    what do you picture making?"* — no options, no recommendation (anti-anchoring).
    Next turn, acknowledge their words, then a recommended artifact plus the
    alternatives that genuinely compete. Vocabulary: user flow · journey map ·
-   wireframe · static mockup · concept image · storyboard · interactive
-   prototype · functional prototype. Name the tradeoff for each.
+   data-flow map · wireframe · static mockup · concept image · storyboard ·
+   interactive prototype · functional prototype · hi-fi build on the design
+   system. Name the tradeoff for each.
 3. **What fidelity is actually needed?** Render each dimension as a labeled
    low↔high dial line, each placement justified by PRD evidence:
 

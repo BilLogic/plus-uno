@@ -79,7 +79,20 @@ the same contract and exit ritual below.
 A revision re-enters *here*, not at "fix the artifact" — a failed review may
 legitimately change the deliverable or tool, not just content.
 
-## 3. The self-check block — every spec carries the contract
+## 3. The prompt-spec — shape, then the self-check block
+
+**Every prompt-spec names the same skeleton:** the flow's **trigger → steps →
+outcome**, the actors and systems touched, and the constraints from grounding.
+Specs for something interactive add the asset spec the generating tool needs —
+real copy (never lorem), sample data, screen states **including empty and
+error**, and the specific behavior under test. Always name what is out of scope,
+so the tool doesn't invent it. Each deliverable's reference adds its own
+specifics on top of this skeleton.
+
+**Direct production is sanctioned only where UNO holds the medium:** an in-chat
+text sketch, or a write through a gated design-tool writer. Everything else is a
+spec the designer carries to the external tool.
+
 
 Every prompt-spec ends with an embedded self-check: the confirmed brief
 restated as concrete pass/fail checks (serves the goal · right artifact shape ·
@@ -102,7 +115,9 @@ before building. Filling a gap with invented behavior is a defect, not a draft.
 component the system doesn't have: (1) name the gap explicitly, (2) propose the
 nearest existing composition as the interim, (3) file a uno-maintain intake for
 the missing component. Zero hand-rolled lookalikes — a gap is a finding, not a
-license to invent.
+license to invent. Filing is an external-estate write, so it needs the usual
+approval: if no approver is present, record the intake in the artifact manifest
+as pending and say so — never drop the gap silently, and never write unasked.
 
 ## 5. Exit — validation, manifest, hand off
 

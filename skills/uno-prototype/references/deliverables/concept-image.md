@@ -26,6 +26,6 @@ don't assume it.
 
 ## Exit
 
-Method §6: manifest line (fidelity · tool · PRD link) · hand to uno-review.
+Method §5: manifest line (fidelity · tool · PRD link) · hand to uno-review.
 A concept image feeding further work rungs up the ladder (→ storyboard,
 wireframe) rather than exiting.

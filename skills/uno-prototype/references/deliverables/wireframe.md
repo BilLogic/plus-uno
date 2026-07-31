@@ -18,7 +18,7 @@ or the coded build).
 - Box-drawing characters, one screen per block, annotate interactive elements
   (`[button]`, `(radio)`, `▸ link`), name each screen and state.
 - Iterate live; small revisions in-message. Style reference:
-  `examples/ascii-wireframe.md`.
+  `skills/uno-prototype/examples/ascii-wireframe.md`.
 - Still checked against the brief card before it exits anywhere; if it exits,
   it produces the manifest line like every other artifact (method §5).
 
@@ -34,11 +34,11 @@ Building wireframes *from DS components* triggers the registry gate:
 
 **Target tools:** Stitch (PRD → wireframe generation) · Figma Make (mid visual
 polish). Write an interactive/functional-shaped prompt-spec (normative shape:
-method §2) — everything a diagram spec names, plus the asset spec — real copy,
+method §3) — everything a diagram spec names, plus the asset spec — real copy,
 sample data, screen states **including empty/error**, and what is out of scope
 so the tool doesn't invent it. End with the embedded self-check block (brief
 card + dial settings as pass/fail checks). Golden example:
-`examples/wireframe-spec.md`; check with
+`skills/uno-prototype/examples/wireframe-spec.md`; check with
 `bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Offer the
 paste-back re-check.
 

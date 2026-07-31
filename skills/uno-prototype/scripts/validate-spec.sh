@@ -41,7 +41,16 @@ if grep -qiE 'flow map|user flow|journey|data-flow' "$spec"; then
   check "flow skeleton (trigger/steps/outcome)" 'trigger'
 fi
 if grep -qiE 'interactive prototype|functional prototype|screen|mockup|wireframe|table view' "$spec"; then
-  check "screen states (empty/zero-results/error)" 'empty|zero.?result|error state|loading'
+  # Require an explicit states SECTION, not a stray "empty" anywhere in the file —
+  # a flow map's open questions used to satisfy this on a spec with no screens.
+  check "screens/states section" '^#+.*(state|screen)|^\*\*(screen|state)'
+  check "  … covering empty/zero-results" 'empty|zero.?result'
+fi
+
+# Structural honesty: a spec that says nothing is unresolved on an incomplete PRD
+# is usually hiding invention. Warn (never fail) when no gap is surfaced.
+if ! grep -qiE 'open question|unresolved|undecided|not specified|unspecified|ask' "$spec"; then
+  echo "[warn] no open questions or gaps surfaced — confirm the PRD really had none"
 fi
 
 if [[ $fail -eq 1 ]]; then
