@@ -79,7 +79,7 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · Q1 of 4',
     question: 'Step 2 · Q1 — What are you trying to achieve?',
     guidance:
-      'Recommend the most likely goal(s) for THIS PRD (multi-select), each anchored to concrete PRD evidence (quote or name the section that suggests it). Vocabulary to pick from — do not dump it all: validate usability · explore concepts · compare alternatives · evaluate visual direction · communicate product vision · align stakeholders · reduce engineering ambiguity. Lead with the recommended goal(s), one line of why each. Frame this as reflecting *with* the designer on what this prototype is for — not deciding it for them.',
+      'Recommend the most likely goal(s) for THIS PRD (multi-select), each anchored to concrete PRD evidence (quote or name the section that suggests it). Vocabulary to pick from — do not dump it all: validate usability · explore concepts · compare alternatives · evaluate visual direction · communicate product vision · align stakeholders · reduce engineering ambiguity. Lead with the recommended goal(s) and say why each, briefly. Frame this as reflecting *with* the designer on what this prototype is for — not deciding it for them.',
   },
   // Q2, beat 1 — open-ended, no recommendation yet (anti-anchoring).
   reflect_artifact_open: {
@@ -98,7 +98,7 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · Q2 of 4 (suggestion)',
     question: 'Step 2 · Q2 — Here is the artifact I would suggest — does it fit?',
     guidance:
-      'Building on what the designer just described in their own words, acknowledge their framing first, THEN offer ONE recommended artifact + ONE alternative + Other (not the full list), each tied to their description and the PRD. Vocabulary: user flow · journey map · wireframe (incl. quick ASCII sketch in-chat) · static mockup · concept image · storyboard · interactive prototype · functional prototype. One line of tradeoff each; never imply only one correct answer — this is prototyping *with* them.',
+      'Building on what the designer just described in their own words, acknowledge their framing first, THEN offer a recommended artifact plus the alternatives that genuinely compete (not the full list), each tied to their description and the PRD. Vocabulary: user flow · journey map · wireframe (incl. quick ASCII sketch in-chat) · static mockup · concept image · storyboard · interactive prototype · functional prototype. Name the tradeoff for each; never imply only one correct answer — this is prototyping *with* them.',
   },
   reflect_fidelity: {
     stepIndex: 3,
@@ -114,7 +114,7 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · Q4 of 4',
     question: 'Step 2 · Q4 — What should the prototype intentionally NOT include?',
     guidance:
-      'State the "won\'t include" list in prose (screens skipped · interactions left fake · flows that need not exist · details that won\'t move the goal), each item traceable to the PRD or the stated goal. THEN confirm with one confirm option that RESTATES the key exclusions + two alternatives + Other.',
+      'State the "won\'t include" list in prose (screens skipped · interactions left fake · flows that need not exist · details that won\'t move the goal), each item traceable to the PRD or the stated goal. THEN confirm with an option that RESTATES the key exclusions, plus room to adjust or answer freely.',
   },
   // The contract gate — one card, one confirmation, then build.
   reflect_confirm: {

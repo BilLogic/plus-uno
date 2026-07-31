@@ -34,8 +34,8 @@ The plain-text form is a first-class rendering, **not a degradation** — the
 contract is one question, options shown, recommendation marked, free-form
 answer always accepted (a bare number matching an option parses too — phrase
 that affordance however fits the question you just asked, or leave it implicit).
-Never name a specific tool in your reply, and never refuse to proceed because
-a tool is missing.
+Don't narrate tool mechanics mid-intake — just ask the question — and never
+refuse to proceed because a tool is missing.
 
 ## Rules — every step, both modes
 
@@ -43,8 +43,9 @@ a tool is missing.
    truth for what to ask this turn.
 2. **One question per message — no exceptions**, rendered per § How to ask.
    `choice` steps use the options from the JSON. Reflection steps: compose the
-   PRD-specific options yourself (recommended first, labeled "(Recommended)",
-   1–2 alternatives, plus room to answer freely); honor `multiSelect`,
+   PRD-specific options yourself (lead with the recommendation and mark it as
+   such; add the alternatives that genuinely compete; always leave room to
+   answer freely); honor `multiSelect`,
    `openEnded`, `confirm`, `stepIndex`/`stepTotal`. Plus Design System is always
    applied; never ask which design system to use.
 3. **Set expectations, show position.** Open `prd_check` with the one-line flow
@@ -91,10 +92,10 @@ The lists below are vocabulary to pick from, not menus to show.
    reduce engineering ambiguity.
 2. **What artifact fits? — two beats.** First OPEN-ENDED: *"In your own words,
    what do you picture making?"* — no options, no recommendation (anti-anchoring).
-   Next turn, acknowledge their words, then one recommended artifact + one
-   alternative + Other. Vocabulary: user flow · journey map · wireframe ·
-   static mockup · concept image · storyboard · interactive prototype ·
-   functional prototype. One line of tradeoff each.
+   Next turn, acknowledge their words, then a recommended artifact plus the
+   alternatives that genuinely compete. Vocabulary: user flow · journey map ·
+   wireframe · static mockup · concept image · storyboard · interactive
+   prototype · functional prototype. Name the tradeoff for each.
 3. **What fidelity is actually needed?** Render each dimension as a labeled
    low↔high dial line, each placement justified by PRD evidence:
 
@@ -109,8 +110,8 @@ The lists below are vocabulary to pick from, not menus to show.
    settings ("Yes: mid visual, real interactions, 3 screens").
 4. **What should it intentionally NOT include?** State the won't-include list
    in prose (screens skipped · interactions left fake · flows that need not
-   exist), each item traceable to the PRD or goal; confirm with one restating
-   option + two alternatives + Other.
+   exist), each item traceable to the PRD or goal; confirm with an option that
+   restates the key exclusions, plus room to adjust or answer freely.
 
 **Confirm the brief.** Assemble the answers into ONE brief card — Goal ·
 Artifact · **Fidelity (the dial settings, not a label)** · Won't include — and
