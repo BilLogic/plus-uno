@@ -6,7 +6,9 @@ tags: [harness, portability, hooks]
 dependencies: []
 ---
 
-# Wire the uno-prototype intake FSM for Antigravity (Windsurf dropped per Bill, 2026-07-30)
+# Wire the uno-prototype intake FSM for Antigravity
+
+Windsurf dropped per Bill (2026-07-31). Antigravity is still wanted.
 
 ## Problem Statement
 
