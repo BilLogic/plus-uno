@@ -139,8 +139,8 @@ function buildHandoffMessage(context = {}) {
   return [
     'Step 2 (Prototype Reflection) is complete — the brief is confirmed and the uno-prototype hook will no longer intercept.',
     ...contractLines,
-    'Restate this brief at the top of the Step 3 plan, then lay out pages/frames, flows, interactions, and components; confirm the plan and touched files before any large edit.',
-    'Then Step 4 (Generate) — we build WITH the designer against this brief. For a high-fi build, first ask the "do you already have a Figma file?" question, then scaffold from prototypes/starter on the Plus Design System. The validation loop\'s objective is this brief: the artifact serves the goal, matches the fidelity dials, and contains nothing from the won\'t-include list — never expand scope just because the PRD lists more.',
+    'NOW load the ONE deliverable doc the confirmed artifact selects — the map is in skills/uno-prototype/SKILL.md § Deliverables & routing (e.g. a user flow → references/deliverables/flow-map.md; a hi-fi build → references/deliverables/coded-build.md). Step 3 (Plan) and Step 4 (Generate) live in that doc: restate this brief at the top of the plan, confirm the plan and touched files before any large edit, then produce the deliverable.',
+    'The validation loop\'s objective is this brief: the artifact serves the goal, matches the fidelity dials, and contains nothing from the won\'t-include list — never expand scope just because the PRD lists more.',
   ].join(' ');
 }
 

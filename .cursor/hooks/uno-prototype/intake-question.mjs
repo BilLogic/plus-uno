@@ -115,7 +115,7 @@ export function buildAgentIntakeInstruction(state) {
       return [
         'uno-prototype Step 2 (Prototype Reflection) gate is active. Read `.cursor/hooks/briefings/active-intake-question.json` before doing anything else.',
         `This is reflection step ${state.stepIndex} of ${state.stepTotal}, OPEN-ENDED beat: ask the one question from the JSON in plain text or as a single AskQuestion with free-form entry expected — do NOT present a recommendation or an options menu this turn; the designer speaks first, in their own words.`,
-        'Never batch reflection questions; never skip ahead to Step 3/4 or start building.',
+        'Never batch reflection questions; never skip ahead to planning or building.',
         reviseNote,
         'Follow the `guidance` field in that JSON. Do NOT load method.md.',
       ].join(' ');
@@ -123,7 +123,7 @@ export function buildAgentIntakeInstruction(state) {
 
     return [
       'uno-prototype Step 2 (Prototype Reflection) gate is active. Read `.cursor/hooks/briefings/active-intake-question.json` before doing anything else.',
-      `This is reflection step ${state.stepIndex} of ${state.stepTotal}: ask EXACTLY this one question via AskQuestion (questions.length === 1). Never batch the four reflection questions; never skip ahead to Step 3/4 or start building.`,
+      `This is reflection step ${state.stepIndex} of ${state.stepTotal}: ask EXACTLY this one question via AskQuestion (questions.length === 1). Never batch the four reflection questions; never skip ahead to planning or building.`,
       state.stepIndex === 1
         ? 'PRD received — before asking, if you have not already, do Step 1 (Understand): summarize the PRD and recommend nothing yet, then ask this question.'
         : '',
